@@ -1,0 +1,456 @@
+#!/usr/bin/env python
+#coding=utf-8
+
+import os
+import sys
+import subprocess
+import urllib
+import zipfile
+import platform
+import shutil
+#=======================================================================================================================
+#           Project paths
+#=======================================================================================================================
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
+COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'compiler.jar')
+SRC_PATH = os.path.join(PROJECT_PATH, 'src')
+TESTS_PATH =  os.path.join(PROJECT_PATH, 'tests')
+OUT_PATH = os.path.join(PROJECT_PATH, 'out')
+DOCS_OUT_PATH = os.path.join(OUT_PATH, 'docs')
+QUNIT_PATH = os.path.join(CONTRIB_PATH, 'qunit')
+JSDOC_PATH = os.path.join(CONTRIB_PATH, 'jsdoc')
+GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphics', 'src')
+JSDOC_TEMPLATE_PATH = os.path.join(CONTRIB_PATH, 'ac-jsdoc3-customization')
+CLOSURE_LIBRARY_PATH = os.path.join(CONTRIB_PATH, 'closure-library')
+CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
+CLOSURE_LINTER_WRAPPER_PATH = os.path.join(CONTRIB_PATH, 'closure-linter-wrapper')
+CLOSURE_BIN_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'bin')
+DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
+CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
+EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs')
+
+QUNIT_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'qunit-externs.js')
+UTILS_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'utils-externs.js')
+#=======================================================================================================================
+#                            Synchronize contributions.
+#=======================================================================================================================
+
+def __has_closure_compiler():
+    return os.path.exists(COMPILER_PATH)
+
+
+def __has_closure_linter():
+    hasLint = True
+    try:
+        subprocess.Popen(['gjslint'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except StandardError:
+        hasLint = False
+
+    return hasLint
+
+
+def __need_sync_contrib():
+    return not __has_closure_compiler() or not __has_closure_linter()
+
+def __sync_contrib():
+    __checkPathExistence(CONTRIB_PATH)
+
+    subprocess.call(['git', 'submodule', 'init'])
+    subprocess.call(['git', 'submodule', 'update'])
+    subprocess.call(['rm', '-f', '.git/hooks/post-checkout'])
+    subprocess.call(['ln', '-s', '../../update-submodules', '.git/hooks/post-checkout'])
+
+    #Download closure compiler
+    if not __has_closure_compiler():
+        print 'Download closure compiler'
+        __download_and_unzip_from_http(
+            'http://dl.google.com/closure-compiler/compiler-20131014.zip',
+            'compiler'
+        )
+
+    #Install closure linter
+    if not __has_closure_linter():
+        print 'Install closure linter'
+        isWin = platform.system() == 'Windows'
+        commands = [] if isWin else ['sudo']
+        commands.append('easy_install')
+        commands.append('http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz')
+        try:
+            subprocess.call(commands)
+        except StandardError:
+            raise StandardError('Sync contribution failed: you should install easy_install module for python')
+
+    print 'All contributions installed'
+
+
+def __download_and_unzip_from_http(fromUrl, dirName):
+    zObjPath = os.path.join(CONTRIB_PATH, dirName + '.zip')
+
+    # download zip archive from url
+    if not os.path.exists(zObjPath):
+        urllib.urlretrieve(
+            fromUrl,
+            zObjPath
+        )
+
+    # extract zip archive
+    targetPath = os.path.join(CONTRIB_PATH, dirName)
+    __checkPathExistence(targetPath)
+    zObj = zipfile.ZipFile(zObjPath)
+    zObj.extractall(path=targetPath)
+    zObj.close()
+
+    # remove archive file
+    os.remove(zObjPath)
+    print 'Download successful'
+
+
+def sync_required(func):
+    def check():
+        if __need_sync_contrib():
+            raise StandardError('Failed: You should synchronize project contribution. \n See help for more info.')
+        func()
+
+    return check
+
+
+def __checkPathExistence(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+
+#=======================================================================================================================
+#                            Compiler flags generation.
+#=======================================================================================================================
+class OptimizationLevel:
+    NONE = 0
+    SIMPLE = 1
+    ADVANCED = 2
+
+
+def __addOption(flags, flagName, flagValue):
+    flags.append('--compiler_flags=--' + flagName + '=' + flagValue)
+
+
+def __setPrettyPrint(flags):
+    __addOption(flags, 'formatting', 'PRETTY_PRINT')
+
+
+def __setOptimizationLevel(flags, level):
+    #set compiler level
+    if level == OptimizationLevel.NONE:
+        levelValue = 'WHITESPACE_ONLY'
+    elif level == OptimizationLevel.SIMPLE:
+        levelValue = 'SIMPLE_OPTIMIZATIONS'
+    elif level == OptimizationLevel.ADVANCED:
+        levelValue = 'ADVANCED_OPTIMIZATIONS'
+    else: levelValue = ''
+
+    __addOption(flags, 'compilation_level', levelValue)
+
+
+def __getOutputFileArg(outputFile):
+    return ['--output_file=' + outputFile]
+
+
+def __getNameSpaces():
+    return ['--namespace=anychartexport']
+
+
+def __getRoots(addTests=False):
+    result = ['--root=%s' % SRC_PATH, '--root=%s' % CLOSURE_LIBRARY_PATH, '--root=%s' % GRAPHICS_PATH]
+    if addTests:
+        result.append('--root=%s' % TESTS_PATH)
+    return result
+
+
+def __getNotOptimizedCompilerArgs():
+    compilerArgs = []
+    __setOptimizationLevel(compilerArgs, OptimizationLevel.NONE)
+    __setPrettyPrint(compilerArgs)
+    return compilerArgs
+
+
+def __getOptimizedCompilerArgs():
+    compilerArgs = [
+        # Убрано, пока не устранены проблемы с deprecated AffineTransform
+        '--compiler_flags=--warning_level=VERBOSE',
+        '--compiler_flags=--generate_exports',
+        '--compiler_flags=--jscomp_warning=deprecated',
+        '--compiler_flags=--jscomp_warning=checkTypes',
+        '--compiler_flags=--jscomp_warning=nonStandardJsDocs',
+        '--compiler_flags=--jscomp_warning=checkRegExp',
+        '--compiler_flags=--jscomp_warning=checkVars',
+        '--compiler_flags=--jscomp_warning=invalidCasts',
+        '--compiler_flags=--jscomp_warning=missingProperties',
+        '--compiler_flags=--jscomp_warning=undefinedVars',
+        '--compiler_flags=--jscomp_warning=duplicateMessage',
+        '--compiler_flags=--jscomp_warning=globalThis',
+        '--compiler_flags=--jscomp_warning=internetExplorerChecks',
+        '--compiler_flags=--jscomp_warning=misplacedTypeAnnotation',
+        '--compiler_flags=--jscomp_warning=suspiciousCode',
+        '--compiler_flags=--jscomp_warning=strictModuleDepCheck',
+        '--compiler_flags=--jscomp_warning=typeInvalidation',
+        '--compiler_flags=--jscomp_warning=undefinedNames',
+        '--compiler_flags=--jscomp_warning=unknownDefines',
+        '--compiler_flags=--jscomp_warning=uselessCode',
+        '--compiler_flags=--jscomp_warning=visibility',
+    ]
+    __setOptimizationLevel(compilerArgs, OptimizationLevel.ADVANCED)
+    return compilerArgs
+
+
+def __getDefaultCompilerArgs(addTests=False):
+    result = [
+        'python',
+        CLOSURE_BUILDER_PATH,
+        '--output_mode=compiled',
+        '--compiler_jar=' + COMPILER_PATH,
+        '--compiler_flags=--charset=UTF-8',
+        '--compiler_flags=--define="goog.DEBUG=true"',
+        '--compiler_flags=--extra_annotation_name="includeDoc"',
+        '--compiler_flags=--extra_annotation_name="illustration"',
+        '--compiler_flags=--extra_annotation_name="illustrationDesc"',
+        '--compiler_flags=--extra_annotation_name="ignoreDoc"',
+        '--compiler_flags=--output_wrapper=(function(){%output%})()',
+    ]
+
+    if addTests:
+        result.append('--compiler_flags=--externs=%s' % QUNIT_EXTERNS_PATH)
+
+    return result
+
+#=======================================================================================================================
+#           Build project
+#=======================================================================================================================
+@sync_required
+def __compileProjectFromCommandLine():
+
+    #Проверяем существует ли путь для выгрузки итогового файла, если нет, создаем.
+    __checkPathExistence(OUT_PATH)
+
+    #outputFileName = os.path.join(OUT_PATH, 'anychart.js')
+    #commands = __getDefaultCompilerArgs() +\
+    #           __getNotOptimizedCompilerArgs() +\
+    #           __getNameSpaces() +\
+    #           __getRoots() +\
+    #           __getOutputFileArg(outputFileName)
+    #__call_compiler(commands, outputFileName)
+
+    #Сборка оптимизированной версии
+    outputFileName = os.path.join(OUT_PATH, 'anychart.min.js')
+    commands = __getDefaultCompilerArgs() +\
+               __getOptimizedCompilerArgs() +\
+               __getNameSpaces() +\
+               __getRoots() +\
+               __getOutputFileArg(outputFileName)
+    __call_compiler(commands, outputFileName)
+
+
+def __call_compiler(commands, outputFileName):
+    tmp = 'Building graphics to ' + outputFileName
+    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    (output, err) = p.communicate()
+    retcode = p.poll()
+    print output
+
+
+#=======================================================================================================================
+#           Build tests
+#=======================================================================================================================
+@sync_required
+def __compileTests():
+    __checkPathExistence(OUT_PATH)
+
+    #сборка оптимизированной версии для запуска общих скомпиленных тестов
+    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.common.min.js')
+    commands = __getDefaultCompilerArgs(True) +\
+               __getOptimizedCompilerArgs() +\
+               ['--namespace=tests'] +\
+               __getRoots(True) +\
+               __getOutputFileArg(outputFileName)
+    __setPrettyPrint(commands)
+    __call_compiler(commands, outputFileName)
+    print ' ---- Build of graphics.tests.common.min.js complete'
+
+    #сборка vml-specific
+    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.vml.min.js')
+    commands = __getDefaultCompilerArgs(True) +\
+               __getOptimizedCompilerArgs() +\
+               ['--namespace=tests.vml'] +\
+               __getRoots(True) +\
+               __getOutputFileArg(outputFileName)
+    __setPrettyPrint(commands)
+    __call_compiler(commands, outputFileName)
+    print ' ---- Build of graphics.tests.vml.min.js complete'
+
+
+    #сборка svg-specific
+    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.svg.min.js')
+    commands = __getDefaultCompilerArgs(True) +\
+               __getOptimizedCompilerArgs() +\
+               ['--namespace=tests.svg'] +\
+               __getRoots(True) +\
+               __getOutputFileArg(outputFileName)
+    __setPrettyPrint(commands)
+    __call_compiler(commands, outputFileName)
+    print ' ---- Build of graphics.tests.svg.min.js complete'
+
+
+#=======================================================================================================================
+#           Build deps
+#=======================================================================================================================
+@sync_required
+def __buildDepsFromCommandLine():
+    output_file = os.path.join(SRC_PATH, 'deps.js')
+    __callDepsWriter(SRC_PATH, output_file, 'whole project')
+
+
+def __callDepsWriter(root, output_file, bundle_name):
+    print 'Writing deps for ' + bundle_name + ' to ' + output_file
+    subprocess.call([
+        'python',
+        DEPS_WRITER_PATH,
+        '--root_with_prefix=' + root + ' ' + os.path.relpath(root, CLOSURE_SOURCE_PATH),
+        '--root_with_prefix=' + TESTS_PATH + ' ' + os.path.relpath(TESTS_PATH, CLOSURE_SOURCE_PATH),
+        '--root_with_prefix=' + GRAPHICS_PATH + ' ' + os.path.relpath(GRAPHICS_PATH, CLOSURE_SOURCE_PATH),
+        '--output_file=' + output_file
+    ])
+
+#=======================================================================================================================
+#                            Linter.
+#=======================================================================================================================
+@sync_required
+def __lintFromCommandLine():
+    __callLinter(SRC_PATH)
+    __callLinter(TESTS_PATH)
+
+
+def __callLinter(root):
+    print 'Linting ' + root + ' directory.'
+    subprocess.call([
+        'python',
+        os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'gjslint.py'),
+        '--flagfile',
+        'gjslint.cfg',
+        '-r',
+        root
+    ])
+
+#=======================================================================================================================
+#                            JSDoc auto fix.
+#=======================================================================================================================
+@sync_required
+def __autofixFromCommandLine():
+    __callAutoFix(SRC_PATH)
+
+
+def __callAutoFix(root):
+    print 'Trying to autofix ' + root + ' directory.'
+    subprocess.call([
+        'python',
+        os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'fixjsstyle.py'),
+        '--flagfile',
+        'gjslint.cfg',
+        '-r',
+        root
+    ])
+
+#=======================================================================================================================
+#                            JSDoc build.
+#=======================================================================================================================
+@sync_required
+def __buildJSDocFromCommandLine():
+    __buildDocs()
+
+
+def __buildDocs():
+    print 'Building JSDoc to ' + DOCS_OUT_PATH
+    __checkPathExistence(OUT_PATH)
+    __checkPathExistence(DOCS_OUT_PATH)
+    shutil.rmtree(DOCS_OUT_PATH)
+    os.mkdir(DOCS_OUT_PATH)
+    os.mkdir(os.path.join(DOCS_OUT_PATH,'scripts'))
+    shutil.copy(os.path.join(OUT_PATH, 'graphics.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'graphics.min.js'))
+
+    subprocess.call([
+        os.path.join(JSDOC_PATH, 'jsdoc'),
+        SRC_PATH,
+        '-r',
+        '-t',
+        os.path.join(JSDOC_TEMPLATE_PATH, 'templates', 'ac_v3'),
+        '-c',
+        os.path.join(JSDOC_TEMPLATE_PATH, 'conf.json'),
+        '-d', DOCS_OUT_PATH,
+        '-l',
+        os.path.join(JSDOC_TEMPLATE_PATH, 'README.md')],
+        shell=(platform.system() == 'Windows'))
+
+#=======================================================================================================================
+#                            Logging.
+#=======================================================================================================================
+warnings_list = []
+
+def __print_no_bundles():
+    print 'No bundles found, see help for more info. (python build --help)'
+
+
+def __print_warnings_list():
+    for msg in warnings_list:
+        print "\nWarning:"
+        print msg
+
+
+def __printHelp():
+    print "Команды выполняемые скриптом:\n"\
+          "\n"\
+          "contrib          Сборка всех зависимостей проекта, таких как внешние билбиотеки, \n"\
+          "                 компилятор, и другие утилитные вещи. (python build contrib) \n"\
+          "\n"\
+          "deps             Генерация dependencies как для продуктовых модулей по отдельности,\n"\
+          "                 так и для всего проекта (python build deps).\n"\
+          "\n"\
+          "compile            Сборка продуктовых модулей  (python build compile).\n"\
+          "\n"\
+          "lint             Проверка кода на соответствие google JavaScript style guide (python build lint)\n"\
+          "\n"\
+          "autofix          Исправление не соответствией кода google JavaScript style guide (python build autofix).\n"\
+          "                 Это эксперементальная функция. За ней нужно всегда проверять что же она там наисправляла."\
+          "\n"\
+          "docs             Сборка документации по продуктовому модулю или по всему проекту (python build docs).\n"
+
+
+#=======================================================================================================================
+#           Main
+#=======================================================================================================================
+def __execMainScript():
+    args = sys.argv
+    if len(args) == 1:
+        __printHelp()
+    elif args[1] == 'help' or args[1] == '--help' or args[1] == '-h':
+        __printHelp()
+    elif args[1] == 'contrib':
+        __sync_contrib()
+    elif args[1] == 'compile':
+        __compileProjectFromCommandLine()
+    elif args[1] == 'tests':
+        __compileTests()
+    elif args[1] == 'deps':
+        __buildDepsFromCommandLine()
+    elif args[1] == 'lint':
+        __lintFromCommandLine()
+    elif args[1] == 'autofix':
+        __autofixFromCommandLine()
+    elif args[1] == 'docs':
+        __buildJSDocFromCommandLine()
+    else:
+        __printHelp()
+
+    __print_warnings_list()
+
+if __name__ == '__main__':
+    try:
+        __execMainScript()
+    except StandardError as e:
+        print e
