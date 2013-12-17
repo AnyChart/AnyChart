@@ -174,7 +174,6 @@ def __getNotOptimizedCompilerArgs():
 
 def __getOptimizedCompilerArgs():
     compilerArgs = [
-        # Убрано, пока не устранены проблемы с deprecated AffineTransform
         '--compiler_flags=--warning_level=VERBOSE',
         '--compiler_flags=--generate_exports',
         '--compiler_flags=--jscomp_warning=deprecated',
@@ -196,6 +195,8 @@ def __getOptimizedCompilerArgs():
         '--compiler_flags=--jscomp_warning=unknownDefines',
         '--compiler_flags=--jscomp_warning=uselessCode',
         '--compiler_flags=--jscomp_warning=visibility',
+        # uncomment to have some fun ;)
+        #'--compiler_flags=--jscomp_warning=reportUnknownTypes',
     ]
     __setOptimizationLevel(compilerArgs, OptimizationLevel.ADVANCED)
     return compilerArgs
