@@ -78,7 +78,7 @@ anychart.utils.Invalidatable.prototype.markConsistent = function(state) {
  * @return {boolean} Имеет ли элемент переданное состояние рассинхронизации.
  */
 anychart.utils.Invalidatable.prototype.isConsistent = function() {
-  return !!this.consistency_;
+  return !this.consistency_;
 };
 
 
@@ -119,3 +119,13 @@ anychart.utils.InvalidatedStatesEvent = function(target, invalidatedStates) {
   this.invalidatedStates = invalidatedStates;
 };
 goog.inherits(anychart.utils.InvalidatedStatesEvent, goog.events.Event);
+
+
+/**
+ * Проверяет, имеет ли элемент переданное состояние рассинхронизации (или хотя бы одно из комбинации).
+ * @param {anychart.utils.ConsistencyState|number} state Состояние, которое нужно проверить (или комбинация).
+ * @return {boolean} Имеет ли элемент переданное состояние рассинхронизации.
+ */
+anychart.utils.InvalidatedStatesEvent.prototype.invalidated = function(state) {
+  return !!(this.invalidatedStates & state);
+};

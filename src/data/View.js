@@ -16,8 +16,18 @@ anychart.data.View = function(parentView) {
   goog.base(this);
 
   this.initView(parentView);
+
+  this.invalidate(anychart.utils.ConsistencyState.DATA);
 };
 goog.inherits(anychart.data.View, anychart.utils.Invalidatable);
+
+
+/**
+ * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * @type {number}
+ */
+anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
 
 
 /**
@@ -51,6 +61,17 @@ anychart.data.View.prototype.initView = function(parentView) {
   this.parentView = parentView;
 
   parentView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
+};
+
+
+/**
+ * Ensures that the view redirection mask is consistent due to last changes.
+ */
+anychart.data.View.prototype.ensureConsistent = function() {
+  if (this.isConsistent())
+    return;
+  this.mask = this.buildMask();
+  this.markConsistent(anychart.utils.ConsistencyState.DATA);
 };
 
 
@@ -97,6 +118,7 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
  * @return {*} The full row current or previous value. May be anything including undefined.
  */
 anychart.data.View.prototype.row = function(rowIndex, opt_value) {
+  this.ensureConsistent();
   rowIndex = this.mask[rowIndex];
   if (goog.isDef(rowIndex)) {
     if (arguments.length > 1)
@@ -113,6 +135,7 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
  * @return {number} Number of rows in the set.
  */
 anychart.data.View.prototype.getRowsCount = function() {
+  this.ensureConsistent();
   return this.mask.length;
 };
 
@@ -131,6 +154,7 @@ anychart.data.View.prototype.getMapping = function() {
  * @return {anychart.data.Iterator} New iterator.
  */
 anychart.data.View.prototype.getIterator = function() {
+  this.ensureConsistent();
   return new anychart.data.Iterator(this);
 };
 
@@ -149,21 +173,6 @@ anychart.data.View.prototype.buildMask = goog.abstractMethod;
  * @protected
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
-  if (!!(event.invalidatedStates & anychart.utils.ConsistencyState.DATA)) {
-    var newMask = this.buildMask();
-    var changed = false;
-    if (newMask.length == this.mask.length) {
-      for (var i = 0; i < newMask.length; i++)
-        if (newMask[i] != this.mask[i]) {
-          changed = true;
-          break;
-        }
-    } else {
-      changed = true;
-    }
-    if (changed) {
-      this.mask = newMask;
-      this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
-    }
-  }
+  if (event.invalidated(anychart.utils.ConsistencyState.DATA))
+    this.invalidate(anychart.utils.ConsistencyState.DATA);
 };

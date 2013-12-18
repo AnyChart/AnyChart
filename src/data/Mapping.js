@@ -70,6 +70,13 @@ anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping,
 goog.inherits(anychart.data.Mapping, anychart.data.View);
 
 
+/**
+ * Mapping doesn't support DATA dirty state.
+ * @type {number}
+ */
+anychart.data.Mapping.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
+
+
 /** @inheritDoc */
 anychart.data.Mapping.prototype.initView = function(parentView) {
   //do nothing here
@@ -129,6 +136,6 @@ anychart.data.Mapping.prototype.getRowsCount = function() {
 
 /** @inheritDoc */
 anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
-  if (!!(event.invalidatedStates & anychart.utils.ConsistencyState.DATA))
+  if (event.invalidated(anychart.utils.ConsistencyState.DATA))
     this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
 };

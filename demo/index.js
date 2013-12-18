@@ -32,8 +32,8 @@ function load() {
   console.log(toArray(view2, 'x'));
   console.log(toArray(view2, 'value'));
 
-  console.log('dataSet.row(3, [\'b\', 20])');
-  dataSet.row(3, ['b', 20]);
+  console.log('dataSet.row(3, [\'1\', 20])');
+  dataSet.row(3, ['1', 20]);
 
   console.log(toArray(view1, 'x'));
   console.log(toArray(view1, 'value'));

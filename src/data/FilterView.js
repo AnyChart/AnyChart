@@ -30,8 +30,6 @@ anychart.data.FilterView = function(parentView, fieldName, func) {
    * @private
    */
   this.func_ = func;
-
-  this.mask = this.buildMask();
 };
 goog.inherits(anychart.data.FilterView, anychart.data.View);
 

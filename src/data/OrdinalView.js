@@ -37,8 +37,6 @@ anychart.data.OrdinalView = function(parentView, fieldName, categories) {
         this.comparator_
     );
   }
-
-  this.mask = this.buildMask();
 };
 goog.inherits(anychart.data.OrdinalView, anychart.data.View);
 

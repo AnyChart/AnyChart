@@ -21,8 +21,6 @@ anychart.data.ScatterView = function(parentView, fieldName) {
    * @private
    */
   this.fieldName_ = fieldName;
-
-  this.mask = this.buildMask();
 };
 goog.inherits(anychart.data.ScatterView, anychart.data.View);
 
