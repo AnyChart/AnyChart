@@ -1,6 +1,7 @@
 goog.provide('anychart.data.View');
 
 goog.require('anychart.data.Iterator');
+goog.require('anychart.utils.Invalidatable');
 
 
 
@@ -9,8 +10,32 @@ goog.require('anychart.data.Iterator');
  * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
  * @constructor
  * @implements {anychart.data.IView}
+ * @extends {anychart.utils.Invalidatable}
  */
 anychart.data.View = function(parentView) {
+  goog.base(this);
+
+  this.initView(parentView);
+};
+goog.inherits(anychart.data.View, anychart.utils.Invalidatable);
+
+
+/**
+ * Redirection mask for a view. Each value in this array means a number of the parentView row to fetch,
+ * when that index is asked from the current view.
+ * @type {Array.<number>}
+ * @protected
+ */
+anychart.data.View.prototype.mask;
+
+
+/**
+ * Internal function to initialize view. Mapping doesn't need this code to initialize, but needs base constructor
+ * because of EventTarget initialization. So that's we it is done so dirty:(
+ * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
+ * @protected
+ */
+anychart.data.View.prototype.initView = function(parentView) {
   /**
    * Mapping applied to the views sequence.
    * @type {!anychart.data.Mapping}
@@ -24,16 +49,9 @@ anychart.data.View = function(parentView) {
    * @protected
    */
   this.parentView = parentView;
+
+  parentView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
 };
-
-
-/**
- * Redirection mask for a view. Each value in this array means a number of the parentView row to fetch,
- * when that index is asked from the current view.
- * @type {Array.<number>}
- * @protected
- */
-anychart.data.View.prototype.mask;
 
 
 /**
@@ -43,11 +61,10 @@ anychart.data.View.prototype.mask;
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
-  var result = new anychart.data.View(this);
-  result.mask = opt_categories ?
-      this.buildOrdinalMask_(fieldName, /** @type {!Array} */(opt_categories)) :
-      this.buildScatterMask_(fieldName);
-
+  var result = opt_categories ?
+      new anychart.data.OrdinalView(this, fieldName, /** @type {!Array} */(opt_categories)) :
+      new anychart.data.ScatterView(this, fieldName);
+  this.registerDisposable(result);
   return result;
 };
 
@@ -60,14 +77,8 @@ anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.filter = function(fieldName, func) {
-  var result = new anychart.data.View(this);
-  var mask = [];
-  var iterator = this.getIterator();
-  while (iterator.advance()) {
-    if (func(iterator.get(fieldName)))
-      mask.push(iterator.getIndex());
-  }
-  result.mask = mask;
+  var result = new anychart.data.FilterView(this, fieldName, func);
+  this.registerDisposable(result);
   return result;
 };
 
@@ -125,75 +136,34 @@ anychart.data.View.prototype.getIterator = function() {
 
 
 /**
- * Builds mask to use in ordinal view.
- * @param {string} fieldName Field name that should be categorized.
- * @param {!Array} categories A set of categories to fit to.
- * @return {!Array.<number>} Returns masking array.
- * @private
+ * Builds redirection mask.
+ * @return {!Array.<number>} The mask.
+ * @protected
  */
-anychart.data.View.prototype.buildOrdinalMask_ = function(fieldName, categories) {
-  var result = [];
-
-  var count = categories.length;
-
-  if (count) {
-    var i;
-    var categoriesMap = [];
-    var comparator = function(a, b) {
-      return anychart.utils.compare(a.value, b.value);
-    };
-    for (i = 0; i < count; i++) {
-      goog.array.binaryInsert(
-          categoriesMap,
-          {value: categories[i], index: i},
-          comparator
-      );
-    }
-
-    var mask = new Array(count);
-    var iterator = this.getIterator();
-    var item = {value: 0, index: 0};
-    while (iterator.advance()) {
-      var value = iterator.get(fieldName);
-      if (goog.isDef(value)) {
-        item.value = value;
-        var index = goog.array.binarySearch(categoriesMap, item, comparator);
-        if (index >= 0) {
-          mask[categoriesMap[index].index] = iterator.getIndex();
-        }
-      }
-    }
-
-    for (i = 0; i < count; i++)
-      if (i in mask)
-        result.push(mask[i]);
-  }
-
-  return result;
-};
+anychart.data.View.prototype.buildMask = goog.abstractMethod;
 
 
 /**
- * Builds mask to use in scatter view.
- * @param {string} fieldName Field name that should be used.
- * @return {!Array.<number>} Returns masking array.
- * @private
+ * Handles changes in parent view.
+ * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @protected
  */
-anychart.data.View.prototype.buildScatterMask_ = function(fieldName) {
-  var mask = [];
-  var values = [];
-  var iterator = this.getIterator();
-  while (iterator.advance()) {
-    var value = iterator.get(fieldName);
-    if (goog.isDef(value)) {
-      var index = goog.array.binarySearch(values, value, anychart.utils.compare);
-      if (index < 0) {
-        goog.array.insertAt(values, value, ~index);
-        goog.array.insertAt(mask, iterator.getIndex(), ~index);
-      } else {
-        mask[index] = iterator.getIndex();
-      }
+anychart.data.View.prototype.parentViewChangedHandler = function(event) {
+  if (!!(event.invalidatedStates & anychart.utils.ConsistencyState.DATA)) {
+    var newMask = this.buildMask();
+    var changed = false;
+    if (newMask.length == this.mask.length) {
+      for (var i = 0; i < newMask.length; i++)
+        if (newMask[i] != this.mask[i]) {
+          changed = true;
+          break;
+        }
+    } else {
+      changed = true;
+    }
+    if (changed) {
+      this.mask = newMask;
+      this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
     }
   }
-  return mask;
 };

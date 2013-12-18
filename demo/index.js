@@ -3,7 +3,7 @@ var data, dataSet, mapping, view1, view2;
 function load() {
   data = [
     ['a', 0],
-    ['b', 1],
+    ['c', 1],
     [{value: 10}, 2],
     ['d', 3],
     [1, 4],
@@ -18,6 +18,35 @@ function load() {
   mapping = dataSet.mapAs();
   view1 = mapping.prepare('x');
   view2 = mapping.prepare('x', ['a', 'd', 1, '1', '2', 2]);
+
+  console.log(toArray(view1, 'x'));
+  console.log(toArray(view1, 'value'));
+  console.log(toArray(view2, 'x'));
+  console.log(toArray(view2, 'value'));
+
+  console.log('dataSet.row(3, [\'d\', 20])');
+  dataSet.row(3, ['d', 20]);
+
+  console.log(toArray(view1, 'x'));
+  console.log(toArray(view1, 'value'));
+  console.log(toArray(view2, 'x'));
+  console.log(toArray(view2, 'value'));
+
+  console.log('dataSet.row(3, [\'b\', 20])');
+  dataSet.row(3, ['b', 20]);
+
+  console.log(toArray(view1, 'x'));
+  console.log(toArray(view1, 'value'));
+  console.log(toArray(view2, 'x'));
+  console.log(toArray(view2, 'value'));
+
+  console.log('dataSet.row(3, null)');
+  dataSet.row(3, null);
+
+  console.log(toArray(view1, 'x'));
+  console.log(toArray(view1, 'value'));
+  console.log(toArray(view2, 'x'));
+  console.log(toArray(view2, 'value'));
 }
 
 function toArray(view, opt_fieldName) {

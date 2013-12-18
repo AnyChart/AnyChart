@@ -21,7 +21,10 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
+  goog.base(this, this); // hack to pass this only exception through compiler
+  // We don't use goog.base(this), cause we don't want all this stuff with redirection here.
   this.parentView = parentSet;
+  parentSet.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
 
   /**
    * Настройки адресации колонок для рядов, представляющих собой массив.
@@ -65,6 +68,12 @@ anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping,
   this.indexProps_ = opt_indexProps || ['x'];
 };
 goog.inherits(anychart.data.Mapping, anychart.data.View);
+
+
+/** @inheritDoc */
+anychart.data.Mapping.prototype.initView = function(parentView) {
+  //do nothing here
+};
 
 
 /**
@@ -115,4 +124,11 @@ anychart.data.Mapping.prototype.row = function(rowIndex, opt_value) {
 /** @inheritDoc */
 anychart.data.Mapping.prototype.getRowsCount = function() {
   return this.parentView.getRowsCount();
+};
+
+
+/** @inheritDoc */
+anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
+  if (!!(event.invalidatedStates & anychart.utils.ConsistencyState.DATA))
+    this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
 };

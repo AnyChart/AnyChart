@@ -2,6 +2,7 @@ goog.provide('anychart.data.Set');
 
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
+goog.require('anychart.utils.Invalidatable');
 goog.require('goog.array');
 
 
@@ -15,10 +16,21 @@ goog.require('goog.array');
  * @param {Array=} opt_data Data for the set can be passed here.
  * @constructor
  * @implements {anychart.data.IView}
+ * @extends {anychart.utils.Invalidatable}
  */
 anychart.data.Set = function(opt_data) {
+  goog.base(this);
   this.data(opt_data || null);
 };
+goog.inherits(anychart.data.Set, anychart.utils.Invalidatable);
+
+
+/**
+ * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * @type {number}
+ */
+anychart.data.Set.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
 
 
 /**
@@ -43,8 +55,15 @@ anychart.data.Set.prototype.data = function(opt_data) {
           data[i] = goog.array.slice(data[i], 0);
       }
       this.storage_ = data;
-    } else
-      this.storage_ = [];
+      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    } else {
+      if (this.storage_ && this.storage_.length > 0) {
+        this.storage_.length = 0;
+        this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+      } else {
+        this.storage_ = [];
+      }
+    }
     return this;
   }
   return this.storage_;
@@ -65,7 +84,9 @@ anychart.data.Set.prototype.data = function(opt_data) {
  * @return {anychart.data.Mapping} The mapping for the data set.
  */
 anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
-  return new anychart.data.Mapping(this, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
+  var res = new anychart.data.Mapping(this, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
+  this.registerDisposable(res);
+  return res;
 };
 
 
@@ -83,8 +104,10 @@ anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping
 anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
   /** @type {*} */
   var value = this.storage_[rowIndex];
-  if (arguments.length > 1)
+  if (arguments.length > 1) {
     this.storage_[rowIndex] = opt_value;
+    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+  }
   return value;
 };
 
