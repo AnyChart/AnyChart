@@ -47,6 +47,7 @@ anychart.data.Set.prototype.storage_;
  */
 anychart.data.Set.prototype.data = function(opt_data) {
   if (goog.isDef(opt_data)) {
+    anychart.globalLock.lock();
     if (goog.isArrayLike(opt_data)) {
       /** @type {!Array} */
       var data = goog.array.slice(opt_data, 0);
@@ -64,6 +65,7 @@ anychart.data.Set.prototype.data = function(opt_data) {
         this.storage_ = [];
       }
     }
+    anychart.globalLock.unlock();
     return this;
   }
   return this.storage_;
@@ -105,8 +107,10 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
   /** @type {*} */
   var value = this.storage_[rowIndex];
   if (arguments.length > 1) {
+    anychart.globalLock.lock();
     this.storage_[rowIndex] = opt_value;
     this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    anychart.globalLock.unlock();
   }
   return value;
 };

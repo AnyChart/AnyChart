@@ -121,9 +121,12 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
   rowIndex = this.mask[rowIndex];
   if (goog.isDef(rowIndex)) {
-    if (arguments.length > 1)
-      return this.parentView.row(rowIndex, opt_value);
-    else
+    if (arguments.length > 1) {
+      anychart.globalLock.lock();
+      var res = this.parentView.row(rowIndex, opt_value);
+      anychart.globalLock.unlock();
+      return res;
+    } else
       return this.parentView.row(rowIndex);
   }
   return undefined;
