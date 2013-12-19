@@ -1,4 +1,4 @@
-var data, dataSet, mapping, view1, view2;
+var data, dataSet, mapping, view1, view2, view3;
 
 function load() {
   data = [
@@ -18,11 +18,14 @@ function load() {
   mapping = dataSet.mapAs();
   view1 = mapping.prepare('x');
   view2 = mapping.prepare('x', ['a', 'd', 1, '1', '2', 2]);
+  view3 = view1.concat(view2);//.sort('value');//.filter('value', function(a) {return a < 3 || a > 7});
 
   console.log(toArray(view1, 'x'));
   console.log(toArray(view1, 'value'));
   console.log(toArray(view2, 'x'));
   console.log(toArray(view2, 'value'));
+  console.log(toArray(view3, 'x'));
+  console.log(toArray(view3, 'value'));
 
   console.log('dataSet.row(3, [\'d\', 20])');
   dataSet.row(3, ['d', 20]);
@@ -31,6 +34,8 @@ function load() {
   console.log(toArray(view1, 'value'));
   console.log(toArray(view2, 'x'));
   console.log(toArray(view2, 'value'));
+  console.log(toArray(view3, 'x'));
+  console.log(toArray(view3, 'value'));
 
   console.log('dataSet.row(3, [\'1\', 20])');
   dataSet.row(3, ['1', 20]);
@@ -39,6 +44,8 @@ function load() {
   console.log(toArray(view1, 'value'));
   console.log(toArray(view2, 'x'));
   console.log(toArray(view2, 'value'));
+  console.log(toArray(view3, 'x'));
+  console.log(toArray(view3, 'value'));
 
   console.log('dataSet.row(3, null)');
   dataSet.row(3, null);
@@ -47,6 +54,8 @@ function load() {
   console.log(toArray(view1, 'value'));
   console.log(toArray(view2, 'x'));
   console.log(toArray(view2, 'value'));
+  console.log(toArray(view3, 'x'));
+  console.log(toArray(view3, 'value'));
 }
 
 function toArray(view, opt_fieldName) {

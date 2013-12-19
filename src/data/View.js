@@ -7,7 +7,7 @@ goog.require('anychart.utils.Invalidatable');
 
 /**
  * A "view" - like a db select from a data set.
- * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
+ * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @constructor
  * @implements {anychart.data.IView}
  * @extends {anychart.utils.Invalidatable}
@@ -15,7 +15,14 @@ goog.require('anychart.utils.Invalidatable');
 anychart.data.View = function(parentView) {
   goog.base(this);
 
-  this.initView(parentView);
+  /**
+   * The parent view to ask for data from.
+   * @type {!anychart.data.IView}
+   * @protected
+   */
+  this.parentView = parentView;
+
+  parentView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
 
   this.invalidate(anychart.utils.ConsistencyState.DATA);
 };
@@ -37,31 +44,6 @@ anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @protected
  */
 anychart.data.View.prototype.mask;
-
-
-/**
- * Internal function to initialize view. Mapping doesn't need this code to initialize, but needs base constructor
- * because of EventTarget initialization. So that's we it is done so dirty:(
- * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
- * @protected
- */
-anychart.data.View.prototype.initView = function(parentView) {
-  /**
-   * Mapping applied to the views sequence.
-   * @type {!anychart.data.Mapping}
-   * @private
-   */
-  this.mapping_ = parentView.getMapping();
-
-  /**
-   * The parent view to ask for data from.
-   * @type {!anychart.data.IView}
-   * @protected
-   */
-  this.parentView = parentView;
-
-  parentView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
-};
 
 
 /**
@@ -105,6 +87,36 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
 
 
 /**
+ * Creates a derivative view that ensures sorting by a passed field.
+ * @param {string} fieldName Field name to make sort by.
+ * @param {function(*, *):number=} opt_comparator Sorting function that should accept two field values and return
+ *    numeric result of the comparison.
+ * @return {!anychart.data.View} The new derived view.
+ */
+anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
+  var result = new anychart.data.SortView(this, fieldName, opt_comparator);
+  this.registerDisposable(result);
+  return result;
+};
+
+
+/**
+ * Concatenates two views to make a derivative view, that contains rows from both views.
+ * @param {(!anychart.data.IView|!Array)} otherView A view, data set or even an array to concat with.
+ * @return {!anychart.data.IView} The new derived view.
+ */
+anychart.data.View.prototype.concat = function(otherView) {
+  if (goog.isArray(otherView))
+    otherView = new anychart.data.Set(/** @type {!Array} */(otherView));
+  if (otherView instanceof anychart.data.Set)
+    otherView = (/** @type {!anychart.data.Set} */(otherView)).mapAs();
+  var result = new anychart.data.ConcatView(this, /** @type {!anychart.data.IView} */(otherView));
+  this.registerDisposable(result);
+  return result;
+};
+
+
+/**
  * Gets or sets the full row of the set by its index. If there is no any row for the index - returns undefined.
  * If used as a setter - returns the previous value of the row (don't think it saves the previous state of objects
  * stored by reference - it doesn't).
@@ -129,7 +141,7 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
     } else
       return this.parentView.row(rowIndex);
   }
-  return undefined;
+  return rowIndex; // undefined
 };
 
 
@@ -144,11 +156,12 @@ anychart.data.View.prototype.getRowsCount = function() {
 
 
 /**
- * Returns view mapping.
- * @return {!anychart.data.Mapping} Current view mapping.
- */
-anychart.data.View.prototype.getMapping = function() {
-  return this.mapping_;
+* Returns the mapping for the row.
+* @param {number} rowIndex Index of the row.
+* @return {!anychart.data.Mapping} Mapping for the row.
+*/
+anychart.data.View.prototype.getRowMapping = function(rowIndex) {
+  return this.parentView.getRowMapping(this.mask[rowIndex]);
 };
 
 

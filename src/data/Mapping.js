@@ -21,10 +21,7 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
-  goog.base(this, this); // hack to pass this only exception through compiler
-  // We don't use goog.base(this), cause we don't want all this stuff with redirection here.
-  this.parentView = parentSet;
-  parentSet.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
+  goog.base(this, parentSet);
 
   /**
    * Настройки адресации колонок для рядов, представляющих собой массив.
@@ -77,12 +74,6 @@ goog.inherits(anychart.data.Mapping, anychart.data.View);
 anychart.data.Mapping.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
 
 
-/** @inheritDoc */
-anychart.data.Mapping.prototype.initView = function(parentView) {
-  //do nothing here
-};
-
-
 /**
  * Fetches field value from the row by its field name. Returns undefined, if no matching field found.
  * @param {*} row The row to fetch field value from.
@@ -114,17 +105,14 @@ anychart.data.Mapping.prototype.get = function(row, rowIndex, fieldName) {
 
 
 /** @inheritDoc */
-anychart.data.Mapping.prototype.getMapping = function() {
+anychart.data.Mapping.prototype.getRowMapping = function(rowIndex) {
   return this;
 };
 
 
 /** @inheritDoc */
 anychart.data.Mapping.prototype.row = function(rowIndex, opt_value) {
-  if (arguments.length > 1)
-    return this.parentView.row(rowIndex, opt_value);
-  else
-    return this.parentView.row(rowIndex);
+  return this.parentView.row.apply(this.parentView, arguments);
 };
 
 

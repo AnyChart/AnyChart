@@ -83,7 +83,7 @@ anychart.data.Set.prototype.data = function(opt_data) {
  *    найдено внутри этого объекта.
  * @param {!Array.<string>=} opt_indexProps Массив имен полей, в качестве значения которых можно отдать текущий индекс
  *    ряда, если другие опции не сработали.
- * @return {anychart.data.Mapping} The mapping for the data set.
+ * @return {!anychart.data.Mapping} The mapping for the data set.
  */
 anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
   var res = new anychart.data.Mapping(this, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
@@ -122,4 +122,14 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
  */
 anychart.data.Set.prototype.getRowsCount = function() {
   return this.storage_.length;
+};
+
+
+/**
+ * Returns the mapping for the row. This method is not implemented for the Set. Use mapAs() result instead.
+ * @param {number} rowIndex Index of the row.
+ */
+anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
+  //TODO(Anton Saukh): replace this throw by proper error handling.
+  throw new Error('Asking rowMapping from a Set! What a fag...');
 };

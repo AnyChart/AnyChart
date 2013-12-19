@@ -7,7 +7,7 @@ goog.require('goog.array');
 
 /**
  * Special view to use as the terminating view with Ordinal scales.
- * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
+ * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {string} fieldName Field name to make ordinal mask by.
  * @param {!Array} categories A set of categories to fit to.
  * @constructor

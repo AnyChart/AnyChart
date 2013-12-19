@@ -7,7 +7,7 @@ goog.require('goog.array');
 
 /**
  * Special view to use as the terminating view with Scatter scales.
- * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
+ * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {string} fieldName Field name to make scatter mask by.
  * @constructor
  * @extends {anychart.data.View}

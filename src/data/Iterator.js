@@ -63,7 +63,7 @@ anychart.data.Iterator.prototype.reset = function() {
  */
 anychart.data.Iterator.prototype.advance = function() {
   this.currentRow_ = this.view_.row(++this.currentIndex_);
-  return goog.isDef(this.currentRow_);
+  return this.currentIndex_ < this.getRowsCount();
 };
 
 
@@ -73,7 +73,7 @@ anychart.data.Iterator.prototype.advance = function() {
  * @return {*} The field value or undefined, if not found.
  */
 anychart.data.Iterator.prototype.get = function(fieldName) {
-  return this.view_.getMapping().get(this.currentRow_, this.currentIndex_, fieldName);
+  return this.view_.getRowMapping(this.currentIndex_).get(this.currentRow_, this.currentIndex_, fieldName);
 };
 
 

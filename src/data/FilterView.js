@@ -7,7 +7,7 @@ goog.require('goog.array');
 
 /**
  * Filtering view.
- * @param {!anychart.data.View} parentView Parent view. The last view is a mapping.
+ * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {string} fieldName Field name to make filter by.
  * @param {function(*):boolean} func Filter function that should accept a field value and return true if the row
  *    should be included into the resulting view and false otherwise.

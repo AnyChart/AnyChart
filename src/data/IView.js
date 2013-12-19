@@ -5,6 +5,7 @@ goog.provide('anychart.data.IView');
 /**
  * A common part between anychart.data.Set and anychart.data.View.
  * @interface
+ * @extends {goog.events.Listenable}
  */
 anychart.data.IView = function() {
 };
@@ -29,3 +30,11 @@ anychart.data.IView.prototype.row = function(rowIndex, opt_value) {};
  * @return {number} Number of rows in the set.
  */
 anychart.data.IView.prototype.getRowsCount = function() {};
+
+
+/**
+ * Returns the mapping for the row.
+ * @param {number} rowIndex Index of the row.
+ * @return {!anychart.data.Mapping} Mapping for the row.
+ */
+anychart.data.IView.prototype.getRowMapping = function(rowIndex) {};
