@@ -1,15 +1,22 @@
 var data, dataSet, mapping, view1, view2, view3, title;
 
-function load1() {
+function load() {
   title = new anychart.elements.Title();
   title.text('AAAAAAAAA!!!!').container('container').background().fill('red').corners(10);
-  title.margin(0).padding(10).height(300).width(300).hAlign('center').vAlign('center');
+  title.margin(0).padding(10).hAlign('center').vAlign('center');
   title.draw();
   title.listen('invalidated', function() { title.draw(); });
 }
 
+function qq() {
+  var q = title.container_.data();
+  title.container_.dispose();
+  var a = acgraph.create().container('container');
+  a.data(q);
+}
 
-function load() {
+
+function load1() {
   data = [
     ['a', 0],
     ['c', 1],

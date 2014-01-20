@@ -214,6 +214,8 @@ def __getDefaultCompilerArgs(addTests=False):
         '--compiler_flags=--extra_annotation_name="illustration"',
         '--compiler_flags=--extra_annotation_name="illustrationDesc"',
         '--compiler_flags=--extra_annotation_name="ignoreDoc"',
+        '--compiler_flags=--extra_annotation_name="propertyDoc"',
+        '--compiler_flags=--extra_annotation_name="shortDescription"',
         '--compiler_flags=--output_wrapper=(function(){%output%})()',
     ]
 

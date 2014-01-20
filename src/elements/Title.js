@@ -146,13 +146,6 @@ anychart.elements.Title = function() {
    * @private
    */
   this.align_ = anychart.utils.Align.CENTER;
-
-  /**
-   * Title rotation. Default depends on orientation.
-   * @type {number}
-   * @private
-   */
-  this.rotation_ = NaN;
 };
 goog.inherits(anychart.elements.Title, anychart.elements.Text);
 
@@ -339,83 +332,71 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
 
 
 /**
- * Getter and setter for title rotation. Note that default rotation depends on title orientation. Also note that the
- * angle is set relative to container 0 angle.
- * @param {(number|null)=} opt_value Rotation angle to set. Pass null or NaN to reset to orientation default.
- * @return {!anychart.elements.Title|number} Rotation or title for chaining.
- */
-anychart.elements.Title.prototype.rotation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isNull(opt_value))
-      opt_value = NaN;
-    else
-      opt_value = +opt_value;
-    if (!((isNaN(opt_value) && isNaN(this.rotation_)) || opt_value == this.rotation_)) {
-      this.rotation_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
-    }
-    return this;
-  }
-  if (isNaN(this.rotation_)) {
-    switch (this.orientation_) {
-      case anychart.utils.Orientation.LEFT:
-        return -90;
-      case anychart.utils.Orientation.RIGHT:
-        return 90;
-      //case anychart.utils.Orientation.TOP:
-      //case anychart.utils.Orientation.BOTTOM:
-      default:
-        return 0;
-    }
-  }
-  return this.rotation_;
-};
-
-
-/**
  * Draws the title
  * @return {!anychart.elements.Title} The title for chaining.
  */
 anychart.elements.Title.prototype.draw = function() {
+  // If its all ok - leave this method
+  if (this.isConsistent())
+    return this;
+  // We will need the text element any way, so we should create it if missing.
   var isInitial;
   if (isInitial = !this.text_) {
     this.text_ = acgraph.text();
     this.registerDisposable(this.text_);
   }
-  if (this.isConsistent())
-    return this;
+  // Getting the stage and suspending it to make the change.
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
+  // Checking APPEARANCE state. It excludes text width and height inconsistency, that will be checked later.
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE)) {
+    // Applying text settings if needed.
     this.applyTextSettings(this.text_, isInitial);
     this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
   }
 
+  // Checking PIXEL_BOUNDS state. If it is inconsistent, we need to recalculate title bounds.
+  // But we don't need to mark it consistent here, because we don't know where to apply that new bounds yet.
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
     this.calcActualBounds_();
-    // we are not marking it consistent here.
+    // we are not marking it consistent here, just ensuring everything is calculated.
   }
 
-  var hasBackground = this.background_ && (this.background_.fill() != 'none' || this.background_.stroke() != 'none');
+  // Checking if we have to draw background. We don't draw it if it is totally transparent.
+  var hasBackground = this.background_ && this.background_.draw() &&
+      (this.background_.fill() != 'none' || this.background_.stroke() != 'none');
+  // If background appearance changed, we should do something about that.
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE)) {
+    // If there is a non-transparent background
     if (hasBackground) {
+      // We should render a layer, that has a background path and a text element in it.
+      // So checking if there is a layer
       if (!this.layer_) {
+        // and creating it if there is no any.
         this.layer_ = acgraph.layer();
+        // super-silently resetting background container to the newly created layer and drawing it to have the bg go first
         this.background_
             .suspendInvalidationDispatching()
             .container(this.layer_)
             .resumeInvalidationDispatching(false)
             .draw();
+        // settings text parent
         this.text_.parent(this.layer_);
         this.registerDisposable(this.layer_);
-        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER);
+        // ensuring that we will set layer container to the proper value later in this method.
+        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
       }
+      // settings proper bounds to the background
       this.background_.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
+      // and drawing it
       this.background_.draw();
     } else {
+      // Else we should render only the text element, so if there is a layer, than we should remove the background
+      // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
+      // container later in this method
       if (this.layer_) {
         if (this.background_ && this.background_.container() == this.layer_)
           this.background_
@@ -423,28 +404,30 @@ anychart.elements.Title.prototype.draw = function() {
               .container(null)
               .resumeInvalidationDispatching(false)
               .draw();
+        this.text_.parent(null);
         goog.dispose(this.layer_);
-        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER);
+        this.layer_ = null;
+        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
       }
     }
+    // Background appearance is now consistent, so we mark the corresponding state.
     this.markConsistent(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
   }
 
+  // If there is any inconsistency in title bounds
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
-    if (this.widthConstricted_)
-      this.text_.width(this.textWidth_);
-    if (this.heightConstricted_)
-      this.text_.height(this.textHeight_);
+    // setting text bounds if needed.
+    this.text_.width(this.widthConstricted_ ? this.textWidth_ : null);
+    this.text_.height(this.heightConstricted_ ? this.textHeight_ : null);
+    // settings text offset for
     this.text_.x(/** @type {number} */(this.padding().left()));
     this.text_.y(/** @type {number} */(this.padding().top()));
 
     if (this.parentBounds_ || stage) {
       var elementToPosition = hasBackground ? this.layer_ : this.text_;
       elementToPosition.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-      //elementToPosition.translate(this.actualLeft_, this.actualTop_);
-      elementToPosition.rotate(/** @type {number} */(this.rotation()),
-          this.pixelBounds_.left + this.pixelBounds_.width / 2,
-          this.pixelBounds_.top + this.pixelBounds_.height / 2);
+      elementToPosition.translate(this.actualLeft_, this.actualTop_);
+      elementToPosition.rotate(this.getRotation_(), this.actualLeft_, this.actualTop_);
       this.markConsistent(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
     }
   }
@@ -463,13 +446,42 @@ anychart.elements.Title.prototype.draw = function() {
 
 
 /**
- * Returns title bounds with all margin and padding.
- * @return {!anychart.math.Rect} Pixel bounds of the title with all padding and margin.
+ * Returns remaining parent bounds to use elsewhere.
+ * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
-anychart.elements.Title.prototype.getPixelBounds = function() {
+anychart.elements.Title.prototype.getRemainingBounds = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS))
     this.calcActualBounds_();
-  return this.pixelBounds_.clone();
+  /** @type {anychart.math.Rect} */
+  var parentBounds;
+  if (this.parentBounds_) {
+    parentBounds = this.parentBounds_.clone();
+  } else {
+    var container = /** @type {acgraph.vector.ILayer} */(this.container());
+    var stage = container ? container.getStage() : null;
+    if (stage) {
+      parentBounds = stage.getBounds(); // cloned already
+    } else {
+      return new anychart.math.Rect(0, 0, 0, 0);
+    }
+  }
+  switch (this.orientation_) {
+    case anychart.utils.Orientation.TOP:
+      parentBounds.top += this.pixelBounds_.height;
+      parentBounds.height -= this.pixelBounds_.height;
+      break;
+    case anychart.utils.Orientation.RIGHT:
+      parentBounds.width -= this.pixelBounds_.width;
+      break;
+    case anychart.utils.Orientation.BOTTOM:
+      parentBounds.height -= this.pixelBounds_.height;
+      break;
+    case anychart.utils.Orientation.LEFT:
+      parentBounds.left += this.pixelBounds_.width;
+      parentBounds.width -= this.pixelBounds_.width;
+      break;
+  }
+  return parentBounds;
 };
 
 
@@ -483,6 +495,25 @@ anychart.elements.Title.prototype.applyTextSettings = function(textElement, isIn
   }
   goog.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
+};
+
+
+/**
+ * Internal getter for title rotation due to orientation.
+ * @return {number} Rotation degree.
+ * @private
+ */
+anychart.elements.Title.prototype.getRotation_ = function() {
+  switch (this.orientation_) {
+    case anychart.utils.Orientation.LEFT:
+      return -90;
+    case anychart.utils.Orientation.RIGHT:
+      return 90;
+    //case anychart.utils.Orientation.TOP:
+    //case anychart.utils.Orientation.BOTTOM:
+    default:
+      return 0;
+  }
 };
 
 
@@ -544,9 +575,8 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
-    // TODO(): это пока не работает - не могу сообразить математику
-    if (false && parentBounds && parentBounds.width < this.backgroundWidth_) {
-      this.backgroundWidth_ = parentBounds.width;
+    if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
+      this.backgroundWidth_ = margin.tightenWidth(parentWidth);
       this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
       this.widthConstricted_ = true;
     } else {
@@ -561,9 +591,8 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else {
     this.textHeight_ = textBounds.height;
     this.backgroundHeight_ = padding.widenHeight(this.textHeight_);
-    // TODO(): это пока не работает - не могу сообразить математику
-    if (false && parentBounds && parentBounds.height < this.backgroundHeight_) {
-      this.backgroundHeight_ = parentBounds.height;
+    if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
+      this.backgroundHeight_ = margin.tightenHeight(parentHeight);
       this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
       this.heightConstricted_ = true;
     } else {
@@ -573,86 +602,93 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
-  var rotation = goog.graphics.AffineTransform.getRotateInstance(
-      goog.math.toRadians(/** @type {number} */(this.rotation())),
-      widthWithMargin / 2,
-      heightWithMargin / 2);
-  var rotatedBounds = acgraph.math.getBoundsOfRectWithTransform(
-      new anychart.math.Rect(
-          anychart.utils.normalize(/** @type {number} */(margin.left()), this.backgroundWidth_),
-          anychart.utils.normalize(/** @type {number} */(margin.top()), this.backgroundHeight_),
-          this.backgroundWidth_, this.backgroundHeight_),
-      rotation);
-  var rotatedBoundsWithMargin = acgraph.math.getBoundsOfRectWithTransform(
-      new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin),
-      rotation);
-
+  var leftMargin = anychart.utils.normalize(/** @type {number} */(margin.left()), this.backgroundWidth_);
+  var topMargin = anychart.utils.normalize(/** @type {number} */(margin.top()), this.backgroundWidth_);
   if (parentBounds) {
     switch (this.orientation_) {
       case anychart.utils.Orientation.TOP:
       case anychart.utils.Orientation.BOTTOM:
         switch (this.align_) {
           case anychart.utils.Align.LEFT:
-            this.actualLeft_ = rotatedBounds.getLeft() - rotatedBoundsWithMargin.getLeft();
+            this.actualLeft_ = parentBounds.getLeft() + leftMargin;
             break;
           case anychart.utils.Align.RIGHT:
-            this.actualLeft_ = parentBounds.getRight() -
-                (rotatedBoundsWithMargin.getRight() - rotatedBounds.getRight()) -
-                rotatedBounds.getWidth();
+            this.actualLeft_ = parentBounds.getRight() - widthWithMargin + leftMargin;
             break;
           default:
-            this.actualLeft_ = (parentBounds.getLeft() + parentBounds.getRight() - rotatedBoundsWithMargin.getWidth()) / 2 +
-                (rotatedBounds.getLeft() - rotatedBoundsWithMargin.getLeft());
+            this.actualLeft_ = (parentBounds.getLeft() + parentBounds.getRight() - widthWithMargin) / 2 + leftMargin;
             break;
         }
         break;
       case anychart.utils.Orientation.LEFT:
+        switch (this.align_) {
+          case anychart.utils.Align.TOP:
+          case anychart.utils.Align.RIGHT:
+            this.actualTop_ = parentBounds.getTop() + widthWithMargin - leftMargin;
+            break;
+          case anychart.utils.Align.BOTTOM:
+          case anychart.utils.Align.LEFT:
+            this.actualTop_ = parentBounds.getBottom() - leftMargin;
+            break;
+          default:
+            this.actualTop_ = (parentBounds.getTop() + parentBounds.getBottom() + widthWithMargin) / 2 - leftMargin;
+            break;
+        }
+        break;
       case anychart.utils.Orientation.RIGHT:
         switch (this.align_) {
           case anychart.utils.Align.TOP:
-            this.actualTop_ = rotatedBounds.getTop() - rotatedBoundsWithMargin.getTop();
+          case anychart.utils.Align.LEFT:
+            this.actualTop_ = parentBounds.getTop() + leftMargin;
             break;
           case anychart.utils.Align.BOTTOM:
-            this.actualTop_ = parentBounds.getBottom() -
-                (rotatedBoundsWithMargin.getBottom() - rotatedBounds.getBottom()) -
-                rotatedBounds.getHeight();
+          case anychart.utils.Align.RIGHT:
+            this.actualTop_ = parentBounds.getBottom() - widthWithMargin + leftMargin;
             break;
           default:
-            this.actualTop_ = (parentBounds.getTop() + parentBounds.getBottom() - rotatedBoundsWithMargin.getHeight()) / 2 +
-                (rotatedBounds.getTop() - rotatedBoundsWithMargin.getTop());
+            this.actualTop_ = (parentBounds.getTop() + parentBounds.getBottom() - widthWithMargin) / 2 + leftMargin;
             break;
         }
         break;
     }
     switch (this.orientation_) {
       case anychart.utils.Orientation.TOP:
-        this.actualTop_ = rotatedBounds.getTop() - rotatedBoundsWithMargin.getTop();
+        this.actualTop_ = parentBounds.getTop() + topMargin;
+        this.pixelBounds_ = new anychart.math.Rect(
+            this.actualLeft_ - leftMargin,
+            parentBounds.getTop(),
+            widthWithMargin,
+            heightWithMargin);
         break;
       case anychart.utils.Orientation.RIGHT:
-        this.actualLeft_ = parentBounds.getRight() -
-            (rotatedBoundsWithMargin.getRight() - rotatedBounds.getRight()) -
-            rotatedBounds.getWidth();
+        this.actualLeft_ = parentBounds.getRight() - topMargin;
+        this.pixelBounds_ = new anychart.math.Rect(
+            parentBounds.getRight() - widthWithMargin,
+            this.actualTop_ - leftMargin,
+            widthWithMargin,
+            heightWithMargin);
         break;
       case anychart.utils.Orientation.BOTTOM:
-        this.actualTop_ = parentBounds.getBottom() -
-            (rotatedBoundsWithMargin.getBottom() - rotatedBounds.getBottom()) -
-            rotatedBounds.getHeight();
+        this.actualTop_ = parentBounds.getBottom() - heightWithMargin + topMargin;
+        this.pixelBounds_ = new anychart.math.Rect(
+            this.actualLeft_ - leftMargin,
+            parentBounds.getBottom() - heightWithMargin,
+            widthWithMargin,
+            heightWithMargin);
         break;
       case anychart.utils.Orientation.LEFT:
-        this.actualLeft_ = rotatedBounds.getLeft() - rotatedBoundsWithMargin.getLeft();
+        this.actualLeft_ = parentBounds.getLeft() + topMargin;
+        this.pixelBounds_ = new anychart.math.Rect(
+            parentBounds.getLeft(),
+            this.actualTop_ - widthWithMargin + leftMargin,
+            widthWithMargin,
+            heightWithMargin);
         break;
     }
-    this.pixelBounds_ = new anychart.math.Rect(
-        this.actualLeft_ - rotatedBoundsWithMargin.getLeft() + rotatedBounds.getLeft(),
-        this.actualTop_ - rotatedBoundsWithMargin.getTop() + rotatedBounds.getTop(),
-        rotatedBoundsWithMargin.getWidth(),
-        rotatedBoundsWithMargin.getHeight());
   } else {
-    this.actualLeft_ = rotatedBounds.getLeft() - rotatedBoundsWithMargin.getLeft();
-    this.actualTop_ = rotatedBounds.getTop() - rotatedBoundsWithMargin.getTop();
-    this.pixelBounds_ = new anychart.math.Rect(0, 0,
-        rotatedBoundsWithMargin.getWidth(),
-        rotatedBoundsWithMargin.getHeight());
+    this.actualLeft_ = leftMargin;
+    this.actualTop_ = topMargin;
+    this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
   }
 };
 
