@@ -9,7 +9,13 @@ goog.require('goog.events.EventTarget');
  * @enum {number}
  */
 anychart.utils.ConsistencyState = {
-  DATA: 0x001
+  DATA: 0x0001,
+  CONTAINER: 0x0002,
+  BOUNDS: 0x0004,
+  PIXEL_BOUNDS: 0x0008,
+  APPEARANCE: 0x0010,
+  BACKGROUND_APPEARANCE: 0x0020,
+  ALL: 0xFFFF
 };
 
 
@@ -50,16 +56,39 @@ anychart.utils.Invalidatable.prototype.consistency_ = 0;
 
 
 /**
+ * If NaN - no dispatching suspending is active.
+ * If a number - contains the cumulative state for all suspended states that were to be dispatched during the suspend.
+ * @type {number}
+ * @private
+ */
+anychart.utils.Invalidatable.prototype.suspendedDispatching_ = NaN;
+
+
+/**
  * Устанавливает элементу переданную комбинацию состояний рассинхронизации {@link anychart.utils.ConsistencyState}.
  * @param {anychart.utils.ConsistencyState|number} state Состояние, которые нужно установить (или комбинация состояний).
  * @return {number} Композиция состояний связности, которые реально изменились.
  */
 anychart.utils.Invalidatable.prototype.invalidate = function(state) {
+  var effective = this.silentlyInvalidate(state);
+  if (!!effective)
+    this.dispatchInvalidationEvent(effective);
+  return effective;
+};
+
+
+/**
+ * Устанавливает элементу переданную комбинацию состояний рассинхронизации {@link anychart.utils.ConsistencyState}.
+ * В отличие от invalidate() не запускает событие - краткая форма записи:
+ * this.suspendInvalidationDispatching().invalidate(state).resumeInvalidationDispatching(false);
+ *
+ * @param {anychart.utils.ConsistencyState|number} state Состояние, которые нужно установить (или комбинация состояний).
+ * @return {number} Композиция состояний связности, которые реально изменились.
+ */
+anychart.utils.Invalidatable.prototype.silentlyInvalidate = function(state) {
   state &= this.SUPPORTED_CONSISTENCY_STATES;
   var effective = state & ~this.consistency_;
   this.consistency_ |= effective;
-  if (!!effective)
-    this.dispatchInvalidationEvent(effective);
   return effective;
 };
 
@@ -97,7 +126,48 @@ anychart.utils.Invalidatable.prototype.hasInvalidationState = function(state) {
  * @param {anychart.utils.ConsistencyState|number} state Установленные состояния инвалидации.
  */
 anychart.utils.Invalidatable.prototype.dispatchInvalidationEvent = function(state) {
-  this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, state));
+  if (isNaN(this.suspendedDispatching_))
+    this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, state));
+  else
+    this.suspendedDispatching_ |= state;
+};
+
+
+/**
+ * Suspends invalidation events dispatching. The dispatching can be then resumed with or without cumulative dispatching
+ * of all affected states.
+ * @return {!anychart.utils.Invalidatable} Itself for chaining.
+ */
+anychart.utils.Invalidatable.prototype.suspendInvalidationDispatching = function() {
+  if (isNaN(this.suspendedDispatching_))
+    this.suspendedDispatching_ = 0;
+  return this;
+};
+
+
+/**
+ * Resumes dispatching of invalidation events.
+ * @param {boolean} doDispatchSuspendedStates Whether to dispatch all invalidation that were to be dispatched while the
+ *    suspend or not.
+ * @return {anychart.utils.Invalidatable} Itself for chaining.
+ */
+anychart.utils.Invalidatable.prototype.resumeInvalidationDispatching = function(doDispatchSuspendedStates) {
+  if (isNaN(this.suspendedDispatching_))
+    return this;
+  var eventsToDispatch = this.suspendedDispatching_;
+  this.suspendedDispatching_ = NaN;
+  if (doDispatchSuspendedStates)
+    this.dispatchInvalidationEvent(eventsToDispatch);
+  return this;
+};
+
+
+/**
+ * Defines is invalidation dispatching suspended or not.
+ * @return {boolean} Is invalidation dispatching suspended or not.
+ */
+anychart.utils.Invalidatable.prototype.isInvalidationDispatchingSuspended = function() {
+  return isNaN(this.suspendedDispatching_);
 };
 
 

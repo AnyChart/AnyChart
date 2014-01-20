@@ -2,7 +2,10 @@ goog.provide('anychart');
 goog.provide('anychart.globalLock');
 
 goog.require('acgraphexport');
+goog.require('anychart.Chart');
 goog.require('anychart.data');
+goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Title');
 goog.require('anychart.utils');
 
 
@@ -35,7 +38,11 @@ anychart.globalLock.lock = function() {
  * @param {Object=} opt_context Handler context.
  */
 anychart.globalLock.onUnlock = function(handler, opt_context) {
-  anychart.globalLock.subscribers.push(goog.bind(handler, opt_context));
+  if (anychart.globalLock.locked) {
+    anychart.globalLock.subscribers.push(goog.bind(handler, opt_context));
+  } else {
+    handler.apply(opt_context);
+  }
 };
 
 
@@ -52,4 +59,45 @@ anychart.globalLock.unlock = function() {
     }
   }
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Default font settings
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.global['anychart'] = goog.global['anychart'] || {};
+
+
+/**
+ * Default value for size of font.
+ * @type {string|number}
+ *
+ */
+goog.global['anychart']['fontSize'] = '16px';
+
+
+/**
+ * Default value for color of font
+ * @type {string}
+ *
+ */
+goog.global['anychart']['fontColor'] = '#000';
+
+
+/**
+ * Default value for style of font.
+ * @type {string}
+ *
+ */
+goog.global['anychart']['fontFamily'] = 'Arial';
+
+
+/**
+ * Default value for direction of text. Text direction may be left-to-right or right-to-left.
+ * @type {string}
+ *
+ */
+goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
+//endregion
 

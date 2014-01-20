@@ -73,6 +73,28 @@ anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
 
 
 /**
+ * Creates pie-ready derivative view.
+ * @param {string} fieldName Field name to make filter by.
+ * @param {function(*):boolean=} opt_func Filter function that should accept a field value and return true if the row
+ *    should be included into the resulting view as a and false otherwise.
+ * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
+ *     every value of other. This function
+ *     takes 4 arguments (the function's previous result or the initial value,
+ *     the value of the current array element, the current array index, and the
+ *     array itself)
+ *     function(previousValue, currentValue, index, array).
+ * @param {(function():R)=} opt_otherInitialConstructor The function that constructs initial value for opt_other func.
+ * @template T,S,R
+ * @return {!anychart.data.View} The new derived view.
+ */
+anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
+  var result = new anychart.data.PieView(this, fieldName, opt_func, opt_other, opt_otherInitialConstructor);
+  this.registerDisposable(result);
+  return result;
+};
+
+
+/**
  * Creates a derivative view, containing only row that passed the filter.
  * @param {string} fieldName A field which value will be passed to a filter function.
  * @param {function(*):boolean} func Filter function that should accept a field value and return true if the row
@@ -161,6 +183,7 @@ anychart.data.View.prototype.getRowsCount = function() {
 * @return {!anychart.data.Mapping} Mapping for the row.
 */
 anychart.data.View.prototype.getRowMapping = function(rowIndex) {
+  this.ensureConsistent();
   return this.parentView.getRowMapping(this.mask[rowIndex]);
 };
 

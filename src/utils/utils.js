@@ -1,4 +1,70 @@
 goog.provide('anychart.utils');
+goog.provide('anychart.utils.Align');
+
+
+/**
+ * Align enumeration.
+ * @enum {string}
+ */
+anychart.utils.Align = {
+  CENTER: 'center',
+  LEFT: 'left',
+  RIGHT: 'right',
+  TOP: 'top',
+  BOTTOM: 'bottom'
+};
+
+
+/**
+ * Normalizes user input align to its enumeration values. Also accepts 'middle' and null. Defaults to opt_default or
+ * 'center'.
+ *
+ * @param {string} align Align to normalize.
+ * @param {anychart.utils.Align=} opt_default Align to normalize.
+ * @return {anychart.utils.Align} Normalized align.
+ */
+anychart.utils.normalizeAlign = function(align, opt_default) {
+  if (goog.isString(align)) {
+    align = align.toLowerCase();
+    if (align == 'middle') return anychart.utils.Align.CENTER;
+    for (var i in anychart.utils.Align) {
+      if (align == anychart.utils.Align[i])
+        return anychart.utils.Align[i];
+    }
+  }
+  return opt_default || anychart.utils.Align.CENTER;
+};
+
+
+/**
+ * Orientation enumeration.
+ * @enum {string}
+ */
+anychart.utils.Orientation = {
+  LEFT: 'left',
+  RIGHT: 'right',
+  TOP: 'top',
+  BOTTOM: 'bottom'
+};
+
+
+/**
+ * Normalizes user input orientation to its enumeration values. Also accepts null. Defaults to opt_default or 'top'.
+ *
+ * @param {string} orientation Orientation to normalize.
+ * @param {anychart.utils.Orientation=} opt_default Orientation to normalize.
+ * @return {anychart.utils.Orientation} Normalized orientation.
+ */
+anychart.utils.normalizeOrientation = function(orientation, opt_default) {
+  if (goog.isString(orientation)) {
+    orientation = orientation.toLowerCase();
+    for (var i in anychart.utils.Orientation) {
+      if (orientation == anychart.utils.Orientation[i])
+        return anychart.utils.Orientation[i];
+    }
+  }
+  return opt_default || anychart.utils.Orientation.TOP;
+};
 
 
 /**
@@ -68,4 +134,40 @@ anychart.utils.hash = function(value) {
   return goog.isObject(value) ?
       'o' + goog.getUid(value) :
       (typeof value).charAt(0) + value;
+};
+
+
+/**
+ * Normalizes number or string value and converts it to number.
+ * Supports percent strings if opt_containerSize is defined and not NaN - calculates percentage in that case.
+ * @param {string|number} value Value to normalize.
+ * @param {number=} opt_containerSize Optional container dimension to support percent option.
+ * @return {!number} Calculated percent value.
+ */
+anychart.utils.normalize = function(value, opt_containerSize) {
+  return goog.isNumber(value) ?
+      value :
+      (!isNaN(opt_containerSize) && anychart.utils.isPercent(value) ?
+          opt_containerSize * parseFloat(value) / 100 :
+          parseFloat(value));
+};
+
+
+/**
+ * Define whenever value is set in percent.
+ * @param {*} value Value to define.
+ * @return {boolean} Is value set in percent.
+ */
+anychart.utils.isPercent = function(value) {
+  return goog.isString(value) && goog.string.endsWith(value, '%');
+};
+
+
+/**
+ * Define whenever value is set in percent.
+ * @param {*} value Value to define.
+ * @return {boolean} Is value set in percent.
+ */
+anychart.utils.isUnit = function(value) {
+  return goog.isString(value) && value.charAt(value.length - 1).toLowerCase() == 'u';
 };

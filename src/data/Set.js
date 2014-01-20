@@ -26,14 +26,6 @@ goog.inherits(anychart.data.Set, anychart.utils.Invalidatable);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
- * @type {number}
- */
-anychart.data.Set.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
-
-
-/**
  * Internal data set storage.
  * @type {!Array}
  */

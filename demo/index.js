@@ -1,4 +1,13 @@
-var data, dataSet, mapping, view1, view2, view3;
+var data, dataSet, mapping, view1, view2, view3, title;
+
+function load1() {
+  title = new anychart.elements.Title();
+  title.text('AAAAAAAAA!!!!').container('container').background().fill('red').corners(10);
+  title.margin(0).padding(10).height(300).width(300).hAlign('center').vAlign('center');
+  title.draw();
+  title.listen('invalidated', function() { title.draw(); });
+}
+
 
 function load() {
   data = [
@@ -16,16 +25,16 @@ function load() {
 
   dataSet = new anychart.data.Set(data);
   mapping = dataSet.mapAs();
-  view1 = mapping.prepare('x');
-  view2 = mapping.prepare('x', ['a', 'd', 1, '1', '2', 2]);
-  view3 = view1.concat(view2);//.sort('value');//.filter('value', function(a) {return a < 3 || a > 7});
+  view1 = mapping.preparePie('value');
+  view2 = mapping.preparePie('value', function(val) { return val > 3;});
+  view3 = mapping.preparePie('value', function(val) { return val > 3;}, undefined, function() { return { 'value': 0, 'fill': 'red', 'x': 100 }; });
 
-  console.log(toArray(view1, 'x'));
-  console.log(toArray(view1, 'value'));
-  console.log(toArray(view2, 'x'));
-  console.log(toArray(view2, 'value'));
-  console.log(toArray(view3, 'x'));
-  console.log(toArray(view3, 'value'));
+  console.log('x1', toArray(view1, 'x'));
+  console.log('y1', toArray(view1, 'value'));
+  console.log('x2', toArray(view2, 'x'));
+  console.log('y2', toArray(view2, 'value'));
+  console.log('x3', toArray(view3, 'x'));
+  console.log('y3', toArray(view3, 'value'));
 
   console.log('dataSet.row(3, [\'d\', 20])');
   dataSet.row(3, ['d', 20]);
@@ -59,6 +68,7 @@ function load() {
 }
 
 function toArray(view, opt_fieldName) {
+  if (!view) return '-----';
   var res = [];
   var iter = view.getIterator();
   while (iter.advance())
