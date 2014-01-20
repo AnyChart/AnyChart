@@ -8,7 +8,13 @@ function load() {
   title.listen('invalidated', function() { title.draw(); });
 }
 
-function qq() {
+function q() {
+  title.silentlyInvalidate(0xffff);
+  // вместо title.silentlyInvalidate(0xffff); можно написать и title.width(300).width(null)
+  title.draw();
+}
+
+function w() {
   var q = title.container_.data();
   title.container_.dispose();
   var a = acgraph.create().container('container');
