@@ -218,8 +218,8 @@ anychart.elements.Title.prototype.width = function(opt_value) {
       this.width_ = opt_value;
       this.invalidate(
           anychart.utils.ConsistencyState.PIXEL_BOUNDS |
-          anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-          anychart.utils.ConsistencyState.APPEARANCE);
+              anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+              anychart.utils.ConsistencyState.APPEARANCE);
     }
     return this;
   }
@@ -238,8 +238,8 @@ anychart.elements.Title.prototype.height = function(opt_value) {
       this.height_ = opt_value;
       this.invalidate(
           anychart.utils.ConsistencyState.PIXEL_BOUNDS |
-          anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-          anychart.utils.ConsistencyState.APPEARANCE);
+              anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+              anychart.utils.ConsistencyState.APPEARANCE);
     }
     return this;
   }
@@ -256,8 +256,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @param {(string|number)=} opt_left Left space.
  * @return {!anychart.elements.Title|!anychart.utils.Margin} Margin or title for chaining.
  */
-anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
-    opt_left) {
+anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
     this.registerDisposable(this.margin_);
@@ -280,8 +279,7 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
  * @param {(string|number)=} opt_left Left space.
  * @return {!anychart.elements.Title|!anychart.utils.Padding} Padding or title for chaining.
  */
-anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
-    opt_left) {
+anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
     this.registerDisposable(this.padding_);
@@ -714,4 +712,54 @@ anychart.elements.Title.prototype.boundsInvalidated_ = function(event) {
   if (event.invalidated(anychart.utils.ConsistencyState.BOUNDS)) {
     this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
   }
+};
+
+
+/**
+ * Copy title settings from the passed title it itself.
+ * @param {anychart.elements.Title} title Title to copy settings from.
+ * @return {anychart.elements.Title} Returns itself for chaining call.
+ */
+anychart.elements.Title.prototype.cloneFrom = function(title) {
+  this.suspendInvalidationDispatching();
+  if (goog.isDefAndNotNull(title)) {
+    this.background(title.background_);
+    this.align(title.align_);
+    this.orientation(title.orientation_);
+    this.margin(title.margin_);
+    this.padding(title.padding_);
+    this.textSettings(title.settingsObj);
+    this.width(title.width_);
+    this.height(title.height_);
+  } else {
+    this.align(anychart.utils.Align.CENTER);
+    this.orientation(anychart.utils.Orientation.TOP);
+    this.margin(null);
+    this.padding(null);
+    this.width(null);
+    this.height(null);
+    this.textSettings({
+      'fontSize': goog.global['anychart']['fontSize'],
+      'fontFamily': goog.global['anychart']['fontFamily'],
+      'fontColor': goog.global['anychart']['fontColor'],
+      'fontOpacity': 1,
+      'fontDecoration': acgraph.vector.Text.Decoration.NONE,
+      'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
+      'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
+      'fontWeight': 'normal',
+      'letterSpacing': 'normal',
+      'direction': goog.global['anychart']['textDirection'],
+      'lineHeight': 'normal',
+      'textIndent': '0px',
+      'vAlign': acgraph.vector.Text.VAlign.TOP,
+      'hAlign': acgraph.vector.Text.HAlign.START,
+      'textWrap': acgraph.vector.Text.TextWrap.NO_WRAP,
+      'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
+      'selectable': false,
+      'useHtml': false,
+      'text': 'Title text'
+    });
+  }
+  this.resumeInvalidationDispatching(true);
+  return this;
 };

@@ -14,7 +14,11 @@ goog.require('goog.dom');
  */
 anychart.elements.Base = function() {
   goog.base(this);
+
+  this.suspendInvalidationDispatching();
   this.invalidate(anychart.utils.ConsistencyState.CONTAINER);
+  this.invalidate(anychart.utils.ConsistencyState.Z_INDEX);
+  this.resumeInvalidationDispatching(true);
 };
 goog.inherits(anychart.elements.Base, anychart.utils.Invalidatable);
 
@@ -40,7 +44,8 @@ anychart.elements.Base.prototype.zIndex_ = 0;
  * @type {number}
  */
 anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.CONTAINER;
+    anychart.utils.ConsistencyState.CONTAINER |
+        anychart.utils.ConsistencyState.Z_INDEX;
 
 
 /**
@@ -78,6 +83,7 @@ anychart.elements.Base.prototype.container = function(opt_value) {
 anychart.elements.Base.prototype.zIndex = function(opt_zIndex) {
   if (goog.isDef(opt_zIndex)) {
     this.zIndex_ = +opt_zIndex || 0;
+    this.invalidate(anychart.utils.ConsistencyState.Z_INDEX);
     return this;
   }
   return this.zIndex_;

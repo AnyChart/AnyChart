@@ -9,13 +9,91 @@ goog.require('goog.events.EventTarget');
  * @enum {number}
  */
 anychart.utils.ConsistencyState = {
+  /**
+   * Выставляется когда изменились данные.
+   */
   DATA: 0x0001,
+
+  /**
+   * Выставляется когда изменился содержащий елемент контейнер.
+   */
   CONTAINER: 0x0002,
+
+  /**
+   * Выставляется когда изменились настройки позиции или размера.
+   * Это не значит что фактическое местоположение изменилось, изменилась лишь настройка.
+   */
   BOUNDS: 0x0004,
+
+  /**
+   *  Выставляется когда фактическая позиция или размер изменились.
+   */
   PIXEL_BOUNDS: 0x0008,
+
+  /**
+   * Выставляется когда все окружение елемента изменилось и его нужно полностью перерисовать.
+   */
   APPEARANCE: 0x0010,
+
+  /**
+   * Выставляется когда изменились настройки фона елемента не влияющие на остальные части елемента.
+   * Это значит, что нужно перерисовать только фон и ничего кроме фона.
+   */
   BACKGROUND_APPEARANCE: 0x0020,
-  ALL: 0xFFFF
+
+  /**
+   * Выставляется когда изменились настройки заголовка елемента не влияющие на остальные части элемента.
+   * Это значит что нужно перерисовать только заголовок и ничего кроме заголовка.
+   */
+  TITLE_APPEARANCE: 0x0040,
+
+  /**
+   * Выставляется когда изменился zIndex контейнера.
+   */
+  Z_INDEX: 0x0080,
+
+  //  RESERVED_FLAG1: 0x0100,
+  //  RESERVED_FLAG2: 0x0200,
+  //  RESERVED_FLAG3: 0x0400,
+  //  RESERVED_FLAG4: 0x0800,
+  //  RESERVED_FLAG5: 0x1000,
+  //  RESERVED_FLAG6: 0x2000,
+  //  RESERVED_FLAG7: 0x4000,
+  //  RESERVED_FLAG8: 0x8000,
+  //  RESERVED_FLAG9: 0x10000,
+  //  RESERVED_FLAG10: 0x20000,
+  //  RESERVED_FLAG11: 0x40000,
+  //  RESERVED_FLAG12: 0x80000,
+  //  RESERVED_FLAG13: 0x100000,
+  //  RESERVED_FLAG14: 0x200000,
+  //  RESERVED_FLAG15: 0x400000,
+  //  RESERVED_FLAG16: 0x800000,
+  //  RESERVED_FLAG17: 0x1000000,
+  //  RESERVED_FLAG18: 0x2000000,
+  //  RESERVED_FLAG19: 0x4000000,
+  //  RESERVED_FLAG20: 0x8000000,
+  //  RESERVED_FLAG21: 0x10000000,
+  //  RESERVED_FLAG22: 0x20000000,
+  //  RESERVED_FLAG23: 0x40000000,
+  //  RESERVED_FLAG24: 0x80000000,
+  //  RESERVED_FLAG25: 0x100000000,
+  //  RESERVED_FLAG26: 0x200000000,
+  //  RESERVED_FLAG27: 0x400000000,
+  //  RESERVED_FLAG28: 0x800000000,
+  //  RESERVED_FLAG29: 0x1000000000,
+  //  RESERVED_FLAG30: 0x2000000000,
+  //  RESERVED_FLAG31: 0x4000000000,
+  //  RESERVED_FLAG32: 0x8000000000,
+  //  RESERVED_FLAG33: 0x10000000000,
+  //  RESERVED_FLAG34: 0x20000000000,
+  //  RESERVED_FLAG35: 0x40000000000,
+  //  RESERVED_FLAG36: 0x80000000000,
+  //  RESERVED_FLAG37: 0x100000000000,
+  //  RESERVED_FLAG38: 0x200000000000,
+  //  RESERVED_FLAG39: 0x400000000000,
+  //  RESERVED_FLAG40: 0x800000000000,
+  //  RESERVED_FLAG_LAST: 0x10000000000000000,
+  ALL: 0xFF
 };
 
 

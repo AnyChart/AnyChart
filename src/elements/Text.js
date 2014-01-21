@@ -104,8 +104,8 @@ anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_v
       }
     } else if (goog.isObject(opt_objectOrName)) {
       this.suspendInvalidationDispatching();
-      for (var item in opt_value) {
-        this.textSettings(item, opt_value[item]);
+      for (var item in opt_objectOrName) {
+        this.textSettings(item, opt_objectOrName[item]);
       }
       this.resumeInvalidationDispatching(true);
     }
@@ -292,16 +292,6 @@ anychart.elements.Text.prototype.selectable = function(opt_value) {
  */
 anychart.elements.Text.prototype.useHtml = function(opt_value) {
   return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('useHtml', opt_value));
-};
-
-
-/**
- * Text rotation angle in degrees.
- * @param {number=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|number} Asked value or itself for chaining.
- */
-anychart.elements.Text.prototype.rotation = function(opt_value) {
-  return /** @type {!anychart.elements.Text|number} */(this.textSettings('rotation', opt_value));
 };
 
 

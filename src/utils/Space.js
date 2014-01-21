@@ -84,8 +84,7 @@ anychart.utils.Space.prototype.left_;
  * @param {(string|number)=} opt_left Left space.
  * @return {anychart.utils.Space} Returns itself for chaining.
  */
-anychart.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
-    opt_left) {
+anychart.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   var top, right, bottom, left;
   var argsLen = arguments.length;
   // else if branches sorted a bit like by usage frequency
@@ -301,4 +300,21 @@ anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
   var top = anychart.utils.normalize(this.top_, initialHeight);
   var bottom = anychart.utils.normalize(this.bottom_, initialHeight);
   return initialHeight + top + bottom;
+};
+
+
+/**
+ * Clone settings from the passed space to itself.
+ * @param {anychart.utils.Space} space Space to copy settings from.
+ * @return {anychart.utils.Space} Return itself for chaining call.
+ */
+anychart.utils.Space.prototype.cloneFrom = function(space) {
+  this.suspendInvalidationDispatching();
+  if (goog.isDefAndNotNull(space)) {
+    this.set(space);
+  } else {
+    this.set();
+  }
+  this.resumeInvalidationDispatching(true);
+  return this;
 };

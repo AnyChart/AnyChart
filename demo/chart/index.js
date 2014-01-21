@@ -2,10 +2,17 @@ var chart;
 function load() {
   chart = new anychart.Chart();
   chart.container('container');
-  chart.background().fill('red');
+  chart.title().background().fill('red .5');
+  chart.background().fill('red .5');
   chart.draw();
 
-  chart.margin().left(100);
-  chart.margin().right(100);
+  var title = new anychart.elements.Title();
+  title.text('New Chart title');
+  title.background().fill('blue .5');
 
+  var background = new anychart.elements.Background();
+  background.fill('green .5');
+
+  chart.title(title);
+  chart.background(background);
 }

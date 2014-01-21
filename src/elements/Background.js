@@ -41,7 +41,7 @@ anychart.elements.Background = function(opt_type, var_args) {
    * @type {!Array}
    * @private
    */
-  this.fill_ = ['#000', 0.5];
+  this.fill_ = ['#000', 0.5]; //если убирать отсюда создание массива, то нужно не забыть убрать apply из copyFrom
 
   /**
    * Stroke settings. Contains array of arguments that were passed to the stroke() method to support all
@@ -49,7 +49,7 @@ anychart.elements.Background = function(opt_type, var_args) {
    * @type {!Array}
    * @private
    */
-  this.stroke_ = ['#000'];
+  this.stroke_ = ['#000']; //если убирать отсюда создание массива, то нужно не забыть убрать apply из copyFrom
 
   this.invalidate(anychart.utils.ConsistencyState.ALL);
 };
