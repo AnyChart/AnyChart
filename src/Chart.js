@@ -208,7 +208,9 @@ anychart.Chart.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    this.background_.suspendInvalidationDispatching();
     this.background_.cloneFrom(opt_value);
+    this.background_.resumeInvalidationDispatching(true);
     return this;
   }
   return this.background_;
@@ -245,11 +247,13 @@ anychart.Chart.prototype.title = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    this.title_.suspendInvalidationDispatching();
     if (goog.isString(opt_value)) {
       this.title_.text(opt_value);
-    } else if (opt_value instanceof anychart.elements.Title) {
+    } else {
       this.title_.cloneFrom(opt_value);
     }
+    this.title_.resumeInvalidationDispatching(true);
     return this;
   }
   return this.title_;

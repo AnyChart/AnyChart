@@ -18,26 +18,7 @@ anychart.elements.Text = function() {
    * @type {!Object}
    * @protected
    */
-  this.settingsObj = {
-    'fontSize': goog.global['anychart']['fontSize'],
-    'fontFamily': goog.global['anychart']['fontFamily'],
-    'fontColor': goog.global['anychart']['fontColor'],
-    'fontOpacity': 1,
-    'fontDecoration': acgraph.vector.Text.Decoration.NONE,
-    'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
-    'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
-    'fontWeight': 'normal',
-    'letterSpacing': 'normal',
-    'direction': goog.global['anychart']['textDirection'],
-    'lineHeight': 'normal',
-    'textIndent': '0px',
-    'vAlign': acgraph.vector.Text.VAlign.TOP,
-    'hAlign': acgraph.vector.Text.HAlign.START,
-    'textWrap': acgraph.vector.Text.TextWrap.NO_WRAP,
-    'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
-    'selectable': false,
-    'useHtml': false
-  };
+  this.settingsObj;
 
   /**
    * Contains flags for all settings that were changed.
@@ -58,6 +39,7 @@ anychart.elements.Text = function() {
     'selectable': true
   };
 
+  this.restoreDefaults();
   this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
 };
 goog.inherits(anychart.elements.Text, anychart.elements.Base);
@@ -69,8 +51,8 @@ goog.inherits(anychart.elements.Text, anychart.elements.Base);
  */
 anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.APPEARANCE |
-    anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+        anychart.utils.ConsistencyState.APPEARANCE |
+        anychart.utils.ConsistencyState.PIXEL_BOUNDS;
 
 
 /**
@@ -103,11 +85,9 @@ anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_v
         return this.settingsObj[opt_objectOrName];
       }
     } else if (goog.isObject(opt_objectOrName)) {
-      this.suspendInvalidationDispatching();
       for (var item in opt_objectOrName) {
         this.textSettings(item, opt_objectOrName[item]);
       }
-      this.resumeInvalidationDispatching(true);
     }
     return this;
   }
@@ -336,4 +316,33 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.textOverflow(this.settingsObj['textOverflow']);
   if ('selectable' in this.changedSettings)
     textElement.selectable(this.settingsObj['selectable']);
+};
+
+
+/**
+ * Restore text default settings.
+ * @return {anychart.elements.Text} Returns itself for chaining call.
+ */
+anychart.elements.Text.prototype.restoreDefaults = function() {
+  this.settingsObj = {
+    'fontSize': goog.global['anychart']['fontSize'],
+    'fontFamily': goog.global['anychart']['fontFamily'],
+    'fontColor': goog.global['anychart']['fontColor'],
+    'fontOpacity': 1,
+    'fontDecoration': acgraph.vector.Text.Decoration.NONE,
+    'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
+    'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
+    'fontWeight': 'normal',
+    'letterSpacing': 'normal',
+    'direction': goog.global['anychart']['textDirection'],
+    'lineHeight': 'normal',
+    'textIndent': '0px',
+    'vAlign': acgraph.vector.Text.VAlign.TOP,
+    'hAlign': acgraph.vector.Text.HAlign.START,
+    'textWrap': acgraph.vector.Text.TextWrap.NO_WRAP,
+    'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
+    'selectable': false,
+    'useHtml': false
+  };
+  return this;
 };

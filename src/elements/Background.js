@@ -345,7 +345,6 @@ anychart.elements.Background.prototype.draw = function() {
  * @return {!anychart.elements.Background} Returns itself for chaining.
  */
 anychart.elements.Background.prototype.cloneFrom = function(background) {
-  this.suspendInvalidationDispatching();
   if (goog.isDefAndNotNull(background)) {
     this.fill.apply(this, background.fill_);
     this.stroke.apply(this, background.stroke_);
@@ -354,6 +353,6 @@ anychart.elements.Background.prototype.cloneFrom = function(background) {
   } else {
     this.fill(null).stroke(null).corners(0);
   }
-  this.resumeInvalidationDispatching(true);
   return this;
 };
+

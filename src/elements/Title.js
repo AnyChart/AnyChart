@@ -12,7 +12,6 @@ goog.require('anychart.utils.Padding');
  */
 anychart.elements.Title = function() {
   goog.base(this);
-  this.settingsObj['text'] = 'Title text';
 
   /**
    * Text element.
@@ -138,14 +137,16 @@ anychart.elements.Title = function() {
    * @type {anychart.utils.Orientation}
    * @private
    */
-  this.orientation_ = anychart.utils.Orientation.TOP;
+  this.orientation_;
 
   /**
    * Title align.
    * @type {anychart.utils.Align}
    * @private
    */
-  this.align_ = anychart.utils.Align.CENTER;
+  this.align_;
+
+  this.restoreDefaults();
 };
 goog.inherits(anychart.elements.Title, anychart.elements.Text);
 
@@ -188,10 +189,10 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 
 /**
  * Gets or sets the title background.
- * @param {anychart.elements.Background=} opt_background Background object to set.
+ * @param {anychart.elements.Background=} opt_value Background object to set.
  * @return {!anychart.elements.Title|!anychart.elements.Background} Returns the background or itself for chaining.
  */
-anychart.elements.Title.prototype.background = function(opt_background) {
+anychart.elements.Title.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.elements.Background();
     this.background_.cloneFrom(null);
@@ -199,8 +200,11 @@ anychart.elements.Title.prototype.background = function(opt_background) {
     this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
     this.background_.listen(anychart.utils.Invalidatable.INVALIDATED, this.backgroundInvalidated_, false, this);
   }
-  if (goog.isDef(opt_background)) {
-    this.background_.cloneFrom(opt_background);
+
+  if (goog.isDef(opt_value)) {
+    this.background_.suspendInvalidationDispatching();
+    this.background_.cloneFrom(opt_value);
+    this.background_.resumeInvalidationDispatching(true);
     return this;
   }
   return this.background_;
@@ -716,12 +720,11 @@ anychart.elements.Title.prototype.boundsInvalidated_ = function(event) {
 
 
 /**
- * Copy title settings from the passed title it itself.
+ * Copy title settings from the passed title to it itself.
  * @param {anychart.elements.Title} title Title to copy settings from.
  * @return {anychart.elements.Title} Returns itself for chaining call.
  */
 anychart.elements.Title.prototype.cloneFrom = function(title) {
-  this.suspendInvalidationDispatching();
   if (goog.isDefAndNotNull(title)) {
     this.background(title.background_);
     this.align(title.align_);
@@ -731,35 +734,31 @@ anychart.elements.Title.prototype.cloneFrom = function(title) {
     this.textSettings(title.settingsObj);
     this.width(title.width_);
     this.height(title.height_);
+    this.textSettings(title.settingsObj);
   } else {
-    this.align(anychart.utils.Align.CENTER);
-    this.orientation(anychart.utils.Orientation.TOP);
-    this.margin(null);
-    this.padding(null);
-    this.width(null);
-    this.height(null);
-    this.textSettings({
-      'fontSize': goog.global['anychart']['fontSize'],
-      'fontFamily': goog.global['anychart']['fontFamily'],
-      'fontColor': goog.global['anychart']['fontColor'],
-      'fontOpacity': 1,
-      'fontDecoration': acgraph.vector.Text.Decoration.NONE,
-      'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
-      'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
-      'fontWeight': 'normal',
-      'letterSpacing': 'normal',
-      'direction': goog.global['anychart']['textDirection'],
-      'lineHeight': 'normal',
-      'textIndent': '0px',
-      'vAlign': acgraph.vector.Text.VAlign.TOP,
-      'hAlign': acgraph.vector.Text.HAlign.START,
-      'textWrap': acgraph.vector.Text.TextWrap.NO_WRAP,
-      'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
-      'selectable': false,
-      'useHtml': false,
-      'text': 'Title text'
-    });
+    this.restoreDefaults();
+    this.text('');
   }
-  this.resumeInvalidationDispatching(true);
+
+  return this;
+};
+
+
+/**
+ * Restore title default settings.
+ * @return {anychart.elements.Title} Returns itself for chaining call.
+ */
+anychart.elements.Title.prototype.restoreDefaults = function() {
+  goog.base(this, 'restoreDefaults');
+
+  this.text('Title text');
+  this.align(anychart.utils.Align.CENTER);
+  this.orientation(anychart.utils.Orientation.TOP);
+  this.margin(0, 0, 10, 0);
+  this.padding(null);
+  this.width(null);
+  this.height(null);
+  this.background(null);
+
   return this;
 };
