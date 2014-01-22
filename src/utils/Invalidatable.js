@@ -52,7 +52,16 @@ anychart.utils.ConsistencyState = {
    */
   Z_INDEX: 0x0080,
 
-  //  RESERVED_FLAG1: 0x0100,
+  /**
+   * Выставляется когда изменились настройки форматирования текста.
+   */
+  TEXT_FORMAT: 0x0100,
+
+  /**
+   * Выставляется когда изменились настройки позиционирования.
+   */
+  POSITION: 0x0400,
+
   //  RESERVED_FLAG2: 0x0200,
   //  RESERVED_FLAG3: 0x0400,
   //  RESERVED_FLAG4: 0x0800,
@@ -93,7 +102,7 @@ anychart.utils.ConsistencyState = {
   //  RESERVED_FLAG39: 0x400000000000,
   //  RESERVED_FLAG40: 0x800000000000,
   //  RESERVED_FLAG_LAST: 0x10000000000000000,
-  ALL: 0xFF
+  ALL: 0x1FF
 };
 
 

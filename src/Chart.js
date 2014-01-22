@@ -23,7 +23,7 @@ anychart.Chart = function() {
    * @type {anychart.utils.ZIndexedLayer}
    * @protected
    */
-  this.rootElement = new anychart.utils.ZIndexedLayer();
+  this.rootElement = null;
 
   /**
    * @type {anychart.elements.Background}
@@ -299,6 +299,9 @@ anychart.Chart.prototype.draw = function() {
   //chart content bounds, allocated space for all chart appearance items.
   var contentAreaBounds;
 
+  //create root element only if draw ever called
+  if (!this.rootElement) this.rootElement = new anychart.utils.ZIndexedLayer();
+
   //suspend stage
   var stage = this.rootElement.getStage();
   var manualSuspend = stage && !stage.isSuspended();
@@ -342,7 +345,7 @@ anychart.Chart.prototype.draw = function() {
   this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
   //end clear appearance states
 
-  //start clear container depend states
+  //start clear container consistency states
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.utils.ConsistencyState.Z_INDEX);
@@ -352,7 +355,7 @@ anychart.Chart.prototype.draw = function() {
     this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.utils.ConsistencyState.CONTAINER);
   }
-  //end clear container depend states
+  //end clear container consistency states
 
   //after all chart items drawn, we can clear other states
   this.markConsistent(anychart.utils.ConsistencyState.BOUNDS);

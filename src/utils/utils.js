@@ -2,6 +2,11 @@ goog.provide('anychart.utils');
 goog.provide('anychart.utils.Align');
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Align.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Align enumeration.
  * @enum {string}
@@ -36,6 +41,11 @@ anychart.utils.normalizeAlign = function(align, opt_default) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Orientation.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Orientation enumeration.
  * @enum {string}
@@ -67,6 +77,72 @@ anychart.utils.normalizeOrientation = function(orientation, opt_default) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Nine position.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Nine positions enumeration.
+ * @enum {string}
+ */
+anychart.utils.NinePositions = {
+  LEFT_TOP: 'lefttop',
+  TOP: 'top',
+  RIGHT_TOP: 'righttop',
+  LEFT_CENTER: 'leftcenter',
+  CENTER: 'center',
+  RIGHT_CENTER: 'rightcenter',
+  LEFT_BOTTOM: 'leftbottom',
+  BOTTOM: 'bottom',
+  RIGHT_BOTTOM: 'rightbottom'
+};
+
+
+/**
+ * Normalizes user input to NinePositions enumeration values.  Defaults to opt_default or 'center'.
+ *
+ * @param {*} position One of nine positions to normalize.
+ * @param {anychart.utils.NinePositions=} opt_default Default position value.
+ * @return {anychart.utils.NinePositions} Normalized position.
+ */
+anychart.utils.normalizeNinePositions = function(position, opt_default) {
+  if (goog.isString(position)) {
+    position = position.toLowerCase();
+    for (var i in anychart.utils.NinePositions) {
+      if (position == anychart.utils.NinePositions[i])
+        return anychart.utils.NinePositions[i];
+    }
+  }
+  return goog.isDef(opt_default) ? opt_default : anychart.utils.NinePositions.CENTER;
+};
+
+
+/**
+ * Like normalizeNinePositions method but allow to return custom position string value (inside, outside, custom, etc).
+ *
+ * @param {*} position One of nine positions to normalize.
+ * @param {anychart.utils.NinePositions|string=} opt_default Default position value.
+ * @return {anychart.utils.NinePositions|string} Normalized position.
+ */
+anychart.utils.normalizePosition = function(position, opt_default) {
+  if (goog.isString(position)) {
+    position = position.toLowerCase();
+    for (var i in anychart.utils.NinePositions) {
+      if (position == anychart.utils.NinePositions[i])
+        return anychart.utils.NinePositions[i];
+    }
+    return position;
+  }
+  return goog.isDef(opt_default) ? opt_default : anychart.utils.NinePositions.CENTER;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Utils functions.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Получает или устанавливает свойство объекта obj, с учетом переданного способа адресации полей.
  * Поиск поля для чтения или записи производится по порядку элементов в mapping, затем field (mapping может быть пуст).
