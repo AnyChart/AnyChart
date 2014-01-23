@@ -746,7 +746,6 @@ anychart.elements.Title.prototype.cloneFrom = function(title) {
 
 /**
  * Restore title default settings.
- * @return {anychart.elements.Title} Returns itself for chaining call.
  */
 anychart.elements.Title.prototype.restoreDefaults = function() {
   goog.base(this, 'restoreDefaults');
@@ -759,6 +758,4 @@ anychart.elements.Title.prototype.restoreDefaults = function() {
   this.width(null);
   this.height(null);
   this.background(null);
-
-  return this;
 };

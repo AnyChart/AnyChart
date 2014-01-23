@@ -9,6 +9,7 @@ goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Title');
 goog.require('anychart.pie.Chart');
 goog.require('anychart.utils');
+goog.require('anychart.utils.ColorPalette');
 
 
 /**

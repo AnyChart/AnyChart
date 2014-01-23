@@ -415,4 +415,3 @@ anychart.Chart.prototype.shouldDrawTitle = function() {
       this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE) ||
           this.hasInvalidationState(anychart.utils.ConsistencyState.TITLE_APPEARANCE)));
 };
-

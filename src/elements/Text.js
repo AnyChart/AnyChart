@@ -321,7 +321,6 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
 
 /**
  * Restore text default settings.
- * @return {anychart.elements.Text} Returns itself for chaining call.
  */
 anychart.elements.Text.prototype.restoreDefaults = function() {
   this.settingsObj = {
@@ -344,5 +343,4 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
     'selectable': false,
     'useHtml': false
   };
-  return this;
 };

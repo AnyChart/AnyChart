@@ -13,6 +13,7 @@ function load() {
 
   palette.colorAt(0, 'green');
   palette.colors(['red', 'green', 'blue']);
+  palette.restoreDefaults();
 }
 
 function draw() {

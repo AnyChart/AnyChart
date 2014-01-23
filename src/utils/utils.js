@@ -109,7 +109,8 @@ anychart.utils.NinePositions = {
 anychart.utils.normalizeNinePositions = function(position, opt_default) {
   if (goog.isString(position)) {
     position = position.toLowerCase();
-    if (goog.object.contains(anychart.utils.NinePositions, position)) return position;
+    if (goog.object.contains(anychart.utils.NinePositions, position))
+      return /** @type {anychart.utils.NinePositions} */(position);
   }
   return goog.isDef(opt_default) ? opt_default : anychart.utils.NinePositions.CENTER;
 };

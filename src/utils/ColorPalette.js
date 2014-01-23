@@ -14,7 +14,7 @@ anychart.utils.ColorPalette = function() {
    * @type {anychart.utils.ColorPalette.Type}
    * @private
    */
-  this.type_ = null;
+  this.type_;
 
   /**
    * Color palette colors list.
@@ -23,7 +23,7 @@ anychart.utils.ColorPalette = function() {
    */
   this.colors_ = null;
 
-  this.restoreDefaults();
+  this.restoreDefaults(true);
 };
 goog.inherits(anychart.utils.ColorPalette, anychart.utils.Invalidatable);
 
@@ -54,7 +54,8 @@ anychart.utils.ColorPalette.Type = {
 anychart.utils.ColorPalette.normalizeType = function(type, opt_default) {
   if (goog.isString(type)) {
     type = type.toLowerCase();
-    if (goog.object.contains(anychart.utils.ColorPalette.Type, type)) return type;
+    if (goog.object.contains(anychart.utils.ColorPalette.Type, type))
+      return /** @type {anychart.utils.ColorPalette.Type} */(type);
   }
   return opt_default || anychart.utils.ColorPalette.Type.DISTINCT;
 };
@@ -102,8 +103,9 @@ anychart.utils.ColorPalette.prototype.colors = function(opt_value) {
 
 /**
  * Restore color palette default settings.
+ * @param {boolean=} opt_doNotDispatch Define, should dispatch invalidation event after default settings will be restored.
  */
-anychart.utils.ColorPalette.prototype.restoreDefaults = function() {
+anychart.utils.ColorPalette.prototype.restoreDefaults = function(opt_doNotDispatch) {
   this.type_ = anychart.utils.ColorPalette.Type.DISTINCT;
   this.colors_ = [
     '#1D8BD1',
@@ -147,4 +149,5 @@ anychart.utils.ColorPalette.prototype.restoreDefaults = function() {
     '#FF9A00',
     '#FF6500'
   ];
+  if (opt_doNotDispatch) this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
 };
