@@ -56,7 +56,7 @@ anychart.pie.Chart = function(opt_data) {
    * @type {(string|number)}
    * @private
    */
-  this.explode_ = 0;
+  this.explode_ = 15;
 
   /**
    * The sort type for the pie points.
@@ -453,7 +453,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     color = this.palette_.colorAt(iterator.getIndex()) || 'black';
     var fill = iterator.get('fill') || color;
     var stroke = iterator.get('stroke') || '1 ' + color + ' 0.6';
-    exploded = iterator.get('exploded');
+    exploded = !!iterator.get('exploded');
     this.anglesMap_[iterator.getIndex()] = [start, sweep, exploded];
     this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, exploded, fill, stroke, null);
     start += sweep;
