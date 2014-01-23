@@ -58,14 +58,22 @@ anychart.utils.ConsistencyState = {
   TEXT_FORMAT: 0x0100,
 
   /**
+   * Выставляется когда изменилось отображение pie chart.
+   */
+  PIE_APPEARANCE: 0x0200,
+
+  /**
    * Выставляется когда изменились настройки позиционирования.
    */
   POSITION: 0x0400,
-
-  //  RESERVED_FLAG2: 0x0200,
-  //  RESERVED_FLAG3: 0x0400,
-  //  RESERVED_FLAG4: 0x0800,
-  //  RESERVED_FLAG5: 0x1000,
+  /**
+   * Вызывается изменилось состояние HOVER
+   */
+  HOVER: 0x0800,
+  /**
+   * Вызывается изменилось состояние CLICK
+   */
+  CLICK: 0x1000,
   //  RESERVED_FLAG6: 0x2000,
   //  RESERVED_FLAG7: 0x4000,
   //  RESERVED_FLAG8: 0x8000,
@@ -102,7 +110,7 @@ anychart.utils.ConsistencyState = {
   //  RESERVED_FLAG39: 0x400000000000,
   //  RESERVED_FLAG40: 0x800000000000,
   //  RESERVED_FLAG_LAST: 0x10000000000000000,
-  ALL: 0x1FF
+  ALL: 0x7FF
 };
 
 

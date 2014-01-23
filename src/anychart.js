@@ -5,8 +5,11 @@ goog.require('acgraphexport');
 goog.require('anychart.Chart');
 goog.require('anychart.data');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Title');
+goog.require('anychart.pie.Chart');
 goog.require('anychart.utils');
+goog.require('anychart.utils.ColorPalette');
 
 /**
   @namespace

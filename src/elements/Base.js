@@ -15,10 +15,7 @@ goog.require('goog.dom');
 anychart.elements.Base = function() {
   goog.base(this);
 
-  this.suspendInvalidationDispatching();
-  this.invalidate(anychart.utils.ConsistencyState.CONTAINER);
-  this.invalidate(anychart.utils.ConsistencyState.Z_INDEX);
-  this.resumeInvalidationDispatching(true);
+  this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.Z_INDEX);
 };
 goog.inherits(anychart.elements.Base, anychart.utils.Invalidatable);
 

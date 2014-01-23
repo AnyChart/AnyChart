@@ -1,5 +1,6 @@
 goog.provide('anychart.elements.Multilabel');
 goog.require('anychart.elements.Text');
+goog.require('anychart.utils');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 
@@ -39,14 +40,14 @@ anychart.elements.Multilabel = function() {
    * @type {anychart.utils.NinePositions|string}
    * @private
    */
-  this.position_ = null;
+  this.position_;
 
   /**
    * Labels anchor settings.
    * @type {anychart.utils.NinePositions}
    * @private
    */
-  this.anchor_ = null;
+  this.anchor_;
 
   //todo (Roman Lubushkin): padding is not supported yet
   /**
@@ -61,14 +62,14 @@ anychart.elements.Multilabel = function() {
    * @type {number|string}
    * @private
    */
-  this.offsetX_ = null;
+  this.offsetX_;
 
   /**
    * Offset by Y coordinate from labels position.
    * @type {number|string}
    * @private
    */
-  this.offsetY_ = null;
+  this.offsetY_;
 
   /**
    * Labels text formatter function.
@@ -106,7 +107,7 @@ anychart.elements.Multilabel = function() {
   this.textElementsMap_ = null;
 
   /**
-   * @type {Array.<number>}
+   * @type {Array.<string>}
    * @private
    */
   this.drawedIndexesList_ = null;
@@ -236,7 +237,7 @@ anychart.elements.Multilabel.prototype.positionFormatter = function(opt_value) {
  */
 anychart.elements.Multilabel.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value, null);
+    opt_value = anychart.utils.normalizePosition(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
       this.invalidate(
@@ -347,9 +348,9 @@ anychart.elements.Multilabel.prototype.end = function() {
 
     //уничтожаем все отрисованые в прошлый раз лейблы
     for (i = 0, count = this.drawedIndexesList_.length; i < count; i++) {
-      /** @type {number} */
+      /** @type {string} */
       var index = this.drawedIndexesList_[i];
-      this.textElementsMap_[index].dispose();
+      /** @type {acgraph.vector.Text} */(this.textElementsMap_[index]).dispose();
     }
   }
 
