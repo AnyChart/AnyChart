@@ -10,6 +10,7 @@ goog.require('goog.array');
  * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {!anychart.data.IView} secondView Other parent view to concat with. The last view is a mapping.
  * @constructor
+ * @name anychart.data.ConcatView
  * @extends {anychart.data.View}
  */
 anychart.data.ConcatView = function(parentView, secondView) {

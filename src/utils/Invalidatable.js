@@ -112,6 +112,7 @@ anychart.utils.ConsistencyState = {
  * Изменять состояния целостности можно методами invalidate() и markConsistent().
  * Проверять наличие - методами isConsistent() и hasInvalidationState().
  * @constructor
+ * @name anychart.utils.Invalidatable
  * @extends {goog.events.EventTarget}
  */
 anychart.utils.Invalidatable = function() {

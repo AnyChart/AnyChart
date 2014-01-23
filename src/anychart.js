@@ -8,6 +8,10 @@ goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Title');
 goog.require('anychart.utils');
 
+/**
+  @namespace
+  @name anychart
+  */
 
 /**
  * If the globalLock is locked.

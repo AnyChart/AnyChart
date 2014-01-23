@@ -10,6 +10,7 @@ goog.require('anychart.utils.Invalidatable');
  * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @constructor
  * @implements {anychart.data.IView}
+ * @name anychart.data.View
  * @extends {anychart.utils.Invalidatable}
  */
 anychart.data.View = function(parentView) {

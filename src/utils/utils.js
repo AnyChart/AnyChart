@@ -1,7 +1,10 @@
 goog.provide('anychart.utils');
 goog.provide('anychart.utils.Align');
 
-
+/**
+ @namespace
+ @name anychart.utils
+ */
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Align.
