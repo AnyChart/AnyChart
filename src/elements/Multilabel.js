@@ -425,11 +425,17 @@ anychart.elements.Multilabel.prototype.draw = function(formatProvider, positionP
 
   if (isInitial || anychart.utils.ConsistencyState.POSITION) {
     var position = this.positionFormatter_.call(this, positionProvider, index);
-    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(textElement.getBounds(), this.anchor_);
-    position.x -= anchorCoordinate.x;
-    position.y -= anchorCoordinate.y;
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
+        new acgraph.math.Rect(
+            0,
+            0,
+            textElement.getBounds().width,
+            textElement.getBounds().height),
+        this.anchor_);
+    var x = position.x - anchorCoordinate.x;
+    var y = position.y - anchorCoordinate.y;
     textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    textElement.translate(position.x, position.y);
+    textElement.translate(x, y);
     this.markConsistent(anychart.utils.ConsistencyState.POSITION);
   }
 
