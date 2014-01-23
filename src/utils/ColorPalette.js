@@ -151,3 +151,20 @@ anychart.utils.ColorPalette.prototype.restoreDefaults = function(opt_doNotDispat
   ];
   if (opt_doNotDispatch) this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
 };
+
+
+/**
+ * Copies type and colors settings from the passed palette to itself.
+ * @param {anychart.utils.ColorPalette} palette Color palette to copy settings from.
+ * @return {!anychart.utils.ColorPalette} Returns itself for chaining.
+ */
+anychart.utils.ColorPalette.prototype.cloneFrom = function(palette) {
+  if (goog.isDefAndNotNull(palette)) {
+    this.type_ = palette.type_;
+    this.colors_ = palette.colors_;
+  } else {
+    this.type_ = anychart.utils.ColorPalette.Type.DISTINCT;
+    this.colors_ = [];
+  }
+  return this;
+};

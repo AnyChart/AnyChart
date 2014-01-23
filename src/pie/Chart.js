@@ -73,6 +73,14 @@ anychart.pie.Chart = function(opt_data) {
    */
   this.labels_ = null;
 
+  /**
+   * Pie chart default palette.
+   * @type {anychart.utils.ColorPalette}
+   * @private
+   */
+  this.palette_ = new anychart.utils.ColorPalette();
+  this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.invalidatePalette_, false, this);
+
   this.data(opt_data);
   this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
   this.resumeInvalidationDispatching(false);
@@ -127,7 +135,7 @@ anychart.pie.Chart.prototype.prepareData = function(data) {
     parentView = parentView.filter('value', this.otherPointFilter_);
   } else if (this.otherPointType_ == 'group') {
     parentView = parentView.preparePie('value', this.otherPointFilter_, undefined, function() {
-      return {'value': 0, 'fill': 'green 0.6', 'stroke': '1 black 1'};
+      return {'value': 0};
     });
   } else if (this.otherPointType_ != 'none') {
     throw Error('No acceptable data passed to the pie plot');
@@ -149,6 +157,26 @@ anychart.pie.Chart.prototype.prepareData = function(data) {
 
 
 /**
+ * Getter/setter for pie palette.
+ * @param {(anychart.utils.ColorPalette|Array)=} opt_value Color palette instance.
+ * @return {(anychart.utils.ColorPalette|anychart.pie.Chart)} Color palette instance or self for chaining.
+ */
+anychart.pie.Chart.prototype.palette = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isArray(opt_value)) {
+      this.palette_.colors(opt_value);
+    } else {
+      this.palette_.cloneFrom(opt_value);
+      this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    }
+    return this;
+  } else {
+    return this.palette_;
+  }
+};
+
+
+/**
  * Getter/setter for pie labels.
  * @param {anychart.elements.Multilabel=} opt_value Multilabel instance.
  * @return {(anychart.elements.Multilabel|anychart.pie.Chart)} Multilabel instance or self for chaining.
@@ -159,7 +187,9 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
     this.labels_.textFormatter(function(formatProvider, index) {
       return formatProvider;
     });
-    this.labels_.positionFormatter(null);
+    this.labels_.positionFormatter(function(positionProvider, index) {
+      return positionProvider(index);
+    });
     this.labels_.listen(anychart.utils.Invalidatable.INVALIDATED, this.labelsInvalidated_, false, this);
     this.registerDisposable(this.labels_);
     this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
@@ -382,18 +412,18 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   var start = /** @type {number} */ (this.startAngle_);
   var sweep = 0;
 
-  this.anglesMap = {};
+  this.anglesMap_ = {};
 
   while (iterator.advance()) {
 
     value = parseFloat(iterator.get('value'));
 
     sweep = value / this.valuesSum_ * 360;
-
-    var fill = iterator.get('fill') || 'blue 0.6';
-    var stroke = iterator.get('stroke') || '1 black 1';
+    var color = this.palette_.colorAt(iterator.getIndex()) || 'black';
+    var fill = iterator.get('fill') || color;
+    var stroke = iterator.get('stroke') || '1 ' + color + ' 0.6';
     var exploded = iterator.get('exploded');
-    this.anglesMap[iterator.getIndex()] = [start, sweep];
+    this.anglesMap_[iterator.getIndex()] = [start, sweep, exploded];
     this.drawPoint_(start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, exploded, fill, stroke);
     start += sweep;
   }
@@ -401,11 +431,23 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   if (this.labels_) {
     iterator.reset();
     this.labels_.container(this.rootElement);
-    var positionProvider = function(index) {
 
-    };
+    var positionProvider = goog.bind(function(index) {
+      var start = this.anglesMap_[index][0];
+      var sweep = this.anglesMap_[index][1];
+      var exploded = this.anglesMap_[index][2];
+      var angle = (start + sweep / 2) * Math.PI / 180;
+
+      var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
+
+      var x = this.cx_ + dR * Math.cos(angle);
+      var y = this.cy_ + dR * Math.sin(angle);
+
+      return {'x': x, 'y': y};
+    }, this);
+
     while (iterator.advance()) {
-      this.labels_.draw(iterator.get('value'), positionProvider);
+      this.labels_.draw(iterator.get('value').toString(), positionProvider);
     }
     this.labels_.end();
   }
@@ -470,6 +512,18 @@ anychart.pie.Chart.prototype.dataInvalidated_ = function(event) {
  */
 anychart.pie.Chart.prototype.labelsInvalidated_ = function(event) {
   if (event.invalidated(anychart.utils.ConsistencyState.APPEARANCE)) {
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE)
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.invalidatePalette_ = function(event) {
+  if (event.invalidated(anychart.utils.ConsistencyState.DATA)) {
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
   }
 };
