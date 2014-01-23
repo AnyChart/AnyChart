@@ -248,3 +248,48 @@ anychart.utils.isPercent = function(value) {
 anychart.utils.isUnit = function(value) {
   return goog.isString(value) && value.charAt(value.length - 1).toLowerCase() == 'u';
 };
+
+
+/**
+ * Получает координаты якоря на границе.
+ * @param {acgraph.math.Rect} bounds Прямоугольник границ.
+ * @param {anychart.utils.NinePositions} anchor Якорь, координаты которого нужно получить.
+ * @return {Object.<string, number>} Координаты якоря в виде [x, y].
+ */
+anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
+  var x = bounds.left;
+  var y = bounds.top;
+  switch (anchor) {
+    case anychart.utils.NinePositions.LEFT_TOP:
+      break;
+    case anychart.utils.NinePositions.LEFT_CENTER:
+      y += bounds.height / 2;
+      break;
+    case anychart.utils.NinePositions.LEFT_BOTTOM:
+      y += bounds.height;
+      break;
+    case anychart.utils.NinePositions.TOP:
+      x += bounds.width / 2;
+      break;
+    case anychart.utils.NinePositions.CENTER:
+      x += bounds.width / 2;
+      y += bounds.height / 2;
+      break;
+    case anychart.utils.NinePositions.BOTTOM:
+      x += bounds.width / 2;
+      y += bounds.height;
+      break;
+    case anychart.utils.NinePositions.RIGHT_TOP:
+      x += bounds.width;
+      break;
+    case anychart.utils.NinePositions.RIGHT_CENTER:
+      x += bounds.width;
+      y += bounds.height / 2;
+      break;
+    case anychart.utils.NinePositions.RIGHT_BOTTOM:
+      x += bounds.width;
+      y += bounds.height;
+      break;
+  }
+  return {x: x, y: y};
+};

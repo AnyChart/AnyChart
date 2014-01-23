@@ -56,7 +56,7 @@ anychart.pie.Chart = function(opt_data) {
    * @type {(string|number)}
    * @private
    */
-  this.explode_ = 0;
+  this.explode_ = 15;
 
   /**
    * The sort type for the pie points.
@@ -388,7 +388,22 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
   if (!this.hasInvalidationState(anychart.utils.ConsistencyState.DATA) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE) && !this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER) && !this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK)) return;
 
+  var iterator = this.view_.getIterator();
   var color, exploded;
+
+  var positionProvider = goog.bind(function(index) {
+    var start = this.anglesMap_[index][0];
+    var sweep = this.anglesMap_[index][1];
+    var exploded = this.anglesMap_[index][2];
+    var angle = (start + sweep / 2) * Math.PI / 180;
+
+    var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
+
+    var x = this.cx_ + dR * Math.cos(angle);
+    var y = this.cy_ + dR * Math.sin(angle);
+
+    return {'x': x, 'y': y};
+  }, this);
 
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER)) {
     if (this.hovered_) {
@@ -411,6 +426,11 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.anglesMap_[pieSliceIndex][2] = !this.anglesMap_[pieSliceIndex][2];
 
       this.drawPoint_(pieSliceIndex, this.anglesMap_[pieSliceIndex][0], this.anglesMap_[pieSliceIndex][1], this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, this.anglesMap_[pieSliceIndex][2], null, null, pieSlice);
+      if (this.labels_) {
+        iterator.select(pieSliceIndex);
+        this.labels_.draw(iterator.get('value').toString(), positionProvider, pieSliceIndex);
+        this.labels_.end();
+      }
 
       this.markConsistent(anychart.utils.ConsistencyState.CLICK);
       return;
@@ -426,8 +446,6 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE)) {
     this.calculate_(bounds);
   }
-
-  var iterator = this.view_.getIterator();
 
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.DATA)) {
     var sum = 0;
@@ -453,7 +471,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     color = this.palette_.colorAt(iterator.getIndex()) || 'black';
     var fill = iterator.get('fill') || color;
     var stroke = iterator.get('stroke') || '1 ' + color + ' 0.6';
-    exploded = iterator.get('exploded');
+    exploded = !!iterator.get('exploded');
     this.anglesMap_[iterator.getIndex()] = [start, sweep, exploded];
     this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, exploded, fill, stroke, null);
     start += sweep;
@@ -462,20 +480,6 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   if (this.labels_) {
     iterator.reset();
     this.labels_.container(this.rootElement);
-
-    var positionProvider = goog.bind(function(index) {
-      var start = this.anglesMap_[index][0];
-      var sweep = this.anglesMap_[index][1];
-      var exploded = this.anglesMap_[index][2];
-      var angle = (start + sweep / 2) * Math.PI / 180;
-
-      var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
-
-      var x = this.cx_ + dR * Math.cos(angle);
-      var y = this.cy_ + dR * Math.sin(angle);
-
-      return {'x': x, 'y': y};
-    }, this);
 
     while (iterator.advance()) {
       this.labels_.draw(iterator.get('value').toString(), positionProvider);
