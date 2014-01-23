@@ -148,7 +148,7 @@ anychart.elements.Multilabel.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Gets or sets the labels background settings.
  * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!anychart.elements.Title|!anychart.elements.Background} Returns the background or itself for chaining.
+ * @return {!anychart.elements.Multilabel|!anychart.elements.Background} Returns the background or itself for chaining.
  */
 anychart.elements.Multilabel.prototype.background = function(opt_value) {
   if (!this.background_) {
