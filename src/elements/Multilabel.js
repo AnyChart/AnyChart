@@ -425,6 +425,9 @@ anychart.elements.Multilabel.prototype.draw = function(formatProvider, positionP
 
   if (isInitial || anychart.utils.ConsistencyState.POSITION) {
     var position = this.positionFormatter_.call(this, positionProvider, index);
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(textElement.getBounds(), this.anchor_);
+    position.x += anchorCoordinate.x;
+    position.y += anchorCoordinate.y;
     textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     textElement.translate(position.x, position.y);
     this.markConsistent(anychart.utils.ConsistencyState.POSITION);
@@ -470,6 +473,7 @@ anychart.elements.Multilabel.prototype.restoreDefaults = function() {
   };
   this.end();
   this.background(null);
+  this.anchor(anychart.utils.NinePositions.CENTER);
 };
 
 
