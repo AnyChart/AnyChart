@@ -190,7 +190,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 /**
  * Gets or sets the title background.
  * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!anychart.elements.Title|!anychart.elements.Background} Returns the background or itself for chaining.
+ * @return {!(anychart.elements.Title|anychart.elements.Background)} Returns the background or itself for chaining.
  */
 anychart.elements.Title.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -258,7 +258,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!anychart.elements.Title|!anychart.utils.Margin} Margin or title for chaining.
+ * @return {!(anychart.elements.Title|anychart.utils.Margin)} Margin or title for chaining.
  */
 anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -281,7 +281,7 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!anychart.elements.Title|!anychart.utils.Padding} Padding or title for chaining.
+ * @return {!(anychart.elements.Title|anychart.utils.Padding)} Padding or title for chaining.
  */
 anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {

@@ -375,14 +375,14 @@ def __buildDocs():
     shutil.rmtree(DOCS_OUT_PATH)
     os.mkdir(DOCS_OUT_PATH)
     os.mkdir(os.path.join(DOCS_OUT_PATH,'scripts'))
-    shutil.copy(os.path.join(OUT_PATH, 'graphics.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'graphics.min.js'))
+    shutil.copy(os.path.join(OUT_PATH, 'anychart.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'anychart.min.js'))
 
     subprocess.call([
-        os.path.join(JSDOC_PATH, 'jsdoc'),
+        os.path.join(JSDOC_TEMPLATE_PATH, 'jsdoc'),
         SRC_PATH,
         '-r',
         '-t',
-        os.path.join(JSDOC_TEMPLATE_PATH, 'templates', 'ac_v3'),
+        os.path.join(JSDOC_TEMPLATE_PATH, 'templates', 'main'),
         '-c',
         os.path.join(JSDOC_TEMPLATE_PATH, 'conf.json'),
         '-d', DOCS_OUT_PATH,

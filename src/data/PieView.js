@@ -35,7 +35,7 @@ anychart.data.PieView = function(parentView, fieldName, opt_func, opt_other, opt
 
   /**
    * Filter function.
-   * @type {(function(*):boolean)|null}
+   * @type {(function(*):boolean)?}
    * @private
    */
   this.func_ = opt_func || null;
@@ -54,7 +54,7 @@ anychart.data.PieView = function(parentView, fieldName, opt_func, opt_other, opt
 
   /**
    * Other initial value constructor.
-   * @type {function(): R|null}
+   * @type {function(): R?}
    * @private
    * @template R
    */

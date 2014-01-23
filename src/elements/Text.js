@@ -66,7 +66,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *
  * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get the whole object.
  * @param {(Object|string|number|boolean)=} opt_value Setting value if used as a setter.
- * @return {!anychart.elements.Text|!Object|string|number} A copy of settings or the Text for chaining.
+ * @return {!(anychart.elements.Text|Object|string|number)} A copy of settings or the Text for chaining.
  */
 anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_value) {
   if (goog.isDef(opt_objectOrName)) {
