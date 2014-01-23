@@ -11,13 +11,13 @@ function load() {
 
   var pointData = [6371664, 7216301, 1486621, 786622, 900000];
 
-  var seriesData = new anychart.data.Set([
+  var seriesData = [
     {x: "Department Stores", y: pointData[0], fill: "rgb(29,139,209)", stroke: 'none'},
     {x: "Discount Stores", y: pointData[1], fill: "rgb(241,104,60)", stroke: 'none'},
     {x: "Men's/Women's Stores", y: pointData[2], fill: "rgb(42,214,42)", stroke: 'none'},
     {x: "Juvenile Specialty Stores", y: pointData[3], fill: "rgb(219,220,37)", stroke: 'none'},
     {x: "All other outlets", y: pointData[4], fill: "rgb(143,188,143)", stroke: 'none'}
-  ]);
+  ];
 
   chart = new anychart.pie.Chart(seriesData)
       .container('container')
@@ -64,7 +64,7 @@ function load() {
   var stage = chart.container();
   var trialText = stage.text(0, 0, 'AnyChart Trial Version', {
     opacity: 0.15,
-    fontSize: chart.pixelBounds().height / 8
+    fontSize: chart.pixelBounds().height / 9
   });
 
   trialText.x(chart.pixelBounds().left + (chart.pixelBounds().width - trialText.getBounds().width) / 2)
