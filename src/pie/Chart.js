@@ -386,7 +386,7 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 anychart.pie.Chart.prototype.drawContent = function(bounds) {
   goog.base(this, 'drawContent', bounds);
 
-  if (!this.hasInvalidationState(anychart.utils.ConsistencyState.DATA) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE) && !this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER) && !this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK)) return;
+  if (!this.hasInvalidationState(anychart.utils.ConsistencyState.DATA) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE) && !this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER) && !this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK) && !this.hasInvalidationState(anychart.utils.ConsistencyState.BOUNDS) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) return;
 
   var iterator = this.view_.getIterator();
   var color, exploded;
@@ -443,7 +443,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     this.dataLayer_ = acgraph.layer().parent(this.rootElement);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.APPEARANCE)) {
     this.calculate_(bounds);
   }
 
