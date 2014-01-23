@@ -79,7 +79,7 @@ anychart.pie.Chart = function(opt_data) {
    * @private
    */
   this.palette_ = new anychart.utils.ColorPalette();
-  this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.invalidatePalette_, false, this);
+  this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
 
   this.data(opt_data);
   this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
@@ -95,7 +95,9 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.DATA |
-        anychart.utils.ConsistencyState.PIE_APPEARANCE;
+        anychart.utils.ConsistencyState.PIE_APPEARANCE |
+        anychart.utils.ConsistencyState.HOVER |
+        anychart.utils.ConsistencyState.CLICK;
 
 
 /**
@@ -384,7 +386,36 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 anychart.pie.Chart.prototype.drawContent = function(bounds) {
   goog.base(this, 'drawContent', bounds);
 
-  if (!this.hasInvalidationState(anychart.utils.ConsistencyState.DATA) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE)) return;
+  if (!this.hasInvalidationState(anychart.utils.ConsistencyState.DATA) && !this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE) && !this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER) && !this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK)) return;
+
+  var color, exploded;
+
+  if (this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER)) {
+    if (this.hovered_) {
+      var pieSlice = this.hovered_[0];
+      var pieSliceIndex = this.hovered_[1];
+      var isHovered = this.hovered_[2];
+
+      color = /** @type {string} */ (this.palette_.colorAt(pieSliceIndex)) + (isHovered ? ' 0.4' : '');
+      pieSlice.fill(color);
+
+      this.markConsistent(anychart.utils.ConsistencyState.HOVER);
+      return;
+    }
+  }
+
+  if (this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK)) {
+    if (this.clicked_) {
+      pieSlice = this.clicked_[0];
+      pieSliceIndex = this.clicked_[1];
+      this.anglesMap_[pieSliceIndex][2] = !this.anglesMap_[pieSliceIndex][2];
+
+      this.drawPoint_(pieSliceIndex, this.anglesMap_[pieSliceIndex][0], this.anglesMap_[pieSliceIndex][1], this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, this.anglesMap_[pieSliceIndex][2], null, null, pieSlice);
+
+      this.markConsistent(anychart.utils.ConsistencyState.CLICK);
+      return;
+    }
+  }
 
   if (this.dataLayer_) {
     this.dataLayer_.removeChildren();
@@ -419,12 +450,12 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     value = parseFloat(iterator.get('value'));
 
     sweep = value / this.valuesSum_ * 360;
-    var color = this.palette_.colorAt(iterator.getIndex()) || 'black';
+    color = this.palette_.colorAt(iterator.getIndex()) || 'black';
     var fill = iterator.get('fill') || color;
     var stroke = iterator.get('stroke') || '1 ' + color + ' 0.6';
-    var exploded = iterator.get('exploded');
+    exploded = iterator.get('exploded');
     this.anglesMap_[iterator.getIndex()] = [start, sweep, exploded];
-    this.drawPoint_(start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, exploded, fill, stroke);
+    this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, this.explodeValue_, exploded, fill, stroke, null);
     start += sweep;
   }
 
@@ -459,6 +490,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
 /**
  * Internal function for drawing slice by arguments.
+ * @param {number} index Index of row in the view.
  * @param {number} start Start angle.
  * @param {number} sweep Sweep angle.
  * @param {number} cx X coordinate of center point.
@@ -467,14 +499,20 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
  * @param {number} innerRadius Inner radius.
  * @param {number} explode Explode value.
  * @param {boolean} exploded Is point exploded.
- * @param {acgraph.vector.Fill} fill Fill setting.
- * @param {acgraph.vector.Stroke} stroke Stroke setting.
- * @return {boolean} True if point drawed.
+ * @param {acgraph.vector.Fill?} fill Fill setting.
+ * @param {acgraph.vector.Stroke?} stroke Stroke setting.
+ * @param {acgraph.vector.Path=} opt_path If set, draws to that path.
+ * @return {boolean} True if point draw.
  * @private
  */
-anychart.pie.Chart.prototype.drawPoint_ = function(start, sweep, cx, cy, radius, innerRadius, explode, exploded, fill, stroke) {
+anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, radius, innerRadius, explode, exploded, fill, stroke, opt_path) {
   if (sweep == 0) return false;
-  var pie = this.dataLayer_.path();
+  if (opt_path) {
+    var pie = opt_path;
+    pie.clear();
+  } else {
+    pie = this.dataLayer_.path();
+  }
 
   if (exploded) {
     var angle = start + sweep / 2;
@@ -486,8 +524,13 @@ anychart.pie.Chart.prototype.drawPoint_ = function(start, sweep, cx, cy, radius,
   } else {
     pie = acgraph.vector.primitives.donut(pie, cx, cy, radius, innerRadius, start, sweep);
   }
+  if (opt_path) return true;
 
+  pie['__index'] = index;
   pie.fill(fill).stroke(stroke);
+
+  acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
+  acgraph.events.listen(pie, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
 
   return true;
 };
@@ -522,8 +565,58 @@ anychart.pie.Chart.prototype.labelsInvalidated_ = function(event) {
  * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
  * @private
  */
-anychart.pie.Chart.prototype.invalidatePalette_ = function(event) {
+anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
   if (event.invalidated(anychart.utils.ConsistencyState.DATA)) {
     this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
   }
+};
+
+
+/**
+ * Mouse over internal handler.
+ * @param {acgraph.events.Event} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
+  var pie = event.target;
+  var index = pie['__index'];
+
+  this.hovered_ = [pie, index, true];
+  acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
+
+  this.invalidate(anychart.utils.ConsistencyState.HOVER);
+};
+
+
+/**
+ * Mouse out internal handler.
+ * @param {acgraph.events.Event} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
+  var pie = event.target;
+  var index = pie['__index'];
+
+  if (this.hovered_[0] == pie && this.hovered_[1] == index && this.hovered_[2]) {
+    this.hovered_ = [pie, index, false];
+  } else {
+    this.hovered_ = null;
+  }
+
+  this.invalidate(anychart.utils.ConsistencyState.HOVER);
+};
+
+
+/**
+ * Mouse click internal handler.
+ * @param {acgraph.events.Event} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.mouseClickHandler_ = function(event) {
+  var pie = event.target;
+  var index = pie['__index'];
+
+  this.clicked_ = [pie, index];
+
+  this.invalidate(anychart.utils.ConsistencyState.CLICK);
 };

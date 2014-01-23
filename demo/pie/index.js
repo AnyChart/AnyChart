@@ -17,7 +17,6 @@ function load() {
       .otherPointFilter(function(val) { return val > 3; })
       .otherPointType('group')
       .sort('desc')
-      .draw()
-      .palette(['red', 'green', 'blue']);
+      .draw();
 
 }

@@ -66,8 +66,14 @@ anychart.utils.ConsistencyState = {
    * Выставляется когда изменились настройки позиционирования.
    */
   POSITION: 0x0400,
-  //  RESERVED_FLAG4: 0x0800,
-  //  RESERVED_FLAG5: 0x1000,
+  /**
+   * Вызывается изменилось состояние HOVER
+   */
+  HOVER: 0x0800,
+  /**
+   * Вызывается изменилось состояние CLICK
+   */
+  CLICK: 0x1000,
   //  RESERVED_FLAG6: 0x2000,
   //  RESERVED_FLAG7: 0x4000,
   //  RESERVED_FLAG8: 0x8000,
