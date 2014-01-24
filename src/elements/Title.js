@@ -419,8 +419,8 @@ anychart.elements.Title.prototype.draw = function() {
   // If there is any inconsistency in title bounds
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
     // setting text bounds if needed.
-    this.text_.width(this.widthConstricted_ ? this.textWidth_ : null);
-    this.text_.height(this.heightConstricted_ ? this.textHeight_ : null);
+    this.text_.width(this.widthConstricted_ ? this.textWidth_ : undefined);
+    this.text_.height(this.heightConstricted_ ? this.textHeight_ : undefined);
     // settings text offset for
     this.text_.x(/** @type {number} */(this.padding().left()));
     this.text_.y(/** @type {number} */(this.padding().top()));
@@ -539,9 +539,9 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
       this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
     }
     if (this.width_ == null && this.text_.width() != null)
-      this.text_.width(null);
+      this.text_.width(undefined);
     if (this.height_ == null && this.text_.height() != null)
-      this.text_.height(null);
+      this.text_.height(undefined);
     textBounds = this.text_.getBounds();
   }
 

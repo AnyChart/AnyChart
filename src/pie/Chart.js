@@ -1,4 +1,5 @@
 goog.provide('anychart.pie.Chart');
+goog.require('anychart.Chart');
 
 
 
