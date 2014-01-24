@@ -392,6 +392,12 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   var iterator = this.view_.getIterator();
   var color, exploded;
 
+  if (iterator.getRowsCount() >= 10) {
+    if (window.console) {
+      window.console.log('Warning: To much point in Pie chart. See https://anychart.atlassian.net/wiki/pages/viewpage.action?pageId=17301506 for details.');
+    }
+  }
+
   var positionProvider = goog.bind(function(index) {
     var start = this.anglesMap_[index][0];
     var sweep = this.anglesMap_[index][1];
