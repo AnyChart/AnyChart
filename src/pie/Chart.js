@@ -394,7 +394,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
   if (iterator.getRowsCount() >= 10) {
     if (window.console) {
-      window.console.log('Warning: To much point in Pie chart. See https://anychart.atlassian.net/wiki/pages/viewpage.action?pageId=17301506 for details.');
+      window.console.log('Warning: Too much points in Pie chart. See https://anychart.atlassian.net/wiki/pages/viewpage.action?pageId=17301506 for details.');
     }
   }
 
