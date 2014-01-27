@@ -28,6 +28,11 @@ anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.Pie.Chart
+//
+//----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);
 
 anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;
