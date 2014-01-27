@@ -3,12 +3,25 @@ goog.provide('anychartexport');
 goog.require('anychart');
 
 goog.exportSymbol('anychart.data.Set', anychart.data.Set);
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.Base
+//
+//----------------------------------------------------------------------------------------------------------------------
 anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;
 anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.BaseWithBounds
+//
+//----------------------------------------------------------------------------------------------------------------------
+anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;
 anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.Chart
+//
+//----------------------------------------------------------------------------------------------------------------------
 anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;
 anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
