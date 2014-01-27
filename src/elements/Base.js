@@ -74,12 +74,12 @@ anychart.elements.Base.prototype.container = function(opt_value) {
 
 /**
  * Z index of the element getter and setter.
- * @param {number=} opt_zIndex zIndex to set or nothing to get.
+ * @param {number=} opt_value zIndex to set or nothing to get.
  * @return {(number|!anychart.elements.Base)} Current zIndex or itself for chaining.
  */
-anychart.elements.Base.prototype.zIndex = function(opt_zIndex) {
-  if (goog.isDef(opt_zIndex)) {
-    this.zIndex_ = +opt_zIndex || 0;
+anychart.elements.Base.prototype.zIndex = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.zIndex_ = +opt_value || 0;
     this.invalidate(anychart.utils.ConsistencyState.Z_INDEX);
     return this;
   }
