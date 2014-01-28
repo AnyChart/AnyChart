@@ -2,7 +2,38 @@ goog.provide('anychartexport');
 
 goog.require('anychart');
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.data.Set
+//
+//----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.data.Set', anychart.data.Set);
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
+anychart.data.Set.prototype['getRowCount'] = anychart.data.Set.prototype.getRowCount;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.data.View
+//
+//----------------------------------------------------------------------------------------------------------------------
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.data.Iterator
+//
+//----------------------------------------------------------------------------------------------------------------------
+anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;
+anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
+anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
+anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
+anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
+anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Base
@@ -30,7 +61,7 @@ anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.Pie.Chart
+//  anychart.pie.Chart
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);
