@@ -71,6 +71,38 @@ anychart.elements.Multilabel.prototype['draw'] = anychart.elements.Multilabel.pr
 anychart.elements.Multilabel.prototype['restoreDefaults'] = anychart.elements.Multilabel.prototype.restoreDefaults;
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Scales
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.scales.Linear', anychart.scales.Linear);
+goog.exportSymbol('anychart.scales.Ordinal', anychart.scales.Ordinal);
+
+anychart.scales.Base.prototype['stackMode'] = anychart.scales.Base.prototype.stackMode;
+
+anychart.scales.Linear.prototype['transform'] = anychart.scales.Linear.prototype.transform;
+anychart.scales.Linear.prototype['inverseTransform'] = anychart.scales.Linear.prototype.inverseTransform;
+anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
+anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;
+anychart.scales.Linear.prototype['minimum'] = anychart.scales.Linear.prototype.minimum;
+anychart.scales.Linear.prototype['maximum'] = anychart.scales.Linear.prototype.maximum;
+
+anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;
+anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;
+anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;
+anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;
+
+anychart.scales.LinearTicks.prototype['interval'] = anychart.scales.LinearTicks.prototype.interval;
+anychart.scales.LinearTicks.prototype['count'] = anychart.scales.LinearTicks.prototype.count;
+anychart.scales.LinearTicks.prototype['base'] = anychart.scales.LinearTicks.prototype.base;
+anychart.scales.LinearTicks.prototype['set'] = anychart.scales.LinearTicks.prototype.set;
+anychart.scales.LinearTicks.prototype['get'] = anychart.scales.LinearTicks.prototype.get;
+
+anychart.scales.OrdinalTicks.prototype['interval'] = anychart.scales.OrdinalTicks.prototype.interval;
+anychart.scales.OrdinalTicks.prototype['set'] = anychart.scales.OrdinalTicks.prototype.set;
+anychart.scales.OrdinalTicks.prototype['get'] = anychart.scales.OrdinalTicks.prototype.get;
+anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.prototype.names;
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Text.
 //
 //----------------------------------------------------------------------------------------------------------------------

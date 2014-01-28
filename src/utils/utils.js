@@ -294,3 +294,53 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
   }
   return {x: x, y: y};
 };
+
+
+/**
+ * Rounds a given number to a certain number of decimal places.
+ * @param {number} num The number to be rounded.
+ * @param {number=} opt_digitsCount Optional The number of places after the decimal point.
+ * @return {number} The rounded number.
+ */
+anychart.math.round = function(num, opt_digitsCount) {
+  var tmp = Math.pow(10, opt_digitsCount || 0);
+  return Math.round(num * tmp) / tmp;
+};
+
+
+/**
+ * Returns the nearest number to the left from value that meets equation ((value - opt_base) mod interval === 0).
+ * @param {number} value Value to align.
+ * @param {number} interval Value to align by.
+ * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @return {number} Aligned value.
+ */
+anychart.utils.alignLeft = function(value, interval, opt_base) {
+  opt_base = opt_base || 0;
+  var mod = anychart.math.round((value - opt_base) % interval, 7);
+  if (mod < 0)
+    mod += interval;
+  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
+    mod -= interval;
+  return anychart.math.round(value - mod, 7);
+};
+
+
+/**
+ * Returns the nearest number to the right from value that meets equation ((value - opt_base) mod interval === 0).
+ * @param {number} value Value to align.
+ * @param {number} interval Value to align by.
+ * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @return {number} Aligned value.
+ */
+anychart.utils.alignRight = function(value, interval, opt_base) {
+  opt_base = opt_base || 0;
+  var mod = anychart.math.round((value - opt_base) % interval, 7);
+  if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
+    mod -= interval;
+  if (mod == 0)
+    return anychart.math.round(value, 7);
+  else if (mod < 0)
+    mod += interval;
+  return anychart.math.round(value + interval - mod, 7);
+};

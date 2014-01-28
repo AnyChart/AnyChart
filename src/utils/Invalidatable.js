@@ -74,11 +74,26 @@ anychart.utils.ConsistencyState = {
    * Вызывается изменилось состояние CLICK
    */
   CLICK: 0x1000,
-  //  RESERVED_FLAG6: 0x2000,
-  //  RESERVED_FLAG7: 0x4000,
-  //  RESERVED_FLAG8: 0x8000,
-  //  RESERVED_FLAG9: 0x10000,
-  //  RESERVED_FLAG10: 0x20000,
+  /**
+   * Ticks settings changed. Axes redrawing needed.
+   */
+  TICKS_SET: 0x2000,
+  /**
+   * Scale settings changed. Data and axes redrawing needed.
+   */
+  SCALE_SETTINGS: 0x4000,
+  /**
+   * Scale settings changed. Data pass needed (for ex. auto calculation turned on).
+   */
+  SCALE_SETTINGS_HARD: 0x8000,
+  /**
+   * Scale stack settings changed. Data redrawing needed.
+   */
+  SCALE_STACK_SETTINGS: 0x10000,
+  /**
+   * Scale categorization settings changed. Data recategorisation is needed.
+   */
+  SCALE_RECATEGORIZED: 0x20000,
   //  RESERVED_FLAG11: 0x40000,
   //  RESERVED_FLAG12: 0x80000,
   //  RESERVED_FLAG13: 0x100000,
