@@ -48,6 +48,22 @@ anychart.data.View.prototype.mask;
 
 
 /**
+ * Metadata storage.
+ * @type {Array.<Object>}
+ * @private
+ */
+anychart.data.View.prototype.metadata_ = null;
+
+
+/**
+ * If the metadata should be transitioned to the parent view.
+ * @type {boolean}
+ * @private
+ */
+anychart.data.View.prototype.transitMeta_ = false;
+
+
+/**
  * Ensures that the view redirection mask is consistent due to last changes.
  */
 anychart.data.View.prototype.ensureConsistent = function() {
@@ -90,6 +106,17 @@ anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
  */
 anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
   var result = new anychart.data.PieView(this, fieldName, opt_func, opt_other, opt_otherInitialConstructor);
+  this.registerDisposable(result);
+  return result;
+};
+
+
+/**
+ * Creates a derivative view, containing just the same data set and order as this view does.
+ * @return {!anychart.data.View} The new derived view.
+ */
+anychart.data.View.prototype.derive = function() {
+  var result = new anychart.data.View(this);
   this.registerDisposable(result);
   return result;
 };
@@ -200,11 +227,18 @@ anychart.data.View.prototype.getIterator = function() {
 
 
 /**
- * Builds redirection mask.
+ * Builds redirection mask. Mask defaults to equality masking.
  * @return {!Array.<number>} The mask.
  * @protected
  */
-anychart.data.View.prototype.buildMask = goog.abstractMethod;
+anychart.data.View.prototype.buildMask = function() {
+  var mask = [];
+  var iterator = this.parentView.getIterator();
+  while (iterator.advance()) {
+    mask.push(iterator.getIndex());
+  }
+  return mask;
+};
 
 
 /**
@@ -215,4 +249,64 @@ anychart.data.View.prototype.buildMask = goog.abstractMethod;
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
   if (event.invalidated(anychart.utils.ConsistencyState.DATA))
     this.invalidate(anychart.utils.ConsistencyState.DATA);
+};
+
+
+/**
+ * Getter and setter for a metadata value.
+ *
+ * ATTENTION: THE CHECK IF IT IS A SETTER IS MADE BY PARAMS COUNT,
+ * e.g. ds.meta(1, 'qqq', undefined); is a SETTER.
+ * @param {number} index Row index.
+ * @param {string} name Name of the metadata field.
+ * @param {*=} opt_value Value to set.
+ * @return {anychart.data.View|*|undefined} Self for chaining or value.
+ */
+anychart.data.View.prototype.meta = function(index, name, opt_value) {
+  if (this.transitMeta_) {
+    return this.parentMeta.apply(this, arguments);
+  }
+  if (!this.metadata_) this.metadata_ = [];
+  var obj = this.metadata_[index];
+  if (!obj)
+    this.metadata_[index] = obj = {};
+  if (arguments.length > 2) {
+    obj[name] = opt_value;
+    return this;
+  }
+  return obj[name];
+};
+
+
+/**
+ * Getter and setter for parent metadata value. Can be overridden in descendants.
+ *
+ * ATTENTION: THE CHECK IF IT IS A SETTER IS MADE BY PARAMS COUNT,
+ * e.g. ds.meta(1, 'qqq', undefined); is a SETTER.
+ * @param {number} index Row index.
+ * @param {string} name Name of the metadata field.
+ * @param {*=} opt_value Value to set.
+ * @return {anychart.data.View|*|undefined} Self for chaining or value.
+ * @protected
+ */
+anychart.data.View.prototype.parentMeta = function(index, name, opt_value) {
+  index = this.mask[index];
+  //TODO(Anton Saukh): fix it to proper error reporting.
+  if (!goog.isDef(index))
+    throw Error('Index cannot be masked by this View');
+  if (arguments.length > 2) {
+    this.parentView.meta(index, name, opt_value);
+    return this;
+  } else {
+    return this.parentView.meta(index, name);
+  }
+};
+
+
+/**
+ * Sets metadata transitioning state.
+ * @param {boolean} on If the meta should be transitioned.
+ */
+anychart.data.View.prototype.transitionMeta = function(on) {
+  this.transitMeta_ = !!on;
 };

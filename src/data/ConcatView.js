@@ -65,3 +65,22 @@ anychart.data.ConcatView.prototype.parentViewChangedHandler = function(event) {
   if (event.invalidated(anychart.utils.ConsistencyState.DATA))
     this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
 };
+
+
+/** @inheritDoc */
+anychart.data.ConcatView.prototype.parentMeta = function(index, name, opt_value) {
+  var count = this.parentView.getRowsCount();
+  var parentView;
+  if (index < count) {
+    parentView = this.parentView;
+  } else {
+    index -= count;
+    parentView = this.secondView_;
+  }
+  if (arguments.length > 2) {
+    parentView.meta(index, name, opt_value);
+    return this;
+  } else {
+    return parentView.meta(index, name);
+  }
+};

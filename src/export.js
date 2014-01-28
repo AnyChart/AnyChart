@@ -17,12 +17,14 @@ anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRow
 //  anychart.data.View
 //
 //----------------------------------------------------------------------------------------------------------------------
+anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
 anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
 anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
 anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
 anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
 anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
 anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Iterator
@@ -32,6 +34,8 @@ anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.se
 anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
 anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
 anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
+anychart.data.Iterator.prototype['getMeta'] = anychart.data.Iterator.prototype.getMeta;
+anychart.data.Iterator.prototype['getMeta'] = anychart.data.Iterator.prototype.getMeta;
 anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
 anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
 //----------------------------------------------------------------------------------------------------------------------
