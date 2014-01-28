@@ -69,6 +69,8 @@ anychart.data.View.prototype.transitMeta_ = false;
 anychart.data.View.prototype.ensureConsistent = function() {
   if (this.isConsistent())
     return;
+  if (this.metadata_)
+    this.metadata_.length = 0;
   this.mask = this.buildMask();
   this.markConsistent(anychart.utils.ConsistencyState.DATA);
 };
