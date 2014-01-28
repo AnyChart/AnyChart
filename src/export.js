@@ -11,7 +11,7 @@ goog.exportSymbol('anychart.data.Set', anychart.data.Set);
 anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
 anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
 anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
-anychart.data.Set.prototype['getRowCount'] = anychart.data.Set.prototype.getRowCount;
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.View
