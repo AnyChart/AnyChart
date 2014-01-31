@@ -94,6 +94,7 @@ anychart.elements.Background.prototype['corners'] = anychart.elements.Background
 //  Multilabel.
 //
 //----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.Multilabel', anychart.elements.Multilabel);
 anychart.elements.Multilabel.prototype['background'] = anychart.elements.Multilabel.prototype.background;
 anychart.elements.Multilabel.prototype['textFormatter'] = anychart.elements.Multilabel.prototype.textFormatter;
 anychart.elements.Multilabel.prototype['positionFormatter'] = anychart.elements.Multilabel.prototype.positionFormatter;
@@ -102,6 +103,7 @@ anychart.elements.Multilabel.prototype['anchor'] = anychart.elements.Multilabel.
 anychart.elements.Multilabel.prototype['width'] = anychart.elements.Multilabel.prototype.width;
 anychart.elements.Multilabel.prototype['height'] = anychart.elements.Multilabel.prototype.height;
 anychart.elements.Multilabel.prototype['end'] = anychart.elements.Multilabel.prototype.end;
+anychart.elements.Multilabel.prototype['reset'] = anychart.elements.Multilabel.prototype.reset;
 anychart.elements.Multilabel.prototype['draw'] = anychart.elements.Multilabel.prototype.draw;
 anychart.elements.Multilabel.prototype['restoreDefaults'] = anychart.elements.Multilabel.prototype.restoreDefaults;
 //----------------------------------------------------------------------------------------------------------------------

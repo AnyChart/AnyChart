@@ -338,7 +338,7 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
     'textIndent': '0px',
     'vAlign': acgraph.vector.Text.VAlign.TOP,
     'hAlign': acgraph.vector.Text.HAlign.START,
-    'textWrap': acgraph.vector.Text.TextWrap.NO_WRAP,
+    'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
     'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
     'selectable': false,
     'useHtml': false

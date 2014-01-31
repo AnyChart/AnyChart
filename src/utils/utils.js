@@ -344,3 +344,42 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
     mod += interval;
   return anychart.math.round(value + interval - mod, 7);
 };
+
+
+/**
+ * Применение оффсета к переданной позиции в зависимости от якоря.
+ * @param {acgraph.math.Coordinate} position Розиция к оторой будут применены оффсеты.
+ * @param {anychart.utils.NinePositions} anchor Якорь.
+ * @param {number} offsetX Оффсет по Х.
+ * @param {number} offsetY Оффсет по Y.
+ * @return {acgraph.math.Coordinate} Позиция с примененным оффсетом.
+ */
+anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY) {
+  switch (anchor) {
+    case anychart.utils.NinePositions.CENTER:
+    case anychart.utils.NinePositions.LEFT_CENTER:
+    case anychart.utils.NinePositions.TOP:
+    case anychart.utils.NinePositions.LEFT_TOP:
+      position.x += offsetX;
+      position.y += offsetY;
+      break;
+
+    case anychart.utils.NinePositions.LEFT_BOTTOM:
+    case anychart.utils.NinePositions.BOTTOM:
+      position.x += offsetX;
+      position.y -= offsetY;
+      break;
+
+    case anychart.utils.NinePositions.RIGHT_CENTER:
+    case anychart.utils.NinePositions.RIGHT_TOP:
+      position.x -= offsetX;
+      position.y += offsetY;
+      break;
+
+    case anychart.utils.NinePositions.RIGHT_BOTTOM:
+      position.x -= offsetX;
+      position.y -= offsetY;
+      break;
+  }
+  return position;
+};
