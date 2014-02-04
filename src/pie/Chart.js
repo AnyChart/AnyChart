@@ -76,10 +76,10 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Pie chart default palette.
-   * @type {anychart.utils.ColorPalette}
+   * @type {anychart.utils.DistinctColorPalette|anychart.utils.RangeColorPalette}
    * @private
    */
-  this.palette_ = new anychart.utils.ColorPalette();
+  this.palette_ = new anychart.utils.DistinctColorPalette();
   this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
 
   this.data(opt_data);
@@ -161,8 +161,9 @@ anychart.pie.Chart.prototype.prepareData = function(data) {
 
 /**
  * Getter/setter for pie palette.
- * @param {(anychart.utils.ColorPalette|Array)=} opt_value Color palette instance.
- * @return {(anychart.utils.ColorPalette|anychart.pie.Chart)} Color palette instance or self for chaining.
+ * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Color palette instance.
+ * @return {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|anychart.pie.Chart)} Color palette
+ * instance or self for chaining.
  */
 anychart.pie.Chart.prototype.palette = function(opt_value) {
   if (goog.isDef(opt_value)) {

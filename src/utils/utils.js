@@ -1,5 +1,7 @@
 goog.provide('anychart.utils');
 goog.provide('anychart.utils.Align');
+goog.provide('anychart.utils.color');
+goog.require('goog.color');
 
 
 /**
@@ -383,3 +385,102 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
   }
   return position;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Color.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Helper for isValidHexColor_.
+ * @type {RegExp}
+ * @private
+ */
+anychart.utils.color.validHexColorRe_ = /^#(?:[0-9a-f]{3}){1,2}$/i;
+
+
+/**
+ * Regular expression for matching and capturing RGB style strings. Helper for
+ * isValidRgbColor_.
+ * @type {RegExp}
+ * @private
+ */
+anychart.utils.color.rgbColorRe_ =
+    /^(?:rgb)?\((0|[1-9]\d{0,2}),\s?(0|[1-9]\d{0,2}),\s?(0|[1-9]\d{0,2})\)$/i;
+
+
+/**
+ * Checks if a string is a valid rgb color.  We expect strings of the format
+ * '(r, g, b)', or 'rgb(r, g, b)', where each color component is an int in
+ * [0, 255].
+ * @param {string} str String to check.
+ * @return {!goog.color.Rgb} the rgb representation of the color if it is
+ *     a valid color, or the empty array otherwise.
+ * @private
+ */
+anychart.utils.color.isValidRgbColor_ = function(str) {
+  // Each component is separate (rather than using a repeater) so we can
+  // capture the match. Also, we explicitly set each component to be either 0,
+  // or start with a non-zero, to prevent octal numbers from slipping through.
+  var regExpResultArray = str.match(anychart.utils.color.rgbColorRe_);
+  if (regExpResultArray) {
+    var r = Number(regExpResultArray[1]);
+    var g = Number(regExpResultArray[2]);
+    var b = Number(regExpResultArray[3]);
+    if (r >= 0 && r <= 255 &&
+        g >= 0 && g <= 255 &&
+        b >= 0 && b <= 255) {
+      return [r, g, b];
+    }
+  }
+  return [];
+};
+
+
+/**
+ * Checks if a string is a valid hex color.  We expect strings of the format
+ * #RRGGBB (ex: #1b3d5f) or #RGB (ex: #3CA == #33CCAA).
+ * @param {string} str String to check.
+ * @return {boolean} Whether the string is a valid hex color.
+ * @private
+ */
+anychart.utils.color.isValidHexColor_ = function(str) {
+  return anychart.utils.color.validHexColorRe_.test(str);
+};
+
+
+/**
+ * Parses a color out of a string.
+ * @param {string} str Color in some format.
+ * @return {Object} Contains two properties: 'hex', which is a string containing
+ *     a hex representation of the color, as well as 'type', which is a string
+ *     containing the type of color format passed in ('hex', 'rgb', 'named').
+ */
+anychart.utils.color.parseColor = function(str) {
+  var result = {};
+  str = String(str);
+
+  var maybeHex = goog.color.prependHashIfNecessaryHelper(str);
+  if (anychart.utils.color.isValidHexColor_(maybeHex)) {
+    result.hex = goog.color.normalizeHex(maybeHex);
+    result.type = 'hex';
+    return result;
+  } else {
+    var rgb = anychart.utils.color.isValidRgbColor_(str);
+    if (rgb.length) {
+      result.hex = goog.color.rgbArrayToHex(rgb);
+      result.type = 'rgb';
+      return result;
+    } else if (goog.color.names) {
+      var hex = goog.color.names[str.toLowerCase()];
+      if (hex) {
+        result.hex = hex;
+        result.type = 'named';
+        return result;
+      }
+    }
+  }
+  return null;
+};
+

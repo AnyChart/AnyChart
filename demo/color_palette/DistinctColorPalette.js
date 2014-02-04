@@ -4,7 +4,7 @@ function load() {
   count = 12;
 
   stage = acgraph.create('100%', '100%', 'container');
-  palette = new anychart.utils.ColorPalette();
+  palette = new anychart.utils.DistinctColorPalette();
   palette.listen('invalidated', function() {
     stage.removeChildren();
     draw();
@@ -14,6 +14,7 @@ function load() {
   palette.colorAt(0, 'green');
   palette.colors(['red', 'green', 'blue']);
   palette.restoreDefaults();
+  draw();
 }
 
 function draw() {

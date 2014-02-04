@@ -11,7 +11,8 @@ goog.require('anychart.pie');
 goog.require('anychart.scales.Linear');
 goog.require('anychart.scales.Ordinal');
 goog.require('anychart.utils');
-goog.require('anychart.utils.ColorPalette');
+goog.require('anychart.utils.DistinctColorPalette');
+goog.require('anychart.utils.RangeColorPalette');
 
 /**
   @namespace
