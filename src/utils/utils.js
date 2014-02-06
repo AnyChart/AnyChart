@@ -1,6 +1,7 @@
 goog.provide('anychart.utils');
 goog.provide('anychart.utils.Align');
 goog.provide('anychart.utils.color');
+goog.require('anychart.math.Coordinate');
 goog.require('goog.color');
 
 
@@ -139,6 +140,25 @@ anychart.utils.normalizePosition = function(position, opt_default) {
     return position;
   }
   return goog.isDef(opt_default) ? opt_default : anychart.utils.NinePositions.CENTER;
+};
+
+
+/**
+ * Пытается нормализовать anychart.math.Coordinate до acgraph.math.Coordinate.
+ * @param {anychart.math.Coordinate} value anychart.math.Coordinate to normalize.
+ * @return {acgraph.math.Coordinate} Normalized to acgraph.math.Coordinate value.
+ */
+anychart.utils.normalizeMathPosition = function(value) {
+  if (value instanceof acgraph.math.Coordinate) {
+    return /** @type {acgraph.math.Coordinate} */(value);
+  } else {
+    if (goog.isArray(value)) {
+      return new acgraph.math.Coordinate(value[0], value[1]);
+    } else if (goog.isObject(value)) {
+      return new acgraph.math.Coordinate(value['x'], value['y']);
+    }
+  }
+  return new acgraph.math.Coordinate(0, 0);
 };
 
 

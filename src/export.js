@@ -106,7 +106,24 @@ anychart.elements.Background.prototype['fill'] = anychart.elements.Background.pr
 anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;
 anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;
 anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;
-// ----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.Label
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.Label', anychart.elements.Label);
+anychart.elements.Label.prototype['background'] = anychart.elements.Label.prototype.background;
+anychart.elements.Label.prototype['padding'] = anychart.elements.Label.prototype.padding;
+anychart.elements.Label.prototype['width'] = anychart.elements.Label.prototype.width;
+anychart.elements.Label.prototype['height'] = anychart.elements.Label.prototype.height;
+anychart.elements.Label.prototype['parentBounds'] = anychart.elements.Label.prototype.parentBounds;
+anychart.elements.Label.prototype['rotation'] = anychart.elements.Label.prototype.rotation;
+anychart.elements.Label.prototype['anchor'] = anychart.elements.Label.prototype.anchor;
+anychart.elements.Label.prototype['offsetX'] = anychart.elements.Label.prototype.offsetX;
+anychart.elements.Label.prototype['offsetY'] = anychart.elements.Label.prototype.offsetY;
+anychart.elements.Label.prototype['position'] = anychart.elements.Label.prototype.position;
+anychart.elements.Label.prototype['draw'] = anychart.elements.Label.prototype.draw;
+//----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Multilabel
 //
@@ -205,3 +222,9 @@ anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColo
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
 anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.math.Rect
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
