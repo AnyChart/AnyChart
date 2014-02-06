@@ -94,7 +94,11 @@ anychart.utils.ConsistencyState = {
    * Scale categorization settings changed. Data recategorisation is needed.
    */
   SCALE_RECATEGORIZED: 0x20000,
-  //  RESERVED_FLAG11: 0x40000,
+
+  /**
+   * Вызывается когда изменились настройки лейблов
+   */
+  LABELS: 0x40000,
   //  RESERVED_FLAG12: 0x80000,
   //  RESERVED_FLAG13: 0x100000,
   //  RESERVED_FLAG14: 0x200000,
@@ -125,7 +129,7 @@ anychart.utils.ConsistencyState = {
   //  RESERVED_FLAG39: 0x400000000000,
   //  RESERVED_FLAG40: 0x800000000000,
   //  RESERVED_FLAG_LAST: 0x10000000000000000,
-  ALL: 0x7FF
+  ALL: 0x3FFFF
 };
 
 
@@ -267,7 +271,7 @@ anychart.utils.Invalidatable.prototype.resumeInvalidationDispatching = function(
     return this;
   var eventsToDispatch = this.suspendedDispatching_;
   this.suspendedDispatching_ = NaN;
-  if (doDispatchSuspendedStates)
+  if (doDispatchSuspendedStates && eventsToDispatch)
     this.dispatchInvalidationEvent(eventsToDispatch);
   return this;
 };

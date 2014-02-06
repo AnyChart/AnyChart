@@ -78,6 +78,9 @@ anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.inner
 anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;
 anychart.pie.Chart.prototype['explode'] = anychart.pie.Chart.prototype.explode;
 anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;
+anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;
+anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;
+anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Title

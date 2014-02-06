@@ -126,6 +126,24 @@ anychart.data.PieView.prototype.row = function(rowIndex, opt_value) {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.data.PieView.prototype.parentMeta = function(index, name, opt_value) {
+  if (index >= this.mask.length) {
+    index -= this.mask.length;
+    if (arguments.length > 2) {
+      this.otherPointView_.meta.apply(this.otherPointView_, arguments);
+      return this;
+    } else {
+      return this.otherPointView_.meta.apply(this.otherPointView_, arguments);
+    }
+  } else {
+    return anychart.data.View.prototype.parentMeta.apply(this, arguments);
+  }
+};
+
+
 
 /**
  * Special mapping for other point for PieView.
@@ -157,6 +175,16 @@ anychart.data.PieView.Mapping_.prototype.row = function(rowIndex, opt_value) {
     return res;
   } else
     return undefined;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.data.PieView.Mapping_.prototype.meta = function(index, name, opt_value) {
+  if (index == 0) {
+    return anychart.data.View.prototype.meta.apply(this, arguments);
+  }
 };
 
 

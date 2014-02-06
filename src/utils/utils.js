@@ -1,5 +1,6 @@
 goog.provide('anychart.utils');
 goog.provide('anychart.utils.Align');
+goog.provide('anychart.utils.Sort');
 goog.provide('anychart.utils.color');
 goog.require('anychart.math.Coordinate');
 goog.require('goog.color');
@@ -159,6 +160,52 @@ anychart.utils.normalizeMathPosition = function(value) {
     }
   }
   return new acgraph.math.Coordinate(0, 0);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Sort.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Sort enumeration.
+ * @enum {string}
+ */
+anychart.utils.Sort = {
+  /**
+   * Ascending sort.
+   */
+  ASC: 'asc',
+
+  /**
+   * Descending sort.
+   */
+  DESC: 'desc',
+
+  /**
+   * No sort.
+   */
+  NONE: 'none'
+};
+
+
+/**
+ * Normalizes user input sort to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
+ *
+ * @param {string} sort Sort to normalize.
+ * @param {anychart.utils.Sort=} opt_default Default value.
+ * @return {anychart.utils.Sort} Normalized sort.
+ */
+anychart.utils.normalizeSort = function(sort, opt_default) {
+  if (goog.isString(sort)) {
+    sort = sort.toLowerCase();
+    for (var i in anychart.utils.Sort) {
+      if (sort == anychart.utils.Sort[i])
+        return anychart.utils.Sort[i];
+    }
+  }
+  return opt_default || anychart.utils.Sort.NONE;
 };
 
 
@@ -404,6 +451,21 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
       break;
   }
   return position;
+};
+
+
+/**
+ * Нормализует значение представленное в виде числа либо процента.
+ * Если было число либо процент (строка с числом и знаком %) вернется это значение
+ * иначе вернется значение opt_default либо 0.
+ * @param {*} value Value to normalize.
+ * @param {(number|string)=} opt_default Default value.
+ * @return {(number|string)} Нормализованное значение.
+ */
+anychart.utils.normalizeNumberOrStringPercentValue = function(value, opt_default) {
+  var ret = parseFloat(value);
+  if (goog.isNumber(value) && !isNaN(value) || goog.isNumber(ret) && !isNaN(ret)) return (/** @type {(number|string)} */ (value));
+  return opt_default || 0;
 };
 
 
