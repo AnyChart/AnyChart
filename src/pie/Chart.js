@@ -473,7 +473,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
     this.invalidate(anychart.utils.ConsistencyState.LABELS);
   }
 
-  if (goog.isDef(opt_value) && opt_value instanceof anychart.elements.Multilabel) {
+  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.Multilabel || goog.isNull(opt_value))) {
     this.labels_.cloneFrom(opt_value);
     this.labels_.reset();
     this.invalidate(anychart.utils.ConsistencyState.LABELS);

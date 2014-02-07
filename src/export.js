@@ -85,6 +85,10 @@ anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
 anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
 anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
 anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
+
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.DROP', anychart.pie.Chart.OtherPointType.DROP);
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.GROUP', anychart.pie.Chart.OtherPointType.GROUP);
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.NONE', anychart.pie.Chart.OtherPointType.NONE);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Title
@@ -219,6 +223,10 @@ anychart.utils.Invalidatable.prototype['listen'] = anychart.utils.Invalidatable.
 //  anychart.utils.ColorPalette
 //
 //----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
+goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
+goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
+
 goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;
