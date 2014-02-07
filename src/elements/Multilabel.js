@@ -822,8 +822,8 @@ anychart.elements.Multilabel.prototype.cloneFrom = function(labels) {
     this.padding(0);
     this.offsetX(0);
     this.offsetY(0);
-    this.textFormatter(null);
-    this.positionFormatter(null);
+    this.textFormatter(function() {});
+    this.positionFormatter(function() {return{'x': 0, 'y': 0}});
     this.background(null);
   }
   return this;
