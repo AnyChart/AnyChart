@@ -208,7 +208,7 @@ anychart.elements.Text.prototype['textOverflow'] = anychart.elements.Text.protot
 anychart.elements.Text.prototype['selectable'] = anychart.elements.Text.prototype.selectable;
 anychart.elements.Text.prototype['useHtml'] = anychart.elements.Text.prototype.useHtml;
 
-// ----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.utils.Invalidatable
 //
@@ -235,3 +235,11 @@ anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.R
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.color
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.color.blend', anychart.color.blend);
+goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);
+goog.exportSymbol('anychart.color.darken', anychart.color.darken);
