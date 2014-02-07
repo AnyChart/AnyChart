@@ -118,7 +118,7 @@ anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
 /**
  * Getter and setter for tick names.
  * @param {Array=} opt_values An array of tick aliases.
- * @return {!anychart.scales.OrdinalTicks|!Array} Names or this for chaining.
+ * @return {!(anychart.scales.OrdinalTicks|Array)} Names or this for chaining.
  */
 anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
   if (goog.isDef(opt_values)) {

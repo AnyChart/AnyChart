@@ -67,24 +67,26 @@ anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 //  anychart.pie.Chart
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);
-anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;
-anychart.pie.Chart.prototype['setOtherPoint'] = anychart.pie.Chart.prototype.setOtherPoint;
-anychart.pie.Chart.prototype['otherPointType'] = anychart.pie.Chart.prototype.otherPointType;
-anychart.pie.Chart.prototype['otherPointFilter'] = anychart.pie.Chart.prototype.otherPointFilter;
-anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;
-anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;
-anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;
-anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;
-anychart.pie.Chart.prototype['explode'] = anychart.pie.Chart.prototype.explode;
-anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;
-anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;
-anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;
-anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;
-anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
-anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
-anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
-anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
+goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);//in docs/
+
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.DROP', anychart.pie.Chart.OtherPointType.DROP);//in docs/
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.GROUP', anychart.pie.Chart.OtherPointType.GROUP);//in docs/
+goog.exportSymbol('anychart.pie.Chart.OtherPointType.NONE', anychart.pie.Chart.OtherPointType.NONE);//in docs/
+
+anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//in docs/
+anychart.pie.Chart.prototype['otherPointType'] = anychart.pie.Chart.prototype.otherPointType;//in docs/
+anychart.pie.Chart.prototype['otherPointFilter'] = anychart.pie.Chart.prototype.otherPointFilter;//in docs/
+anychart.pie.Chart.prototype['setOtherPoint'] = anychart.pie.Chart.prototype.setOtherPoint;//in docs/
+anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//in docs/
+anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//in docs/
+anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//in docs/
+anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;//in docs/
+anychart.pie.Chart.prototype['explode'] = anychart.pie.Chart.prototype.explode;//in docs/
+anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;//in docs/
+anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;//in docs/
+anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/
+anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/
+anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/
 
 goog.exportSymbol('anychart.pie.Chart.OtherPointType.DROP', anychart.pie.Chart.OtherPointType.DROP);
 goog.exportSymbol('anychart.pie.Chart.OtherPointType.GROUP', anychart.pie.Chart.OtherPointType.GROUP);
