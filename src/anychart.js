@@ -6,6 +6,7 @@ goog.require('anychart.Chart');
 goog.require('anychart.data');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Label');
+goog.require('anychart.elements.Marker');
 goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Title');
 goog.require('anychart.math');
@@ -113,4 +114,3 @@ goog.global['anychart']['fontFamily'] = 'Arial';
  */
 goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
 //endregion
-
