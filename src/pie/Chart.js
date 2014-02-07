@@ -431,6 +431,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
         }
 
         this.palette_ = new cls();
+        this.palette_.cloneFrom(opt_value);
         this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
         this.registerDisposable(this.palette_);
       }
