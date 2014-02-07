@@ -81,6 +81,10 @@ anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;
 anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;
 anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;
 anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;
+anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
+anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
+anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
+anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Title

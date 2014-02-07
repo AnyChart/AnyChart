@@ -1,5 +1,6 @@
 goog.provide('anychart.pie.Chart');
 goog.require('anychart.Chart');
+goog.require('anychart.color');
 goog.require('anychart.math');
 goog.require('anychart.utils.Sort');
 
@@ -151,6 +152,46 @@ anychart.pie.Chart = function(opt_data) {
    * @private
    */
   this.preparingData_ = false;
+
+  /**
+   * Default fill function.
+   * @this {{index:number, sourceColor: acgraph.vector.Fill}}
+   * @return {acgraph.vector.Fill} Fill for pie slice.
+   * @private
+   */
+  this.fill_ = function() {
+    return /** @type {acgraph.vector.Fill} */ (this['sourceColor']);
+  };
+
+  /**
+   * Default stroke function.
+   * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
+   * @return {acgraph.vector.Stroke} Stroke for pie slice.
+   * @private
+   */
+  this.stroke_ = function() {
+    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
+  };
+
+  /**
+   * Default fill function for hover state.
+   * * @this {{index:number, sourceColor: acgraph.vector.Fill}}
+   * @return {acgraph.vector.Fill} Fill for pie slice of hover state.
+   * @private
+   */
+  this.hoverFill_ = function() {
+    return /** @type {acgraph.vector.Fill} */ (anychart.color.lighten(this['sourceColor']));
+  };
+
+  /**
+   * Default stroke function for hover state.
+   * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
+   * @return {acgraph.vector.Stroke} Stroke for pie slice of hover state.
+   * @private
+   */
+  this.hoverStroke_ = function() {
+    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
+  };
 
   this.palette();
   this.labels();
@@ -339,6 +380,74 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
     return this;
   }
   return this.palette_;
+};
+
+
+/**
+ * Getter/setter for pie slices fill in normal state.
+ * Default fill - is a function that returns color form default palette.
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value Fill or fill function for normal state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} Current fill, fill-function in normal state or self for chaining.
+ */
+anychart.pie.Chart.prototype.fill = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.fill_ = opt_value;
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    return this;
+  } else {
+    return this.fill_;
+  }
+};
+
+
+/**
+ * Getter/setter for pie slices stroke in normal state.
+ * Default stroke - is a function that returns color that darken than a color from default palette by factor 0.2.
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value Stroke or stroke function for normal state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} Current stroke, stroke-function in normal state or self for chaining.
+ */
+anychart.pie.Chart.prototype.stroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.stroke_ = opt_value;
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    return this;
+  } else {
+    return this.stroke_;
+  }
+};
+
+
+/**
+ * Getter/setter for pie slices fill in hover state.
+ * Default hover fill - is a function that returns color that lighten than a color from normal state by factor 0.3.
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value Fill or fill-function for hover state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} Current fill, fill-function in hover state or self for chaining.
+ */
+anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hoverFill_ = opt_value;
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    return this;
+  } else {
+    return this.hoverFill_;
+  }
+};
+
+
+/**
+ * Getter/setter for pie slices stroke in hover state.
+ * Default hover stroke - is a function that returns color that darken than a color from normal state by factor 0.3.
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value Stroke or stroke-function for hover state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} Current stroke, stroke-function in hover state or self for chaining.
+ */
+anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hoverStroke_ = opt_value;
+    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    return this;
+  } else {
+    return this.hoverStroke_;
+  }
 };
 
 
@@ -556,6 +665,84 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 
 
 /**
+ * Gets final normalized fill color.
+ * @param {number} pieSliceIndex Index of a pie slice.
+ * @param {boolean=} opt_hover Whether pie slice hovered or not.
+ * @param {acgraph.vector.Fill=} opt_fill Normal state fill.
+ * @return {!acgraph.vector.Fill} Normalized fill.
+ * @private
+ */
+anychart.pie.Chart.prototype.getFillColor_ = function(pieSliceIndex, opt_hover, opt_fill) {
+  var scope, fill;
+
+  scope = {
+    'index': pieSliceIndex
+  };
+
+  if (goog.isFunction(this.fill_)) {
+    scope['sourceColor'] = this.palette_.colorAt(pieSliceIndex) || 'black';
+    fill = this.fill_.call(scope);
+  } else if (goog.isDef(this.fill_)) {
+    fill = this.fill_;
+  }
+
+  fill = anychart.color.normalizeFill(fill);
+
+  if (goog.isDefAndNotNull(opt_hover) && opt_hover === true) {
+    if (goog.isDef(opt_fill)) fill = anychart.color.normalizeFill(opt_fill);
+    scope['sourceColor'] = fill;
+    if (goog.isFunction(this.hoverFill_)) {
+      fill = this.hoverFill_.call(scope);
+    } else if (goog.isDefAndNotNull(this.hoverFill_)) {
+      fill = this.hoverFill_;
+    }
+    return anychart.color.normalizeFill(fill);
+  } else {
+    return fill;
+  }
+};
+
+
+/**
+ * Gets final normalized stroke color.
+ * @param {number} pieSliceIndex Index of a pie slice.
+ * @param {boolean=} opt_hover Whether pie slice hovered or not.
+ * @param {acgraph.vector.Stroke=} opt_stroke Normal state stroke.
+ * @return {!acgraph.vector.Stroke} Normalized stroke.
+ * @private
+ */
+anychart.pie.Chart.prototype.getStrokeColor_ = function(pieSliceIndex, opt_hover, opt_stroke) {
+  var scope, stroke;
+
+  scope = {
+    'index': pieSliceIndex
+  };
+
+  if (goog.isFunction(this.stroke_)) {
+    scope['sourceColor'] = this.palette_.colorAt(pieSliceIndex) || 'black';
+    stroke = this.stroke_.call(scope);
+  } else if (goog.isDefAndNotNull(this.stroke_)) {
+    stroke = this.stroke_;
+  } else stroke = 'none';
+
+  stroke = anychart.color.normalizeStroke(stroke);
+
+  if (goog.isDefAndNotNull(opt_hover) && opt_hover === true) {
+    if (goog.isDef(opt_stroke)) stroke = anychart.color.normalizeStroke(opt_stroke);
+    scope['sourceColor'] = stroke;
+    if (goog.isFunction(this.hoverStroke_)) {
+      stroke = this.hoverStroke_.call(scope);
+    } else if (goog.isDefAndNotNull(this.hoverStroke_)) {
+      stroke = this.hoverStroke_;
+    }
+    return anychart.color.normalizeStroke(stroke);
+  } else {
+    return stroke;
+  }
+};
+
+
+/**
  * Drawing content.
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
@@ -565,7 +752,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   if (this.isConsistent()) return;
 
   var iterator = this.view_.getIterator();
-  var color, fill, stroke, exploded;
+  var fill, stroke, exploded;
 
   if (iterator.getRowsCount() >= 10) {
     if (window.console) {
@@ -608,9 +795,8 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
       sweep = value / this.valuesSum_ * 360;
 
-      color = this.palette_.colorAt(iterator.getIndex()) || 'black';
-      fill = iterator.get('fill') || color;
-      stroke = iterator.get('stroke') || '1 ' + color + ' 0.6';
+      fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
+      stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
 
       iterator.setMeta('start', start).setMeta('sweep', sweep);
       if (!(exploded = iterator.getMeta('exploded'))) {
@@ -643,13 +829,17 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     if (this.hovered_) {
       var pieSlice = this.hovered_[0];
       var pieSliceIndex = this.hovered_[1];
-      iterator.select(pieSliceIndex);
       var isHovered = this.hovered_[2];
+      iterator.select(pieSliceIndex);
 
-      color = iterator.get('fill') || this.palette_.colorAt(pieSliceIndex) || 'black';
+      var fillColor = isHovered ? iterator.get('hoverFill') : iterator.get('fill');
+      var strokeColor = isHovered ? iterator.get('hoverStroke') : iterator.get('stroke');
 
-      color = /** @type {string} */ (color) + (isHovered ? ' 0.4' : '');
-      pieSlice.fill(color);
+      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, iterator.get('fill'));
+      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, iterator.get('stroke'));
+
+      pieSlice.fill(fill);
+      pieSlice.stroke(stroke);
     }
     this.markConsistent(anychart.utils.ConsistencyState.HOVER);
   }
@@ -705,7 +895,8 @@ anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, 
   if (opt_path) return true;
 
   pie['__index'] = index;
-  pie.fill(fill).stroke(stroke);
+  pie.fill(fill);
+  pie.stroke(stroke);
 
   acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
   acgraph.events.listen(pie, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
