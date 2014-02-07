@@ -392,7 +392,6 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
  *  new anychart.pie.Chart(data)
  *     .container(stage)
  *     .bounds(0,0,'33%', '100%')
- *     .palette()
  *     .draw();
  *  var chart2 = new anychart.pie.Chart(data)
  *     .container(stage)
