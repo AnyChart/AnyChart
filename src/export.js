@@ -195,24 +195,25 @@ anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.p
 //  anychart.elements.Text
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.Text.prototype['fontSize'] = anychart.elements.Text.prototype.fontSize;
-anychart.elements.Text.prototype['fontFamily'] = anychart.elements.Text.prototype.fontFamily;
-anychart.elements.Text.prototype['fontColor'] = anychart.elements.Text.prototype.fontColor;
-anychart.elements.Text.prototype['fontOpacity'] = anychart.elements.Text.prototype.fontOpacity;
-anychart.elements.Text.prototype['fontDecoration'] = anychart.elements.Text.prototype.fontDecoration;
-anychart.elements.Text.prototype['fontStyle'] = anychart.elements.Text.prototype.fontStyle;
-anychart.elements.Text.prototype['fontVariant'] = anychart.elements.Text.prototype.fontVariant;
-anychart.elements.Text.prototype['fontWeight'] = anychart.elements.Text.prototype.fontWeight;
-anychart.elements.Text.prototype['letterSpacing'] = anychart.elements.Text.prototype.letterSpacing;
-anychart.elements.Text.prototype['direction'] = anychart.elements.Text.prototype.direction;
-anychart.elements.Text.prototype['lineHeight'] = anychart.elements.Text.prototype.lineHeight;
-anychart.elements.Text.prototype['textIndent'] = anychart.elements.Text.prototype.textIndent;
-anychart.elements.Text.prototype['vAlign'] = anychart.elements.Text.prototype.vAlign;
-anychart.elements.Text.prototype['hAlign'] = anychart.elements.Text.prototype.hAlign;
-anychart.elements.Text.prototype['textWrap'] = anychart.elements.Text.prototype.textWrap;
-anychart.elements.Text.prototype['textOverflow'] = anychart.elements.Text.prototype.textOverflow;
-anychart.elements.Text.prototype['selectable'] = anychart.elements.Text.prototype.selectable;
-anychart.elements.Text.prototype['useHtml'] = anychart.elements.Text.prototype.useHtml;
+anychart.elements.Text.prototype['fontSize'] = anychart.elements.Text.prototype.fontSize;//in docs/
+anychart.elements.Text.prototype['fontFamily'] = anychart.elements.Text.prototype.fontFamily;//in docs/
+anychart.elements.Text.prototype['fontColor'] = anychart.elements.Text.prototype.fontColor;//in docs/
+anychart.elements.Text.prototype['fontOpacity'] = anychart.elements.Text.prototype.fontOpacity;//in docs/
+anychart.elements.Text.prototype['fontDecoration'] = anychart.elements.Text.prototype.fontDecoration;//in docs/
+anychart.elements.Text.prototype['fontStyle'] = anychart.elements.Text.prototype.fontStyle;//in docs/
+anychart.elements.Text.prototype['fontVariant'] = anychart.elements.Text.prototype.fontVariant;//in docs/
+anychart.elements.Text.prototype['fontWeight'] = anychart.elements.Text.prototype.fontWeight;//in docs/
+anychart.elements.Text.prototype['letterSpacing'] = anychart.elements.Text.prototype.letterSpacing;//in docs/
+anychart.elements.Text.prototype['direction'] = anychart.elements.Text.prototype.direction;//in docs/
+anychart.elements.Text.prototype['lineHeight'] = anychart.elements.Text.prototype.lineHeight;//in docs/
+anychart.elements.Text.prototype['textIndent'] = anychart.elements.Text.prototype.textIndent;//in docs/
+anychart.elements.Text.prototype['vAlign'] = anychart.elements.Text.prototype.vAlign;//in docs/
+anychart.elements.Text.prototype['hAlign'] = anychart.elements.Text.prototype.hAlign;//in docs/
+anychart.elements.Text.prototype['textWrap'] = anychart.elements.Text.prototype.textWrap;//in docs/
+anychart.elements.Text.prototype['textOverflow'] = anychart.elements.Text.prototype.textOverflow;//in docs/
+anychart.elements.Text.prototype['selectable'] = anychart.elements.Text.prototype.selectable;//in docs/
+anychart.elements.Text.prototype['useHtml'] = anychart.elements.Text.prototype.useHtml;//in docs/
+anychart.elements.Text.prototype['textSettings'] = anychart.elements.Text.prototype.textSettings;//in docs/
 
 // ----------------------------------------------------------------------------------------------------------------------
 //
