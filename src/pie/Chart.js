@@ -387,10 +387,28 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
  * @return {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette)} Color palette instance.
  *//**
  * Setter for pie palette.
- * @example <c>Array</c>
- *  var data = [20, 7, 10, 14];
- *  chart = new anychart.pie.Chart(data);
- *  chart.palette(['#00F', '#00D', '#00B', '#009']);
+ * @example <t>stageOnly</t>
+ *  var data = [20, 7, 10, 14, 8, 14, 7, 12];
+ *  new anychart.pie.Chart(data)
+ *     .container(stage)
+ *     .bounds(0,0,'33%', '100%')
+ *     .palette()
+ *     .draw();
+ *  var chart2 = new anychart.pie.Chart(data)
+ *     .container(stage)
+ *     .bounds('33%',0,'33%', '100%')
+ *     .palette(['#00F', '#00E', '#00D', '#00C', '#00B', '#00A', '#009', '#008'])
+ *     .draw();
+ *  chart2.labels();
+ *  var chart3 = new anychart.pie.Chart(data)
+ *     .container(stage)
+ *     .bounds('66%',0,'33%', '100%')
+ *     .palette(
+ *          new anychart.utils.RangeColorPalette()
+ *              .colors(['red', 'yellow'])
+ *              .count(data.length)
+ *      )
+ *     .draw();
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Color palette instance.
  * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
  *//**
