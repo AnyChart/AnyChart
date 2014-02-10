@@ -28,13 +28,15 @@ anychart.scales.Linear = function() {
   this.minorTicks_ = null;
 
   /**
-   * @type {number} Scale input domain minimum.
+   * Scale input domain minimum.
+   * @type {number}
    * @private
    */
   this.dataRangeMin_ = 0;
 
   /**
-   * @type {number} Scale input domain maximum.
+   * Scale input domain maximum.
+   * @type {number}
    * @private
    */
   this.dataRangeMax_ = 1;

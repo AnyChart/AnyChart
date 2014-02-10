@@ -328,6 +328,7 @@ def __callDepsWriter(root, output_file, bundle_name):
 def __lintFromCommandLine():
     __callLinter(SRC_PATH)
     __callLinter(TESTS_PATH)
+    __checkDocsOverridesErrors()
 
 
 def __callLinter(root):
@@ -341,6 +342,14 @@ def __callLinter(root):
         root
     ])
 
+def __checkDocsOverridesErrors():
+    print ""
+    print 'Check overrides fails in docs'
+    subprocess.call([
+        'python',
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
+        '--lint'
+    ])
 #=======================================================================================================================
 #                            JSDoc auto fix.
 #=======================================================================================================================
@@ -358,6 +367,11 @@ def __callAutoFix(root):
         'gjslint.cfg',
         '-r',
         root
+    ])
+    subprocess.call([
+        'python',
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
+        '--autofix'
     ])
 
 #=======================================================================================================================

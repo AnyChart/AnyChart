@@ -6,7 +6,7 @@ goog.require('anychart.elements.Base');
 
 
 /**
- *
+ * Class is responsible for formatting the text. Processes the plain text and the text in html format.
  * @constructor
  * @extends {anychart.elements.Base}
  */
@@ -56,17 +56,55 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Gets or sets text appearance settings.
- * Can be called in 4 different ways:
- * 1) text.textSettings() - returns an object with all text settings by name.
- * 2) text.textSettings(name) - returns a value of asked text setting by its name.
- * 3) text.textSettings(object) - overrides current text settings by passed settings object.
- * 4) text.textSettings(name, value) - overrides text setting NAME with VALUE.
- * Note that if you ask for a text settings and it returns undefined than you probably misspelled the setting name.
- *
+ * Getter for full text appearance settings.
+ * @return {!Object} A copy of settings object.
+ *//**
+ * Getter for all text appearance settings.<br/>
+ * <b>Note:</b> Возвращает <b>undefined</b>, если имя настройки указано неверно.
+ * @example <t>listingOnly</t>
+ * someTextElement.textSettings('fontFamily');
+ * @param {string=} opt_name Наименование настройки.
+ * @return {string|number|boolean|undefined} Значение указанной настройки.
+ *//**
+ * Setter for text appearance settings.<br/>
+ * Overrides current text settings by passed settings object.
+ * @example <t>listingOnly</t>
+ * someTextElement.textSettings({'fontFamily': 'Tahoma', 'color': 'red'});
+ * @param {Object=} opt_objectWithSettings Объект с настройками. Полный объект выглядит так:
+ * <code>   {
+ *      'fontSize': smth,
+ *      'fontFamily': smth,
+ *      'fontColor': smth,
+ *      'fontOpacity': smth,
+ *      'fontDecoration': smth,
+ *      'fontStyle': smth,
+ *      'fontVariant': smth,
+ *      'fontWeight': smth,
+ *      'letterSpacing': smth,
+ *      'direction': smth,
+ *      'lineHeight': smth,
+ *      'textIndent': smth,
+ *      'vAlign': smth,
+ *      'hAlign': smth,
+ *      'textWrap': smth,
+ *      'textOverflow': smth,
+ *      'selectable': smth,
+ *      'useHtml': smth
+ *    }</code>
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * Setter for text appearance settings.<br/>
+ * Overrides text setting Value by it's Name.
+ * @example <t>listingOnly</t>
+ * someTextElement.textSettings('fontFamily', 'Tahoma');
+ * @param {Object=} opt_name Наименование настройки.
+ * @param {(string|number|boolean)=} opt_value Setting value.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
  * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get the whole object.
  * @param {(Object|string|number|boolean)=} opt_value Setting value if used as a setter.
- * @return {!(anychart.elements.Text|Object|string|number)} A copy of settings or the Text for chaining.
+ * @return {!(anychart.elements.Text|Object|string|number|boolean)} A copy of settings or the Text for chaining.
  */
 anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_value) {
   if (goog.isDef(opt_objectOrName)) {
@@ -96,9 +134,19 @@ anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_v
 
 
 /**
- * Text font size.
- * @param {string|number=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|string|number} Asked value or itself for chaining.
+ * Getter for text font size.
+ * @return {string|number} Current font size.
+ *//**
+ * Setter for text font size.
+ * @example <t>listingOnly</t>
+ * someTextElement.fontSize('18px');
+ * someTextElement.fontSize(18);
+ * @param {string|number=} opt_value ['16px'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {string|number=} opt_value .
+ * @return {!anychart.elements.Text|string|number} .
  */
 anychart.elements.Text.prototype.fontSize = function(opt_value) {
   return /** @type {!anychart.elements.Text|string|number} */(this.textSettings('fontSize', opt_value));
@@ -106,9 +154,18 @@ anychart.elements.Text.prototype.fontSize = function(opt_value) {
 
 
 /**
- * Text font family.
- * @param {string=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|string} Asked value or itself for chaining.
+ * Getter for font family.
+ * @return {string} Current font family.
+ *//**
+ * Setter for font family.
+ * @example <t>listingOnly</t>
+ * someTextElement.fontFamily('Tahoma');
+ * @param {string=} opt_value ['Arial'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {string=} opt_value .
+ * @return {!anychart.elements.Text|string} .
  */
 anychart.elements.Text.prototype.fontFamily = function(opt_value) {
   return /** @type {!anychart.elements.Text|string} */(this.textSettings('fontFamily', opt_value));
@@ -116,9 +173,20 @@ anychart.elements.Text.prototype.fontFamily = function(opt_value) {
 
 
 /**
- * Text font color.
- * @param {string=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|string} Asked value or itself for chaining.
+ * Getter for text font color.
+ * @return {string} Current font color.
+ *//**
+ * Setter for text font color.<br/>
+ * {@link http://www.w3schools.com/html/html_colors.asp}
+ * @example <t>listingOnly</t>
+ * someTextElement.fontColor('rgba(200, 0, 15, .5)');
+ * someTextElement.fontColor('red');
+ * @param {string=} opt_value ['#000'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {string=} opt_value .
+ * @return {!anychart.elements.Text|string} .
  */
 anychart.elements.Text.prototype.fontColor = function(opt_value) {
   return /** @type {!anychart.elements.Text|string} */(this.textSettings('fontColor', opt_value));
@@ -126,9 +194,19 @@ anychart.elements.Text.prototype.fontColor = function(opt_value) {
 
 
 /**
- * Text font opacity.
- * @param {number=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|number} Asked value or itself for chaining.
+ * Getter for text font opacity.
+ * @return {number} Current font opacity.
+ *//**
+ * Setter for text font opacity.<br/>
+ * Double value from 0 to 1.
+ * @example <t>listingOnly</t>
+ * someTextElement.fontOpacity(0.3);
+ * @param {number=} opt_value [1] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {!anychart.elements.Text|number} .
  */
 anychart.elements.Text.prototype.fontOpacity = function(opt_value) {
   return /** @type {!anychart.elements.Text|number} */(this.textSettings('fontOpacity', opt_value));
@@ -136,9 +214,18 @@ anychart.elements.Text.prototype.fontOpacity = function(opt_value) {
 
 
 /**
- * Text font decoration.
- * @param {acgraph.vector.Text.Decoration=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.Decoration} Asked value or itself for chaining.
+ * Getter for text font decoration.
+ * @return {acgraph.vector.Text.Decoration|string} Current font decoration.
+ *//**
+ * Setter for text font decoration.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.fontDecoration('blink');
+ * @param {(acgraph.vector.Text.Decoration|string)=} opt_value [{@link acgraph.vector.Text.Decoration}.NONE] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.Decoration} .
  */
 anychart.elements.Text.prototype.fontDecoration = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.Decoration} */(this.textSettings('fontDecoration', opt_value));
@@ -146,9 +233,18 @@ anychart.elements.Text.prototype.fontDecoration = function(opt_value) {
 
 
 /**
- * Text font style.
- * @param {acgraph.vector.Text.FontStyle=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.FontStyle} Asked value or itself for chaining.
+ * Getter for text font style.
+ * @return {acgraph.vector.Text.FontStyle|string} Current font style.
+ *//**
+ * Setter for text font style.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.fontStyle('italic');
+ * @param {(acgraph.vector.Text.FontStyle|string)=} opt_value [{@link acgraph.vector.Text.FontStyle}.NORMAL] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.FontStyle} .
  */
 anychart.elements.Text.prototype.fontStyle = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.FontStyle} */(this.textSettings('fontStyle', opt_value));
@@ -156,9 +252,18 @@ anychart.elements.Text.prototype.fontStyle = function(opt_value) {
 
 
 /**
- * Text font variant.
- * @param {acgraph.vector.Text.FontVariant=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.FontVariant} Asked value or itself for chaining.
+ * Getter for text font variant.
+ * @return {acgraph.vector.Text.FontVariant|string} Current font variant.
+ *//**
+ * Setter for text font variant.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.FontVariant('small-caps');
+ * @param {(acgraph.vector.Text.FontVariant|string)=} opt_value [{@link acgraph.vector.Text.FontVariant}.NORMAL] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.FontVariant} .
  */
 anychart.elements.Text.prototype.fontVariant = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.FontVariant} */(this.textSettings('fontVariant', opt_value));
@@ -166,9 +271,20 @@ anychart.elements.Text.prototype.fontVariant = function(opt_value) {
 
 
 /**
- * Text font weight.
- * @param {(string|number)=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|string|number} Asked value or itself for chaining.
+ * Getter for text font weight.
+ * @return {string|number} Current font weight.
+ *//**
+ * Setter for text font weight.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_font_weight.asp}
+ * @example <t>listingOnly</t>
+ * someTextElement.fontWeight(400);
+ * someTextElement.fontWeight('bold');
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number)=} opt_value .
+ * @return {!anychart.elements.Text|string|number} .
  */
 anychart.elements.Text.prototype.fontWeight = function(opt_value) {
   return /** @type {!anychart.elements.Text|string|number} */(this.textSettings('fontWeight', opt_value));
@@ -176,9 +292,19 @@ anychart.elements.Text.prototype.fontWeight = function(opt_value) {
 
 
 /**
- * Text letter spacing.
- * @param {(number|string)=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|number|string} Asked value or itself for chaining.
+ * Getter for text letter spacing.
+ * @return {string|number} Current letter spacing.
+ *//**
+ * Setter for text letter spacing.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
+ * @example <t>listingOnly</t>
+ * someTextElement.letterSpacing('-4px');
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.elements.Text|number|string} .
  */
 anychart.elements.Text.prototype.letterSpacing = function(opt_value) {
   return /** @type {!anychart.elements.Text|number|string} */(this.textSettings('letterSpacing', opt_value));
@@ -186,9 +312,18 @@ anychart.elements.Text.prototype.letterSpacing = function(opt_value) {
 
 
 /**
- * Text direction.
- * @param {acgraph.vector.Text.Direction=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.Direction} Asked value or itself for chaining.
+ * Getter for text direction.
+ * @return {acgraph.vector.Text.Direction|string} Current text direction.
+ *//**
+ * Setter for text direction.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.direction('rtl');
+ * @param {(acgraph.vector.Text.Direction|string)=} opt_value [{@link acgraph.vector.Text.Direction}.LTR] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.Direction|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.Direction} .
  */
 anychart.elements.Text.prototype.direction = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.Direction} */(this.textSettings('direction', opt_value));
@@ -196,9 +331,19 @@ anychart.elements.Text.prototype.direction = function(opt_value) {
 
 
 /**
- * Text line height.
- * @param {(number|string)=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|number|string} Asked value or itself for chaining.
+ * Getter for text line height.
+ * @return {string|number} Current text line height.
+ *//**
+ * Setter for text line height.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
+ * @example <t>listingOnly</t>
+ * someTextElement.lineHeight(14);
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.elements.Text|number|string} .
  */
 anychart.elements.Text.prototype.lineHeight = function(opt_value) {
   return /** @type {!anychart.elements.Text|number|string} */(this.textSettings('lineHeight', opt_value));
@@ -206,9 +351,18 @@ anychart.elements.Text.prototype.lineHeight = function(opt_value) {
 
 
 /**
- * Text indent.
- * @param {number=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|number} Asked value or itself for chaining.
+ * Getter for text indent.
+ * @return {number} Current text indent.
+ *//**
+ * Setter for text indent.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.textIndent(0.3);
+ * @param {number=} opt_value [0] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {!anychart.elements.Text|number} .
  */
 anychart.elements.Text.prototype.textIndent = function(opt_value) {
   return /** @type {!anychart.elements.Text|number} */(this.textSettings('textIndent', opt_value));
@@ -216,9 +370,18 @@ anychart.elements.Text.prototype.textIndent = function(opt_value) {
 
 
 /**
- * Text vertical align.
- * @param {acgraph.vector.Text.VAlign=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.VAlign} Asked value or itself for chaining.
+ * Getter for text vertical align.
+ * @return {acgraph.vector.Text.VAlign|string} Current text vertical align.
+ *//**
+ * Setter for text vertical align.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.vAlign('middle');
+ * @param {(acgraph.vector.Text.VAlign|string)=} opt_value [{@link acgraph.vector.Text.VAlign}.TOP] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.VAlign|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.VAlign} .
  */
 anychart.elements.Text.prototype.vAlign = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.VAlign} */(this.textSettings('vAlign', opt_value));
@@ -226,9 +389,18 @@ anychart.elements.Text.prototype.vAlign = function(opt_value) {
 
 
 /**
- * Text horizontal align.
- * @param {acgraph.vector.Text.HAlign=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.HAlign} Asked value or itself for chaining.
+ * Getter for text horizontal align.
+ * @return {acgraph.vector.Text.HAlign|string} Current text horizontal align.
+ *//**
+ * Setter for text horizontal align.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.hAlign('center');
+ * @param {(acgraph.vector.Text.HAlign|string)=} opt_value [{@link acgraph.vector.Text.HAlign}.START] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.VAlign|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.HAlign} .
  */
 anychart.elements.Text.prototype.hAlign = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.HAlign} */(this.textSettings('hAlign', opt_value));
@@ -236,9 +408,18 @@ anychart.elements.Text.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Text wrap settings.
- * @param {acgraph.vector.Text.TextWrap=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.TextWrap} Asked value or itself for chaining.
+ * Getter for text wrap settings.
+ * @return {acgraph.vector.Text.TextWrap|string} Current text wrap settings.
+ *//**
+ * Setter for text wrap settings.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.textWrap('noWrap');
+ * @param {(acgraph.vector.Text.TextWrap|string)=} opt_value [{@link acgraph.vector.Text.TextWrap}.BY_LETTER] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.TextWrap} .
  */
 anychart.elements.Text.prototype.textWrap = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.TextWrap} */(this.textSettings('textWrap', opt_value));
@@ -246,9 +427,18 @@ anychart.elements.Text.prototype.textWrap = function(opt_value) {
 
 
 /**
- * Text overflow settings.
- * @param {acgraph.vector.Text.TextOverflow=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|acgraph.vector.Text.TextOverflow} Asked value or itself for chaining.
+ * Getter for text overflow settings.
+ * @return {acgraph.vector.Text.TextOverflow|string} Current text overflow settings.
+ *//**
+ * Setter for text overflow settings.<br/>
+ * @example <t>listingOnly</t>
+ * someTextElement.textOverflow(acgraph.vector.Text.TextOverflow.ELLIPSIS);
+ * @param {(acgraph.vector.Text.TextOverflow|string)=} opt_value [{@link acgraph.vector.Text.TextOverflow}.CLIP] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.TextOverflow|string=} opt_value .
+ * @return {!anychart.elements.Text|acgraph.vector.Text.TextOverflow} .
  */
 anychart.elements.Text.prototype.textOverflow = function(opt_value) {
   return /** @type {!anychart.elements.Text|acgraph.vector.Text.TextOverflow} */(this.textSettings('textOverflow', opt_value));
@@ -256,9 +446,20 @@ anychart.elements.Text.prototype.textOverflow = function(opt_value) {
 
 
 /**
- * If the text is selectable.
- * @param {boolean=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|boolean} Asked value or itself for chaining.
+ * Getter for text selectable.
+ * @return {boolean} Current text selectable.
+ *//**
+ * Setter for text selectable.<br/>
+ * Данное свойство определяет восприимчивость текста к выделению. Если устанавливется <b>false</b>, то текст невозможно
+ * будет выделить.
+ * @example <t>listingOnly</t>
+ * someTextElement.selectable(true);
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value .
+ * @return {!anychart.elements.Text|boolean} .
  */
 anychart.elements.Text.prototype.selectable = function(opt_value) {
   return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('selectable', opt_value));
@@ -266,9 +467,19 @@ anychart.elements.Text.prototype.selectable = function(opt_value) {
 
 
 /**
- * If the text format should use HTML parsing.
- * @param {boolean=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Text|boolean} Asked value or itself for chaining.
+ * Getter for flag useHTML.
+ * @return {boolean} Current flag useHTML.
+ *//**
+ * Setter for flag useHTML.<br/>
+ * Данное свойство определяет надо ли парсить HTML текст.
+ * @example <t>listingOnly</t>
+ * someTextElement.useHtml(true);
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value .
+ * @return {!anychart.elements.Text|boolean} .
  */
 anychart.elements.Text.prototype.useHtml = function(opt_value) {
   return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('useHtml', opt_value));
@@ -335,7 +546,7 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
     'letterSpacing': 'normal',
     'direction': goog.global['anychart']['textDirection'],
     'lineHeight': 'normal',
-    'textIndent': '0px',
+    'textIndent': 0,
     'vAlign': acgraph.vector.Text.VAlign.TOP,
     'hAlign': acgraph.vector.Text.HAlign.START,
     'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
