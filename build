@@ -216,7 +216,6 @@ def __getDefaultCompilerArgs(addTests=False):
         '--compiler_flags=--extra_annotation_name="ignoreDoc"',
         '--compiler_flags=--extra_annotation_name="propertyDoc"',
         '--compiler_flags=--extra_annotation_name="shortDescription"',
-        '--compiler_flags=--output_wrapper=(function(){%output%})()',
     ]
 
     if addTests:
@@ -228,18 +227,27 @@ def __getDefaultCompilerArgs(addTests=False):
 #           Build project
 #=======================================================================================================================
 @sync_required
+def __compileReleaseProjectFromCommandLine():
+
+    #compile anychart.min.js
+    __compileProjectFromCommandLine()
+
+    #compile anychart.js
+    outputFileName = os.path.join(OUT_PATH, 'anychart.js')
+    commands = __getDefaultCompilerArgs() +\
+               __getNotOptimizedCompilerArgs() +\
+               __getNameSpaces() +\
+               __getRoots() +\
+               __getOutputFileArg(outputFileName)
+    __call_compiler(commands, outputFileName)
+
+
+
+@sync_required
 def __compileProjectFromCommandLine():
 
     #Проверяем существует ли путь для выгрузки итогового файла, если нет, создаем.
     __checkPathExistence(OUT_PATH)
-
-    #outputFileName = os.path.join(OUT_PATH, 'anychart.js')
-    #commands = __getDefaultCompilerArgs() +\
-    #           __getNotOptimizedCompilerArgs() +\
-    #           __getNameSpaces() +\
-    #           __getRoots() +\
-    #           __getOutputFileArg(outputFileName)
-    #__call_compiler(commands, outputFileName)
 
     #Сборка оптимизированной версии
     outputFileName = os.path.join(OUT_PATH, 'anychart.min.js')
@@ -247,7 +255,9 @@ def __compileProjectFromCommandLine():
                __getOptimizedCompilerArgs() +\
                __getNameSpaces() +\
                __getRoots() +\
-               __getOutputFileArg(outputFileName)
+               __getOutputFileArg(outputFileName) +\
+               ['--compiler_flags=--output_wrapper=(function(){%output%})()']
+
     __call_compiler(commands, outputFileName)
 
 
@@ -451,6 +461,8 @@ def __execMainScript():
         __sync_contrib()
     elif args[1] == 'compile':
         __compileProjectFromCommandLine()
+    elif args[1] == 'compile-release':
+        __compileReleaseProjectFromCommandLine()
     elif args[1] == 'tests':
         __compileTests()
     elif args[1] == 'deps':
