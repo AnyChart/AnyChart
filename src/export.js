@@ -9,8 +9,7 @@ anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.se
 anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
 anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
 anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
-anychart.data.Iterator.prototype['getMeta'] = anychart.data.Iterator.prototype.getMeta;
-anychart.data.Iterator.prototype['getMeta'] = anychart.data.Iterator.prototype.getMeta;
+anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;
 anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
 anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
 //----------------------------------------------------------------------------------------------------------------------

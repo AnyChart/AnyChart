@@ -120,9 +120,9 @@ anychart.pie.Chart = function(opt_data) {
   this.positionProvider_ = goog.bind(function(index) {
     var iterator = this.data().getIterator();
     iterator.select(index);
-    var start = /** @type {number} */ (iterator.getMeta('start'));
-    var sweep = /** @type {number} */ (iterator.getMeta('sweep'));
-    var exploded = /** @type {boolean} */ (iterator.getMeta('exploded'));
+    var start = /** @type {number} */ (iterator.meta('start'));
+    var sweep = /** @type {number} */ (iterator.meta('sweep'));
+    var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
     var angle = (start + sweep / 2) * Math.PI / 180;
 
     var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
@@ -1110,10 +1110,10 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
       stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
 
-      iterator.setMeta('start', start).setMeta('sweep', sweep);
-      if (!(exploded = iterator.getMeta('exploded'))) {
+      iterator.meta('start', start).meta('sweep', sweep);
+      if (!(exploded = iterator.meta('exploded'))) {
         exploded = !!iterator.get('exploded');
-        iterator.setMeta('exploded', exploded);
+        iterator.meta('exploded', exploded);
       }
 
       this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, exploded, this.explodeValue_, null);
@@ -1161,7 +1161,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     if (this.clicked_) {
       pieSliceIndex = this.clicked_[0];
       iterator.select(pieSliceIndex);
-      iterator.setMeta('exploded', !iterator.getMeta('exploded'));
+      iterator.meta('exploded', !iterator.meta('exploded'));
       this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
     }
   }

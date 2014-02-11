@@ -96,22 +96,16 @@ anychart.data.Iterator.prototype.getRowsCount = function() {
 
 
 /**
- * Getter for a metadata value.
- * @param {string} name Name of the metadata field.
- * @return {*|undefined} Metadata value.
+ * Gets or sets meta data value by field name.
+ * @param {string} name Name of metadata field.
+ * @param {*=} opt_value Value to set.
+ * @return {!anychart.data.Iterator|*} Self for chaining or value.
  */
-anychart.data.Iterator.prototype.getMeta = function(name) {
-  return this.view_.meta(this.currentIndex_, name);
+anychart.data.Iterator.prototype.meta = function(name, opt_value) {
+  if (arguments.length > 1) {
+    this.view_.meta(this.currentIndex_, name, opt_value);
+    return this;
+  } else
+    return this.view_.meta(this.currentIndex_, name);
 };
 
-
-/**
- * Setter for a metadata value.
- * @param {string} name Name of the metadata field.
- * @param {*|undefined} value Value to set.
- * @return {!anychart.data.Iterator} Self for chaining or value.
- */
-anychart.data.Iterator.prototype.setMeta = function(name, value) {
-  this.view_.meta(this.currentIndex_, name, value);
-  return this;
-};
