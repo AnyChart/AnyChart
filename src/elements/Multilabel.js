@@ -802,6 +802,7 @@ anychart.elements.Multilabel.prototype.restoreDefaults = function() {
  */
 anychart.elements.Multilabel.prototype.cloneFrom = function(labels) {
   if (goog.isDefAndNotNull(labels)) {
+    this.textSettings(labels.settingsObj);
     this.width(labels.width_);
     this.height(labels.height_);
     this.rotation(labels.rotation_);
