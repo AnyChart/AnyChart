@@ -165,7 +165,15 @@ anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.a
 anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;
 anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;
 anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.Ticks
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.Ticks', anychart.elements.Ticks);
+anychart.elements.Ticks.prototype['length'] = anychart.elements.Ticks.prototype.length;
+anychart.elements.Ticks.prototype['stroke'] = anychart.elements.Ticks.prototype.stroke;
+anychart.elements.Ticks.prototype['position'] = anychart.elements.Ticks.prototype.position;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math.Rect

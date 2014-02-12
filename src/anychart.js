@@ -8,6 +8,7 @@ goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Marker');
 goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');
 goog.require('anychart.math');
 goog.require('anychart.pie');
