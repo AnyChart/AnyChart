@@ -5,13 +5,13 @@ goog.require('anychart');
 //  anychart.data.Iterator
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;
-anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
-anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
-anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
-anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;
-anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
-anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
+anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//in docs/
+anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//in docs/
+anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//in docs/
+anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//in docs/
+anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//in docs/
+anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//in docs/
+anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Set
