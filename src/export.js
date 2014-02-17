@@ -17,11 +17,11 @@ anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.protot
 //  anychart.data.Set
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.data.Set', anychart.data.Set);
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;
+goog.exportSymbol('anychart.data.Set', anychart.data.Set);//in docs/
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.View
