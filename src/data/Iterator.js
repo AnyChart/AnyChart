@@ -175,6 +175,10 @@ anychart.data.Iterator.prototype.getRowsCount = function() {
  *    {name: 'Margaret', age: 24, contact: 6597522},        {'name': 'SampleText'},
  *    {name: 'John', age: 39, contact: 6597001},            {}
  * ]                                                     ]
+ * // Внимание! Сеттер устанавливает любое переданное ему значение так как оно есть.
+ * iterator.meta('smth', null);                             {'smth': null}
+ * iterator.meta('smth', undefined);                        {'smth': undefined}
+ * iterator.meta('smth', function(){ do_smth; });           {'smth': function(){ do_smth; }}
  * @param {string} name Name of metadata field.
  * @param {*=} opt_value Value to set.
  * @return {!anychart.data.Iterator} Экземпляр класса {@link anychart.data.Iterator} для цепочного вызова.

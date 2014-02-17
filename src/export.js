@@ -27,14 +27,13 @@ anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRow
 //  anychart.data.View
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/
 
 //----------------------------------------------------------------------------------------------------------------------
 //
