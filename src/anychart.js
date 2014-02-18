@@ -19,9 +19,9 @@ goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
 
 /**
-  @namespace
-  @name anychart
-  */
+ @namespace
+ @name anychart
+ */
 
 
 /**
@@ -115,3 +115,35 @@ goog.global['anychart']['fontFamily'] = 'Arial';
  */
 goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
 //endregion
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Document load event.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @type {Array.<Array>}
+ * @private
+ */
+anychart.documentLoadCallbacks_;
+
+
+/**
+ * Add callback for document load event.
+ * @param {Function} func Function which will called on document load event.
+ * @param {*=} opt_scope Function call context.
+ */
+anychart.onDocumentLoad = function(func, opt_scope) {
+  if (!anychart.documentLoadCallbacks_) {
+    anychart.documentLoadCallbacks_ = [];
+  }
+  anychart.documentLoadCallbacks_.push([func, opt_scope]);
+
+  goog.events.listen(goog.dom.getWindow(), goog.events.EventType.LOAD, function() {
+    for (var i = 0, count = anychart.documentLoadCallbacks_.length; i < count; i++) {
+      var item = anychart.documentLoadCallbacks_[i];
+      item[0].apply(item[1]);
+    }
+  });
+};

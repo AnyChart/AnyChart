@@ -266,7 +266,12 @@ anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColo
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
 anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.Chart
