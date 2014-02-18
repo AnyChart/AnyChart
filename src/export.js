@@ -5,36 +5,35 @@ goog.require('anychart');
 //  anychart.data.Iterator
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;
-anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
-anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
-anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
-anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;
-anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
-anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
+anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//in docs/
+anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//in docs/
+anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//in docs/
+anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//in docs/
+anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//in docs/
+anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//in docs/
+anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Set
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.data.Set', anychart.data.Set);
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;
+goog.exportSymbol('anychart.data.Set', anychart.data.Set);//in docs/
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.View
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/
 
 //----------------------------------------------------------------------------------------------------------------------
 //

@@ -6,7 +6,9 @@ goog.require('anychart.utils.Invalidatable');
 
 
 /**
- * A "view" - like a db select from a data set.
+ * "View" - это представление исходного набора данных, в результате операций над ними (сортировка, фильтрация и тд).<br/>
+ * <b>Note:</b> дефолтный View - это  представление исходных данных с дефолтным маппингом.<br/>
+ *
  * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @constructor
  * @implements {anychart.data.IView}
@@ -126,9 +128,14 @@ anychart.data.View.prototype.derive = function() {
 
 /**
  * Creates a derivative view, containing only row that passed the filter.
+ * @example <t>listingOnly</t>
+ *  // оставляем значения более 3.
+ *  view.filter('fieldName', function(fieldValue){
+ *    return fieldValue > 3;
+ *  });
  * @param {string} fieldName A field which value will be passed to a filter function.
  * @param {function(*):boolean} func Filter function that should accept a field value and return true if the row
- *    should be included into the resulting view and false otherwise.
+ *  should be included into the resulting view.
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.filter = function(fieldName, func) {
@@ -140,9 +147,14 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
 
 /**
  * Creates a derivative view that ensures sorting by a passed field.
+ * @example <t>listingOnly</t>
+ *  // sorting by string length.
+ *  view.filter('pointName', function(value1, value2){
+ *    return value1.toString().length() - value2.toString().length();
+ *  });
  * @param {string} fieldName Field name to make sort by.
  * @param {function(*, *):number=} opt_comparator Sorting function that should accept two field values and return
- *    numeric result of the comparison.
+ *  numeric result of the comparison.
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
@@ -154,7 +166,57 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
 
 /**
  * Concatenates two views to make a derivative view, that contains rows from both views.
- * @param {(!anychart.data.IView|!Array)} otherView A view, data set or even an array to concat with.
+ * @example <c>Конкатинация двух View</c><t>listingOnly</t>
+ * // mainView                      additionalView
+ *  [                               [
+ *    [1, 3, 5],                        {x: 2, y: 5},
+ *    [5, 3, 1]                         {x: 3, y: 7},
+ *  ]                                   function(){ return {x: 4, y: 7}}
+ *                                  ]
+ * mainView.concat(additionalView);
+ * // Result mainView
+ *  [
+ *    [1, 3, 5],
+ *    [5, 3, 1],
+ *    {x: 2, y: 5},
+ *    {x: 3, y: 7},
+ *    function(){ return {x: 4, y: 7}}
+ *  ]
+ * @example <c>Конкатинация View и dataSet</c><t>listingOnly</t>
+ * // mainView
+ *  [
+ *    [1, 3, 5],
+ *    [5, 3, 1]
+ *  ]
+ * mainView.concat(new anychart.data.Set([
+ *     {x: 2, y: 5},
+ *     {x: 3, y: 7},
+ *     function(){ return {x: 4, y: 7}}
+ *  ]));
+ * // Result mainView
+ *  [
+ *    [1, 3, 5],
+ *    [5, 3, 1],
+ *    {x: 2, y: 5},
+ *    {x: 3, y: 7},
+ *    function(){ return {x: 4, y: 7}}
+ *  ]
+ * @example <c>Конкатинация View и Массива</c><t>listingOnly</t>
+ * // mainView
+ *  [
+ *    [1, 3, 5],
+ *    [5, 3, 1]
+ *  ]
+ * mainView.concat([2, 2, 2]);
+ * // Result mainView
+ *  [
+ *    [1, 3, 5],
+ *    [5, 3, 1],
+ *    2,
+ *    2,
+ *    2
+ *  ]
+ * @param {!(anychart.data.IView|Array)} otherView A view, data set or even an array to concat with.
  * @return {!anychart.data.IView} The new derived view.
  */
 anychart.data.View.prototype.concat = function(otherView) {
@@ -169,17 +231,42 @@ anychart.data.View.prototype.concat = function(otherView) {
 
 
 /**
- * Gets or sets the full row of the set by its index. If there is no any row for the index - returns undefined.
- * If used as a setter - returns the previous value of the row (don't think it saves the previous state of objects
- * stored by reference - it doesn't).
- *
- * NOTE: The number of parameters is the only thing that matters in determining if it is a setter or a getter!
- *
- * NOTE: If current view doesn't contain a row with passed index it does nothing and returns undefined.
- *
+ * Gets the full row of the set by it's index.<br/>
+ * <b>Note:</b> If there is no any row for the index - returns <b>undefined</b>.<br/>
+ * Пример работы достаточно хорошо описан тут {@link anychart.data.Set#row}
+ * @example <t>listingOnly</t>
+ * // Данные
+ *  [
+ *    [1, 2, 4, 7],
+ *    [11, 12, 14, 17],
+ *    [21, 22, 24, 27]
+ *  ]
+ *  view.row(2); // вернет [21, 22, 24, 27]
+ *  view.row(3); // вернет undefined
+ * @see anychart.data.Set#row
  * @param {number} rowIndex Index of the row to fetch.
- * @param {*=} opt_value If passed, the method is treated as a setter.
- * @return {*} The full row current or previous value. May be anything including undefined.
+ * @return {*} The full row current.
+ *//**
+ * Sets the full row of the set by its index.<br/>
+ * <b>Note:</b> returns the previous value of the row (it doesn't saves the previous state of objects).<br/>
+ * @example <t>listingOnly</t>
+ * // Данные
+ *  [
+ *    [1, 2, 4, 7],
+ *    [11, 12, 14, 17],
+ *    [21, 22, 24, 27]
+ *  ]
+ *  view.row(2, [2, 2, 2, 2]); // вернет [21, 22, 24, 27]
+ *  view.row(3, {'low': 4, 'high': 11}); // вернет undefined
+ * @see anychart.data.Set#row
+ * @param {number} rowIndex Index of the row to fetch.
+ * @param {*=} opt_value Value to set.
+ * @return {*} The full row of previous value.
+ *//**
+ * @ignoreDoc
+ * @param {number} rowIndex .
+ * @param {*=} opt_value .
+ * @return {*} .
  */
 anychart.data.View.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
@@ -198,7 +285,8 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
- * Returns the number of rows in a view.
+ * Returns the number of rows in current view.
+ * @see anychart.data.Iterator#getRowsCount
  * @return {number} Number of rows in the set.
  */
 anychart.data.View.prototype.getRowsCount = function() {
@@ -219,7 +307,12 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
- * Returns new iterator for the view.
+ * Returns new iterator for current view.
+ * @example <t>listingOnly</t>
+ * // создаем новый набор данных.
+ * var dataSet = new anychart.data.Set([1,2,3]);
+ * // выполняем над ним дефолтный маппинг и получаем итератор.
+ * var iterator = dataSet.mapAs().getIterator();
  * @return {anychart.data.Iterator} New iterator.
  */
 anychart.data.View.prototype.getIterator = function() {
@@ -255,14 +348,32 @@ anychart.data.View.prototype.parentViewChangedHandler = function(event) {
 
 
 /**
- * Getter and setter for a metadata value.
- *
- * ATTENTION: THE CHECK IF IT IS A SETTER IS MADE BY PARAMS COUNT,
- * e.g. ds.meta(1, 'qqq', undefined); is a SETTER.
+ * Getter for a metadata value.<br/>
+ * Принцип работы достаточно хорошо описан в {@link anychart.data.Iterator#meta}.
+ * @example <t>listingOnly</t>
+ * // Выбор значение поля 'name' в четвертой строке.
+ * view.meta(4, 'name');
+ * @param {number} index Row index.
+ * @param {string} name Name of the metadata field.
+ * @return {*} Current value.
+ * @see anychart.data.Iterator#meta
+ *//**
+ * Setter for a metadata value.
+ * Принцип работы достаточно хорошо описан в {@link anychart.data.Iterator#meta}.
+ * @example <t>listingOnly</t>
+ * // Установка значение полю 'name' в четвертой строке.
+ * view.meta(4, 'name', 'Samuel L. M.');
  * @param {number} index Row index.
  * @param {string} name Name of the metadata field.
  * @param {*=} opt_value Value to set.
- * @return {anychart.data.View|*|undefined} Self for chaining or value.
+ * @return {anychart.data.View} Экземпляр класса {@link anychart.data.View} для цепочного вызова.
+ * @see anychart.data.Iterator#meta
+ *//**
+ * @ignoreDoc
+ * @param {number} index .
+ * @param {string} name .
+ * @param {*=} opt_value .
+ * @return {anychart.data.View|*|undefined} .
  */
 anychart.data.View.prototype.meta = function(index, name, opt_value) {
   if (this.transitMeta_) {
