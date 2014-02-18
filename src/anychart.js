@@ -119,6 +119,21 @@ goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Definers.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Define, is passed value fit to the none definition.
+ * @param {*} value Value to define.
+ * @return {boolean} Is passed value fit to the none definition.
+ */
+anychart.isNone = function(value) {
+  return value === null || (goog.isString(value) && value.toLowerCase() == 'none');
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Document load event.
 //
 //----------------------------------------------------------------------------------------------------------------------

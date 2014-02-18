@@ -99,6 +99,11 @@ anychart.utils.ConsistencyState = {
    * Вызывается когда изменились настройки лейблов
    */
   LABELS: 0x40000,
+
+  /**
+   * Выставляется когда у элемента изменилось состояние включености.
+   */
+  ENABLED: 0x100000,
   //  RESERVED_FLAG12: 0x80000,
   //  RESERVED_FLAG13: 0x100000,
   //  RESERVED_FLAG14: 0x200000,
@@ -129,7 +134,7 @@ anychart.utils.ConsistencyState = {
   //  RESERVED_FLAG39: 0x400000000000,
   //  RESERVED_FLAG40: 0x800000000000,
   //  RESERVED_FLAG_LAST: 0x10000000000000000,
-  ALL: 0x3FFFF
+  ALL: 0xFFFFFFFFFFFFF
 };
 
 
