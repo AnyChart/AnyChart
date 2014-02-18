@@ -57,8 +57,8 @@ anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zI
 //  anychart.elements.BaseWithBounds
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;
-anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;
+anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;//in docs/
+anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Label

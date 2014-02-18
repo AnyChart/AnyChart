@@ -44,13 +44,30 @@ anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Gets/Sets element bounds settings. These bounds can contain strings, percents, etc.
- * @param {(number|string|anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_boundsOrX X-coordinate
- *    or entire bounds.
+ * Getter for element bounds settings.
+ * @return {!anychart.utils.Bounds} Current element's bounds.
+ *//**
+ * Устанавливает значения bound эоемента одним параметром.<br/>
+ * @example <t>listingOnly</t>
+ * element.bounds( new anychart.math.Rect(0, 0, 100, 100) );
+ * @param {(anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_value Bounds of element.
+ * @return {!anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * Setter for element bounds settings.
+ * @example <t>listingOnly</t>
+ * element.bounds(0, 100, '50%', '400px');
+ * @param {(number|string)=} opt_x X-coordinate.
  * @param {(number|string)=} opt_y Y-coordinate.
  * @param {(number|string)=} opt_width Width.
  * @param {(number|string)=} opt_height Height.
- * @return {(!anychart.elements.Base|!anychart.utils.Bounds)} Element bounds or thw element for chaining.
+ * @return {!anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_boundsOrX .
+ * @param {(number|string)=} opt_y .
+ * @param {(number|string)=} opt_width .
+ * @param {(number|string)=} opt_height .
+ * @return {(!anychart.elements.Base|!anychart.utils.Bounds)} .
  */
 anychart.elements.BaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_y, opt_width, opt_height) {
   if (!this.bounds_) {
@@ -67,19 +84,43 @@ anychart.elements.BaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_
 
 
 /**
- * Gets or sets definitive, pixel bounds of the element.
- * When getting the value it tries to get it in several ways from the bounds, set by bounds() method, consequently
- * trying to use container size passed to the method, fetched from the container (if any), and finally - trying to
- * get bounds without any container size at all. Also you can set a math.Rect, if
- *
- * @param {(!anychart.math.Rect|null|number)=} opt_valueOrContainerWidth Several meanings:
- *    1) rectangle if used as a setter,
- *    2) null to reset the value to auto calculation,
- *    3) number to use as a container width value in auto calculation (works as getter),
- *    4) nothing if used as getter.
- * @param {number=} opt_containerHeight Container height, if you know it and use the method as a getter.
- * @return {(!anychart.elements.Base|!anychart.math.Rect)} Returns the rect with determined pixel bounds or itself for
- *    chaining.
+ * Возвращает текущее точное значение баундов.<br/>
+ * <b>Note:</b> Если методом {@link anychart.elements.BaseWithBounds#bounds} ширина и/или высота была задана в процентах,
+ * то при автокалькуляции могут возникнуть проблемы, если нигде по цепочке родительских контейнеров нет конкретныхх
+ * пиксельных значений, в таком случае для корректного вычисления точных значений необходимо передать параметры
+ * контейнера в ручную с помощью параметров <b>containerWidth</b> и <b>containerHeight</b>. В противном случае они
+ * <b>не нужны!</b><br/>
+ * <b>Note:</b> Если данный метод вызывался как сеттер, то вне зависимости от параметров геттера вернется значение
+ * переданное в сеттер.
+ * @shortDescription Возвращает текущее точное значение баундов.
+ * @example <t>listingOnly</t>
+ * // simple usage
+ * element.bounds(0, 10, 200, 300);
+ * element.pixelBounds(); // returns Rect with size: 200x300
+ * // container size: 400 x 100
+ * element.bounds(0, 10, '50%', '57%');
+ * element.pixelBounds(400, 100); // returns Rect with size: 200x57
+ * @example <c>Using setter</c><t>listingOnly</t>
+ * var rect = new anychart.math.Rect( 0, 0, 100, 100);
+ * element.pixelBounds(rect);
+ * element.pixelBounds(); // returns value of variable rect.
+ * element.pixelBounds(400, 100); // returns value of variable rect.
+ * @param {number=} opt_containerWidth Width of container in pixels.
+ * @param {number=} opt_containerHeight Height of container in pixels.
+ * @return {!anychart.math.Rect} Returns the rect with determined pixel bounds.
+ *//**
+ * Sets definitive pixel bounds of the element.<br/>
+ * <b>Note:</b> Если передать в качестве параметра <b>null</b>, то предыдущее значение сбросится и применится
+ * авторассчет bounds элемента.
+ * @example <t>listingOnly</t>
+ * element.pixelBounds( new anychart.math.Rect( 0, 0, 100, 100) );
+ * @param {(!anychart.math.Rect|null)=} opt_value Value to set.
+ * @return {!anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(!anychart.math.Rect|null|number)=} opt_valueOrContainerWidth .
+ * @param {number=} opt_containerHeight .
+ * @return {(!anychart.elements.Base|!anychart.math.Rect)} .
  */
 anychart.elements.BaseWithBounds.prototype.pixelBounds = function(opt_valueOrContainerWidth, opt_containerHeight) {
   if ((opt_valueOrContainerWidth instanceof anychart.math.Rect) || goog.isNull(opt_valueOrContainerWidth)) {
