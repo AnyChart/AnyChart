@@ -306,8 +306,7 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  *//**
  * Возвращает текущие данные чарта.
  * @return {anychart.data.View} Current view or self for chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_value .
  * @return {(anychart.data.View|anychart.pie.Chart)} .
@@ -413,8 +412,7 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
  *     .draw();
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Color palette instance.
  * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
  * @return {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|anychart.pie.Chart)} .
@@ -582,8 +580,7 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *  chart.labels(labels);
  * @param {anychart.elements.Multilabel=} opt_value [] Multilabel instance.
  * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {anychart.elements.Multilabel=} opt_value .
  * @return {(anychart.elements.Multilabel|anychart.pie.Chart)} .
@@ -654,8 +651,7 @@ anychart.pie.Chart.prototype.setOtherPoint = function(typeValue, filterValue) {
  *//**
  * Возвращает текущий способ формирования точки "Остальное".
  * @return {(anychart.pie.Chart.OtherPointType|string)} Текущий способ формирования точки "Остальное".
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value .
  * @return {(anychart.pie.Chart.OtherPointType|string|anychart.pie.Chart)} .
@@ -701,8 +697,7 @@ anychart.pie.Chart.prototype.otherPointType = function(opt_value) {
  *//**
  * Возвразает текущую фильтр-фунукцию точки "Остальное".
  * @return {Function} Фильтр-функция.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {function(*):boolean=} opt_value .
  * @return {(Function|anychart.pie.Chart)} .
@@ -738,8 +733,7 @@ anychart.pie.Chart.prototype.otherPointFilter = function(opt_value) {
  *//**
  * Getter for current pie's outer radius.
  * @return {(string|number)} Outer radius.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.pie.Chart)} .
@@ -782,8 +776,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
  *//**
  * Getter for inner radius in case of donut.
  * @return {(string|number|function(number):number)} Current inner radius of pie/donut chart.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number|function(number):number)=} opt_value .
  * @return {(string|number|function(number):number|anychart.pie.Chart)} .
@@ -850,8 +843,7 @@ anychart.pie.Chart.prototype.getPixelInnerRadius = function() {
  *//**
  * Getter for angle from which the first piece is drawn clockwise.
  * @return {(string|number)} Current start angle.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.pie.Chart)} .
@@ -911,8 +903,7 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
  *//**
  * Getter for value which pie slice should be exploded.
  * @return {(string|number)} Explode value.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.pie.Chart)} .
@@ -947,8 +938,7 @@ anychart.pie.Chart.prototype.explode = function(opt_value) {
  *//**
  * Getter for current sort setting.
  * @return {anychart.utils.Sort} Sort setting.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.utils.Sort|string)=} opt_value .
  * @return {(anychart.utils.Sort|anychart.pie.Chart)} .
