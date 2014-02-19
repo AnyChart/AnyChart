@@ -203,7 +203,10 @@ anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.ge
 anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/
 anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/
 anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/
-
+anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
+anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
+anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
+anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Base
