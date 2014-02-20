@@ -10,7 +10,7 @@ goog.require('anychart.utils.ZIndexedLayer');
 
 
 /**
- * Base chart.
+ * Базовый класс для всех чартов, в котором определены отступы, background и title.
  * @constructor
  * @extends {anychart.elements.BaseWithBounds}
  */
@@ -77,32 +77,68 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart margin.
- * Can accept other Space object or from 0 to 4 values (numbers or percent strings).
- * Space values are applied just as in CSS:
- * 1) set(25, 50, 75, 100):
- *    top space is 25
- *    right space is 50
- *    bottom space is 75
- *    left space is 100
- * 2) set(25, 50, 75):
- *    top space is 25
- *    right and left spaces are 50
- *    bottom space is 75
- * 3) set(25, 50):
- *    top and bottom spaces are 25
- *    right and left spaces are 50
- * 4) set(25):
- *    all four spaces are 25
- * 5) set():
- *    return current margin instance
- *
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {anychart.Chart|anychart.utils.Margin} Current margin or chart instance for chaining call.
+ * Getter for current chart margin.
+ * @illustration <t>simple</t>
+ * var margins = 20;
+ * stage.rect(0, 0, stage.width(), stage.height()).fill('orange 0.1');
+ * stage.text(stage.width() / 3, 0, 'margins');
+ * //arrows
+ * stage.path()
+ *     .moveTo(stage.width() / 2, 0)
+ *     .lineTo(stage.width() / 2, margins);
+ * stage.triangleUp(stage.width() / 2, 3, 3);
+ * stage.triangleDown(stage.width() / 2, margins - 3, 3);
+ * stage.path()
+ *     .moveTo(stage.width() / 2, stage.height() - margins)
+ *     .lineTo(stage.width() / 2, stage.height());
+ * stage.triangleUp(stage.width() / 2, stage.height() - margins + 3, 3);
+ * stage.triangleDown(stage.width() / 2, stage.height() - 3, 3);
+ * stage.path()
+ *     .moveTo(0, stage.height() / 2)
+ *     .lineTo(margins, stage.height() / 2);
+ * stage.triangleUp(3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * stage.path()
+ *     .moveTo(stage.width(), stage.height() / 2)
+ *     .lineTo(stage.width() - margins, stage.height() / 2);
+ * stage.triangleUp(stage.width() - margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(stage.width() - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * //content area
+ * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('white 1');
+ * stage.text(stage.width() / 4, stage.height() / 2 - margins, 'Chart Content Area').fontSize(21);
+ * @return {anychart.utils.Margin} Current chart margin.
+ *//**
+ * Setter for chart margin in pixels by one value.<br/>
+ * @example <t>listingOnly</t>
+ * // all margins 15px
+ * chart.margin(15);
+ * // all margins 15px
+ * chart.margin('15px');
+ * // top and bottom 5px ,right and left 15px
+ * chart.margin( new anychart.utils.Space(5,15) );
+ * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * Setter for chart margin in pixels by few numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * chart.margin(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * chart.margin(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * chart.margin(10, '15px', '5px', 12);
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.Chart|anychart.utils.Margin} .
  */
 anychart.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -136,32 +172,94 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart padding.
- * Can accept other Space object or from 0 to 4 values (numbers or percent strings).
- * Space values are applied just as in CSS:
- * 1) set(25, 50, 75, 100):
- *    top space is 25
- *    right space is 50
- *    bottom space is 75
- *    left space is 100
- * 2) set(25, 50, 75):
- *    top space is 25
- *    right and left spaces are 50
- *    bottom space is 75
- * 3) set(25, 50):
- *    top and bottom spaces are 25
- *    right and left spaces are 50
- * 4) set(25):
- *    all four spaces are 25
- * 5) set():
- *    return current margin instance
- *
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {anychart.Chart|anychart.utils.Padding} Current margin or chart instance for chaining call.
+ * Getter for current chart padding.
+ * @illustration <t>simple</t>
+ * //margins
+ * var margins = 20;
+ * stage.rect(0, 0, stage.width(), stage.height()).fill('orange 0.1');
+ * stage.text(stage.width() / 3, 0, 'margins');
+ * //arrows
+ * stage.path()
+ *     .moveTo(stage.width() / 2, 0)
+ *     .lineTo(stage.width() / 2, margins);
+ * stage.triangleUp(stage.width() / 2, 3, 3);
+ * stage.triangleDown(stage.width() / 2, margins - 3, 3);
+ * stage.path()
+ *     .moveTo(stage.width() / 2, stage.height() - margins)
+ *     .lineTo(stage.width() / 2, stage.height());
+ * stage.triangleUp(stage.width() / 2, stage.height() - margins + 3, 3);
+ * stage.triangleDown(stage.width() / 2, stage.height() - 3, 3);
+ * stage.path()
+ *     .moveTo(0, stage.height() / 2)
+ *     .lineTo(margins, stage.height() / 2);
+ * stage.triangleUp(3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * stage.path()
+ *     .moveTo(stage.width(), stage.height() / 2)
+ *     .lineTo(stage.width() - margins, stage.height() / 2);
+ * stage.triangleUp(stage.width() - margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(stage.width() - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * //paddings
+ * var paddings = 20;
+ * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('blue 0.1');
+ * stage.text(stage.width() / 3, margins, 'paddings');
+ * //arrows
+ * stage.path()
+ *     .moveTo(stage.width() / 2, 0 + margins)
+ *     .lineTo(stage.width() / 2, paddings + margins);
+ * stage.triangleUp(stage.width() / 2, 3 + margins, 3);
+ * stage.triangleDown(stage.width() / 2, paddings - 3 + margins, 3);
+ * stage.path()
+ *     .moveTo(stage.width() / 2, stage.height() - paddings - margins)
+ *     .lineTo(stage.width() / 2, stage.height() - margins);
+ * stage.triangleUp(stage.width() / 2, stage.height() - paddings + 3 - margins, 3);
+ * stage.triangleDown(stage.width() / 2, stage.height() - 3 - margins, 3);
+ * stage.path()
+ *     .moveTo(margins, stage.height() / 2)
+ *     .lineTo(margins + paddings, stage.height() / 2);
+ * stage.triangleUp(margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(margins + paddings - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * stage.path()
+ *     .moveTo(stage.width() - margins, stage.height() / 2)
+ *     .lineTo(stage.width() - margins - paddings, stage.height() / 2);
+ * stage.triangleUp(stage.width() - margins - paddings + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
+ * stage.triangleDown(stage.width() - margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
+ * //content area
+ * stage.rect(paddings + margins, paddings + margins, stage.width() - 2 * (paddings + margins), stage.height() - 2 * (paddings + margins)).fill('white 1');
+ * stage.text(stage.width() / 4, stage.height() / 2 - paddings, 'Chart Content Area').fontSize(21);
+ * @return {anychart.utils.Padding} Current chart padding.
+ *//**
+ * Setter for chart paddings in pixels by one value.<br/>
+ * @example <t>listingOnly</t>
+ * // all paddings 15px
+ * chart.padding(15);
+ * // all paddings 15px
+ * chart.padding('15px');
+ * // top and bottom 5px ,right and left 15px
+ * chart.padding( new anychart.utils.Space(5,15) );
+ * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * Setter for chart paddings in pixels by few numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * chart.padding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * chart.padding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * chart.padding(10, '15px', '5px', 12);
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.Chart|anychart.utils.Padding} .
  */
 anychart.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -195,9 +293,33 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart background.
+ * Getter for current chart background.
+ * @example
+ * chart = new anychart.Chart();
+ * chart.background().stroke('2 green');
+ * @return {anychart.elements.Background} Current chart background.
+ *//**
+ * Setter for chart background.
+ * @example
+ * chart = new anychart.Chart();
+ * var background = new anychart.elements.Background()
+ *    .stroke('2 rgb(36,102,177)')
+ *    .corners(10)
+ *    .fill({
+ *           keys: [
+ *             "rgb(255,255,255) 1",
+ *             "rgb(233,233,233) 1",
+ *             "rgb(255,255,255) 1"
+ *           ],
+ *           angle: -90
+ *         });
+ * chart.background(background);
  * @param {(anychart.elements.Background)=} opt_value Background object to set.
- * @return {anychart.Chart|anychart.elements.Background} Chart background or chart instance for chaining call.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.elements.Background)=} opt_value .
+ * @return {anychart.Chart|anychart.elements.Background} .
  */
 anychart.Chart.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -235,9 +357,28 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart title.
+ * Getter for chart title.
+ * @example
+ * chart = new anychart.Chart();
+ * chart.title().fontSize(41);
+ * @return {anychart.elements.Title} Current chart title.
+ *//**
+ * Setter for chart title.
+ * @example <c>Simple string</c>
+ * chart = new anychart.Chart();
+ * chart.title('My custom title');
+ * @example
+ * chart = new anychart.Chart();
+ * chart.title( new anychart.elements.Title()
+ *      .fontColor('red')
+ *      .text('Red title')
+ * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
- * @return {anychart.elements.Title|anychart.Chart} Chart title or chart instance for chaining call.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|anychart.elements.Title)=} opt_value .
+ * @return {anychart.elements.Title|anychart.Chart} .
  */
 anychart.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -282,8 +423,8 @@ anychart.Chart.prototype.titleInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Draw chart to specified container.
- * @return {anychart.Chart} Chart instance for chaining call.
+ * Запускает процедуру рендеринга всего содержимого чарта в заранее указанный контейнер.
+ * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
  */
 anychart.Chart.prototype.draw = function() {
   if (this.isConsistent()) return this;

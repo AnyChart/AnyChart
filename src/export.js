@@ -280,11 +280,11 @@ goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.Chart', anychart.Chart);
-anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;
-anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;
-anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
-anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;
-anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math
