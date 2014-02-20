@@ -200,7 +200,9 @@ anychart.pie.Chart = function(opt_data) {
   };
 
   this.palette();
-  this.labels();
+  this.labels()
+      .fontColor('white')
+      .fontSize(13);
   this.data(opt_data);
   this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
   this.resumeInvalidationDispatching(false);

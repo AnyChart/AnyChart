@@ -11,7 +11,7 @@ anychart.elements.Marker = function() {
 
   /**
    * Type of marker.
-   * @type {anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+   * @type {(anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
   this.type_;
@@ -328,21 +328,6 @@ anychart.elements.Marker.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Restore marker default settings.
- */
-anychart.elements.Marker.prototype.restoreDefaults = function() {
-  this.type(anychart.elements.Marker.Type.DIAGONAL_CROSS);
-  this.size(10);
-  this.fill('black');
-  this.stroke('none');
-  this.anchor(anychart.utils.NinePositions.CENTER);
-  this.position({x: 0, y: 0});
-  this.offsetX(0);
-  this.offsetY(0);
-};
-
-
-/**
  * Getter and setter for parent element bounds. Used to calculate offsets passed in percents.
  * @param {anychart.math.Rect=} opt_value Parent bounds to set.
  * @return {!anychart.elements.Marker|anychart.math.Rect} Marker or parent bounds.
@@ -351,7 +336,7 @@ anychart.elements.Marker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
       this.parentBounds_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.utils.ConsistencyState.POSITION);
     }
     return this;
   }
@@ -391,7 +376,9 @@ anychart.elements.Marker.prototype.draw = function() {
 
     var markerBounds = this.markerElement_.getBounds();
 
-    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height), this.anchor_);
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
+        new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
+        this.anchor_);
 
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
@@ -431,6 +418,44 @@ anychart.elements.Marker.prototype.draw = function() {
 };
 
 
+/**
+ * Restore marker default settings.
+ */
+anychart.elements.Marker.prototype.restoreDefaults = function() {
+  this.type(anychart.elements.Marker.Type.DIAGONAL_CROSS);
+  this.size(10);
+  this.fill('black');
+  this.stroke('none');
+  this.anchor(anychart.utils.NinePositions.CENTER);
+  this.position({x: 0, y: 0});
+  this.offsetX(0);
+  this.offsetY(0);
+};
+
+
+/**
+ * Copies marker settings from the passed marker instance to itself.
+ * @param {anychart.elements.Marker} marker Marker to copy settings from.
+ * @return {!anychart.elements.Marker} Returns itself for chaining.
+ */
+anychart.elements.Marker.prototype.cloneFrom = function(marker) {
+  if (goog.isDefAndNotNull(marker)) {
+    this.type(marker.type_);
+    this.size(marker.size_);
+    this.fill(marker.fill_);
+    this.stroke(marker.stroke_);
+    this.anchor(marker.anchor_);
+    this.position(marker.position_);
+    this.offsetX(marker.offsetX_);
+    this.offsetY(marker.offsetY_);
+    this.parentBounds(marker.parentBounds_);
+  } else {
+    this.restoreDefaults();
+  }
+  return this;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Disposing.
@@ -438,7 +463,8 @@ anychart.elements.Marker.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.elements.Marker.prototype.disposeInternal = function() {
+  delete this.type_;
+  delete this.fill_;
+  delete this.stroke_;
   goog.base(this, 'disposeInternal');
-  //we should dispose markerElement
-  //It disposed with registerDisposable call
 };

@@ -557,6 +557,7 @@ anychart.elements.Label.prototype.createTextElement_ = function() {
  */
 anychart.elements.Label.prototype.cloneFrom = function(label) {
   if (goog.isDefAndNotNull(label)) {
+    this.settingsObj = label.settingsObj;
     this.background_ = label.background_;
     this.padding_ = label.padding_;
     this.width_ = label.width_;

@@ -37,11 +37,20 @@ anychart.elements.Base.prototype.zIndex_ = 0;
 
 
 /**
+ * Is element enabled.
+ * @type {boolean}
+ * @private
+ */
+anychart.elements.Base.prototype.enabled_ = true;
+
+
+/**
  * Supported consistency states.
  * @type {number}
  */
 anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.CONTAINER |
+    anychart.utils.ConsistencyState.ENABLED |
+        anychart.utils.ConsistencyState.CONTAINER |
         anychart.utils.ConsistencyState.Z_INDEX;
 
 
@@ -84,4 +93,22 @@ anychart.elements.Base.prototype.zIndex = function(opt_value) {
     return this;
   }
   return this.zIndex_;
+};
+
+
+/**
+ * Gets or Sets element enabled state.
+ * @param {boolean=} opt_value Element enabled state value.
+ * @return {anychart.elements.Base|boolean} Element enabled state.
+ */
+anychart.elements.Base.prototype.enabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.enabled_ != opt_value) {
+      this.enabled_ = opt_value;
+      this.invalidate(anychart.utils.ConsistencyState.ENABLED);
+    }
+    return this;
+  } else {
+    return this.enabled_;
+  }
 };

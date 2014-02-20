@@ -5,36 +5,35 @@ goog.require('anychart');
 //  anychart.data.Iterator
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;
-anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;
-anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;
-anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;
-anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;
-anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;
-anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;
+anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//in docs/
+anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//in docs/
+anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//in docs/
+anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//in docs/
+anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//in docs/
+anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//in docs/
+anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Set
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.data.Set', anychart.data.Set);
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;
+goog.exportSymbol('anychart.data.Set', anychart.data.Set);//in docs/
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.View
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/
 
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -53,13 +52,14 @@ anychart.elements.Background.prototype['corners'] = anychart.elements.Background
 //----------------------------------------------------------------------------------------------------------------------
 anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;
 anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;
+anychart.elements.Base.prototype['enabled'] = anychart.elements.Base.prototype.enabled;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.BaseWithBounds
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;
-anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;
+anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;//in docs/
+anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Label
@@ -107,6 +107,40 @@ goog.exportSymbol('anychart.elements.Marker.Type.STAR10', anychart.elements.Mark
 goog.exportSymbol('anychart.elements.Marker.Type.TRIANGLE_DOWN', anychart.elements.Marker.Type.TRIANGLE_DOWN);
 goog.exportSymbol('anychart.elements.Marker.Type.TRIANGLE_UP', anychart.elements.Marker.Type.TRIANGLE_UP);
 goog.exportSymbol('anychart.elements.Marker.Type.SQUARE', anychart.elements.Marker.Type.SQUARE);
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.Marker
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.Multimarker', anychart.elements.Multimarker);
+anychart.elements.Multimarker.prototype['positionFormatter'] = anychart.elements.Multimarker.prototype.positionFormatter;
+anychart.elements.Multimarker.prototype['anchor'] = anychart.elements.Multimarker.prototype.anchor;
+anychart.elements.Multimarker.prototype['offsetX'] = anychart.elements.Multimarker.prototype.offsetX;
+anychart.elements.Multimarker.prototype['offsetY'] = anychart.elements.Multimarker.prototype.offsetY;
+anychart.elements.Multimarker.prototype['position'] = anychart.elements.Multimarker.prototype.position;
+anychart.elements.Multimarker.prototype['type'] = anychart.elements.Multimarker.prototype.type;
+anychart.elements.Multimarker.prototype['size'] = anychart.elements.Multimarker.prototype.size;
+anychart.elements.Multimarker.prototype['fill'] = anychart.elements.Multimarker.prototype.fill;
+anychart.elements.Multimarker.prototype['stroke'] = anychart.elements.Multimarker.prototype.stroke;
+anychart.elements.Multimarker.prototype['anchorAt'] = anychart.elements.Multimarker.prototype.anchorAt;
+anychart.elements.Multimarker.prototype['offsetXAt'] = anychart.elements.Multimarker.prototype.offsetXAt;
+anychart.elements.Multimarker.prototype['offsetYAt'] = anychart.elements.Multimarker.prototype.offsetYAt;
+anychart.elements.Multimarker.prototype['positionAt'] = anychart.elements.Multimarker.prototype.positionAt;
+anychart.elements.Multimarker.prototype['typeAt'] = anychart.elements.Multimarker.prototype.typeAt;
+anychart.elements.Multimarker.prototype['sizeAt'] = anychart.elements.Multimarker.prototype.sizeAt;
+anychart.elements.Multimarker.prototype['fillAt'] = anychart.elements.Multimarker.prototype.fillAt;
+anychart.elements.Multimarker.prototype['strokeAt'] = anychart.elements.Multimarker.prototype.strokeAt;
+anychart.elements.Multimarker.prototype['draw'] = anychart.elements.Multimarker.prototype.draw;
+anychart.elements.Multimarker.prototype['end'] = anychart.elements.Multimarker.prototype.end;
+anychart.elements.Multimarker.prototype['measure'] = anychart.elements.Multimarker.prototype.measure;
+anychart.elements.Multimarker.prototype['serialize'] = anychart.elements.Multimarker.prototype.serialize;
+anychart.elements.Multimarker.prototype['deserialize'] = anychart.elements.Multimarker.prototype.deserialize;
+anychart.elements.Multimarker.prototype['deserializeAt'] = anychart.elements.Multimarker.prototype.deserializeAt;
+anychart.elements.Multimarker.prototype['enabledAt'] = anychart.elements.Multimarker.prototype.enabled;
+anychart.elements.Multimarker.prototype['clear'] = anychart.elements.Multimarker.prototype.clear;
+anychart.elements.Multimarker.prototype['dropCustomSettings'] = anychart.elements.Multimarker.prototype.dropCustomSettings;
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Multilabel
@@ -204,7 +238,10 @@ anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.ge
 anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/
 anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/
 anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/
-
+anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
+anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
+anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
+anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Base
@@ -266,18 +303,23 @@ anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColo
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
 anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.Chart
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.Chart', anychart.Chart);
-anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;
-anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;
-anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
-anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;
-anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math

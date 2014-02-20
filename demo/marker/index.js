@@ -18,35 +18,35 @@ function load() {
   marker = new anychart.elements.Marker();
   marker
       .container('container')
+      .size(35)
       .fill({keys: keys, cx: 0.5, cy: 0.5})
       .stroke('3 blue')
       .position({x: 100, y: 100})
-      .anchor('top')
-      .size(36)
-//      .offsetX(10)
-//      .offsetY(10);
+      .anchor(anychart.utils.NinePositions.LEFT_BOTTOM)
+      .offsetX(10)
+      .offsetY(10);
 
   marker.draw();
 
   marker
       .parentBounds(marker.container().getBounds())
-      .anchor('bottom')
-//      .position({x: '50%', y: '50%'})
+      .anchor(anychart.utils.NinePositions.CENTER)
+      .position({x: '50%', y: '50%'})
       .offsetX(0)
       .offsetY(0);
-//  marker.draw();
+  marker.draw();
 
   marker
       .type(anychart.elements.Marker.Type.STAR10);
   marker.draw();
 
   marker
-      .fill('black 0.3')
+      .fill('!!!')
       .stroke('5 red');
   marker.draw();
 
 
-  marker.container().rect(100, 100, 1, 400);
+//  marker.container().rect(100, 100, 1, 400);
 //  marker.container().rect().setBounds(marker.pixelBounds());
 
 
