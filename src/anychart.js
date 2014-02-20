@@ -20,9 +20,9 @@ goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
 
 /**
-  @namespace
-  @name anychart
-  */
+ @namespace
+ @name anychart
+ */
 
 
 /**
