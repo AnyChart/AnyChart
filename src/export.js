@@ -50,11 +50,16 @@ anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in do
 //  anychart.elements.Background
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Background', anychart.elements.Background);
-anychart.elements.Background.prototype['fill'] = anychart.elements.Background.prototype.fill;
-anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;
-anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;
-anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;
+goog.exportSymbol('anychart.elements.Background', anychart.elements.Background);//in docs/
+anychart.elements.Background.prototype['fill'] = anychart.elements.Background.prototype.fill;//in docs/
+anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;//in docs/
+anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;//in docs/
+anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;//in docs/
+anychart.elements.Background.prototype['draw'] = anychart.elements.Background.prototype.draw;//in docs/
+goog.exportSymbol('anychart.elements.Background.CornerType.NONE', anychart.elements.Background.CornerType.NONE);//in docs/
+goog.exportSymbol('anychart.elements.Background.CornerType.ROUND ', anychart.elements.Background.CornerType.ROUND);//in docs/
+goog.exportSymbol('anychart.elements.Background.CornerType.CUT', anychart.elements.Background.CornerType.CUT);//in docs/
+goog.exportSymbol('anychart.elements.Background.CornerType.ROUND_INNER', anychart.elements.Background.CornerType.ROUND_INNER);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Base
