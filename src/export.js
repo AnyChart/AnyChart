@@ -153,18 +153,18 @@ anychart.elements.Text.prototype['textSettings'] = anychart.elements.Text.protot
 //  anychart.elements.Title
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Title', anychart.elements.Title);
-anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;
-anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;
-anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;
-anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;
-anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;
-anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;
-anychart.elements.Title.prototype['padding'] = anychart.elements.Title.prototype.padding;
-anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.align;
-anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;
-anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;
-anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;
+goog.exportSymbol('anychart.elements.Title', anychart.elements.Title);//in docs/
+anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/
+anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/
+anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/
+anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;//in docs/
+anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;//in docs/
+anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;//in docs/
+anychart.elements.Title.prototype['padding'] = anychart.elements.Title.prototype.padding;//in docs/
+anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.align;//in docs/
+anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;//in docs/
+anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;//in docs/
+anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Ticks
@@ -257,6 +257,15 @@ anychart.utils.Invalidatable.prototype['listen'] = anychart.utils.Invalidatable.
 goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
 goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
 goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
+goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);
+goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);
+goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);
+goog.exportSymbol('anychart.utils.Align.TOP', anychart.utils.Align.TOP);
+goog.exportSymbol('anychart.utils.Align.BOTTOM', anychart.utils.Align.BOTTOM);
+goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.LEFT);
+goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);
+goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);
+goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);
 goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;

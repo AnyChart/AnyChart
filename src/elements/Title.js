@@ -6,7 +6,29 @@ goog.require('anychart.utils.Padding');
 
 
 /**
- * Title class.
+ * Класс, описывающий элемент - заголовок.<br/>
+ * Заголовок может быть как частью другого, более сложного, элемента (чарт, легенда, ось и тд), так и самостоятельным
+ * элементом визаулизации.<br/>
+ * Заголовку можно назначить позиционирование, выравнивание текста, а также background.
+ * @illustration <t>simple</t>
+ * var layer1= stage.layer();
+ * layer1.rect(1,1,stage.width()/2-4, stage.height()-2).stroke('1 black');
+ * layer1.rect(1,1,stage.width()/2-4, 50).fill('orange 0.1');
+ * layer1.text(stage.width()/4 - 30, 10, 'Title').fontSize(17);
+ * var layer2= stage.layer().translate(stage.width()/2 ,0);
+ * layer2.rect(2,1,stage.width()/2-2, stage.height()-2).stroke('1 black');
+ * layer2.rect(2,1, 50, stage.height()-2).fill('orange 0.1');
+ * layer2.text(10, stage.height() /2 +20, 'Title').fontSize(17).rotateByAnchor(-90, 'center');
+ * @illustrationDesc
+ * Заголовок занимает всю часть контейнера. по своей высоте (или ширине, зависит от ориентации).
+ * @example <c>Создание самостоятельного заголовка.</c><t>simple-h100</t>
+ * new anychart.elements.Title()
+ *     .text('My custom Title')
+ *     .fontSize(27)
+ *     .height('100')
+ *     .vAlign('middle')
+ *     .container(stage)
+ *     .draw();
  * @constructor
  * @extends {anychart.elements.Text}
  */
@@ -161,9 +183,53 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter and setter for parent element bounds.
- * @param {anychart.math.Rect=} opt_value Parent bounds to set.
- * @return {!anychart.elements.Title|anychart.math.Rect} Title or parent bounds.
+ * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * @return {anychart.math.Rect} Title or parent bounds.
+ *//**
+ * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * @illustration <t>simple</t>
+ * var layer = stage.layer();
+ * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
+ * var layerBounds = new anychart.math.Rect(0, 0, stage.width() / 3, stage.height() / 3);
+ * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
+ *      .stroke('2 red');
+ * layer.text(2, 2, 'stageBounds');
+ * var layer2 = stage.layer();
+ * layer2.rect(0, 0, stage.width() / 3, stage.height() / 3)
+ *      .stroke('2 blue');
+ * layer2.text(2, -20, 'layerBounds');
+ * layer2.translate(0, stage.height() / 4);
+ * new anychart.elements.Title()
+ *     .text('Title\n(stageBounds)')
+ *     .container(layer2)
+ *     .fontSize(14)
+ *     .hAlign('center')
+ *     .parentBounds(stageBounds)
+ *     .draw();
+ * new anychart.elements.Title()
+ *     .text('Title\n(layerBounds)')
+ *     .fontSize(14)
+ *     .hAlign('center')
+ *     .container(layer2)
+ *     .parentBounds(layerBounds)
+ *     .fontColor('gray')
+ *     .draw();
+ * @illustrationDesc
+ * Title находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции title:<br/>
+ *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
+ *   b. Черным - когда в качестве родительских заданы баунды stage.
+ * @example <t>listingOnly</t>
+ * new anychart.elements.Title()
+ *     .text('Title text')
+ *     .container(layer2)
+ *     .parentBounds(stageBounds)
+ *     .draw();
+ * @param {anychart.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Rect=} opt_value .
+ * @return {!anychart.elements.Title|anychart.math.Rect} .
  */
 anychart.elements.Title.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -178,9 +244,21 @@ anychart.elements.Title.prototype.parentBounds = function(opt_value) {
 
 
 /**
- * Text contents.
- * @param {string=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Title|string} Asked value or itself for chaining.
+ * Gets text content for current title.
+ * @return {string} Current text content of title.
+ *//**
+ * Sets text content for title.
+ * @example <t>simple-h100</t>
+ * var title = new anychart.elements.Title();
+ * title.text('My custom Text');
+ * title.container(stage)
+ *      .draw();
+ * @param {string=} opt_value ['Title text'] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {string=} opt_value .
+ * @return {!anychart.elements.Title|string} .
  */
 anychart.elements.Title.prototype.text = function(opt_value) {
   return /** @type {!anychart.elements.Title|string} */(this.textSettings('text', opt_value));
@@ -188,9 +266,42 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 
 
 /**
- * Gets or sets the title background.
- * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!(anychart.elements.Title|anychart.elements.Background)} Returns the background or itself for chaining.
+ * Getter for title background.
+ * @example <t>simple-h100</t>
+ * var title = new anychart.elements.Title();
+ * title.text('\' Simple text \'')
+ *      .background()
+ *          .stroke('1 rgb(36,102,177) 0.4')
+ *          .corners(2);
+ * title.container(stage)
+ *      .draw()
+ * @return {!anychart.elements.Background} Returns current background.
+ *//**
+ * Setter for title background.
+ * @example <t>simple-h100</t>
+ * var myTitleBackground = new anychart.elements.Background()
+ *         .stroke('1 rgb(36,102,177) 0.4')
+ *         .corners(2)
+ *         .fill({
+ *           keys: [
+ *             "rgb(255,255,255) 1",
+ *             "rgb(223,223,223) 1",
+ *             "rgb(255,255,255) 1"
+ *           ],
+ *           angle: -90
+ *         });
+ * new anychart.elements.Title()
+ *     .text('Title text')
+ *     .padding(5)
+ *     .background( myTitleBackground )
+ *     .container(stage)
+ *     .draw();
+ * @param {anychart.elements.Background=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.elements.Background=} opt_value .
+ * @return {!(anychart.elements.Title|anychart.elements.Background)} .
  */
 anychart.elements.Title.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -212,9 +323,19 @@ anychart.elements.Title.prototype.background = function(opt_value) {
 
 
 /**
- * Title width settings.
- * @param {(number|string|null)=} opt_value Width value to set.
- * @return {!anychart.elements.Title|number|string|null} Title width or title itself for chaining.
+ * Getter for title width.
+ * @return {number|string|null} Current title width.
+ *//**
+ * Setter for title width.<br/>
+ * <b>Note:</b> Если будет переданно <b>null</b>, то ширина будет рассчитываться автоматически.
+ * @example <t>listingOnly</t>
+ * title.width('200px');
+ * @param {(number|string|null)=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Title|number|string|null} .
  */
 anychart.elements.Title.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -232,9 +353,19 @@ anychart.elements.Title.prototype.width = function(opt_value) {
 
 
 /**
- * Title height settings.
- * @param {(number|string|null)=} opt_value Height value to set.
- * @return {!anychart.elements.Title|number|string|null} Title height or title itself for chaining.
+ * Getter for title height.
+ * @return {number|string|null} Current title width.
+ *//**
+ * Setter for title height.<br/>
+ * <b>Note:</b> Если будет переданно <b>null</b>, то высота будет рассчитываться автоматически.
+ * @example <t>listingOnly</t>
+ * title.height('200px');
+ * @param {(number|string|null)=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Title|number|string|null} .
  */
 anychart.elements.Title.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -252,13 +383,34 @@ anychart.elements.Title.prototype.height = function(opt_value) {
 
 
 /**
- * Title margin.
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.elements.Title|anychart.utils.Margin)} Margin or title for chaining.
+ * Getter for current title margin.<br/>
+ * Иллюстрацию работы с margins см тут {@link anychart.Chart#margin}.
+ * @return {anychart.utils.Margin} Current title margin.
+ *//**
+ * Setter for title margin in pixels by one value.<br/>
+ * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * Setter for title margin in pixels by few numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * title.margin(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * title.margin(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * title.margin(10, '15px', '5px', 12);
+ * @param {(string|number)=} opt_value1 [0] Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 [0] Right or right-left space.
+ * @param {(string|number)=} opt_value3 [10] Bottom space.
+ * @param {(string|number)=} opt_value4 [0] Left space.
+ * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.elements.Title|anychart.utils.Margin} .
  */
 anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -275,13 +427,34 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
 
 
 /**
- * Title padding.
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.elements.Title|anychart.utils.Padding)} Padding or title for chaining.
+ * Getter for current title padding.<br/>
+ * Иллюстрацию работы с margins см тут {@link anychart.Chart#padding}.
+ * @return {anychart.utils.Padding} Current title padding.
+ *//**
+ * Setter for title padding in pixels by one value.<br/>
+ * @param {(string|number|anychart.utils.Space)=} opt_value [null] Value to set.
+ * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * Setter for title padding in pixels by few numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * title.padding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * title.padding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * title.padding(10, '15px', '5px', 12);
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.elements.Title|anychart.utils.Padding} .
  */
 anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -298,9 +471,28 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
 
 
 /**
- * Getter and setter for title align.
- * @param {(anychart.utils.Align|string)=} opt_value Align value to set.
- * @return {!anychart.elements.Title|anychart.utils.Align} Align or title for chaining.
+ * Getter for title align.
+ * @return {anychart.utils.Align} Current title align.
+ *//**
+ * Setter for title align.
+ * @example <t>simple-h100</t>
+ * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
+ * new anychart.elements.Title()
+ *     .text('Left align')
+ *     .align('left')
+ *     .container(stage)
+ *     .draw();
+ * new anychart.elements.Title()
+ *     .text('Right align')
+ *     .align('right')
+ *     .container(stage)
+ *     .draw();
+ * @param {(anychart.utils.Align|string)=} opt_value [{@link anychart.utils.Align}.CENTER] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.utils.Align|string)=} opt_value .
+ * @return {!anychart.elements.Title|anychart.utils.Align} .
  */
 anychart.elements.Title.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -316,9 +508,28 @@ anychart.elements.Title.prototype.align = function(opt_value) {
 
 
 /**
- * Getter and setter for title orientation.
- * @param {(anychart.utils.Orientation|string)=} opt_value Orientation value to set.
- * @return {!anychart.elements.Title|anychart.utils.Orientation} Orientation or title for chaining.
+ * Getter for title orientation.
+ * @return {anychart.utils.Orientation} Orientation or title for chaining.
+ *//**
+ * Setter for title orientation.
+ * @example <t>simple</t>
+ * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
+ * new anychart.elements.Title()
+ *     .text('Left title orientation')
+ *     .orientation('left')
+ *     .container(stage)
+ *     .draw();
+ * new anychart.elements.Title()
+ *     .text('Right title orientation')
+ *     .orientation('right')
+ *     .container(stage)
+ *     .draw();
+ * @param {(anychart.utils.Orientation|string)=} opt_value [{@link anychart.utils.Orientation}.TOP] Value to set.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.utils.Orientation|string)=} opt_value .
+ * @return {!anychart.elements.Title|anychart.utils.Orientation} .
  */
 anychart.elements.Title.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -334,8 +545,8 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
 
 
 /**
- * Draws the title
- * @return {!anychart.elements.Title} The title for chaining.
+ * Render title content.
+ * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
  */
 anychart.elements.Title.prototype.draw = function() {
   // If its all ok - leave this method
@@ -448,7 +659,19 @@ anychart.elements.Title.prototype.draw = function() {
 
 
 /**
- * Returns remaining parent bounds to use elsewhere.
+ * Возвращает отсавшуюся от контейнера часть, после размешения в нем текущего заголовка.
+ * @example <t>simple-h100</t>
+ * // размещаем первый заголовок наверху Stage.
+ * var title1 = new anychart.elements.Title()
+ *     .text('First title')
+ *     .container(stage)
+ *     .draw();
+ * // размещаем второй заголовок сверху оставшейся части, то есть под первым заголовком.
+ * new anychart.elements.Title()
+ *     .text('Second title')
+ *     .container(stage)
+ *     .parentBounds(title1.getRemainingBounds())
+ *     .draw();
  * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Title.prototype.getRemainingBounds = function() {

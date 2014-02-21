@@ -501,6 +501,8 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.color(this.settingsObj['fontColor']);
   if (isInitial || 'direction' in this.changedSettings)
     textElement.direction(this.settingsObj['direction']);
+  if (isInitial || 'textWrap' in this.changedSettings)
+    textElement.textWrap(this.settingsObj['textWrap']);
   if ('fontOpacity' in this.changedSettings)
     textElement.opacity(this.settingsObj['fontOpacity']);
   if ('fontDecoration' in this.changedSettings)
@@ -521,8 +523,6 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.vAlign(this.settingsObj['vAlign']);
   if ('hAlign' in this.changedSettings)
     textElement.hAlign(this.settingsObj['hAlign']);
-  if ('textWrap' in this.changedSettings)
-    textElement.textWrap(this.settingsObj['textWrap']);
   if ('textOverflow' in this.changedSettings)
     textElement.textOverflow(this.settingsObj['textOverflow']);
   if ('selectable' in this.changedSettings)
