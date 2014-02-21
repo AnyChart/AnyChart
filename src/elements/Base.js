@@ -8,7 +8,7 @@ goog.require('goog.dom');
 
 
 /**
- * Base class for all elements that have common work protocol.
+ * Base class for all elements.
  * @constructor
  * @extends {anychart.utils.Invalidatable}
  */
@@ -55,12 +55,28 @@ anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Gets/Sets element container. The element should append it's root element to the container on draw.
+ * Getter for element's current container.
+ * @return {acgraph.vector.ILayer} Current container.
+ *//**
+ * Setter for element container.<br/>
+ * Each element append all it's content to this container.<br/>
  * The order of adding is not defined, but usually it will be the order in which elements are drawn for the first time.
- * So if you need to specify the order - use ZIndexedLayer and zIndex.
- *
- * @param {(acgraph.vector.ILayer|string|Element)=} opt_value Container value if used as setter.
- * @return {(acgraph.vector.ILayer|anychart.elements.Base)} Container or itself for chaining.
+ * So if you need to specify the order use {@link anychart.elements.Base#zIndex}.
+ * @example <t>listingOnly</t>
+ * // string
+ *  element.container('containerIdentifier');
+ * // DOM-element
+ *  var domElement = document.getElementById('containerIdentifier');
+ *  element.container(domElement);
+ * // Framework-element
+ *  var fwElement = new anychart.elements.Title();
+ *  element.container( fwElement.container() );
+ * @param {(acgraph.vector.ILayer|string|Element)=} opt_value Value to set.
+ * @return {anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
+ * @return {(acgraph.vector.ILayer|anychart.elements.Base)} .
  */
 anychart.elements.Base.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -82,9 +98,26 @@ anychart.elements.Base.prototype.container = function(opt_value) {
 
 
 /**
- * Z index of the element getter and setter.
- * @param {number=} opt_value zIndex to set or nothing to get.
- * @return {(number|!anychart.elements.Base)} Current zIndex or itself for chaining.
+ * Getter for current Z-index of the element.
+ * @return {number} Current zIndex.
+ *//**
+ * Setter for Z-index of the element.<br/>
+ * @illustration <t>stageOnly</t>
+ *  var stroke = '1 black 1';
+ *  layer.ellipse(75, 105, 55, 35).fill('#cc6622', 1).stroke(stroke)
+ *  layer.ellipse(95, 75, 55, 35).fill('#ccaa22', 1).stroke(stroke)
+ *  layer.ellipse(115, 45, 55, 35).fill('#ccee22', 1).stroke(stroke);
+ *  layer.text(195, 100, 'index = 0');
+ *  layer.text(195, 70, 'index = 1');
+ *  layer.text(195, 40, 'index = 2');
+ * @illustrationDesc
+ *  Чем больше значение индекса - тем выше положение элемента.
+ * @param {number=} opt_value Value to set.
+ * @return {!anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {(number|!anychart.elements.Base)} .
  */
 anychart.elements.Base.prototype.zIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -97,9 +130,19 @@ anychart.elements.Base.prototype.zIndex = function(opt_value) {
 
 
 /**
- * Gets or Sets element enabled state.
- * @param {boolean=} opt_value Element enabled state value.
- * @return {anychart.elements.Base|boolean} Element enabled state.
+ * Getter for current element state (enabled or disabled).
+ * @return {boolean} Current element state.
+ *//**
+ * Setter for element enabled state.
+ * @example <t>listingOnly</t>
+ * if (!element.enabled())
+ *    element.enabled(true);
+ * @param {boolean=} opt_value Value to set.
+ * @return {anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value Value to set.
+ * @return {anychart.elements.Base|boolean} .
  */
 anychart.elements.Base.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {

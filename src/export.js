@@ -50,9 +50,9 @@ anychart.elements.Background.prototype['corners'] = anychart.elements.Background
 //  anychart.elements.Base
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;
-anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;
-anychart.elements.Base.prototype['enabled'] = anychart.elements.Base.prototype.enabled;
+anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;//in docs/
+anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;//in docs/
+anychart.elements.Base.prototype['enabled'] = anychart.elements.Base.prototype.enabled;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.BaseWithBounds
@@ -107,40 +107,6 @@ goog.exportSymbol('anychart.elements.Marker.Type.STAR10', anychart.elements.Mark
 goog.exportSymbol('anychart.elements.Marker.Type.TRIANGLE_DOWN', anychart.elements.Marker.Type.TRIANGLE_DOWN);
 goog.exportSymbol('anychart.elements.Marker.Type.TRIANGLE_UP', anychart.elements.Marker.Type.TRIANGLE_UP);
 goog.exportSymbol('anychart.elements.Marker.Type.SQUARE', anychart.elements.Marker.Type.SQUARE);
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  anychart.elements.Marker
-//
-//----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Multimarker', anychart.elements.Multimarker);
-anychart.elements.Multimarker.prototype['positionFormatter'] = anychart.elements.Multimarker.prototype.positionFormatter;
-anychart.elements.Multimarker.prototype['anchor'] = anychart.elements.Multimarker.prototype.anchor;
-anychart.elements.Multimarker.prototype['offsetX'] = anychart.elements.Multimarker.prototype.offsetX;
-anychart.elements.Multimarker.prototype['offsetY'] = anychart.elements.Multimarker.prototype.offsetY;
-anychart.elements.Multimarker.prototype['position'] = anychart.elements.Multimarker.prototype.position;
-anychart.elements.Multimarker.prototype['type'] = anychart.elements.Multimarker.prototype.type;
-anychart.elements.Multimarker.prototype['size'] = anychart.elements.Multimarker.prototype.size;
-anychart.elements.Multimarker.prototype['fill'] = anychart.elements.Multimarker.prototype.fill;
-anychart.elements.Multimarker.prototype['stroke'] = anychart.elements.Multimarker.prototype.stroke;
-anychart.elements.Multimarker.prototype['anchorAt'] = anychart.elements.Multimarker.prototype.anchorAt;
-anychart.elements.Multimarker.prototype['offsetXAt'] = anychart.elements.Multimarker.prototype.offsetXAt;
-anychart.elements.Multimarker.prototype['offsetYAt'] = anychart.elements.Multimarker.prototype.offsetYAt;
-anychart.elements.Multimarker.prototype['positionAt'] = anychart.elements.Multimarker.prototype.positionAt;
-anychart.elements.Multimarker.prototype['typeAt'] = anychart.elements.Multimarker.prototype.typeAt;
-anychart.elements.Multimarker.prototype['sizeAt'] = anychart.elements.Multimarker.prototype.sizeAt;
-anychart.elements.Multimarker.prototype['fillAt'] = anychart.elements.Multimarker.prototype.fillAt;
-anychart.elements.Multimarker.prototype['strokeAt'] = anychart.elements.Multimarker.prototype.strokeAt;
-anychart.elements.Multimarker.prototype['draw'] = anychart.elements.Multimarker.prototype.draw;
-anychart.elements.Multimarker.prototype['end'] = anychart.elements.Multimarker.prototype.end;
-anychart.elements.Multimarker.prototype['measure'] = anychart.elements.Multimarker.prototype.measure;
-anychart.elements.Multimarker.prototype['serialize'] = anychart.elements.Multimarker.prototype.serialize;
-anychart.elements.Multimarker.prototype['deserialize'] = anychart.elements.Multimarker.prototype.deserialize;
-anychart.elements.Multimarker.prototype['deserializeAt'] = anychart.elements.Multimarker.prototype.deserializeAt;
-anychart.elements.Multimarker.prototype['enabledAt'] = anychart.elements.Multimarker.prototype.enabled;
-anychart.elements.Multimarker.prototype['clear'] = anychart.elements.Multimarker.prototype.clear;
-anychart.elements.Multimarker.prototype['dropCustomSettings'] = anychart.elements.Multimarker.prototype.dropCustomSettings;
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Multilabel
@@ -238,10 +204,7 @@ anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.ge
 anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/
 anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/
 anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/
-anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;
-anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;
-anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;
-anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Base
@@ -315,11 +278,11 @@ goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.Chart', anychart.Chart);
-anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/
-anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/
-anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/
-anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/
-anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math
