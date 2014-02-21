@@ -1,5 +1,15 @@
 goog.provide('anychartexport');
 goog.require('anychart');
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.color
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.color.blend', anychart.color.blend);//in docs/
+goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);//in docs/
+goog.exportSymbol('anychart.color.darken', anychart.color.darken);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Iterator
@@ -298,12 +308,3 @@ anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  anychart.color
-//
-//----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.color.blend', anychart.color.blend);
-goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);
-goog.exportSymbol('anychart.color.darken', anychart.color.darken);
-

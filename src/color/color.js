@@ -6,22 +6,35 @@ goog.require('goog.string');
 
 
 /**
+ * Пространство имен для цветовых утилит.
  * @namespace
  * @name anychart.color
  */
 
 
 /**
- * Blend two colors together, using the specified factor to indicate the weight
- * given to the first color
- * @param {goog.color.Rgb} rgb1 First color represented in rgb.
- * @param {goog.color.Rgb} rgb2 Second color represented in rgb.
+ * Blend two colors together, using the specified factor to indicate the weight given to the first color.
+ * @example <t>stageOnly</t>
+ * var color1 = [255, 0, 0];
+ * var color2 = [0, 0, 255];
+ * stage.rect(10, 10, stage.width() / 4, stage.height() - 20).fill('red');
+ * stage.rect(3 * stage.width() / 4 - 10, 10, stage.width() / 4, stage.height() - 20).fill('blue');
+ * var mixColor1 = anychart.color.blend(color1, color2, 0.2);
+ * var mixColor2 = anychart.color.blend(color1, color2, 0.8);
+ * stage.rect(stage.width() / 3 + 10, 10, stage.width() / 4, stage.height() / 2 - 10)
+ *     .fill('rgb('+mixColor1.join(',')+')');
+ * stage.rect(stage.width() / 3 + 10, stage.height() / 2 + 10, stage.width() / 4, stage.height() / 2 - 20)
+ *     .fill('rgb('+mixColor2.join(',')+')');
+ * @param {goog.color.Rgb} rgb1 First color represented in rgb like array of 3 numbers.
+ * @param {goog.color.Rgb} rgb2 Second color represented in rgb like array of 3 numbers.
  * @param {number} factor The weight to be given to rgb1 over rgb2. Values
  *     should be in the range [0, 1]. If less than 0, factor will be set to 0.
  *     If greater than 1, factor will be set to 1.
- * @return {!goog.color.Rgb} Combined color represented in rgb.
+ * @return {!goog.color.Rgb} Combined color represented in rgb like array of 3 numbers.
  */
-anychart.color.blend = goog.color.blend;
+anychart.color.blend = function(rgb1, rgb2, factor) {
+  return goog.color.blend(rgb1, rgb2, factor);
+};
 
 
 /**
@@ -63,8 +76,15 @@ anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
 
 /**
  * Makes color lighten by factor.
+ * @example <t>stageOnly</t>
+ * stage.rect(10, 10, stage.width() / 3 - 10, stage.height() - 20)
+ *      .fill('red');
+ * stage.rect(stage.width() / 3 + 10, 10, stage.width() / 3 - 20, stage.height() - 20)
+ *      .fill( anychart.color.lighten('red'));
+ * stage.rect(2*stage.width() / 3 + 10, 10, stage.width() / 3 - 30, stage.height() - 20)
+ *      .fill( anychart.color.lighten('red', .8));
  * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke need to be lighten.
- * @param {number=} opt_factor [0.3] Factor of blending.
+ * @param {number=} opt_factor [0.3] Factor of blending with white color.
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of lighten color, or color if color can not be lighten.
  */
 anychart.color.lighten = function(fillOrStroke, opt_factor) {
@@ -83,8 +103,15 @@ anychart.color.lighten = function(fillOrStroke, opt_factor) {
 
 /**
  * Makes color darken by factor.
+ * @example <t>stageOnly</t>
+ * stage.rect(10, 10, stage.width() / 3 - 10, stage.height() - 20)
+ *      .fill('red');
+ * stage.rect(stage.width() / 3 + 10, 10, stage.width() / 3 - 20, stage.height() - 20)
+ *      .fill( anychart.color.darken('red'));
+ * stage.rect(2*stage.width() / 3 + 10, 10, stage.width() / 3 - 30, stage.height() - 20)
+ *      .fill( anychart.color.darken('red', .8));
  * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke need to be darken.
- * @param {number=} opt_factor [0.3] Factor of blending.
+ * @param {number=} opt_factor [0.3] Factor of blending with black color.
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of darken color, or color if color can not be darken.
  */
 anychart.color.darken = function(fillOrStroke, opt_factor) {
