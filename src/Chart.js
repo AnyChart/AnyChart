@@ -64,6 +64,17 @@ goog.inherits(anychart.Chart, anychart.elements.BaseWithBounds);
  * Supported consistency states. Adds APPEARANCE to BaseWithBounds states.
  * @type {number}
  */
+anychart.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.utils.ConsistencyState.APPEARANCE |
+        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+        anychart.utils.ConsistencyState.TITLE_APPEARANCE;
+
+
+/**
+ * Supported consistency states. Adds APPEARANCE to BaseWithBounds states.
+ * @type {number}
+ */
 anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.APPEARANCE |
@@ -143,7 +154,7 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
-    this.margin_.listen(anychart.utils.Invalidatable.INVALIDATED, this.marginInvalidated_, false, this);
+    this.margin_.listenInvalidation(this.marginInvalidated_, this);
     this.registerDisposable(this.margin_);
   }
 
@@ -264,7 +275,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
 anychart.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
-    this.padding_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paddingInvalidated_, false, this);
+    this.padding_.listenInvalidation(this.paddingInvalidated_, this);
     this.registerDisposable(this.padding_);
   }
 
@@ -325,7 +336,7 @@ anychart.Chart.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.elements.Background();
     this.background_.cloneFrom(null);
-    this.background_.listen(anychart.utils.Invalidatable.INVALIDATED, this.backgroundInvalidated_, false, this);
+    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
     this.registerDisposable(this.background_);
   }
 
@@ -383,7 +394,7 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 anychart.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.elements.Title();
-    this.title_.listen(anychart.utils.Invalidatable.INVALIDATED, this.titleInvalidated_, false, this);
+    this.title_.listenInvalidation(this.titleInvalidated_, this);
     this.registerDisposable(this.title_);
   }
 
@@ -505,7 +516,7 @@ anychart.Chart.prototype.draw = function() {
   if (manualSuspend) stage.resume();
 
   //todo(Anton Saukh): rework this shit!
-  this.listen(anychart.utils.Invalidatable.INVALIDATED, this.invalidateHandler_, false, this);
+  this.listenInvalidation(this.invalidateHandler_, this);
   //end shit
 
   return this;

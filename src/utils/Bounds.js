@@ -40,6 +40,14 @@ goog.inherits(anychart.utils.Bounds, anychart.utils.Invalidatable);
 
 
 /**
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * @type {number}
+ */
+anychart.utils.Bounds.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.BOUNDS;
+
+
+/**
  * Left edge position.
  * @type {(number|string|undefined)}
  * @private

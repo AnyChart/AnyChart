@@ -49,6 +49,16 @@ goog.inherits(anychart.elements.Text, anychart.elements.Base);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.APPEARANCE |
@@ -90,7 +100,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *      'textOverflow': smth,
  *      'selectable': smth,
  *      'useHtml': smth
- *    }</code>
+ *    }</code>.
  * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
  *//**
  * Setter for text appearance settings.<br/>

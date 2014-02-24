@@ -48,6 +48,16 @@ anychart.elements.Base.prototype.enabled_ = true;
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.ENABLED |
+    anychart.utils.ConsistencyState.CONTAINER |
+    anychart.utils.ConsistencyState.Z_INDEX;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.utils.ConsistencyState.ENABLED |
         anychart.utils.ConsistencyState.CONTAINER |

@@ -165,6 +165,17 @@ goog.inherits(anychart.elements.Multimarker, anychart.elements.Base);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Multimarker.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.POSITION |
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.DATA;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Multimarker.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.POSITION |

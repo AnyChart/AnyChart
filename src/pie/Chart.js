@@ -214,6 +214,19 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
  * Supported consistency states.
  * @type {number}
  */
+anychart.pie.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.Chart.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.DATA |
+    anychart.utils.ConsistencyState.PIE_APPEARANCE |
+    anychart.utils.ConsistencyState.LABELS |
+    anychart.utils.ConsistencyState.HOVER |
+    anychart.utils.ConsistencyState.CLICK;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.DATA |
@@ -337,7 +350,7 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 
     goog.dispose(this.view_);
     this.view_ = this.prepareData_(this.parentView_);
-    this.view_.listen(anychart.utils.Invalidatable.INVALIDATED, this.dataInvalidated_, false, this);
+    this.view_.listenInvalidation(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
     this.invalidate(anychart.utils.ConsistencyState.DATA | anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
     return this;
@@ -420,8 +433,7 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
 anychart.pie.Chart.prototype.palette = function(opt_value) {
   if (!this.palette_) {
     this.palette_ = new anychart.utils.DistinctColorPalette();
-    this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
-    this.registerDisposable(this.palette_);
+    this.palette_.listenInvalidation(this.paletteInvalidated_, this);
     this.paletteType_ = 'distinct';
   }
 
@@ -451,7 +463,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
         this.palette_ = new cls();
         this.palette_.cloneFrom(opt_value);
-        this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
+        this.palette_.listenInvalidation(this.paletteInvalidated_, this);
         this.registerDisposable(this.palette_);
       }
     }

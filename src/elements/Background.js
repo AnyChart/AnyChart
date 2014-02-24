@@ -143,6 +143,15 @@ anychart.elements.Background.CornerType = {
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Background.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.BaseWithBounds.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.APPEARANCE;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.APPEARANCE;

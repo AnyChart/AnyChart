@@ -161,6 +161,13 @@ anychart.utils.Invalidatable.INVALIDATED = 'invalidated';
 
 
 /**
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * @type {number}
+ */
+anychart.utils.Invalidatable.prototype.DISPATCHED_CONSISTENCY_STATES = 0;
+
+
+/**
  * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
  * @type {number}
  */
@@ -182,6 +189,25 @@ anychart.utils.Invalidatable.prototype.consistency_ = 0;
  * @private
  */
 anychart.utils.Invalidatable.prototype.suspendedDispatching_ = NaN;
+
+
+/**
+ * Adds an event listener. A listener can only be added once to an
+ * object and if it is added again the key for the listener is
+ * returned. Note that if the existing listener is a one-off listener
+ * (registered via listenOnce), it will no longer be a one-off
+ * listener after a call to listen().
+ *
+ * @param {function(this:SCOPE, anychart.utils.InvalidatedStatesEvent):(boolean|undefined)} listener Callback
+ *     method.
+ * @param {SCOPE=} opt_scope Object in whose scope to call the
+ *     listener.
+ * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @template SCOPE
+ */
+anychart.utils.Invalidatable.prototype.listenInvalidation = function(listener, opt_scope) {
+  return this.listen(anychart.utils.Invalidatable.INVALIDATED, listener, false, opt_scope);
+};
 
 
 /**
@@ -243,9 +269,14 @@ anychart.utils.Invalidatable.prototype.hasInvalidationState = function(state) {
 
 /**
  * Отправляет подписчикам событие инвалидации объекта.
+ *
+ * NOTE: ОТПРАВИТЬСЯ МОГУТ ТОЛЬКО ТЕ СОБЫТИЯ, КОТОРЫЕ ЕСТЬ В МАСКЕ DISPATCHED_CONSISTENCY_STATES!
+ *
  * @param {anychart.utils.ConsistencyState|number} state Установленные состояния инвалидации.
  */
 anychart.utils.Invalidatable.prototype.dispatchInvalidationEvent = function(state) {
+  state &= this.DISPATCHED_CONSISTENCY_STATES;
+  if (!state) return;
   if (isNaN(this.suspendedDispatching_))
     this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, state));
   else

@@ -22,10 +22,11 @@ goog.inherits(anychart.utils.DistinctColorPalette, anychart.utils.Invalidatable)
 
 
 /**
- * Supported consistency states.
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.utils.DistinctColorPalette.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.utils.ConsistencyState.DATA;
+anychart.utils.DistinctColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
 
 
 /**

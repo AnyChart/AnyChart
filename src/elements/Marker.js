@@ -83,6 +83,28 @@ goog.inherits(anychart.elements.Marker, anychart.elements.Base);
 
 
 /**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.elements.Marker.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.POSITION |
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.DATA;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.elements.Marker.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.POSITION |
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.DATA;
+
+
+/**
  * Markers type.
  * @enum {string}
  */
@@ -164,17 +186,6 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
   }
   return drawer;
 };
-
-
-/**
- * Supported consistency states.
- * @type {number}
- */
-anychart.elements.Marker.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.POSITION |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.DATA;
 
 
 /**

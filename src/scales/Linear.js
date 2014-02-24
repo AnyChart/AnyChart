@@ -104,7 +104,7 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.scales.LinearTicks(this);
     this.registerDisposable(this.ticks_);
-    this.ticks_.listen(anychart.utils.Invalidatable.INVALIDATED, this.ticksInvalidated_, false, this);
+    this.ticks_.listenInvalidation(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
     this.ticks_.set(opt_value);

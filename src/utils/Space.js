@@ -24,6 +24,14 @@ goog.inherits(anychart.utils.Space, anychart.utils.Invalidatable);
 
 
 /**
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * @type {number}
+ */
+anychart.utils.Space.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.BOUNDS;
+
+
+/**
  * Top space.
  * @type {number|string}
  * @private

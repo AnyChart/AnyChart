@@ -168,6 +168,17 @@ goog.inherits(anychart.elements.Multilabel, anychart.elements.Text);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Multilabel.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+    anychart.utils.ConsistencyState.TEXT_FORMAT |
+    anychart.utils.ConsistencyState.POSITION;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Multilabel.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
@@ -191,7 +202,7 @@ anychart.elements.Multilabel.prototype.background = function(opt_value) {
     this.background_.cloneFrom(null);
     this.registerDisposable(this.background_);
     this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
-    this.background_.listen(anychart.utils.Invalidatable.INVALIDATED, this.backgroundInvalidated_, false, this);
+    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -229,7 +240,7 @@ anychart.elements.Multilabel.prototype.padding = function(opt_spaceOrTopOrTopAnd
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
     this.registerDisposable(this.padding_);
-    this.padding_.listen(anychart.utils.Invalidatable.INVALIDATED, this.boundsInvalidated_, false, this);
+    this.padding_.listenInvalidation(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.set.apply(this.padding_, arguments);
