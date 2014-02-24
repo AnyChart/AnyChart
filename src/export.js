@@ -24,6 +24,14 @@ anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.
 anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  anychart.data.Mapping
+//
+//----------------------------------------------------------------------------------------------------------------------
+anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//in docs/
+anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//in docs/
+anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//in docs/
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  anychart.data.Set
 //
 //----------------------------------------------------------------------------------------------------------------------
