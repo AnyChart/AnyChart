@@ -710,6 +710,17 @@ anychart.elements.Title.prototype.getRemainingBounds = function() {
 };
 
 
+/**
+ * Return title content bounds.
+ * @return {anychart.math.Rect}
+ */
+anychart.elements.Title.prototype.getContentBounds = function() {
+  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS))
+    this.calcActualBounds_();
+  return this.pixelBounds_;
+};
+
+
 /** @inheritDoc */
 anychart.elements.Title.prototype.applyTextSettings = function(textElement, isInitial) {
   if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {

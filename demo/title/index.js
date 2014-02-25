@@ -5,6 +5,7 @@ function load() {
   title.text('I\'m a title text!!\nHAY!!').container('container').background().fill('red 0.3').corners(10);
   title.margin(10).padding(10).hAlign('center').vAlign('center').width(200).height(100);
   title.draw();
+  title.container().rect().setBounds(title.getContentBounds());
   // еще можно поломать все меняя ориентацию и положение тайтла, если его ширина не фиксирована
   title.listen('invalidated', function() { title.draw(); });
 }
