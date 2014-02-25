@@ -36,6 +36,14 @@ goog.inherits(anychart.data.View, anychart.utils.Invalidatable);
  * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
  * @type {number}
  */
+anychart.data.View.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
+
+
+/**
+ * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * @type {number}
+ */
 anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.utils.ConsistencyState.DATA;
 
@@ -422,4 +430,19 @@ anychart.data.View.prototype.parentMeta = function(index, name, opt_value) {
  */
 anychart.data.View.prototype.transitionMeta = function(on) {
   this.transitMeta_ = !!on;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.data.View.prototype.serialize = function() {
+  var arr = [];
+  var iterator = this.getIterator();
+
+  while (iterator.advance()) {
+    arr.push(this.row(iterator.getIndex()));
+  }
+
+  return arr;
 };

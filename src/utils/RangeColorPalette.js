@@ -39,10 +39,11 @@ goog.inherits(anychart.utils.RangeColorPalette, anychart.utils.Invalidatable);
 
 
 /**
- * Supported consistency states.
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.utils.RangeColorPalette.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.utils.ConsistencyState.DATA;
+anychart.utils.RangeColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
 
 
 /**

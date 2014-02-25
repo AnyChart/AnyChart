@@ -214,6 +214,19 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
  * Supported consistency states.
  * @type {number}
  */
+anychart.pie.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.Chart.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.DATA |
+    anychart.utils.ConsistencyState.PIE_APPEARANCE |
+    anychart.utils.ConsistencyState.LABELS |
+    anychart.utils.ConsistencyState.HOVER |
+    anychart.utils.ConsistencyState.CLICK;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.DATA |
@@ -337,7 +350,7 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 
     goog.dispose(this.view_);
     this.view_ = this.prepareData_(this.parentView_);
-    this.view_.listen(anychart.utils.Invalidatable.INVALIDATED, this.dataInvalidated_, false, this);
+    this.view_.listenInvalidation(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
     this.invalidate(anychart.utils.ConsistencyState.DATA | anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
     return this;
@@ -420,8 +433,7 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
 anychart.pie.Chart.prototype.palette = function(opt_value) {
   if (!this.palette_) {
     this.palette_ = new anychart.utils.DistinctColorPalette();
-    this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
-    this.registerDisposable(this.palette_);
+    this.palette_.listenInvalidation(this.paletteInvalidated_, this);
     this.paletteType_ = 'distinct';
   }
 
@@ -451,7 +463,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
         this.palette_ = new cls();
         this.palette_.cloneFrom(opt_value);
-        this.palette_.listen(anychart.utils.Invalidatable.INVALIDATED, this.paletteInvalidated_, false, this);
+        this.palette_.listenInvalidation(this.paletteInvalidated_, this);
         this.registerDisposable(this.palette_);
       }
     }
@@ -629,7 +641,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
  * <code>function(pointValue){
  *   ...
  *   return BOOLEAN;
- * }
+ * }.
  * </code>
  */
 anychart.pie.Chart.prototype.setOtherPoint = function(typeValue, filterValue) {
@@ -691,7 +703,7 @@ anychart.pie.Chart.prototype.otherPointType = function(opt_value) {
  * <code>function(pointValue){
  *   ...
  *   return BOOLEAN;
- * }
+ * }.
  * </code>
  * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
  *//**
@@ -770,7 +782,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
  * <code>function(outerRadius){
  *   ...
  *   return NUMBER;
- * }
+ * }.
  * </code>
  * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
  *//**
@@ -1297,4 +1309,104 @@ anychart.pie.Chart.prototype.mouseClickHandler_ = function(event) {
 
   this.clicked_ = [index];
   this.invalidate(anychart.utils.ConsistencyState.CLICK);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.pie.Chart.prototype.serialize = function() {
+  var json = {};
+
+  var chart = goog.base(this, 'serialize');
+
+  chart['type'] = 'pie';
+
+  var fill = this.fill();
+  var stroke = this.stroke();
+  var hoverFill = this.hoverFill();
+  var hoverStroke = this.hoverStroke();
+  var data = this.data();
+
+  chart['radius'] = this.radius();
+  chart['innerRadius'] = this.innerRadius();
+  chart['explode'] = this.explode();
+  chart['startAngle'] = this.startAngle();
+  chart['sort'] = this.sort();
+
+  if (!goog.isFunction(fill)) chart['fill'] = fill;
+  if (!goog.isFunction(stroke)) chart['stroke'] = stroke;
+  if (!goog.isFunction(hoverFill)) chart['hoverFill'] = hoverFill;
+  if (!goog.isFunction(hoverStroke)) chart['hoverStroke'] = hoverStroke;
+
+  if (data) chart['data'] = data.serialize();
+
+  if (this.labels_) chart['labels'] = this.labels_.serialize();
+
+  json['chart'] = chart;
+  return json;
+};
+
+
+/**
+ * Deserialize pie chart from config.
+ * @param {Object} config json config.
+ */
+anychart.pie.Chart.prototype.deserialize = function(config) {
+  var chart = config['chart'];
+
+  var data = chart['data'];
+  var radius = chart['radius'];
+  var innerRadius = chart['innerRadius'];
+  var explode = chart['explode'];
+  var startAngle = chart['startAngle'];
+  var sort = chart['sort'];
+  var fill = chart['fill'];
+  var stroke = chart['stroke'];
+  var hoverFill = chart['hoverFill'];
+  var hoverStroke = chart['hoverStroke'];
+
+  var margin = chart['margin'];
+  var padding = chart['padding'];
+  var background = chart['background'];
+  var title = chart['title'];
+  var labels = chart['labels'];
+
+  this.suspendInvalidationDispatching();
+
+  this.data(data);
+  this.radius(radius);
+  this.innerRadius(innerRadius);
+  this.explode(explode);
+  this.startAngle(startAngle);
+  this.sort(sort);
+  this.fill(fill);
+  this.stroke(stroke);
+  this.hoverFill(hoverFill);
+  this.hoverStroke(hoverStroke);
+
+  if (margin) {
+    this.margin().deserialize(margin);
+  }
+
+  if (padding) {
+    this.padding().deserialize(padding);
+  }
+
+  if (background) {
+    this.background().deserialize(background);
+  }
+
+  if (title) {
+    this.title().deserialize(title);
+  }
+
+  if (labels) {
+    var multiLabels = this.labels();
+    multiLabels.textFormatter(/** @type {Function} */ (this.labels().textFormatter()));
+    multiLabels.positionFormatter(/** @type {Function} */ (this.labels().positionFormatter()));
+    multiLabels.deserialize(labels);
+  }
+
+  this.resumeInvalidationDispatching(false);
 };

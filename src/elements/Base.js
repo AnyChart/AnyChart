@@ -48,6 +48,16 @@ anychart.elements.Base.prototype.enabled_ = true;
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.ENABLED |
+    anychart.utils.ConsistencyState.CONTAINER |
+    anychart.utils.ConsistencyState.Z_INDEX;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.utils.ConsistencyState.ENABLED |
         anychart.utils.ConsistencyState.CONTAINER |
@@ -154,4 +164,25 @@ anychart.elements.Base.prototype.enabled = function(opt_value) {
   } else {
     return this.enabled_;
   }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Base.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['enabled'] = this.enabled();
+  json['zIndex'] = this.zIndex();
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Base.prototype.deserialize = function(config) {
+  goog.base(this, 'deserialize', config);
+  this.enabled(config['enabled']);
+  this.zIndex(config['zIndex']);
 };

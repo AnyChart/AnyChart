@@ -33,7 +33,18 @@ goog.inherits(anychart.scales.Base, anychart.utils.Invalidatable);
 
 
 /**
- * Также может диспатчить состояния SCALE_SETTINGS, SCALE_SETTINGS_HARD, SCALE_STACK_SETTINGS и SCALE_RECATEGORIZED.
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * @type {number}
+ */
+anychart.scales.Base.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.SCALE_SETTINGS ||
+    anychart.utils.ConsistencyState.SCALE_SETTINGS_HARD ||
+    anychart.utils.ConsistencyState.SCALE_RECATEGORIZED ||
+    anychart.utils.ConsistencyState.TICKS_SET;
+
+
+/**
+ * Также может диспатчить состояния SCALE_SETTINGS, SCALE_SETTINGS_HARD и SCALE_RECATEGORIZED.
  * @type {number}
  */
 anychart.scales.Base.prototype.SUPPORTED_CONSISTENCY_STATES =

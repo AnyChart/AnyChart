@@ -38,6 +38,15 @@ anychart.elements.Ticks = function() {
 goog.inherits(anychart.elements.Ticks, anychart.utils.Invalidatable);
 
 
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.elements.Ticks.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.BOUNDS;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Enums.

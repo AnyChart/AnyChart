@@ -177,6 +177,15 @@ goog.inherits(anychart.elements.Title, anychart.elements.Text);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Title.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
@@ -309,7 +318,7 @@ anychart.elements.Title.prototype.background = function(opt_value) {
     this.background_.cloneFrom(null);
     this.registerDisposable(this.background_);
     this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
-    this.background_.listen(anychart.utils.Invalidatable.INVALIDATED, this.backgroundInvalidated_, false, this);
+    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -416,7 +425,7 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
     this.registerDisposable(this.margin_);
-    this.margin_.listen(anychart.utils.Invalidatable.INVALIDATED, this.boundsInvalidated_, false, this);
+    this.margin_.listenInvalidation(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.set.apply(this.margin_, arguments);
@@ -460,7 +469,7 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
     this.registerDisposable(this.padding_);
-    this.padding_.listen(anychart.utils.Invalidatable.INVALIDATED, this.boundsInvalidated_, false, this);
+    this.padding_.listenInvalidation(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.set.apply(this.padding_, arguments);
@@ -992,4 +1001,60 @@ anychart.elements.Title.prototype.restoreDefaults = function() {
   this.width(null);
   this.height(null);
   this.background(null);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Title.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var align = this.align();
+  var orientation = this.orientation();
+  var width = this.width();
+  var height = this.height();
+
+  var background = this.background_;
+  var margin = this.margin_;
+  var padding = this.padding_;
+
+  json['align'] = align;
+  json['orientation'] = orientation;
+  json['width'] = width;
+  json['height'] = height;
+
+  if (background) json['background'] = background.serialize();
+  if (margin) json['margin'] = margin.serialize();
+  if (padding) json['padding'] = padding.serialize();
+
+  return json;
+};
+
+
+/**
+ * Deserializes data from config.
+ * @param {Object} config Json config.
+ */
+anychart.elements.Title.prototype.deserialize = function(config) {
+  var padding = config['padding'];
+  var margin = config['margin'];
+  var background = config['background'];
+
+  if (padding) {
+    this.padding().deserialize(padding);
+  }
+
+  if (margin) {
+    this.margin().deserialize(margin);
+  }
+
+  if (background) {
+    this.background().deserialize(background);
+  }
+
+  this.textSettings(config);
+  this.align(config['align']);
+  this.width(config['width']);
+  this.height(config['height']);
 };

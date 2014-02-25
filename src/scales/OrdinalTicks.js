@@ -20,7 +20,7 @@ anychart.scales.OrdinalTicks = function(scale) {
    * @private
    */
   this.scale_ = scale;
-  this.scale_.listen(anychart.utils.Invalidatable.INVALIDATED, this.scaleInvalidated_, false, this);
+  this.scale_.listenInvalidation(this.scaleInvalidated_, this);
 };
 goog.inherits(anychart.scales.OrdinalTicks, anychart.utils.Invalidatable);
 

@@ -19,10 +19,17 @@ anychart.scales.LinearTicks = function(scale) {
    * @private
    */
   this.scale_ = scale;
-  this.scale_.listen(anychart.utils.Invalidatable.INVALIDATED, this.scaleInvalidated_, false, this);
+  this.scale_.listenInvalidation(this.scaleInvalidated_, this);
   this.silentlyInvalidate(anychart.utils.ConsistencyState.TICKS_SET);
 };
 goog.inherits(anychart.scales.LinearTicks, anychart.utils.Invalidatable);
+
+
+/**
+ * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * @type {number}
+ */
+anychart.scales.LinearTicks.prototype.DISPATCHED_CONSISTENCY_STATES = anychart.utils.ConsistencyState.TICKS_SET;
 
 
 /**

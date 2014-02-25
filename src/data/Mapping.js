@@ -28,6 +28,14 @@ goog.inherits(anychart.data.Mapping, anychart.data.View);
 
 
 /**
+ * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * @type {number}
+ */
+anychart.data.Mapping.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.utils.ConsistencyState.DATA;
+
+
+/**
  * Mapping doesn't support DATA dirty state.
  * @type {number}
  */

@@ -49,6 +49,16 @@ goog.inherits(anychart.elements.Text, anychart.elements.Base);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.APPEARANCE |
+    anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.APPEARANCE |
@@ -90,7 +100,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *      'textOverflow': smth,
  *      'selectable': smth,
  *      'useHtml': smth
- *    }</code>
+ *    }</code>.
  * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
  *//**
  * Setter for text appearance settings.<br/>
@@ -554,4 +564,54 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
     'selectable': false,
     'useHtml': false
   };
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Text.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var fontSize = this.fontSize();
+  var fontFamily = this.fontFamily();
+  var fontColor = this.fontColor();
+  var fontOpacity = this.fontOpacity();
+  var fontDecoration = this.fontDecoration();
+  var fontStyle = this.fontStyle();
+  var fontVariant = this.fontVariant();
+  var fontWeight = this.fontWeight();
+  var letterSpacing = this.letterSpacing();
+  var direction = this.direction();
+  var lineHeight = this.lineHeight();
+  var textIndent = this.textIndent();
+  var vAlign = this.vAlign();
+  var hAlign = this.hAlign();
+  var textWrap = this.textWrap();
+  var textOverflow = this.textOverflow();
+  var selectable = this.selectable();
+  var useHtml = this.useHtml();
+  var text = this.textSettings('text');
+
+  json['fontSize'] = fontSize;
+  json['fontFamily'] = fontFamily;
+  json['fontColor'] = fontColor;
+  json['fontOpacity'] = fontOpacity;
+  json['fontDecoration'] = fontDecoration;
+  json['fontStyle'] = fontStyle;
+  json['fontVariant'] = fontVariant;
+  json['fontWeight'] = fontWeight;
+  json['letterSpacing'] = letterSpacing;
+  json['direction'] = direction;
+  json['lineHeight'] = lineHeight;
+  json['textIndent'] = textIndent;
+  json['vAlign'] = vAlign;
+  json['hAlign'] = hAlign;
+  json['textWrap'] = textWrap;
+  json['textOverflow'] = textOverflow;
+  json['selectable'] = selectable;
+  json['useHtml'] = useHtml;
+  json['text'] = text;
+
+  return json;
 };

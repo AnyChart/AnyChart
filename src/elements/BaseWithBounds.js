@@ -37,6 +37,16 @@ anychart.elements.BaseWithBounds.prototype.pixelBounds_;
  * Supported consistency states. Adds BOUNDS and PIXEL_BOUNDS to Base states.
  * @type {number}
  */
+anychart.elements.BaseWithBounds.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.BOUNDS |
+    anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+
+
+/**
+ * Supported consistency states. Adds BOUNDS and PIXEL_BOUNDS to Base states.
+ * @type {number}
+ */
 anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.utils.ConsistencyState.BOUNDS |
@@ -73,7 +83,7 @@ anychart.elements.BaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_
   if (!this.bounds_) {
     this.bounds_ = new anychart.utils.Bounds();
     this.registerDisposable(this.bounds_);
-    this.bounds_.listen(anychart.utils.Invalidatable.INVALIDATED, this.boundsInvalidated, false, this);
+    this.bounds_.listenInvalidation(this.boundsInvalidated, this);
   }
   if (goog.isDef(opt_boundsOrX)) {
     this.bounds_.set.apply(this.bounds_, arguments);

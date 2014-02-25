@@ -168,6 +168,17 @@ goog.inherits(anychart.elements.Multilabel, anychart.elements.Text);
  * Supported consistency states.
  * @type {number}
  */
+anychart.elements.Multilabel.prototype.DISPATCHED_CONSISTENCY_STATES =
+    anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
+    anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+    anychart.utils.ConsistencyState.TEXT_FORMAT |
+    anychart.utils.ConsistencyState.POSITION;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
 anychart.elements.Multilabel.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
@@ -191,7 +202,7 @@ anychart.elements.Multilabel.prototype.background = function(opt_value) {
     this.background_.cloneFrom(null);
     this.registerDisposable(this.background_);
     this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
-    this.background_.listen(anychart.utils.Invalidatable.INVALIDATED, this.backgroundInvalidated_, false, this);
+    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -229,7 +240,7 @@ anychart.elements.Multilabel.prototype.padding = function(opt_spaceOrTopOrTopAnd
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
     this.registerDisposable(this.padding_);
-    this.padding_.listen(anychart.utils.Invalidatable.INVALIDATED, this.boundsInvalidated_, false, this);
+    this.padding_.listenInvalidation(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.set.apply(this.padding_, arguments);
@@ -831,5 +842,54 @@ anychart.elements.Multilabel.prototype.cloneFrom = function(labels) {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.elements.Multilabel.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var padding = this.padding_;
+  var background = this.background_;
+
+  json['width'] = this.width();
+  json['height'] = this.height();
+  json['rotation'] = this.rotation();
+  json['position'] = this.position();
+  json['anchor'] = this.anchor();
+  json['offsetX'] = this.offsetX();
+  json['offsetY'] = this.offsetY();
+
+  if (padding) json['padding'] = padding.serialize();
+  if (background) json['background'] = background.serialize();
+
+  return json;
+};
 
 
+/**
+ * Deserializes data from config.
+ * @param {Object} config Json config.
+ */
+anychart.elements.Multilabel.prototype.deserialize = function(config) {
+
+  var padding = config['padding'];
+  var background = config['background'];
+
+  if (padding) {
+    this.padding().deserialize(padding);
+  }
+
+  if (background) {
+    this.background().deserialize(background);
+  }
+
+  this.width(config['width']);
+  this.height(config['height']);
+  this.rotation(config['rotation']);
+  this.position(config['position']);
+  this.anchor(config['anchor']);
+  this.offsetX(config['offsetX']);
+  this.offsetY(config['offsetY']);
+
+  this.textSettings(config);
+};

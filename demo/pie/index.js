@@ -1,4 +1,4 @@
-var chart;
+var chart, newPie, seriesData;
 var summPointsValues = 0;
 function load() {
   var data = [
@@ -12,7 +12,7 @@ function load() {
 
   var pointData = [6371664, 7216301, 1486621, 786622, 900000];
 
-  var seriesData = [
+  seriesData = [
     {x: "Department Stores", y: pointData[0], fill: {
       keys:['0 red 1', '0.5 green 1', '1 blue 1']
     }, stroke: 'none', hoverFill:'pink'},
@@ -63,7 +63,6 @@ function load() {
       });
 
   chart.draw();
-
   var stage = chart.container();
   var trialText = stage.text(0, 0, 'AnyChart Trial Version', {
     opacity: 0.15,
@@ -74,3 +73,17 @@ function load() {
       .y(chart.pixelBounds().top + (chart.pixelBounds().height - trialText.getBounds().height) / 2)
       .pointerEvents('none');
 }
+
+var foo = function() {
+  chart.setOtherPoint('group', function(val) {return val > 1500000});
+  chart.sort('asc');
+  document.getElementById('bar')['disabled'] = false;
+};
+
+var bar = function() {
+  chart.container().removeChildren();
+  var json = chart.getJSON();
+  newPie = anychart.json(json);
+  newPie.container(chart.container());
+  newPie.draw();
+};
