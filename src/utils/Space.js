@@ -326,3 +326,36 @@ anychart.utils.Space.prototype.cloneFrom = function(space) {
   this.resumeInvalidationDispatching(true);
   return this;
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.utils.Space.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var top = this.top();
+  var right = this.right();
+  var bottom = this.bottom();
+  var left = this.left();
+
+  json['top'] = top;
+  json['right'] = right;
+  json['bottom'] = bottom;
+  json['left'] = left;
+
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.utils.Space.prototype.deserialize = function(config) {
+  goog.base(this, 'deserialize', config);
+
+  this.top(config['top']);
+  this.right(config['right']);
+  this.bottom(config['bottom']);
+  this.left(config['left']);
+};

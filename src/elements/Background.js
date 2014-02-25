@@ -605,3 +605,78 @@ anychart.elements.Background.prototype.cloneFrom = function(background) {
   return this;
 };
 
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Background.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var corners = this.corners();
+  var cornerType = this.cornerType();
+
+  var fill = this.fill();
+  var stroke = this.stroke();
+
+  if (fill) {
+    var fillData, tmpFill, tmpStroke;
+    if (fill instanceof acgraph.vector.HatchFill) {
+      fillData = {
+        'type': 'hatchFill',
+        'hatchType': fill.type,
+        'color': fill.color,
+        'thickness': fill.thickness,
+        'size': fill.size
+      };
+    } else if (fill instanceof acgraph.vector.PatternFill) {
+      fillData = fill.serialize();
+    } else if (goog.isObject(fill) && ('keys' in fill)) {
+      if (('cx' in fill) && ('cy' in fill)) {
+        tmpFill = anychart.utils.recursiveClone(fill);
+        tmpFill['type'] = 'RadialGradientFill';
+        fillData = tmpFill;
+      } else {
+        tmpFill = anychart.utils.recursiveClone(fill);
+        tmpFill['type'] = 'LinearGradientFill';
+        fillData = tmpFill;
+      }
+    } else {
+      fillData = fill;
+    }
+    if (fillData) json['fill'] = fillData;
+  } else {
+    if (fill == null) json['fill'] = fill;
+  }
+
+  if (stroke || stroke == null) {
+    json['stroke'] = stroke;
+  } else if (goog.isObject(stroke) && ('keys' in stroke)) {
+    if (('cx' in stroke) && ('cy' in stroke)) {
+      tmpStroke = anychart.utils.recursiveClone(stroke);
+      tmpStroke['type'] = 'RadialGradientFill';
+      json['stroke'] = tmpStroke;
+    } else {
+      tmpStroke = anychart.utils.recursiveClone(stroke);
+      tmpStroke['type'] = 'LinearGradientFill';
+      json['stroke'] = tmpStroke;
+    }
+  }
+
+  if (corners) json['corners'] = corners;
+  if (cornerType) json['cornerType'] = cornerType;
+
+  return json;
+};
+
+
+/**
+ * Deserializes data from config.
+ * @param {Object} config Json config.
+ */
+anychart.elements.Background.prototype.deserialize = function(config) {
+  this.fill(config['fill']);
+  this.stroke(config['stroke']);
+  this.corners(config['corners']);
+  this.cornerType(config['cornerType']);
+};
+

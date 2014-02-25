@@ -35,54 +35,49 @@ anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype
 //  anychart.data.Set
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.data.Set', anychart.data.Set);//in docs/
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/
+goog.exportSymbol('anychart.data.Set', anychart.data.Set);
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.View
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/
+anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Background
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Background', anychart.elements.Background);//in docs/
-anychart.elements.Background.prototype['fill'] = anychart.elements.Background.prototype.fill;//in docs/
-anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;//in docs/
-anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;//in docs/
-anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;//in docs/
-anychart.elements.Background.prototype['draw'] = anychart.elements.Background.prototype.draw;//in docs/
-goog.exportSymbol('anychart.elements.Background.CornerType.NONE', anychart.elements.Background.CornerType.NONE);//in docs/
-goog.exportSymbol('anychart.elements.Background.CornerType.ROUND ', anychart.elements.Background.CornerType.ROUND);//in docs/
-goog.exportSymbol('anychart.elements.Background.CornerType.CUT', anychart.elements.Background.CornerType.CUT);//in docs/
-goog.exportSymbol('anychart.elements.Background.CornerType.ROUND_INNER', anychart.elements.Background.CornerType.ROUND_INNER);//in docs/
+goog.exportSymbol('anychart.elements.Background', anychart.elements.Background);
+anychart.elements.Background.prototype['fill'] = anychart.elements.Background.prototype.fill;
+anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;
+anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;
+anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Base
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;//in docs/
-anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;//in docs/
-anychart.elements.Base.prototype['enabled'] = anychart.elements.Base.prototype.enabled;//in docs/
+anychart.elements.Base.prototype['container'] = anychart.elements.Base.prototype.container;
+anychart.elements.Base.prototype['zIndex'] = anychart.elements.Base.prototype.zIndex;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.BaseWithBounds
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;//in docs/
-anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;//in docs/
+anychart.elements.BaseWithBounds.prototype['bounds'] = anychart.elements.BaseWithBounds.prototype.bounds;
+anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.BaseWithBounds.prototype.pixelBounds;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Label
@@ -132,39 +127,6 @@ goog.exportSymbol('anychart.elements.Marker.Type.TRIANGLE_UP', anychart.elements
 goog.exportSymbol('anychart.elements.Marker.Type.SQUARE', anychart.elements.Marker.Type.SQUARE);
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.elements.Marker
-//
-//----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Multimarker', anychart.elements.Multimarker);
-anychart.elements.Multimarker.prototype['positionFormatter'] = anychart.elements.Multimarker.prototype.positionFormatter;
-anychart.elements.Multimarker.prototype['anchor'] = anychart.elements.Multimarker.prototype.anchor;
-anychart.elements.Multimarker.prototype['offsetX'] = anychart.elements.Multimarker.prototype.offsetX;
-anychart.elements.Multimarker.prototype['offsetY'] = anychart.elements.Multimarker.prototype.offsetY;
-anychart.elements.Multimarker.prototype['position'] = anychart.elements.Multimarker.prototype.position;
-anychart.elements.Multimarker.prototype['type'] = anychart.elements.Multimarker.prototype.type;
-anychart.elements.Multimarker.prototype['size'] = anychart.elements.Multimarker.prototype.size;
-anychart.elements.Multimarker.prototype['fill'] = anychart.elements.Multimarker.prototype.fill;
-anychart.elements.Multimarker.prototype['stroke'] = anychart.elements.Multimarker.prototype.stroke;
-anychart.elements.Multimarker.prototype['anchorAt'] = anychart.elements.Multimarker.prototype.anchorAt;
-anychart.elements.Multimarker.prototype['offsetXAt'] = anychart.elements.Multimarker.prototype.offsetXAt;
-anychart.elements.Multimarker.prototype['offsetYAt'] = anychart.elements.Multimarker.prototype.offsetYAt;
-anychart.elements.Multimarker.prototype['positionAt'] = anychart.elements.Multimarker.prototype.positionAt;
-anychart.elements.Multimarker.prototype['typeAt'] = anychart.elements.Multimarker.prototype.typeAt;
-anychart.elements.Multimarker.prototype['sizeAt'] = anychart.elements.Multimarker.prototype.sizeAt;
-anychart.elements.Multimarker.prototype['fillAt'] = anychart.elements.Multimarker.prototype.fillAt;
-anychart.elements.Multimarker.prototype['strokeAt'] = anychart.elements.Multimarker.prototype.strokeAt;
-anychart.elements.Multimarker.prototype['draw'] = anychart.elements.Multimarker.prototype.draw;
-anychart.elements.Multimarker.prototype['end'] = anychart.elements.Multimarker.prototype.end;
-anychart.elements.Multimarker.prototype['measure'] = anychart.elements.Multimarker.prototype.measure;
-anychart.elements.Multimarker.prototype['serialize'] = anychart.elements.Multimarker.prototype.serialize;
-anychart.elements.Multimarker.prototype['deserialize'] = anychart.elements.Multimarker.prototype.deserialize;
-anychart.elements.Multimarker.prototype['deserializeAt'] = anychart.elements.Multimarker.prototype.deserializeAt;
-anychart.elements.Multimarker.prototype['enabledAt'] = anychart.elements.Multimarker.prototype.enabled;
-anychart.elements.Multimarker.prototype['clear'] = anychart.elements.Multimarker.prototype.clear;
-anychart.elements.Multimarker.prototype['dropCustomSettings'] = anychart.elements.Multimarker.prototype.dropCustomSettings;
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  anychart.elements.Multilabel
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -209,18 +171,18 @@ anychart.elements.Text.prototype['textSettings'] = anychart.elements.Text.protot
 //  anychart.elements.Title
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Title', anychart.elements.Title);//in docs/
-anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/
-anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/
-anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/
-anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;//in docs/
-anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;//in docs/
-anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;//in docs/
-anychart.elements.Title.prototype['padding'] = anychart.elements.Title.prototype.padding;//in docs/
-anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.align;//in docs/
-anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;//in docs/
-anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;//in docs/
-anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;//in docs/
+goog.exportSymbol('anychart.elements.Title', anychart.elements.Title);
+anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;
+anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;
+anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;
+anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;
+anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;
+anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;
+anychart.elements.Title.prototype['padding'] = anychart.elements.Title.prototype.padding;
+anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.align;
+anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;
+anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;
+anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Ticks
@@ -260,10 +222,7 @@ anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.ge
 anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/
 anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/
 anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/
-anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//in docs/
-anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//in docs/
-anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//in docs/
-anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//in docs/
+anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Base
@@ -316,15 +275,6 @@ anychart.utils.Invalidatable.prototype['listen'] = anychart.utils.Invalidatable.
 goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
 goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
 goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
-goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);
-goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);
-goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);
-goog.exportSymbol('anychart.utils.Align.TOP', anychart.utils.Align.TOP);
-goog.exportSymbol('anychart.utils.Align.BOTTOM', anychart.utils.Align.BOTTOM);
-goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.LEFT);
-goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);
-goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);
-goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);
 goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;
@@ -336,24 +286,33 @@ anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorP
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart
+//  anychart.json
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
+goog.exportSymbol('anychart.json', anychart.json);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.Chart
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.Chart', anychart.Chart);//in docs/
-anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/
-anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/
-anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/
-anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/
-anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/
+goog.exportSymbol('anychart.Chart', anychart.Chart);
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.color
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.color.blend', anychart.color.blend);
+goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);
+goog.exportSymbol('anychart.color.darken', anychart.color.darken);
+

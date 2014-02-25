@@ -842,5 +842,54 @@ anychart.elements.Multilabel.prototype.cloneFrom = function(labels) {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.elements.Multilabel.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var padding = this.padding_;
+  var background = this.background_;
+
+  json['width'] = this.width();
+  json['height'] = this.height();
+  json['rotation'] = this.rotation();
+  json['position'] = this.position();
+  json['anchor'] = this.anchor();
+  json['offsetX'] = this.offsetX();
+  json['offsetY'] = this.offsetY();
+
+  if (padding) json['padding'] = padding.serialize();
+  if (background) json['background'] = background.serialize();
+
+  return json;
+};
 
 
+/**
+ * Deserializes data from config.
+ * @param {Object} config Json config.
+ */
+anychart.elements.Multilabel.prototype.deserialize = function(config) {
+
+  var padding = config['padding'];
+  var background = config['background'];
+
+  if (padding) {
+    this.padding().deserialize(padding);
+  }
+
+  if (background) {
+    this.background().deserialize(background);
+  }
+
+  this.width(config['width']);
+  this.height(config['height']);
+  this.rotation(config['rotation']);
+  this.position(config['position']);
+  this.anchor(config['anchor']);
+  this.offsetX(config['offsetX']);
+  this.offsetY(config['offsetY']);
+
+  this.textSettings(config);
+};

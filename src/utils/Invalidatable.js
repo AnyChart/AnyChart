@@ -322,6 +322,23 @@ anychart.utils.Invalidatable.prototype.isInvalidationDispatchingSuspended = func
 };
 
 
+/**
+ * Deserializes element to JSON.
+ * @return {Object} Deserialized JSON object of element.
+ */
+anychart.utils.Invalidatable.prototype.serialize = function() {
+  return {};
+};
+
+
+/**
+ * Deserializes element from JSON.
+ * @param {Object} config Config of the element.
+ */
+anychart.utils.Invalidatable.prototype.deserialize = function(config) {
+};
+
+
 
 /**
  * Special event for changes in dirty states.

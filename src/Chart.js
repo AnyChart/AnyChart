@@ -159,7 +159,7 @@ anychart.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rig
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.margin_.set(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left);
+    this.margin_.set.apply(this.margin_, arguments);
     return this;
   }
   return this.margin_;
@@ -280,7 +280,7 @@ anychart.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_ri
   }
 
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.padding_.set(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left);
+    this.padding_.set.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -566,4 +566,19 @@ anychart.Chart.prototype.shouldDrawTitle = function() {
   return !!(this.title_ && (
       this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE) ||
           this.hasInvalidationState(anychart.utils.ConsistencyState.TITLE_APPEARANCE)));
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.Chart.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  if (this.margin_) json['margin'] = this.margin_.serialize();
+  if (this.padding_) json['padding'] = this.padding_.serialize();
+  if (this.background_) json['background'] = this.background_.serialize();
+  if (this.title_) json['title'] = this.title_.serialize();
+
+  return json;
 };

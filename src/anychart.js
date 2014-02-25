@@ -77,6 +77,69 @@ anychart.globalLock.unlock = function() {
 };
 
 
+/**
+ * Validates correctness of the json.
+ * @param {Object} json JSON object.
+ * @return {boolean} Is json valid.
+ * @private
+ */
+anychart.isJsonValid_ = function(json) {
+  return true;
+};
+
+
+
+/**
+ * Factory for creating class constructors by json config.
+ * @constructor
+ */
+anychart.ClassFactory = function() {
+};
+goog.addSingletonGetter(anychart.ClassFactory);
+
+
+/**
+ * Returns instance of the class.
+ * @param {Object} json json config.
+ * @return {*} Class constructor.
+ */
+anychart.ClassFactory.prototype.getClass = function(json) {
+  if (json['chart'] && json['chart']['type'] == 'pie') return new anychart.pie.Chart();
+  return null;
+};
+
+
+/**
+ * Creates element by config.
+ * @param {(Object|string)} jsonConfig Config.
+ * @return {*} Element created by config.
+ */
+anychart.json = function(jsonConfig) {
+  /**
+   * Parsed json config.
+   * @type {Object}
+   */
+  var json = {};
+  if (goog.isString(jsonConfig)) {
+    try {
+      json = /** @type {Object} */ (JSON.parse(jsonConfig));
+    } catch (e) {
+      if (window['console']) window['console']['log'](e.stack);
+      json = null;
+    }
+  } else if (goog.isObject(jsonConfig) && !goog.isFunction(jsonConfig)) {
+    json = jsonConfig;
+  }
+
+  if (anychart.isJsonValid_(json)) {
+    var cls = anychart.ClassFactory.getInstance().getClass(json);
+    if (cls) {
+      cls.deserialize(json);
+      return cls;
+    }
+    else return null;
+  } else return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Default font settings

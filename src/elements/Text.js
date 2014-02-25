@@ -565,3 +565,53 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
     'useHtml': false
   };
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Text.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var fontSize = this.fontSize();
+  var fontFamily = this.fontFamily();
+  var fontColor = this.fontColor();
+  var fontOpacity = this.fontOpacity();
+  var fontDecoration = this.fontDecoration();
+  var fontStyle = this.fontStyle();
+  var fontVariant = this.fontVariant();
+  var fontWeight = this.fontWeight();
+  var letterSpacing = this.letterSpacing();
+  var direction = this.direction();
+  var lineHeight = this.lineHeight();
+  var textIndent = this.textIndent();
+  var vAlign = this.vAlign();
+  var hAlign = this.hAlign();
+  var textWrap = this.textWrap();
+  var textOverflow = this.textOverflow();
+  var selectable = this.selectable();
+  var useHtml = this.useHtml();
+  var text = this.textSettings('text');
+
+  json['fontSize'] = fontSize;
+  json['fontFamily'] = fontFamily;
+  json['fontColor'] = fontColor;
+  json['fontOpacity'] = fontOpacity;
+  json['fontDecoration'] = fontDecoration;
+  json['fontStyle'] = fontStyle;
+  json['fontVariant'] = fontVariant;
+  json['fontWeight'] = fontWeight;
+  json['letterSpacing'] = letterSpacing;
+  json['direction'] = direction;
+  json['lineHeight'] = lineHeight;
+  json['textIndent'] = textIndent;
+  json['vAlign'] = vAlign;
+  json['hAlign'] = hAlign;
+  json['textWrap'] = textWrap;
+  json['textOverflow'] = textOverflow;
+  json['selectable'] = selectable;
+  json['useHtml'] = useHtml;
+  json['text'] = text;
+
+  return json;
+};

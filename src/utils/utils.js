@@ -455,6 +455,26 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
 
 
 /**
+ * Does a recursive clone of the object.
+ *
+ * @param {*} obj Object to clone.
+ * @return {*} Clone of the input object.
+ */
+anychart.utils.recursiveClone = function(obj) {
+  var res;
+  if (goog.isArray(obj)) {
+    res = new Array(obj.length);
+  } else if (goog.isObject(obj)) {
+    res = {};
+  } else
+    return obj;
+  for (var key in obj)
+    res[key] = anychart.utils.recursiveClone(obj[key]);
+  return res;
+};
+
+
+/**
  * Нормализует значение представленное в виде числа либо процента.
  * Если было число либо процент (строка с числом и знаком %) вернется это значение
  * иначе вернется значение opt_default либо 0.

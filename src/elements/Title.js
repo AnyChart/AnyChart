@@ -991,3 +991,59 @@ anychart.elements.Title.prototype.restoreDefaults = function() {
   this.height(null);
   this.background(null);
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.elements.Title.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  var align = this.align();
+  var orientation = this.orientation();
+  var width = this.width();
+  var height = this.height();
+
+  var background = this.background_;
+  var margin = this.margin_;
+  var padding = this.padding_;
+
+  json['align'] = align;
+  json['orientation'] = orientation;
+  json['width'] = width;
+  json['height'] = height;
+
+  if (background) json['background'] = background.serialize();
+  if (margin) json['margin'] = margin.serialize();
+  if (padding) json['padding'] = padding.serialize();
+
+  return json;
+};
+
+
+/**
+ * Deserializes data from config.
+ * @param {Object} config Json config.
+ */
+anychart.elements.Title.prototype.deserialize = function(config) {
+  var padding = config['padding'];
+  var margin = config['margin'];
+  var background = config['background'];
+
+  if (padding) {
+    this.padding().deserialize(padding);
+  }
+
+  if (margin) {
+    this.margin().deserialize(margin);
+  }
+
+  if (background) {
+    this.background().deserialize(background);
+  }
+
+  this.textSettings(config);
+  this.align(config['align']);
+  this.width(config['width']);
+  this.height(config['height']);
+};
