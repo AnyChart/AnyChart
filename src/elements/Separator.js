@@ -341,7 +341,7 @@ anychart.elements.Separator.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.elements.Separator.prototype.restore = function() {
-  if (this.path_) this.path_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  if (this.path_ && this.enabled()) this.path_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
 };
 
 

@@ -543,7 +543,7 @@ anychart.elements.Label.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.elements.Label.prototype.restore = function() {
-  if (this.textElement_) this.textElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  if (this.textElement_ && this.enabled()) this.textElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
   if (this.background_) {
     this.background_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.background_.restore();

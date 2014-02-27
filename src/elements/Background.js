@@ -594,7 +594,7 @@ anychart.elements.Background.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.elements.Background.prototype.restore = function() {
-  if (this.rect_) this.rect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  if (this.rect_ && this.enabled()) this.rect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
 };
 
 

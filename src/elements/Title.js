@@ -235,7 +235,8 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
  *     .draw();
  * @param {anychart.math.Rect=} opt_value Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value .
  * @return {!anychart.elements.Title|anychart.math.Rect} .
@@ -264,7 +265,8 @@ anychart.elements.Title.prototype.parentBounds = function(opt_value) {
  *      .draw();
  * @param {string=} opt_value ['Title text'] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {string=} opt_value .
  * @return {!anychart.elements.Title|string} .
@@ -307,7 +309,8 @@ anychart.elements.Title.prototype.text = function(opt_value) {
  *     .draw();
  * @param {anychart.elements.Background=} opt_value [null] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {anychart.elements.Background=} opt_value .
  * @return {!(anychart.elements.Title|anychart.elements.Background)} .
@@ -341,7 +344,8 @@ anychart.elements.Title.prototype.background = function(opt_value) {
  * title.width('200px');
  * @param {(number|string|null)=} opt_value [null] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.elements.Title|number|string|null} .
@@ -371,7 +375,8 @@ anychart.elements.Title.prototype.width = function(opt_value) {
  * title.height('200px');
  * @param {(number|string|null)=} opt_value [null] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.elements.Title|number|string|null} .
@@ -413,7 +418,8 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @param {(string|number)=} opt_value3 [10] Bottom space.
  * @param {(string|number)=} opt_value4 [0] Left space.
  * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -457,7 +463,8 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
  * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -498,7 +505,8 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
  *     .draw();
  * @param {(anychart.utils.Align|string)=} opt_value [{@link anychart.utils.Align}.CENTER] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(anychart.utils.Align|string)=} opt_value .
  * @return {!anychart.elements.Title|anychart.utils.Align} .
@@ -535,7 +543,8 @@ anychart.elements.Title.prototype.align = function(opt_value) {
  *     .draw();
  * @param {(anychart.utils.Orientation|string)=} opt_value [{@link anychart.utils.Orientation}.TOP] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(anychart.utils.Orientation|string)=} opt_value .
  * @return {!anychart.elements.Title|anychart.utils.Orientation} .
@@ -672,10 +681,12 @@ anychart.elements.Title.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.elements.Title.prototype.restore = function() {
-  if (this.layer_) {
-    this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-  } else if (this.text_) {
-    this.text_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  if (this.enabled()) {
+    if (this.layer_) {
+      this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    } else if (this.text_) {
+      this.text_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    }
   }
 };
 
