@@ -145,7 +145,7 @@ anychart.elements.Background.CornerType = {
  */
 anychart.elements.Background.prototype.DISPATCHED_CONSISTENCY_STATES =
     anychart.elements.BaseWithBounds.prototype.DISPATCHED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.APPEARANCE;
+        anychart.utils.ConsistencyState.APPEARANCE;
 
 
 /**
@@ -535,8 +535,12 @@ anychart.elements.Background.prototype.draw = function() {
     this.rect_ = acgraph.rect();
     this.registerDisposable(this.rect_);
   }
+
   if (this.isConsistent())
     return this;
+
+  this.resolveEnabledState();
+
   var stage = this.rect_.getStage();
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
@@ -585,6 +589,18 @@ anychart.elements.Background.prototype.draw = function() {
   if (manualSuspend) stage.resume();
 
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.elements.Background.prototype.restore = function() {
+  if (this.rect_) this.rect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+};
+
+
+/** @inheritDoc */
+anychart.elements.Background.prototype.remove = function() {
+  if (this.rect_) this.rect_.parent(null);
 };
 
 

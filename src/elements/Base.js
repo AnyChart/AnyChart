@@ -50,8 +50,8 @@ anychart.elements.Base.prototype.enabled_ = true;
  */
 anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES =
     anychart.utils.ConsistencyState.ENABLED |
-    anychart.utils.ConsistencyState.CONTAINER |
-    anychart.utils.ConsistencyState.Z_INDEX;
+        anychart.utils.ConsistencyState.CONTAINER |
+        anychart.utils.ConsistencyState.Z_INDEX;
 
 
 /**
@@ -167,6 +167,45 @@ anychart.elements.Base.prototype.enabled = function(opt_value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Drawing.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Base elements draw, control element disabled state.
+ * @return {anychart.elements.Base} Return itself for chaining call.
+ */
+anychart.elements.Base.prototype.resolveEnabledState = function() {
+  if (this.hasInvalidationState(anychart.utils.ConsistencyState.ENABLED)) {
+    if (this.enabled()) {
+      this.restore();
+    } else {
+      this.remove();
+    }
+    this.markConsistent(anychart.utils.ConsistencyState.ENABLED);
+  }
+  return this;
+};
+
+
+/**
+ * Add all elements content to container depend on enabled state.
+ */
+anychart.elements.Base.prototype.restore = goog.abstractMethod;
+
+
+/**
+ * Remove all element content from container.
+ */
+anychart.elements.Base.prototype.remove = goog.abstractMethod;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  JSON.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @inheritDoc
  */

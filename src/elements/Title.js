@@ -179,7 +179,7 @@ goog.inherits(anychart.elements.Title, anychart.elements.Text);
  */
 anychart.elements.Title.prototype.DISPATCHED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
+        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
 
 
 /**
@@ -561,6 +561,9 @@ anychart.elements.Title.prototype.draw = function() {
   // If its all ok - leave this method
   if (this.isConsistent())
     return this;
+
+  this.resolveEnabledState();
+
   // We will need the text element any way, so we should create it if missing.
   var isInitial;
   if (isInitial = !this.text_) {
@@ -664,6 +667,26 @@ anychart.elements.Title.prototype.draw = function() {
 
   if (manualSuspend) stage.resume();
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.elements.Title.prototype.restore = function() {
+  if (this.layer_) {
+    this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  } else if (this.text_) {
+    this.text_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  }
+};
+
+
+/** @inheritDoc */
+anychart.elements.Title.prototype.remove = function() {
+  if (this.layer_) {
+    this.layer_.parent(null);
+  } else if (this.text_) {
+    this.text_.parent(null);
+  }
 };
 
 
