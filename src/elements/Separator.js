@@ -297,18 +297,12 @@ anychart.elements.Separator.prototype.draw = function() {
     this.registerDisposable(this.path_);
   }
 
+  this.resolveEnabledState();
+
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
-
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.ENABLED)) {
-    if (this.path_) {
-      this.path_.visible(/** @type {boolean} */ (this.enabled()));
-      this.silentlyInvalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
-    }
-    this.markConsistent(anychart.utils.ConsistencyState.ENABLED);
-  }
 
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
     this.calculateSeparatorBounds_();
@@ -342,6 +336,18 @@ anychart.elements.Separator.prototype.draw = function() {
 
   if (manualSuspend) stage.resume();
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.elements.Separator.prototype.restore = function() {
+  if (this.path_) this.path_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+};
+
+
+/** @inheritDoc */
+anychart.elements.Separator.prototype.remove = function() {
+  if (this.path_) this.path_.parent(null);
 };
 
 

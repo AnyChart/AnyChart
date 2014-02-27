@@ -103,8 +103,8 @@ goog.inherits(anychart.elements.Label, anychart.elements.Text);
  */
 anychart.elements.Label.prototype.DISPATCHED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-    anychart.utils.ConsistencyState.TEXT_FORMAT;
+        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
+        anychart.utils.ConsistencyState.TEXT_FORMAT;
 
 
 /**
@@ -394,6 +394,8 @@ anychart.elements.Label.prototype.position = function(opt_value) {
 anychart.elements.Label.prototype.draw = function() {
   if (this.isConsistent()) return this;
 
+  this.resolveEnabledState();
+
   var text = /** @type {string} */(this.text());
   var isInitial = false;
 
@@ -536,6 +538,23 @@ anychart.elements.Label.prototype.draw = function() {
   }
 
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.elements.Label.prototype.restore = function() {
+  if (this.textElement_) this.textElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  if (this.background_) {
+    this.background_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.background_.restore();
+  }
+};
+
+
+/** @inheritDoc */
+anychart.elements.Label.prototype.remove = function() {
+  if (this.textElement_) this.textElement_.parent(null);
+  if (this.background_) this.background_.remove();
 };
 
 

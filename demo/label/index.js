@@ -1,6 +1,6 @@
 var label;
 function load() {
-  var label = new anychart.elements.Label();
+  label = new anychart.elements.Label();
   label.container('container');
   label.position({x: '20%', y: 20});
   label.text('Some label text');
@@ -11,4 +11,8 @@ function load() {
   label.background().fill('green .5').stroke('none');
   label.parentBounds(new anychart.math.Rect(0, 0, 1157, 622));
   label.draw();
+
+  label.listen('invalidated', function() {
+    label.draw();
+  });
 }
