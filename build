@@ -245,6 +245,7 @@ def __compileReleaseProjectFromCommandLine():
 
 @sync_required
 def __compileProjectFromCommandLine():
+    print "Compile components..."
 
     #Проверяем существует ли путь для выгрузки итогового файла, если нет, создаем.
     __checkPathExistence(OUT_PATH)
@@ -267,49 +268,6 @@ def __call_compiler(commands, outputFileName):
     (output, err) = p.communicate()
     retcode = p.poll()
     print output
-
-
-#=======================================================================================================================
-#           Build tests
-#=======================================================================================================================
-@sync_required
-def __compileTests():
-    __checkPathExistence(OUT_PATH)
-
-    #сборка оптимизированной версии для запуска общих скомпиленных тестов
-    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.common.min.js')
-    commands = __getDefaultCompilerArgs(True) +\
-               __getOptimizedCompilerArgs() +\
-               ['--namespace=tests'] +\
-               __getRoots(True) +\
-               __getOutputFileArg(outputFileName)
-    __setPrettyPrint(commands)
-    __call_compiler(commands, outputFileName)
-    print ' ---- Build of graphics.tests.common.min.js complete'
-
-    #сборка vml-specific
-    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.vml.min.js')
-    commands = __getDefaultCompilerArgs(True) +\
-               __getOptimizedCompilerArgs() +\
-               ['--namespace=tests.vml'] +\
-               __getRoots(True) +\
-               __getOutputFileArg(outputFileName)
-    __setPrettyPrint(commands)
-    __call_compiler(commands, outputFileName)
-    print ' ---- Build of graphics.tests.vml.min.js complete'
-
-
-    #сборка svg-specific
-    outputFileName = os.path.join(OUT_PATH, 'graphics.tests.svg.min.js')
-    commands = __getDefaultCompilerArgs(True) +\
-               __getOptimizedCompilerArgs() +\
-               ['--namespace=tests.svg'] +\
-               __getRoots(True) +\
-               __getOutputFileArg(outputFileName)
-    __setPrettyPrint(commands)
-    __call_compiler(commands, outputFileName)
-    print ' ---- Build of graphics.tests.svg.min.js complete'
-
 
 #=======================================================================================================================
 #           Build deps
@@ -342,7 +300,7 @@ def __lintFromCommandLine():
 
 
 def __callLinter(root):
-    print 'Linting ' + root + ' directory.'
+    print 'Linting ' + root + ' directory.\n'
     subprocess.call([
         'python',
         os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'gjslint.py'),
@@ -352,9 +310,9 @@ def __callLinter(root):
         root
     ])
 
+#Проверяем наличие ошибок в документации после автоформатирования кода в Idea/WebStrom
 def __checkDocsOverridesErrors():
-    print ""
-    print 'Check overrides fails in docs'
+    print '\nCheck overrides fails in docs'
     subprocess.call([
         'python',
         os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
@@ -369,7 +327,7 @@ def __autofixFromCommandLine():
 
 
 def __callAutoFix(root):
-    print 'Trying to autofix ' + root + ' directory.'
+    print 'Trying to autofix ' + root + ' directory.\n'
     subprocess.call([
         'python',
         os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'fixjsstyle.py'),
@@ -378,6 +336,7 @@ def __callAutoFix(root):
         '-r',
         root
     ])
+    #Чиним документацию, посе автоформатирования кода в Idea/WebStorm
     subprocess.call([
         'python',
         os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
@@ -393,6 +352,13 @@ def __buildJSDocFromCommandLine():
 
 
 def __buildDocs():
+    # Компилируем код, если вызван ключ
+    args = sys.argv
+    for arg in args[2:]:
+      if (arg == '-c'):
+        __compileProjectFromCommandLine()
+
+    # Собираем документацию
     print 'Building JSDoc to ' + DOCS_OUT_PATH
     __checkPathExistence(OUT_PATH)
     __checkPathExistence(DOCS_OUT_PATH)
@@ -443,10 +409,11 @@ def __printHelp():
           "lint             Проверка кода на соответствие google JavaScript style guide (python build lint)\n"\
           "\n"\
           "autofix          Исправление не соответствией кода google JavaScript style guide (python build autofix).\n"\
-          "                 Это эксперементальная функция. За ней нужно всегда проверять что же она там наисправляла\n."\
+          "                 Это эксперементальная функция. За ней нужно всегда проверять что же она там наисправляла\n"\
           "\n"\
-          "docs             Сборка документации по продуктовому модулю или по всему проекту (python build docs).\n"
-
+          "docs             Сборка документации по продуктовому модулю или по всему проекту (python build docs)."\
+          "\n\t"\
+          "-c       Выполнит compile перед сборкой документации.\n"\
 
 #=======================================================================================================================
 #           Main
@@ -463,8 +430,6 @@ def __execMainScript():
         __compileProjectFromCommandLine()
     elif args[1] == 'compile-release':
         __compileReleaseProjectFromCommandLine()
-    elif args[1] == 'tests':
-        __compileTests()
     elif args[1] == 'deps':
         __buildDepsFromCommandLine()
     elif args[1] == 'lint':

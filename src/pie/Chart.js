@@ -475,10 +475,32 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
 
 /**
- * Getter/setter for pie slices fill in normal state.
- * Default fill - is a function that returns color form default palette.
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value Fill or fill function for normal state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} Current fill, fill-function in normal state or self for chaining.
+ * Getter for pie slices fill in normal state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in normal state.
+ *//**
+ * Setter for pie slices fill in normal state.
+ * @example
+ *  var data = [10, 1, 7, 10];
+ *  chart = new anychart.pie.Chart(data);
+ *  chart.fill( function() {
+ *    var color = 50*(this.index + 1);
+ *    return 'rgba('+color+','+color+','+color+','+(0.5+(this.index/10))+')';
+ *  });
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return fill from default pallete.
+ * function() {
+ *   return this.sourceColor;
+ * };] Либо Fill, либо fill-function, общий вид которой:<code>function() {
+ *  // контекст this: {
+ *  //  index : number  - индекс текущей точки
+ *  //  sourceColor : acgraph.vector.Fill - fill текущей точки
+ *  // }
+ *  return myFill; //acgraph.vector.Fill
+ * };</code>
+ * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.fill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -492,10 +514,29 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
 
 
 /**
- * Getter/setter for pie slices stroke in normal state.
- * Default stroke - is a function that returns color that darken than a color from default palette by factor 0.2.
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value Stroke or stroke function for normal state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} Current stroke, stroke-function in normal state or self for chaining.
+ * Getter for pie slices stroke in normal state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in normal state.
+ *//**
+ * Setter for pie slices stroke in normal state.
+ * @example
+ *  var data = [10, 1, 7, 10];
+ *  chart = new anychart.pie.Chart(data);
+ *  chart.stroke('#CC0088');
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from default pallete.
+ * function() {
+ *   return anychart.color.darken(this.sourceColor);
+ * };] Либо Stroke, либо stroke-function, общий вид которой:<code>function() {
+ *  // контекст this: {
+ *  //  index : number  - индекс текущей точки
+ *  //  sourceColor : acgraph.vector.Stroke - stroke текущей точки
+ *  // }
+ *  return myStroke; //acgraph.vector.Stroke
+ * };</code>
+ * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -509,10 +550,32 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
 
 
 /**
- * Getter/setter for pie slices fill in hover state.
- * Default hover fill - is a function that returns color that lighten than a color from normal state by factor 0.3.
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value Fill or fill-function for hover state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} Current fill, fill-function in hover state or self for chaining.
+ * Getter for pie slices fill in hover state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in hover state.
+ *//**
+ * Setter for pie slices fill in hover state.
+ * @example
+ *  var data = [10, 1, 7, 10];
+ *  chart = new anychart.pie.Chart(data);
+ *  chart.hoverFill( function() {
+ *    var color = 50*(this.index + 1);
+ *    return 'rgba('+color+','+color+','+color+','+(0.5+(this.index/10))+')';
+ *  });
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighten fill of default pallete.
+ * function() {
+ *   return anychart.color.lighten(this.sourceColor);
+ * };] Либо Fill, либо fill-function, общий вид которой:<code>function() {
+ *  // контекст this: {
+ *  //  index : number  - индекс текущей точки
+ *  //  sourceColor : acgraph.vector.Fill - fill текущей точки
+ *  // }
+ *  return myFill; //acgraph.vector.Fill
+ * };</code>
+ * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -526,10 +589,29 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
 
 
 /**
- * Getter/setter for pie slices stroke in hover state.
- * Default hover stroke - is a function that returns color that darken than a color from normal state by factor 0.3.
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value Stroke or stroke-function for hover state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} Current stroke, stroke-function in hover state or self for chaining.
+ * Getter for pie slices stroke in hover state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in hover state.
+ *//**
+ * Setter for pie slices stroke in hover state.
+ * @example
+ *  var data = [10, 1, 7, 10];
+ *  chart = new anychart.pie.Chart(data);
+ *  chart.hoverStroke('2 #CC0088');
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from default pallete.
+ * function() {
+ *   return anychart.color.darken(this.sourceColor);
+ * };] Либо Stroke, либо stroke-function, общий вид которой:<code>function() {
+ *  // контекст this: {
+ *  //  index : number  - индекс текущей точки
+ *  //  sourceColor : acgraph.vector.Stroke - stroke текущей точки
+ *  // }
+ *  return myStroke; //acgraph.vector.Stroke
+ * };</code>
+ * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
