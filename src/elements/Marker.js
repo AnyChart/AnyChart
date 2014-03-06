@@ -3,6 +3,22 @@ goog.provide('anychart.elements.Marker');
 
 
 /**
+ * Класс, описывающий элемент - маркер.<br/>
+ * Маркер - это самостоятельный элемент визаулизации, которому можно задать тип (предопределенный или свой), размер и
+ * заливку, а также можно спозиционировать широким набором инструментов:
+ * <ul>
+ *   <li>{@link anychart.elements.Marker#anchor}</li>
+ *   <li>{@link anychart.elements.Marker#position}</li>
+ *   <li>{@link anychart.elements.Marker#offsetX} и {@link anychart.elements.Marker#offsetY}</li>
+ *   <li>{@link anychart.elements.Marker#parentBounds}</li>
+ * </ul>
+ * @example <t>simple-h100</t>
+ * new anychart.elements.Marker()
+ *     .type('star5')
+ *     .size(27)
+ *     .position([ 100, 50])
+ *     .container(stage)
+ *     .draw();
  * @constructor
  * @extends {anychart.elements.Base}
  */
@@ -109,17 +125,95 @@ anychart.elements.Marker.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @enum {string}
  */
 anychart.elements.Marker.Type = {
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .star4(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   STAR4: 'star4',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .star5(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   STAR5: 'star5',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .star6(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   STAR6: 'star6',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .star7(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   STAR7: 'star7',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .star10(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   STAR10: 'star10',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .triangleUp(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   TRIANGLE_UP: 'triangleup',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .triangleDown(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   TRIANGLE_DOWN: 'triangledown',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .cross(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   CROSS: 'cross',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .diamond(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   DIAMOND: 'diamond',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .diagonalCross(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   DIAGONAL_CROSS: 'diagonalcross',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30)
+   *      .circle(stage.width()/2, stage.height()/2, stage.height()/2-5);
+   */
   CIRCLE: 'circle',
+  /**
+   * @illustration
+   * stage.width(200)
+   *      .height(30);
+   * var side = stage.height()/2-5;
+   * stage.path()
+   *        .moveTo(stage.width()/2 - side, stage.height()/2 - side)
+   *        .lineTo(stage.width()/2 + side, stage.height()/2 - side)
+   *        .lineTo(stage.width()/2 + side, stage.height()/2 + side)
+   *        .lineTo(stage.width()/2 - side, stage.height()/2 + side)
+   *        .close()
+   */
   SQUARE: 'square'
 };
 
@@ -189,9 +283,22 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 
 
 /**
- * Gets or sets marker position settings.
- * @param {anychart.math.Coordinate=} opt_value Markers position settings.
- * @return {anychart.elements.Marker|anychart.math.Coordinate} Marker position settings or itself for chaining call.
+ * Getter for current marker position settings.
+ * @return {anychart.math.Coordinate} Current marker position settings.
+ *//**
+ * Setter for marker position settings.
+ * @example <t>simple-h100</t>
+ * var marker = new anychart.elements.Marker()
+ *     .position([100, 50])
+ * marker.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {anychart.math.Coordinate=} opt_value [{x: 0, y: 0} относительно заанных баундов] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Coordinate=} opt_value .
+ * @return {!anychart.elements.Marker|anychart.math.Coordinate} .
  */
 anychart.elements.Marker.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -207,9 +314,24 @@ anychart.elements.Marker.prototype.position = function(opt_value) {
 
 
 /**
- * Gets or sets marker anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Markers anchor settings.
- * @return {anychart.elements.Marker|anychart.utils.NinePositions} Markers anchor settings or itself for chaining call.
+ * Getter for marker anchor settings.
+ * @return {anychart.utils.NinePositions} Current marker anchor settings.
+ *//**
+ * Setter for marker anchor settings.<br/>
+ * <b>Note:</b> Совмещает точку позиционирования лейбла ({@link anychart.elements.Marker#position}) с указанным якорем.
+ * @example <t>simple-h100</t>
+ * var marker = new anychart.elements.Marker()
+ *     .position([100, 50])
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * marker.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.utils.NinePositions|string)=} opt_value .
+ * @return {!anychart.elements.Marker|anychart.utils.NinePositions} .
  */
 anychart.elements.Marker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -226,12 +348,43 @@ anychart.elements.Marker.prototype.anchor = function(opt_value) {
 
 
 /**
- * Gets or sets marker type settings.
- * @param {(anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- * Type or custom drawer.
- * @return {anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|
- * anychart.elements.Marker} Markers type settings or itself
- * for chaining call.
+ * Getter for current marker type settings.
+ * @return {anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ *  Markers type settings.
+ *//**
+ * Setter for marker type settings.
+ * @example <c>By Enum value.</c><t>simple-h100</t>
+ * var marker = new anychart.elements.Marker()
+ *     .position([100, 50])
+ *     .type(anychart.elements.Marker.Type.STAR5);
+ * marker.container(stage).draw();
+ * @example <c>By custom function.</c><t>simple-h100</t>
+ * new anychart.elements.Marker()
+ *     .position([100, 50])
+ *     .size(20)
+ *     .type(function(path, x, y, size) {
+ *       var point1 = {x: x + 1.7 * size, y: y + 0.6 * size};
+ *       var point2 = {x: x, y: y + size / 2};
+ *       path.moveTo(point1.x, point1.y)
+ *           .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
+ *           .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
+ *           .moveTo(point1.x, point1.y)
+ *           .close();
+ *       path.rotate(16).translate(-10, -40);
+ *       return path;
+ *     })
+ *     .container(stage)
+ *     .draw();
+ * @param {(anychart.elements.Marker.Type|
+ *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
+ *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.elements.Marker.Type|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.elements.Marker|anychart.elements.Marker.Type|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.elements.Marker.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -247,9 +400,35 @@ anychart.elements.Marker.prototype.type = function(opt_value) {
 
 
 /**
- * Gets or sets marker size settings.
- * @param {number=} opt_value Marker size.
- * @return {number|anychart.elements.Marker} Markers size settings or itself for chaining call.
+ * Getter for current marker size settings.
+ * @return {number} Current markers size.
+ *//**
+ * Setter for marker size in pixels.
+ * @example <t>simple-h100</t>
+ * // size 5
+ * new anychart.elements.Marker()
+ *     .position([stage.width() / 4, stage.height() / 2])
+ *     .size(5)
+ *     .container(stage)
+ *     .draw();
+ * // size 10
+ * new anychart.elements.Marker()
+ *     .position([2 * stage.width() / 4, stage.height() / 2])
+ *     .size(10)
+ *     .container(stage)
+ *     .draw();
+ * // size 20
+ * new anychart.elements.Marker()
+ *     .position([3 * stage.width() / 4 , stage.height() / 2])
+ *     .size(20)
+ *     .container(stage)
+ *     .draw();
+ * @param {number=} opt_value [10] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {number|anychart.elements.Marker} .
  */
 anychart.elements.Marker.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -267,9 +446,62 @@ anychart.elements.Marker.prototype.size = function(opt_value) {
 
 
 /**
- * Gets or sets marker fill settings.
- * @param {acgraph.vector.Fill=} opt_value Marker fill.
- * @return {acgraph.vector.Fill|anychart.elements.Marker} Markers fill settings or itself for chaining call.
+ * Возвращает текущий fill.
+ * @return {!acgraph.vector.Fill} Параметры текущей заливки (пустая заливка это всегда 'none').
+ *//**
+ * Устанавливает настройки заливки через объект или одной строкой.<br/>
+ * Принимает объекты типов:
+ * <ul>
+ * <li>{@link acgraph.vector.LinearGradientFill}</li>
+ * <li>{@link acgraph.vector.RadialGradientFill}</li>
+ * <li>{@link acgraph.vector.Fill}</li>
+ * <li>{@link acgraph.vector.ImageFill}</li>
+ * </ul>
+ * Либо цвет в виде строки. Причем, одной строкой можно задать и прозрачность (в виде '<b>Color Opacity</b>',
+ * например 'red .5').
+ * @shortDescription Устанавливает настройки заливки через объект или одной строкой.
+ * @example <c>Solid Fill</c><t>simple-h100</t>
+ * var marker = new anychart.elements.Marker();
+ * // Устанавливаем fill
+ *   marker.fill('red 0.1');
+ * // the same
+ * // marker.fill('#ff0000 0.1');
+ * // or
+ * // marker.fill({color: 'red', opacity: 0.1});
+ * // or
+ * // marker.fill('#ff0000 0.1');
+ * // then draw
+ * marker
+ *    .position([100, 50])
+ *    .size(45)
+ *    .container(stage)
+ *    .draw();
+ * @example <c>Gradient Fill</c><t>simple-h100</t>
+ * var marker = new anychart.elements.Marker();
+ *   // Устанавливаем fill
+ *   marker.fill({keys:['red .1', 'orange'], mode: true, angle: 45});
+ * marker
+ *   .position([100, 50])
+ *   .size(45)
+ *   .container(stage)
+ *   .draw();
+ * @example <c>Image Fill</c><t>simple-h100</t>
+ * new anychart.elements.Marker()
+ *    .fill({
+ *        src: 'styles/images/rainbow.png',
+ *        mode: acgraph.vector.ImageFillMode.STRETCH
+ *     })
+ *     .stroke('1 #000')
+ *     .position([100, 50])
+ *     .size(45)
+ *     .container(stage)
+ *     .draw();
+ * @param {acgraph.vector.Fill} value ['#000'] Заливка в виде одного сложного объекта или строки.
+ * @return {!anychart.elements.Marker} An instance of the {@link anychart.elements.Marker} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill)=} opt_value .
+ * @return {!(acgraph.vector.Fill|anychart.elements.Marker)} .
  */
 anychart.elements.Marker.prototype.fill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -285,9 +517,58 @@ anychart.elements.Marker.prototype.fill = function(opt_value) {
 
 
 /**
- * Gets or sets marker stroke settings.
- * @param {acgraph.vector.Stroke=} opt_value Marker stroke.
- * @return {acgraph.vector.Stroke|anychart.elements.Marker} Markers stroke settings or itself for chaining call.
+ * Возаращает текущий stroke.
+ * @return {acgraph.vector.Stroke} Возвращает текущую настройку линии.
+ *//**
+ * Устанавливает настройки stroke одним параметром.<br/>
+ * Допустимы следующие варианты:
+ * <ul>
+ * <li>Строкой в формате '[thickness ]color[ opacity]':
+ * <ol>
+ * <li><b>'color'</b> - {@link http://www.w3schools.com/html/html_colors.asp}.</li>
+ * <li><b>'thickness color'</b> - like a css border, e.g. '3 red' or '3px red'</li>
+ * <li><b>'color opacity'</b> - as a fill string, e.g. '#fff 0.5'</li>
+ * <li><b>'thickness color opacity'</b> - as a complex string, e.g. '3px #00ff00 0.5'</li>
+ * </ol>
+ * </li>
+ * <li>Объект {@link acgraph.vector.Stroke}</li>
+ * <li>Массив ключей {@link acgraph.vector.GradientKey}</li>
+ * <li><b>null</b> - сбросит текущие настройки stroke.</li>
+ * </ul>
+ * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
+ * @shortDescription Устанавливает настройки stroke одним параметром.
+ * @example <c>Настроки строкой</c><t>simple</t>
+ * new anychart.elements.Marker()
+ *   .stroke('red')
+ *   .position([ stage.width()/5, 50]).size(stage.width()/10)
+ *   .fill('none').container(stage).draw();
+ * new anychart.elements.Marker()
+ *   .stroke('4px ORANGE')
+ *   .position([ 2*stage.width()/5, 50]).size(stage.width()/10)
+ *   .fill('none').container(stage).draw();
+ * new anychart.elements.Marker()
+ *   .stroke('#0f0 0.7')
+ *   .position([ 3*stage.width()/5, 50]).size(stage.width()/10)
+ *   .fill('none').container(stage).draw();
+ * new anychart.elements.Marker()
+ *   .stroke('4 #0000FF 0.3')
+ *   .position([ 4*stage.width()/5, 50]).size(stage.width()/10)
+ *   .fill('none').container(stage).draw();
+ * @example <c>Настроки объектом или массивом</c><t>simple</t>
+ * new anychart.elements.Marker()
+ *   .stroke({color: '#f00', thickness: 2, opacity: 0.9})
+ *   .position([100, 50]).size(45)
+ *   .fill('none').container(stage).draw();
+ * new anychart.elements.Marker()
+ *   .stroke(['red', 'green', 'blue'])
+ *   .position([200, 50]).size(45)
+ *   .fill('none').container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['none'] Стиль заливки в формате '[thickness ]color[ opacity]'.
+ * @return {anychart.elements.Marker} An instance of the {@link anychart.elements.Marker} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke)=} opt_value .
+ * @return {(!anychart.elements.Marker|acgraph.vector.Stroke)} .
  */
 anychart.elements.Marker.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -303,9 +584,95 @@ anychart.elements.Marker.prototype.stroke = function(opt_value) {
 
 
 /**
- * Gets or sets marker offsetX settings.
- * @param {(number|string)=} opt_value Marker offsetX settings to set.
- * @return {number|string|anychart.elements.Marker} Marker offsetX value or itself for chaining call.
+ * Getter for current marker offsetX settings.
+ * @return {number|string} Marker offsetX value.
+ *//**
+ * Setter for marker offsetX settings.
+ * @illustration <t>simple</t>
+ * var pathBounds = {
+ *   left: stage.width() / 3,
+ *   top: stage.height() / 8,
+ *   width: 3 * stage.height() / 7,
+ *   height: 3 * stage.height() / 7
+ * };
+ * stage.path().fill('none').stroke('1 grey .2')
+ *     .moveTo(pathBounds.left, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height)
+ *     .close();
+ * stage.text(pathBounds.left - 55, pathBounds.top - 15, 'LEFT_TOP');
+ * stage.circle(pathBounds.left, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left, pathBounds.top);
+ * stage.text(pathBounds.left - 78, pathBounds.top + pathBounds.height / 2 - 8, 'LEFT_CENTER');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left - 80, pathBounds.top + pathBounds.height, 'LEFT_BOTTOM');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 10, pathBounds.top - 18, 'TOP');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 20, pathBounds.top + pathBounds.height / 2 - 15, 'CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 23, pathBounds.top + pathBounds.height + 2, 'BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top - 15, 'RIGHT_TOP');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height / 2 - 8, 'RIGHT_CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height, 'RIGHT_BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(85, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
+ * @illustrationDesc
+ * Стрелочками обозначено направление положительно заданных офсетов относительно якоря в котором спозиционирован лейбл.
+ * @example <t>simple-h100</t>
+ * var marker = new anychart.elements.Marker()
+ *     .position([100, 50])
+ *     // выставляем оффсеты по 10px.
+ *     .offsetX(10)
+ *     .offsetY(10)
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * marker.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(number|string)=} opt_value [0] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.elements.Marker|number|string} .
  */
 anychart.elements.Marker.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -321,9 +688,27 @@ anychart.elements.Marker.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Gets or sets marker offsetY settings.
- * @param {(number|string)=} opt_value Marker offsetY settings to set.
- * @return {number|string|anychart.elements.Marker} Marker offsetY value or itself for chaining call.
+ * Getter for current marker offsetY settings.
+ * @return {number|string} Marker offsetY value.
+ *//**
+ * Setter for marker offsetY settings.
+ * See illustration in {@link anychart.elements.Marker#offsetX}.
+ * @example <t>simple-h100</t>
+ * var marker = new anychart.elements.Marker()
+ *     .position([100, 50])
+ *     // выставляем оффсеты по 10px.
+ *     .offsetX(10)
+ *     .offsetY(10)
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * marker.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(number|string)=} opt_value [0] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.elements.Marker|number|string} .
  */
 anychart.elements.Marker.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -339,9 +724,46 @@ anychart.elements.Marker.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Getter and setter for parent element bounds. Used to calculate offsets passed in percents.
- * @param {anychart.math.Rect=} opt_value Parent bounds to set.
- * @return {!anychart.elements.Marker|anychart.math.Rect} Marker or parent bounds.
+ * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * @return {anychart.math.Rect} Current parent bounds.
+ *//**
+ * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.<br/>
+ * Width, height, offsets заданные в проуентах считаются относительно этих заданных баундов.
+ * @illustration <t>simple-h100</t>
+ * var layer = stage.layer();
+ * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
+ * var layerBounds = new anychart.math.Rect(100, 20, stage.width() / 3, stage.height() / 3);
+ * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
+ *      .stroke('2 red');
+ * layer.text(2*stage.width()/3, 2, 'stageBounds');
+ * var layer2 = stage.layer();
+ * layer2.rect(layerBounds.left, layerBounds.top, layerBounds.width, layerBounds.height)
+ *      .stroke('2 blue');
+ * layer2.text(layerBounds.left, layerBounds.top+layerBounds.height, 'layerBounds');
+ * new anychart.elements.Marker()
+ *     .container(layer2)
+ *     .parentBounds(stageBounds)
+ *     .draw();
+ * new anychart.elements.Marker()
+ *     .container(layer2)
+ *     .parentBounds(layerBounds)
+ *     .stroke('grey')
+ *     .draw();
+ * @illustrationDesc
+ * Marker находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции marker:<br/>
+ *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
+ *   b. Черным - когда в качестве родительских заданы баунды stage.
+ * @example <t>listingOnly</t>
+ * new anychart.elements.Marker()
+ *     .container(layer)
+ *     .parentBounds(stageBounds)
+ *     .draw();
+ * @param {anychart.math.Rect=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Rect=} opt_value .
+ * @return {!anychart.elements.Marker|anychart.math.Rect} .
  */
 anychart.elements.Marker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -356,8 +778,8 @@ anychart.elements.Marker.prototype.parentBounds = function(opt_value) {
 
 
 /**
- * Draw marker with specified setting.
- * @return {anychart.elements.Marker} Returns itself for chaining call.
+ * Render marker.
+ * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
  */
 anychart.elements.Marker.prototype.draw = function() {
   if (this.isConsistent()) return this;
@@ -404,7 +826,6 @@ anychart.elements.Marker.prototype.draw = function() {
 
     this.markerElement_.clear();
     drawer.call(this, this.markerElement_, markerBounds.left + markerBounds.width / 2, markerBounds.top + markerBounds.height / 2, this.size_);
-
     this.markConsistent(anychart.utils.ConsistencyState.POSITION);
     this.markConsistent(anychart.utils.ConsistencyState.DATA);
   }
