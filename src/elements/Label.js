@@ -8,7 +8,23 @@ goog.require('anychart.utils.ZIndexedLayer');
 
 
 /**
- * Этот класс предназначен для рисования лейблов по абсолютным координатам в конкретный конейнер.
+ * Класс, описывающий элемент - лейбл.<br/>
+ * Лейбл может быть как частью другого, более сложного, элемента (чарт, легенда, ось и тд), так и самостоятельным
+ * элементом визаулизации.<br/>
+ * Лейблу можно задать background, а также его можно спозиционировать широким набором инструментов:
+ * <ul>
+ *   <li>{@link anychart.elements.Label#anchor}</li>
+ *   <li>{@link anychart.elements.Label#position}</li>
+ *   <li>{@link anychart.elements.Label#offsetX} и {@link anychart.elements.Label#offsetY}</li>
+ *   <li>{@link anychart.elements.Label#parentBounds}</li>
+ * </ul>
+ * @example <c>Создание самостоятельного заголовка.</c><t>simple-h100</t>
+ * new anychart.elements.Label()
+ *     .text('My custom Label')
+ *     .fontSize(27)
+ *     .background(null)
+ *     .container(stage)
+ *     .draw();
  * @constructor
  * @extends {anychart.elements.Text}
  */
@@ -123,9 +139,22 @@ anychart.elements.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Label text value.
- * @param {string=} opt_value Value to set if used as a setter.
- * @return {!anychart.elements.Label|string} Asked value or itself for chaining.
+ * Gets text content for current label.
+ * @return {string} Current text content of label.
+ *//**
+ * Sets text content for label.
+ * @example <t>simple-h100</t>
+ * new anychart.elements.Label()
+ *      .text('My custom label Text')
+ *      .container(stage)
+ *      .background(null)
+ *      .draw();
+ * @param {string=} opt_value ['Label text'] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {string=} opt_value .
+ * @return {!anychart.elements.Label|string} .
  */
 anychart.elements.Label.prototype.text = function(opt_value) {
   if (goog.isDef(opt_value) && this.textSettings('text') != opt_value) {
@@ -142,9 +171,41 @@ anychart.elements.Label.prototype.text = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets the Label background settings.
- * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!(anychart.elements.Label|anychart.elements.Background)} Returns the background or itself for chaining.
+ * Getter for label background.
+ * @example <t>simple-h100</t>
+ * var label = new anychart.elements.Label();
+ * label.text('\' Simple text \'')
+ *      .background()
+ *          .stroke('1 rgb(36,102,177) 0.4')
+ *          .corners(2);
+ * label.container(stage)
+ *      .draw();
+ * @return {!anychart.elements.Background} Returns current background.
+ *//**
+ * Setter for label background.
+ * @example <t>simple-h100</t>
+ * var myLableBackground = new anychart.elements.Background()
+ *         .stroke('1 rgb(36,102,177) 0.4')
+ *         .corners(2)
+ *         .fill({
+ *           keys: [
+ *             "rgb(255,255,255) 1",
+ *             "rgb(223,223,223) 1",
+ *             "rgb(255,255,255) 1"
+ *           ],
+ *           angle: -90
+ *         });
+ * new anychart.elements.Label()
+ *     .padding(5)
+ *     .background( myLableBackground )
+ *     .container(stage)
+ *     .draw();
+ * @param {anychart.elements.Background=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.elements.Background=} opt_value .
+ * @return {!(anychart.elements.Label|anychart.elements.Background)} .
  */
 anychart.elements.Label.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -178,13 +239,34 @@ anychart.elements.Label.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Label padding.
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.elements.Label|anychart.utils.Padding)} Padding or Label for chaining.
+ * Getter for current label padding.<br/>
+ * Иллюстрацию работы с margins см тут {@link anychart.Chart#padding}.
+ * @return {anychart.utils.Padding} Current label padding.
+ *//**
+ * Setter for label padding in pixels by one value.<br/>
+ * @param {(string|number|anychart.utils.Space)=} opt_value [null] Value to set.
+ * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * Setter for label padding in pixels by few numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * label.padding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * label.padding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * label.padding(10, '15px', '5px', 12);
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.elements.Label|anychart.utils.Padding} .
  */
 anychart.elements.Label.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -219,9 +301,23 @@ anychart.elements.Label.prototype.boundsInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Label width settings.
- * @param {(number|string|null)=} opt_value Width value to set.
- * @return {!anychart.elements.Label|number|string|null} Label width or itself for chaining call.
+ * Getter for label width.
+ * @return {number|string|null} Current label width.
+ *//**
+ * Setter for label width.<br/>
+ * <b>Note:</b> Если будет переданно <b>null</b>, то ширина будет рассчитываться автоматически.
+ * @example <t>simple-h100</t>
+ * label = new anychart.elements.Label()
+ *      .width('200px');
+ * // отметим область, занимаемую лейблом, синей рамкой.
+ * label.background().stroke('1 #00F')
+ * label.container(stage).draw();
+ * @param {(number|string|null)=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Label|number|string|null} .
  */
 anychart.elements.Label.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -239,9 +335,23 @@ anychart.elements.Label.prototype.width = function(opt_value) {
 
 
 /**
- * Label height settings.
- * @param {(number|string|null)=} opt_value Height value to set.
- * @return {!anychart.elements.Label|number|string|null} Label height or itself for chaining.
+ * Getter for label height.
+ * @return {number|string|null} Current label width.
+ *//**
+ * Setter for label height.<br/>
+ * <b>Note:</b> Если будет переданно <b>null</b>, то высота будет рассчитываться автоматически.
+ * @example <t>simple-h100</t>
+ * label = new anychart.elements.Label()
+ *      .height('90px');
+ * // отметим область, занимаемую лейблом, синей рамкой.
+ * label.background().stroke('1 #00F')
+ * label.container(stage).draw();
+ * @param {(number|string|null)=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Label|number|string|null} .
  */
 anychart.elements.Label.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -259,9 +369,49 @@ anychart.elements.Label.prototype.height = function(opt_value) {
 
 
 /**
- * Getter and setter for parent element bounds. Used to calculate width, height, offsets passed in percents.
- * @param {anychart.math.Rect=} opt_value Parent bounds to set.
- * @return {!anychart.elements.Label|anychart.math.Rect} Label or parent bounds.
+ * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * @return {anychart.math.Rect} Current parent bounds.
+ *//**
+ * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.<br/>
+ * Width, height, offsets заданные в проуентах считаются относительно этих заданных баундов.
+ * @illustration <t>simple-h100</t>
+ * var layer = stage.layer();
+ * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
+ * var layerBounds = new anychart.math.Rect(100, 20, stage.width() / 3, stage.height() / 3);
+ * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
+ *      .stroke('2 red');
+ * layer.text(2*stage.width()/3, 2, 'stageBounds');
+ * var layer2 = stage.layer();
+ * layer2.rect(layerBounds.left, layerBounds.top, layerBounds.width, layerBounds.height)
+ *      .stroke('2 blue');
+ * layer2.text(layerBounds.left, layerBounds.top+layerBounds.height, 'layerBounds');
+ * new anychart.elements.Label()
+ *     .container(layer2)
+ *     .parentBounds(stageBounds)
+ *     .background(null)
+ *     .draw();
+ * new anychart.elements.Label()
+ *     .container(layer2)
+ *     .background(null)
+ *     .parentBounds(layerBounds)
+ *     .fontColor('gray')
+ *     .draw();
+ * @illustrationDesc
+ * Label находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции label:<br/>
+ *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
+ *   b. Черным - когда в качестве родительских заданы баунды stage.
+ * @example <t>listingOnly</t>
+ * new anychart.elements.Label()
+ *     .container(layer)
+ *     .parentBounds(stageBounds)
+ *     .background(null)
+ *     .draw();
+ * @param {anychart.math.Rect=} opt_value [null] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Rect=} opt_value .
+ * @return {!anychart.elements.Label|anychart.math.Rect} .
  */
 anychart.elements.Label.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -304,9 +454,26 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
 
 
 /**
- * Gets or sets Label anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Label anchor settings.
- * @return {anychart.elements.Label|anychart.utils.NinePositions} Label anchor settings or itself for chaining call.
+ * Getter for label anchor settings.
+ * @return {anychart.utils.NinePositions} Current label anchor settings.
+ *//**
+ * Setter for label anchor settings.<br/>
+ * <b>Note:</b> Совмещает точку позиционирования лейбла ({@link anychart.elements.Label#position}) с указанным якорем.
+ * @example <t>simple-h100</t>
+ * var label = new anychart.elements.Label()
+ *     .padding(5)
+ *     .position([100, 50])
+ *     .anchor(anychart.utils.NinePositions.LEFT_BOTTOM);
+ * label.background().stroke('1 #aaa')
+ * label.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.utils.NinePositions|string)=} opt_value .
+ * @return {!anychart.elements.Label|anychart.utils.NinePositions} .
  */
 anychart.elements.Label.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -326,9 +493,97 @@ anychart.elements.Label.prototype.anchor = function(opt_value) {
 
 
 /**
- * Gets or sets Label offsetX settings.
- * @param {(number|string)=} opt_value Label offsetX settings to set.
- * @return {number|string|anychart.elements.Label} Label offsetX value or itself for chaining call.
+ * Getter for current label offsetX settings.
+ * @return {number|string} Label offsetX value.
+ *//**
+ * Setter for label offsetX settings.
+ * @illustration <t>simple</t>
+ * var pathBounds = {
+ *   left: stage.width() / 3,
+ *   top: stage.height() / 8,
+ *   width: 3 * stage.height() / 7,
+ *   height: 3 * stage.height() / 7
+ * };
+ * stage.path().fill('none').stroke('1 grey .2')
+ *     .moveTo(pathBounds.left, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height)
+ *     .close();
+ * stage.text(pathBounds.left - 55, pathBounds.top - 15, 'LEFT_TOP');
+ * stage.circle(pathBounds.left, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left, pathBounds.top);
+ * stage.text(pathBounds.left - 78, pathBounds.top + pathBounds.height / 2 - 8, 'LEFT_CENTER');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left - 80, pathBounds.top + pathBounds.height, 'LEFT_BOTTOM');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 10, pathBounds.top - 18, 'TOP');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 20, pathBounds.top + pathBounds.height / 2 - 15, 'CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left + pathBounds.width / 2 - 23, pathBounds.top + pathBounds.height + 2, 'BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top - 15, 'RIGHT_TOP');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15, 5)
+ *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height / 2 - 8, 'RIGHT_CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
+ *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2);
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height, 'RIGHT_BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15, 5)
+ *     .rotateByAnchor(85, acgraph.vector.Anchor.CENTER).fill('green');
+ * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
+ * @illustrationDesc
+ * Стрелочками обозначено направление положительно заданных офсетов относительно якоря в котором спозиционирован лейбл.
+ * @example <t>simple-h100</t>
+ * var label = new anychart.elements.Label()
+ *     .padding(5)
+ *     .position([100, 50])
+ *     // выставляем оффсеты по 10px.
+ *     .offsetX(10)
+ *     .offsetY(10)
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * label.background().stroke('1 #aaa')
+ * label.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(number|string)=} opt_value [0] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {number|string|anychart.elements.Label} .
  */
 anychart.elements.Label.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -345,9 +600,29 @@ anychart.elements.Label.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Gets or sets Label offsetY settings.
- * @param {(number|string)=} opt_value Label offsetY settings to set.
- * @return {number|string|anychart.elements.Label} Label offsetY value or itself for chaining call.
+ * Getter for current label offsetY settings.
+ * @return {number|string} Label offsetY value.
+ *//**
+ * Setter for label offsetY settings.
+ * See illustration in {@link anychart.elements.Label#offsetX}.
+ * @example <t>simple-h100</t>
+ * var label = new anychart.elements.Label()
+ *     .padding(5)
+ *     .position([100, 50])
+ *     // выставляем оффсеты по 10px.
+ *     .offsetX(10)
+ *     .offsetY(10)
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * label.background().stroke('1 #aaa')
+ * label.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {(number|string)=} opt_value [0] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {number|string|anychart.elements.Label} .
  */
 anychart.elements.Label.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -364,9 +639,24 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Gets or sets Label position settings.
- * @param {anychart.math.Coordinate=} opt_value New label position.
- * @return {anychart.math.Coordinate|anychart.elements.Label} Current label position settings or itself for chaining.
+ * Getter for current label position settings.
+ * @return {anychart.math.Coordinate} Current label position settings.
+ *//**
+ * Setter for label position settings.
+ * @example <t>simple-h100</t>
+ * var label = new anychart.elements.Label()
+ *     .padding(5)
+ *     .position([100, 50])
+ * label.background().stroke('1 #aaa')
+ * label.container(stage).draw();
+ * // обозначим красным точку поционирования лейбла.
+ * stage.circle(100, 50, 2).stroke('3 red')
+ * @param {anychart.math.Coordinate=} opt_value [{x: 0, y: 0} относительно заанных баундов] Value to set.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Coordinate=} opt_value .
+ * @return {!anychart.elements.Label|anychart.math.Coordinate} .
  */
 anychart.elements.Label.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -388,8 +678,8 @@ anychart.elements.Label.prototype.position = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Draw label with specified setting.
- * @return {anychart.elements.Label} Returns itself for chaining call.
+ * Render label content.
+ * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
  */
 anychart.elements.Label.prototype.draw = function() {
   if (this.isConsistent()) return this;

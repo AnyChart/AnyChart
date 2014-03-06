@@ -92,17 +92,72 @@ anychart.utils.normalizeOrientation = function(orientation, opt_default) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Nine positions enumeration.
+ * @illustration <t>simple</t>
+ * var orange = '1 orange 1';
+ * var star = stage.star5(stage.width()/2, stage.height()/3, stage.height()/4).fill('yellow', 0.5);
+ * var pathBounds = star.getBounds();
+ * stage.path().fill('none').stroke(orange)
+ *     .moveTo(pathBounds.left, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top)
+ *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height)
+ *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height)
+ *     .close();
+ * stage.text(pathBounds.left - 55, pathBounds.top - 15, 'LEFT_TOP');
+ * stage.circle(pathBounds.left, pathBounds.top, 3).fill('blue');
+ * stage.text(pathBounds.left - 78, pathBounds.top + pathBounds.height/2 - 8, 'LEFT_CENTER');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height/2, 3).fill('blue');
+ * stage.text(pathBounds.left - 80, pathBounds.top + pathBounds.height, 'LEFT_BOTTOM');
+ * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.text(pathBounds.left  + pathBounds.width/2 - 10, pathBounds.top - 18, 'TOP');
+ * stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top, 3).fill('blue');
+ * stage.text(pathBounds.left + pathBounds.width/2 - 20, pathBounds.top + pathBounds.height/2 - 15, 'CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top + pathBounds.height/2, 3).fill('blue');
+ * stage.text(pathBounds.left + pathBounds.width/2 - 23, pathBounds.top + pathBounds.height+ 2, 'BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top + pathBounds.height, 3).fill('blue');
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top - 15, 'RIGHT_TOP');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top, 3).fill('blue');
+ * stage.text(pathBounds.left + pathBounds.width + 5 , pathBounds.top + pathBounds.height/2 - 8, 'RIGHT_CENTER');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height/2, 3).fill('blue');
+ * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height, 'RIGHT_BOTTOM');
+ * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
  * @enum {string}
  */
 anychart.utils.NinePositions = {
+  /**
+   * Defines left-top position
+   */
   LEFT_TOP: 'lefttop',
+  /**
+   * Defines top position
+   */
   TOP: 'top',
+  /**
+   * Defines right-top position
+   */
   RIGHT_TOP: 'righttop',
+  /**
+   * Defines left-center position
+   */
   LEFT_CENTER: 'leftcenter',
+  /**
+   * Defines center position
+   */
   CENTER: 'center',
+  /**
+   * Defines right-center position
+   */
   RIGHT_CENTER: 'rightcenter',
+  /**
+   * Defines left-bottom position
+   */
   LEFT_BOTTOM: 'leftbottom',
+  /**
+   * Defines bottom position
+   */
   BOTTOM: 'bottom',
+  /**
+   * Defines right-bottom position
+   */
   RIGHT_BOTTOM: 'rightbottom'
 };
 

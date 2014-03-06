@@ -52,7 +52,6 @@ anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs
 anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/
 anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/
 anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Background
@@ -88,18 +87,20 @@ anychart.elements.BaseWithBounds.prototype['pixelBounds'] = anychart.elements.Ba
 //  anychart.elements.Label
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Label', anychart.elements.Label);
-anychart.elements.Label.prototype['background'] = anychart.elements.Label.prototype.background;
-anychart.elements.Label.prototype['padding'] = anychart.elements.Label.prototype.padding;
-anychart.elements.Label.prototype['width'] = anychart.elements.Label.prototype.width;
-anychart.elements.Label.prototype['height'] = anychart.elements.Label.prototype.height;
-anychart.elements.Label.prototype['parentBounds'] = anychart.elements.Label.prototype.parentBounds;
+goog.exportSymbol('anychart.elements.Label', anychart.elements.Label);//in docs/
+anychart.elements.Label.prototype['background'] = anychart.elements.Label.prototype.background;//in docs/
+anychart.elements.Label.prototype['padding'] = anychart.elements.Label.prototype.padding;//in docs/
+anychart.elements.Label.prototype['width'] = anychart.elements.Label.prototype.width;//in docs/
+anychart.elements.Label.prototype['height'] = anychart.elements.Label.prototype.height;//in docs/
+anychart.elements.Label.prototype['parentBounds'] = anychart.elements.Label.prototype.parentBounds;//in docs/
+anychart.elements.Label.prototype['anchor'] = anychart.elements.Label.prototype.anchor;//in docs/
+anychart.elements.Label.prototype['offsetX'] = anychart.elements.Label.prototype.offsetX;//in docs/
+anychart.elements.Label.prototype['offsetY'] = anychart.elements.Label.prototype.offsetY;//in docs/
+anychart.elements.Label.prototype['position'] = anychart.elements.Label.prototype.position;//in docs/
+anychart.elements.Label.prototype['text'] = anychart.elements.Label.prototype.text;//in docs/
+anychart.elements.Label.prototype['draw'] = anychart.elements.Label.prototype.draw;//in docs/
+
 anychart.elements.Label.prototype['rotation'] = anychart.elements.Label.prototype.rotation;
-anychart.elements.Label.prototype['anchor'] = anychart.elements.Label.prototype.anchor;
-anychart.elements.Label.prototype['offsetX'] = anychart.elements.Label.prototype.offsetX;
-anychart.elements.Label.prototype['offsetY'] = anychart.elements.Label.prototype.offsetY;
-anychart.elements.Label.prototype['position'] = anychart.elements.Label.prototype.position;
-anychart.elements.Label.prototype['draw'] = anychart.elements.Label.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.Marker
@@ -251,7 +252,6 @@ anychart.elements.Ticks.prototype['position'] = anychart.elements.Ticks.prototyp
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.pie.Chart
@@ -326,12 +326,9 @@ anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.p
 anychart.utils.Invalidatable.prototype['listen'] = anychart.utils.Invalidatable.prototype.listen;
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.utils.ColorPalette
+//  anychart.utils Position
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
-goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
-goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
 goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);
 goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);
 goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);
@@ -341,6 +338,20 @@ goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.
 goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);
 goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);
 goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_TOP', anychart.utils.NinePositions.LEFT_TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.TOP', anychart.utils.NinePositions.TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_TOP', anychart.utils.NinePositions.RIGHT_TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_CENTER', anychart.utils.NinePositions.LEFT_CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.CENTER', anychart.utils.NinePositions.CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_CENTER', anychart.utils.NinePositions.RIGHT_CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_BOTTOM', anychart.utils.NinePositions.LEFT_BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.BOTTOM', anychart.utils.NinePositions.BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_BOTTOM', anychart.utils.NinePositions.RIGHT_BOTTOM);//in docs/
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.utils ColorPalette
+//
+//----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;
@@ -350,6 +361,14 @@ anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColo
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
 anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.utils.Sort
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
+goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
+goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart

@@ -193,7 +193,7 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
- * @return {anychart.math.Rect} Title or parent bounds.
+ * @return {anychart.math.Rect} Current parent bounds.
  *//**
  * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.
  * @illustration <t>simple</t>
@@ -233,7 +233,7 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
  *     .container(layer2)
  *     .parentBounds(stageBounds)
  *     .draw();
- * @param {anychart.math.Rect=} opt_value Value to set.
+ * @param {anychart.math.Rect=} opt_value [null] Value to set.
  * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
  *//**
  * @ignoreDoc
