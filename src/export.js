@@ -355,15 +355,15 @@ goog.exportSymbol('anychart.utils.NinePositions.RIGHT_BOTTOM', anychart.utils.Ni
 //  anychart.utils ColorPalette
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);
-anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;
-anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;
-anychart.utils.DistinctColorPalette.prototype['restoreDefaults'] = anychart.utils.DistinctColorPalette.prototype.restoreDefaults;
-goog.exportSymbol('anychart.utils.RangeColorPalette', anychart.utils.RangeColorPalette);
-anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColorPalette.prototype.colorAt;
-anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
+goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);//in docs/
+anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;//in docs/
+anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;//in docs/
+anychart.utils.DistinctColorPalette.prototype['restoreDefaults'] = anychart.utils.DistinctColorPalette.prototype.restoreDefaults;//in docs/
+goog.exportSymbol('anychart.utils.RangeColorPalette', anychart.utils.RangeColorPalette);//in docs/
+anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColorPalette.prototype.colorAt;//in docs/
+anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;//in docs/
 anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;//in docs/
-anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
+anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.utils.Sort

@@ -5,6 +5,15 @@ goog.require('goog.color');
 
 /**
  * Класс определяющий работу градиентной палитры.
+ * @example <t>simple-100</t>
+ * var palette = new anychart.utils.RangeColorPalette()
+ *     .colors(['red', 'yellow'])
+ *     .count(9);
+ * for (var i = 1; i < 10; i++) {
+ *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
+ *     .fill(palette.colorAt(i))
+ *     .stroke('1px #000');
+ * }
  * @constructor
  * @extends {anychart.utils.Invalidatable}
  */
@@ -115,7 +124,16 @@ anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
  * @return {acgraph.vector.SolidFill|anychart.utils.RangeColorPalette} Color palette colors by index.
  *//**
  * Setter for color palette colors from list by index.
- * @example <t>listingOnly</t>
+ * @example <t>simple-100</t>
+ * var palette = new anychart.utils.RangeColorPalette()
+ *     .colors(['red', 'yellow'])
+ *     .count(9);
+ * palette.colorAt(4, 'blue');
+ * for (var i = 1; i < 10; i++) {
+ *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
+ *     .fill(palette.colorAt(i))
+ *     .stroke('1px #000');
+ * }
  * @param {number} index Index to set or get color.
  * @param {acgraph.vector.SolidFill=} opt_color Color to set by passed index.
  * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.

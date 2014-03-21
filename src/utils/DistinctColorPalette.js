@@ -3,6 +3,15 @@ goog.provide('anychart.utils.DistinctColorPalette');
 
 
 /**
+ * Класс, определяющий палитру цветов.
+ * @example <t>simple-100</t>
+ * var palette = new anychart.utils.DistinctColorPalette()
+ *     .colors(['red', 'yellow', 'brown', 'green']);
+ * for (var i = 1; i < 10; i++) {
+ *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
+ *       .fill(palette.colorAt(i))
+ *       .stroke('1px #000');
+ * }
  * @constructor
  * @extends {anychart.utils.Invalidatable}
  */
@@ -30,11 +39,28 @@ anychart.utils.DistinctColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
 
 
 /**
- * Gets or sets color to color palette colors list by passed index.
+ * Getter for color palette colors from list by index.
+ * @param {number} index Index to set or get color.
+ * @return {acgraph.vector.Fill|anychart.utils.DistinctColorPalette} Color palette colors by index.
+ *//**
+ * Setter for color palette colors from list by index.
+ * @example <t>simple-100</t>
+ * var palette = new anychart.utils.DistinctColorPalette()
+ *     .colors(['red', 'yellow', 'brown', 'green']);
+ * palette.colorAt(2, 'white');
+ * for (var i = 1; i < 10; i++) {
+ *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
+ *       .fill(palette.colorAt(i))
+ *       .stroke('1px #000');
+ * }
  * @param {number} index Index to set or get color.
  * @param {acgraph.vector.Fill=} opt_color Color to set by passed index.
- * @return {acgraph.vector.Fill|anychart.utils.DistinctColorPalette|null} Color palette color from colors list by passed index,
- * null if no colors in colors list or itself for chaining call.
+ * @return {!anychart.utils.DistinctColorPalette} An instance of the {@link anychart.utils.DistinctColorPalette} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number} index .
+ * @param {acgraph.vector.Fill=} opt_color .
+ * @return {acgraph.vector.Fill|anychart.utils.DistinctColorPalette} .
  */
 anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_color) {
   if (!this.colors_) this.colors_ = [];
@@ -54,9 +80,17 @@ anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_colo
 
 
 /**
- * Gets or sets color palette colors list.
+ * Getter for color palette colors list.
+ * @return {Array.<acgraph.vector.Fill>} Color palette colors list.
+ *//**
+ * Setter for color palette colors list.
+ * @example <t>listingOnly</t>
  * @param {Array.<acgraph.vector.Fill>=} opt_value Color palette colors list to set.
- * @return {Array.<acgraph.vector.Fill>|anychart.utils.DistinctColorPalette} Color palette colors list or itself for chaining call.
+ * @return {!anychart.utils.DistinctColorPalette} An instance of the {@link anychart.utils.DistinctColorPalette} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {Array.<acgraph.vector.Fill>=} opt_value .
+ * @return {Array.<acgraph.vector.Fill>|anychart.utils.DistinctColorPalette} .
  */
 anychart.utils.DistinctColorPalette.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {

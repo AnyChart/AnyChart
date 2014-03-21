@@ -8,24 +8,14 @@ function load() {
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
- var MMarker = new anychart.elements.Multimarker()
-     .type('star5')
-     .fill('none')
-     .stroke('3px black .7')
-     .size('24')
-     .container(stage);
- for (var i=0; i<9; i++) {
-   if (i==6){
-      MMarker.end();
-      MMarker.fill('blue');
-   }
-   var positionProvider = {
-     x: 35 + i*65,
-     y: 50
-   };
-   MMarker.draw(positionProvider);
- }
-  MMarker.clear()
+  var palette = new anychart.utils.DistinctColorPalette()
+      .colors(['red', 'yellow', 'brown', 'green']);
+  palette.colorAt(2, 'white')
+  for (var i = 1; i < 10; i++) {
+    stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
+        .fill(palette.colorAt(i))
+        .stroke('1px #000');
+  }
 
 //  var rect = stage.rect(50, 30, 75, 125).stroke('1 #aaa').fill('#eee');
 
