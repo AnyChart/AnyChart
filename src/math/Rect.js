@@ -5,9 +5,9 @@ goog.require('acgraph.math.Rect');
 
 
 /**
- * Rectangle class.
- * @param {number} x X-coordinate.
- * @param {number} y Y-coordinate.
+ * Класс, описывающий прямоугольник.
+ * @param {number} x X-coordinate of top-left point.
+ * @param {number} y Y-coordinate of top-left point.
  * @param {number} w Width.
  * @param {number} h Height.
  * @constructor

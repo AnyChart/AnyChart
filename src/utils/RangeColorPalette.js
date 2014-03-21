@@ -4,6 +4,7 @@ goog.require('goog.color');
 
 
 /**
+ * Класс определяющий работу градиентной палитры.
  * @constructor
  * @extends {anychart.utils.Invalidatable}
  */
@@ -55,11 +56,21 @@ anychart.utils.RangeColorPalette.prototype.colorPalette_;
 
 
 /**
- * Gets or sets color palette colors list.
+ * Getter for color palette colors list.
+ * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>} Color palette colors list.
+ *//**
+ * Setter for color palette colors list.
+ * @example <t>listingOnly</t>
  * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
  * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value Color palette colors list to set.
+ * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value .
  * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.utils.RangeColorPalette} Color palette colors list or itself for chaining call.
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.utils.RangeColorPalette} .
  */
 anychart.utils.RangeColorPalette.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -74,9 +85,17 @@ anychart.utils.RangeColorPalette.prototype.colors = function(opt_value) {
 
 
 /**
- * Gets or sets color palette colors counts.
- * @param {number=} opt_value Color palette colors counts.
- * @return {number|anychart.utils.RangeColorPalette} Color palette color counts or itself for chaining call.
+ * Getter for color palette's colors counts.
+ * @return {number} Current color palette's colors count.
+ *//**
+ * Setter for color palette's colors counts.<br/>
+ * <b>Note:</b> Определяет на сколько частей разбить градиент.
+ * @param {number=} opt_value [NaN] Color palette colors counts.
+ * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {number|anychart.utils.RangeColorPalette} .
  */
 anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -91,11 +110,20 @@ anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
 
 
 /**
- * Gets or sets color to color palette colors list by passed index.
+ * Getter for color palette colors from list by index.
+ * @param {number} index Index to set or get color.
+ * @return {acgraph.vector.SolidFill|anychart.utils.RangeColorPalette} Color palette colors by index.
+ *//**
+ * Setter for color palette colors from list by index.
+ * @example <t>listingOnly</t>
  * @param {number} index Index to set or get color.
  * @param {acgraph.vector.SolidFill=} opt_color Color to set by passed index.
- * @return {acgraph.vector.SolidFill|anychart.utils.RangeColorPalette} Color palette color from colors list by passed index,
- * null if no colors in colors list or itself for chaining call.
+ * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number} index .
+ * @param {acgraph.vector.SolidFill=} opt_color .
+ * @return {acgraph.vector.SolidFill|anychart.utils.RangeColorPalette} .
  */
 anychart.utils.RangeColorPalette.prototype.colorAt = function(index, opt_color) {
   if (!this.colors_ || this.colors_.length < 1) return null;

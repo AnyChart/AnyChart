@@ -20,10 +20,25 @@ goog.require('goog.color');
  * @enum {string}
  */
 anychart.utils.Align = {
+  /**
+   * Устанавливает выравнивание по центру.
+   */
   CENTER: 'center',
+  /**
+   * Устанавливает выравнивание по левой стороне.
+   */
   LEFT: 'left',
+  /**
+   * Устанавливает выравнивание по правой стороне.
+   */
   RIGHT: 'right',
+  /**
+   * Устанавливает выравнивание сверху.
+   */
   TOP: 'top',
+  /**
+   * Устанавливает выравнивание снизу.
+   */
   BOTTOM: 'bottom'
 };
 
@@ -59,9 +74,21 @@ anychart.utils.normalizeAlign = function(align, opt_default) {
  * @enum {string}
  */
 anychart.utils.Orientation = {
+  /**
+   * Устанавливает ориентацию по левой стороне.
+   */
   LEFT: 'left',
+  /**
+   * Устанавливает ориентацию по правой стороне.
+   */
   RIGHT: 'right',
+  /**
+   * Устанавливает ориентацию сверху.
+   */
   TOP: 'top',
+  /**
+   * Устанавливает ориентацию снизу.
+   */
   BOTTOM: 'bottom'
 };
 
@@ -232,12 +259,10 @@ anychart.utils.Sort = {
    * Ascending sort.
    */
   ASC: 'asc',
-
   /**
    * Descending sort.
    */
   DESC: 'desc',
-
   /**
    * No sort.
    */

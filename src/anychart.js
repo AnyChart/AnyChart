@@ -111,7 +111,7 @@ anychart.ClassFactory.prototype.getClass = function(json) {
 
 
 /**
- * Creates element by config.
+ * Десериализует переданный JSON и возвращает получившийся элемент в случае успеха или null.
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
@@ -211,6 +211,18 @@ anychart.documentLoadCallbacks_;
 
 /**
  * Add callback for document load event.
+ * @example <t>listingOnly</t>
+ * anychart.onDocumentLoad(function() {
+ *     var chart = new anychart.pie.Chart([ //create an instance of pie chart with data
+ *         ['Chocolate paste', 5],
+ *         ['White honey', 2],
+ *         ['Strawberry jam', 2],
+ *         ['Сondensed milk', 1]
+ *     ]);
+ *     chart.title('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
+ *     chart.container('chart-container'); //pass the container where chart will be drawn
+ *     chart.draw(); //call the chart draw() method to initiate chart drawing
+ * });
  * @param {Function} func Function which will called on document load event.
  * @param {*=} opt_scope Function call context.
  */

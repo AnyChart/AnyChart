@@ -254,7 +254,7 @@ goog.exportSymbol('anychart.elements.Ticks.Position.OUTSIDE', anychart.elements.
 //  anychart.math.Rect
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
+goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.pie.Chart
@@ -282,7 +282,7 @@ anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//in do
 anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//in docs/final
 anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//in docs/final
 anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//in docs/final
-anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;
+anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Base
@@ -332,15 +332,15 @@ anychart.utils.Invalidatable.prototype['listen'] = anychart.utils.Invalidatable.
 //  anychart.utils Position
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);
-goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);
-goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);
-goog.exportSymbol('anychart.utils.Align.TOP', anychart.utils.Align.TOP);
-goog.exportSymbol('anychart.utils.Align.BOTTOM', anychart.utils.Align.BOTTOM);
-goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.LEFT);
-goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);
-goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);
-goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);
+goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);//in docs/
+goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);//in docs/
+goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);//in docs/
+goog.exportSymbol('anychart.utils.Align.TOP', anychart.utils.Align.TOP);//in docs/
+goog.exportSymbol('anychart.utils.Align.BOTTOM', anychart.utils.Align.BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.LEFT);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);//in docs/
 goog.exportSymbol('anychart.utils.NinePositions.LEFT_TOP', anychart.utils.NinePositions.LEFT_TOP);//in docs/
 goog.exportSymbol('anychart.utils.NinePositions.TOP', anychart.utils.NinePositions.TOP);//in docs/
 goog.exportSymbol('anychart.utils.NinePositions.RIGHT_TOP', anychart.utils.NinePositions.RIGHT_TOP);//in docs/
@@ -362,23 +362,23 @@ anychart.utils.DistinctColorPalette.prototype['restoreDefaults'] = anychart.util
 goog.exportSymbol('anychart.utils.RangeColorPalette', anychart.utils.RangeColorPalette);
 anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColorPalette.prototype.colorAt;
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;
-anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;
+anychart.utils.RangeColorPalette.prototype['count'] = anychart.utils.RangeColorPalette.prototype.count;//in docs/
 anychart.utils.RangeColorPalette.prototype['restoreDefaults'] = anychart.utils.RangeColorPalette.prototype.restoreDefaults;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.utils.Sort
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);
-goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);
-goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);
+goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);//in docs/
+goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);//in docs/
+goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.json', anychart.json);
-goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);
+goog.exportSymbol('anychart.json', anychart.json);//in docs/
+goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.Chart
@@ -390,9 +390,3 @@ anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//i
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  anychart.math
-//
-//----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
