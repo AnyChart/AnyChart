@@ -3,74 +3,50 @@ var radiusPixel = 0;
 
 function load() {
   var container = 'container';
-  var stage = acgraph.create(400, 300, container);
+  var stage = acgraph.create(400, 200, container);
   var layer = acgraph.layer();
+  stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-
-  var orange = '1 orange 1';
-  var star = stage.star5(stage.width() / 2, stage.height() / 3, stage.height() / 4).fill('none').stroke('none');
+  var star = stage.star4(stage.width()/2, stage.height()/2, stage.height()/2-10).fill('yellow', 0.5);
   var pathBounds = star.getBounds();
-  stage.path().fill('none').stroke('1 grey .2')
-      .moveTo(pathBounds.left, pathBounds.top)
-      .lineTo(pathBounds.left + pathBounds.width, pathBounds.top)
-      .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height)
-      .lineTo(pathBounds.left, pathBounds.top + pathBounds.height)
-      .close();
-  stage.text(pathBounds.left - 55, pathBounds.top - 15, 'LEFT_TOP');
-  stage.circle(pathBounds.left, pathBounds.top, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
-  stage.text(pathBounds.left - 78, pathBounds.top + pathBounds.height / 2 - 8, 'LEFT_CENTER');
-  stage.circle(pathBounds.left, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15)
-      .lineTo(pathBounds.left, pathBounds.top + pathBounds.height / 2);
-  stage.text(pathBounds.left - 80, pathBounds.top + pathBounds.height, 'LEFT_BOTTOM');
-  stage.circle(pathBounds.left, pathBounds.top + pathBounds.height, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height- 15, 5)
-      .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height- 15)
-      .lineTo(pathBounds.left, pathBounds.top+ pathBounds.height);
-  stage.text(pathBounds.left + pathBounds.width / 2 - 10, pathBounds.top - 18, 'TOP');
-  stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + pathBounds.width / 2+ 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left+ pathBounds.width / 2 + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left+ pathBounds.width / 2, pathBounds.top);
-  stage.text(pathBounds.left + pathBounds.width / 2 - 20, pathBounds.top + pathBounds.height / 2 - 15, 'CENTER');
-  stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
-  stage.text(pathBounds.left + pathBounds.width / 2 - 23, pathBounds.top + pathBounds.height + 2, 'BOTTOM');
-  stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
-  stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top - 15, 'RIGHT_TOP');
-  stage.circle(pathBounds.left + pathBounds.width, pathBounds.top, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
-  stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height / 2 - 8, 'RIGHT_CENTER');
-  stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
-  stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height, 'RIGHT_BOTTOM');
-  stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
-  stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
-      .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
-  stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
-      .lineTo(pathBounds.left, pathBounds.top);
+  stage.text(pathBounds.left + pathBounds.width/2 + 7, pathBounds.top, 'NORTH');
+  stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top , 3).fill('blue');
+  stage.text(pathBounds.left -37, pathBounds.top + pathBounds.height/2 -7, 'EAST');
+  stage.circle(pathBounds.left, pathBounds.top + pathBounds.height/2, 3).fill('blue');
+  stage.text(pathBounds.left + pathBounds.width + 7, pathBounds.top + pathBounds.height/2 -7, 'WEST');
+  stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height/2, 3).fill('blue');
+  stage.text(pathBounds.left + pathBounds.width/2 + 7, pathBounds.top + pathBounds.height -7, 'SOUTH');
+  stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top + pathBounds.height, 3).fill('blue');
+
+//  var rect = stage.rect(50, 30, 75, 125).stroke('1 #aaa').fill('#eee');
+
+//  // create objects for multimarkers
+//  var bars = [];
+//  bars.push(
+//      stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
+//      stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
+//      stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
+//      stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
+//  );
+//  // sets global settings
+//  var MMarker = new anychart.elements.Multimarker()
+//      .fill('blue')
+//      .stroke('.5 blue')
+//      .container(stage);
+//  // sets custom positions
+//  MMarker
+//      .fillAt(0, 'red')
+//      .fillAt(3, 'none');
+//  // connecting markers and objects
+//  for (i in bars) {
+//    var barBounds = bars[i].getBounds();
+//    var positionProvider = {
+//      x: barBounds.left,
+//      y: barBounds.top
+//    };
+//    MMarker.draw(positionProvider);
+//  }
 
 //
 //  layer.circle(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius(), center.y - Math.sin(Math.PI/3)*chart.getPixelRadius(), 4).fill('red .5').stroke('red');

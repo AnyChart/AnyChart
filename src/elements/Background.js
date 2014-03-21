@@ -6,20 +6,20 @@ goog.require('goog.array');
 
 
 /**
- * Класс, описывающий элемент визуализации Background.<br/>
- * Background может быть как частью другого, более сложного, элемента (чарт, легенда, заголовок и тд), так и самостоятельным
- * элементом визаулизации.<br/>
- * Background можно назначить заливку, бордер, а также сглаживание углов.<br/>
- * <b>Note:</b> Если хотите использовать Background как самостоятельный элемент, то ему обязательно необходимо указывать
- *  bounds, в которые отрисовываться.
+ * Background element class.<br/>
+ * Background can be self-sufficient element or be a part of other complex element,
+ * such as as a chart, a legend, a title.<br/>
+ * Background has the fill, the border and the corner settings.<br/>
+ * <b>Note:</b> If you want to use Background as a self-sufficient element
+ *  you need to set the bounds where it should be displayed.
  * @example <t>simple-h100</t>
  * new anychart.elements.Background()
  *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .container(stage).draw();
  * @param {anychart.elements.Background.CornerType=} opt_cornerType [anychart.elements.Background.CornerType.ROUND] Type
  *  of the background corners.
- * @param {...(number|string)} var_args Набор радиусов (аналогично {@link anychart.elements.Background#corners} только
- *  без массива.
+ * @param {...(number|string)} var_args The set of radii (similar to {@link anychart.elements.Background#corners} but
+ * without an array.
  * @extends {anychart.elements.BaseWithBounds}
  * @constructor
  */
@@ -46,20 +46,20 @@ anychart.elements.Background = function(opt_cornerType, var_args) {
   this.corners_ = goog.array.slice(arguments, 1, 5);
 
   /**
-   * Fill settings. Contains array of arguments that were passed to the fill() method to support all
+   * Fill settings. Contains an array of arguments that were passed to the fill() method to support all
    * acgraph.vector.Shape.fill() overloads.
    * @type {!Array}
    * @private
    */
-  this.fill_ = ['#000', 0.5]; //если убирать отсюда создание массива, то нужно не забыть убрать apply из copyFrom
+  this.fill_ = ['#000', 0.5]; // if we remove the creation of an array from here, we should not forget to remove "apply" from "copyFrom"
 
   /**
-   * Stroke settings. Contains array of arguments that were passed to the stroke() method to support all
+   * Stroke settings. Contains an array of arguments that were passed to the stroke() method to support all
    * acgraph.vector.Shape.stroke() overloads.
    * @type {!Array}
    * @private
    */
-  this.stroke_ = ['#000']; //если убирать отсюда создание массива, то нужно не забыть убрать apply из copyFrom
+  this.stroke_ = ['#000']; // if we remove the creation of an array from here, we should not forget to remove "apply" from "copyFrom"
 
   this.invalidate(anychart.utils.ConsistencyState.ALL);
 };
@@ -158,10 +158,10 @@ anychart.elements.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for current corner's radius.
- * @return {(number|string|Array.<number>)} Текущая настройка углов.
+ * Getter for the current corners radius.
+ * @return {(number|string|Array.<number>)} Current corner settings.
  *//** topLeft, topRight, bottomRight, bottomLeft
- * Setter for corner's radius by one value.
+ * Setter for corner radius using one value.
  * @example <c>One for all.</c><t>simple-h100</t>
  * new anychart.elements.Background()
  *   .cornerType(anychart.elements.Background.CornerType.CUT)
@@ -176,11 +176,11 @@ anychart.elements.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
  *    // same .corners('5px 7px 12px 7px')
  *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
- * @param {(number|string|Array.<number>)=} opt_value ['0px'] Value to set.<br/><b>Note:</b> Если в массиве менее 4 значений
- *  (или в строке через пробел менее четырех значений), то берется первое значение и оно устанавливается всем.
+ * @param {(number|string|Array.<number>)=} opt_value ['0px'] The value to set.<br/><b>Note:</b> If there is less than 4 elements
+ *  (or space delimited string has less than 4 values) then the first value is set for all 4 corners.
  * @return {!anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
- * Setter for corner's radius by each value.
+ * Setter for corner radius using several values.
  * @example <t>simple-h100</t>
  * new anychart.elements.Background()
  *   .cornerType(anychart.elements.Background.CornerType.CUT)
@@ -249,23 +249,23 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
 
 
 /**
- * Возвращает текущий fill.
- * @return {!acgraph.vector.Fill} Параметры текущей заливки (пустая заливка это всегда 'none').
+ * Returns the current fill.
+ * @return {!acgraph.vector.Fill} The parameters of the current fill (empty fill is 'none').
  *//**
- * Устанавливает настройки заливки через объект или одной строкой.<br/>
- * Принимает объекты типов:
+ * Sets fill settings using an object or a string.<br/>
+ * It accepts the following types of objects:
  * <ul>
  * <li>{@link acgraph.vector.LinearGradientFill}</li>
  * <li>{@link acgraph.vector.RadialGradientFill}</li>
  * <li>{@link acgraph.vector.Fill}</li>
  * <li>{@link acgraph.vector.ImageFill}</li>
  * </ul>
- * Либо цвет в виде строки. Причем, одной строкой можно задать и прозрачность (в виде '<b>Color Opacity</b>',
- * например 'red .5').
- * @shortDescription Устанавливает настройки заливки через объект или одной строкой.
+ * Or you can simply pass a color as string, along with opacity (like this: '<b>Color Opacity</b>',
+ * e.g. 'red .5').
+ * @shortDescription Sets fill settings using an object or a string.
  * @example <c>Solid Fill</c><t>simple-h100</t>
  * var bg = new anychart.elements.Background();
- * // Устанавливаем fill
+ * // Setting fill
  *   bg.fill('red 0.1');
  * // the same
  * // bg.fill('#ff0000 0.1');
@@ -273,13 +273,13 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * // bg.fill({color: 'red', opacity: 0.1});
  * // or
  * // bg.fill('#ff0000 0.1');
- * // than draw
+ * // then draw
  * bg.container(stage)
  *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
  *   .draw();
  * @example <c>Gradient Fill</c><t>simple-h100</t>
  * var bg = new anychart.elements.Background();
- * // Устанавливаем fill
+ * // Setting fill
  *   bg.fill({keys:['red .1', 'orange'], mode: true, angle: 45});
  * bg.container(stage)
  *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
@@ -291,52 +291,52 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  *        src: 'styles/images/rainbow.png',
  *        mode: acgraph.vector.ImageFillMode.TILE
  *     }).container(stage).draw();
- * @param {acgraph.vector.Fill} value ['#000 0.5'] Заливка в виде одного сложного объекта или строки.
+ * @param {acgraph.vector.Fill} value ['#000 0.5'] Fill as an object or a string.
  * @return {!acgraph.vector.Shape} An instance of the {@link acgraph.vector.Shape} class for method chaining.
  * *//**
- * Заливка в виде цвета строкой и прозрачности.<br/>
- * <b>Note:</b> Если цвет задан в виде строки, например 'red .5', то он имеет больший приоритет, чем opt_opacity, т.е. в случае
- * когда <b>fill</b> задан <b>rect.fill('red 0.3', 0.7)</b>, итоговая прозрачность заливки будет 0.3.
- * @shortDescription Заливка в виде цвета строкой и прозрачности.
+ * Fill as a color with an opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5'), it has priority over opt_opacity parameter, so when
+ *<b>fill</b> is set as <b>rect.fill('red 0.3', 0.7)</b> the opacity will be 0.3, not 0.7.
+ * @shortDescription Fill as a string of a color with an opacity.
  * @example <t>simple-h100</t>
  * var bg = new anychart.elements.Background();
- * // Устанавливаем fill
+ * // Setting fill
  *   bg.fill('red', 0.1);
  * bg.container(stage)
  *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
  *   .draw();
- * @param {string} color Цвет заливки в виде строки.
- * @param {number=} opt_opacity Прозрачность заливки.
+ * @param {string} color Color of the fill as a string
+ * @param {number=} opt_opacity Opacity of the fill.
  * @return {!anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
- * Заливка линейным градиентом.<br/>
- * Есть три режима работы:
+ * Gradient fill.<br/>
+ * There are three modes:
  * <ul>
- *  <li>ObjectBoundingBox с сохранением угла</li>
- *  <li>ObjectBoundingBox без сохранения угла</li>
+ *  <li>ObjectBoundingBox preserving an angle</li>
+ *  <li>ObjectBoundingBox without preserving an angle</li>
  *  <li>UserSpaceOnUse</li>
  * </ul>
- * <h4>Режимы:</h4>
- * <p><b>ObjectBoundingBox с сохранением угла</b><br/>
- * Если передан параметр типа boolean, то он отвечает за поведение градиента относительно фигуры, в которую он
- * вписывается, а точнее, определяет поведение угла наклона линии градиента. Если true - то это режим ObjectBoundingBox
- * с сохранением угла. То есть в любой фигуре угол наклона градиента визуально будет соответствовать заданному.<br/>
- * <b>Note:</b> По умолчанию, вектор градиента, рассчитанный для заданного угла в фигуре с соотношением не 1:1, не будет в итоге
- * визуально располагаться под этим углом. Браузер трансформирует угол в пропорции соотношения сторон. Поэтому
- * сделан алгоритм, который приводит в соответствие конечный угол к заданному в любой фигуре.</p>
- * <p><b>ObjectBoundingBox без сохранения угла</b><br/>
- * Если параметр имеет значение false - это режим ObjectBoundingBox без сохранения угла. В этом случае будет применено
- * поведение по умолчанию - вектор градиента будет расчитан под заданным углом, но в фигуре с соотношением сторон
- * не 1:1 он будет измнен браузером (сжат пропорционально соотношению сторон) и визуально угол наклона вектора
- * градиента не будет соответствовать заданному.</p>
+ * <h4>Modes:</h4>
+ * <p><b>ObjectBoundingBox preserving an angle</b><br/>
+ * If boolean is passed then angle control is enabled
+ * to be precise: you can define how gradient angle behaves. Is set to true - it is ObjectBoundingBox mode
+ * preserving an angle, which means that in any shape the gradient angle is preserved.<br/>
+ * <b>Note:</b> By default the gradient angle for all shapes which sides are not in 1:1 ratio will not look
+ * as it should: browsers transform the angle depending on dimensions ratio. That's why an algorithm
+ * to keep an angle is created.</p>
+ * <p><b>ObjectBoundingBox without preserving an angle</b><br/>
+ * If set to false - ObjectBoundingBox without preserving an angle mode works. In this case default behaviour
+ * is enabled - gradient vector is calculated as it should be, but for all shapes which sides are not in
+ * 1:1 rato it will be changes by a browser (skewed according to sides ratio) and it will not look like
+ * the angles set.</p>
  * <p><b>UserSpaceOnUse</b><br/>
- * Если параметр является объектом acgraph.math.Rect (прямоугольной фигурой), то это режим  UserSpaceOnUse.
- * В данном режиме градиенту указываются собственные размеры и координаты. Фигуры, к которым этот градиент
- * применяется, закрашиваются частью градиента в которую они попадают (фигура с такими же размерами и
- * координатами как и градиент будет закращена всем градиентом полностью). Подробнее о этом режиме тут -
+ * If acgraph.math.Rect object is passed - UserSpaceOnUse mode is enabled.
+ * In this case gradient gets its own size and coordinatesы. Shapes that are colored using this gradient
+ * are colored with a part of the gradient (if sizes math - shape will be colored entirely).
+ * Learn more about this mode at:
  * <a href='http://www.w3.org/TR/SVG/pservers.html#LinearGradientElementGradientUnitsAttribute'>
- * gradientUnits</a>. В этом режиме угол наклона вектора всегда сохраняется.</p>
- * @shortDescription Заливка линейным градиентом.
+ * gradientUnits</a>. In this case gradient angle is always preserved.</p>
+ * @shortDescription Line gradient fill.
  * @illustration <t>simple</t>
  * stage.text(0*stage.width()/6+3, 0, 'a');
  * new anychart.elements.Background()
@@ -367,17 +367,17 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  *   .bounds( new anychart.math.Rect(5*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
  * @illustrationDesc
- *  a) ObjectBoundingBox без сохранением угла.<br/>
- *  b) ObjectBoundingBox с сохранением угла.<br/>
+ *  a) ObjectBoundingBox without preserving an angle.<br/>
+ *  b) ObjectBoundingBox preserving an angle.<br/>
  *  c) UserSpaceOnUse.<br/>
- *  d) Трехстопные градиенты.<br/>
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Ключи градиента.
- * @param {number=} opt_angle Угол градиента относительно горизонтали в градусах.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Режим градиента.
- * @param {number=} opt_opacity Общая прозрачность градиента.
+ *  d) Three-stop gradients.<br/>
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle, set in degrees, relative to horizontal line.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
  * @return {!anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
- * Заливка радиальным градиентом.
+ * Radial gradient fill.
  * @example <t>simple-h100</t>
  * var bg = new anychart.elements.Background();
  * // Устанавливаем fill
@@ -385,13 +385,13 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * bg.container(stage)
  *   .bounds( new anychart.math.Rect(10, 10, 90, 90) )
  *   .draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number} cx The X ratio of the center radial gradient.
+ * @param {number} cy The Y ratio of the center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If set then userSpaceOnUse mode else objectBoundingBox.
+ * @param {number=} opt_opacity The opacity of the gradient.
+ * @param {number=} opt_fx The X ratio of the focal point.
+ * @param {number=} opt_fy The Y ratio of the focal point.
  * @return {!anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
  * @ignoreDoc
@@ -419,27 +419,27 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
 
 
 /**
- * Возаращает текущий stroke.
- * @return {acgraph.vector.Stroke} Возвращает текущую настройку линии.
+ * Returns the current stroke.
+ * @return {acgraph.vector.Stroke} Returns the curren line settings.
  *//**
- * Устанавливает настройки stroke одним параметром.<br/>
- * Допустимы следующие варианты:
+ * Sets stroke settings using one parameter.<br/>
+ * The following ways are acceptable:
  * <ul>
- * <li>Строкой в формате '[thickness ]color[ opacity]':
+ * <li>String formatted as '[thickness ]color[ opacity]':
  * <ol>
  * <li><b>'color'</b> - {@link http://www.w3schools.com/html/html_colors.asp}.</li>
  * <li><b>'thickness color'</b> - like a css border, e.g. '3 red' or '3px red'</li>
- * <li><b>'color opacity'</b> - as a fill string, e.g. '#fff 0.5'</li>
+ * <li><b>'color opacity'</b> - the same as color settings in fill, e.g. '#fff 0.5'</li>
  * <li><b>'thickness color opacity'</b> - as a complex string, e.g. '3px #00ff00 0.5'</li>
  * </ol>
  * </li>
- * <li>Объект {@link acgraph.vector.Stroke}</li>
- * <li>Массив ключей {@link acgraph.vector.GradientKey}</li>
- * <li><b>null</b> - сбросит текущие настройки stroke.</li>
+ * <li>{@link acgraph.vector.Stroke} object</li>
+ * <li>Keys array {@link acgraph.vector.GradientKey}</li>
+ * <li><b>null</b> resets stroke settings.</li>
  * </ul>
- * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
- * @shortDescription Устанавливает настройки stroke одним параметром.
- * @example <c>Настроки строкой</c><t>simple</t>
+ * <b>Note:</b> Order in string is significant and '3px red' is not the same as 'red 3px'.
+ * @shortDescription Sets stroke settings using a single parameter.
+ * @example <c>Settings using a string</c><t>simple</t>
  * new anychart.elements.Background()
  *   .bounds( new anychart.math.Rect(stage.width()/2-8, 5, 16, stage.height()-10) )
  *   .fill('none').container(stage).draw();
@@ -459,7 +459,7 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  *   .stroke('4 #0000FF 0.3')
  *   .bounds( new anychart.math.Rect(30, 3.4*stage.height()/4, stage.width()-60, stage.height()/4 - 35) )
  *   .fill('none').container(stage).draw();
- * @example <c>Настроки объектом или массивом</c><t>simple</t>
+ * @example <c>Settings using an object or an array</c><t>simple</t>
  * new anychart.elements.Background()
  *   .stroke({color: '#f00', thickness: 2, opacity: 0.9})
  *   .bounds( new anychart.math.Rect(30, 0.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
@@ -468,14 +468,14 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  *   .stroke(['red', 'green', 'blue'])
  *   .bounds( new anychart.math.Rect(30, 1.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
  *   .fill('none').container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['#000'] Стиль заливки в формате '[thickness ]color[ opacity]'.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['#000'] Stroke settings in '[thickness ]color[ opacity]' format.
  * @return {anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
- * Устанавливает настройки stroke в общем виде.<br/>
- * <b>Note:</b> When stroke properties are set both by complex stroke object properties and by stroke() method params,
- * object properties have more priority. E.g. setting <b>shape.stroke('10 red', 5);</b> (or <b>shape.stroke({color: 'red',
- * thickness: 10}, 5);</b> will result a red stroke with thickness 10px.
- * @shortDescription Устанавливает настройки stroke в общем виде.
+ * Sets stroke settings.<br/>
+ * <b>Note:</b> When stroke properties are set both by a complex stroke object properties and by stroke() method params,
+ * object properties have a priority. E.g. setting <b>shape.stroke('10 red', 5);</b> (or <b>shape.stroke({color: 'red',
+ * thickness: 10}, 5);</b> will result in a red stroke with a thickness of 10px.
+ * @shortDescription Setting stroke settings.
  * @example <t>simple</t>
  * new anychart.elements.Background()
  *   .stroke('red .5', 4)
@@ -493,13 +493,13 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  *   .stroke({color: '#00B'}, 10, '', acgraph.vector.StrokeLineJoin.ROUND, acgraph.vector.StrokeLineCap.SQUARE)
  *   .bounds( new anychart.math.Rect(30, 3.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4 -5) )
  *   .fill('none').container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string)} value Стиль заливки, как описан выше.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths. Dash array contains a
- * list of white space separated lengths and percentages that specify the lengths of alternating dashes and gaps. If an
- * odd number of values is provided, then the list of values is repeated to yield an even number of values. Thus, stroke
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string)} value Stroke settings as described above.
+ * @param {number=} opt_thickness Stroke thickness. Default is 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used for stroke paths. Dash array contains a
+ * list of white spaces separated lengths and percentages that specify the lengths of alternating dashes and gaps. If an
+ * odd number of values is provided, then the list of the values is repeated to yield an even number of values. Thus, stroke
  * dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joining style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {anychart.elements.Background} An instance of the {@link anychart.elements.Background} class for method chaining.
  *//**
@@ -527,7 +527,7 @@ anychart.elements.Background.prototype.stroke = function(opt_strokeOrFill, opt_t
 
 /**
  * Render background.
- * @return {!anychart.elements.Background} Экземпляр класса {@link anychart.elements.Background} для цепочного вызова.
+ * @return {!anychart.elements.Background} An instance of {@link anychart.elements.Background} class for method chaining.
  */
 anychart.elements.Background.prototype.draw = function() {
   // we don't have a ConsistencyState for this, because it would be redundant.

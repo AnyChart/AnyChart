@@ -6,10 +6,10 @@ goog.require('anychart.utils.Invalidatable');
 
 
 /**
- * "View" - это представление исходного набора данных, в результате операций над ними (сортировка, фильтрация и тд).<br/>
- * <b>Note:</b> дефолтный View - это  представление исходных данных с дефолтным маппингом.<br/>
+ * View is a representation of raw data.<br/>
+ * <b>Note:</b> Default View is a view with default mapping.<br/>
  *
- * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
+ * @param {!anychart.data.IView} parentView The parent view. The last view is a mapping.
  * @constructor
  * @implements {anychart.data.IView}
  * @name anychart.data.View
@@ -19,7 +19,7 @@ anychart.data.View = function(parentView) {
   goog.base(this);
 
   /**
-   * The parent view to ask for data from.
+   * The parent view to ask data from.
    * @type {!anychart.data.IView}
    * @protected
    */
@@ -33,7 +33,7 @@ goog.inherits(anychart.data.View, anychart.utils.Invalidatable);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Consistency state mask supported by this object.
  * @type {number}
  */
 anychart.data.View.prototype.DISPATCHED_CONSISTENCY_STATES =
@@ -41,7 +41,7 @@ anychart.data.View.prototype.DISPATCHED_CONSISTENCY_STATES =
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Consistency state mask supported by this object.
  * @type {number}
  */
 anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
@@ -49,7 +49,7 @@ anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Redirection mask for a view. Each value in this array means a number of the parentView row to fetch,
+ * The redirection mask for a view. Each value in this array is an index of the row in parentView to fetch,
  * when that index is asked from the current view.
  * @type {Array.<number>}
  * @protected
@@ -66,7 +66,7 @@ anychart.data.View.prototype.metadata_ = null;
 
 
 /**
- * If the metadata should be transitioned to the parent view.
+ * If the metadata should be passed to the parent view.
  * @type {boolean}
  * @private
  */
@@ -74,7 +74,7 @@ anychart.data.View.prototype.transitMeta_ = false;
 
 
 /**
- * Ensures that the view redirection mask is consistent due to last changes.
+ * Ensures that the view redirection mask is consistent with the last changes.
  */
 anychart.data.View.prototype.ensureConsistent = function() {
   if (this.isConsistent())
@@ -87,10 +87,10 @@ anychart.data.View.prototype.ensureConsistent = function() {
 
 
 /**
- * Creates prepared derivative view. Internal method. Should not be published!
+ * Creates prepared derived view. Internal method. Should not be published!
  * @param {string} fieldName The name of the field to look at.
  * @param {Array=} opt_categories Categories set to use in case of ordinal scale.
- * @return {!anychart.data.View} The new derived view.
+ * @return {!anychart.data.View} The derived view.
  */
 anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
   var result = opt_categories ?
@@ -102,13 +102,13 @@ anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
 
 
 /**
- * Creates pie-ready derivative view.
- * @param {string} fieldName Field name to make filter by.
- * @param {function(*):boolean=} opt_func Filter function that should accept a field value and return true if the row
+ * Creates a pie-ready view.
+ * @param {string} fieldName A field name to make filter by.
+ * @param {function(*):boolean=} opt_func A filter function that should accept a field value and return true if the row
  *    should be included into the resulting view as a and false otherwise.
  * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
  *     every value of other. This function
- *     takes 4 arguments (the function's previous result or the initial value,
+ *     takes 4 arguments (the function previous result or the initial value,
  *     the value of the current array element, the current array index, and the
  *     array itself)
  *     function(previousValue, currentValue, index, array).
@@ -124,7 +124,7 @@ anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_othe
 
 
 /**
- * Creates a derivative view, containing just the same data set and order as this view does.
+ * Creates a derived view, containing just the same data set and order as this view does.
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.derive = function() {
@@ -135,14 +135,14 @@ anychart.data.View.prototype.derive = function() {
 
 
 /**
- * Creates a derivative view, containing only row that passed the filter.
+ * Creates a derived view, containing only the rows that pass the filter.
  * @example <t>listingOnly</t>
- *  // оставляем значения более 3.
+ *  // Filter out values lesser or equal to 3:
  *  view.filter('fieldName', function(fieldValue){
  *    return fieldValue > 3;
  *  });
  * @param {string} fieldName A field which value will be passed to a filter function.
- * @param {function(*):boolean} func Filter function that should accept a field value and return true if the row
+ * @param {function(*):boolean} func A filter function that should accept a field value and return true if the row
  *  should be included into the resulting view.
  * @return {!anychart.data.View} The new derived view.
  */
@@ -154,14 +154,14 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
 
 
 /**
- * Creates a derivative view that ensures sorting by a passed field.
+ * Creates a derived view that ensures sorting by a passed field.
  * @example <t>listingOnly</t>
- *  // sorting by string length.
+ *  // Sorting by string length:
  *  view.filter('pointName', function(value1, value2){
  *    return value1.toString().length() - value2.toString().length();
  *  });
- * @param {string} fieldName Field name to make sort by.
- * @param {function(*, *):number=} opt_comparator Sorting function that should accept two field values and return
+ * @param {string} fieldName A field name to make sort by.
+ * @param {function(*, *):number=} opt_comparator A sorting function that should accept two field values and return
  *  numeric result of the comparison.
  * @return {!anychart.data.View} The new derived view.
  */
@@ -173,8 +173,8 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
 
 
 /**
- * Concatenates two views to make a derivative view, that contains rows from both views.
- * @example <c>Конкатинация двух View</c><t>listingOnly</t>
+ * Concatenates two views to make a derived view that contains rows from both views.
+ * @example <c>Concatenation of two Views</c><t>listingOnly</t>
  * // mainView                      additionalView
  *  [                               [
  *    [1, 3, 5],                        {x: 2, y: 5},
@@ -190,7 +190,7 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
  *    {x: 3, y: 7},
  *    function(){ return {x: 4, y: 7}}
  *  ]
- * @example <c>Конкатинация View и dataSet</c><t>listingOnly</t>
+ * @example <c>Concatenation of a View and a data Set</c><t>listingOnly</t>
  * // mainView
  *  [
  *    [1, 3, 5],
@@ -209,7 +209,7 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
  *    {x: 3, y: 7},
  *    function(){ return {x: 4, y: 7}}
  *  ]
- * @example <c>Конкатинация View и Массива</c><t>listingOnly</t>
+ * @example <c>Concatenation of a View and and Array</c><t>listingOnly</t>
  * // mainView
  *  [
  *    [1, 3, 5],
@@ -239,37 +239,37 @@ anychart.data.View.prototype.concat = function(otherView) {
 
 
 /**
- * Gets the full row of the set by it's index.<br/>
- * <b>Note:</b> If there is no any row for the index - returns <b>undefined</b>.<br/>
- * Пример работы достаточно хорошо описан тут {@link anychart.data.Set#row}
+ * Gets a full row of the set by an index.<br/>
+ * <b>Note:</b> If there is no row with the given index, methods returns <b>undefined</b>.<br/>
+ * See sample at {@link anychart.data.Set#row}
  * @example <t>listingOnly</t>
- * // Данные
+ * // Data
  *  [
  *    [1, 2, 4, 7],
  *    [11, 12, 14, 17],
  *    [21, 22, 24, 27]
  *  ]
- *  view.row(2); // вернет [21, 22, 24, 27]
- *  view.row(3); // вернет undefined
+ *  view.row(2); // returns [21, 22, 24, 27]
+ *  view.row(3); // returns undefined
  * @see anychart.data.Set#row
- * @param {number} rowIndex Index of the row to fetch.
- * @return {*} The full row current.
+ * @param {number} rowIndex An index of the row to fetch.
+ * @return {*} The row.
  *//**
- * Sets the full row of the set by its index.<br/>
- * <b>Note:</b> returns the previous value of the row (it doesn't saves the previous state of objects).<br/>
+ * Sets a row of the set by an index.<br/>
+ * <b>Note:</b> Previous value of a row is returned but it is lost completely after that!.<br/>
  * @example <t>listingOnly</t>
- * // Данные
+ * // Data
  *  [
  *    [1, 2, 4, 7],
  *    [11, 12, 14, 17],
  *    [21, 22, 24, 27]
  *  ]
- *  view.row(2, [2, 2, 2, 2]); // вернет [21, 22, 24, 27]
- *  view.row(3, {'low': 4, 'high': 11}); // вернет undefined
+ *  view.row(2, [2, 2, 2, 2]); // returns [21, 22, 24, 27]
+ *  view.row(3, {'low': 4, 'high': 11}); // returns undefined
  * @see anychart.data.Set#row
- * @param {number} rowIndex Index of the row to fetch.
- * @param {*=} opt_value Value to set.
- * @return {*} The full row of previous value.
+ * @param {number} rowIndex An index of the row to fetch.
+ * @param {*=} opt_value A value to set.
+ * @return {*} Previous value of the row.
  *//**
  * @ignoreDoc
  * @param {number} rowIndex .
@@ -293,9 +293,9 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
- * Returns the number of rows in current view.
+ * Returns the number of the rows in the current view.
  * @see anychart.data.Iterator#getRowsCount
- * @return {number} Number of rows in the set.
+ * @return {number} The number of the rows in the set.
  */
 anychart.data.View.prototype.getRowsCount = function() {
   this.ensureConsistent();
@@ -305,8 +305,8 @@ anychart.data.View.prototype.getRowsCount = function() {
 
 /**
 * Returns the mapping for the row.
-* @param {number} rowIndex Index of the row.
-* @return {!anychart.data.Mapping} Mapping for the row.
+* @param {number} rowIndex The index of the row.
+* @return {!anychart.data.Mapping} The mapping for the row.
 */
 anychart.data.View.prototype.getRowMapping = function(rowIndex) {
   this.ensureConsistent();
@@ -315,11 +315,11 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
- * Returns new iterator for current view.
+ * Returns a new iterator for the current view.
  * @example <t>listingOnly</t>
- * // создаем новый набор данных.
+ * // Create a new data Set:
  * var dataSet = new anychart.data.Set([1,2,3]);
- * // выполняем над ним дефолтный маппинг и получаем итератор.
+ * // Default mapping and getting an iterator:
  * var iterator = dataSet.mapAs().getIterator();
  * @return {anychart.data.Iterator} New iterator.
  */
@@ -330,7 +330,7 @@ anychart.data.View.prototype.getIterator = function() {
 
 
 /**
- * Builds redirection mask. Mask defaults to equality masking.
+ * Builds redirection mask. The default mask is an equality mask.
  * @return {!Array.<number>} The mask.
  * @protected
  */
@@ -345,8 +345,8 @@ anychart.data.View.prototype.buildMask = function() {
 
 
 /**
- * Handles changes in parent view.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * Handles changes in the parent view.
+ * @param {anychart.utils.InvalidatedStatesEvent} event The event object.
  * @protected
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
@@ -357,9 +357,9 @@ anychart.data.View.prototype.parentViewChangedHandler = function(event) {
 
 /**
  * Getter for a metadata value.<br/>
- * Принцип работы достаточно хорошо описан в {@link anychart.data.Iterator#meta}.
+ * Learn how it works at {@link anychart.data.Iterator#meta}.
  * @example <t>listingOnly</t>
- * // Выбор значение поля 'name' в четвертой строке.
+ * // Select 'name' field in the fourth row:
  * view.meta(4, 'name');
  * @param {number} index Row index.
  * @param {string} name Name of the metadata field.
@@ -367,14 +367,14 @@ anychart.data.View.prototype.parentViewChangedHandler = function(event) {
  * @see anychart.data.Iterator#meta
  *//**
  * Setter for a metadata value.
- * Принцип работы достаточно хорошо описан в {@link anychart.data.Iterator#meta}.
+ * Learn how it works at {@link anychart.data.Iterator#meta}.
  * @example <t>listingOnly</t>
- * // Установка значение полю 'name' в четвертой строке.
- * view.meta(4, 'name', 'Samuel L. M.');
+ * // Set value to the 'name' field in the fourth row:
+ * view.meta(4, 'name', 'Jules Winnfield');
  * @param {number} index Row index.
  * @param {string} name Name of the metadata field.
  * @param {*=} opt_value Value to set.
- * @return {anychart.data.View} Экземпляр класса {@link anychart.data.View} для цепочного вызова.
+ * @return {anychart.data.View} The instance of {@link anychart.data.View} class for method chaining.
  * @see anychart.data.Iterator#meta
  *//**
  * @ignoreDoc
@@ -400,12 +400,12 @@ anychart.data.View.prototype.meta = function(index, name, opt_value) {
 
 
 /**
- * Getter and setter for parent metadata value. Can be overridden in descendants.
+ * Getter and setter for the parent metadata value. Can be overridden in the descendants.
  *
- * ATTENTION: THE CHECK IF IT IS A SETTER IS MADE BY PARAMS COUNT,
- * e.g. ds.meta(1, 'qqq', undefined); is a SETTER.
- * @param {number} index Row index.
- * @param {string} name Name of the metadata field.
+ * ATTENTION: THE CHECK IF IT IS A SETTER IS BASED ON THE NUMBER OF PARAMETERS,
+ * e.g. ds.meta(1, 'qqq', undefined); is still a SETTER.
+ * @param {number} index A row index.
+ * @param {string} name The name of the metadata field.
  * @param {*=} opt_value Value to set.
  * @return {anychart.data.View|*|undefined} Self for chaining or value.
  * @protected
@@ -414,7 +414,7 @@ anychart.data.View.prototype.parentMeta = function(index, name, opt_value) {
   index = this.mask[index];
   //TODO(Anton Saukh): fix it to proper error reporting.
   if (!goog.isDef(index))
-    throw Error('Index cannot be masked by this View');
+    throw Error('Index can not be masked by this View');
   if (arguments.length > 2) {
     this.parentView.meta(index, name, opt_value);
     return this;

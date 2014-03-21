@@ -6,7 +6,7 @@ goog.require('anychart.elements.Base');
 
 
 /**
- * Class is responsible for formatting the text. Processes the plain text and the text in html format.
+ * This class is responsible of the text formatting, it processes the plain text and the text in HTML format.
  * @constructor
  * @extends {anychart.elements.Base}
  */
@@ -21,7 +21,7 @@ anychart.elements.Text = function() {
   this.settingsObj;
 
   /**
-   * Contains flags for all settings that were changed.
+   * Contains the flags for all settings that were changed.
    * @type {!Object.<boolean>}
    * @protected
    */
@@ -29,7 +29,7 @@ anychart.elements.Text = function() {
   };
 
   /**
-   * The enumeration of text settings that do not cause a PIXEL_BOUNDS invalidation both with APPEARANCE.
+   * The enumeration of the text settings that do not cause PIXEL_BOUNDS invalidation both with APPEARANCE.
    * @type {Object.<boolean>}
    * @protected
    */
@@ -66,21 +66,21 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for full text appearance settings.
+ * Getter for the full text appearance settings.
  * @return {!Object} A copy of settings object.
  *//**
  * Getter for all text appearance settings.<br/>
- * <b>Note:</b> Возвращает <b>undefined</b>, если имя настройки указано неверно.
+ * <b>Note:</b> Returns <b>undefined</b> if the name of the setting is wrong.
  * @example <t>listingOnly</t>
  * someTextElement.textSettings('fontFamily');
- * @param {string=} opt_name Наименование настройки.
- * @return {string|number|boolean|undefined} Значение указанной настройки.
+ * @param {string=} opt_name Setting name.
+ * @return {string|number|boolean|undefined} Value of the setting.
  *//**
  * Setter for text appearance settings.<br/>
  * Overrides current text settings by passed settings object.
  * @example <t>listingOnly</t>
  * someTextElement.textSettings({'fontFamily': 'Tahoma', 'color': 'red'});
- * @param {Object=} opt_objectWithSettings Объект с настройками. Полный объект выглядит так:
+ * @param {Object=} opt_objectWithSettings Settings object. Complete object looks like this:
  * <code>   {
  *      'fontSize': smth,
  *      'fontFamily': smth,
@@ -101,18 +101,18 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *      'selectable': smth,
  *      'useHtml': smth
  *    }</code>.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
- * Setter for text appearance settings.<br/>
- * Overrides text setting Value by it's Name.
+ * Setter for the text appearance settings.<br/>
+ * Overrides text setting Value by its Name.
  * @example <t>listingOnly</t>
  * someTextElement.textSettings('fontFamily', 'Tahoma');
- * @param {Object=} opt_name Наименование настройки.
+ * @param {Object=} opt_name Setting name.
  * @param {(string|number|boolean)=} opt_value Setting value.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get the whole object.
+ * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get complete object.
  * @param {(Object|string|number|boolean)=} opt_value Setting value if used as a setter.
  * @return {!(anychart.elements.Text|Object|string|number|boolean)} A copy of settings or the Text for chaining.
  */
@@ -152,7 +152,7 @@ anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_v
  * someTextElement.fontSize('18px');
  * someTextElement.fontSize(18);
  * @param {string|number=} opt_value ['16px'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {string|number=} opt_value .
@@ -164,14 +164,14 @@ anychart.elements.Text.prototype.fontSize = function(opt_value) {
 
 
 /**
- * Getter for font family.
- * @return {string} Current font family.
+ * Getter for the font family.
+ * @return {string} The current font family.
  *//**
  * Setter for font family.
  * @example <t>listingOnly</t>
  * someTextElement.fontFamily('Tahoma');
  * @param {string=} opt_value ['Arial'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {string=} opt_value .
@@ -183,16 +183,16 @@ anychart.elements.Text.prototype.fontFamily = function(opt_value) {
 
 
 /**
- * Getter for text font color.
- * @return {string} Current font color.
+ * Getter for the text font color.
+ * @return {string} The current font color.
  *//**
- * Setter for text font color.<br/>
+ * Setter for the text font color.<br/>
  * {@link http://www.w3schools.com/html/html_colors.asp}
  * @example <t>listingOnly</t>
  * someTextElement.fontColor('rgba(200, 0, 15, .5)');
  * someTextElement.fontColor('red');
  * @param {string=} opt_value ['#000'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {string=} opt_value .
@@ -204,15 +204,15 @@ anychart.elements.Text.prototype.fontColor = function(opt_value) {
 
 
 /**
- * Getter for text font opacity.
- * @return {number} Current font opacity.
+ * Getter for the text font opacity.
+ * @return {number} The current font opacity.
  *//**
- * Setter for text font opacity.<br/>
+ * Setter for the text font opacity.<br/>
  * Double value from 0 to 1.
  * @example <t>listingOnly</t>
  * someTextElement.fontOpacity(0.3);
  * @param {number=} opt_value [1] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -224,14 +224,14 @@ anychart.elements.Text.prototype.fontOpacity = function(opt_value) {
 
 
 /**
- * Getter for text font decoration.
- * @return {acgraph.vector.Text.Decoration|string} Current font decoration.
+ * Getter for the text font decoration.
+ * @return {acgraph.vector.Text.Decoration|string} The current font decoration.
  *//**
- * Setter for text font decoration.<br/>
+ * Setter for the text font decoration.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.fontDecoration('blink');
  * @param {(acgraph.vector.Text.Decoration|string)=} opt_value [{@link acgraph.vector.Text.Decoration}.NONE] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
@@ -243,14 +243,14 @@ anychart.elements.Text.prototype.fontDecoration = function(opt_value) {
 
 
 /**
- * Getter for text font style.
- * @return {acgraph.vector.Text.FontStyle|string} Current font style.
+ * Getter for the text font style.
+ * @return {acgraph.vector.Text.FontStyle|string} The current font style.
  *//**
- * Setter for text font style.<br/>
+ * Setter for the text font style.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.fontStyle('italic');
  * @param {(acgraph.vector.Text.FontStyle|string)=} opt_value [{@link acgraph.vector.Text.FontStyle}.NORMAL] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
@@ -262,14 +262,14 @@ anychart.elements.Text.prototype.fontStyle = function(opt_value) {
 
 
 /**
- * Getter for text font variant.
- * @return {acgraph.vector.Text.FontVariant|string} Current font variant.
+ * Getter for the text font variant.
+ * @return {acgraph.vector.Text.FontVariant|string} The current font variant.
  *//**
- * Setter for text font variant.<br/>
+ * Setter for the text font variant.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.FontVariant('small-caps');
  * @param {(acgraph.vector.Text.FontVariant|string)=} opt_value [{@link acgraph.vector.Text.FontVariant}.NORMAL] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
@@ -281,16 +281,16 @@ anychart.elements.Text.prototype.fontVariant = function(opt_value) {
 
 
 /**
- * Getter for text font weight.
- * @return {string|number} Current font weight.
+ * Getter for the text font weight.
+ * @return {string|number} The current font weight.
  *//**
- * Setter for text font weight.<br/>
+ * Setter for the text font weight.<br/>
  * {@link http://www.w3schools.com/cssref/pr_font_weight.asp}
  * @example <t>listingOnly</t>
  * someTextElement.fontWeight(400);
  * someTextElement.fontWeight('bold');
  * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
@@ -302,15 +302,15 @@ anychart.elements.Text.prototype.fontWeight = function(opt_value) {
 
 
 /**
- * Getter for text letter spacing.
- * @return {string|number} Current letter spacing.
+ * Getter for the text letter spacing.
+ * @return {string|number} The current letter spacing.
  *//**
- * Setter for text letter spacing.<br/>
+ * Setter for the text letter spacing.<br/>
  * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
  * @example <t>listingOnly</t>
  * someTextElement.letterSpacing('-4px');
  * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -322,14 +322,14 @@ anychart.elements.Text.prototype.letterSpacing = function(opt_value) {
 
 
 /**
- * Getter for text direction.
+ * Getter for the text direction.
  * @return {acgraph.vector.Text.Direction|string} Current text direction.
  *//**
- * Setter for text direction.<br/>
+ * Setter for the text direction.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.direction('rtl');
  * @param {(acgraph.vector.Text.Direction|string)=} opt_value [{@link acgraph.vector.Text.Direction}.LTR] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.Direction|string=} opt_value .
@@ -341,15 +341,15 @@ anychart.elements.Text.prototype.direction = function(opt_value) {
 
 
 /**
- * Getter for text line height.
- * @return {string|number} Current text line height.
+ * Getter for the text line height.
+ * @return {string|number} The current text line height.
  *//**
- * Setter for text line height.<br/>
+ * Setter for the text line height.<br/>
  * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
  * @example <t>listingOnly</t>
  * someTextElement.lineHeight(14);
  * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -361,14 +361,14 @@ anychart.elements.Text.prototype.lineHeight = function(opt_value) {
 
 
 /**
- * Getter for text indent.
- * @return {number} Current text indent.
+ * Getter for the text indent.
+ * @return {number} The current text indent.
  *//**
- * Setter for text indent.<br/>
+ * Setter for the text indent.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.textIndent(0.3);
  * @param {number=} opt_value [0] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -380,14 +380,14 @@ anychart.elements.Text.prototype.textIndent = function(opt_value) {
 
 
 /**
- * Getter for text vertical align.
- * @return {acgraph.vector.Text.VAlign|string} Current text vertical align.
+ * Getter for the text vertical align.
+ * @return {acgraph.vector.Text.VAlign|string} The current text vertical align.
  *//**
- * Setter for text vertical align.<br/>
+ * Setter for the text vertical align.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.vAlign('middle');
  * @param {(acgraph.vector.Text.VAlign|string)=} opt_value [{@link acgraph.vector.Text.VAlign}.TOP] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.VAlign|string=} opt_value .
@@ -399,14 +399,14 @@ anychart.elements.Text.prototype.vAlign = function(opt_value) {
 
 
 /**
- * Getter for text horizontal align.
- * @return {acgraph.vector.Text.HAlign|string} Current text horizontal align.
+ * Getter for the text horizontal align.
+ * @return {acgraph.vector.Text.HAlign|string} Th current text horizontal align.
  *//**
- * Setter for text horizontal align.<br/>
+ * Setter for the text horizontal align.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.hAlign('center');
  * @param {(acgraph.vector.Text.HAlign|string)=} opt_value [{@link acgraph.vector.Text.HAlign}.START] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.VAlign|string=} opt_value .
@@ -418,14 +418,14 @@ anychart.elements.Text.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Getter for text wrap settings.
- * @return {acgraph.vector.Text.TextWrap|string} Current text wrap settings.
+ * Getter for the text wrap settings.
+ * @return {acgraph.vector.Text.TextWrap|string} Th current text wrap settings.
  *//**
- * Setter for text wrap settings.<br/>
+ * Setter for the text wrap settings.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.textWrap('noWrap');
  * @param {(acgraph.vector.Text.TextWrap|string)=} opt_value [{@link acgraph.vector.Text.TextWrap}.BY_LETTER] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
@@ -437,14 +437,14 @@ anychart.elements.Text.prototype.textWrap = function(opt_value) {
 
 
 /**
- * Getter for text overflow settings.
- * @return {acgraph.vector.Text.TextOverflow|string} Current text overflow settings.
+ * Getter for the text overflow settings.
+ * @return {acgraph.vector.Text.TextOverflow|string} The current text overflow settings.
  *//**
- * Setter for text overflow settings.<br/>
+ * Setter for the text overflow settings.<br/>
  * @example <t>listingOnly</t>
  * someTextElement.textOverflow(acgraph.vector.Text.TextOverflow.ELLIPSIS);
  * @param {(acgraph.vector.Text.TextOverflow|string)=} opt_value [{@link acgraph.vector.Text.TextOverflow}.CLIP] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.vector.Text.TextOverflow|string=} opt_value .
@@ -456,16 +456,15 @@ anychart.elements.Text.prototype.textOverflow = function(opt_value) {
 
 
 /**
- * Getter for text selectable.
- * @return {boolean} Current text selectable.
+ * Getter for the text selectable option.
+ * @return {boolean} The current text selectable option.
  *//**
- * Setter for text selectable.<br/>
- * Данное свойство определяет восприимчивость текста к выделению. Если устанавливется <b>false</b>, то текст невозможно
- * будет выделить.
+ * Setter for the text selectable.<br/>
+ * This options defines whether the text can be selected. If set to <b>false</b> one can't select the text.
  * @example <t>listingOnly</t>
  * someTextElement.selectable(true);
  * @param {boolean=} opt_value [false] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value .
@@ -477,15 +476,15 @@ anychart.elements.Text.prototype.selectable = function(opt_value) {
 
 
 /**
- * Getter for flag useHTML.
- * @return {boolean} Current flag useHTML.
+ * Getter for the useHTML flag.
+ * @return {boolean} The current value of useHTML flag.
  *//**
  * Setter for flag useHTML.<br/>
- * Данное свойство определяет надо ли парсить HTML текст.
+ * This property defines whether HTML text should be parsed.
  * @example <t>listingOnly</t>
  * someTextElement.useHtml(true);
  * @param {boolean=} opt_value [false] Value to set.
- * @return {!anychart.elements.Text} Экземпляр класса {@link anychart.elements.Text} для цепочного вызова.
+ * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value .
@@ -499,7 +498,7 @@ anychart.elements.Text.prototype.useHtml = function(opt_value) {
 /**
  * Applies known changes in settings.
  * @param {!acgraph.vector.Text} textElement Text element to apply settings to.
- * @param {boolean} isInitial If the text element needs initial settings appliance.
+ * @param {boolean} isInitial If the text element needs initial settings application.
  * @protected
  */
 anychart.elements.Text.prototype.applyTextSettings = function(textElement, isInitial) {

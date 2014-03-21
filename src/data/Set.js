@@ -8,14 +8,14 @@ goog.require('goog.array');
 
 
 /**
- * Хранилище для линейных (не древовидных и не иерархических) данных.<br/>
- * Понимает данные как массив рядов, которые состоят из колонок (см листинг 1).
- * Перед работой с этим хранилищем нужно задать способ адресации колонок в рядах с помощью метода
- * {@link anychart.data.Set#mapAs} (способов адресации колонок для хранилища может быть сколько угодно).<br/>
- * В качестве строки может быть: элемент, массив элементов, объект (под элементом понимается число, строка или функция).
- * Данные могут быть как однородными, так и разнородными, способ чтения данных регламентируется маппингом
- * {@link anychart.data.Set#mapAs}. Пример дефолтного маппинга см в Листингах 3-5 ниже.
- * @example <c>Листинг 1. Представление данных.</c><t>listingOnly</t>
+ * Linear data storage.<br/>
+ * Data is stored as an array or rows where each row contains several columns (see Listing 1 below).
+ * To start working with this storage you need to map columns using
+ * {@link anychart.data.Set#mapAs} method (you can create as many mappings as you like).<br/>
+ * Each field can be a number, a string, a function, an array or an object.
+ * Data fields can of any type and they way you read them depends on mapping only:
+ * {@link anychart.data.Set#mapAs}. Sample mappings are shown in code samples 3, 4 and 5.
+ * @example <c>Sample 1. Data notion.</c><t>listingOnly</t>
  * // Col1 Col2 Col3
  *  [
  *   [110, 112, 114], // row1
@@ -30,29 +30,29 @@ goog.require('goog.array');
  *    314, // row3
  *    414  // row4
  *  ]
- * @example <c>Листинг 2. Примеры данных.</c><t>listingOnly</t>
- * // Массив чисел/строк/функций
+ * @example <c>Sample 2. Sample data.</c><t>listingOnly</t>
+ * // An array with numbers, strings and functions:
  *  new anychart.data.Set([
  *    20,
  *    7,
  *    '10',
  *    function(smth){ return smth*10; }
  *    ]);
- * // Массив массивов
+ * // An array of arrays:
  *  new anychart.data.Set([
  *    [1, 22, 13],
  *    [13, 22, 23],
  *    [17, 22, 33],
  *    [21, 22, 43]
  *  ]);
- * // Массив объектов
+ * // An array of objects.
  *  new anychart.data.Set([
  *    {name: 'Point 1', value: 10},
  *    {name: 'Point 2', value: 7},
  *    {name: 'Point 3', value: 20},
  *    {name: 'Point 4', value: 14}
  *  ]);
- * // Массив смешанных данных
+ * // A multi-typed array:
  *  new anychart.data.Set([
  *    {value: 10, name: 'Point 1'},
  *    {value: 7, name: 'Point 2'},
@@ -63,62 +63,58 @@ goog.require('goog.array');
  *    22,
  *    function (params) { do_smth; return smth; }
  *  ]);
- * @example <c>Листинг 3. Дефолтный маппинг данных. Числа.</c><t>listingOnly</t>
- * // 'x' - это индекс элемента, а 'value' - значение
- * // то есть:
- *   // исходные данные         интерпретирует как
+ * @example <c>Sample 3. Default data mapping. Numbers.</c><t>listingOnly</t>
+ * // 'x' is an index of an element and 'value' is its value.
+ *   // Raw data         Mapped as
  *   [
  *    1,                        {x: 0, value: 1}
  *    2,                        {x: 1, value: 2}
  *    '-5',                     {x: 2, value: -5}
  *    function(){ return 1;}    {x: 3, value: 1}
  *   ]
- *   // для случая OHLC - не приспособлена
- * @example <c>Листинг 4. Дефолтный маппинг данных. Массивы.</c><t>listingOnly</t>
- * // 'x' - элемент массива с индексом 0
- * // 'value' - элемент массива с индексом 1
- * // 'size' - элемент массива с индексом 2
- * // элементы массива с индексом более 2 никак не интерпретируются.
- * // то есть:
- *   // исходные данные          интерпретирует как
+ *   // so this will not work with OHLC
+ * @example <c>Sample 4. Default data mapping. Arrays.</c><t>listingOnly</t>
+ * // 'x' is an element with the index of 0,
+ * // 'value' is an element with the index of 1,
+ * // 'size' is an element with the index of 2.
+ * // All elements with the index greater than 2 are ignored.
+ *   // Raw data          Mapped as
  *   [
  *      [2],                     {x: 2}
  *      [5, 13],                 {x: 5, value: 13}
  *      [7, '4', 21],            {x: 7, value: 4, size: 21}
  *      [11, 21, 34, 45]         {x: 11, value: 21, size: 34}
  *   ]
- *   // для случая OHLC
- *     // 'open' - элемент массива с индексом 0
- *     // 'high' - элемент массива с индексом 1
- *     // 'low' - элемент массива с индексом 2
- *     // 'close' - элемент массива с индексом 3
- *     // элементы массива с индексом более 3 никак не интерпретируются.
- *     // то есть:
+ *   // In case of OHLC
+ *     // 'open' is an element with the index of 0
+ *     // 'high' is an element with the index of 1
+ *     // 'low' is an element with the index of 2
+ *     // 'close' is an element with the index of 3
+ *     //  All elements with the index greater than 3 are ignored.
  *     [
  *        [11, 21, 34, 45]         {open: 11, high: 21, low: 34, close: 45}
  *     ]
- * @example <c>Листинг 5. Дефолтный маппинг данных. Объекты.</c><t>listingOnly</t>
- * // В объектах все соответствует именам, кроме того, можно определять несколько
- * // соответсвий и приоритет. Например, поле 'x' ищется в поле 'x', а поле 'value'
- * // в полях: 'value', потом 'y', и в конце в 'close'.
- * // то есть:
- *   // исходные данные                 интерпретирует как
+ * @example <c>Sample 5. Default data mapping. Objects.</c><t>listingOnly</t>
+ * // In objects everything corresponds to the names of properties, but you can define several mappings and a priority.
+ * // E.g.: 'x' can be mapped to 'x' and 'value' can be looked for
+ * // in 'value', then 'y', then in 'close'.
+ *   // Raw data                 Mapped as
  *   [
  *      {x: 2},                           {x: 2}
  *      {x: 5, value: 13},                {x: 5, value: 13}
  *      {x: 7, y: 4, size: 21},           {x: 7, value: 4, size: 21}
  *      {x: 11, close: 21, size: 34}      {x: 11, value: 21, size: 34}
  *   ]
- *   // для случая OHLC
+ *   // In case of OHLC
  *   [
  *     {open: 11, high: 21, low: 34, close: 45}   {open: 11, high: 21, low: 34, close: 45}
- *   ] // то есть:
- *     // 'open' - элемент массива с индексом 0
- *     // 'high' - элемент массива с индексом 1
- *     // 'low' - элемент массива с индексом 2
- *     // 'close' - элемент массива с индексом 3
- *     // элементы массива с индексом более 3 никак не интерпретируются.
- * @param {Array=} opt_data Data for the set can be passed here.
+ *   ]
+ *     // 'open' is an element with the index of 0,
+ *     // 'high' is an element with the index of 1,
+ *     // 'low' is an element with the index of 2,
+ *     // 'close' is an element with the index of 3.
+ *     // All elements with the index greater than 3 are ignored.
+ * @param {Array=} opt_data Data set raw data can be set here.
  * @constructor
  * @implements {anychart.data.IView}
  * @extends {anychart.utils.Invalidatable}
@@ -131,7 +127,7 @@ goog.inherits(anychart.data.Set, anychart.utils.Invalidatable);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Consistency state mask supported by this object.
  * @type {number}
  */
 anychart.data.Set.prototype.DISPATCHED_CONSISTENCY_STATES =
@@ -146,8 +142,8 @@ anychart.data.Set.prototype.storage_;
 
 
 /**
- * Getter for Set data.
- * @return {!Array} Data array of the Set or the Set for chaining.
+ * Getter for the data in the Set.
+ * @return {!Array} Data array of the Set or the Set for the method chaining.
  *//**
  * Setter for Set data.
  * @example <t>listingOnly</t>
@@ -164,8 +160,8 @@ anychart.data.Set.prototype.storage_;
  *    {name: 'Point 3', value: 20},
  *    {name: 'Point 4', value: 14}
  *  ]);
- * @param {Array=} opt_value Value to set.
- * @return {!anychart.data.Set} Экземпляр класса {@link anychart.data.Set} для цепочного вызова.
+ * @param {Array=} opt_value A value to set.
+ * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {Array=} opt_value .
@@ -199,24 +195,24 @@ anychart.data.Set.prototype.data = function(opt_value) {
 
 
 /**
- * Задает маппинг данных.<br/>
- * Можно единовременно указывать маппинг для разных типов входных данных (см листинги).
- * Дефолтный маппинг можно посмотреть в листингах описания конструктора {@link anychart.data.Set}.
- * @example <c>Кастомизированный Маппинг данных.</c><t>listingOnly</t>
- * // Простой маппинг
+ * Defines data mapping.<br/>
+ * You can define mappings for the different types of data (see samples).
+ * Default mapping is shown in {@link anychart.data.Set} constructor samples.
+ * @example <c>Custom data mapping.</c><t>listingOnly</t>
+ * // Simple mapping
  *  dataSet.mapAs({
  *    'value': 0,
  *    'x': 1,
  *    'fill': 2
  *  });
- *   // исходные данные          интерпретирует как
+ *   // Raw data          Mapped as
  *   [
  *    [11, 1, 'red 0.5'],       {x: 1, value: 11, fill: 'red 0.5'}
  *    [21, 2, 'green 0.5'],     {x: 2, value: 21, fill: 'green 0.5'}
  *    [14, 3, 'blue 0.5'],      {x: 3, value: 14, fill: 'blue 0.5'}
  *    [11, 4, 'yellow 0.5']     {x: 4, value: 11, fill: 'yellow 0.5'}
  *   ]
- * // Комбинированный маппинг
+ * // Combined mapping
  *  dataSet.mapAs({
  *    'value': 0,
  *    'x': 1,
@@ -226,7 +222,7 @@ anychart.data.Set.prototype.data = function(opt_value) {
  *    'fill': ['fill', 'color']
  *   }, null, ['close']
  *  );
- *  // исходные данные          интерпретирует как
+ *  // Raw data          Mapped as
  *   [
  *    [11, 1, 'red 0.5'],       {x: 1, value: 11, fill: 'red 0.5'}
  *    [21, 2, 'green 0.5'],     {x: 2, value: 21, fill: 'green 0.5'}
@@ -251,14 +247,13 @@ anychart.data.Set.prototype.data = function(opt_value) {
  *   'high': 2,
  *   'low': 3,
  *   'close': 4
- * }] Настройки адресации колонок для рядов, представляющих собой массив.
- * @param {!(Object.<Array.<string>>)=} opt_objectMapping [{'value': &#91;'value', 'y', 'close'&#93;}] Настройки
- *  адресации колонок для рядов, являющихся объектами.
- * @param {!(Array.<string>)=} opt_defaultProps [&#91;'value', 'close'&#93;] Имена полей, которым ставить в соответствие
- *  значение ряда, если он является строкой, числом или функцией. Не работает в случаях, если ряд - объект,
- *  даже если нужное поле не было найдено внутри этого объекта.
- * @param {!(Array.<string>)=} opt_indexProps [&#91;'x'&#93;] Имена полей, которым ставить в соответствие текущий индекс
- *  ряда, если другие опции не сработали.
+ * }] Column mapping for the rows which are arrays.
+ * @param {!(Object.<Array.<string>>)=} opt_objectMapping [{'value': &#91;'value', 'y', 'close'&#93;}] Column mapping for the rows
+ *  which are objects.
+ * @param {!(Array.<string>)=} opt_defaultProps [&#91;'value', 'close'&#93;] The names of the fields to map to
+ *  if a row is a string, number or a function. Does not work in cases when a row is an object.
+ * @param {!(Array.<string>)=} opt_indexProps [&#91;'x'&#93;] The names of the fields to be mapped to the current index
+ *  if other options failed.
  * @return {!anychart.data.Mapping} The mapping for the data set.
  */
 anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
@@ -269,48 +264,48 @@ anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping
 
 
 /**
- * Gets the full row of the set by its index.<br/>
- * <b>Note:</b> If there is no any row for the index - returns <b>undefined</b>.
+ * Gets the full row of the set by the index.<br/>
+ * <b>Note:</b> If there is no row for the index - returns <b>undefined</b>.
  * @example <t>listingOnly</t>
- * // Данные
+ * // Data
  *  [
  *    [1, 2, 4, 7],
  *    {'high': 14, 'low': 3},
  *    7
  *  ]
- *  dataSet.row(0); // вернет [1, 2, 4, 7]
- *  dataSet.row(1); // вернет {'high': 14, 'low': 3}
- *  dataSet.row(2); // вернет 7
- *  dataSet.row(3); // вернет undefined
- * @param {number} rowIndex Index of the row to fetch.
- * @return {*} The full row current.
+ *  dataSet.row(0); // returns [1, 2, 4, 7]
+ *  dataSet.row(1); // returns {'high': 14, 'low': 3}
+ *  dataSet.row(2); // returns 7
+ *  dataSet.row(3); // returns undefined
+ * @param {number} rowIndex The index of the row to fetch.
+ * @return {*} The current row.
  *//**
- * Sets the full row of the set by its index.<br/>
- * <b>Note:</b> Замещает текущее значение. Предыдущее значение возвращается и нигде не сохраняется!
+ * Sets the row in the set by the index.<br/>
+ * <b>Note:</b> Replaces the current value, previous values is returned but it is lost completely after that!
  * @example <t>listingOnly</t>
- * // Данные
+ * // Data
  *  [
  *    [1, 2, 4, 7],
  *    {'high': 14, 'low': 3},
  *    7
  *  ]
- *  dataSet.row(2, [2, 2, 2, 2]); // вернет 7
- *  dataSet.row(3, {'low': 4, 'high': 11}); // вернет undefined
- * // Данные после изменений
+ *  dataSet.row(2, [2, 2, 2, 2]); // returns 7
+ *  dataSet.row(3, {'low': 4, 'high': 11}); // returns undefined
+ * // Data after the changes
  *  [
  *    [1, 2, 4, 7],
  *    {'high': 14, 'low': 3},
  *    [2, 2, 2, 2],
  *    {'low': 4, 'high': 11}
  *  ]
- * @param {number} rowIndex Index of the row to fetch.
- * @param {*=} opt_value Value to set.
- * @return {*} Previous value of row.
+ * @param {number} rowIndex The index of the row to fetch.
+ * @param {*=} opt_value The value to set.
+ * @return {*} The previous value of the row.
  *//**
  * @ignoreDoc
- * @param {number} rowIndex Index of the row to fetch.
- * @param {*=} opt_value If passed, the method is treated as a setter.
- * @return {*} The full row current or previous value. May be anything including undefined.
+ * @param {number} rowIndex The index of the row to fetch.
+ * @param {*=} opt_value If set, the method is treated as a setter.
+ * @return {*} Current or previous value of the row. Can be anything, including undefined.
  */
 anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
   /** @type {*} */
@@ -326,8 +321,8 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
- * Returns number of rows of current data set.
- * @return {number} Number of rows in the set.
+ * Returns the number of the rows in the current data set.
+ * @return {number} The number of the rows in the set.
  */
 anychart.data.Set.prototype.getRowsCount = function() {
   return this.storage_.length;
@@ -335,10 +330,11 @@ anychart.data.Set.prototype.getRowsCount = function() {
 
 
 /**
- * Returns the mapping for the row. This method is not implemented for the Set. Use mapAs() result instead.
- * @param {number} rowIndex Index of the row.
+ * Returns the mapping for the row. This method is not implemented for the Set. Use mapAs() instead.
+ * @param {number} rowIndex The index of the row.
  */
 anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
   //TODO(Anton Saukh): replace this throw by proper error handling.
-  throw new Error('Asking rowMapping from a Set! What a fag...');
+  //TODO(Anton Saukh): please avoid curses in the code!
+  throw new Error('Asking rowMapping from a Set! What a shame...');
 };

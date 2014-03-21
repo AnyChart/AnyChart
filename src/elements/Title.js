@@ -6,10 +6,10 @@ goog.require('anychart.utils.Padding');
 
 
 /**
- * Класс, описывающий элемент - заголовок.<br/>
- * Заголовок может быть как частью другого, более сложного, элемента (чарт, легенда, ось и тд), так и самостоятельным
- * элементом визаулизации.<br/>
- * Заголовку можно назначить позиционирование, выравнивание текста, а также background.
+ * Title element class.<br/>
+ * Title can be a part of an other complex element, such as a chart, a legend or an axis,
+ * as well a self-sufficient element.<br/>
+ * A title have a positione, text alignment and a background.
  * @illustration <t>simple</t>
  * var layer1= stage.layer();
  * layer1.rect(1,1,stage.width()/2-4, stage.height()-2).stroke('1 black');
@@ -20,8 +20,8 @@ goog.require('anychart.utils.Padding');
  * layer2.rect(2,1, 50, stage.height()-2).fill('orange 0.1');
  * layer2.text(10, stage.height() /2 +20, 'Title').fontSize(17).rotateByAnchor(-90, 'center');
  * @illustrationDesc
- * Заголовок занимает всю часть контейнера. по своей высоте (или ширине, зависит от ориентации).
- * @example <c>Создание самостоятельного заголовка.</c><t>simple-h100</t>
+ * Title occupies the whole part of a container (depending on the orientation by the width or the height).
+ * @example <c>Self-sufficient title.</c><t>simple-h100</t>
  * new anychart.elements.Title()
  *     .text('My custom Title')
  *     .fontSize(27)
@@ -43,14 +43,14 @@ anychart.elements.Title = function() {
   this.text_ = null;
 
   /**
-   * Background element if any.
+   * Background element (if any).
    * @type {anychart.elements.Background}
    * @private
    */
   this.background_ = null;
 
   /**
-   * Layer element if background is visible.
+   * Layer element (if background is visible).
    * @type {acgraph.vector.Layer}
    * @private
    */
@@ -192,10 +192,10 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Returns bounds for positioning.
  * @return {anychart.math.Rect} Current parent bounds.
  *//**
- * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Sets bound for positioning.
  * @illustration <t>simple</t>
  * var layer = stage.layer();
  * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
@@ -224,9 +224,9 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
  *     .fontColor('gray')
  *     .draw();
  * @illustrationDesc
- * Title находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции title:<br/>
- *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
- *   b. Черным - когда в качестве родительских заданы баунды stage.
+ * Title is inside a layer (marked with a blue framt), two title positioning options are shown:<br/>
+ *   a. Gray - within the parent container.<br/>
+ *   b. Black - when the stage bounds act as parent.
  * @example <t>listingOnly</t>
  * new anychart.elements.Title()
  *     .text('Title text')
@@ -234,7 +234,7 @@ anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
  *     .parentBounds(stageBounds)
  *     .draw();
  * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value .
@@ -253,17 +253,17 @@ anychart.elements.Title.prototype.parentBounds = function(opt_value) {
 
 
 /**
- * Gets text content for current title.
- * @return {string} Current text content of title.
+ * Gets the text content for the current title.
+ * @return {string} The current text content of the title.
  *//**
- * Sets text content for title.
+ * Sets the text content for the title.
  * @example <t>simple-h100</t>
  * var title = new anychart.elements.Title();
  * title.text('My custom Text');
  * title.container(stage)
  *      .draw();
  * @param {string=} opt_value ['Title text'] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {string=} opt_value .
@@ -275,7 +275,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 
 
 /**
- * Getter for title background.
+ * Getter for the title background.
  * @example <t>simple-h100</t>
  * var title = new anychart.elements.Title();
  * title.text('\' Simple text \'')
@@ -284,9 +284,9 @@ anychart.elements.Title.prototype.text = function(opt_value) {
  *          .corners(2);
  * title.container(stage)
  *      .draw()
- * @return {!anychart.elements.Background} Returns current background.
+ * @return {!anychart.elements.Background} Returns the current background.
  *//**
- * Setter for title background.
+ * Setter for the title background.
  * @example <t>simple-h100</t>
  * var myTitleBackground = new anychart.elements.Background()
  *         .stroke('1 rgb(36,102,177) 0.4')
@@ -306,7 +306,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
  *     .container(stage)
  *     .draw();
  * @param {anychart.elements.Background=} opt_value [null] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.Background=} opt_value .
@@ -332,15 +332,15 @@ anychart.elements.Title.prototype.background = function(opt_value) {
 
 
 /**
- * Getter for title width.
- * @return {number|string|null} Current title width.
+ * Getter for the title width.
+ * @return {number|string|null} The current title width.
  *//**
- * Setter for title width.<br/>
- * <b>Note:</b> Если будет переданно <b>null</b>, то ширина будет рассчитываться автоматически.
+ * Setter for the title width.<br/>
+ * <b>Note:</b> If <b>null</b> is passed the width is calcualted automatically.
  * @example <t>listingOnly</t>
  * title.width('200px');
  * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -362,15 +362,15 @@ anychart.elements.Title.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for title height.
- * @return {number|string|null} Current title width.
+ * Getter for the title height.
+ * @return {number|string|null} The current title width.
  *//**
- * Setter for title height.<br/>
- * <b>Note:</b> Если будет переданно <b>null</b>, то высота будет рассчитываться автоматически.
+ * Setter for the title height.<br/>
+ * <b>Note:</b> If <b>null</b> is passed the height is calcualted automatically.
  * @example <t>listingOnly</t>
  * title.height('200px');
  * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -392,15 +392,15 @@ anychart.elements.Title.prototype.height = function(opt_value) {
 
 
 /**
- * Getter for current title margin.<br/>
- * Иллюстрацию работы с margins см тут {@link anychart.Chart#margin}.
- * @return {anychart.utils.Margin} Current title margin.
+ * Getter for the current title margin.<br/>
+ * Learn more about margins at {@link anychart.Chart#margin}.
+ * @return {anychart.utils.Margin} The current title margin.
  *//**
- * Setter for title margin in pixels by one value.<br/>
+ * Setter for the title margin in pixels using one value.<br/>
  * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
- * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
- * Setter for title margin in pixels by few numbers.<br/>
+ * Setter for the title margin in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
  * // 1) top and bottom 10px, left and right 15px
  * title.margin(10, '15px');
@@ -412,7 +412,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @param {(string|number)=} opt_value2 [0] Right or right-left space.
  * @param {(string|number)=} opt_value3 [10] Bottom space.
  * @param {(string|number)=} opt_value4 [0] Left space.
- * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
@@ -436,15 +436,15 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
 
 
 /**
- * Getter for current title padding.<br/>
- * Иллюстрацию работы с margins см тут {@link anychart.Chart#padding}.
- * @return {anychart.utils.Padding} Current title padding.
+ * Getter for the current title padding.<br/>
+ * Learn more about paddings at {@link anychart.Chart#padding}.
+ * @return {anychart.utils.Padding} The current title padding.
  *//**
- * Setter for title padding in pixels by one value.<br/>
+ * Setter for the title padding in pixels using single value.<br/>
  * @param {(string|number|anychart.utils.Space)=} opt_value [null] Value to set.
- * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
- * Setter for title padding in pixels by few numbers.<br/>
+ * Setter for the title padding in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
  * // 1) top and bottom 10px, left and right 15px
  * title.padding(10, '15px');
@@ -456,7 +456,7 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
@@ -480,10 +480,10 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
 
 
 /**
- * Getter for title align.
- * @return {anychart.utils.Align} Current title align.
+ * Getter for the title align.
+ * @return {anychart.utils.Align} The current title align.
  *//**
- * Setter for title align.
+ * Setter for the title align.
  * @example <t>simple-h100</t>
  * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
  * new anychart.elements.Title()
@@ -497,7 +497,7 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
  *     .container(stage)
  *     .draw();
  * @param {(anychart.utils.Align|string)=} opt_value [{@link anychart.utils.Align}.CENTER] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.Align|string)=} opt_value .
@@ -517,10 +517,10 @@ anychart.elements.Title.prototype.align = function(opt_value) {
 
 
 /**
- * Getter for title orientation.
- * @return {anychart.utils.Orientation} Orientation or title for chaining.
+ * Getter for the title orientation.
+ * @return {anychart.utils.Orientation} The orientation or the title for chaining.
  *//**
- * Setter for title orientation.
+ * Setter for the title orientation.
  * @example <t>simple</t>
  * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
  * new anychart.elements.Title()
@@ -534,7 +534,7 @@ anychart.elements.Title.prototype.align = function(opt_value) {
  *     .container(stage)
  *     .draw();
  * @param {(anychart.utils.Orientation|string)=} opt_value [{@link anychart.utils.Orientation}.TOP] Value to set.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.Orientation|string)=} opt_value .
@@ -554,8 +554,8 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
 
 
 /**
- * Render title content.
- * @return {!anychart.elements.Title} Экземпляр класса {@link anychart.elements.Title} для цепочного вызова.
+ * Render the title content.
+ * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  */
 anychart.elements.Title.prototype.draw = function() {
   // If its all ok - leave this method
@@ -564,7 +564,7 @@ anychart.elements.Title.prototype.draw = function() {
 
   this.resolveEnabledState();
 
-  // We will need the text element any way, so we should create it if missing.
+  // We will need the text element anyway, so we should create it if it is missing.
   var isInitial;
   if (isInitial = !this.text_) {
     this.text_ = acgraph.text();
@@ -583,11 +583,11 @@ anychart.elements.Title.prototype.draw = function() {
     this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
   }
 
-  // Checking PIXEL_BOUNDS state. If it is inconsistent, we need to recalculate title bounds.
-  // But we don't need to mark it consistent here, because we don't know where to apply that new bounds yet.
+  // Checking PIXEL_BOUNDS state. If it is inconsistent, we need to recalculate the title bounds.
+  // But we don't need to mark it is consistent here, because we don't know where to apply new bounds yet.
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
     this.calcActualBounds_();
-    // we are not marking it consistent here, just ensuring everything is calculated.
+    // we are not marking it is consistent here, just ensuring everything is calculated.
   }
 
   // Checking if we have to draw background. We don't draw it if it is totally transparent.
@@ -597,12 +597,12 @@ anychart.elements.Title.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE)) {
     // If there is a non-transparent background
     if (hasBackground) {
-      // We should render a layer, that has a background path and a text element in it.
+      // We should render a layer that has a background path and a text element in it.
       // So checking if there is a layer
       if (!this.layer_) {
-        // and creating it if there is no any.
+        // and creating it if there is not.
         this.layer_ = acgraph.layer();
-        // super-silently resetting background container to the newly created layer and drawing it to have the bg go first
+        // super-silently resetting background container to the newly created layer and drawing it to have the background go first
         this.background_
             .suspendInvalidationDispatching()
             .container(this.layer_)
@@ -614,13 +614,13 @@ anychart.elements.Title.prototype.draw = function() {
         // ensuring that we will set layer container to the proper value later in this method.
         this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
       }
-      // settings proper bounds to the background
+      // setting proper bounds to the background
       this.background_.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
       // and drawing it
       this.background_.draw();
     } else {
-      // Else we should render only the text element, so if there is a layer, than we should remove the background
-      // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
+      // Else we should render only the text element, so if there is a layer, then we should remove the background
+      // from it and dispose the layer. Also we silently invalidate the CONTAINER to rerender the text to the proper
       // container later in this method
       if (this.layer_) {
         if (this.background_ && this.background_.container() == this.layer_)
@@ -644,7 +644,7 @@ anychart.elements.Title.prototype.draw = function() {
     // setting text bounds if needed.
     this.text_.width(this.widthConstricted_ ? this.textWidth_ : undefined);
     this.text_.height(this.heightConstricted_ ? this.textHeight_ : undefined);
-    // settings text offset for
+    // setting text offset for
     this.text_.x(/** @type {number} */(this.padding().left()));
     this.text_.y(/** @type {number} */(this.padding().top()));
 
@@ -693,14 +693,14 @@ anychart.elements.Title.prototype.remove = function() {
 
 
 /**
- * Возвращает отсавшуюся от контейнера часть, после размешения в нем текущего заголовка.
+ * Returns the remaining (after title placement) part of the container.
  * @example <t>simple-h100</t>
- * // размещаем первый заголовок наверху Stage.
+ * // Placing the first title on the top of the Stage.
  * var title1 = new anychart.elements.Title()
  *     .text('First title')
  *     .container(stage)
  *     .draw();
- * // размещаем второй заголовок сверху оставшейся части, то есть под первым заголовком.
+ * // Placing the second title over the remainging part - under the first title.
  * new anychart.elements.Title()
  *     .text('Second title')
  *     .container(stage)
@@ -745,7 +745,7 @@ anychart.elements.Title.prototype.getRemainingBounds = function() {
 
 
 /**
- * Return title content bounds.
+ * Return the title content bounds.
  * @return {anychart.math.Rect}
  */
 anychart.elements.Title.prototype.getContentBounds = function() {
@@ -769,7 +769,7 @@ anychart.elements.Title.prototype.applyTextSettings = function(textElement, isIn
 
 
 /**
- * Internal getter for title rotation due to orientation.
+ * Internal getter for the title rotation (orientation wise).
  * @return {number} Rotation degree.
  * @private
  */
@@ -788,7 +788,7 @@ anychart.elements.Title.prototype.getRotation_ = function() {
 
 
 /**
- * Calculates actual size of the title due to different sizing cases.
+ * Calculates the actual size of the title for the different sizing cases.
  * @private
  */
 anychart.elements.Title.prototype.calcActualBounds_ = function() {
@@ -976,7 +976,7 @@ anychart.elements.Title.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Listener for bounds invalidation.
+ * Listener for the bounds invalidation.
  * @param {anychart.utils.InvalidatedStatesEvent} event Invalidation event.
  * @private
  */
@@ -988,7 +988,7 @@ anychart.elements.Title.prototype.boundsInvalidated_ = function(event) {
 
 
 /**
- * Copy title settings from the passed title to it itself.
+ * Copy the title settings from the passed title to itself.
  * @param {anychart.elements.Title} title Title to copy settings from.
  * @return {anychart.elements.Title} Returns itself for chaining call.
  */
@@ -1013,7 +1013,7 @@ anychart.elements.Title.prototype.cloneFrom = function(title) {
 
 
 /**
- * Restore title default settings.
+ * Restore the title default settings.
  */
 anychart.elements.Title.prototype.restoreDefaults = function() {
   goog.base(this, 'restoreDefaults');
@@ -1058,7 +1058,7 @@ anychart.elements.Title.prototype.serialize = function() {
 
 
 /**
- * Deserializes data from config.
+ * Deserializes the data from config.
  * @param {Object} config Json config.
  */
 anychart.elements.Title.prototype.deserialize = function(config) {

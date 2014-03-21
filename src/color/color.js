@@ -6,7 +6,7 @@ goog.require('goog.string');
 
 
 /**
- * Пространство имен для цветовых утилит.
+ * Color utilities namespace.
  * @namespace
  * @name anychart.color
  */
@@ -25,12 +25,12 @@ goog.require('goog.string');
  *     .fill('rgb('+mixColor1.join(',')+')');
  * stage.rect(stage.width() / 3 + 10, stage.height() / 2 + 10, stage.width() / 4, stage.height() / 2 - 20)
  *     .fill('rgb('+mixColor2.join(',')+')');
- * @param {goog.color.Rgb} rgb1 First color represented in rgb like array of 3 numbers.
- * @param {goog.color.Rgb} rgb2 Second color represented in rgb like array of 3 numbers.
- * @param {number} factor The weight to be given to rgb1 over rgb2. Values
- *     should be in the range [0, 1]. If less than 0, factor will be set to 0.
+ * @param {goog.color.Rgb} rgb1 The first color represented as RGB array of 3 numbers.
+ * @param {goog.color.Rgb} rgb2 The second color represented as RGB array of 3 numbers.
+ * @param {number} factor The weight of the first color over the second one rgb2. Values
+ *     should be in the [0, 1] range. If set to a value less than 0, factor will be set to 0.
  *     If greater than 1, factor will be set to 1.
- * @return {!goog.color.Rgb} Combined color represented in rgb like array of 3 numbers.
+ * @return {!goog.color.Rgb} Combined color represented as RGB array.
  */
 anychart.color.blend = function(rgb1, rgb2, factor) {
   return goog.color.blend(rgb1, rgb2, factor);
@@ -75,7 +75,7 @@ anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
 
 
 /**
- * Makes color lighten by factor.
+ * Makes color lighter by a factor.
  * @example <t>stageOnly</t>
  * stage.rect(10, 10, stage.width() / 3 - 10, stage.height() - 20)
  *      .fill('red');
@@ -83,16 +83,16 @@ anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
  *      .fill( anychart.color.lighten('red'));
  * stage.rect(2*stage.width() / 3 + 10, 10, stage.width() / 3 - 30, stage.height() - 20)
  *      .fill( anychart.color.lighten('red', .8));
- * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke need to be lighten.
- * @param {number=} opt_factor [0.3] Factor of blending with white color.
- * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of lighten color, or color if color can not be lighten.
+ * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke to be lightened.
+ * @param {number=} opt_factor [0.3] White color blending factor.
+ * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the lightened color, or Color if color can not be lighten.
  */
 anychart.color.lighten = function(fillOrStroke, opt_factor) {
   var hex;
-  // если вернулся null - значит не смогли получить hex - значит возвращаем что пришло без изменений
+  // if null is returned then we can't get a hex representation and return the initial color
   if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
 
-  // превращаем наш hex-цвет в goog.color.Rgb (массив 3х чисел, который понимает goog.color.lighten)
+  // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.lighten)
   var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
   if (!goog.isDefAndNotNull(opt_factor)) {
     opt_factor = 0.3;
@@ -102,7 +102,7 @@ anychart.color.lighten = function(fillOrStroke, opt_factor) {
 
 
 /**
- * Makes color darken by factor.
+ * Makes color darker by a factor.
  * @example <t>stageOnly</t>
  * stage.rect(10, 10, stage.width() / 3 - 10, stage.height() - 20)
  *      .fill('red');
@@ -110,16 +110,16 @@ anychart.color.lighten = function(fillOrStroke, opt_factor) {
  *      .fill( anychart.color.darken('red'));
  * stage.rect(2*stage.width() / 3 + 10, 10, stage.width() / 3 - 30, stage.height() - 20)
  *      .fill( anychart.color.darken('red', .8));
- * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke need to be darken.
- * @param {number=} opt_factor [0.3] Factor of blending with black color.
- * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of darken color, or color if color can not be darken.
+ * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke to be darkened.
+ * @param {number=} opt_factor [0.3] Black color blending factor.
+ * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the darkened color, or Color if color can't be darkened.
  */
 anychart.color.darken = function(fillOrStroke, opt_factor) {
   var hex;
-  // если вернулся null - значит не смогли получить hex - значит возвращаем что пришло без изменений
+  // if null is returned then we can't get a hex representation and return the initial color
   if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
 
-  // превращаем наш hex-цвет в goog.color.Rgb (массив 3х чисел, который понимает goog.color.lighten)
+  // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.darken)
   var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
   if (!goog.isDefAndNotNull(opt_factor)) {
     opt_factor = 0.3;
@@ -129,7 +129,7 @@ anychart.color.darken = function(fillOrStroke, opt_factor) {
 
 
 /**
- * Look at fill() method for params description.
+ * See fill() method for params description.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .

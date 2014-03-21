@@ -7,10 +7,10 @@ goog.require('anychart.utils.Sort');
 
 
 /**
- * Класс предназначен для создания и управления типом графика Pie (Donut).<br/>
- * Подробнее о назначении данного типа визуализации Вы можете прочитать здесь
+ * Pie (Donut) Chart Class.<br/>
+ * Learn more about this type of charts at:
  * {@link http://demos.anychart.dev/articles/Pie-Donut.html}.<br/>
- * Pie интерактивен. Есть возможность кастомизировать поведение на click и hover.
+ * Pie is interactive, you can customize click and hover behavior.
  * @example
  *  var data = [20, 7, 10, 14];
  *  chart = new anychart.pie.Chart(data);
@@ -31,7 +31,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Filter function that should accept a field value and return true if the row
-   *    should be included into the resulting view as a and false otherwise..
+   *    should be included into the resulting view as a and false otherwise.
    * @param {*} val Value supposed to be filtered.
    * @return {boolean} Filtering result.
    * @private
@@ -41,28 +41,28 @@ anychart.pie.Chart = function(opt_data) {
   };
 
   /**
-   * Start angle for first slice of pie.
+   * Start angle for the first slice of a pie chart.
    * @type {(string|number)}
    * @private
    */
   this.startAngle_ = -90;
 
   /**
-   * Outer radius for the pie.
+   * Outer radius of the pie chart.
    * @type {(string|number)}
    * @private
    */
   this.radius_ = '40%';
 
   /**
-   * Inner radius in case of donut.
+   * Inner radius in case of a donut chart.
    * @type {!(string|number|function(number):number)}
    * @private
    */
   this.innerRadius_ = 0;
 
   /**
-   * Value which pie slice should be exploded.
+   * The value to which pie slice should expand (explode).
    * @type {(string|number)}
    * @private
    */
@@ -113,7 +113,7 @@ anychart.pie.Chart = function(opt_data) {
   this.parentViewToDispose_ = null;
 
   /**
-   * Position provider for labels position formatter.
+   * Position provider for the labels position formatter.
    * @type {function(number):Object}
    * @private
    */
@@ -135,7 +135,7 @@ anychart.pie.Chart = function(opt_data) {
 
 
   /**
-   * Format provider for labels text formatter.
+   * Format provider for the the labels text formatter.
    * @type {function(number, String):Object}
    * @private
    */
@@ -152,7 +152,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Flag identifies that information is not fully gathered to calculate/recalculate data.
-   * Used in setOtherPoint, to prevent call of data set method twice.
+   * Used in setOtherPoint to prevent call of data set method twice.
    * @see #setOtherPoint
    * @type {boolean}
    * @private
@@ -162,7 +162,7 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * Default fill function.
    * @this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * @return {acgraph.vector.Fill} Fill for pie slice.
+   * @return {acgraph.vector.Fill} Fill for a pie slice.
    * @private
    */
   this.fill_ = function() {
@@ -172,7 +172,7 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * Default stroke function.
    * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * @return {acgraph.vector.Stroke} Stroke for pie slice.
+   * @return {acgraph.vector.Stroke} Stroke for a pie slice.
    * @private
    */
   this.stroke_ = function() {
@@ -182,7 +182,7 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * Default fill function for hover state.
    * * @this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * @return {acgraph.vector.Fill} Fill for pie slice of hover state.
+   * @return {acgraph.vector.Fill} Fill for a pie slice in hover state.
    * @private
    */
   this.hoverFill_ = function() {
@@ -192,7 +192,7 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * Default stroke function for hover state.
    * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * @return {acgraph.vector.Stroke} Stroke for pie slice of hover state.
+   * @return {acgraph.vector.Stroke} Stroke for a pie slice in hover state.
    * @private
    */
   this.hoverStroke_ = function() {
@@ -237,23 +237,23 @@ anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Определяет способ обработки точек, отфильтрованных фильтр-функцией.
+ * Defines the way to treat points filtered out by a filter function.
  * @enum {string}
  */
 anychart.pie.Chart.OtherPointType = {
   /**
-   * Не учитывать отфильтрованные точки.
+   * Ignore filtered out point.
    */
   DROP: 'drop',
 
   /**
-   * Сгруппировать отфильтрованные точки в одну.
+   * Group filtered out point into one point.
    */
   GROUP: 'group',
 
   /**
-   * Не проводить никаких манипуляций с отфильтрованными точками.<br/>
-   * Установлено по умолчанию.
+   * Don't do anything with filtered out points.<br/>
+   * This is a default behavior.
    */
   NONE: 'none'
 };
@@ -278,12 +278,12 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
 
 
 /**
- * Устанавливает данные для текущего чарта.
- * Про нюансы работы с {@link anychart.data.Mapping}, читать в соответствующей статье.
- * @example <c>Задаем данные через простой массив</c>
+ * Sets data for the current chart.
+ * Learn more about mapping at {@link anychart.data.Mapping}.
+ * @example <c>Set data using simple array</c>
  *  var data = [20, 7, 10, 14];
  *  chart = new anychart.pie.Chart(data);
- * @example <c>Задаем данные как {@link anychart.data.Set}</c>
+ * @example <c>Set data using {@link anychart.data.Set}</c>
  *  var dataSet = new anychart.data.Set([
  *    {name: 'Point 1', value: 10},
  *    {name: 'Point 2', value: 7},
@@ -291,7 +291,7 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  *    {name: 'Point 4', value: 14}
  *  ]);
  *  var chart = new anychart.pie.Chart(dataSet);
- * @example <c>Задаем данные как {@link anychart.data.Mapping}</c>
+ * @example <c>Set data using {@link anychart.data.Mapping}</c>
  *  var dataSet = new anychart.data.Set([
  *    {name: 'Point 1', value: 10},
  *    {name: 'Point 2', value: 7},
@@ -299,7 +299,7 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  *    {name: 'Point 4', value: 14}
  *  ]);
  *  var chart = new anychart.pie.Chart(dataSet.mapAs().sort('value'));
- * @example <c>Задаем данные через сложный {@link anychart.data.Mapping}</c> <t>stageOnly</t>
+ * @example <c>Set data using a complex {@link anychart.data.Mapping}</c> <t>stageOnly</t>
  *  var dataSet = new anychart.data.Set([
  *    [1, 22, 13],
  *    [13, 22, 23],
@@ -315,9 +315,9 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  *      .bounds('50%',0,'50%', '100%')
  *      .draw();
  * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_value Data for the chart.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Возвращает текущие данные чарта.
+ * Returns current chart data.
  * @return {anychart.data.View} Current view or self for chaining.
  *//**
  * @ignoreDoc
@@ -360,7 +360,7 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 
 
 /**
- * Method that prepares final view of data.
+ * Method that prepares the final view of data.
  * @param {(anychart.data.View)} data Data.
  * @return {anychart.data.View} Prepared view.
  * @private
@@ -398,10 +398,10 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
 
 
 /**
- * Getter for current pie's palette.
+ * Getter for the current pie palette.
  * @return {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette)} Color palette instance.
  *//**
- * Setter for pie palette.
+ * Setter for a pie palette.
  * @example <t>stageOnly</t>
  *  var data = [20, 7, 10, 14, 8, 14, 7, 12];
  *  new anychart.pie.Chart(data)
@@ -424,7 +424,7 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
  *      )
  *     .draw();
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Color palette instance.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
@@ -475,10 +475,10 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
 
 /**
- * Getter for pie slices fill in normal state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in normal state.
+ * Getter for the pie slices fill in normal state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the normal state.
  *//**
- * Setter for pie slices fill in normal state.
+ * Setter for the pie slices fill in the normal state.
  * @example
  *  var data = [10, 1, 7, 10];
  *  chart = new anychart.pie.Chart(data);
@@ -486,17 +486,17 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
  *    var color = 50*(this.index + 1);
  *    return 'rgba('+color+','+color+','+color+','+(0.5+(this.index/10))+')';
  *  });
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return fill from default pallete.
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return the fill from the default pallete.
  * function() {
  *   return this.sourceColor;
- * };] Либо Fill, либо fill-function, общий вид которой:<code>function() {
- *  // контекст this: {
- *  //  index : number  - индекс текущей точки
- *  //  sourceColor : acgraph.vector.Fill - fill текущей точки
+ * };] or Fill, or fill-function, which should look like this:<code>function() {
+ *  //  this: {
+ *  //  index : number  - the index of the current point
+ *  //  sourceColor : acgraph.vector.Fill - fill of the current point
  *  // }
  *  return myFill; //acgraph.vector.Fill
  * };</code>
- * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
@@ -514,25 +514,25 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
 
 
 /**
- * Getter for pie slices stroke in normal state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in normal state.
+ * Getter for the pie slices stroke in the normal state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the normal state.
  *//**
- * Setter for pie slices stroke in normal state.
+ * Setter for the pie slices stroke in the normal state.
  * @example
  *  var data = [10, 1, 7, 10];
  *  chart = new anychart.pie.Chart(data);
  *  chart.stroke('#CC0088');
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from default pallete.
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
  * function() {
  *   return anychart.color.darken(this.sourceColor);
- * };] Либо Stroke, либо stroke-function, общий вид которой:<code>function() {
- *  // контекст this: {
- *  //  index : number  - индекс текущей точки
- *  //  sourceColor : acgraph.vector.Stroke - stroke текущей точки
+ * };] or Stroke, or stroke-function, which should look like:<code>function() {
+ *  //  this: {
+ *  //  index : number  - the index of the current point
+ *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
  *  // }
  *  return myStroke; //acgraph.vector.Stroke
  * };</code>
- * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
@@ -550,10 +550,10 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
 
 
 /**
- * Getter for pie slices fill in hover state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in hover state.
+ * Getter for the pie slices fill in the hover state.
+ * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the hover state.
  *//**
- * Setter for pie slices fill in hover state.
+ * Setter for the pie slices fill in the hover state.
  * @example
  *  var data = [10, 1, 7, 10];
  *  chart = new anychart.pie.Chart(data);
@@ -561,17 +561,17 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
  *    var color = 50*(this.index + 1);
  *    return 'rgba('+color+','+color+','+color+','+(0.5+(this.index/10))+')';
  *  });
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighten fill of default pallete.
+ * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighter fill of the default pallete.
  * function() {
  *   return anychart.color.lighten(this.sourceColor);
- * };] Либо Fill, либо fill-function, общий вид которой:<code>function() {
- *  // контекст this: {
- *  //  index : number  - индекс текущей точки
- *  //  sourceColor : acgraph.vector.Fill - fill текущей точки
+ * };] or Fill, or fill-function, which should look like:<code>function() {
+ *  //  this: {
+ *  //  index : number  - the index of the current point
+ *  //  sourceColor : acgraph.vector.Fill - fill of the current point
  *  // }
  *  return myFill; //acgraph.vector.Fill
  * };</code>
- * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
@@ -589,25 +589,25 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
 
 
 /**
- * Getter for pie slices stroke in hover state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in hover state.
+ * Getter for the pie slices stroke in the hover state.
+ * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the hover state.
  *//**
- * Setter for pie slices stroke in hover state.
+ * Setter for the pie slices stroke in the hover state.
  * @example
  *  var data = [10, 1, 7, 10];
  *  chart = new anychart.pie.Chart(data);
  *  chart.hoverStroke('2 #CC0088');
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from default pallete.
+ * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
  * function() {
  *   return anychart.color.darken(this.sourceColor);
- * };] Либо Stroke, либо stroke-function, общий вид которой:<code>function() {
- *  // контекст this: {
- *  //  index : number  - индекс текущей точки
- *  //  sourceColor : acgraph.vector.Stroke - stroke текущей точки
+ * };] or Stroke, or stroke-function, which should look like:<code>function() {
+ *  //  this: {
+ *  //  index : number  - the index of the current point
+ *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
  *  // }
  *  return myStroke; //acgraph.vector.Stroke
  * };</code>
- * @return {!anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
@@ -625,10 +625,10 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
 
 
 /**
- * Getter for current pie's labels.<br/>
- * Используется для доступа к текущим (в том числе и к дефолтным) настройкам леблов.<br>
- * <b>Note:</b> Дефолтные лейблы появятся при первом вызове этого геттера.
- * @example <c>Пример дефолтных лейблов</c><t>stageOnly</t>
+ * Getter for the current pie labels.<br/>
+ * It is used to access to the current (default too) settings of the labels.<br>
+ * <b>Note:</b> Default labels will appear when this getter is called for the first time.
+ * @example <c>Default labels sample</c><t>stageOnly</t>
  *  var data = [10, 7, 4];
  *  var chart1 = new anychart.pie.Chart(data)
  *     .container(stage)
@@ -647,11 +647,11 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *  chart3.labels()
  *     .fontSize(10)
  *     .fontColor('white');
- * @return {anychart.elements.Multilabel} Экземпляр класса {@link anychart.elements.Multilabel} для цепочного вызова.
+ * @return {anychart.elements.Multilabel} An instance of {@link anychart.elements.Multilabel} class for method chaining.
  *//**
- * Setter for pie's labels.<br/>
- * <b>Note:</b> Стоит отметить, что за позиционирование отвечает метод {@link anychart.elements.Multilabel#positionFormatter}
- * а за текстовое наполнение лейбла метод {@link anychart.elements.Multilabel#textFormatter}
+ * Setter for the pie labels.<br/>
+ * <b>Note:</b> positioing is done using {@link anychart.elements.Multilabel#positionFormatter} method
+ * and text is formatted using {@link anychart.elements.Multilabel#textFormatter} method.
  * @example
  *  var data = [
  *    {name: 'Point 1', value: 10},
@@ -673,7 +673,7 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *      .fontColor('white');
  *  chart.labels(labels);
  * @param {anychart.elements.Multilabel=} opt_value [] Multilabel instance.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.Multilabel=} opt_value .
@@ -707,10 +707,10 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 
 /**
- * Комбинированный вызов методов {@link anychart.pie.Chart#otherPointType} и {@link anychart.pie.Chart#otherPointFilter}.
+ * Combined call of {@link anychart.pie.Chart#otherPointType} and {@link anychart.pie.Chart#otherPointFilter} methods.
  * <br>
- * Для установки параметров точки "Остальное" рекомендуется имеено этот метод, так как перерисовка графика целиком будет
- * произведена только один раз, а при последовательном вызове вышеописанных методов график перерисуется два раза.
+ * We recommend to use this method to set of "Other" point parameters, because this way
+ * chart is redrawn only once, in case of sequential call - it is redrawn twice.
  * @example
  *  var data = [10, 1, 7, 10, 2, 4, 20, 3, 14];
  *  chart = new anychart.pie.Chart(data);
@@ -718,8 +718,8 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
  *    return (value >= 10);
  *  });
  * @param {(anychart.pie.Chart.OtherPointType|string)} typeValue Type of the other point filtering.
- * @param {(function(*):boolean)} filterValue Фильтр-функция, которая по текущему значению точки возвращает булевый
- * флаг, определяющий относится эта точка к точке "Остальное". Общий вид:
+ * @param {(function(*):boolean)} filterValue Filter function which returns boolean flag
+ * based on a value of a point, flag is used to decide whether a point falls into "Other". In general this function looks like this:
  * <code>function(pointValue){
  *   ...
  *   return BOOLEAN;
@@ -737,14 +737,14 @@ anychart.pie.Chart.prototype.setOtherPoint = function(typeValue, filterValue) {
 
 
 /**
- * Устанавливает способ формирования точки "Остальное".<br/>
- * <b>Note:</b> Если вы планруете задать еще и фильтр-функцию для точки "Остальное", то мы рекомендуем использовать
- * метод {@link anychart.pie.Chart#setOtherPoint}, который комбинирует в себе оба этих метода.
- * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value [{@link anychart.pie.Chart.OtherPointType}.NONE] Способ формирования.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * Sets the way to create the "Other" point.<br/>
+ * <b>Note:</b> If you plan to use a filter function for an "Other" point we recommend to use
+ * {@link anychart.pie.Chart#setOtherPoint} method which combines two methods.
+ * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value [{@link anychart.pie.Chart.OtherPointType}.NONE] The way to create the "Other" point.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Возвращает текущий способ формирования точки "Остальное".
- * @return {(anychart.pie.Chart.OtherPointType|string)} Текущий способ формирования точки "Остальное".
+ * Returns the current way to create the "Other" point.
+ * @return {(anychart.pie.Chart.OtherPointType|string)} The current way to create the "Other" point.
  *//**
  * @ignoreDoc
  * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value .
@@ -765,32 +765,32 @@ anychart.pie.Chart.prototype.otherPointType = function(opt_value) {
 
 
 /**
- * Устанавливает фильтр-фунукцию точки "Остальное".<br/>
- * <b>Note:</b> Если вы планруете задать еще и способ группировки для точки "Остальное", то мы рекомендуем использовать
- * метод {@link anychart.pie.Chart#setOtherPoint}, который комбинирует в себе оба этих метода.
+ * Sets the filter function of the "Other" point.<br/>
+ * <b>Note:</b> If you plan to use grouping on the "Other" point we recommend to use
+ * {@link anychart.pie.Chart#setOtherPoint} method, which combines two methods.
  * @example
  *  var data = [10, 1, 7, 10, 2, 4, 20, 3, 14];
  *  chart = new anychart.pie.Chart(data);
- *  // Оставляем только точки, которые пройдут фильтр-функцию
+ *  // Leave only the points that pass the filter-function
  *  chart.otherPointType('drop');
- *  // Оставляем только те точки, значение которых больше или равно 10.
+ *  // Leave only the points with values greater than 10.
  *  chart.otherPointFilter(function(value){
  *     return (value >= 10);
  *   });
- * @param {function(*):boolean=} opt_value [//остаются точки, значения которых более 3
+ * @param {function(*):boolean=} opt_value [//only the point with values greater than 3
  * function(val) {
  *   return val > 3;
- * }] Фильтр-функция, которая по текущему
- * значению точки возвращает булевый флаг, определяющий относится эта точка к точке "Остальное". Общий вид:
+ * }] Filter-function that returns boolean
+ * flag to decide if it is a point to be placed in the "Other" point. In general this function looks like this:
  * <code>function(pointValue){
  *   ...
  *   return BOOLEAN;
  * }.
  * </code>
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Возвразает текущую фильтр-фунукцию точки "Остальное".
- * @return {Function} Фильтр-функция.
+ * Returns the current filter-function of the "Other" point.
+ * @return {Function} Filter-function.
  *//**
  * @ignoreDoc
  * @param {function(*):boolean=} opt_value .
@@ -808,9 +808,9 @@ anychart.pie.Chart.prototype.otherPointFilter = function(opt_value) {
 
 
 /**
- * Setter for outer pie radius.<br/>
- * Радиус может быть задан либо числом (тогда воспринимается как пиксельное значение), либо строкой, например '42%' или
- * '152px'.
+ * Setter for the outer pie radius.<br/>
+ * Radious can be set as a number (considered as number of pixels),
+ * or as a string, e.g.'42%' or '152px'.
  * @example <t>stageOnly</t>
  *  var data = [10, 7, 4];
  *  var chart1 = new anychart.pie.Chart(data)
@@ -823,9 +823,9 @@ anychart.pie.Chart.prototype.otherPointFilter = function(opt_value) {
  *     .draw();
  *  chart2.radius('52%');
  * @param {(string|number)=} opt_value ['40%'] Value of the outer radius.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Getter for current pie's outer radius.
+ * Getter for the current pie outer radius.
  * @return {(string|number)} Outer radius.
  *//**
  * @ignoreDoc
@@ -844,7 +844,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
 
 
 /**
- * Setter for inner radius in case of donut.
+ * Setter for the inner radius in case of a Donut chart.
  * @example <t>stageOnly</t>
  *  var data = [10, 7, 4, 5];
  *  var chart1 = new anychart.pie.Chart(data)
@@ -859,17 +859,17 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
  *  chart2.innerRadius(function(outerRadius){
  *    return parseFloat(outerRadius)/2;
  *  });
- * @param {(string|number|function(number):number)=} opt_value [0] Значение внутреннего радиуса в пикселях, процентах или
- * вычисляется функцией. Общий вид функции, аргумент которой текущее пиксельное значение внешнего радиуса:
+ * @param {(string|number|function(number):number)=} opt_value [0] he value of the inner radius in pixels, percents or
+ * function. In general the function should look like this:
  * <code>function(outerRadius){
  *   ...
  *   return NUMBER;
  * }.
  * </code>
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Getter for inner radius in case of donut.
- * @return {(string|number|function(number):number)} Current inner radius of pie/donut chart.
+ * Getter for the inner radius in case of a Donut chart.
+ * @return {(string|number|function(number):number)} Current inner radius of a pie/donut chart.
  *//**
  * @ignoreDoc
  * @param {(string|number|function(number):number)=} opt_value .
@@ -887,9 +887,9 @@ anychart.pie.Chart.prototype.innerRadius = function(opt_value) {
 
 
 /**
- * Getter for pie chart center point.<br/>
- * <b>Note:</b> Корректно работает только после вызова {@link anychart.pie.Chart#draw}
- * @return {anychart.math.Coordinate} XY coordinate of current pie center.
+ * Getter for the pie chart center point.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pie.Chart#draw} is called.
+ * @return {anychart.math.Coordinate} XY coordinate of the current pie chart center.
  */
 anychart.pie.Chart.prototype.getCenterPoint = function() {
   return {'x': this.cx_, 'y': this.cy_};
@@ -897,9 +897,9 @@ anychart.pie.Chart.prototype.getCenterPoint = function() {
 
 
 /**
- * Getter for current pie pixel outer radius.<br/>
- * <b>Note:</b> Корректно работает только после вызова {@link anychart.pie.Chart#draw}
- * @return {number} Pixel value of pie radius.
+ * Getter for the current pie pixel outer radius.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pie.Chart#draw} is called.
+ * @return {number} Pixel value of the pie radius.
  */
 anychart.pie.Chart.prototype.getPixelRadius = function() {
   return this.radiusValue_;
@@ -907,9 +907,9 @@ anychart.pie.Chart.prototype.getPixelRadius = function() {
 
 
 /**
- * Getter for current pie pixel inner radius.<br/>
- * <b>Note:</b> Корректно работает только после вызова {@link anychart.pie.Chart#draw}
- * @return {number} XY coordinate of pie center.
+ * Getter for the current pie pixel inner radius.<br/>
+ * <b>Note:</b> Works only after {@link anychart.pie.Chart#draw} is called.
+ * @return {number} XY coordinate of the pie center.
  */
 anychart.pie.Chart.prototype.getPixelInnerRadius = function() {
   return this.innerRadiusValue_;
@@ -917,7 +917,7 @@ anychart.pie.Chart.prototype.getPixelInnerRadius = function() {
 
 
 /**
- * Setter for angle from which the first piece is drawn clockwise.
+ * Setter for the angle from which the first slice is drawn clockwise.
  * @illustration
  * var data = [3.4, 0, 6.6, 6.6, 3.4];
  * chart = new anychart.pie.Chart(data);
@@ -933,9 +933,9 @@ anychart.pie.Chart.prototype.getPixelInnerRadius = function() {
  * layer.circle(center.x - chart.getPixelRadius(), center.y, 4).fill('red .5').stroke('red');
  * layer.text(center.x - chart.getPixelRadius()-30, center.y -8, '180\u00B0');
  * @param {(string|number)=} opt_value [-90] Value of the start angle.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Getter for angle from which the first piece is drawn clockwise.
+ * Getter for the angle from which the first slice is drawn clockwise.
  * @return {(string|number)} Current start angle.
  *//**
  * @ignoreDoc
@@ -954,7 +954,7 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
 
 
 /**
- * Устанавливает значение explode точки от центра Pie/Donut в пикселях.
+ * Sets the value of exploding in pixels.
  * @illustration
  * layer.parent(stage);
  *  var data = new anychart.data.Set([
@@ -992,11 +992,11 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
  *      .lineTo(center.x-20, center.y+14)
  *      .stroke('1 red');
  *  layer.circle(center.x-20, center.y+14, 4).fill('red .5').stroke('red');
- * @param {(string|number)=} opt_value [15] Value of the explode.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @param {(string|number)=} opt_value [15] Value of the expansion/exploding.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Getter for value which pie slice should be exploded.
- * @return {(string|number)} Explode value.
+ * Getter for the value of pie slice exploding.
+ * @return {(string|number)} Exploding value.
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
@@ -1014,8 +1014,8 @@ anychart.pie.Chart.prototype.explode = function(opt_value) {
 
 
 /**
- * Setter for sort setting.<br/>
- * Можно отсортировать отображаемые данные по возрастанию/убыванию или аообще отключить сортировку.
+ * Setter for the sort setting.<br/>
+ * Ascending, Descending and No sorting is supported.
  * @example <t>stageOnly</t>
  *  var data = [3.4, 10, 6.6, 7, 3.4];
  *  new anychart.pie.Chart(data)
@@ -1028,9 +1028,9 @@ anychart.pie.Chart.prototype.explode = function(opt_value) {
  *      .sort(anychart.utils.Sort.DESC)
  *      .draw();
  * @param {(anychart.utils.Sort|string)=} opt_value [{@link anychart.utils.Sort}.NONE] Value of the sort setting.
- * @return {anychart.pie.Chart} Экземпляр класса {@link anychart.pie.Chart} для цепочного вызова.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
- * Getter for current sort setting.
+ * Getter for the current sort setting.
  * @return {anychart.utils.Sort} Sort setting.
  *//**
  * @ignoreDoc
@@ -1052,8 +1052,8 @@ anychart.pie.Chart.prototype.sort = function(opt_value) {
 
 
 /**
- * Calculating common values for pie plot.
- * @param {anychart.math.Rect} bounds Bounds of content area.
+ * Calculating common values for a pie plot.
+ * @param {anychart.math.Rect} bounds Bounds of the content area.
  * @private
  */
 anychart.pie.Chart.prototype.calculate_ = function(bounds) {
@@ -1073,9 +1073,9 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 
 
 /**
- * Gets final normalized fill color.
+ * Gets the final normalized fill color.
  * @param {number} pieSliceIndex Index of a pie slice.
- * @param {boolean=} opt_hover Whether pie slice hovered or not.
+ * @param {boolean=} opt_hover Whether a pie sliceis hovered or not.
  * @param {acgraph.vector.Fill=} opt_fill Normal state fill.
  * @return {!acgraph.vector.Fill} Normalized fill.
  * @private
@@ -1112,9 +1112,9 @@ anychart.pie.Chart.prototype.getFillColor_ = function(pieSliceIndex, opt_hover, 
 
 
 /**
- * Gets final normalized stroke color.
+ * Gets the final normalized stroke color.
  * @param {number} pieSliceIndex Index of a pie slice.
- * @param {boolean=} opt_hover Whether pie slice hovered or not.
+ * @param {boolean=} opt_hover Whether a pie slice is hovered or not.
  * @param {acgraph.vector.Stroke=} opt_stroke Normal state stroke.
  * @return {!acgraph.vector.Stroke} Normalized stroke.
  * @private
@@ -1184,7 +1184,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       }
 
       /**
-       * Sum of all pie slices value.
+       * Sum of all  pie slices values.
        * @type {number}
        * @private
        */
@@ -1265,12 +1265,12 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
 
 /**
- * Internal function for drawing slice by arguments.
- * @param {number} index Index of row in the view.
+ * Internal function for drawinga slice by arguments.
+ * @param {number} index Index of a row in the view.
  * @param {number} start Start angle.
  * @param {number} sweep Sweep angle.
- * @param {number} cx X coordinate of center point.
- * @param {number} cy Y coordinate of center point.
+ * @param {number} cx The X coordinate of center point.
+ * @param {number} cy The Y coordinate of center point.
  * @param {number} radius Outer radius.
  * @param {number} innerRadius Inner radius.
  * @param {acgraph.vector.Fill?} fill Fill setting.
@@ -1278,7 +1278,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
  * @param {boolean=} opt_exploded Is point exploded.
  * @param {number=} opt_explode Explode value.
  * @param {acgraph.vector.Path=} opt_path If set, draws to that path.
- * @return {boolean} True if point draw.
+ * @return {boolean} True if point is drawn.
  * @private
  */
 anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, radius, innerRadius, fill, stroke, opt_exploded, opt_explode, opt_path) {

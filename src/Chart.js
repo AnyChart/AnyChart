@@ -10,12 +10,12 @@ goog.require('anychart.utils.ZIndexedLayer');
 
 
 /**
- * Базовый класс для всех чартов, в котором определены отступы, background и title.
+ * Base class for all charts, contains the margins, the background and the title.
  * @constructor
  * @extends {anychart.elements.BaseWithBounds}
  */
 anychart.Chart = function() {
-  //todo: этот суспенд можно заменить на флаг конкретно для чарта,если больше это нигде не понадобится.
+  //todo: this suspend can be replaced with a flag for the chart if it will not be needed anywhere else.
   this.suspendInvalidationDispatching();
   goog.base(this);
 
@@ -88,7 +88,7 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current chart margin.
+ * Getter for the current chart margin.
  * @illustration <t>simple</t>
  * var margins = 20;
  * stage.rect(0, 0, stage.width(), stage.height()).fill('orange 0.1');
@@ -117,9 +117,9 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * //content area
  * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('white 1');
  * stage.text(stage.width() / 4, stage.height() / 2 - margins, 'Chart Content Area').fontSize(21);
- * @return {anychart.utils.Margin} Current chart margin.
+ * @return {anychart.utils.Margin} The current chart margin.
  *//**
- * Setter for chart margin in pixels by one value.<br/>
+ * Setter for the chart margin in pixels using a single value.<br/>
  * @example <t>listingOnly</t>
  * // all margins 15px
  * chart.margin(15);
@@ -128,9 +128,9 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * // top and bottom 5px ,right and left 15px
  * chart.margin( new anychart.utils.Space(5,15) );
  * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
- * Setter for chart margin in pixels by few numbers.<br/>
+ * Setter for the chart margin in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
  * // 1) top and bottom 10px, left and right 15px
  * chart.margin(10, '15px');
@@ -142,7 +142,7 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
@@ -172,7 +172,7 @@ anychart.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rig
  * @private
  */
 anychart.Chart.prototype.marginInvalidated_ = function(event) {
-  //что бы не поменялось в марджинах, оно влияет на размер чарта, значит нужно перерисовывать все
+  // whatever has changed in margins affects chart size, so we need to redraw everything
   this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
 };
 
@@ -183,7 +183,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current chart padding.
+ * Getter for the current chart padding.
  * @illustration <t>simple</t>
  * //margins
  * var margins = 20;
@@ -240,7 +240,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * stage.text(stage.width() / 4, stage.height() / 2 - paddings, 'Chart Content Area').fontSize(21);
  * @return {anychart.utils.Padding} Current chart padding.
  *//**
- * Setter for chart paddings in pixels by one value.<br/>
+ * Setter for the chart paddings in pixels using a single value.<br/>
  * @example <t>listingOnly</t>
  * // all paddings 15px
  * chart.padding(15);
@@ -249,9 +249,9 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * // top and bottom 5px ,right and left 15px
  * chart.padding( new anychart.utils.Space(5,15) );
  * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
- * Setter for chart paddings in pixels by few numbers.<br/>
+ * Setter for the chart paddings in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
  * // 1) top and bottom 10px, left and right 15px
  * chart.padding(10, '15px');
@@ -263,7 +263,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
@@ -293,7 +293,7 @@ anychart.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_ri
  * @private
  */
 anychart.Chart.prototype.paddingInvalidated_ = function(event) {
-  //что бы не поменялось в паддингах, оно влияет на размер чарта, значит нужно перерисовывать все
+  // whatever has changed in paddings affects chart size, so we need to redraw everything
   this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
 };
 
@@ -304,13 +304,13 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current chart background.
+ * Getter for the current chart background.
  * @example
  * chart = new anychart.Chart();
  * chart.background().stroke('2 green');
- * @return {anychart.elements.Background} Current chart background.
+ * @return {anychart.elements.Background} The current chart background.
  *//**
- * Setter for chart background.
+ * Setter for the chart background.
  * @example
  * chart = new anychart.Chart();
  * var background = new anychart.elements.Background()
@@ -326,7 +326,7 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
  *         });
  * chart.background(background);
  * @param {(anychart.elements.Background)=} opt_value Background object to set.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.elements.Background)=} opt_value .
@@ -356,8 +356,8 @@ anychart.Chart.prototype.background = function(opt_value) {
  * @private
  */
 anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
-  // что бы не изменилось в фоне, мы перерисовываем только фон.
-  // он никак не может повлиять на остальные елементы
+  // whatever has changed in background we redraw only background
+  // because it doesn't affect other elements
   this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
 };
 
@@ -368,16 +368,16 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart title.
+ * Getter for the chart title.
  * @example
  * chart = new anychart.Chart();
  * chart.title().fontSize(41);
- * @return {anychart.elements.Title} Current chart title.
+ * @return {anychart.elements.Title} The current chart title.
  *//**
- * Setter for chart title.
+ * Setter for the chart title.
  * @example <c>Simple string</c>
  * chart = new anychart.Chart();
- * chart.title('My custom title');
+ * chart.title('Conqueror of Naxxramas');
  * @example
  * chart = new anychart.Chart();
  * chart.title( new anychart.elements.Title()
@@ -385,7 +385,7 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
  *      .text('Red title')
  * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining
  *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Title)=} opt_value .
@@ -418,11 +418,11 @@ anychart.Chart.prototype.title = function(opt_value) {
  * @private
  */
 anychart.Chart.prototype.titleInvalidated_ = function(event) {
-  //Если у тайтла поменялись размеры, то это влияет на весь график и нужно перерисовывать все
+  // if title size has changed it affects the whole chart and we need to redraw
   if (event.invalidated(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
     this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
   } else {
-    //Если размер не поменялся, то все остальное (цвет текста или фона) на график не влияет
+    // if size hasn't changed then all other stuff (color of the text or the background) doesn't affect the chart
     this.invalidate(anychart.utils.ConsistencyState.TITLE_APPEARANCE);
   }
 };
@@ -434,15 +434,15 @@ anychart.Chart.prototype.titleInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Запускает процедуру рендеринга всего содержимого чарта в заранее указанный контейнер.
- * @return {anychart.Chart} Экземпляр класса {@link anychart.Chart} для цепочного вызова.
+ * Starts the rendering of the chart into the container.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  */
 anychart.Chart.prototype.draw = function() {
   if (this.isConsistent()) return this;
 
-  //total chart area bounds, do not override, it can be useful later.
+  //total chart area bounds, do not override, it can be useful later
   var totalBounds;
-  //chart area with applied margin.
+  //chart area with applied margin
   var boundsWithoutMargin;
   //chart area with applied margin and padding
   var boundsWithoutPadding;
@@ -451,7 +451,7 @@ anychart.Chart.prototype.draw = function() {
   //chart content bounds, allocated space for all chart appearance items.
   var contentAreaBounds;
 
-  //create root element only if draw ever called
+  //create root element only if draw is called
   if (!this.rootElement) this.rootElement = new anychart.utils.ZIndexedLayer();
 
   //suspend stage
@@ -509,13 +509,13 @@ anychart.Chart.prototype.draw = function() {
   }
   //end clear container consistency states
 
-  //after all chart items drawn, we can clear other states
+  //after all chart items are drawn, we can clear other states
   this.markConsistent(anychart.utils.ConsistencyState.BOUNDS);
   this.markConsistent(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
 
   if (manualSuspend) stage.resume();
 
-  //todo(Anton Saukh): rework this shit!
+  //todo(Anton Saukh): rework this mess!
   this.listenInvalidation(this.invalidateHandler_, this);
   //end shit
 
@@ -524,13 +524,13 @@ anychart.Chart.prototype.draw = function() {
 
 
 /**
- * Extension point do draw chart content.
+ * Extension point draw chart content.
  * @param {acgraph.math.Rect} bounds Chart content area bounds.
  */
 anychart.Chart.prototype.drawContent = goog.nullFunction;
 
 
-//todo(Anton Saukh): rework this shit!
+//todo(Anton Saukh): rework this mess!
 /**
  * Internal invalidation event handler, redraw chart on all invalidate events.
  * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
@@ -544,11 +544,11 @@ anychart.Chart.prototype.invalidateHandler_ = function(event) {
   }
   this.draw();
 };
-//end shit
+//end of the mess
 
 
 /**
- * Define, should we draw background or not.
+ * Define should we draw background or not.
  * @return {boolean} Should we draw background or not.
  */
 anychart.Chart.prototype.shouldDrawBackground = function() {
@@ -559,7 +559,7 @@ anychart.Chart.prototype.shouldDrawBackground = function() {
 
 
 /**
- * Define, should we draw background or not.
+ * Define should we draw background or not.
  * @return {boolean} Should we draw background or not.
  */
 anychart.Chart.prototype.shouldDrawTitle = function() {

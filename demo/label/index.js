@@ -2,7 +2,7 @@ var label;
 function load() {
   label = new anychart.elements.Label();
   label.container('container');
-  label.position({x: '20%', y: 20});
+  label.position({x: '200%', y: 20});
   label.text('Some label text');
   label.anchor('center');
   label.padding(10, 5, 10, 5);

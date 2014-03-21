@@ -21,7 +21,7 @@ goog.inherits(anychart.elements.Base, anychart.utils.Invalidatable);
 
 
 /**
- * Container which the root element should be added to.
+ * Container to which the root element should be added to.
  * @type {acgraph.vector.ILayer}
  * @private
  */
@@ -37,7 +37,7 @@ anychart.elements.Base.prototype.zIndex_ = 0;
 
 
 /**
- * Is element enabled.
+ * Whether element is enabled or not.
  * @type {boolean}
  * @private
  */
@@ -65,11 +65,11 @@ anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for element's current container.
- * @return {acgraph.vector.ILayer} Current container.
+ * Getter for the element's current container.
+ * @return {acgraph.vector.ILayer} The current container.
  *//**
- * Setter for element container.<br/>
- * Each element append all it's content to this container.<br/>
+ * Setter for the element container.<br/>
+ * Each element appends all it's content to this container.<br/>
  * The order of adding is not defined, but usually it will be the order in which elements are drawn for the first time.
  * So if you need to specify the order use {@link anychart.elements.Base#zIndex}.
  * @example <t>listingOnly</t>
@@ -81,8 +81,8 @@ anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
  * // Framework-element
  *  var fwElement = new anychart.elements.Title();
  *  element.container( fwElement.container() );
- * @param {(acgraph.vector.ILayer|string|Element)=} opt_value Value to set.
- * @return {anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ * @param {(acgraph.vector.ILayer|string|Element)=} opt_value The value to set.
+ * @return {anychart.elements.Base} An instance of {@link anychart.elements.Base} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
@@ -108,10 +108,10 @@ anychart.elements.Base.prototype.container = function(opt_value) {
 
 
 /**
- * Getter for current Z-index of the element.
- * @return {number} Current zIndex.
+ * Getter for the current Z-index of the element.
+ * @return {number} The current zIndex.
  *//**
- * Setter for Z-index of the element.<br/>
+ * Setter for the Z-index of the element.<br/>
  * @illustration <t>stageOnly</t>
  *  var stroke = '1 black 1';
  *  layer.ellipse(75, 105, 55, 35).fill('#cc6622', 1).stroke(stroke)
@@ -121,9 +121,9 @@ anychart.elements.Base.prototype.container = function(opt_value) {
  *  layer.text(195, 70, 'index = 1');
  *  layer.text(195, 40, 'index = 2');
  * @illustrationDesc
- *  Чем больше значение индекса - тем выше положение элемента.
+ * The bigger the index - the higher the element position is.
  * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ * @return {!anychart.elements.Base} An instance of {@link anychart.elements.Base} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -140,15 +140,15 @@ anychart.elements.Base.prototype.zIndex = function(opt_value) {
 
 
 /**
- * Getter for current element state (enabled or disabled).
- * @return {boolean} Current element state.
+ * Getter for the current element state (enabled or disabled).
+ * @return {boolean} The current element state.
  *//**
- * Setter for element enabled state.
+ * Setter for the element enabled state.
  * @example <t>listingOnly</t>
  * if (!element.enabled())
  *    element.enabled(true);
  * @param {boolean=} opt_value Value to set.
- * @return {anychart.elements.Base} Экземпляр класса {@link anychart.elements.Base} для цепочного вызова.
+ * @return {anychart.elements.Base} An instance of {@link anychart.elements.Base} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Value to set.
@@ -190,13 +190,13 @@ anychart.elements.Base.prototype.resolveEnabledState = function() {
 
 
 /**
- * Add all elements content to container depend on enabled state.
+ * Add all elements content to a container depending on enabled state.
  */
 anychart.elements.Base.prototype.restore = goog.abstractMethod;
 
 
 /**
- * Remove all element content from container.
+ * Remove all elements content from the container.
  */
 anychart.elements.Base.prototype.remove = goog.abstractMethod;
 

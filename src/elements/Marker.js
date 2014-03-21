@@ -377,7 +377,14 @@ anychart.elements.Marker.prototype.anchor = function(opt_value) {
  *     .draw();
  * @param {(anychart.elements.Marker.Type|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer.
+ *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Функция, задающее произвольно
+ *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
+ *    // path - это acgraph.vector.Path
+ *    // x, y - текущее позиционирование маркера
+ *    // size - размер маркера
+ *    ... //do smth
+ *    return path;
+ *  }</code>.
  * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
  *//**
  * @ignoreDoc
