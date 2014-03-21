@@ -3,21 +3,29 @@ var radiusPixel = 0;
 
 function load() {
   var container = 'container';
-  var stage = acgraph.create(400, 200, container);
+  var stage = acgraph.create(400, 100, container);
   var layer = acgraph.layer();
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-  var star = stage.star4(stage.width()/2, stage.height()/2, stage.height()/2-10).fill('yellow', 0.5);
-  var pathBounds = star.getBounds();
-  stage.text(pathBounds.left + pathBounds.width/2 + 7, pathBounds.top, 'NORTH');
-  stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top , 3).fill('blue');
-  stage.text(pathBounds.left -37, pathBounds.top + pathBounds.height/2 -7, 'EAST');
-  stage.circle(pathBounds.left, pathBounds.top + pathBounds.height/2, 3).fill('blue');
-  stage.text(pathBounds.left + pathBounds.width + 7, pathBounds.top + pathBounds.height/2 -7, 'WEST');
-  stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height/2, 3).fill('blue');
-  stage.text(pathBounds.left + pathBounds.width/2 + 7, pathBounds.top + pathBounds.height -7, 'SOUTH');
-  stage.circle(pathBounds.left + pathBounds.width/2, pathBounds.top + pathBounds.height, 3).fill('blue');
+ var MMarker = new anychart.elements.Multimarker()
+     .type('star5')
+     .fill('none')
+     .stroke('3px black .7')
+     .size('24')
+     .container(stage);
+ for (var i=0; i<9; i++) {
+   if (i==6){
+      MMarker.end();
+      MMarker.fill('blue');
+   }
+   var positionProvider = {
+     x: 35 + i*65,
+     y: 50
+   };
+   MMarker.draw(positionProvider);
+ }
+  MMarker.clear()
 
 //  var rect = stage.rect(50, 30, 75, 125).stroke('1 #aaa').fill('#eee');
 
