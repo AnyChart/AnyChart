@@ -5,7 +5,7 @@ goog.require('goog.color');
 
 /**
  * Класс определяющий работу градиентной палитры.
- * @example <t>simple-100</t>
+ * @example <t>simple-h100</t>
  * var palette = new anychart.utils.RangeColorPalette()
  *     .colors(['red', 'yellow'])
  *     .count(9);
@@ -124,7 +124,7 @@ anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
  * @return {acgraph.vector.SolidFill|anychart.utils.RangeColorPalette} Color palette colors by index.
  *//**
  * Setter for color palette colors from list by index.
- * @example <t>simple-100</t>
+ * @example <t>simple-h100</t>
  * var palette = new anychart.utils.RangeColorPalette()
  *     .colors(['red', 'yellow'])
  *     .count(9);

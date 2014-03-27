@@ -4,7 +4,7 @@ goog.provide('anychart.utils.DistinctColorPalette');
 
 /**
  * Класс, определяющий палитру цветов.
- * @example <t>simple-100</t>
+ * @example <t>simple-h100</t>
  * var palette = new anychart.utils.DistinctColorPalette()
  *     .colors(['red', 'yellow', 'brown', 'green']);
  * for (var i = 1; i < 10; i++) {
@@ -44,7 +44,7 @@ anychart.utils.DistinctColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
  * @return {acgraph.vector.Fill|anychart.utils.DistinctColorPalette} Color palette colors by index.
  *//**
  * Setter for color palette colors from list by index.
- * @example <t>simple-100</t>
+ * @example <t>simple-h100</t>
  * var palette = new anychart.utils.DistinctColorPalette()
  *     .colors(['red', 'yellow', 'brown', 'green']);
  * palette.colorAt(2, 'white');
