@@ -15,7 +15,7 @@ goog.require('goog.color');
  *     .stroke('1px #000');
  * }
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.utils.RangeColorPalette = function() {
   goog.base(this);
@@ -45,15 +45,14 @@ anychart.utils.RangeColorPalette = function() {
 
   this.restoreDefaults(true);
 };
-goog.inherits(anychart.utils.RangeColorPalette, anychart.utils.Invalidatable);
+goog.inherits(anychart.utils.RangeColorPalette, anychart.Base);
 
 
 /**
  * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.utils.RangeColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.utils.RangeColorPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
@@ -85,7 +84,7 @@ anychart.utils.RangeColorPalette.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.colors_ = opt_value;
     this.processColorRange_();
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     return this.colors_;
@@ -110,7 +109,7 @@ anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.count_ = opt_value;
     this.processColorRange_();
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     return this.count_;
@@ -149,7 +148,7 @@ anychart.utils.RangeColorPalette.prototype.colorAt = function(index, opt_color) 
 
   if (goog.isDef(opt_color)) {
     this.colorPalette_[index] = opt_color;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     if (index > this.count_ - 1) index = this.count_ - 1;
@@ -284,7 +283,7 @@ anychart.utils.RangeColorPalette.prototype.restoreDefaults = function(opt_doNotD
     '#FF6500'
   ];
   this.processColorRange_();
-  if (opt_doNotDispatch) this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+  if (opt_doNotDispatch) this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 
 

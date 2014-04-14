@@ -1,7 +1,7 @@
 goog.provide('anychart.elements.Ticks');
 
+goog.require('anychart.Base');
 goog.require('anychart.utils');
-goog.require('anychart.utils.Invalidatable');
 
 
 
@@ -9,7 +9,7 @@ goog.require('anychart.utils.Invalidatable');
  * Класс определяющий тики на оси.<br/>
  * У тиков можно настроить положение, длинну и характеристики линий.
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.elements.Ticks = function() {
   goog.base(this);
@@ -34,18 +34,25 @@ anychart.elements.Ticks = function() {
    * @private
    */
   this.position_;
+
+  /**
+   * Ticks enabled.
+   * @type {boolean}
+   * @private
+   */
+  this.enabled_;
   this.restoreDefaults();
 };
-goog.inherits(anychart.elements.Ticks, anychart.utils.Invalidatable);
+goog.inherits(anychart.elements.Ticks, anychart.Base);
 
 
 /**
  * Supported consistency states.
  * @type {number}
  */
-anychart.elements.Ticks.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.APPEARANCE |
-    anychart.utils.ConsistencyState.BOUNDS;
+anychart.elements.Ticks.prototype.SUPPORTED_SIGNALS =
+    anychart.Signal.NEEDS_REDRAW |
+    anychart.Signal.BOUNDS_CHANGED;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,7 +123,7 @@ anychart.elements.Ticks.Position = {
 anychart.elements.Ticks.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.length_ = opt_value;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else
     return this.length_;
@@ -175,7 +182,7 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
 anychart.elements.Ticks.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.stroke_ = opt_value;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.APPEARANCE);
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     return this;
   } else
     return this.stroke_;
@@ -221,7 +228,7 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
 anychart.elements.Ticks.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.position_ = opt_value.toLowerCase();
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else
     return this.position_;
@@ -229,27 +236,56 @@ anychart.elements.Ticks.prototype.position = function(opt_value) {
 
 
 /**
- * Restore labels default settings.
+ * Gets or Sets element enabled state.
+ * @param {boolean=} opt_value Element enabled state value.
+ * @return {anychart.elements.Ticks|boolean} Element enabled state.
  */
-anychart.elements.Ticks.prototype.restoreDefaults = function() {
-  this.position_ = anychart.elements.Ticks.Position.OUTSIDE;
-  this.stroke_ = 'black';
-  this.length_ = 5;
+anychart.elements.Ticks.prototype.enabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.enabled_ != opt_value) {
+      this.enabled_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.enabled_;
+  }
 };
 
 
 /**
- * Copies labels settings from the passed labels instance to itself.
- * @param {anychart.elements.Ticks} ticks Ticks to copy settings from.
- * @return {!anychart.elements.Ticks} Returns itself for chaining.
+ * Restore labels default settings.
  */
-anychart.elements.Ticks.prototype.clonFrom = function(ticks) {
-  if (goog.isDefAndNotNull(ticks)) {
-    this.length(ticks.length_);
-    this.position(ticks.position_);
-    this.stroke(ticks.stroke_);
-  } else {
-    this.restoreDefaults();
-  }
+anychart.elements.Ticks.prototype.restoreDefaults = function() {
+  this.length_ = 5;
+  this.position_ = anychart.elements.Ticks.Position.OUTSIDE;
+  this.stroke_ = 'black';
+  this.enabled_ = true;
+  this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Ticks serialization.
+ * @return {Object} Serialized axis data.
+ */
+anychart.elements.Ticks.prototype.serialize = function() {
+  var data = {};
+  data['length'] = this.length_;
+  data['position'] = this.position_;
+  data['stroke'] = this.stroke_;
+  data['enabled'] = this.enabled_;
+
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.elements.Ticks.prototype.deserialize = function(value) {
+  if (goog.isDef(value['length'])) this.length(value['length']);
+  if (goog.isDef(value['position'])) this.position(value['position']);
+  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
+  if (goog.isDef(value['enabled'])) this.enabled(value['enabled']);
+
   return this;
 };

@@ -333,6 +333,44 @@ anychart.color.normalizeStroke = function(opt_strokeOrFill, opt_thickness, opt_d
 
 
 /**
+ * Tests colors equality. Can test a fill against stroke also.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color1 First color.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color2 Second color.
+ * @return {boolean} Comparison result.
+ */
+anychart.color.equals = function(color1, color2) {
+  // TODO(Anton Saukh): Fix it.
+  return color1 == color2;
+};
+
+
+/**
+ * Serializes fill or stroke.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color
+ * @return {Object|string}
+ */
+anychart.color.serialize = function(color) {
+  var result;
+  if (color instanceof acgraph.vector.HatchFill) {
+    result = {
+      'type': 'hatchFill',
+      'hatchType': color['type'],
+      'color': color['color'],
+      'thickness': color['thickness'],
+      'size': color['size']
+    };
+  } else if (color instanceof acgraph.vector.PatternFill) {
+    result = color.serialize();
+  } else if (goog.isObject(color)) {
+    result = /** @type {Object} */(anychart.utils.recursiveClone(color));
+  } else {
+    result = color || 'none';
+  }
+  return result;
+};
+
+
+/**
  * Приводит режим к прямоугольнику. Если не может (например это null или boolean), возвращает null.
  * @param {null|number|boolean|acgraph.math.Rect|{left:number,top:number,width:number,height:number}|undefined} mode Режим
  *    градиента, который нужно нормализовать.

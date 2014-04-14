@@ -14,13 +14,13 @@ goog.require('anychart.utils.Sort');
  * @example
  *  var data = [20, 7, 10, 14];
  *  chart = new anychart.pie.Chart(data);
- * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_data Data for the chart.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @extends {anychart.Chart}
  * @constructor
  */
 anychart.pie.Chart = function(opt_data) {
   goog.base(this);
-  this.suspendInvalidationDispatching();
+  this.suspendSignalsDispatching();
 
   /**
    * Type of the other point.
@@ -31,7 +31,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Filter function that should accept a field value and return true if the row
-   *    should be included into the resulting view as a and false otherwise.
+   *    should be included into the resulting view as a and false otherwise..
    * @param {*} val Value supposed to be filtered.
    * @return {boolean} Filtering result.
    * @private
@@ -77,7 +77,6 @@ anychart.pie.Chart = function(opt_data) {
   this.sort_ = anychart.utils.Sort.NONE;
 
   /**
-   * Pie labels.
    * @type {anychart.elements.Multilabel}
    * @private
    */
@@ -204,23 +203,19 @@ anychart.pie.Chart = function(opt_data) {
       .fontColor('white')
       .fontSize(13);
   this.data(opt_data);
-  this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
-  this.resumeInvalidationDispatching(false);
+  this.invalidate(anychart.ConsistencyState.ALL);
+  this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.pie.Chart, anychart.Chart);
 
 
 /**
  * Supported consistency states.
- * @type {number}
- */
-anychart.pie.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.Chart.prototype.DISPATCHED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.DATA |
-    anychart.utils.ConsistencyState.PIE_APPEARANCE |
-    anychart.utils.ConsistencyState.LABELS |
-    anychart.utils.ConsistencyState.HOVER |
-    anychart.utils.ConsistencyState.CLICK;
+* @type {number}
+*/
+anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
+    anychart.Chart.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -229,11 +224,11 @@ anychart.pie.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
  */
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.DATA |
-        anychart.utils.ConsistencyState.PIE_APPEARANCE |
-        anychart.utils.ConsistencyState.LABELS |
-        anychart.utils.ConsistencyState.HOVER |
-        anychart.utils.ConsistencyState.CLICK;
+        anychart.ConsistencyState.DATA |
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.LABELS |
+        anychart.ConsistencyState.HOVER |
+        anychart.ConsistencyState.CLICK;
 
 
 /**
@@ -321,7 +316,7 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  * @return {anychart.data.View} Current view or self for chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_value .
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
  * @return {(anychart.data.View|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.data = function(opt_value) {
@@ -333,13 +328,13 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
        * @type {anychart.data.View}
        */
       var parentView;
-      if ((opt_value instanceof anychart.data.Mapping) || (opt_value instanceof anychart.data.View)) {
+      if (opt_value instanceof anychart.data.View) {
         parentView = opt_value;
         this.parentViewToDispose_ = null;
       } else {
         if (opt_value instanceof anychart.data.Set)
           parentView = (this.parentViewToDispose_ = opt_value).mapAs();
-        else if (goog.isArray(opt_value))
+        else if (goog.isArray(opt_value) || goog.isString(opt_value))
           parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value)).mapAs();
         else
           parentView = (this.parentViewToDispose_ = new anychart.data.Set(null)).mapAs();
@@ -350,9 +345,9 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 
     goog.dispose(this.view_);
     this.view_ = this.prepareData_(this.parentView_);
-    this.view_.listenInvalidation(this.dataInvalidated_, this);
+    this.view_.listenSignals(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
-    this.invalidate(anychart.utils.ConsistencyState.DATA | anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.DATA | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.view_;
@@ -433,7 +428,7 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
 anychart.pie.Chart.prototype.palette = function(opt_value) {
   if (!this.palette_) {
     this.palette_ = new anychart.utils.DistinctColorPalette();
-    this.palette_.listenInvalidation(this.paletteInvalidated_, this);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.paletteType_ = 'distinct';
   }
 
@@ -463,11 +458,11 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
         this.palette_ = new cls();
         this.palette_.cloneFrom(opt_value);
-        this.palette_.listenInvalidation(this.paletteInvalidated_, this);
+        this.palette_.listenSignals(this.paletteInvalidated_, this);
         this.registerDisposable(this.palette_);
       }
     }
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.palette_;
@@ -495,7 +490,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
  *  //  sourceColor : acgraph.vector.Fill - fill of the current point
  *  // }
  *  return myFill; //acgraph.vector.Fill
- * };</code>
+ * };</code>.
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
@@ -505,7 +500,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 anychart.pie.Chart.prototype.fill = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.fill_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.fill_;
@@ -531,7 +526,7 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
  *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
  *  // }
  *  return myStroke; //acgraph.vector.Stroke
- * };</code>
+ * };</code>.
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
@@ -541,7 +536,7 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
 anychart.pie.Chart.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.stroke_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.stroke_;
@@ -570,7 +565,7 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
  *  //  sourceColor : acgraph.vector.Fill - fill of the current point
  *  // }
  *  return myFill; //acgraph.vector.Fill
- * };</code>
+ * };</code>.
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
@@ -580,7 +575,7 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
 anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.hoverFill_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.hoverFill_;
@@ -606,7 +601,7 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
  *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
  *  // }
  *  return myStroke; //acgraph.vector.Stroke
- * };</code>
+ * };</code>.
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
@@ -616,7 +611,7 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
 anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.hoverStroke_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.hoverStroke_;
@@ -682,7 +677,6 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
 anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.Multilabel();
-    this.labels_.cloneFrom(null);
     this.labels_.textFormatter(function(formatProvider, index) {
       return formatProvider(index, 'value').toString();
     });
@@ -690,16 +684,14 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
       return positionProvider(index);
     });
 
-    this.labels_.reset();
-    this.labels_.listen(anychart.utils.Invalidatable.INVALIDATED, this.labelsInvalidated_, false, this);
+    this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
-    this.invalidate(anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.Multilabel || goog.isNull(opt_value))) {
-    this.labels_.cloneFrom(opt_value);
-    this.labels_.reset();
-    this.invalidate(anychart.utils.ConsistencyState.LABELS);
+    this.labels_.deserialize(opt_value ? opt_value.serialize() : {});
+    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.labels_;
@@ -727,12 +719,12 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
  * </code>
  */
 anychart.pie.Chart.prototype.setOtherPoint = function(typeValue, filterValue) {
-  this.suspendInvalidationDispatching();
+  this.suspendSignalsDispatching();
   this.preparingData_ = true;
   this.otherPointType(typeValue);
   this.preparingData_ = false;
   this.otherPointFilter(filterValue);
-  this.resumeInvalidationDispatching(true);
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -835,7 +827,7 @@ anychart.pie.Chart.prototype.otherPointFilter = function(opt_value) {
 anychart.pie.Chart.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.radius_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.radius_;
@@ -878,7 +870,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
 anychart.pie.Chart.prototype.innerRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.innerRadius_ = opt_value;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.innerRadius_;
@@ -945,7 +937,7 @@ anychart.pie.Chart.prototype.getPixelInnerRadius = function() {
 anychart.pie.Chart.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.startAngle_ = (+opt_value == 0) ? 0 : +opt_value || -90;
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.startAngle_;
@@ -1005,7 +997,7 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
 anychart.pie.Chart.prototype.explode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.explode_ = anychart.utils.normalizeNumberOrStringPercentValue(opt_value, 15);
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.explode_;
@@ -1151,14 +1143,18 @@ anychart.pie.Chart.prototype.getStrokeColor_ = function(pieSliceIndex, opt_hover
 
 
 /**
+ * @inheritDoc
+ */
+anychart.pie.Chart.prototype.remove = function() {
+  if (this.dataLayer_) this.dataLayer_.parent(null);
+};
+
+
+/**
  * Drawing content.
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
 anychart.pie.Chart.prototype.drawContent = function(bounds) {
-  goog.base(this, 'drawContent', bounds);
-
-  if (this.isConsistent()) return;
-
   var iterator = this.view_.getIterator();
   var fill, stroke, exploded;
 
@@ -1168,30 +1164,64 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     }
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
+    if (this.hovered_) {
+      var pieSlice = this.hovered_[0];
+      var pieSliceIndex = this.hovered_[1];
+      var isHovered = this.hovered_[2];
+      iterator.select(pieSliceIndex);
+
+      var fillColor = isHovered ? iterator.get('hoverFill') : iterator.get('fill');
+      var strokeColor = isHovered ? iterator.get('hoverStroke') : iterator.get('stroke');
+
+      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, iterator.get('fill'));
+      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, iterator.get('stroke'));
+
+      pieSlice.fill(fill);
+      pieSlice.stroke(stroke);
+    }
+    this.markConsistent(anychart.ConsistencyState.HOVER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CLICK)) {
+    this.markConsistent(anychart.ConsistencyState.CLICK);
+    if (this.clicked_) {
+      pieSliceIndex = this.clicked_[0];
+      iterator.select(pieSliceIndex);
+      iterator.meta('exploded', !iterator.meta('exploded'));
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+
+  iterator.reset();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.calculate_(bounds);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.dataLayer_) {
       this.dataLayer_.removeChildren();
     } else {
       this.dataLayer_ = acgraph.layer().parent(this.rootElement);
     }
 
-    this.calculate_(bounds);
-
-    if (this.hasInvalidationState(anychart.utils.ConsistencyState.DATA)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
       var sum = 0;
       while (iterator.advance()) {
         sum += parseFloat(iterator.get('value'));
       }
 
       /**
-       * Sum of all  pie slices values.
+       * Sum of all pie slices value.
        * @type {number}
        * @private
        */
       this.valuesSum_ = sum;
 
       iterator.reset();
-      this.markConsistent(anychart.utils.ConsistencyState.DATA);
+      this.markConsistent(anychart.ConsistencyState.DATA);
     }
 
     var value;
@@ -1215,12 +1245,11 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, exploded, this.explodeValue_, null);
       start += sweep;
     }
-    this.markConsistent(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.LABELS | anychart.utils.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     if (this.labels_) {
-      this.labels_.reset();
       iterator.reset();
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
@@ -1230,36 +1259,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       }
       this.labels_.end();
     }
-    this.markConsistent(anychart.utils.ConsistencyState.LABELS);
-  }
-
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.HOVER)) {
-    if (this.hovered_) {
-      var pieSlice = this.hovered_[0];
-      var pieSliceIndex = this.hovered_[1];
-      var isHovered = this.hovered_[2];
-      iterator.select(pieSliceIndex);
-
-      var fillColor = isHovered ? iterator.get('hoverFill') : iterator.get('fill');
-      var strokeColor = isHovered ? iterator.get('hoverStroke') : iterator.get('stroke');
-
-      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, iterator.get('fill'));
-      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, iterator.get('stroke'));
-
-      pieSlice.fill(fill);
-      pieSlice.stroke(stroke);
-    }
-    this.markConsistent(anychart.utils.ConsistencyState.HOVER);
-  }
-
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.CLICK)) {
-    this.markConsistent(anychart.utils.ConsistencyState.CLICK);
-    if (this.clicked_) {
-      pieSliceIndex = this.clicked_[0];
-      iterator.select(pieSliceIndex);
-      iterator.meta('exploded', !iterator.meta('exploded'));
-      this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE | anychart.utils.ConsistencyState.LABELS);
-    }
+    this.markConsistent(anychart.ConsistencyState.LABELS);
   }
 };
 
@@ -1315,34 +1315,36 @@ anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, 
 
 /**
  * Internal data invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.dataInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.DATA)) {
-    this.invalidate(anychart.utils.ConsistencyState.DATA | anychart.utils.ConsistencyState.PIE_APPEARANCE);
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    this.invalidate(anychart.ConsistencyState.DATA | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
   }
 };
 
 
 /**
  * Internal label invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.labelsInvalidated_ = function(event) {
-  this.invalidate(anychart.utils.ConsistencyState.LABELS);
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
 /**
  * Internal palette invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+  @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.DATA)) {
-    this.invalidate(anychart.utils.ConsistencyState.PIE_APPEARANCE);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1359,7 +1361,7 @@ anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
   this.hovered_ = [pie, index, true];
 
   acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-  this.invalidate(anychart.utils.ConsistencyState.HOVER);
+  this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1376,7 +1378,7 @@ anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
 
   acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
 
-  this.invalidate(anychart.utils.ConsistencyState.HOVER);
+  this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1390,7 +1392,7 @@ anychart.pie.Chart.prototype.mouseClickHandler_ = function(event) {
   var index = pie['__index'];
 
   this.clicked_ = [index];
-  this.invalidate(anychart.utils.ConsistencyState.CLICK);
+  this.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1430,10 +1432,7 @@ anychart.pie.Chart.prototype.serialize = function() {
 };
 
 
-/**
- * Deserialize pie chart from config.
- * @param {Object} config json config.
- */
+/** @inheritDoc */
 anychart.pie.Chart.prototype.deserialize = function(config) {
   var chart = config['chart'];
 
@@ -1448,13 +1447,11 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   var hoverFill = chart['hoverFill'];
   var hoverStroke = chart['hoverStroke'];
 
-  var margin = chart['margin'];
-  var padding = chart['padding'];
-  var background = chart['background'];
-  var title = chart['title'];
   var labels = chart['labels'];
 
-  this.suspendInvalidationDispatching();
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', chart);
 
   this.data(data);
   this.radius(radius);
@@ -1467,28 +1464,14 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.hoverFill(hoverFill);
   this.hoverStroke(hoverStroke);
 
-  if (margin) {
-    this.margin().deserialize(margin);
-  }
+  //if (labels) {
+  //  var multiLabels = this.labels();
+  //  multiLabels.textFormatter(/** @type {Function} */ (this.labels().textFormatter()));
+  //  multiLabels.positionFormatter(/** @type {Function} */ (this.labels().positionFormatter()));
+  //  multiLabels.deserialize(labels);
+  //}
 
-  if (padding) {
-    this.padding().deserialize(padding);
-  }
+  this.resumeSignalsDispatching(false);
 
-  if (background) {
-    this.background().deserialize(background);
-  }
-
-  if (title) {
-    this.title().deserialize(title);
-  }
-
-  if (labels) {
-    var multiLabels = this.labels();
-    multiLabels.textFormatter(/** @type {Function} */ (this.labels().textFormatter()));
-    multiLabels.positionFormatter(/** @type {Function} */ (this.labels().positionFormatter()));
-    multiLabels.deserialize(labels);
-  }
-
-  this.resumeInvalidationDispatching(false);
+  return this;
 };

@@ -54,7 +54,7 @@ anychart.data.PieView = function(parentView, fieldName, opt_func, opt_other, opt
 
   /**
    * Other initial value constructor.
-   * @type {function(): R?}
+   * @type {function(): ?R}
    * @private
    * @template R
    */
@@ -102,7 +102,7 @@ anychart.data.PieView.prototype.buildMask = function() {
  */
 anychart.data.PieView.prototype.getRowsCount = function() {
   this.ensureConsistent();
-  return this.mask.length + this.otherPointView_.getRowsCount();
+  return (this.mask ? this.mask.length : this.parentView.getRowsCount()) + this.otherPointView_.getRowsCount();
 };
 
 
@@ -119,9 +119,10 @@ anychart.data.PieView.prototype.getRowMapping = function(rowIndex) {
 /** @inheritDoc */
 anychart.data.PieView.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
-  if (rowIndex < this.mask.length)
+  var len = (this.mask ? this.mask.length : this.parentView.getRowsCount());
+  if (rowIndex < len)
     return anychart.data.View.prototype.row.apply(this, arguments);
-  rowIndex -= this.mask.length;
+  rowIndex -= len;
   return this.otherPointView_.row.apply(this.otherPointView_, arguments);
 };
 
@@ -130,8 +131,9 @@ anychart.data.PieView.prototype.row = function(rowIndex, opt_value) {
  * @inheritDoc
  */
 anychart.data.PieView.prototype.parentMeta = function(index, name, opt_value) {
-  if (index >= this.mask.length) {
-    index -= this.mask.length;
+  var len = (this.mask ? this.mask.length : this.parentView.getRowsCount());
+  if (index >= len) {
+    index -= len;
     if (arguments.length > 2) {
       this.otherPointView_.meta.apply(this.otherPointView_, arguments);
       return this;
@@ -152,7 +154,7 @@ anychart.data.PieView.prototype.parentMeta = function(index, name, opt_value) {
  * @private
  */
 anychart.data.PieView.Mapping_ = function() {
-  anychart.utils.Invalidatable.call(this);
+  anychart.Base.call(this);
   this.initMappingInfo();
 
   /**

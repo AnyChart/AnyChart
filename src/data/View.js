@@ -1,7 +1,7 @@
 goog.provide('anychart.data.View');
 
+goog.require('anychart.Base');
 goog.require('anychart.data.Iterator');
-goog.require('anychart.utils.Invalidatable');
 
 
 
@@ -13,7 +13,7 @@ goog.require('anychart.utils.Invalidatable');
  * @constructor
  * @implements {anychart.data.IView}
  * @name anychart.data.View
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.data.View = function(parentView) {
   goog.base(this);
@@ -25,27 +25,25 @@ anychart.data.View = function(parentView) {
    */
   this.parentView = parentView;
 
-  parentView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
+  parentView.listen(anychart.Base.SIGNAL, this.parentViewChangedHandler, false, this);
 
-  this.invalidate(anychart.utils.ConsistencyState.DATA);
+  this.invalidate(anychart.ConsistencyState.DATA);
 };
-goog.inherits(anychart.data.View, anychart.utils.Invalidatable);
+goog.inherits(anychart.data.View, anychart.Base);
 
 
 /**
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.data.View.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.data.View.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
 
 
 /**
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.DATA;
 
 
 /**
@@ -54,7 +52,7 @@ anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {Array.<number>}
  * @protected
  */
-anychart.data.View.prototype.mask;
+anychart.data.View.prototype.mask = null;
 
 
 /**
@@ -82,7 +80,7 @@ anychart.data.View.prototype.ensureConsistent = function() {
   if (this.metadata_)
     this.metadata_.length = 0;
   this.mask = this.buildMask();
-  this.markConsistent(anychart.utils.ConsistencyState.DATA);
+  this.markConsistent(anychart.ConsistencyState.DATA);
 };
 
 
@@ -90,7 +88,7 @@ anychart.data.View.prototype.ensureConsistent = function() {
  * Creates prepared derived view. Internal method. Should not be published!
  * @param {string} fieldName The name of the field to look at.
  * @param {Array=} opt_categories Categories set to use in case of ordinal scale.
- * @return {!anychart.data.View} The derived view.
+ * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
   var result = opt_categories ?
@@ -108,7 +106,7 @@ anychart.data.View.prototype.prepare = function(fieldName, opt_categories) {
  *    should be included into the resulting view as a and false otherwise.
  * @param {(function(R, T, number, Array) : R)=} opt_other The function to call for
  *     every value of other. This function
- *     takes 4 arguments (the function previous result or the initial value,
+ *     takes 4 arguments (the function's previous result or the initial value,
  *     the value of the current array element, the current array index, and the
  *     array itself)
  *     function(previousValue, currentValue, index, array).
@@ -278,7 +276,7 @@ anychart.data.View.prototype.concat = function(otherView) {
  */
 anychart.data.View.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
-  rowIndex = this.mask[rowIndex];
+  rowIndex = this.mask ? this.mask[rowIndex] : rowIndex;
   if (goog.isDef(rowIndex)) {
     if (arguments.length > 1) {
       anychart.globalLock.lock();
@@ -299,7 +297,7 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
  */
 anychart.data.View.prototype.getRowsCount = function() {
   this.ensureConsistent();
-  return this.mask.length;
+  return this.mask ? this.mask.length : this.parentView.getRowsCount();
 };
 
 
@@ -310,7 +308,7 @@ anychart.data.View.prototype.getRowsCount = function() {
 */
 anychart.data.View.prototype.getRowMapping = function(rowIndex) {
   this.ensureConsistent();
-  return this.parentView.getRowMapping(this.mask[rowIndex]);
+  return this.parentView.getRowMapping(this.mask ? this.mask[rowIndex] : rowIndex);
 };
 
 
@@ -321,7 +319,7 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
  * var dataSet = new anychart.data.Set([1,2,3]);
  * // Default mapping and getting an iterator:
  * var iterator = dataSet.mapAs().getIterator();
- * @return {anychart.data.Iterator} New iterator.
+ * @return {!anychart.data.Iterator} New iterator.
  */
 anychart.data.View.prototype.getIterator = function() {
   this.ensureConsistent();
@@ -331,27 +329,22 @@ anychart.data.View.prototype.getIterator = function() {
 
 /**
  * Builds redirection mask. The default mask is an equality mask.
- * @return {!Array.<number>} The mask.
+ * @return {Array.<number>} The mask.
  * @protected
  */
 anychart.data.View.prototype.buildMask = function() {
-  var mask = [];
-  var iterator = this.parentView.getIterator();
-  while (iterator.advance()) {
-    mask.push(iterator.getIndex());
-  }
-  return mask;
+  return null;
 };
 
 
 /**
  * Handles changes in the parent view.
- * @param {anychart.utils.InvalidatedStatesEvent} event The event object.
+ * @param {anychart.SignalEvent} event The event object.
  * @protected
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.DATA))
-    this.invalidate(anychart.utils.ConsistencyState.DATA);
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED))
+    this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.DATA_CHANGED);
 };
 
 
@@ -411,7 +404,7 @@ anychart.data.View.prototype.meta = function(index, name, opt_value) {
  * @protected
  */
 anychart.data.View.prototype.parentMeta = function(index, name, opt_value) {
-  index = this.mask[index];
+  index = this.mask ? this.mask[index] : index;
   //TODO(Anton Saukh): fix it to proper error reporting.
   if (!goog.isDef(index))
     throw Error('Index can not be masked by this View');

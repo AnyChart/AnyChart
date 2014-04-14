@@ -9,7 +9,7 @@ goog.require('goog.array');
 /**
  * Soecial View which allows to map anychart.data.Set storages.
  * @param {!anychart.data.Set} parentSet The data set to map.
- * @param {!Object.<number>=} opt_arrayMapping Mapping for array rows,
+ * @param {!Object.<Array.<number>>=} opt_arrayMapping Mapping for array rows.
  * @param {!Object.<Array.<string>>=} opt_objectMapping Mapping for object rows.
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
  *    Doesn't work if a row is an object.
@@ -28,8 +28,7 @@ goog.inherits(anychart.data.Mapping, anychart.data.View);
  * Conistency states supported by this object.
  * @type {number}
  */
-anychart.data.Mapping.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.data.Mapping.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -53,15 +52,22 @@ anychart.data.Mapping.prototype.get = function(row, rowIndex, fieldName) {
     /** @type {string} */
     var rowType = goog.typeOf(row);
     if (rowType == 'array') {
-      /** @type {number} */
-      var index = +this.arrayMapping_[fieldName];
-      if (!isNaN(index))
-        result = row[index];
+      /** @type {Array.<number>} */
+      var indexes = this.arrayMapping_[fieldName];
+      if (indexes) {
+        for (var i = 0; i < indexes.length; i++) {
+          if (indexes[i] < row.length) {
+            result = row[indexes[i]];
+            break;
+          }
+        }
+      }
     } else if (rowType == 'object') {
       result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName]);
     } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
       result = row;
-    } else if (goog.array.indexOf(this.indexProps_, fieldName) > -1) {
+    }
+    if (!goog.isDef(result) && goog.array.indexOf(this.indexProps_, fieldName) > -1) {
       result = rowIndex;
     }
   }
@@ -89,14 +95,14 @@ anychart.data.Mapping.prototype.getRowsCount = function() {
 
 /** @inheritDoc */
 anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.DATA))
-    this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED))
+    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 };
 
 
 /**
  * Initializes mapping info objects for the mapping.
- * @param {!Object.<number>=} opt_arrayMapping Mapping settings for array rows.
+ * @param {!Object.<Array.<number>>=} opt_arrayMapping Mapping settings for array rows.
  * @param {!Object.<Array.<string>>=} opt_objectMapping Mapping setting for object rows.
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
  *    Doesn't work if a row is an object.
@@ -106,17 +112,17 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
 anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
   /**
    * Mapping settings for array rows.
-   * @type {!Object.<number>}
+   * @type {!Object.<Array.<number>>}
    * @private
    */
   this.arrayMapping_ = opt_arrayMapping || {
-    'x': 0,
-    'value': 1,
-    'size': 2, // bubble series
-    'open': 1,
-    'high': 2,
-    'low': 3,
-    'close': 4
+    'x': [0],
+    'value': [1, 0],
+    'size': [2], // bubble series
+    'open': [1],
+    'high': [2],
+    'low': [3, 1],
+    'close': [4]
   };
 
   /**

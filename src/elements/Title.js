@@ -1,6 +1,7 @@
 goog.provide('anychart.elements.Title');
 
 goog.require('anychart.elements.Text');
+goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 
 
@@ -33,142 +34,16 @@ goog.require('anychart.utils.Padding');
  * @extends {anychart.elements.Text}
  */
 anychart.elements.Title = function() {
+  this.suspendSignalsDispatching();
   goog.base(this);
 
-  /**
-   * Text element.
-   * @type {acgraph.vector.Text}
-   * @private
-   */
-  this.text_ = null;
+  this.text('Title text');
+  this.zIndex(80);
+  this.margin(0, 0, 10, 0);
+  this.padding(0);
+  this.background(null);
 
-  /**
-   * Background element (if any).
-   * @type {anychart.elements.Background}
-   * @private
-   */
-  this.background_ = null;
-
-  /**
-   * Layer element (if background is visible).
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.layer_ = null;
-
-  /**
-   * Width settings for the title.
-   * @type {number|string|null}
-   * @private
-   */
-  this.width_ = null;
-
-  /**
-   * Height settings for the title.
-   * @type {number|string|null}
-   * @private
-   */
-  this.height_ = null;
-
-  /**
-   * Actual width of the title.
-   * @type {number}
-   * @private
-   */
-  this.backgroundWidth_ = NaN;
-
-  /**
-   * Actual height of the title.
-   * @type {number}
-   * @private
-   */
-  this.backgroundHeight_ = NaN;
-
-  /**
-   * Text width of the title.
-   * @type {number}
-   * @private
-   */
-  this.textWidth_ = NaN;
-
-  /**
-   * Text height of the title.
-   * @type {number}
-   * @private
-   */
-  this.textHeight_ = NaN;
-
-  /**
-   * If the text width is constricted.
-   * @type {boolean}
-   * @private
-   */
-  this.widthConstricted_ = false;
-
-  /**
-   * If the text height is constricted.
-   * @type {boolean}
-   * @private
-   */
-  this.heightConstricted_ = false;
-
-  /**
-   * Title left position.
-   * @type {number}
-   * @private
-   */
-  this.actualLeft_ = NaN;
-
-  /**
-   * Title top position.
-   * @type {number}
-   * @private
-   */
-  this.actualTop_ = NaN;
-
-  /**
-   * Parent bounds stored.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
-   * Pixel bounds due to orientation, align, margins, padding, etc.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.pixelBounds_ = null;
-
-  /**
-   * Title margin.
-   * @type {anychart.utils.Margin}
-   * @private
-   */
-  this.margin_ = null;
-
-  /**
-   * Title text padding.
-   * @type {anychart.utils.Padding}
-   * @private
-   */
-  this.padding_ = null;
-
-  /**
-   * Title orientation.
-   * @type {anychart.utils.Orientation}
-   * @private
-   */
-  this.orientation_;
-
-  /**
-   * Title align.
-   * @type {anychart.utils.Align}
-   * @private
-   */
-  this.align_;
-
-  this.restoreDefaults();
+  this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.elements.Title, anychart.elements.Text);
 
@@ -177,9 +52,7 @@ goog.inherits(anychart.elements.Title, anychart.elements.Text);
  * Supported consistency states.
  * @type {number}
  */
-anychart.elements.Title.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
+anychart.elements.Title.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.prototype.SUPPORTED_SIGNALS;
 
 
 /**
@@ -188,7 +61,159 @@ anychart.elements.Title.prototype.DISPATCHED_CONSISTENCY_STATES =
  */
 anychart.elements.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE;
+    anychart.ConsistencyState.BACKGROUND;
+
+
+/**
+ * Text element.
+ * @type {acgraph.vector.Text}
+ * @private
+ */
+anychart.elements.Title.prototype.text_ = null;
+
+
+/**
+ * Background element (if any).
+ * @type {anychart.elements.Background}
+ * @private
+ */
+anychart.elements.Title.prototype.background_ = null;
+
+
+/**
+ * Layer element (if background is visible).
+ * @type {acgraph.vector.Layer}
+ * @private
+ */
+anychart.elements.Title.prototype.layer_ = null;
+
+
+/**
+ * Width settings for the title.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.elements.Title.prototype.width_ = null;
+
+
+/**
+ * Height settings for the title.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.elements.Title.prototype.height_ = null;
+
+
+/**
+ * Actual width of the title.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.backgroundWidth_ = NaN;
+
+
+/**
+ * Actual height of the title.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.backgroundHeight_ = NaN;
+
+
+/**
+ * Text width of the title.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.textWidth_ = NaN;
+
+
+/**
+ * Text height of the title.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.textHeight_ = NaN;
+
+
+/**
+ * If the text width is constricted.
+ * @type {boolean}
+ * @private
+ */
+anychart.elements.Title.prototype.widthConstricted_ = false;
+
+
+/**
+ * If the text height is constricted.
+ * @type {boolean}
+ * @private
+ */
+anychart.elements.Title.prototype.heightConstricted_ = false;
+
+
+/**
+ * Title left position.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.actualLeft_ = NaN;
+
+
+/**
+ * Title top position.
+ * @type {number}
+ * @private
+ */
+anychart.elements.Title.prototype.actualTop_ = NaN;
+
+
+/**
+ * Parent bounds stored.
+ * @type {anychart.math.Rect}
+ * @private
+ */
+anychart.elements.Title.prototype.parentBounds_ = null;
+
+
+/**
+ * Pixel bounds due to orientation, align, margins, padding, etc.
+ * @type {anychart.math.Rect}
+ * @private
+ */
+anychart.elements.Title.prototype.pixelBounds_ = null;
+
+
+/**
+ * Title margin.
+ * @type {anychart.utils.Margin}
+ * @private
+ */
+anychart.elements.Title.prototype.margin_ = null;
+
+
+/**
+ * Title text padding.
+ * @type {anychart.utils.Padding}
+ * @private
+ */
+anychart.elements.Title.prototype.padding_ = null;
+
+
+/**
+ * Title orientation.
+ * @type {anychart.utils.Orientation}
+ * @private
+ */
+anychart.elements.Title.prototype.orientation_ = anychart.utils.Orientation.TOP;
+
+
+/**
+ * Title align.
+ * @type {anychart.utils.Align}
+ * @private
+ */
+anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
 
 
 /**
@@ -244,7 +269,8 @@ anychart.elements.Title.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
       this.parentBounds_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -315,16 +341,20 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 anychart.elements.Title.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.elements.Background();
-    this.background_.cloneFrom(null);
     this.registerDisposable(this.background_);
-    this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
-    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
+    this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendInvalidationDispatching();
-    this.background_.cloneFrom(opt_value);
-    this.background_.resumeInvalidationDispatching(true);
+    this.background_.suspendSignalsDispatching();
+    if (opt_value instanceof anychart.elements.Background) {
+      this.background_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.background_.deserialize(opt_value);
+    } else if (anychart.isNone(opt_value)) {
+      this.background_.enabled(false);
+    }
+    this.background_.resumeSignalsDispatching(true);
     return this;
   }
   return this.background_;
@@ -350,10 +380,8 @@ anychart.elements.Title.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
-      this.invalidate(
-          anychart.utils.ConsistencyState.PIXEL_BOUNDS |
-              anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-              anychart.utils.ConsistencyState.APPEARANCE);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -380,10 +408,8 @@ anychart.elements.Title.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.height_ != opt_value) {
       this.height_ = opt_value;
-      this.invalidate(
-          anychart.utils.ConsistencyState.PIXEL_BOUNDS |
-              anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-              anychart.utils.ConsistencyState.APPEARANCE);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -397,7 +423,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @return {anychart.utils.Margin} The current title margin.
  *//**
  * Setter for the title margin in pixels using one value.<br/>
- * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Value to set.
  * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * Setter for the title margin in pixels using several numbers.<br/>
@@ -425,7 +451,7 @@ anychart.elements.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
     this.registerDisposable(this.margin_);
-    this.margin_.listenInvalidation(this.boundsInvalidated_, this);
+    this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.set.apply(this.margin_, arguments);
@@ -469,7 +495,7 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
     this.registerDisposable(this.padding_);
-    this.padding_.listenInvalidation(this.boundsInvalidated_, this);
+    this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.set.apply(this.padding_, arguments);
@@ -508,7 +534,8 @@ anychart.elements.Title.prototype.align = function(opt_value) {
     opt_value = anychart.utils.normalizeAlign(opt_value);
     if (this.align_ != opt_value) {
       this.align_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -545,7 +572,8 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
     opt_value = anychart.utils.normalizeOrientation(opt_value);
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -558,11 +586,8 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
  * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  */
 anychart.elements.Title.prototype.draw = function() {
-  // If its all ok - leave this method
-  if (this.isConsistent())
+  if (!this.checkDrawingNeeded())
     return this;
-
-  this.resolveEnabledState();
 
   // We will need the text element anyway, so we should create it if it is missing.
   var isInitial;
@@ -577,108 +602,100 @@ anychart.elements.Title.prototype.draw = function() {
   if (manualSuspend) stage.suspend();
 
   // Checking APPEARANCE state. It excludes text width and height inconsistency, that will be checked later.
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     // Applying text settings if needed.
     this.applyTextSettings(this.text_, isInitial);
-    this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  // Checking PIXEL_BOUNDS state. If it is inconsistent, we need to recalculate the title bounds.
-  // But we don't need to mark it is consistent here, because we don't know where to apply new bounds yet.
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
-    this.calcActualBounds_();
-    // we are not marking it is consistent here, just ensuring everything is calculated.
-  }
-
+  var background = this.background();
   // Checking if we have to draw background. We don't draw it if it is totally transparent.
-  var hasBackground = this.background_ && this.background_.draw() &&
-      (this.background_.fill() != 'none' || this.background_.stroke() != 'none');
-  // If background appearance changed, we should do something about that.
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE)) {
-    // If there is a non-transparent background
-    if (hasBackground) {
-      // We should render a layer that has a background path and a text element in it.
-      // So checking if there is a layer
-      if (!this.layer_) {
-        // and creating it if there is not.
-        this.layer_ = acgraph.layer();
-        // super-silently resetting background container to the newly created layer and drawing it to have the background go first
-        this.background_
-            .suspendInvalidationDispatching()
-            .container(this.layer_)
-            .resumeInvalidationDispatching(false)
-            .draw();
-        // settings text parent
-        this.text_.parent(this.layer_);
-        this.registerDisposable(this.layer_);
-        // ensuring that we will set layer container to the proper value later in this method.
-        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
-      }
-      // setting proper bounds to the background
-      this.background_.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
-      // and drawing it
-      this.background_.draw();
-    } else {
-      // Else we should render only the text element, so if there is a layer, then we should remove the background
-      // from it and dispose the layer. Also we silently invalidate the CONTAINER to rerender the text to the proper
-      // container later in this method
-      if (this.layer_) {
-        if (this.background_ && this.background_.container() == this.layer_)
-          this.background_
-              .suspendInvalidationDispatching()
-              .container(null)
-              .resumeInvalidationDispatching(false)
-              .draw();
-        this.text_.parent(null);
-        goog.dispose(this.layer_);
-        this.layer_ = null;
-        this.silentlyInvalidate(anychart.utils.ConsistencyState.CONTAINER | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
-      }
-    }
-    // Background appearance is now consistent, so we mark the corresponding state.
-    this.markConsistent(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
+  var hasBackground = background.enabled() && (background.fill() != 'none' || background.stroke() != 'none');
+
+  background.suspendSignalsDispatching();
+
+  var needsPositionReset = false;
+
+  // We should render a layer that has a background path and a text element in it.
+  // So checking if there is a layer
+  if (hasBackground && !this.layer_) {
+    // and creating it if there is not.
+    this.layer_ = acgraph.layer();
+    // super-silently resetting background container to the newly created layer and drawing it to have the background go first
+    background.container(this.layer_).draw();
+    // settings text parent
+    this.text_.parent(this.layer_);
+    this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+    this.registerDisposable(this.layer_);
+    this.invalidate(anychart.ConsistencyState.CONTAINER);
+    needsPositionReset = true;
+  } else if (!hasBackground && this.layer_) {
+    // Else we should render only the text element, so if there is a layer, than we should remove the background
+    // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
+    // container later in this method
+    if (background.container() == this.layer_)
+      background.container(null).draw();
+    this.text_.parent(container);
+    goog.dispose(this.layer_);
+    this.layer_ = null;
+    this.invalidate(anychart.ConsistencyState.CONTAINER);
+    needsPositionReset = true;
   }
 
-  // If there is any inconsistency in title bounds
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
+  var elementToPosition = hasBackground ? this.layer_ : this.text_;
+
+  // Checking BOUNDS state. If it is inconsistent, we need to recalculate title bounds.
+  // But we don't need to mark it consistent here, because we don't know where to apply that new bounds yet.
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.calcActualBounds_();
+    if (background) {
+      // settings proper bounds to the background
+      background.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
+      background.draw();
+      this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    }
     // setting text bounds if needed.
-    this.text_.width(this.widthConstricted_ ? this.textWidth_ : undefined);
-    this.text_.height(this.heightConstricted_ ? this.textHeight_ : undefined);
-    // setting text offset for
+    this.text_.width(this.widthConstricted_ ? this.textWidth_ : null);
+    this.text_.height(this.heightConstricted_ ? this.textHeight_ : null);
+    // settings text offset for
     this.text_.x(/** @type {number} */(this.padding().left()));
     this.text_.y(/** @type {number} */(this.padding().top()));
 
-    if (this.parentBounds_ || stage) {
-      var elementToPosition = hasBackground ? this.layer_ : this.text_;
-      elementToPosition.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-      elementToPosition.translate(this.actualLeft_, this.actualTop_);
-      elementToPosition.rotate(this.getRotation_(), this.actualLeft_, this.actualTop_);
-      this.markConsistent(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
-    }
+    needsPositionReset = true;
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.CONTAINER)) {
+  if (needsPositionReset) {
+    elementToPosition.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+    elementToPosition.translate(this.actualLeft_, this.actualTop_);
+    elementToPosition.rotate(this.getRotation_(), this.actualLeft_, this.actualTop_);
+  }
+
+  // If background appearance changed, we should do something about that.
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+    background.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
+    background.draw();
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    elementToPosition.zIndex(/** @type {number} */(this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (hasBackground)
       this.layer_.parent(container);
     else
       this.text_.parent(container);
-    this.markConsistent(anychart.utils.ConsistencyState.CONTAINER);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+  if (background)
+    background.resumeSignalsDispatching(false);
 
   if (manualSuspend) stage.resume();
   return this;
-};
-
-
-/** @inheritDoc */
-anychart.elements.Title.prototype.restore = function() {
-  if (this.enabled()) {
-    if (this.layer_) {
-      this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    } else if (this.text_) {
-      this.text_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    }
-  }
 };
 
 
@@ -709,8 +726,6 @@ anychart.elements.Title.prototype.remove = function() {
  * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Title.prototype.getRemainingBounds = function() {
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS))
-    this.calcActualBounds_();
   /** @type {anychart.math.Rect} */
   var parentBounds;
   if (this.parentBounds_) {
@@ -724,6 +739,10 @@ anychart.elements.Title.prototype.getRemainingBounds = function() {
       return new anychart.math.Rect(0, 0, 0, 0);
     }
   }
+  if (!this.enabled())
+    return parentBounds;
+  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+    this.calcActualBounds_();
   switch (this.orientation_) {
     case anychart.utils.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
@@ -746,10 +765,12 @@ anychart.elements.Title.prototype.getRemainingBounds = function() {
 
 /**
  * Return the title content bounds.
- * @return {anychart.math.Rect}
+ * @return {anychart.math.Rect} Content bounds.
  */
 anychart.elements.Title.prototype.getContentBounds = function() {
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS))
+  if (!this.enabled())
+    return new anychart.math.Rect(0, 0, 0, 0);
+  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calcActualBounds_();
   return this.pixelBounds_;
 };
@@ -795,24 +816,6 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
 
-  var textBounds;
-  if (this.width_ == null || this.height_ == null) {
-    var isInitial;
-    if (isInitial = !this.text_) {
-      this.text_ = acgraph.text();
-      this.registerDisposable(this.text_);
-    }
-    if (isInitial || this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE)) {
-      this.applyTextSettings(this.text_, isInitial);
-      this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
-    }
-    if (this.width_ == null && this.text_.width() != null)
-      this.text_.width(undefined);
-    if (this.height_ == null && this.text_.height() != null)
-      this.text_.height(undefined);
-    textBounds = this.text_.getBounds();
-  }
-
   var padding = this.padding();
   var margin = this.margin();
   /** @type {anychart.math.Rect} */
@@ -838,11 +841,42 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else {
     parentWidth = parentHeight = undefined;
   }
-  if (this.width_ != null) {
+
+  var isInitial;
+  if (isInitial = !this.text_) {
+    this.text_ = acgraph.text();
+    this.registerDisposable(this.text_);
+  }
+  if (isInitial || this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.applyTextSettings(this.text_, isInitial);
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (goog.isNull(this.width_)) {
+    this.textWidth_ = NaN;
+  } else {
     this.backgroundWidth_ = anychart.utils.normalize(this.width_, parentWidth);
     this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
     this.widthConstricted_ = true;
+  }
+
+  if (goog.isNull(this.height_)) {
+    this.textHeight_ = NaN;
   } else {
+    this.backgroundHeight_ = anychart.utils.normalize(this.height_, parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
+    this.heightConstricted_ = true;
+  }
+
+  var textBounds;
+  if (this.width_ == null || this.height_ == null) {
+    this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+    this.text_.width(isNaN(this.textWidth_) ? null : this.textWidth_);
+    this.text_.height(isNaN(this.textHeight_) ? null : this.textHeight_);
+    textBounds = this.text_.getBounds();
+  }
+
+  if (goog.isNull(this.width_)) {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
     if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
@@ -854,11 +888,7 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
     }
   }
 
-  if (this.height_ != null) {
-    this.backgroundHeight_ = anychart.utils.normalize(this.height_, parentHeight);
-    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-    this.heightConstricted_ = true;
-  } else {
+  if (goog.isNull(this.height_)) {
     this.textHeight_ = textBounds.height;
     this.backgroundHeight_ = padding.widenHeight(this.textHeight_);
     if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
@@ -874,6 +904,7 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
   var leftMargin = anychart.utils.normalize(/** @type {number} */(margin.left()), this.backgroundWidth_);
   var topMargin = anychart.utils.normalize(/** @type {number} */(margin.top()), this.backgroundWidth_);
+
   if (parentBounds) {
     switch (this.orientation_) {
       case anychart.utils.Orientation.TOP:
@@ -933,10 +964,10 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
       case anychart.utils.Orientation.RIGHT:
         this.actualLeft_ = parentBounds.getRight() - topMargin;
         this.pixelBounds_ = new anychart.math.Rect(
-            parentBounds.getRight() - widthWithMargin,
+            parentBounds.getRight() - heightWithMargin,
             this.actualTop_ - leftMargin,
-            widthWithMargin,
-            heightWithMargin);
+            heightWithMargin,
+            widthWithMargin);
         break;
       case anychart.utils.Orientation.BOTTOM:
         this.actualTop_ = parentBounds.getBottom() - heightWithMargin + topMargin;
@@ -951,8 +982,8 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
         this.pixelBounds_ = new anychart.math.Rect(
             parentBounds.getLeft(),
             this.actualTop_ - widthWithMargin + leftMargin,
-            widthWithMargin,
-            heightWithMargin);
+            heightWithMargin,
+            widthWithMargin);
         break;
     }
   } else {
@@ -965,67 +996,34 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
 
 /**
  * Internal background invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.elements.Title.prototype.backgroundInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.APPEARANCE)) {
-    this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
 
 /**
- * Listener for the bounds invalidation.
- * @param {anychart.utils.InvalidatedStatesEvent} event Invalidation event.
+ * Listener for bounds invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
 anychart.elements.Title.prototype.boundsInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.BOUNDS)) {
-    this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
 
 
 /**
- * Copy the title settings from the passed title to itself.
- * @param {anychart.elements.Title} title Title to copy settings from.
- * @return {anychart.elements.Title} Returns itself for chaining call.
+ * Clear title.
  */
-anychart.elements.Title.prototype.cloneFrom = function(title) {
-  if (goog.isDefAndNotNull(title)) {
-    this.background(title.background_);
-    this.align(title.align_);
-    this.orientation(title.orientation_);
-    this.margin(title.margin_);
-    this.padding(title.padding_);
-    this.textSettings(title.settingsObj);
-    this.width(title.width_);
-    this.height(title.height_);
-    this.textSettings(title.settingsObj);
-  } else {
-    this.restoreDefaults();
-    this.text('');
-  }
-
-  return this;
-};
-
-
-/**
- * Restore the title default settings.
- */
-anychart.elements.Title.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-
-  this.text('Title text');
-  this.align(anychart.utils.Align.CENTER);
-  this.orientation(anychart.utils.Orientation.TOP);
-  this.margin(0, 0, 10, 0);
-  this.padding(null);
-  this.width(null);
-  this.height(null);
-  this.background(null);
+anychart.elements.Title.prototype.clear = function() {
+  this.layer_.removeChildren();
 };
 
 
@@ -1057,10 +1055,7 @@ anychart.elements.Title.prototype.serialize = function() {
 };
 
 
-/**
- * Deserializes the data from config.
- * @param {Object} config Json config.
- */
+/** @inheritDoc */
 anychart.elements.Title.prototype.deserialize = function(config) {
   var padding = config['padding'];
   var margin = config['margin'];
@@ -1082,4 +1077,6 @@ anychart.elements.Title.prototype.deserialize = function(config) {
   this.align(config['align']);
   this.width(config['width']);
   this.height(config['height']);
+
+  return this;
 };

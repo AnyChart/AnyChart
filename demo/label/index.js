@@ -1,18 +1,31 @@
 var label;
 function load() {
+  var stage = acgraph.create('100%' ,'100%', 'container');
+  stage.rect(100, 100, 300, 300).fill('pink');
   label = new anychart.elements.Label();
-  label.container('container');
-  label.position({x: '200%', y: 20});
+  label.container(stage);
+  label.position('center');
   label.text('Some label text');
   label.anchor('center');
   label.padding(10, 5, 10, 5);
-  label.offsetX(-10);
-  label.offsetY(10);
+  label.offsetX(0);
+  label.offsetY(0);
+  label.width(200);
+  label.height(200);
+  label.fontSize(14);
   label.background().fill('green .5').stroke('none');
-  label.parentBounds(new anychart.math.Rect(0, 0, 1157, 622));
+  label.parentBounds(new anychart.math.Rect(100, 100, 300, 300));
   label.draw();
 
-  label.listen('invalidated', function() {
+  label.listen('signal', function() {
     label.draw();
   });
+}
+
+function oo(value) {
+  label.position(value);
+}
+
+function aa(value) {
+  label.anchor(value);
 }

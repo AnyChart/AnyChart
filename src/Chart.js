@@ -1,26 +1,27 @@
 goog.provide('anychart.Chart');
 
+goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
-goog.require('anychart.elements.BaseWithBounds');
+goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
+goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
-goog.require('anychart.utils.ZIndexedLayer');
 
 
 
 /**
  * Base class for all charts, contains the margins, the background and the title.
  * @constructor
- * @extends {anychart.elements.BaseWithBounds}
+ * @extends {anychart.VisualBaseWithBounds}
  */
 anychart.Chart = function() {
   //todo: this suspend can be replaced with a flag for the chart if it will not be needed anywhere else.
-  this.suspendInvalidationDispatching();
+  this.suspendSignalsDispatching();
   goog.base(this);
 
   /**
-   * @type {anychart.utils.ZIndexedLayer}
+   * @type {acgraph.vector.Layer}
    * @protected
    */
   this.rootElement = null;
@@ -49,37 +50,35 @@ anychart.Chart = function() {
    */
   this.padding_ = null;
 
+  /**
+   * @type {anychart.elements.Legend}
+   * @private
+   */
+  this.legend_ = null;
 
-  this.bounds().set(0, 0, '100%', '100%');
-  this.margin(10, 20, 10, 20);
-  this.padding(10, 20, 10, 20);
-  this.title('Chart title');
-  this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
-  this.resumeInvalidationDispatching(false);
+  this.restoreDefaults();
+  this.invalidate(anychart.ConsistencyState.ALL);
+  this.resumeSignalsDispatching(false);
 };
-goog.inherits(anychart.Chart, anychart.elements.BaseWithBounds);
+goog.inherits(anychart.Chart, anychart.VisualBaseWithBounds);
 
 
 /**
  * Supported consistency states. Adds APPEARANCE to BaseWithBounds states.
  * @type {number}
  */
-anychart.Chart.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-        anychart.utils.ConsistencyState.TITLE_APPEARANCE;
+anychart.Chart.prototype.SUPPORTED_SIGNALS = anychart.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS;
 
 
 /**
- * Supported consistency states. Adds APPEARANCE to BaseWithBounds states.
+ * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND  to BaseWithBounds states.
  * @type {number}
  */
 anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.BaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE |
-        anychart.utils.ConsistencyState.TITLE_APPEARANCE;
+    anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.ConsistencyState.LEGEND |
+        anychart.ConsistencyState.BACKGROUND |
+        anychart.ConsistencyState.TITLE;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,7 +144,7 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
@@ -154,26 +153,37 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
-    this.margin_.listenInvalidation(this.marginInvalidated_, this);
+    this.margin_.listenSignals(this.marginInvalidated_, this);
     this.registerDisposable(this.margin_);
   }
 
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.margin_.set.apply(this.margin_, arguments);
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.margin_.set.apply(this.margin_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Space) {
+      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.margin_.set(opt_spaceOrTopOrTopAndBottom);
+    }
     return this;
+  } else {
+    return this.margin_;
   }
-  return this.margin_;
 };
 
 
 /**
  * Internal margin invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.Chart.prototype.marginInvalidated_ = function(event) {
   // whatever has changed in margins affects chart size, so we need to redraw everything
-  this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -266,7 +276,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
@@ -275,26 +285,37 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
 anychart.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.utils.Padding();
-    this.padding_.listenInvalidation(this.paddingInvalidated_, this);
+    this.padding_.listenSignals(this.paddingInvalidated_, this);
     this.registerDisposable(this.padding_);
   }
 
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.padding_.set.apply(this.padding_, arguments);
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.padding_.set.apply(this.padding_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.padding_.set(opt_spaceOrTopOrTopAndBottom);
+    }
     return this;
+  } else {
+    return this.padding_;
   }
-  return this.padding_;
 };
 
 
 /**
  * Internal padding invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.Chart.prototype.paddingInvalidated_ = function(event) {
   // whatever has changed in paddings affects chart size, so we need to redraw everything
-  this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -335,15 +356,20 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 anychart.Chart.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.elements.Background();
-    this.background_.cloneFrom(null);
-    this.background_.listenInvalidation(this.backgroundInvalidated_, this);
+    this.background_.listenSignals(this.backgroundInvalidated_, this);
     this.registerDisposable(this.background_);
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendInvalidationDispatching();
-    this.background_.cloneFrom(opt_value);
-    this.background_.resumeInvalidationDispatching(true);
+    this.background_.suspendSignalsDispatching();
+    if (opt_value instanceof anychart.elements.Background) {
+      this.background_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.background_.deserialize(opt_value);
+    } else if (anychart.isNone(opt_value)) {
+      this.background_.enabled(false);
+    }
+    this.background_.resumeSignalsDispatching(true);
     return this;
   }
   return this.background_;
@@ -352,13 +378,15 @@ anychart.Chart.prototype.background = function(opt_value) {
 
 /**
  * Internal background invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
   // whatever has changed in background we redraw only background
   // because it doesn't affect other elements
-  this.invalidate(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -368,7 +396,7 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the chart title.
+ * Getter for chart title.
  * @example
  * chart = new anychart.Chart();
  * chart.title().fontSize(41);
@@ -385,46 +413,107 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
  *      .text('Red title')
  * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
- * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.elements.Title)=} opt_value .
+ * @param {(null|string|Object|anychart.elements.Title)=} opt_value .
  * @return {anychart.elements.Title|anychart.Chart} .
  */
 anychart.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.elements.Title();
-    this.title_.listenInvalidation(this.titleInvalidated_, this);
+    this.title_.listenSignals(this.onTitleSignal_, this);
     this.registerDisposable(this.title_);
   }
 
   if (goog.isDef(opt_value)) {
-    this.title_.suspendInvalidationDispatching();
-    if (goog.isString(opt_value)) {
-      this.title_.text(opt_value);
-    } else {
-      this.title_.cloneFrom(opt_value);
+    this.suspendSignalsDispatching();
+    if (opt_value instanceof anychart.elements.Title) {
+      this.title_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.title_.deserialize(opt_value);
+    } else if (anychart.isNone(opt_value)) {
+      this.title_.enabled(false);
     }
-    this.title_.resumeInvalidationDispatching(true);
+    this.resumeSignalsDispatching(true);
     return this;
+  } else {
+    return this.title_;
   }
-  return this.title_;
 };
 
 
 /**
  * Internal title invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.Chart.prototype.titleInvalidated_ = function(event) {
-  // if title size has changed it affects the whole chart and we need to redraw
-  if (event.invalidated(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
-    this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
-  } else {
-    // if size hasn't changed then all other stuff (color of the text or the background) doesn't affect the chart
-    this.invalidate(anychart.utils.ConsistencyState.TITLE_APPEARANCE);
+anychart.Chart.prototype.onTitleSignal_ = function(event) {
+  var state = 0;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.TITLE;
+    signal |= anychart.Signal.NEEDS_REDRAW;
   }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  this.invalidate(state, signal);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Legend.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Chart legend.
+ * @param {(null|string|Object|anychart.elements.Legend)=} opt_value Legend settings.
+ * @return {!(anychart.Chart|anychart.elements.Legend)} Chart legend instance of itself for chaining call.
+ */
+anychart.Chart.prototype.legend = function(opt_value) {
+  if (!this.legend_) {
+    this.legend_ = new anychart.elements.Legend();
+    this.registerDisposable(this.legend_);
+    this.legend_.listenSignals(this.onLegendSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.Legend) {
+      this.legend_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.legend_.deserialize(opt_value);
+    } else if (anychart.isNone(opt_value)) {
+      this.legend_.enabled(false);
+    }
+    return this;
+  } else {
+    return this.legend_;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.Chart.prototype.onLegendSignal_ = function(event) {
+  var state = 0;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.LEGEND;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  this.invalidate(state, signal);
 };
 
 
@@ -438,7 +527,10 @@ anychart.Chart.prototype.titleInvalidated_ = function(event) {
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  */
 anychart.Chart.prototype.draw = function() {
-  if (this.isConsistent()) return this;
+  if (!this.checkDrawingNeeded())
+    return this;
+
+  this.suspendSignalsDispatching();
 
   //total chart area bounds, do not override, it can be useful later
   var totalBounds;
@@ -448,124 +540,169 @@ anychart.Chart.prototype.draw = function() {
   var boundsWithoutPadding;
   // chart area with applied margin, padding and title
   var boundsWithoutTitle;
+  // chart area with applied margin, padding, title and legend
+  var boundsWithoutLegend;
   //chart content bounds, allocated space for all chart appearance items.
   var contentAreaBounds;
 
+
   //create root element only if draw is called
-  if (!this.rootElement) this.rootElement = new anychart.utils.ZIndexedLayer();
+  if (!this.rootElement) this.rootElement = acgraph.layer();
 
   //suspend stage
   var stage = this.rootElement.getStage();
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
-  boundsWithoutMargin = this.margin_ ?
-      this.margin_.tightenBounds(totalBounds) :
-      totalBounds;
-
-  //start clear appearance states
-  if (this.shouldDrawBackground()) {
-    this.background_.suspendInvalidationDispatching();
-    if (!this.background_.container()) this.background_.container(this.rootElement);
-    this.background_.pixelBounds(boundsWithoutMargin);
-    this.background_.resumeInvalidationDispatching(false);
-    this.background_.draw();
-    this.markConsistent(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE);
-  }
-
-  boundsWithoutPadding = this.padding_ ?
-      this.padding_.tightenBounds(boundsWithoutMargin) :
-      boundsWithoutMargin;
-
-  if (this.shouldDrawTitle()) {
-    this.title_.suspendInvalidationDispatching();
-    if (!this.title_.container()) this.title_.container(this.rootElement);
-    this.title_.parentBounds(boundsWithoutPadding);
-    this.title_.resumeInvalidationDispatching(false);
-    this.title_.draw();
-    this.markConsistent(anychart.utils.ConsistencyState.TITLE_APPEARANCE);
-  }
-
-  boundsWithoutTitle = this.title_ ?
-      this.title_.getRemainingBounds() :
-      boundsWithoutPadding;
-
-  contentAreaBounds = boundsWithoutTitle.clone();
-  this.drawContent(contentAreaBounds);
-
-  this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
-  //end clear appearance states
-
   //start clear container consistency states
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.Z_INDEX)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */(this.zIndex()));
-    this.markConsistent(anychart.utils.ConsistencyState.Z_INDEX);
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.CONTAINER)) {
-    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    this.markConsistent(anychart.utils.ConsistencyState.CONTAINER);
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    if (this.enabled()) {
+      this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      if (this.title().enabled()) this.title_.container(this.rootElement);
+    }
+
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
   //end clear container consistency states
 
-  //after all chart items are drawn, we can clear other states
-  this.markConsistent(anychart.utils.ConsistencyState.BOUNDS);
-  this.markConsistent(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+  totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
+  boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
+
+  var background = this.background();
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND) ||
+      this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    background.suspendSignalsDispatching();
+    if (!background.container()) background.container(this.rootElement);
+    background.pixelBounds(boundsWithoutMargin);
+    background.resumeSignalsDispatching(false);
+    background.draw();
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+  }
+
+  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
+
+  var title = this.title();
+  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE) ||
+      this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    title.suspendSignalsDispatching();
+    title.parentBounds(boundsWithoutPadding);
+    title.resumeSignalsDispatching(false);
+    title.draw();
+    this.markConsistent(anychart.ConsistencyState.TITLE);
+  }
+
+  boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
+
+
+  var legend = /** @type {anychart.elements.Legend} */(this.legend());
+  var legendParentBounds = boundsWithoutTitle;
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND | anychart.ConsistencyState.BOUNDS)) {
+    legend.suspendSignalsDispatching();
+    if (!legend.container() && this.legend_.enabled()) legend.container(this.rootElement);
+    legend.parentBounds(legendParentBounds);
+    legend.itemsProvider(this.createLegendItemsProvider());
+    legend.resumeSignalsDispatching(false);
+    legend.draw();
+    this.markConsistent(anychart.ConsistencyState.LEGEND);
+  }
+
+  boundsWithoutLegend = legend.enabled() ? legend.getRemainingBounds() : legendParentBounds;
+
+
+
+  contentAreaBounds = boundsWithoutLegend.clone();
+  this.drawContent(contentAreaBounds);
+
+  //after all chart items drawn, we can clear other states
+  this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
   if (manualSuspend) stage.resume();
 
-  //todo(Anton Saukh): rework this mess!
-  this.listenInvalidation(this.invalidateHandler_, this);
+  //todo(Anton Saukh): rework this shit!
+  this.listenSignals(this.invalidateHandler_, this);
   //end shit
+
+  this.resumeSignalsDispatching(false);
+
+  this.dispatchExternalEvent('CHART_DRAW');
 
   return this;
 };
 
 
 /**
- * Extension point draw chart content.
+ * Extension point do draw chart content.
  * @param {acgraph.math.Rect} bounds Chart content area bounds.
  */
 anychart.Chart.prototype.drawContent = goog.nullFunction;
 
 
-//todo(Anton Saukh): rework this mess!
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Remove/Restore.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.Chart.prototype.remove = function() {
+  this.rootElement.parent(null);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Legend.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Create legend items provider specific for chart type.
+ * @protected
+ * @return {!anychart.utils.LegendItemsProvider} Legend items provider.
+ */
+anychart.Chart.prototype.createLegendItemsProvider = function() {
+  return new anychart.utils.LegendItemsProvider([
+    'chart legend item',
+    'chart legend item',
+    'chart legend item'
+  ]);
+};
+
+
+//todo(Anton Saukh): rework this shit!
 /**
  * Internal invalidation event handler, redraw chart on all invalidate events.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.Chart.prototype.invalidateHandler_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
-    this.suspendInvalidationDispatching();
-    this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
-    this.resumeInvalidationDispatching(false);
-  }
-  this.draw();
+  anychart.globalLock.onUnlock(this.draw, this);
 };
-//end of the mess
+//end shit
 
 
 /**
- * Define should we draw background or not.
- * @return {boolean} Should we draw background or not.
+ * @inheritDoc
  */
-anychart.Chart.prototype.shouldDrawBackground = function() {
-  return !!(this.background_ && (
-      this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE) ||
-          this.hasInvalidationState(anychart.utils.ConsistencyState.BACKGROUND_APPEARANCE)));
-};
+anychart.Chart.prototype.deserialize = function(config) {
+  goog.base(this, 'deserialize', config);
 
+  var margin = config['margin'];
+  var padding = config['padding'];
+  var background = config['background'];
+  var title = config['title'];
+  var legend = config['legend'];
 
-/**
- * Define should we draw background or not.
- * @return {boolean} Should we draw background or not.
- */
-anychart.Chart.prototype.shouldDrawTitle = function() {
-  return !!(this.title_ && (
-      this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE) ||
-          this.hasInvalidationState(anychart.utils.ConsistencyState.TITLE_APPEARANCE)));
+  if (margin) this.margin(margin);
+  if (padding) this.padding(padding);
+  if (background) this.background(background);
+  if (title) this.title(title);
+  if (legend) this.legend(legend);
+
+  return this;
 };
 
 
@@ -579,6 +716,46 @@ anychart.Chart.prototype.serialize = function() {
   if (this.padding_) json['padding'] = this.padding_.serialize();
   if (this.background_) json['background'] = this.background_.serialize();
   if (this.title_) json['title'] = this.title_.serialize();
+  if (this.legend_) json['legend'] = this.legend_.serialize();
 
   return json;
+};
+
+
+/**
+ * Restore default chart settings.
+ */
+anychart.Chart.prototype.restoreDefaults = function() {
+  this.bounds().set(null, null, null, null);
+  this.margin(0);
+  this.padding(10, 20);
+
+  var background = /** @type {anychart.elements.Background} */(this.background());
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
+  background.stroke('rgb(36,102,177)');
+
+  this.title('Chart title');
+
+  var legend = /** @type {anychart.elements.Legend} */(this.legend());
+  legend.position('right');
+  legend.itemsLayout('vertical');
+  legend.align('center');
+  legend.enabled(false);
+  legend.fontSize(10);
+  legend.fontFamily('verdana');
+  legend.fontColor('rgb(35,35,35)');
+
+  var legendSeparator = /** @type {anychart.elements.Separator} */(legend.titleSeparator());
+  legendSeparator.height(1);
+  legendSeparator.fill(['#000000 0', '#000000 1', '#000000 0']);
+
+  var legendTitle = /** @type {anychart.elements.Title} */(legend.title());
+  legendTitle.fontSize(10);
+  legendTitle.fontWeight('bold');
+  legendTitle.fontFamily('verdana');
+  legendTitle.fontColor('rgb(35,35,35)');
+
+  var legendBackground = /** @type {anychart.elements.Background} */(legend.background());
+  legendBackground.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
+  legendBackground.stroke('rgb(221,221,221)');
 };

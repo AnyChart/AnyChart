@@ -4,6 +4,7 @@ function load() {
   chart.container('container');
   chart.title().background().fill('red .5');
   chart.background().fill('red .5');
+  chart.legend().enabled(true);
   chart.draw();
 
   var title = new anychart.elements.Title();

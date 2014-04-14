@@ -13,7 +13,7 @@ goog.require('goog.array');
  */
 anychart.scales.Ordinal = function() {
   /**
-   * @type {!Array.<(number|string)>}
+   * @type {!Array.<*>}
    * @private
    */
   this.values_ = [];
@@ -23,6 +23,13 @@ anychart.scales.Ordinal = function() {
    * @private
    */
   this.valuesMap_ = [];
+
+  /**
+   * Prev values set cache.
+   * @type {Array.<*>}
+   * @private
+   */
+  this.oldValues_ = null;
 
   /**
    * @type {boolean}
@@ -57,7 +64,7 @@ goog.inherits(anychart.scales.Ordinal, anychart.scales.Base);
 
 
 /**
- * @typedef {{key: (number|string), value: (number|string)}}
+ * @typedef {{key: *, value: number}}
  */
 anychart.scales.Ordinal.ValuesMapNode;
 
@@ -86,16 +93,8 @@ anychart.scales.Ordinal.DEFAULT_COMPARATOR_ = function(a, b) {
 
 
 /**
- * Может диспатчить состояния TICKS_SET, SCALE_SETTINGS, SCALE_SETTINGS_HARD, SCALE_STACK_SETTINGS, SCALE_RECATEGORIZED
- * но находиться в них не может.
- * @type {number}
- */
-anychart.scales.Ordinal.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
-
-
-/**
- * @param {number|string} key Node key.
- * @param {number|string} value Node value.
+ * @param {*} key Node key.
+ * @param {number} value Node value.
  * @return {anychart.scales.Ordinal.ValuesMapNode} Created node.
  * @private
  */
@@ -113,7 +112,7 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.scales.OrdinalTicks(this);
     this.registerDisposable(this.ticks_);
-    this.ticks_.listenInvalidation(this.ticksInvalidated_, this);
+    this.ticks_.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
     this.ticks_.set(opt_value);
@@ -124,8 +123,8 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
 
 
 /**
- * @param {(Array.<number|string>|number|string|null)=} opt_values Array of values, or values, or null for autocalc.
- * @param {...(number|string)} var_args Other values, that should be contained in input domain.
+ * @param {(Array.<*>|*|null)=} opt_values Array of values, or values, or null for autocalc.
+ * @param {...*} var_args Other values, that should be contained in input domain.
  * @return {!(anychart.scales.Ordinal|Array.<number|string>)} This or input domain.
  */
 anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
@@ -133,9 +132,8 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
     return this.values_;
   if (goog.isNull(opt_values)) {
     if (!this.autoDomain_) {
-      this.resetDataRange();
       this.autoDomain_ = true;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.SCALE_SETTINGS_HARD);
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
     }
   } else {
     this.autoDomain_ = false;
@@ -145,7 +143,7 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
       this.extendDataRange.apply(this, /** @type {Array} */(opt_values));
     else
       this.extendDataRange.apply(this, arguments);
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.SCALE_RECATEGORIZED);
+    this.checkScaleChanged(false);
   }
   return this;
 };
@@ -155,13 +153,28 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
  * @return {!anychart.scales.Ordinal} Resets input domain.
  */
 anychart.scales.Ordinal.prototype.resetDataRange = function() {
-  this.values_.length = this.valuesMap_.length = 0;
+  this.oldValues_ = this.values_;
+  this.values_ = [];
+  this.valuesMap_.length = 0;
   return this;
 };
 
 
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.checkScaleChanged = function(silently) {
+  var res = !goog.array.equals(this.oldValues_, this.values_);
+  if (res) {
+    if (this.ticks_)
+      this.ticks_.markInvalid();
+    if (!silently)
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  }
+  return res;
+};
+
+
 /**
- * @param {...(number|string)} var_args Values that are supposed to extend the input domain.
+ * @param {...*} var_args Values that are supposed to extend the input domain.
  * @return {!anychart.scales.Ordinal} Itself for chaining.
  */
 anychart.scales.Ordinal.prototype.extendDataRange = function(var_args) {
@@ -184,11 +197,8 @@ anychart.scales.Ordinal.prototype.needsAutoCalc = function() {
 };
 
 
-/**
- * @return {Array.<(number|string)>} Returns categories array if the scale requires series to categorise their data.
- *    Returns null otherwise.
- */
-anychart.scales.Ordinal.prototype.categorisation = function() {
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.getCategorisation = function() {
   return this.values_;
 };
 
@@ -200,7 +210,7 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
 
 
 /**
- * @param {string|number} value Value to transform in input scope.
+ * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
  * @return {number} Value transformed to output scope.
  */
@@ -209,16 +219,18 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
   var index = goog.array.binarySearch(this.valuesMap_, this.aNode_, this.comparator_);
   if (index < 0)
     return NaN;
-  return this.valuesMap_[index].value / this.values_.length +
+  var result = this.valuesMap_[index].value / this.values_.length +
       (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
+  return this.isInverted ? 1 - result : result;
 };
 
 
 /**
  * @param {number} ratio Value to transform in input scope.
- * @return {number|string|undefined} Value transformed to output scope.
+ * @return {*} Value transformed to output scope.
  */
 anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
+  if (this.isInverted) ratio = 1 - ratio;
   //todo(Anton Saukh): needs improvement.
   var index = ratio * this.values_.length;
   return this.values_[Math.round(index)];
@@ -227,10 +239,10 @@ anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
 
 /**
  * Ticks invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.scales.Ordinal.prototype.ticksInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.TICKS_SET))
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.TICKS_SET);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };

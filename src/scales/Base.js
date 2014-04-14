@@ -1,6 +1,6 @@
 goog.provide('anychart.scales.Base');
 
-goog.require('anychart.utils.Invalidatable');
+goog.require('anychart.Base');
 
 
 /**
@@ -16,7 +16,7 @@ anychart.scales.StackMode = {
 
 /**
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.scales.Base = function() {
   goog.base(this);
@@ -28,31 +28,30 @@ anychart.scales.Base = function() {
    * @private
    */
   this.autoCalcs_ = 0;
+
+  /**
+   * If the scale is inverted (rtl or ttb).
+   * @type {boolean}
+   * @protected
+   */
+  this.isInverted = false;
+
+  this.applyStacking = anychart.scales.Base.prototype.applyModeNone_;
 };
-goog.inherits(anychart.scales.Base, anychart.utils.Invalidatable);
+goog.inherits(anychart.scales.Base, anychart.Base);
 
 
 /**
  * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.scales.Base.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.SCALE_SETTINGS ||
-    anychart.utils.ConsistencyState.SCALE_SETTINGS_HARD ||
-    anychart.utils.ConsistencyState.SCALE_RECATEGORIZED ||
-    anychart.utils.ConsistencyState.TICKS_SET;
+anychart.scales.Base.prototype.SUPPORTED_SIGNALS =
+    anychart.Signal.NEEDS_REAPPLICATION |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
- * Также может диспатчить состояния SCALE_SETTINGS, SCALE_SETTINGS_HARD и SCALE_RECATEGORIZED.
- * @type {number}
- */
-anychart.scales.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.TICKS_SET;
-
-
-/**
- * @param {string|number} value Value to transform in input scope.
+ * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
  * @return {number} Value transformed to [0, 1] scope.
  */
@@ -61,9 +60,64 @@ anychart.scales.Base.prototype.transform = goog.abstractMethod;
 
 /**
  * @param {number} ratio Value to transform in input scope.
- * @return {number|string|undefined} Value transformed to output scope.
+ * @return {*} Value transformed to output scope.
  */
 anychart.scales.Base.prototype.inverseTransform = goog.abstractMethod;
+
+
+/**
+ * Getter and setter for scale inversion. If the scale is inverted, axes and series go upside-down or right-to-left
+ * instead of bottom-to-top and left-to-right.
+ * @param {boolean=} opt_value Inverted state to set.
+ * @return {(!anychart.scales.Base|boolean)} Inverted state or itself for chaining.
+ */
+anychart.scales.Base.prototype.inverted = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.isInverted != opt_value) {
+      this.isInverted = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.isInverted;
+};
+
+
+/**
+ * Informs scale that an auto range calculation started for the chart, so it should reset it's data range on the first
+ * call of this method if needed.
+ * @return {!anychart.scales.Base} Chaining.
+ */
+anychart.scales.Base.prototype.startAutoCalc = function() {
+  if (!this.autoCalcs_)
+    this.resetDataRange();
+  this.autoCalcs_++;
+  return this;
+};
+
+
+/**
+ * Informs the scale, that an auto range calculation started for the chart in past was ended.
+ * @param {boolean=} opt_silently If this flag is set, does not dispatch an event if reapplication needed.
+ * @return {boolean} If the calculation changed the scale and it needs to be reapplied.
+ */
+anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
+  this.autoCalcs_ = Math.max(this.autoCalcs_ - 1, 0);
+  if (this.autoCalcs_ == 0) {
+    return this.checkScaleChanged(!!opt_silently);
+  } else
+    return false; // todo: ???
+};
+
+
+/**
+ * Checks if previous data range differs from current, dispatches a REAPPLICATION signal and returns the result.
+ * @param {boolean} silently If set, the signal is not dispatched.
+ * @return {boolean} If the scale was changed and it needs to be reapplied.
+ * @protected
+ */
+anychart.scales.Base.prototype.checkScaleChanged = goog.abstractMethod;
 
 
 //region --- Section Internal methods ---
@@ -79,27 +133,8 @@ anychart.scales.Base.prototype.needsAutoCalc = goog.abstractMethod;
 
 
 /**
- * Informs scale that an auto range calculation started for the chart, so it should reset it's data range on the first
- * call of this method if needed.
- */
-anychart.scales.Base.prototype.startAutoCalc = function() {
-  if (!this.autoCalcs_)
-    this.resetDataRange();
-  this.autoCalcs_++;
-};
-
-
-/**
- * Informs the scale, that an auto range calculation started for the chart in past was ended.
- */
-anychart.scales.Base.prototype.finishAutoCalc = function() {
-  this.autoCalcs_ = Math.max(this.autoCalcs_ - 1, 0);
-};
-
-
-/**
  * Extends the scale range.
- * @param {...(number|string)} var_args Values that are supposed to extend the input domain.
+ * @param {...*} var_args Values that are supposed to extend the input domain.
  * @return {!anychart.scales.Base} Itself for chaining.
  */
 anychart.scales.Base.prototype.extendDataRange = goog.abstractMethod;
@@ -114,10 +149,10 @@ anychart.scales.Base.prototype.resetDataRange = goog.abstractMethod;
 
 
 /**
- * @return {Array.<(number|string)>} Returns categories array if the scale requires series to categorise their data.
+ * @return {Array.<*>} Returns categories array if the scale requires series to categorise their data.
  *    Returns null otherwise.
  */
-anychart.scales.Base.prototype.categorisation = function() {
+anychart.scales.Base.prototype.getCategorisation = function() {
   return null;
 };
 
@@ -186,6 +221,14 @@ anychart.scales.Base.prototype.stackMode_ = anychart.scales.StackMode.NONE;
 
 
 /**
+ * Setting, whether the scale can be stacked. Should be set in the constructor.
+ * @type {boolean}
+ * @protected
+ */
+anychart.scales.Base.prototype.canBeStacked = false;
+
+
+/**
  * Accepts 'none', 'value', 'percent'.
  * @param {anychart.scales.StackMode=} opt_stackMode Stack mode if used as setter.
  * @return {anychart.scales.Base|anychart.scales.StackMode} StackMode or itself for chaining.
@@ -194,10 +237,10 @@ anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
   if (goog.isDef(opt_stackMode)) {
     var str = ('' + opt_stackMode).toLowerCase();
     var res, fn;
-    if (str == /** @type {string} */(anychart.scales.StackMode.PERCENT)) {
+    if (this.canBeStacked && str == /** @type {string} */(anychart.scales.StackMode.PERCENT)) {
       res = anychart.scales.StackMode.PERCENT;
       fn = this.applyModePercent_;
-    } else if (str == /** @type {string} */(anychart.scales.StackMode.VALUE)) {
+    } else if (this.canBeStacked && str == /** @type {string} */(anychart.scales.StackMode.VALUE)) {
       res = anychart.scales.StackMode.VALUE;
       fn = this.applyModeValue_;
     } else {
@@ -207,7 +250,7 @@ anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
     if (this.stackMode_ != res) {
       this.stackMode_ = res;
       this.applyStacking = fn;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.SCALE_SETTINGS);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -245,7 +288,7 @@ anychart.scales.Base.prototype.resetStack = function() {
  * @param {*} value Data value.
  * @return {*} Stacked data value.
  */
-anychart.scales.Base.prototype.applyStacking = anychart.scales.Base.prototype.applyModeNone_;
+anychart.scales.Base.prototype.applyStacking;
 
 
 /**
@@ -310,7 +353,7 @@ anychart.scales.Base.prototype.applyModeValue_ = function(value) {
  * @private
  */
 anychart.scales.Base.prototype.applyModePercent_ = function(value) {
-  var max = /** @type {number} */(value) < 0 ? this.stackMin_ : this.stackMax_;
-  return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, 0, 100));
+  var max = /** @type {number} */(value) < 0 ? -this.stackMin_ : this.stackMax_;
+  return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, -100, 100));
 };
 //endregion

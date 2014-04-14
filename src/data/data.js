@@ -7,6 +7,7 @@ goog.require('anychart.data.PieView');
 goog.require('anychart.data.ScatterView');
 goog.require('anychart.data.Set');
 goog.require('anychart.data.SortView');
+goog.require('anychart.data.csv.Parser');
 
 /**
  Набор классов для работы с данными.<br/>

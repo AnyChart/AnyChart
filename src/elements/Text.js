@@ -1,14 +1,14 @@
 goog.provide('anychart.elements.Text');
 
 goog.require('acgraphexport');
-goog.require('anychart.elements.Base');
+goog.require('anychart.VisualBase');
 
 
 
 /**
  * This class is responsible of the text formatting, it processes the plain text and the text in HTML format.
  * @constructor
- * @extends {anychart.elements.Base}
+ * @extends {anychart.VisualBase}
  */
 anychart.elements.Text = function() {
   goog.base(this);
@@ -18,7 +18,27 @@ anychart.elements.Text = function() {
    * @type {!Object}
    * @protected
    */
-  this.settingsObj;
+  this.settingsObj = {
+    'fontSize': goog.global['anychart']['fontSize'],
+    'fontFamily': goog.global['anychart']['fontFamily'],
+    'fontColor': goog.global['anychart']['fontColor'],
+    'fontOpacity': 1,
+    'fontDecoration': acgraph.vector.Text.Decoration.NONE,
+    'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
+    'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
+    'fontWeight': 'normal',
+    'letterSpacing': 'normal',
+    'direction': goog.global['anychart']['textDirection'],
+    'lineHeight': 'normal',
+    'textIndent': 0,
+    'vAlign': acgraph.vector.Text.VAlign.TOP,
+    'hAlign': acgraph.vector.Text.HAlign.START,
+    'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
+    'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
+    'selectable': false,
+    'hoverable': false,
+    'useHtml': false
+  };
 
   /**
    * Contains the flags for all settings that were changed.
@@ -36,23 +56,20 @@ anychart.elements.Text = function() {
   this.notCauseBoundsChange = {
     'fontColor': true,
     'fontOpacity': true,
-    'selectable': true
+    'selectable': true,
+    'hoverable': true
   };
-
-  this.restoreDefaults();
-  this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
 };
-goog.inherits(anychart.elements.Text, anychart.elements.Base);
+goog.inherits(anychart.elements.Text, anychart.VisualBase);
 
 
 /**
  * Supported consistency states.
  * @type {number}
  */
-anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
-    anychart.utils.ConsistencyState.APPEARANCE |
-    anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+anychart.elements.Text.prototype.SUPPORTED_SIGNALS =
+    anychart.VisualBase.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.BOUNDS_CHANGED;
 
 
 /**
@@ -60,9 +77,9 @@ anychart.elements.Text.prototype.DISPATCHED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+    anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.BOUNDS;
 
 
 /**
@@ -123,10 +140,13 @@ anychart.elements.Text.prototype.textSettings = function(opt_objectOrName, opt_v
         if (this.settingsObj[opt_objectOrName] != opt_value) {
           this.settingsObj[opt_objectOrName] = opt_value;
           this.changedSettings[opt_objectOrName] = true;
-          if (opt_objectOrName in this.notCauseBoundsChange)
-            this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
-          else
-            this.invalidate(anychart.utils.ConsistencyState.APPEARANCE | anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+          var state = anychart.ConsistencyState.APPEARANCE;
+          var signal = anychart.Signal.NEEDS_REDRAW;
+          if (!(opt_objectOrName in this.notCauseBoundsChange)) {
+            state |= anychart.ConsistencyState.BOUNDS;
+            signal |= anychart.Signal.BOUNDS_CHANGED;
+          }
+          this.invalidate(state, signal);
         }
         return this;
       } else {
@@ -476,6 +496,16 @@ anychart.elements.Text.prototype.selectable = function(opt_value) {
 
 
 /**
+ * Pointer events.
+ * @param {boolean=} opt_value .
+ * @return {!anychart.elements.Text|boolean} .
+ */
+anychart.elements.Text.prototype.hoverable = function(opt_value) {
+  return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('hoverable', opt_value));
+};
+
+
+/**
  * Getter for the useHTML flag.
  * @return {boolean} The current value of useHTML flag.
  *//**
@@ -534,35 +564,10 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.hAlign(this.settingsObj['hAlign']);
   if ('textOverflow' in this.changedSettings)
     textElement.textOverflow(this.settingsObj['textOverflow']);
-  if ('selectable' in this.changedSettings)
+  if (isInitial || 'selectable' in this.changedSettings)
     textElement.selectable(this.settingsObj['selectable']);
-};
-
-
-/**
- * Restore text default settings.
- */
-anychart.elements.Text.prototype.restoreDefaults = function() {
-  this.settingsObj = {
-    'fontSize': goog.global['anychart']['fontSize'],
-    'fontFamily': goog.global['anychart']['fontFamily'],
-    'fontColor': goog.global['anychart']['fontColor'],
-    'fontOpacity': 1,
-    'fontDecoration': acgraph.vector.Text.Decoration.NONE,
-    'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
-    'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
-    'fontWeight': 'normal',
-    'letterSpacing': 'normal',
-    'direction': goog.global['anychart']['textDirection'],
-    'lineHeight': 'normal',
-    'textIndent': 0,
-    'vAlign': acgraph.vector.Text.VAlign.TOP,
-    'hAlign': acgraph.vector.Text.HAlign.START,
-    'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
-    'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
-    'selectable': false,
-    'useHtml': false
-  };
+  if (isInitial || 'hoverable' in this.changedSettings)
+    textElement.pointerEvents(this.settingsObj['hoverable'] ? '' : 'none');
 };
 
 
@@ -572,45 +577,25 @@ anychart.elements.Text.prototype.restoreDefaults = function() {
 anychart.elements.Text.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  var fontSize = this.fontSize();
-  var fontFamily = this.fontFamily();
-  var fontColor = this.fontColor();
-  var fontOpacity = this.fontOpacity();
-  var fontDecoration = this.fontDecoration();
-  var fontStyle = this.fontStyle();
-  var fontVariant = this.fontVariant();
-  var fontWeight = this.fontWeight();
-  var letterSpacing = this.letterSpacing();
-  var direction = this.direction();
-  var lineHeight = this.lineHeight();
-  var textIndent = this.textIndent();
-  var vAlign = this.vAlign();
-  var hAlign = this.hAlign();
-  var textWrap = this.textWrap();
-  var textOverflow = this.textOverflow();
-  var selectable = this.selectable();
-  var useHtml = this.useHtml();
-  var text = this.textSettings('text');
-
-  json['fontSize'] = fontSize;
-  json['fontFamily'] = fontFamily;
-  json['fontColor'] = fontColor;
-  json['fontOpacity'] = fontOpacity;
-  json['fontDecoration'] = fontDecoration;
-  json['fontStyle'] = fontStyle;
-  json['fontVariant'] = fontVariant;
-  json['fontWeight'] = fontWeight;
-  json['letterSpacing'] = letterSpacing;
-  json['direction'] = direction;
-  json['lineHeight'] = lineHeight;
-  json['textIndent'] = textIndent;
-  json['vAlign'] = vAlign;
-  json['hAlign'] = hAlign;
-  json['textWrap'] = textWrap;
-  json['textOverflow'] = textOverflow;
-  json['selectable'] = selectable;
-  json['useHtml'] = useHtml;
-  json['text'] = text;
+  json['fontSize'] = this.fontSize();
+  json['fontFamily'] = this.fontFamily();
+  json['fontColor'] = this.fontColor();
+  json['fontOpacity'] = this.fontOpacity();
+  json['fontDecoration'] = this.fontDecoration();
+  json['fontStyle'] = this.fontStyle();
+  json['fontVariant'] = this.fontVariant();
+  json['fontWeight'] = this.fontWeight();
+  json['letterSpacing'] = this.letterSpacing();
+  json['direction'] = this.direction();
+  json['lineHeight'] = this.lineHeight();
+  json['textIndent'] = this.textIndent();
+  json['vAlign'] = this.vAlign();
+  json['hAlign'] = this.hAlign();
+  json['textWrap'] = this.textWrap();
+  json['textOverflow'] = this.textOverflow();
+  json['selectable'] = this.selectable();
+  json['hoverable'] = this.hoverable();
+  json['useHtml'] = this.useHtml();
 
   return json;
 };

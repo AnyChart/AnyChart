@@ -1,7 +1,7 @@
 goog.provide('anychart.utils.Space');
 
+goog.require('anychart.Base');
 goog.require('anychart.utils');
-goog.require('anychart.utils.Invalidatable');
 
 
 
@@ -14,21 +14,21 @@ goog.require('anychart.utils.Invalidatable');
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   goog.base(this);
-  this.set.apply(this, arguments);
+  if (arguments.length)
+    this.set.apply(this, arguments);
 };
-goog.inherits(anychart.utils.Space, anychart.utils.Invalidatable);
+goog.inherits(anychart.utils.Space, anychart.Base);
 
 
 /**
  * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.utils.Space.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.BOUNDS;
+anychart.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
@@ -36,7 +36,7 @@ anychart.utils.Space.prototype.DISPATCHED_CONSISTENCY_STATES =
  * @type {number|string}
  * @private
  */
-anychart.utils.Space.prototype.top_;
+anychart.utils.Space.prototype.top_ = 0;
 
 
 /**
@@ -44,7 +44,7 @@ anychart.utils.Space.prototype.top_;
  * @type {number|string}
  * @private
  */
-anychart.utils.Space.prototype.right_;
+anychart.utils.Space.prototype.right_ = 0;
 
 
 /**
@@ -52,7 +52,7 @@ anychart.utils.Space.prototype.right_;
  * @type {number|string}
  * @private
  */
-anychart.utils.Space.prototype.bottom_;
+anychart.utils.Space.prototype.bottom_ = 0;
 
 
 /**
@@ -60,7 +60,7 @@ anychart.utils.Space.prototype.bottom_;
  * @type {number|string}
  * @private
  */
-anychart.utils.Space.prototype.left_;
+anychart.utils.Space.prototype.left_ = 0;
 
 
 /**
@@ -104,24 +104,24 @@ anychart.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_
     bottom = opt_spaceOrTopOrTopAndBottom.bottom_;
     left = opt_spaceOrTopOrTopAndBottom.left_;
   } else if (argsLen == 1) {
-    left = bottom = right = top = opt_spaceOrTopOrTopAndBottom;
-  } else if (argsLen >= 4) {
-    top = opt_spaceOrTopOrTopAndBottom;
-    right = opt_rightOrRightAndLeft;
-    bottom = opt_bottom;
-    left = opt_left;
+    left = bottom = right = top = opt_spaceOrTopOrTopAndBottom || 0;
   } else if (argsLen == 2) {
-    bottom = top = opt_spaceOrTopOrTopAndBottom;
-    left = right = opt_rightOrRightAndLeft;
+    bottom = top = opt_spaceOrTopOrTopAndBottom || 0;
+    left = right = opt_rightOrRightAndLeft || 0;
   } else if (argsLen == 3) {
-    top = opt_spaceOrTopOrTopAndBottom;
-    left = right = opt_rightOrRightAndLeft;
-    bottom = opt_bottom;
+    top = opt_spaceOrTopOrTopAndBottom || 0;
+    left = right = opt_rightOrRightAndLeft || 0;
+    bottom = opt_bottom || 0;
+  } else if (argsLen >= 4) {
+    top = opt_spaceOrTopOrTopAndBottom || 0;
+    right = opt_rightOrRightAndLeft || 0;
+    bottom = opt_bottom || 0;
+    left = opt_left || 0;
   }
 
-  this.suspendInvalidationDispatching();
+  this.suspendSignalsDispatching();
   this.left(left).top(top).right(right).bottom(bottom);
-  this.resumeInvalidationDispatching(true);
+  this.resumeSignalsDispatching(true);
 
   return this;
 };
@@ -134,16 +134,10 @@ anychart.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_
  */
 anychart.utils.Space.prototype.left = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val;
-    if (!goog.isNull(opt_value) && !isNaN(opt_value))
-      val = +opt_value;
-    else if (goog.isString(opt_value))
-      val = opt_value;
-    else
-      val = 0;
+    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
     if (val != this.left_) {
       this.left_ = val;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else
@@ -158,16 +152,10 @@ anychart.utils.Space.prototype.left = function(opt_value) {
  */
 anychart.utils.Space.prototype.top = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val;
-    if (!goog.isNull(opt_value) && !isNaN(opt_value))
-      val = +opt_value;
-    else if (goog.isString(opt_value))
-      val = opt_value;
-    else
-      val = 0;
+    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
     if (val != this.top_) {
       this.top_ = val;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else
@@ -182,16 +170,10 @@ anychart.utils.Space.prototype.top = function(opt_value) {
  */
 anychart.utils.Space.prototype.right = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val;
-    if (!goog.isNull(opt_value) && !isNaN(opt_value))
-      val = +opt_value;
-    else if (goog.isString(opt_value))
-      val = opt_value;
-    else
-      val = 0;
+    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
     if (val != this.right_) {
       this.right_ = val;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else
@@ -206,23 +188,15 @@ anychart.utils.Space.prototype.right = function(opt_value) {
  */
 anychart.utils.Space.prototype.bottom = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val;
-    if (!goog.isNull(opt_value) && !isNaN(opt_value))
-      val = +opt_value;
-    else if (goog.isString(opt_value))
-      val = opt_value;
-    else
-      val = 0;
+    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
     if (val != this.bottom_) {
       this.bottom_ = val;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.BOUNDS);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else
     return this.bottom_;
 };
-
-//TODO (Anton Saukh): Все-таки margin и padding это разные вещи: разная нормализация при процентных значениях.
 
 
 /**
@@ -231,10 +205,12 @@ anychart.utils.Space.prototype.bottom = function(opt_value) {
  * @return {!anychart.math.Rect} New rect with applied margin.
  */
 anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
-  var left = anychart.utils.normalize(this.left_, boundsRect.width);
-  var right = anychart.utils.normalize(this.right_, boundsRect.width);
-  var top = anychart.utils.normalize(this.top_, boundsRect.height);
-  var bottom = anychart.utils.normalize(this.bottom_, boundsRect.height);
+  var width = this.getWidthToTighten(boundsRect.width);
+  var height = this.getHeightToTighten(boundsRect.height);
+  var left = anychart.utils.normalize(this.left_, width);
+  var right = anychart.utils.normalize(this.right_, width);
+  var top = anychart.utils.normalize(this.top_, height);
+  var bottom = anychart.utils.normalize(this.bottom_, height);
   return new anychart.math.Rect(
       boundsRect.left + left,
       boundsRect.top + top,
@@ -250,6 +226,7 @@ anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
  * @return {number} New width tighten by the margin.
  */
 anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
+  initialWidth = this.getHeightToTighten(initialWidth);
   var left = anychart.utils.normalize(this.left_, initialWidth);
   var right = anychart.utils.normalize(this.right_, initialWidth);
   return initialWidth - left - right;
@@ -262,6 +239,7 @@ anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
  * @return {number} New height tighten by the margin.
  */
 anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
+  initialHeight = this.getHeightToTighten(initialHeight);
   var top = anychart.utils.normalize(this.top_, initialHeight);
   var bottom = anychart.utils.normalize(this.bottom_, initialHeight);
   return initialHeight - top - bottom;
@@ -274,10 +252,12 @@ anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
  * @return {!anychart.math.Rect} New rect with applied margin.
  */
 anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
-  var left = anychart.utils.normalize(this.left_, boundsRect.width);
-  var right = anychart.utils.normalize(this.right_, boundsRect.width);
-  var top = anychart.utils.normalize(this.top_, boundsRect.height);
-  var bottom = anychart.utils.normalize(this.bottom_, boundsRect.height);
+  var width = this.getWidthToWiden(boundsRect.width);
+  var height = this.getHeightToWiden(boundsRect.height);
+  var left = anychart.utils.normalize(this.left_, width);
+  var right = anychart.utils.normalize(this.right_, width);
+  var top = anychart.utils.normalize(this.top_, height);
+  var bottom = anychart.utils.normalize(this.bottom_, height);
   return new anychart.math.Rect(
       boundsRect.left - left,
       boundsRect.top - top,
@@ -293,6 +273,7 @@ anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
  * @return {number} New width widen by the margin.
  */
 anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
+  initialWidth = this.getWidthToWiden(initialWidth);
   var left = anychart.utils.normalize(this.left_, initialWidth);
   var right = anychart.utils.normalize(this.right_, initialWidth);
   return initialWidth + left + right;
@@ -305,6 +286,7 @@ anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
  * @return {number} New height widen by the margin.
  */
 anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
+  initialHeight = this.getHeightToWiden(initialHeight);
   var top = anychart.utils.normalize(this.top_, initialHeight);
   var bottom = anychart.utils.normalize(this.bottom_, initialHeight);
   return initialHeight + top + bottom;
@@ -312,19 +294,44 @@ anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
 
 
 /**
- * Clone settings from the passed space to itself.
- * @param {anychart.utils.Space} space Space to copy settings from.
- * @return {anychart.utils.Space} Return itself for chaining call.
+ * Corrects height to calculate percentage from.
+ * @param {number} initialWidth
+ * @return {number}
  */
-anychart.utils.Space.prototype.cloneFrom = function(space) {
-  this.suspendInvalidationDispatching();
-  if (goog.isDefAndNotNull(space)) {
-    this.set(space);
-  } else {
-    this.set();
-  }
-  this.resumeInvalidationDispatching(true);
-  return this;
+anychart.utils.Space.prototype.getWidthToWiden = function(initialWidth) {
+  return initialWidth;
+};
+
+
+/**
+ * Corrects height to calculate percentage from.
+ * @param {number} initialWidth
+ * @return {number}
+ */
+anychart.utils.Space.prototype.getWidthToTighten = function(initialWidth) {
+  return initialWidth;
+};
+
+
+/**
+ * Corrects height to calculate percentage from.
+ * @param {number} initialHeight
+ * @return {number}
+ * @protected
+ */
+anychart.utils.Space.prototype.getHeightToWiden = function(initialHeight) {
+  return initialHeight;
+};
+
+
+/**
+ * Corrects height to calculate percentage from.
+ * @param {number} initialHeight
+ * @return {number}
+ * @protected
+ */
+anychart.utils.Space.prototype.getHeightToTighten = function(initialHeight) {
+  return initialHeight;
 };
 
 
@@ -334,15 +341,10 @@ anychart.utils.Space.prototype.cloneFrom = function(space) {
 anychart.utils.Space.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  var top = this.top();
-  var right = this.right();
-  var bottom = this.bottom();
-  var left = this.left();
-
-  json['top'] = top;
-  json['right'] = right;
-  json['bottom'] = bottom;
-  json['left'] = left;
+  json['top'] = this.top();
+  json['right'] = this.right();
+  json['bottom'] = this.bottom();
+  json['left'] = this.left();
 
   return json;
 };
@@ -354,8 +356,10 @@ anychart.utils.Space.prototype.serialize = function() {
 anychart.utils.Space.prototype.deserialize = function(config) {
   goog.base(this, 'deserialize', config);
 
+  this.left(config['left']);
   this.top(config['top']);
   this.right(config['right']);
   this.bottom(config['bottom']);
-  this.left(config['left']);
+
+  return this;
 };

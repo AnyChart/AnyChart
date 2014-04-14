@@ -1,8 +1,8 @@
 goog.provide('anychart.data.Set');
 
+goog.require('anychart.Base');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
-goog.require('anychart.utils.Invalidatable');
 goog.require('goog.array');
 
 
@@ -114,24 +114,25 @@ goog.require('goog.array');
  *     // 'low' is an element with the index of 2,
  *     // 'close' is an element with the index of 3.
  *     // All elements with the index greater than 3 are ignored.
- * @param {Array=} opt_data Data set raw data can be set here.
+ * @param {(Array|string)=} opt_data Data set raw data can be set here.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
  * @constructor
  * @implements {anychart.data.IView}
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
-anychart.data.Set = function(opt_data) {
+anychart.data.Set = function(opt_data, opt_csvSettings) {
   goog.base(this);
-  this.data(opt_data || null);
+  this.data(opt_data || null, opt_csvSettings);
 };
-goog.inherits(anychart.data.Set, anychart.utils.Invalidatable);
+goog.inherits(anychart.data.Set, anychart.Base);
 
 
 /**
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.data.Set.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.data.Set.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -164,12 +165,34 @@ anychart.data.Set.prototype.storage_;
  * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {Array=} opt_value .
+ * @param {(Array|string)=} opt_value .
+ * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
  * @return {!(anychart.data.Set|Array)} .
  */
-anychart.data.Set.prototype.data = function(opt_value) {
+anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
     anychart.globalLock.lock();
+    if (goog.isString(opt_value)) {
+      try {
+        var parser = new anychart.data.csv.Parser();
+        if (goog.isObject(opt_csvSettings)) {
+          parser.rowsSeparator(/** @type {string|undefined} */(opt_csvSettings['rowsSeparator'])); // if it is undefined, it will not be set.
+          parser.columnsSeparator(/** @type {string|undefined} */(opt_csvSettings['columnsSeparator'])); // if it is undefined, it will not be set.
+          parser.ignoreTrailingSpaces(/** @type {boolean|undefined} */(opt_csvSettings['ignoreTrailingSpaces'])); // if it is undefined, it will not be set.
+          parser.ignoreFirstRow(/** @type {boolean|undefined} */(opt_csvSettings['ignoreFirstRow'])); // if it is undefined, it will not be set.
+        }
+        opt_value = parser.parse(opt_value);
+      } catch (e) {
+        if (e instanceof Error) {
+          try {
+            goog.global['console']['log'](e.message);
+          } catch (ignored) {
+          }
+        }
+        opt_value = null;
+      }
+    }
     if (goog.isArrayLike(opt_value)) {
       /** @type {!Array} */
       var data = goog.array.slice(opt_value, 0);
@@ -178,11 +201,11 @@ anychart.data.Set.prototype.data = function(opt_value) {
           data[i] = goog.array.slice(data[i], 0);
       }
       this.storage_ = data;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+      this.dispatchSignal(anychart.Signal.DATA_CHANGED);
     } else {
       if (this.storage_ && this.storage_.length > 0) {
         this.storage_.length = 0;
-        this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+        this.dispatchSignal(anychart.Signal.DATA_CHANGED);
       } else {
         this.storage_ = [];
       }
@@ -201,9 +224,9 @@ anychart.data.Set.prototype.data = function(opt_value) {
  * @example <c>Custom data mapping.</c><t>listingOnly</t>
  * // Simple mapping
  *  dataSet.mapAs({
- *    'value': 0,
- *    'x': 1,
- *    'fill': 2
+ *    'value': [0],
+ *    'x': [1],
+ *    'fill': [2]
  *  });
  *   // Raw data          Mapped as
  *   [
@@ -214,9 +237,9 @@ anychart.data.Set.prototype.data = function(opt_value) {
  *   ]
  * // Combined mapping
  *  dataSet.mapAs({
- *    'value': 0,
- *    'x': 1,
- *    'fill': 2
+ *    'value': [0],
+ *    'x': [1],
+ *    'fill': [2]
  *   },{
  *    'value': ['close', 'customY'],
  *    'fill': ['fill', 'color']
@@ -239,14 +262,14 @@ anychart.data.Set.prototype.data = function(opt_value) {
  *    11,                       {close: 4, value: 11}
  *    function(){ return 99;}   {close: 5, value: 99}
  *   ]
- * @param {!(Object.<number>)=} opt_arrayMapping [{
- *   'x': 0,
- *   'value': 1,
- *   'size': 2,
- *   'open': 1,
- *   'high': 2,
- *   'low': 3,
- *   'close': 4
+ * @param {!(Object.<Array.<number>>)=} opt_arrayMapping [{
+ *   'x': [0],
+ *   'value': [1, 0],
+ *   'size': [2],
+ *   'open': [1],
+ *   'high': [2],
+ *   'low': [3, 1],
+ *   'close': [4]
  * }] Column mapping for the rows which are arrays.
  * @param {!(Object.<Array.<string>>)=} opt_objectMapping [{'value': &#91;'value', 'y', 'close'&#93;}] Column mapping for the rows
  *  which are objects.
@@ -313,7 +336,7 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
   if (arguments.length > 1) {
     anychart.globalLock.lock();
     this.storage_[rowIndex] = opt_value;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
     anychart.globalLock.unlock();
   }
   return value;

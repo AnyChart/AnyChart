@@ -1,5 +1,11 @@
 var chart, newPie, seriesData;
 var summPointsValues = 0;
+function resetAsXML() {
+  var a = anychart.utils.json2xml(chart.serialize());
+  document.getElementById('container').innerHTML = '';
+  var q = anychart.xml(a);
+  q.container('container').draw();
+}
 function load() {
   var data = [
     {value: '1', exploded: false},
@@ -41,14 +47,14 @@ function load() {
   }
 
 //  chart.margin('1%', '2%');
-  chart.labels()
+  //chart.labels()
      /* .textFormatter(function(formatProvider, index) {
         var value = parseFloat(formatProvider(index, 'value'));
 
         return Math.ceil(1000 * value / summPointsValues) / 10 + '%';
       })*/
-      .fontSize(11)
-      .fontColor('white');
+      //.fontSize(11)
+      //.fontColor('white');
 
   chart.background()
       .stroke('2 rgb(36,102,177)')
@@ -77,12 +83,11 @@ function load() {
 var foo = function() {
   chart.setOtherPoint('group', function(val) {return val > 1500000});
   chart.sort('asc');
-  document.getElementById('bar')['disabled'] = false;
 };
 
 var bar = function() {
   chart.container().removeChildren();
-  var json = chart.getJSON();
+  var json = chart.serialize();
   newPie = anychart.json(json);
   newPie.container(chart.container());
   newPie.draw();

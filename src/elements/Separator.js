@@ -1,11 +1,12 @@
 goog.provide('anychart.elements.Separator');
+goog.require('anychart.VisualBase');
 
 
 
 /**
  * Class is responsible for separator element.
  * @constructor
- * @extends {anychart.elements.Base}
+ * @extends {anychart.VisualBase}
  */
 anychart.elements.Separator = function() {
   goog.base(this);
@@ -19,14 +20,14 @@ anychart.elements.Separator = function() {
 
   /**
    * Separator fill.
-   * @type {!Array}
+   * @type {acgraph.vector.Fill}
    * @private
    */
   this.fill_;
 
   /**
    * Separator stroke.
-   * @type {!Array}
+   * @type {acgraph.vector.Stroke}
    * @private
    */
   this.stroke_;
@@ -87,13 +88,6 @@ anychart.elements.Separator = function() {
   this.pixelBounds_ = null;
 
   /**
-   * Separator margin.
-   * @type {anychart.utils.Margin}
-   * @private
-   */
-  this.margin_ = null;
-
-  /**
    * Separator orientation.
    * @type {anychart.utils.Orientation}
    * @private
@@ -102,19 +96,18 @@ anychart.elements.Separator = function() {
 
   this.restoreDefaults();
 
-  this.silentlyInvalidate(anychart.utils.ConsistencyState.ALL);
+  this.invalidate(anychart.ConsistencyState.ALL);
 };
-goog.inherits(anychart.elements.Separator, anychart.elements.Base);
+goog.inherits(anychart.elements.Separator, anychart.VisualBase);
 
 
 /**
  * Dispatched consistency states.
  * @type {number}
  */
-anychart.elements.Separator.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.elements.Base.prototype.DISPATCHED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+anychart.elements.Separator.prototype.SUPPORTED_SIGNALS =
+    anychart.VisualBase.prototype.SUPPORTED_SIGNALS |
+        anychart.Signal.BOUNDS_CHANGED;
 
 
 /**
@@ -122,9 +115,9 @@ anychart.elements.Separator.prototype.DISPATCHED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.elements.Separator.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.utils.ConsistencyState.APPEARANCE |
-        anychart.utils.ConsistencyState.PIXEL_BOUNDS;
+    anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.BOUNDS;
 
 
 /**
@@ -136,7 +129,8 @@ anychart.elements.Separator.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
       this.parentBounds_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -153,7 +147,8 @@ anychart.elements.Separator.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -170,7 +165,8 @@ anychart.elements.Separator.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.height_ != opt_value) {
       this.height_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -190,7 +186,7 @@ anychart.elements.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBo
   if (!this.margin_) {
     this.margin_ = new anychart.utils.Margin();
     this.registerDisposable(this.margin_);
-    this.margin_.listenInvalidation(this.boundsInvalidated_, this);
+    this.margin_.listenSignals(this.marginInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.set.apply(this.margin_, arguments);
@@ -210,7 +206,8 @@ anychart.elements.Separator.prototype.orientation = function(opt_value) {
     opt_value = anychart.utils.normalizeOrientation(opt_value);
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -231,14 +228,14 @@ anychart.elements.Separator.prototype.orientation = function(opt_value) {
  */
 anychart.elements.Separator.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = goog.array.slice(arguments, 0);
-    if (!goog.array.equals(val, this.fill_)) {
+    var val = anychart.color.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(val, this.fill_)) {
       this.fill_ = val;
-      this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
-    return this.fill_[0] || null;
+    return this.fill_ || 'none';
   }
 };
 
@@ -254,14 +251,14 @@ anychart.elements.Separator.prototype.fill = function(opt_fillOrColorOrKeys, opt
  */
 anychart.elements.Separator.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = goog.array.slice(arguments, 0);
-    if (!goog.array.equals(val, this.stroke_)) {
+    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(val, this.stroke_)) {
       this.stroke_ = val;
-      this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
-    return this.stroke_[0] || null;
+    return this.stroke_ || 'none';
   }
 };
 
@@ -275,7 +272,7 @@ anychart.elements.Separator.prototype.drawer = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawer_ != opt_value) {
       this.drawer_ = opt_value;
-      this.invalidate(anychart.utils.ConsistencyState.APPEARANCE);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -288,29 +285,27 @@ anychart.elements.Separator.prototype.drawer = function(opt_value) {
  * @return {!anychart.elements.Separator} Экземпляр класса {@link anychart.elements.Separator} для цепочного вызова.
  */
 anychart.elements.Separator.prototype.draw = function() {
-  if (this.isConsistent()) return this;
+  if (!this.checkDrawingNeeded())
+    return this;
 
-  var isInitial;
+  var isInitial = !this.path_;
 
-  if (isInitial = !this.path_) {
+  if (isInitial) {
     this.path_ = acgraph.path();
     this.registerDisposable(this.path_);
   }
-
-  this.resolveEnabledState();
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateSeparatorBounds_();
-    this.silentlyInvalidate(anychart.utils.ConsistencyState.APPEARANCE);
-    this.markConsistent(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.path_.fill(/** @type {acgraph.vector.Fill} */ (this.fill()));
     this.path_.stroke(/** @type {acgraph.vector.Stroke} */ (this.stroke()));
     this.path_.clear();
@@ -320,28 +315,22 @@ anychart.elements.Separator.prototype.draw = function() {
       this.drawer_(this.path_, bounds);
     }
     //    this.drawInternal(bounds);
-    this.markConsistent(anychart.utils.ConsistencyState.APPEARANCE);
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.CONTAINER)) {
-    this.path_.parent(container);
-    this.markConsistent(anychart.utils.ConsistencyState.CONTAINER);
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    if (this.enabled()) this.path_.parent(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.utils.ConsistencyState.Z_INDEX)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */ (this.zIndex());
     this.path_.zIndex(zIndex);
-    this.markConsistent(anychart.utils.ConsistencyState.Z_INDEX);
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (manualSuspend) stage.resume();
   return this;
-};
-
-
-/** @inheritDoc */
-anychart.elements.Separator.prototype.restore = function() {
-  if (this.path_ && this.enabled()) this.path_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
 };
 
 
@@ -352,11 +341,24 @@ anychart.elements.Separator.prototype.remove = function() {
 
 
 /**
+ * Return separator content bounds.
+ * @return {anychart.math.Rect} Separator content bounds.
+ */
+anychart.elements.Separator.prototype.getContentBounds = function() {
+  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+    this.calculateSeparatorBounds_();
+  return new anychart.math.Rect(0, 0, this.pixelBounds_.width, this.pixelBounds_.height);
+};
+
+
+/**
  * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Separator.prototype.getRemainingBounds = function() {
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.utils.ConsistencyState.PIXEL_BOUNDS))
+  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateSeparatorBounds_();
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+  }
   /** @type {anychart.math.Rect} */
   var parentBounds;
   if (this.parentBounds_) {
@@ -398,7 +400,6 @@ anychart.elements.Separator.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
-  if (!this.enabled()) return;
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
 
@@ -510,13 +511,14 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
 
 
 /**
- * Listener for bounds invalidation.
- * @param {anychart.utils.InvalidatedStatesEvent} event Invalidation event.
+ * Listener for margin invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.elements.Separator.prototype.boundsInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.BOUNDS)) {
-    this.invalidate(anychart.utils.ConsistencyState.PIXEL_BOUNDS);
+anychart.elements.Separator.prototype.marginInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
 
@@ -525,6 +527,8 @@ anychart.elements.Separator.prototype.boundsInvalidated_ = function(event) {
  * Restore separator default settings.
  */
 anychart.elements.Separator.prototype.restoreDefaults = function() {
+  this.suspendSignalsDispatching();
+  this.zIndex(60);
   this.orientation(anychart.utils.Orientation.TOP);
   this.margin(0, 0, 10, 0);
   this.width(null);
@@ -541,6 +545,7 @@ anychart.elements.Separator.prototype.restoreDefaults = function() {
         .lineTo(bounds.left, bounds.getBottom())
         .close();
   });
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -564,6 +569,7 @@ anychart.elements.Separator.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.Separator.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
   goog.base(this, 'deserialize', config);
   this.width(config['width']);
   this.height(config['height']);
@@ -571,4 +577,6 @@ anychart.elements.Separator.prototype.deserialize = function(config) {
   this.orientation(config['orientation']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
+  this.resumeSignalsDispatching(true);
+  return this;
 };

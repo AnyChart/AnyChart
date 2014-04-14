@@ -1,6 +1,6 @@
 goog.provide('anychart.scales.OrdinalTicks');
 
-goog.require('anychart.utils.Invalidatable');
+goog.require('anychart.Base');
 goog.require('goog.array');
 
 
@@ -9,7 +9,7 @@ goog.require('goog.array');
  * Scale ticks.
  * @param {!anychart.scales.Ordinal} scale Scale to ask for a setup.
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.scales.OrdinalTicks = function(scale) {
   goog.base(this);
@@ -20,9 +20,15 @@ anychart.scales.OrdinalTicks = function(scale) {
    * @private
    */
   this.scale_ = scale;
-  this.scale_.listenInvalidation(this.scaleInvalidated_, this);
 };
-goog.inherits(anychart.scales.OrdinalTicks, anychart.utils.Invalidatable);
+goog.inherits(anychart.scales.OrdinalTicks, anychart.Base);
+
+
+/**
+ * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * @type {number}
+ */
+anychart.scales.OrdinalTicks.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
@@ -86,7 +92,7 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
       this.explicit_ = null;
       this.autoTicks_ = null;
       this.autoNames_ = null;
-      this.invalidate(anychart.utils.ConsistencyState.TICKS_SET);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -101,7 +107,7 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
  * @return {!anychart.scales.OrdinalTicks} Returns itself for chaining.
  */
 anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
-  if (this.explicit_ != ticks) {
+  if (!goog.array.equals(this.explicitIndexes_, ticks)) {
     this.explicitIndexes_ = goog.array.clone(ticks);
     goog.array.sort(this.explicitIndexes_);
     goog.array.removeDuplicates(this.explicitIndexes_);
@@ -109,7 +115,7 @@ anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
     this.explicit_ = null;
     this.autoTicks_ = null;
     this.autoNames_ = null;
-    this.invalidate(anychart.utils.ConsistencyState.TICKS_SET);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
   return this;
 };
@@ -124,7 +130,7 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
   if (goog.isDef(opt_values)) {
     if (this.names_ != opt_values) {
       this.names_ = opt_values;
-      this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.TICKS_SET);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -151,23 +157,14 @@ anychart.scales.OrdinalTicks.prototype.get = function() {
     return this.explicit_;
   if (this.explicitIndexes_)
     return this.explicit_ = this.makeValues_(this.explicitIndexes_);
-  this.calculate_();
-  return /** @type {!Array} */(this.autoTicks_);
-};
-
-
-/**
- * Calculates autoTicks if needed.
- * @private
- */
-anychart.scales.OrdinalTicks.prototype.calculate_ = function() {
-  if (this.explicit_ || this.explicitIndexes_ || this.autoTicks_)
-    return;
-  var res = [];
-  for (var i = 0, len = this.scale_.values().length; i < len; i += this.interval_) {
-    res.push(i);
+  if (!this.autoTicks_) {
+    var res = [];
+    for (var i = 0, len = this.scale_.values().length; i < len; i += this.interval_) {
+      res.push(i);
+    }
+    this.autoTicks_ = this.makeValues_(res);
   }
-  this.autoTicks_ = this.makeValues_(res);
+  return /** @type {!Array} */(this.autoTicks_);
 };
 
 
@@ -194,15 +191,10 @@ anychart.scales.OrdinalTicks.prototype.makeValues_ = function(indexes) {
 
 
 /**
- * Scale invalidation handler.
- * @param {anychart.utils.InvalidatedStatesEvent} event Event object.
- * @private
+ * Invalidation method used by the scale.
  */
-anychart.scales.OrdinalTicks.prototype.scaleInvalidated_ = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.SCALE_RECATEGORIZED) ||
-      event.invalidated(anychart.utils.ConsistencyState.SCALE_SETTINGS_HARD)) {
-    this.explicit_ = null;
-    this.autoTicks_ = null;
-    this.autoNames_ = null;
-  }
+anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
+  this.explicit_ = null;
+  this.autoTicks_ = null;
+  this.autoNames_ = null;
 };

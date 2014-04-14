@@ -23,7 +23,7 @@ anychart.data.ConcatView = function(parentView, secondView) {
    */
   this.secondView_ = secondView;
 
-  secondView.listen(anychart.utils.Invalidatable.INVALIDATED, this.parentViewChangedHandler, false, this);
+  secondView.listen(anychart.Base.SIGNAL, this.parentViewChangedHandler, false, this);
 };
 goog.inherits(anychart.data.ConcatView, anychart.data.View);
 
@@ -62,8 +62,8 @@ anychart.data.ConcatView.prototype.getRowsCount = function() {
 
 /** @inheritDoc */
 anychart.data.ConcatView.prototype.parentViewChangedHandler = function(event) {
-  if (event.invalidated(anychart.utils.ConsistencyState.DATA))
-    this.dispatchEvent(new anychart.utils.InvalidatedStatesEvent(this, anychart.utils.ConsistencyState.DATA));
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED))
+    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 };
 
 

@@ -2,23 +2,30 @@ goog.provide('anychart');
 goog.provide('anychart.globalLock');
 
 goog.require('acgraphexport');
-goog.require('anychart.Chart');
+goog.require('anychart.cartesian');
 goog.require('anychart.data');
+goog.require('anychart.elements.Axis');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Grid');
 goog.require('anychart.elements.Label');
+goog.require('anychart.elements.Legend');
+goog.require('anychart.elements.LineMarker');
 goog.require('anychart.elements.Marker');
 goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Multimarker');
+goog.require('anychart.elements.RangeMarker');
 goog.require('anychart.elements.Separator');
+goog.require('anychart.elements.TextMarker');
 goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');
+goog.require('anychart.elements.Tooltip');
 goog.require('anychart.math');
 goog.require('anychart.pie');
-goog.require('anychart.scales.Linear');
-goog.require('anychart.scales.Ordinal');
+goog.require('anychart.ui');
 goog.require('anychart.utils');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
+goog.require('goog.json.hybrid');
 
 /**
  @namespace
@@ -106,12 +113,13 @@ goog.addSingletonGetter(anychart.ClassFactory);
  */
 anychart.ClassFactory.prototype.getClass = function(json) {
   if (json['chart'] && json['chart']['type'] == 'pie') return new anychart.pie.Chart();
+  else if (json['chart'] && json['chart']['type'] == 'cartesian') return new anychart.cartesian.Chart();
   return null;
 };
 
 
 /**
- * Десериализует переданный JSON и возвращает получившийся элемент в случае успеха или null.
+ * Creates element by config.
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
@@ -120,16 +128,13 @@ anychart.json = function(jsonConfig) {
    * Parsed json config.
    * @type {Object}
    */
-  var json = {};
+  var json;
   if (goog.isString(jsonConfig)) {
-    try {
-      json = /** @type {Object} */ (JSON.parse(jsonConfig));
-    } catch (e) {
-      if (window['console']) window['console']['log'](e.stack);
-      json = null;
-    }
+    json = goog.json.hybrid.parse(jsonConfig);
   } else if (goog.isObject(jsonConfig) && !goog.isFunction(jsonConfig)) {
     json = jsonConfig;
+  } else {
+    json = {};
   }
 
   if (anychart.isJsonValid_(json)) {
@@ -140,6 +145,16 @@ anychart.json = function(jsonConfig) {
     }
     else return null;
   } else return null;
+};
+
+
+/**
+ * Creates element by config.
+ * @param {string|Node} xmlConfig Config.
+ * @return {*} Element created by config.
+ */
+anychart.xml = function(xmlConfig) {
+  return anychart.json(anychart.utils.xml2json(xmlConfig));
 };
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -211,18 +226,6 @@ anychart.documentLoadCallbacks_;
 
 /**
  * Add callback for document load event.
- * @example <t>listingOnly</t>
- * anychart.onDocumentLoad(function() {
- *     var chart = new anychart.pie.Chart([ //create an instance of pie chart with data
- *         ['Chocolate paste', 5],
- *         ['White honey', 2],
- *         ['Strawberry jam', 2],
- *         ['Сondensed milk', 1]
- *     ]);
- *     chart.title('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
- *     chart.container('chart-container'); //pass the container where chart will be drawn
- *     chart.draw(); //call the chart draw() method to initiate chart drawing
- * });
  * @param {Function} func Function which will called on document load event.
  * @param {*=} opt_scope Function call context.
  */
@@ -238,4 +241,111 @@ anychart.onDocumentLoad = function(func, opt_scope) {
       item[0].apply(item[1]);
     }
   });
+};
+
+
+/**
+ * Attaching DOM load events.
+ * @private
+ */
+anychart.attachDomEvents_ = function() {
+  var window = goog.dom.getWindow();
+  var document = window['document'];
+
+  // goog.events.EventType.DOMCONTENTLOADED - for browsers that supports DOMContentLoaded event. IE9+
+  // goog.events.EventType.READYSTATECHANGE - for IE9-
+  acgraph.events.listen(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
+
+  // A fallback to window.onload, that will always work
+  acgraph.events.listen(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
+};
+
+
+/**
+ * Detaching DOM load events.
+ * @private
+ */
+anychart.detachDomEvents_ = function() {
+  var window = goog.dom.getWindow();
+  var document = window['document'];
+
+  acgraph.events.unlisten(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
+  acgraph.events.unlisten(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
+};
+
+
+/**
+ * Function called when one of [ DOMContentLoad , onreadystatechanged ] events fired on document or onload on window.
+ * @param {acgraph.events.Event} event Event object.
+ * @private
+ */
+anychart.completed_ = function(event) {
+  var document = goog.dom.getWindow()['document'];
+  // readyState === "complete" is good enough for us to call the dom ready in oldIE
+  if (document.addEventListener || window['event']['type'] === 'load' || document['readyState'] === 'complete') {
+    anychart.detachDomEvents_();
+    anychart.ready_(event);
+  }
+};
+
+
+/**
+ * Identifies that document is loaded.
+ * @type {boolean}
+ * @private
+ */
+anychart.isReady_ = false;
+
+
+/**
+ * Function called when document content loaded.
+ * @private
+ * @param {acgraph.events.Event} event Event object.
+ * @return {*} Nothing if document already loaded or timeoutID.
+ */
+anychart.ready_ = function(event) {
+  if (anychart.isReady_) {
+    return;
+  }
+
+  var document = goog.dom.getWindow()['document'];
+
+  // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+  if (!document['body']) {
+    return setTimeout(function() {
+      anychart.ready_(event);
+    }, 1);
+  }
+
+  anychart.isReady_ = true;
+
+  for (var i = 0, count = anychart.documentReadyCallbacks_.length; i < count; i++) {
+    var item = anychart.documentReadyCallbacks_[i];
+    item[0].apply(item[1], [event]);
+  }
+};
+
+
+/**
+ * В общем надо быть бдительным и осторожным когда юзаешь этот метод.
+ * Коллбэк будет вызван до того как произойдет полная загрузка страницы LOAD. - то есть не будет доступа
+ * к CSS и прочем подгружаемым вне head`а либо асинхронно элементов
+ *
+ * Add callback for document load event.
+ * @param {Function} func Function which will called on document load event.
+ * @param {*=} opt_scope Function call context.
+ */
+anychart.onDocumentReady = function(func, opt_scope) {
+  if (!anychart.documentReadyCallbacks_) {
+    anychart.documentReadyCallbacks_ = [];
+  }
+  anychart.documentReadyCallbacks_.push([func, opt_scope]);
+
+  var document = goog.dom.getWindow()['document'];
+
+  if (document['readyState'] === 'complete') {
+    setTimeout(anychart.ready_, 1);
+  } else {
+    anychart.attachDomEvents_();
+  }
 };

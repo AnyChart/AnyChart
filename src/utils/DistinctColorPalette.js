@@ -13,7 +13,7 @@ goog.provide('anychart.utils.DistinctColorPalette');
  *       .stroke('1px #000');
  * }
  * @constructor
- * @extends {anychart.utils.Invalidatable}
+ * @extends {anychart.Base}
  */
 anychart.utils.DistinctColorPalette = function() {
   goog.base(this);
@@ -27,15 +27,14 @@ anychart.utils.DistinctColorPalette = function() {
 
   this.restoreDefaults(true);
 };
-goog.inherits(anychart.utils.DistinctColorPalette, anychart.utils.Invalidatable);
+goog.inherits(anychart.utils.DistinctColorPalette, anychart.Base);
 
 
 /**
  * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
  * @type {number}
  */
-anychart.utils.DistinctColorPalette.prototype.DISPATCHED_CONSISTENCY_STATES =
-    anychart.utils.ConsistencyState.DATA;
+anychart.utils.DistinctColorPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
@@ -70,7 +69,7 @@ anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_colo
 
   if (goog.isDef(opt_color)) {
     this.colors_[index] = opt_color;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     var color = this.colors_[index];
@@ -95,7 +94,7 @@ anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_colo
 anychart.utils.DistinctColorPalette.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.colors_ = opt_value;
-    this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
     return this.colors_;
@@ -150,7 +149,7 @@ anychart.utils.DistinctColorPalette.prototype.restoreDefaults = function(opt_doN
     '#FF9A00',
     '#FF6500'
   ];
-  if (opt_doNotDispatch) this.dispatchInvalidationEvent(anychart.utils.ConsistencyState.DATA);
+  if (opt_doNotDispatch) this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 
 
