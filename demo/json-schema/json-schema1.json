@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "chart": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/base"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "base": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "zIndex": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

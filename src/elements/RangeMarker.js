@@ -345,7 +345,6 @@ anychart.elements.RangeMarker.prototype.remove = function() {
  */
 anychart.elements.RangeMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['parentBounds'] = this.parentBounds();
   data['fill'] = this.fill();
   data['from'] = this.from();
   data['to'] = this.to();
@@ -357,7 +356,6 @@ anychart.elements.RangeMarker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.elements.RangeMarker.prototype.deserialize = function(value) {
   goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['fill'])) this.fill(value['fill']);
   if (goog.isDef(value['from'])) this.from(value['from']);
   if (goog.isDef(value['to'])) this.to(value['to']);

@@ -550,12 +550,14 @@ anychart.elements.TextMarker.prototype.remove = function() {
 anychart.elements.TextMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
   data['orientation'] = this.orientation();
-  data['parentBounds'] = this.parentBounds();
   data['align'] = this.align();
   data['anchor'] = this.anchor();
   data['value'] = this.value();
   data['offsetX'] = this.offsetX();
   data['offsetY'] = this.offsetY();
+  data['text'] = this.text();
+  data['width'] = this.width();
+  data['height'] = this.height();
   return data;
 };
 
@@ -563,13 +565,15 @@ anychart.elements.TextMarker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.elements.TextMarker.prototype.deserialize = function(value) {
   goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['orientation'])) this.orientation(value['orientation']);
   if (goog.isDef(value['align'])) this.align(value['align']);
   if (goog.isDef(value['anchor'])) this.anchor(value['anchor']);
   if (goog.isDef(value['value'])) this.value(value['value']);
   if (goog.isDef(value['offsetX'])) this.offsetX(value['offsetX']);
   if (goog.isDef(value['offsetY'])) this.offsetY(value['offsetY']);
+  if (goog.isDef(value['text'])) this.text(value['text']);
+  if (goog.isDef(value['width'])) this.width(value['width']);
+  if (goog.isDef(value['height'])) this.height(value['height']);
 
   return this;
 };

@@ -2145,6 +2145,7 @@ anychart.elements.Axis.prototype.remove = function() {
 anychart.elements.Axis.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
 
+  data['title'] = this.title().serialize();
   data['labels'] = this.labels().serialize();
   data['minorLabels'] = this.minorLabels().serialize();
   data['ticks'] = this.ticks().serialize();
@@ -2154,11 +2155,11 @@ anychart.elements.Axis.prototype.serialize = function() {
   data['name'] = this.name();
   data['length'] = this.length();
   data['offsetX'] = this.offsetX();
-  data['offsetY'] = this.stroke();
+  data['offsetY'] = this.offsetY();
   data['orientation'] = this.orientation();
-  data['parentBounds'] = this.parentBounds();
   data['drawFirstLabel'] = this.drawFirstLabel();
   data['drawLastLabel'] = this.drawLastLabel();
+  data['overlapMode'] = this.overlapMode();
 
   return data;
 };
@@ -2168,6 +2169,7 @@ anychart.elements.Axis.prototype.serialize = function() {
 anychart.elements.Axis.prototype.deserialize = function(value) {
   goog.base(this, 'deserialize', value);
 
+  if (goog.isDef(value['title'])) this.title().deserialize(value['title']);
   if (goog.isDef(value['labels'])) this.labels().deserialize(value['labels']);
   if (goog.isDef(value['minorLabels'])) this.minorLabels().deserialize(value['minorLabels']);
   if (goog.isDef(value['ticks'])) this.ticks().deserialize(value['ticks']);
@@ -2175,13 +2177,13 @@ anychart.elements.Axis.prototype.deserialize = function(value) {
 
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
   if (goog.isDef(value['name'])) this.name(value['name']);
-  if (goog.isDef(value['length'])) this.length(value['length']);
+  if (goog.isDef(value['length'])) this.length(parseFloat(value['length']));
   if (goog.isDef(value['offsetX'])) this.offsetX(value['offsetX']);
   if (goog.isDef(value['offsetY'])) this.stroke(value['offsetY']);
   if (goog.isDef(value['orientation'])) this.orientation(value['orientation']);
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['drawFirstLabel'])) this.drawFirstLabel(value['drawFirstLabel']);
   if (goog.isDef(value['drawLastLabel'])) this.drawLastLabel(value['drawLastLabel']);
+  if (goog.isDef(value['overlapMode'])) this.overlapMode(value['overlapMode']);
   return this;
 };
 

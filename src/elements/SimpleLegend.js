@@ -1269,7 +1269,7 @@ anychart.elements.Legend.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['itemsLayout'] = this.itemsLayout();
-  json['items'] = this.itemsProvider().getData();
+  //json['items'] = this.itemsProvider().getData();
 
   if (this.margin_) json['margin'] = this.margin_.serialize();
   if (this.padding_) json['padding'] = this.padding_.serialize();

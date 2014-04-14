@@ -1541,10 +1541,10 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       axis.container(this.rootElement);
       if (axis.isHorizontal()) {
         axis.offsetX(leftOffset);
-        axis.length(this.dataBounds_.width);
+        axis.length(parseFloat(this.dataBounds_.width));
       } else {
         axis.offsetY(topOffset);
-        axis.length(this.dataBounds_.height);
+        axis.length(parseFloat(this.dataBounds_.height));
       }
       axis.draw(); ////НАГРУЗКА!!!!!!!!!!
       axis.resumeSignalsDispatching(false);

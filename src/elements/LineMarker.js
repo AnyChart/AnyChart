@@ -289,7 +289,6 @@ anychart.elements.LineMarker.prototype.remove = function() {
  */
 anychart.elements.LineMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['parentBounds'] = this.parentBounds();
   data['stroke'] = this.stroke();
   data['value'] = this.value();
   data['direction'] = this.direction();
@@ -300,7 +299,6 @@ anychart.elements.LineMarker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.elements.LineMarker.prototype.deserialize = function(value) {
   goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
   if (goog.isDef(value['value'])) this.value(value['value']);
   if (goog.isDef(value['direction'])) this.direction(value['direction']);
