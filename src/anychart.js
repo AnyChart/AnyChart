@@ -34,6 +34,13 @@ goog.require('goog.json.hybrid');
 
 
 /**
+ * Current version of framework, replaced on compile time.
+ * @define {string} Current version of framework.
+ */
+anychart.VERSION = '';
+
+
+/**
  * If the globalLock is locked.
  * @type {number}
  */
@@ -169,7 +176,7 @@ goog.global['anychart'] = goog.global['anychart'] || {};
  * @type {string|number}
  *
  */
-goog.global['anychart']['fontSize'] = '16px';
+goog.global['anychart']['fontSize'] = '12px';
 
 
 /**

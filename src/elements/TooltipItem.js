@@ -857,11 +857,11 @@ anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
 anychart.elements.TooltipItem.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  if (this.title_) json['title'] = this.title_.serialize();
-  if (this.separator_) json['separator'] = this.separator_.serialize();
-  if (this.label_) json['content'] = this.label_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
+  json['title'] = this.title().serialize();
+  json['separator'] = this.separator().serialize();
+  json['content'] = this.content().serialize();
+  json['background'] = this.background().serialize();
+  json['padding'] = this.padding().serialize();
 
   json['x'] = this.x_;
   json['y'] = this.y_;
@@ -879,11 +879,16 @@ anychart.elements.TooltipItem.prototype.serialize = function() {
 anychart.elements.TooltipItem.prototype.deserialize = function(config) {
   goog.base(this, 'deserialize', config);
 
-  this.title(config['title']);
-  this.separator(config['separator']);
-  this.content(config['content']);
-  this.background(config['background']);
-  this.padding(config['padding']);
+  if ('title' in config)
+    this.title().deserialize(config['title']);
+  if ('content' in config)
+    this.content().deserialize(config['content']);
+  if ('separator' in config)
+    this.separator().deserialize(config['separator']);
+  if ('background' in config)
+    this.background().deserialize(config['background']);
+  if ('padding' in config)
+    this.padding().deserialize(config['padding']);
   this.x(config['x']);
   this.y(config['y']);
   this.anchor(config['anchor']);

@@ -16,17 +16,11 @@ goog.require('anychart.elements.Multimarker');
 anychart.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  (/** @type {anychart.elements.Multimarker} */(this.markers())).enabled(false);
-  var markers = (/** @type {anychart.elements.Multimarker} */(this.hoverMarkers()));
-  markers.suspendSignalsDispatching();
-  markers.fill('red');
-  markers.size(5);
-  markers.type(anychart.elements.Marker.Type.CIRCLE);
-  markers.resumeSignalsDispatching(false);
-
   this.realMarkers_ = new anychart.elements.Multimarker();
   this.realMarkers_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
   this.realMarkers_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
+  this.realMarkers_.listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
+  this.realMarkers_.listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.registerDisposable(this.realMarkers_);
 };
 goog.inherits(anychart.cartesian.series.BaseWithMarkers, anychart.cartesian.series.Base);
@@ -38,7 +32,7 @@ goog.inherits(anychart.cartesian.series.BaseWithMarkers, anychart.cartesian.seri
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.MARKERS;
+        anychart.ConsistencyState.MARKERS;
 
 
 /**
@@ -67,10 +61,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers_ = null;
  * @protected
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOver = function(event) {
-  if (event && goog.isDef(event['markerIndex'])) {
-    this.hoverPoint(event['markerIndex'], event);
-  } else
-    this.unhover();
+  if (this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event))) {
+    if (event && goog.isDef(event['markerIndex'])) {
+      this.hoverPoint(event['markerIndex'], event);
+    } else
+      this.unhover();
+  }
 };
 
 
@@ -79,7 +75,17 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOver = func
  * @protected
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOut = function(event) {
-  this.unhover();
+  if (this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event)))
+    this.unhover();
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = function(event) {
+  this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
 };
 
 
@@ -223,5 +229,42 @@ anychart.cartesian.series.BaseWithMarkers.prototype.deserialize = function(confi
   var hoverMarkers = config['hoverMarkers'];
   if (hoverMarkers) this.hoverMarkers(hoverMarkers);
   return goog.base(this, 'deserialize', config);
+};
+
+
+/**
+ * Return marker color for series.
+ * @return {!acgraph.vector.Fill} Marker color for series.
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerColor = function() {
+  return this.getFinalFill(false, false);
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  var fillColor = this.getMarkerColor();
+  var strokeColor = /** @type {acgraph.vector.Stroke} */(anychart.color.darken(fillColor));
+
+  var markers = /** @type {anychart.elements.Multimarker} */(this.markers());
+  markers.suspendSignalsDispatching();
+  markers.enabled(true);
+  markers.size(4);
+  markers.fill(fillColor);
+  markers.stroke(strokeColor);
+  markers.type(anychart.elements.Marker.Type.CIRCLE);
+  markers.resumeSignalsDispatching(false);
+
+  var hoverMarkers = (/** @type {anychart.elements.Multimarker} */(this.hoverMarkers()));
+  hoverMarkers.suspendSignalsDispatching();
+  hoverMarkers.fill(fillColor);
+  hoverMarkers.stroke(strokeColor);
+  hoverMarkers.size(6);
+  hoverMarkers.type(anychart.elements.Marker.Type.CIRCLE);
+  hoverMarkers.resumeSignalsDispatching(false);
+
+  return result;
 };
 

@@ -1057,20 +1057,17 @@ anychart.elements.Title.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Title.prototype.deserialize = function(config) {
-  var padding = config['padding'];
-  var margin = config['margin'];
-  var background = config['background'];
-
-  if (padding) {
-    this.padding().deserialize(padding);
+  goog.base(this, 'deserialize', config);
+  if ('padding' in config) {
+    this.padding().deserialize(config['padding']);
   }
 
-  if (margin) {
-    this.margin().deserialize(margin);
+  if ('margin' in config) {
+    this.margin().deserialize(config['margin']);
   }
 
-  if (background) {
-    this.background().deserialize(background);
+  if ('background' in config) {
+    this.background().deserialize(config['background']);
   }
 
   this.textSettings(config);

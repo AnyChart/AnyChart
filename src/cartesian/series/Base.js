@@ -1,8 +1,9 @@
 goog.provide('anychart.cartesian.series.Base');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
-//goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Tooltip');
+goog.require('anychart.events.EventType');
 
 
 
@@ -48,7 +49,8 @@ goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
  */
 anychart.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.DATA_CHANGED |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -245,9 +247,9 @@ anychart.cartesian.series.Base.prototype.hoverFill_ = (function() {
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
- * @private
+ * @protected
  */
-anychart.cartesian.series.Base.prototype.stroke_ = (function() {
+anychart.cartesian.series.Base.prototype.strokeInternal = (function() {
   return anychart.color.darken(this['sourceColor']);
 });
 
@@ -341,7 +343,7 @@ anychart.cartesian.series.Base.prototype.data = function(opt_value, opt_csvSetti
  */
 anychart.cartesian.series.Base.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
   }
 };
 
@@ -765,15 +767,18 @@ anychart.cartesian.series.Base.prototype.applyRatioToBounds = function(ratio, ho
  * @protected
  */
 anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
-  if (event && event.target) {
-    if (goog.isDef(event.target['__tagIndex']))
-      this.hoverPoint(event.target['__tagIndex'], event);
-    else if (event.target['__tagSeriesGlobal'])
-      this.hoverSeries();
-    else
+  var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
+  if (res) {
+    if (event && event.target) {
+      if (goog.isDef(event.target['__tagIndex']))
+        this.hoverPoint(event.target['__tagIndex'], event);
+      else if (event.target['__tagSeriesGlobal'])
+        this.hoverSeries();
+      else
+        this.unhover();
+    } else
       this.unhover();
-  } else
-    this.unhover();
+  }
 };
 
 
@@ -782,7 +787,19 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
  * @protected
  */
 anychart.cartesian.series.Base.prototype.handleMouseOut = function(event) {
-  this.unhover();
+  var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
+  if (res) {
+    this.unhover();
+  }
+};
+
+
+/**
+ * @param {acgraph.events.Event} event
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.handleBrowserEvents = function(event) {
+  this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
 };
 
 
@@ -831,6 +848,8 @@ anychart.cartesian.series.Base.prototype.makeHoverable = function(element, opt_s
     element['__tagIndex'] = this.getIterator().getIndex();
   (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver, false, this);
   (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
+  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.CLICK, this.handleBrowserEvents, false, this);
+  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.DBLCLICK, this.handleBrowserEvents, false, this);
 };
 
 
@@ -1145,13 +1164,13 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
         anychart.color.normalizeStroke.apply(null, arguments);
-    if (stroke != this.stroke_) {
-      this.stroke_ = stroke;
+    if (stroke != this.strokeInternal) {
+      this.strokeInternal = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.stroke_;
+  return this.strokeInternal;
 };
 
 
@@ -1296,4 +1315,105 @@ anychart.cartesian.series.Base.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(false);
 
   return goog.base(this, 'deserialize', config);
+};
+
+
+
+/**
+ * Encapsulates browser event for acgraph.
+ * @param {anychart.cartesian.series.Base} target EventTarget to be set as a target of the event.
+ * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
+ * @constructor
+ * @extends {goog.events.BrowserEvent}
+ */
+anychart.cartesian.series.Base.BrowserEvent = function(target, opt_e) {
+  goog.base(this);
+  if (opt_e)
+    this.copyFrom(opt_e, target);
+
+  /**
+   * Point index.
+   * @type {number}
+   */
+  this['pointIndex'] = opt_e && opt_e.target && opt_e.target['__tagIndex'];
+  if (isNaN(this['pointIndex']))
+    this['pointIndex'] = -1;
+
+  /**
+   * Series data iterator ready for the point capturing.
+   * @type {!anychart.data.Iterator}
+   */
+  this['iterator'] = target.data().getIterator();
+  this['iterator'].select(this['pointIndex']) || this['iterator'].reset();
+
+  /**
+   * Series.
+   * @type {anychart.cartesian.series.Base}
+   */
+  this['series'] = target;
+};
+goog.inherits(anychart.cartesian.series.Base.BrowserEvent, goog.events.BrowserEvent);
+
+
+/**
+ * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
+ * @private
+ * @type {goog.events.BrowserEvent}
+ */
+anychart.cartesian.series.Base.BrowserEvent.prototype.event_;
+
+
+/**
+ * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
+ * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
+ * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
+ */
+anychart.cartesian.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
+  var type = e.type;
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.events.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.events.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.events.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.events.EventType.POINT_DOUBLE_CLICK;
+      break;
+  }
+  this.type = type;
+  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
+  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
+  // from Node to EventTarget, which would make more sense.
+  /** @type {Node} */
+  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
+  this.target = target || e.target;
+  this.currentTarget = e.currentTarget || this.target;
+  this.relatedTarget = e.relatedTarget || this.target;
+
+  this.offsetX = e.offsetX;
+  this.offsetY = e.offsetY;
+
+  this.clientX = e.clientX;
+  this.clientY = e.clientY;
+
+  this.screenX = e.screenX;
+  this.screenY = e.screenY;
+
+  this.button = e.button;
+
+  this.keyCode = e.keyCode;
+  this.charCode = e.charCode;
+  this.ctrlKey = e.ctrlKey;
+  this.altKey = e.altKey;
+  this.shiftKey = e.shiftKey;
+  this.metaKey = e.metaKey;
+  this.platformModifierKey = e.platformModifierKey;
+  this.state = e.state;
+
+  this.event_ = e;
+  delete this.propagationStopped_;
 };

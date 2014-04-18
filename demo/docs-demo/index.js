@@ -1,86 +1,78 @@
-var chart;
+var charts=[];
 var radiusPixel = 0;
-
+var pointsSumm;
+var data = [];
 function load() {
   var container = 'container';
-  var stage = acgraph.create(400, 100, container);
+  var stage = acgraph.create(800, 800, container);
   var layer = acgraph.layer();
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-  var palette = new anychart.utils.DistinctColorPalette()
-      .colors(['red', 'yellow', 'brown', 'green']);
-  palette.colorAt(2, 'white')
-  for (var i = 1; i < 10; i++) {
-    stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
-        .fill(palette.colorAt(i))
-        .stroke('1px #000');
+  var chartsGridSize = [4, 6];
+  var chartsGridItemSize = {
+    w: stage.width() / chartsGridSize[0],
+    h: stage.height() / chartsGridSize[1]
+  };
+
+  var chartTypes = ['column', 'line', 'area', 'spline'];
+
+  for (var i =0; i< chartsGridSize[0]; i++) {
+    for (var j = 0; j < chartsGridSize[1]; j++) {
+      var chart = new anychart.cartesian.Chart();
+      chart.bounds(i*chartsGridItemSize.w, j*chartsGridItemSize.h, chartsGridItemSize.w, chartsGridItemSize.h);
+      chart.title(null);
+      chart.yScale().maximum(1.2).ticks().count(3);
+      chart.xScale().ticks().interval(4);
+      chart.xAxis().title(null);
+      chart.yAxis().title(null);
+      // grid series
+      chart.grid()
+          .oddFill('none')
+          .evenFill('none')
+          .stroke('grey .1');
+      chart.grid()
+          .scale(chart.xScale())
+          .direction('vertical')
+          .oddFill('none')
+          .evenFill('none')
+          .stroke('grey .3');
+      chart.rangeMarker().from(0.2).to(0.9).fill('grey 0.3');
+      // series
+      chart[chartTypes[i%chartTypes.length]](getDataFromSomeSource())
+        .tooltip(null)
+          .markers()
+          .enabled(false);
+      // draw
+      chart.background(null).margin(0).container(stage).draw();
+    }
   }
 
-//  var rect = stage.rect(50, 30, 75, 125).stroke('1 #aaa').fill('#eee');
+//  stage.listen(acgraph.events.EventType.CLICK, streaming);
 
-//  // create objects for multimarkers
-//  var bars = [];
-//  bars.push(
-//      stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
-//      stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
-//      stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
-//      stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
-//  );
-//  // sets global settings
-//  var MMarker = new anychart.elements.Multimarker()
-//      .fill('blue')
-//      .stroke('.5 blue')
-//      .container(stage);
-//  // sets custom positions
-//  MMarker
-//      .fillAt(0, 'red')
-//      .fillAt(3, 'none');
-//  // connecting markers and objects
-//  for (i in bars) {
-//    var barBounds = bars[i].getBounds();
-//    var positionProvider = {
-//      x: barBounds.left,
-//      y: barBounds.top
-//    };
-//    MMarker.draw(positionProvider);
-//  }
+  // add watermark
+  var watermark = new anychart.elements.Label();
+  watermark.text('AnyChart Trial Version')
+      .fontOpacity(.05)
+      .adjustFontSize(true, false)
+      .width('100%')
+      .height('100%')
+      .vAlign('center')
+      .hAlign('center')
+      .parentBounds(stage.getBounds())
+      .padding(20)
+      .hoverable(false)
+      .container(stage)
+      .draw();
+}
 
-//
-//  layer.circle(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius(), center.y - Math.sin(Math.PI/3)*chart.getPixelRadius(), 4).fill('red .5').stroke('red');
-//  layer.text(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius()+7, center.y - Math.sin(Math.PI/3)*chart.getPixelRadius() -10, '-60\u00B0');
-//
-//  layer.circle(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius(), center.y + Math.sin(Math.PI/3)*chart.getPixelRadius(), 4).fill('red .5').stroke('red');
-//  layer.text(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius()+7, center.y + Math.sin(Math.PI/3)*chart.getPixelRadius() -6, '60\u00B0');
+function getDataFromSomeSource(){
+  var data_ = [];
+  for(var length = random(20,40), i=0; i< length;i++)
+    data_.push({'x': (length + i)%24, 'y': Math.random()});
+  return data_;
+}
 
-//
-//  var chart1 = new anychart.pie.Chart(data)
-//      .container(stage)
-//      .bounds(0,0,'50%', '100%')
-//      .draw();
-//  var chart2 = new anychart.pie.Chart(data)
-//      .container(stage)
-//      .bounds('50%',0,'50%', '100%')
-//      .draw();
-//
-//  chart1.innerRadius('25%');
-//  chart2.innerRadius(function(outerRadius){
-//    console.log(out)
-//    return parseFloat(outerRadius)/2;
-//  });
-
-//  leftPie.container(stage);
-//  leftPie.draw();
-//  rightPie.container(stage);
-//  rightPie.draw();
-//
-  /////////////////////////////////////////////////////////
-  /*
-   chart.container(stage);
-   chart.draw();
-   layer.parent(chart.container());
-
-   /*/
-  layer.parent(stage);
-  //*/
+function random(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

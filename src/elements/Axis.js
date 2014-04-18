@@ -17,6 +17,9 @@ anychart.elements.Axis = function() {
   this.suspendSignalsDispatching();
   goog.base(this);
 
+  this.labelsBounds_ = [];
+  this.minorLabelsBounds_ = [];
+
   this.zIndex(10);
 
   this.line_ = acgraph.path();
@@ -24,18 +27,12 @@ anychart.elements.Axis = function() {
   this.title()
       .suspendSignalsDispatching()
       .text('Axis title')
-      .fontSize(11)
-      .fontFamily('tahoma')
-      .fontColor('rgb(34,34,34)')
       .fontWeight('bold')
       .margin(10, 5, 10, 5)
       .resumeSignalsDispatching(false);
 
   this.labels()
       .suspendSignalsDispatching()
-      .fontSize(11)
-      .fontFamily('tahoma')
-      .fontColor('rgb(34,34,34)')
       .offsetX(0)
       .offsetY(0)
       .anchor(anychart.utils.NinePositions.CENTER)
@@ -52,9 +49,6 @@ anychart.elements.Axis = function() {
 
   this.minorLabels()
       .suspendSignalsDispatching()
-      .fontSize(9)
-      .fontFamily('tahoma')
-      .fontColor('rgb(34,34,34)')
       .offsetX(0)
       .offsetY(0)
       .padding(2, 3, 2, 3)
@@ -385,6 +379,7 @@ anychart.elements.Axis.prototype.labels = function(opt_value) {
     } else if (anychart.isNone(opt_value)) {
       this.labels_.enabled(false);
     }
+    this.dropBoundsCache_();
     return this;
   }
   return this.labels_;
@@ -435,6 +430,7 @@ anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
     } else if (anychart.isNone(opt_value)) {
       this.minorLabels_.enabled(false);
     }
+    this.dropBoundsCache_();
     this.invalidate(anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -595,6 +591,7 @@ anychart.elements.Axis.prototype.orientation = function(opt_value) {
     var orientation = anychart.utils.normalizeOrientation(opt_value);
     if (this.orientation_ != orientation) {
       this.orientation_ = orientation;
+      this.dropBoundsCache_();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -627,8 +624,10 @@ anychart.elements.Axis.prototype.scale = function(opt_value) {
  * @private
  */
 anychart.elements.Axis.prototype.scaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dropBoundsCache_();
     this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  }
 };
 
 
@@ -641,6 +640,7 @@ anychart.elements.Axis.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
+      this.dropBoundsCache_();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -658,6 +658,7 @@ anychart.elements.Axis.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
+      this.dropBoundsCache_();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -677,6 +678,7 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.length_ != opt_value) {
       this.length_ = Math.round(opt_value);
+      this.dropBoundsCache_();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -776,6 +778,16 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
 
 
 /**
+ * @private
+ */
+anychart.elements.Axis.prototype.dropBoundsCache_ = function() {
+  this.labelsBounds_.length = 0;
+  this.minorLabelsBounds_.length = 0;
+  this.overlappedLabels_ = null;
+};
+
+
+/**
  * Возвращает объект с индесами лейблов, которые нужно нарисовать.
  * @param {anychart.math.Rect=} opt_bounds Родительские баунды.
  * @return {boolean|Object.<string, Array.<boolean>>} Объек,содержащий массивы с индексами дейблов, которые будут нарисованы
@@ -793,8 +805,6 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
 
       if (scale) {
         var i, j;
-        this.labelsBounds_ = [];
-        this.minorLabelsBounds_ = [];
 
         /**
          * Индекс предыдущего нарисованного мажорного лейбла.
@@ -1119,7 +1129,13 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   var scaleTicks = isMajor ? scale.ticks() : scale.minorTicks();
 
   var value = scaleTicks.get()[index];
-  var ratio = scale.transform(value, .5);
+  var ratio;
+  if (goog.isArray(value)) {
+    ratio = (scale.transform(value[0], 0) + scale.transform(value[1], 1)) / 2;
+    value = value[0];
+  } else {
+    ratio = scale.transform(value, .5);
+  }
 
   var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
 
@@ -2102,17 +2118,26 @@ anychart.elements.Axis.prototype.draw = function() {
 
         for (i = 0; i < ticksArrLen; i++) {
           tickVal = scaleTicksArr[i];
-          ratio = scale.transform(tickVal);
+          var leftTick, rightTick, labelPosition;
+          if (goog.isArray(tickVal)) {
+            leftTick = tickVal[0];
+            rightTick = tickVal[1];
+            labelPosition = (scale.transform(tickVal[0], 0) + scale.transform(tickVal[1], 1)) / 2;
+          } else {
+            leftTick = rightTick = tickVal;
+            labelPosition = scale.transform(tickVal, .5);
+          }
+          ratio = scale.transform(leftTick, 0);
           pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 
           if (ticksDrawer) {
             ticksDrawer.call(this, ratio, pixelShift);
-            if (i == ticksArrLen - 1) ticksDrawer.call(this, scale.transform(tickVal, 1), pixelShift);
+            if (i == ticksArrLen - 1) ticksDrawer.call(this, scale.transform(rightTick, 1), pixelShift);
           }
 
           drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
           if (labelsDrawer && drawLabel)
-            labelsDrawer.call(this, tickVal, scale.transform(tickVal, .5), i, pixelShift);
+            labelsDrawer.call(this, leftTick, labelPosition, i, pixelShift);
         }
       }
       if (goog.isDef(labelsDrawer)) this.labels().end();

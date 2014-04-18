@@ -214,10 +214,10 @@ function load() {
     [4, 60],
     [5, 20]
   ]).markers(null);
-  chart.axis().orientation('left');
-  chart.axis().orientation('bottom');
-  chart.axis().orientation('top');
-  chart.axis().orientation('right');
+  chart.yAxis().orientation('left');
+  chart.xAxis().orientation('bottom');
+  chart.xAxis().orientation('top');
+  chart.yAxis().orientation('right');
 
   chart.lineMarker().direction('horizontal').value(40);
   chart.lineMarker().direction('vertical').value(2);

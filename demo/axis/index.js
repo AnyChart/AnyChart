@@ -71,20 +71,22 @@ function minorTickSet(value) {
       .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
       .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
 }
-
+var scale;
 function load() {
-  var scale = new anychart.scales.Linear();
+  scale = new anychart.scales.Ordinal();
+  scale.values([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  scale.ticks().interval(2);
 
-  var ticks = [0, "25", "50", "75", "100"];
-  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
+//  var ticks = [0, "25", "50", "75", "100"];
+//  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
 
-  scale.ticks().set(ticks);
-  scale.minorTicks().set(minorTicks);
-  var ticksArr = scale.ticks().get();
-  var minorTicksArr = scale.minorTicks().get();
-  scale
-      .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
-      .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
+//  scale.ticks().set(ticks);
+//  scale.minorTicks().set(minorTicks);
+//  var ticksArr = scale.ticks().get();
+//  var minorTicksArr = scale.minorTicks().get();
+//  scale
+//      .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
+//      .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
 
 
 

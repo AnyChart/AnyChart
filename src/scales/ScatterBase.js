@@ -170,6 +170,19 @@ anychart.scales.ScatterBase.prototype.maximumGap = function(opt_value) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
+  this.suspendSignalsDispatching();
+  if (opt_stackMode == anychart.scales.StackMode.PERCENT) {
+    this.minimumGap(0);
+    this.maximumGap(0);
+  }
+  var result = goog.base(this, 'stackMode', opt_stackMode);
+  this.resumeSignalsDispatching(true);
+  return result;
+};
+
+
 /**
  * Resets scale data range if it needs auto calculation.
  * @return {!anychart.scales.ScatterBase} Itself for chaining.

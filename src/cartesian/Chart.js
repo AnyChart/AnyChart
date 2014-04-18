@@ -576,8 +576,9 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Area(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -593,8 +594,9 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bar(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -610,8 +612,9 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bubble(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -627,8 +630,9 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -644,8 +648,9 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Column(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -661,8 +666,9 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Line(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -678,8 +684,9 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Marker(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -695,8 +702,9 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.OHLC(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -712,8 +720,9 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -729,8 +738,9 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -746,8 +756,9 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeColumn(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -763,8 +774,9 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -780,8 +792,9 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  */
 anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -797,8 +810,9 @@ anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSet
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Spline(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -814,8 +828,9 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -831,8 +846,9 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLine(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -848,8 +864,9 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -877,9 +894,12 @@ anychart.cartesian.Chart.prototype.seriesInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES;
   }
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.SERIES;
+    this.invalidateSeries_();
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.SCALES;
-    this.invalidateSeries_();
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -967,8 +987,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
   var value;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
-    for (i = this.series_.length; i--;)
-      this.series_[i].suspendSignalsDispatching();
+    anychart.Base.suspendSignalsDispatching(this.series_);
 
     this.makeScaleMaps_();
 
@@ -1093,8 +1112,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
       }
     }
 
-    for (i = this.series_.length; i--;)
-      this.series_[i].resumeSignalsDispatching(false);
+    anychart.Base.resumeSignalsDispatchingTrue(this.series_);
 
     this.markConsistent(anychart.ConsistencyState.SCALES);
     this.scalesFinalization_ = true;
@@ -1430,26 +1448,30 @@ anychart.cartesian.Chart.prototype.paletteInvalidated_ = function(event) {
 anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
   var i, count;
 
-  anychart.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
-
   this.calculate();
   if (this.scalesFinalization_) {
     var scale;
+    var scalesChanged = false;
     for (i in this.xScales_) {
       scale = this.xScales_[i];
       if (scale.needsAutoCalc())
-        scale.finishAutoCalc();
+        scalesChanged |= scale.finishAutoCalc();
     }
     for (i in this.yScales_) {
       scale = this.yScales_[i];
       if (scale.needsAutoCalc())
-        scale.finishAutoCalc();
+        scalesChanged |= scale.finishAutoCalc();
     }
     this.scalesFinalization_ = false;
+    if (scalesChanged) {
+      this.invalidateSeries_();
+    }
   }
 
   if (this.isConsistent())
     return;
+
+  anychart.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.PALETTE)) {
     for (i = this.series_.length; i--;) {

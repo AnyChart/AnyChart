@@ -80,6 +80,8 @@ anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
       value = +new Date(valueSource);
       if (isNaN(value))
         value = +valueSource;
+    } else if (valueSource instanceof Date) {
+      value = +valueSource;
     } else {
       value = valueSource;
     }
@@ -107,7 +109,7 @@ anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.calculate = function() {
-  if (this.isConsistent()) return;
+  if (this.consistent) return;
 
   goog.base(this, 'calculate');
 
@@ -125,8 +127,6 @@ anychart.scales.DateTime.prototype.calculate = function() {
   this.minorTicks().setupAsMinor(this.min, this.max, originalMin, originalMax);
 
   this.range = this.max - this.min;
-
-  this.markConsistent(anychart.ConsistencyState.TICKS);
 };
 
 
@@ -136,6 +136,8 @@ anychart.scales.DateTime.prototype.calculate = function() {
  * @private
  */
 anychart.scales.DateTime.prototype.ticksInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
-    this.invalidate(anychart.ConsistencyState.TICKS, anychart.Signal.NEEDS_REAPPLICATION);
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.consistent = false;
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  }
 };

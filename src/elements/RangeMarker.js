@@ -318,7 +318,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
  */
 anychart.elements.RangeMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(70);
+  this.zIndex(25);
   this.direction(anychart.utils.Direction.HORIZONTAL);
   this.from(0);
   this.to(0);

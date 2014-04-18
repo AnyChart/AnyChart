@@ -107,7 +107,7 @@ anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
   if (this.autoCalcs_ == 0) {
     return this.checkScaleChanged(!!opt_silently);
   } else
-    return false; // todo: ???
+    return true; // todo: дополнительные действия при просчете разделяемых между графиками шкал!
 };
 
 

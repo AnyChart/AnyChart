@@ -318,6 +318,22 @@ anychart.utils.Bounds.prototype.height = function(opt_value) {
 
 
 /**
+ * Define, is one of the bounds settings set in percent.
+ * @return {boolean} Is one of the bounds settings set in percent.
+ */
+anychart.utils.Bounds.prototype.dependsOnContainerSize = function() {
+  return anychart.utils.isPercent(this.width_) ||
+      anychart.utils.isPercent(this.height_) ||
+      anychart.utils.isPercent(this.left_) ||
+      anychart.utils.isPercent(this.top_) ||
+      this.bottom_ != null ||
+      this.right_ != null ||
+      (goog.isNull(this.width_) && goog.isNull(this.right_)) ||
+      (goog.isNull(this.height_) && goog.isNull(this.bottom_));
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.utils.Bounds.prototype.serialize = function() {

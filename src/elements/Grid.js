@@ -509,6 +509,7 @@ anychart.elements.Grid.prototype.draw = function() {
 
     for (var i = 0, count = ticksArray.length; i < count; i++) {
       var tickVal = ticksArray[i];
+      if (goog.isArray(tickVal)) tickVal = tickVal[0];
       ratio = scale.transform(tickVal);
 
       if (i % 2 == 0) {

@@ -210,6 +210,7 @@ def __getDefaultCompilerArgs(addTests=False):
         '--compiler_jar=' + COMPILER_PATH,
         '--compiler_flags=--charset=UTF-8',
         '--compiler_flags=--define="goog.DEBUG=true"',
+        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(),
         '--compiler_flags=--extra_annotation_name="includeDoc"',
         '--compiler_flags=--extra_annotation_name="illustration"',
         '--compiler_flags=--extra_annotation_name="illustrationDesc"',
@@ -395,6 +396,32 @@ def __print_warnings_list():
         print msg
 
 
+#=======================================================================================================================
+#                            Version.
+#=======================================================================================================================
+def __get_version():
+    #get major, minor versions from version.ini
+    version_file = os.path.join(PROJECT_PATH, 'version.ini')
+    f = open(version_file, 'r')
+    lines = f.readlines()
+    f.close()
+
+    #get commits count from git repo
+    p = subprocess.Popen(
+        ['git', 'rev-list', 'HEAD', '--count'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=PROJECT_PATH)
+    (output, err) = p.communicate()
+
+    return lines[0].split('=')[1].strip() + '.' + lines[1].split('=')[1].strip() + '.' + output.strip()
+
+
+#=======================================================================================================================
+#                            Help.
+#=======================================================================================================================
+
+
 def __printHelp():
     print "Команды выполняемые скриптом:\n"\
           "\n"\
@@ -414,6 +441,7 @@ def __printHelp():
           "docs             Сборка документации по продуктовому модулю или по всему проекту (python build docs)."\
           "\n\t"\
           "-c       Выполнит compile перед сборкой документации.\n"\
+
 
 #=======================================================================================================================
 #           Main

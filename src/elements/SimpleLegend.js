@@ -102,6 +102,24 @@ anychart.elements.Legend = function() {
 
   this.drawedPage_ = NaN;
 
+  this.zIndex(10);
+
+  this.padding(5);
+  var bg = new anychart.elements.Background()
+      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
+        'keys': [
+          '0 #eaeaea',
+          '0.5 #fff',
+          '1 #eaeaea'],
+        'angle': '-90'
+      }))
+      .stroke('1 black 1')
+      .corners(5);
+  this.background(/** @type {anychart.elements.Background} */ (bg));
+  //
+  this.title().text('Legend').orientation('top').margin(0).background(null);
+  this.titleSeparator().orientation('top').margin(3, 0).height(1).fill('red');
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.elements.Legend, anychart.elements.Text);
@@ -661,6 +679,7 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
   switch (this.position_) {
     case anychart.utils.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
+      parentBounds.height -= this.pixelBounds_.height;
       break;
     case anychart.utils.Orientation.RIGHT:
       parentBounds.width -= this.pixelBounds_.width;
@@ -671,6 +690,7 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
       break;
     case anychart.utils.Orientation.LEFT:
       parentBounds.left += this.pixelBounds_.width;
+      parentBounds.width -= this.pixelBounds_.width;
       break;
   }
 
@@ -1227,32 +1247,6 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
     }
   }
   this.drawedPage_ = pageNumber;
-};
-
-
-/**
- * Set defaults.
- */
-anychart.elements.Legend.prototype.restoreDefaults = function() {
-  this.zIndex(10);
-  this.margin(5);
-  this.padding(5);
-  var bg = new anychart.elements.Background()
-      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
-        'keys': [
-          '0 #eaeaea',
-          '0.5 #fff',
-          '1 #eaeaea'],
-        'angle': '-90'
-      }))
-      .stroke('1 black 1')
-      .corners(5);
-  this.background(/** @type {anychart.elements.Background} */ (bg));
-  //
-  this.title().text('Legend').orientation('top').margin(0).background(null);
-  this.titleSeparator().orientation('top').margin(3, 0).height(1).fill('red');
-
-  // set defaults;
 };
 
 
