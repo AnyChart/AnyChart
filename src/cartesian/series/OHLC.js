@@ -132,9 +132,15 @@ anychart.cartesian.series.OHLC.prototype.colorizeShape = function(hover) {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.OHLC.prototype.createPositionProvider = function() {
-  var iterator = this.getIterator();
-  return {x: iterator.meta('x'), y: iterator.meta('close')};
+anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(position) {
+  var shape = this.getIterator().meta('shape');
+  if (shape) {
+    var shapeBounds = shape.getBounds();
+    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
+  } else {
+    var iterator = this.getIterator();
+    return {x: iterator.meta('x'), y: iterator.meta('close')};
+  }
 };
 
 

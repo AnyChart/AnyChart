@@ -39,6 +39,11 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value', 'size'];
   this.referenceValueMeanings = ['x', 'y', 'n'];
   this.referenceValuesSupportStack = false;
+
+  this.markers().position(anychart.utils.NinePositions.CENTER);
+  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
+  this.labels().position(anychart.utils.NinePositions.CENTER);
+  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
 
@@ -342,10 +347,9 @@ anychart.cartesian.series.Bubble.prototype.colorizeShape = function(hover) {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Bubble.prototype.createPositionProvider = function() {
+anychart.cartesian.series.Bubble.prototype.createPositionProvider = function(position) {
   var shape = this.getIterator().meta('shape');
   if (shape) {
-    var position = anychart.utils.NinePositions.CENTER;
     var shapeBounds = shape.getBounds();
     return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
   } else {

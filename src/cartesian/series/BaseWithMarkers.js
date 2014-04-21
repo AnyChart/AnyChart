@@ -22,6 +22,9 @@ anychart.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
   this.realMarkers_.listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
   this.realMarkers_.listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.registerDisposable(this.realMarkers_);
+
+  this.markers().position(anychart.utils.NinePositions.CENTER);
+  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.BaseWithMarkers, anychart.cartesian.series.Base);
 
@@ -205,7 +208,9 @@ anychart.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(hovere
     markers.deserializeAt(index, /** @type {Object} */(pointMarker));
   this.realMarkers_.dropCustomSettingsAt(index);
   this.realMarkers_.deserializeAt(index, markers.serializeAt(index, !hovered));
-  this.realMarkers_.draw(this.createPositionProvider(), index);
+  this.realMarkers_.draw(
+      this.createPositionProvider(/** @type {anychart.utils.NinePositions} */(this.realMarkers_.positionAt(index))),
+      index);
 };
 
 

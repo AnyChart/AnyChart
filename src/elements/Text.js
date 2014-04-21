@@ -28,7 +28,7 @@ anychart.elements.Text = function() {
     'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
     'fontWeight': 'normal',
     'letterSpacing': 'normal',
-    'direction': goog.global['anychart']['textDirection'],
+    'textDirection': goog.global['anychart']['textDirection'],
     'lineHeight': 'normal',
     'textIndent': 0,
     'vAlign': acgraph.vector.Text.VAlign.TOP,
@@ -108,7 +108,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *      'fontVariant': smth,
  *      'fontWeight': smth,
  *      'letterSpacing': smth,
- *      'direction': smth,
+ *      'textDirection': smth,
  *      'lineHeight': smth,
  *      'textIndent': smth,
  *      'vAlign': smth,
@@ -347,7 +347,7 @@ anychart.elements.Text.prototype.letterSpacing = function(opt_value) {
  *//**
  * Setter for the text direction.<br/>
  * @example <t>listingOnly</t>
- * someTextElement.direction('rtl');
+ * someTextElement.textDirection('rtl');
  * @param {(acgraph.vector.Text.Direction|string)=} opt_value [{@link acgraph.vector.Text.Direction}.LTR] Value to set.
  * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
@@ -355,8 +355,8 @@ anychart.elements.Text.prototype.letterSpacing = function(opt_value) {
  * @param {acgraph.vector.Text.Direction|string=} opt_value .
  * @return {!anychart.elements.Text|acgraph.vector.Text.Direction} .
  */
-anychart.elements.Text.prototype.direction = function(opt_value) {
-  return /** @type {!anychart.elements.Text|acgraph.vector.Text.Direction} */(this.textSettings('direction', opt_value));
+anychart.elements.Text.prototype.textDirection = function(opt_value) {
+  return /** @type {!anychart.elements.Text|acgraph.vector.Text.Direction} */(this.textSettings('textDirection', opt_value));
 };
 
 
@@ -538,8 +538,8 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.fontFamily(this.settingsObj['fontFamily']);
   if (isInitial || 'fontColor' in this.changedSettings)
     textElement.color(this.settingsObj['fontColor']);
-  if (isInitial || 'direction' in this.changedSettings)
-    textElement.direction(this.settingsObj['direction']);
+  if (isInitial || 'textDirection' in this.changedSettings)
+    textElement.direction(this.settingsObj['textDirection']);
   if (isInitial || 'textWrap' in this.changedSettings)
     textElement.textWrap(this.settingsObj['textWrap']);
   if ('fontOpacity' in this.changedSettings)
@@ -586,7 +586,7 @@ anychart.elements.Text.prototype.serialize = function() {
   json['fontVariant'] = this.fontVariant();
   json['fontWeight'] = this.fontWeight();
   json['letterSpacing'] = this.letterSpacing();
-  json['direction'] = this.direction();
+  json['textDirection'] = this.textDirection();
   json['lineHeight'] = this.lineHeight();
   json['textIndent'] = this.textIndent();
   json['vAlign'] = this.vAlign();

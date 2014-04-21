@@ -1190,20 +1190,10 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
       item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
   }
 
-  for (i = 0, count = this.textAxesMarkers_.length; i < count; i++) {
-    item = this.textAxesMarkers_[i];
-    if (!item.scale()) {
-      if (item.isHorizontal()) {
-        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-      } else {
-        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-      }
-    }
-  }
-
   var directionBasedElements = goog.array.concat(
       this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
       this.grids_,
       this.minorGrids_);
 

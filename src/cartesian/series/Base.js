@@ -38,6 +38,8 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.realLabels_.listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
   this.labels().textFormatter(function(provider) { return provider['value']; }).enabled(false);
   this.hoverLabels().textFormatter(function(provider) { return provider['value']; }).enabled(false);
+  this.labels().position(anychart.utils.NinePositions.CENTER);
+  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
@@ -439,7 +441,7 @@ anychart.cartesian.series.Base.prototype.getReferenceCoords = function() {
         if (stacked) {
           if (this.referenceValuesSupportStack)
             val = yScale.getPrevVal(val);
-          pix = this.applyRatioToBounds(yScale.transform(val, 0.5), false);
+          pix = this.applyRatioToBounds(goog.math.clamp(yScale.transform(val, 0.5), 0, 1), false);
         } else {
           pix = this.zeroY;
         }
@@ -636,7 +638,9 @@ anychart.cartesian.series.Base.prototype.drawLabel = function(hovered) {
   this.realLabels_.deserializeAt(index, labels.serializeAt(index, !hovered));
   this.realLabels_.textFormatter(/** @type {Function} */(labels.textFormatter()));
   this.realLabels_.positionFormatter(/** @type {Function} */(labels.positionFormatter()));
-  this.realLabels_.draw(this.createFormatProvider(), this.createPositionProvider(), index);
+  this.realLabels_.draw(this.createFormatProvider(),
+      this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(this.realLabels_.positionAt(index))),
+      index);
 };
 
 
@@ -710,6 +714,7 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
 
 /**
  * Create column series format provider.
+ * @param {anychart.utils.NinePositions|string} position
  * @return {Object} Object with info for labels formatting.
  * @protected
  */

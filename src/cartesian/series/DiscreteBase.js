@@ -14,6 +14,10 @@ goog.require('anychart.cartesian.series.BaseWithMarkers');
  */
 anychart.cartesian.series.DiscreteBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
+  this.markers().position(anychart.utils.NinePositions.TOP);
+  this.hoverMarkers().position(anychart.utils.NinePositions.TOP);
+  this.labels().position(anychart.utils.NinePositions.TOP);
+  this.hoverLabels().position(anychart.utils.NinePositions.TOP);
 };
 goog.inherits(anychart.cartesian.series.DiscreteBase, anychart.cartesian.series.BaseWithMarkers);
 
@@ -45,10 +49,9 @@ anychart.cartesian.series.DiscreteBase.prototype.remove = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.DiscreteBase.prototype.createPositionProvider = function() {
+anychart.cartesian.series.DiscreteBase.prototype.createPositionProvider = function(position) {
   var shape = this.getIterator().meta('shape');
   if (shape) {
-    var position = anychart.utils.NinePositions.TOP;
     var shapeBounds = shape.getBounds();
     return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
   } else {

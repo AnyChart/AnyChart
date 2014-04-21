@@ -155,7 +155,7 @@ anychart.cartesian.series.Marker.prototype.remove = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Marker.prototype.createPositionProvider = function() {
+anychart.cartesian.series.Marker.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   return {x: iterator.meta('x'), y: iterator.meta('y')};
 };
@@ -249,7 +249,7 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered) {
     this.marker_.sizeAt(index, /** @type {number} */(this.hoverSize()));
   this.marker_.fillAt(index, this.getFinalFill(true, hovered));
   this.marker_.strokeAt(index, this.getFinalStroke(true, hovered));
-  this.marker_.draw(this.createPositionProvider(), index);
+  this.marker_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
 };
 
 

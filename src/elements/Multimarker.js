@@ -923,15 +923,22 @@ anychart.elements.Multimarker.prototype.offsetY = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {number} index
- * @param {(acgraph.vector.Fill|string)=} opt_value .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.fillAt = function(index, opt_value) {
+anychart.elements.Multimarker.prototype.fillAt = function(index, opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx,
+    opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (!this.customMarkerSettings_[index]) this.customMarkerSettings_[index] = {};
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeFill(opt_value);
-    if (this.customMarkerSettings_[index].fill != opt_value) {
-      this.customMarkerSettings_[index].fill = opt_value;
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = anychart.color.normalizeFill.apply(arguments, goog.array.slice(arguments, 1));
+    if (this.customMarkerSettings_[index].fill != color) {
+      this.customMarkerSettings_[index].fill = color;
       this.appearanceStates_[index] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -980,14 +987,21 @@ anychart.elements.Multimarker.prototype.fillAt = function(index, opt_value) {
  * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Fill|string)=} opt_value .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeFill(opt_value);
-    if (this.fill_ != opt_value) {
-      this.fill_ = opt_value;
+anychart.elements.Multimarker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
+    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = anychart.color.normalizeFill.apply(null, arguments);
+    if (this.fill_ != color) {
+      this.fill_ = color;
       this.commonAppearanceState_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1013,15 +1027,23 @@ anychart.elements.Multimarker.prototype.fill = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {number} index
- * @param {(acgraph.vector.Stroke|string)=} opt_value .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
+ *    если используется как сеттер.
+ * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
+ *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
+ *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_value) {
+anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (!this.customMarkerSettings_[index]) this.customMarkerSettings_[index] = {};
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
-    if (this.customMarkerSettings_[index].stroke != opt_value) {
-      this.customMarkerSettings_[index].stroke = opt_value;
+  if (goog.isDef(opt_strokeOrFill)) {
+    var color = anychart.color.normalizeStroke.apply(null, goog.array.slice(arguments, 1));
+    if (this.customMarkerSettings_[index].stroke != color) {
+      this.customMarkerSettings_[index].stroke = color;
       this.appearanceStates_[index] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1071,14 +1093,22 @@ anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_value) {
  * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|string)=} opt_value .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
+ *    если используется как сеттер.
+ * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
+ *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
+ *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
-      this.stroke_ = opt_value;
+anychart.elements.Multimarker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var color = anychart.color.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != color) {
+      this.stroke_ = color;
       this.commonAppearanceState_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }

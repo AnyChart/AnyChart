@@ -96,7 +96,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.colorizeShape = function
 
 
 /** @inheritDoc */
-anychart.cartesian.series.ContinuousRangeBase.prototype.createPositionProvider = function() {
+anychart.cartesian.series.ContinuousRangeBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   return {x: iterator.meta('x'), y: iterator.meta('high')};
 };

@@ -51,10 +51,9 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Bar.prototype.createPositionProvider = function() {
+anychart.cartesian.series.Bar.prototype.createPositionProvider = function(position) {
   var shape = this.getIterator().meta('shape');
   if (shape) {
-    var position = anychart.utils.NinePositions.RIGHT_CENTER;
     var shapeBounds = shape.getBounds();
     return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
   } else {

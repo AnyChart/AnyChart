@@ -263,7 +263,7 @@ anychart.elements.LineMarker.prototype.draw = function() {
  */
 anychart.elements.LineMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(70);
+  this.zIndex(26);
   this.direction(anychart.utils.Direction.HORIZONTAL);
   this.value(0);
   this.stroke('black');

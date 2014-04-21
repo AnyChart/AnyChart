@@ -419,7 +419,7 @@ anychart.utils.isUnit = function(value) {
 /**
  * Получает координаты якоря на границе.
  * @param {acgraph.math.Rect} bounds Прямоугольник границ.
- * @param {anychart.utils.NinePositions} anchor Якорь, координаты которого нужно получить.
+ * @param {anychart.utils.NinePositions|string} anchor Якорь, координаты которого нужно получить.
  * @return {Object.<string, number>} Координаты якоря в виде [x, y].
  */
 anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
