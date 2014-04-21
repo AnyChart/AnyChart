@@ -557,10 +557,9 @@ anychart.elements.Separator.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['orientation'] = this.orientation();
-  json['fill'] = this.fill();
-  json['stroke'] = this.stroke();
-  if (this.margin_)
-    json['margin'] = this.margin_.serialize();
+  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+  if (this.margin()) json['margin'] = this.margin().serialize();
   return json;
 };
 
@@ -570,13 +569,17 @@ anychart.elements.Separator.prototype.serialize = function() {
  */
 anychart.elements.Separator.prototype.deserialize = function(config) {
   this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
+
   this.width(config['width']);
   this.height(config['height']);
-  this.margin(config['margin']);
   this.orientation(config['orientation']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
+  if (config['margin']) this.margin().deserialize(config['margin']);
+
   this.resumeSignalsDispatching(true);
+
   return this;
 };

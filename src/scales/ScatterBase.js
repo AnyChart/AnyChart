@@ -286,3 +286,34 @@ anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
   if (this.isInverted) ratio = 1 - ratio;
   return ratio * this.range + this.min;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['minimum'] = this.minimumModeAuto ? null : this.minimum();
+  data['maximum'] = this.maximumModeAuto ? null : this.maximum();
+  data['minimumGap'] = this.minimumGap();
+  data['maximumGap'] = this.maximumGap();
+  data['dataRangeMin'] = this.dataRangeMin;
+  data['dataRangeMax'] = this.dataRangeMax;
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', value);
+
+  this.minimum(goog.isNull(value['minimum']) ? NaN : value['minimum']);
+  this.maximum(goog.isNull(value['maximum']) ? NaN : value['maximum']);
+
+  this.minimumGap(value['minimumGap']);
+  this.maximumGap(value['maximumGap']);
+  this.resumeSignalsDispatching(true);
+  return this;
+};

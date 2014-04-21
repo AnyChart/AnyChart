@@ -863,11 +863,11 @@ anychart.elements.TooltipItem.prototype.serialize = function() {
   json['background'] = this.background().serialize();
   json['padding'] = this.padding().serialize();
 
-  json['x'] = this.x_;
-  json['y'] = this.y_;
-  json['anchor'] = this.anchor_;
-  json['visible'] = this.visible_;
-  json['hideDelay'] = this.hideDelay_;
+  json['x'] = this.x();
+  json['y'] = this.y();
+  json['anchor'] = this.anchor();
+  json['visible'] = this.visible();
+  json['hideDelay'] = this.hideDelay();
 
   return json;
 };
@@ -877,23 +877,23 @@ anychart.elements.TooltipItem.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.TooltipItem.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
-  if ('title' in config)
-    this.title().deserialize(config['title']);
-  if ('content' in config)
-    this.content().deserialize(config['content']);
-  if ('separator' in config)
-    this.separator().deserialize(config['separator']);
-  if ('background' in config)
-    this.background().deserialize(config['background']);
-  if ('padding' in config)
-    this.padding().deserialize(config['padding']);
+  this.title(config['title']);
+  this.content(config['content']);
+  this.separator(config['separator']);
+  this.background(config['background']);
+  this.padding(config['padding']);
+
   this.x(config['x']);
   this.y(config['y']);
   this.anchor(config['anchor']);
   this.visible(config['visible']);
   this.hideDelay(config['hideDelay']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

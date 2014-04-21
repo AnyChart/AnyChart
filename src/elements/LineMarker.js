@@ -289,7 +289,7 @@ anychart.elements.LineMarker.prototype.remove = function() {
  */
 anychart.elements.LineMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['stroke'] = this.stroke();
+  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
   data['value'] = this.value();
   data['direction'] = this.direction();
   return data;
@@ -298,10 +298,16 @@ anychart.elements.LineMarker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.LineMarker.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['value'])) this.value(value['value']);
-  if (goog.isDef(value['direction'])) this.direction(value['direction']);
+
+  this.stroke(value['stroke']);
+  this.value(value['value']);
+  this.direction(value['direction']);
+
+  this.resumeSignalsDispatching(true);
+
   return this;
 };
 

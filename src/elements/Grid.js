@@ -667,8 +667,8 @@ anychart.elements.Grid.prototype.serialize = function() {
   data['parentBounds'] = this.parentBounds();
   data['stroke'] = this.stroke();
   data['direction'] = this.direction();
-  data['oddFill'] = this.oddFill();
-  data['evenFill'] = this.evenFill();
+  data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
+  data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
   data['drawFirstLine'] = this.drawFirstLine();
   data['drawLastLine'] = this.drawLastLine();
   data['minor'] = this.minor();
@@ -679,7 +679,10 @@ anychart.elements.Grid.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Grid.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', value);
+
   if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
   if (goog.isDef(value['direction'])) this.direction(value['direction']);
@@ -688,6 +691,9 @@ anychart.elements.Grid.prototype.deserialize = function(value) {
   if (goog.isDef(value['drawFirstLine'])) this.drawFirstLine(value['drawFirstLine']);
   if (goog.isDef(value['drawLastLine'])) this.drawLastLine(value['drawLastLine']);
   if (goog.isDef(value['minor'])) this.minor(value['minor']);
+
+  this.resumeSignalsDispatching(true);
+
   return this;
 };
 

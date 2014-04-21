@@ -1147,17 +1147,17 @@ anychart.elements.Multimarker.prototype.enabledAt = function(index, opt_value) {
  */
 anychart.elements.Multimarker.prototype.serialize = function(opt_withoutCustomSettings) {
   var data = goog.base(this, 'serialize');
-  data['position'] = this.position_;
-  data['anchor'] = this.anchor_;
-  data['type'] = this.type_;
-  data['size'] = this.size_;
-  data['offsetX'] = this.offsetX_;
-  data['offsetY'] = this.offsetY_;
-  data['fill'] = this.fill_;
-  data['stroke'] = this.stroke_;
+
+  data['position'] = this.position();
+  data['anchor'] = this.anchor();
+  data['type'] = this.type();
+  data['size'] = this.size();
+  data['offsetX'] = this.offsetX();
+  data['offsetY'] = this.offsetY();
+  data['fill'] = anychart.color.serialize(/** @type{acgraph.vector.Fill} */(this.fill()));
+  data['stroke'] = anychart.color.serialize(/** @type{acgraph.vector.Stroke} */(this.stroke()));
   if (!opt_withoutCustomSettings)
     data['customMarkerSettings'] = this.customMarkerSettings_;
-  data['parentBounds'] = this.parentBounds_;
 
   return data;
 };
@@ -1202,8 +1202,8 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
       data['size'] = goog.isDef(point.size) ? point.size : this.size_;
       data['offsetX'] = goog.isDef(point.offsetX) ? point.offsetX : this.offsetX_;
       data['offsetY'] = goog.isDef(point.offsetY) ? point.offsetY : this.offsetY_;
-      data['fill'] = goog.isDef(point.fill) ? point.fill : this.fill_;
-      data['stroke'] = goog.isDef(point.stroke) ? point.stroke : this.stroke_;
+      data['fill'] = goog.isDef(point.fill) ? anychart.color.serialize(point.fill) : anychart.color.serialize(this.fill_);
+      data['stroke'] = goog.isDef(point.stroke) ? anychart.color.serialize(point.stroke) : anychart.color.serialize(this.stroke_);
       data['enabled'] = goog.isDef(point.enabled) ? point.enabled : this.enabled();
     }
   } else if (!opt_includeCustomOnly) {
@@ -1213,8 +1213,8 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
     data['size'] = this.size_;
     data['offsetX'] = this.offsetX_;
     data['offsetY'] = this.offsetY_;
-    data['fill'] = this.fill_;
-    data['stroke'] = this.stroke_;
+    data['fill'] = anychart.color.serialize(this.fill_);
+    data['stroke'] = anychart.color.serialize(this.stroke_);
     data['enabled'] = this.enabled();
   }
 
@@ -1227,8 +1227,9 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
  */
 anychart.elements.Multimarker.prototype.deserialize = function(data) {
   this.suspendSignalsDispatching();
-  //goog.base(this, 'deserialize');
-  this.enabled(data['enabled']);
+
+  goog.base(this, 'deserialize', data);
+
   this.position(data['position']);
   this.anchor(data['anchor']);
   this.type(data['type']);
@@ -1238,8 +1239,9 @@ anychart.elements.Multimarker.prototype.deserialize = function(data) {
   this.fill(data['fill']);
   this.stroke(data['stroke']);
   this.customMarkerSettings_ = data['customMarkerSettings'] || {};
-  this.parentBounds(data['parentBounds']);
+
   this.resumeSignalsDispatching(true);
+
   return this;
 };
 

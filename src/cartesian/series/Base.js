@@ -1285,12 +1285,43 @@ anychart.cartesian.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['data'] = this.data().serialize();
   json['name'] = this.name();
-  json['color'] = this.color();
-  json['fill'] = this.fill();
-  json['hoverFill'] = this.hoverFill();
-  json['stroke'] = this.stroke();
-  json['hoverStroke'] = this.hoverStroke();
-  if (this.tooltip_) json['tooltip'] = this.tooltip_.serialize();
+
+  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+
+  if (goog.isFunction(this.fill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize fill function, you should reset it manually.');
+    }
+  } else {
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+  }
+
+  if (goog.isFunction(this.hoverFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverFill function, you should reset it manually.');
+    }
+  } else {
+    json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+  }
+
+  if (goog.isFunction(this.stroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize stroke function, you should reset it manually.');
+    }
+  } else {
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+  }
+
+  if (goog.isFunction(this.hoverStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverStroke function, you should reset it manually.');
+    }
+  } else {
+    json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+  }
+
+  json['tooltip'] = this.tooltip().serialize();
+  json['labels'] = this.labels().serialize();
   return json;
 };
 
@@ -1299,27 +1330,23 @@ anychart.cartesian.series.Base.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Base.prototype.deserialize = function(config) {
-  var data = config['data'];
-  var name = config['name'];
-  var color = config['color'];
-  var fill = config['fill'];
-  var hoverFill = config['hoverFill'];
-  var stroke = config['stroke'];
-  var hoverStroke = config['hoverStroke'];
-  var tooltip = config['tooltip'];
-
   this.suspendSignalsDispatching();
-  if (data) this.data(data);
-  if (name) this.name(name);
-  if (color) this.color(color);
-  if (fill) this.fill(fill);
-  if (hoverFill) this.hoverFill(hoverFill);
-  if (stroke) this.stroke(stroke);
-  if (hoverStroke) this.hoverStroke(hoverStroke);
-  if (tooltip) this.tooltip(tooltip);
+
+  goog.base(this, 'deserialize', config);
+
+  this.data(config['data']);
+  this.name(config['name']);
+  this.color(config['color']);
+  this.fill(config['fill']);
+  this.hoverFill(config['hoverFill']);
+  this.stroke(config['stroke']);
+  this.hoverStroke(config['hoverStroke']);
+  this.tooltip(config['tooltip']);
+  this.labels(config['labels']);
+
   this.resumeSignalsDispatching(false);
 
-  return goog.base(this, 'deserialize', config);
+  return this;
 };
 
 

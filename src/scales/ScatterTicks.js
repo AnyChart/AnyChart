@@ -448,3 +448,32 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmicAsMinor_ = function(value
     this.autoTicks_ = ticks;
   }
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.ScatterTicks.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['mode'] = this.mode();
+  data['base'] = this.base();
+  data['explicit'] = this.explicit_;
+  data['count'] = this.count_;
+  data['interval'] = this.interval_;
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', value);
+  this.mode(value['mode']);
+  this.base(value['base']);
+  this.explicit_ = value['explicit'] || null;
+  this.count_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
+  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
+  this.resumeSignalsDispatching(true);
+  return this;
+};

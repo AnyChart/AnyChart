@@ -1766,12 +1766,11 @@ anychart.cartesian.Chart.prototype.restoreDefaultsForAxis = function(axis) {
 anychart.cartesian.Chart.prototype.deserialize = function(config) {
   var chart = config['chart'];
 
-  debugger;
   if (!chart) return this;
-  goog.base(this, 'deserialize', config);
+  goog.base(this, 'deserialize', chart);
 
   this.suspendSignalsDispatching();
-  var i;
+  var i, json, scale;
   var grids = chart['grids'];
   var minorGrids = chart['minorGrids'];
   var xAxes = chart['xAxes'];
@@ -1782,47 +1781,72 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
   var series = chart['series'];
   var barGroupsPadding = chart['barGroupsPadding'];
   var barsPadding = chart['barsPadding'];
+  var scales = chart['scales'];
 
+  var cls = anychart.ClassFactory.getInstance();
+  var scalesInstances = [];
+  for (i = 0; i < scales.length; i++) {
+    scalesInstances.push(cls.getScale(scales[i]));
+  }
+
+  this.xScale(scalesInstances[chart['xScale']]);
+  chart['yScale'] ?
+      this.yScale(scalesInstances[chart['yScale']]) :
+      this.yScale(scalesInstances[chart['xScale']]);
 
   if (grids) {
     for (i = 0; i < grids.length; i++) {
-      this.grid(grids[i]);
+      json = grids[i];
+      this.grid(json);
+      if (json['scale']) this.grid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (minorGrids) {
     for (i = 0; i < minorGrids.length; i++) {
-      this.minorGrid(minorGrids[i]);
+      json = minorGrids[i];
+      this.minorGrid(json);
+      if (json['scale']) this.minorGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (xAxes) {
     for (i = 0; i < xAxes.length; i++) {
-      this.xAxis(xAxes[i]);
+      json = xAxes[i];
+      this.xAxis(json);
+      if (json['scale']) this.xAxis(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (yAxes) {
     for (i = 0; i < yAxes.length; i++) {
-      this.yAxis(yAxes[i]);
+      json = yAxes[i];
+      this.yAxis(json);
+      if (json['scale']) this.yAxis(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (lineAxesMarkers) {
     for (i = 0; i < lineAxesMarkers.length; i++) {
-      this.lineMarker(lineAxesMarkers[i]);
+      json = lineAxesMarkers[i];
+      this.lineMarker(json);
+      if (json['scale']) this.lineMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (rangeAxesMarkers) {
     for (i = 0; i < rangeAxesMarkers.length; i++) {
-      this.rangeMarker(rangeAxesMarkers[i]);
+      json = rangeAxesMarkers[i];
+      this.rangeMarker(json);
+      if (json['scale']) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (textAxesMarkers) {
     for (i = 0; i < textAxesMarkers.length; i++) {
-      this.textMarker(textAxesMarkers[i]);
+      json = textAxesMarkers[i];
+      this.textMarker(json);
+      if (json['scale']) this.textMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -1882,11 +1906,17 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
         case 'stepline':
           seriesInst = this.stepLine(data);
           break;
-        case 'ateplinearea':
+        case 'steplinearea':
           seriesInst = this.stepLineArea(data);
           break;
+        default:
+          if (window.console) {
+            window.console.log('Warning: We cant deserialize series type.');
+          }
       }
-      seriesInst.deserialize(s);
+      if (seriesInst) seriesInst.deserialize(s);
+      if (s['xScale']) seriesInst.xScale(scalesInstances[s['xScale']]);
+      if (s['yScale']) seriesInst.yScale(scalesInstances[s['yScale']]);
     }
   }
 
@@ -1902,59 +1932,173 @@ anychart.cartesian.Chart.prototype.serialize = function() {
   var json = {};
   var chart = goog.base(this, 'serialize');
   var i;
+  var scalesIds = {};
+  var scales = [];
+  var scale;
+  var config;
+  var objId;
+
+  scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.xScale())]);
+  chart['xScale'] = scales.length - 1;
+  if (this.xScale() != this.yScale()) {
+    scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.yScale())]);
+    chart['yScale'] = scales.length - 1;
+  }
 
   chart['type'] = 'cartesian';
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
-    grids.push(this.grids_[i].serialize());
+    var grid = this.grids_[i];
+    config = grid.serialize();
+    scale = grid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    grids.push(config);
   }
   chart['grids'] = grids;
 
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
-    minorGrids.push(this.minorGrids_[i].serialize());
+    var minorGrid = this.minorGrids_[i];
+    config = minorGrid.serialize();
+    scale = minorGrid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    minorGrids.push(config);
   }
   chart['minorGrids'] = minorGrids;
 
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
-    xAxes.push(this.xAxes_[i].serialize());
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    xAxes.push(config);
   }
   chart['xAxes'] = xAxes;
 
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
-    yAxes.push(this.yAxes_[i].serialize());
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    yAxes.push(config);
   }
   chart['yAxes'] = yAxes;
 
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
-    lineAxesMarkers.push(this.lineAxesMarkers_[i].serialize());
+    var lineAxesMarker = this.lineAxesMarkers_[i];
+    config = lineAxesMarker.serialize();
+    scale = lineAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    lineAxesMarkers.push(config);
   }
   chart['lineAxesMarkers'] = lineAxesMarkers;
 
   var rangeAxesMarkers = [];
   for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
-    rangeAxesMarkers.push(this.rangeAxesMarkers_[i].serialize());
+    var rangeAxesMarker = this.rangeAxesMarkers_[i];
+    config = rangeAxesMarker.serialize();
+    scale = rangeAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    rangeAxesMarkers.push(config);
   }
   chart['rangeAxesMarkers'] = rangeAxesMarkers;
 
   var textAxesMarkers = [];
   for (i = 0; i < this.textAxesMarkers_.length; i++) {
-    textAxesMarkers.push(this.textAxesMarkers_[i].serialize());
+    var textAxesMarker = this.textAxesMarkers_[i];
+    config = textAxesMarker.serialize();
+    scale = textAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    textAxesMarkers.push(config);
   }
   chart['textAxesMarkers'] = textAxesMarkers;
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {
-    series.push(this.series_[i].serialize());
-  }
-  chart['series'] = series;
+    var series_ = this.series_[i];
+    config = series_.serialize();
 
-  chart['barGroupsPadding'] = this.barGroupsPadding_;
-  chart['barsPadding'] = this.barsPadding_;
+    scale = series_.xScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['xScale'] = scales.length - 1;
+    } else {
+      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+
+    scale = series_.yScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['yScale'] = scales.length - 1;
+    } else {
+      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    series.push(config);
+  }
+
+  chart['series'] = series;
+  chart['scales'] = scales;
+  chart['barGroupsPadding'] = this.barGroupsPadding();
+  chart['barsPadding'] = this.barsPadding();
 
   json['chart'] = chart;
 

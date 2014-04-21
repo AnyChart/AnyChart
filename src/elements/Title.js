@@ -1037,6 +1037,7 @@ anychart.elements.Title.prototype.serialize = function() {
   var orientation = this.orientation();
   var width = this.width();
   var height = this.height();
+  var text = this.text();
 
   var background = this.background_;
   var margin = this.margin_;
@@ -1046,6 +1047,7 @@ anychart.elements.Title.prototype.serialize = function() {
   json['orientation'] = orientation;
   json['width'] = width;
   json['height'] = height;
+  json['text'] = text;
 
   if (background) json['background'] = background.serialize();
   if (margin) json['margin'] = margin.serialize();
@@ -1057,7 +1059,10 @@ anychart.elements.Title.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Title.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
+
   if ('padding' in config) {
     this.padding().deserialize(config['padding']);
   }
@@ -1066,14 +1071,14 @@ anychart.elements.Title.prototype.deserialize = function(config) {
     this.margin().deserialize(config['margin']);
   }
 
-  if ('background' in config) {
-    this.background().deserialize(config['background']);
-  }
-
+  this.background(config['background']);
   this.textSettings(config);
   this.align(config['align']);
   this.width(config['width']);
   this.height(config['height']);
+  this.text(config['text']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

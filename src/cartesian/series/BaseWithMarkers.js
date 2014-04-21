@@ -219,8 +219,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(hovere
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  if (this.markers_) json['markers'] = this.markers_.serialize();
-  if (this.hoverMarkers_) json['hoverMarkers'] = this.hoverMarkers_.serialize();
+  json['markers'] = this.markers().serialize();
+  json['hoverMarkers'] = this.hoverMarkers().serialize();
   return json;
 };
 
@@ -229,11 +229,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.deserialize = function(config) {
-  var markers = config['markers'];
-  if (markers) this.markers(markers);
-  var hoverMarkers = config['hoverMarkers'];
-  if (hoverMarkers) this.hoverMarkers(hoverMarkers);
-  return goog.base(this, 'deserialize', config);
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', config);
+  this.markers(config['markers']);
+  this.hoverMarkers(config['hoverMarkers']);
+  this.resumeSignalsDispatching(true);
+  return this;
 };
 
 

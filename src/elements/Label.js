@@ -1159,9 +1159,10 @@ anychart.elements.Label.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.Label.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
-  this.textSettings(config);
   this.width(config['width']);
   this.height(config['height']);
   this.rotation(config['rotation']);
@@ -1177,6 +1178,8 @@ anychart.elements.Label.prototype.deserialize = function(config) {
     this.padding().deserialize(config['padding']);
   if ('background' in config)
     this.background().deserialize(config['background']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

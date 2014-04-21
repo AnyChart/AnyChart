@@ -345,7 +345,7 @@ anychart.elements.RangeMarker.prototype.remove = function() {
  */
 anychart.elements.RangeMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['fill'] = this.fill();
+  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
   data['from'] = this.from();
   data['to'] = this.to();
   data['direction'] = this.direction();
@@ -355,11 +355,17 @@ anychart.elements.RangeMarker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.RangeMarker.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['fill'])) this.fill(value['fill']);
-  if (goog.isDef(value['from'])) this.from(value['from']);
-  if (goog.isDef(value['to'])) this.to(value['to']);
-  if (goog.isDef(value['direction'])) this.direction(value['direction']);
+
+  this.fill(value['fill']);
+  this.from(value['from']);
+  this.to(value['to']);
+  this.direction(value['direction']);
+
+  this.resumeSignalsDispatching(true);
+
   return this;
 };
 

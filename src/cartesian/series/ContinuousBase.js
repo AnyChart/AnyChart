@@ -233,9 +233,9 @@ anychart.cartesian.series.ContinuousBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.ContinuousBase.prototype.deserialize = function(config) {
-  var connectMissing = config['connectMissing'];
   this.suspendSignalsDispatching();
-  if (connectMissing) this.connectMissingPoints(connectMissing);
+  goog.base(this, 'deserialize', config);
+  this.connectMissingPoints(config['connectMissing']);
   this.resumeSignalsDispatching(false);
-  return goog.base(this, 'deserialize', config);
+  return this;
 };

@@ -967,7 +967,8 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
   var labels = this.labels();
   var minorLabels = this.minorLabels();
 
-  var line = this.line_.stroke(this.stroke_);
+  var line = this.line_;
+  line.stroke(this.stroke_);
   var lineThickness = line.stroke().thickness ? parseFloat(line.stroke().thickness) : 1;
 
   if (title.enabled()) {
@@ -2176,7 +2177,7 @@ anychart.elements.Axis.prototype.serialize = function() {
   data['ticks'] = this.ticks().serialize();
   data['minorTicks'] = this.minorTicks().serialize();
 
-  data['stroke'] = this.stroke();
+  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
   data['name'] = this.name();
   data['length'] = this.length();
   data['offsetX'] = this.offsetX();
@@ -2192,23 +2193,28 @@ anychart.elements.Axis.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Axis.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', value);
 
-  if (goog.isDef(value['title'])) this.title().deserialize(value['title']);
-  if (goog.isDef(value['labels'])) this.labels().deserialize(value['labels']);
-  if (goog.isDef(value['minorLabels'])) this.minorLabels().deserialize(value['minorLabels']);
-  if (goog.isDef(value['ticks'])) this.ticks().deserialize(value['ticks']);
-  if (goog.isDef(value['minorTicks'])) this.minorTicks().deserialize(value['minorTicks']);
+  this.title(value['title']);
+  this.labels(value['labels']);
+  this.minorLabels(value['minorLabels']);
+  this.ticks(value['ticks']);
+  this.minorTicks(value['minorTicks']);
 
-  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['name'])) this.name(value['name']);
-  if (goog.isDef(value['length'])) this.length(parseFloat(value['length']));
-  if (goog.isDef(value['offsetX'])) this.offsetX(value['offsetX']);
-  if (goog.isDef(value['offsetY'])) this.stroke(value['offsetY']);
-  if (goog.isDef(value['orientation'])) this.orientation(value['orientation']);
-  if (goog.isDef(value['drawFirstLabel'])) this.drawFirstLabel(value['drawFirstLabel']);
-  if (goog.isDef(value['drawLastLabel'])) this.drawLastLabel(value['drawLastLabel']);
-  if (goog.isDef(value['overlapMode'])) this.overlapMode(value['overlapMode']);
+  this.stroke(value['stroke']);
+  this.name(value['name']);
+  this.length(parseFloat(value['length']));
+  this.offsetX(value['offsetX']);
+  this.stroke(value['offsetY']);
+  this.orientation(value['orientation']);
+  this.drawFirstLabel(value['drawFirstLabel']);
+  this.drawLastLabel(value['drawLastLabel']);
+  this.overlapMode(value['overlapMode']);
+
+  this.resumeSignalsDispatching(true);
+
   return this;
 };
 

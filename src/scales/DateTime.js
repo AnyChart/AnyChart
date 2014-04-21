@@ -141,3 +141,29 @@ anychart.scales.DateTime.prototype.ticksInvalidated_ = function(event) {
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['ticks'] = this.ticks().serialize();
+  data['minorTicks'] = this.minorTicks().serialize();
+  data['type'] = 'datetime';
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', value);
+  this.ticks().deserialize(value['ticks']);
+  this.minorTicks().deserialize(value['minorTicks']);
+
+  this.resumeSignalsDispatching(true);
+
+  return this;
+};

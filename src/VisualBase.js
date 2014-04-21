@@ -264,11 +264,10 @@ anychart.VisualBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.VisualBase.prototype.deserialize = function(config) {
-  goog.base(this, 'deserialize', config);
   if ('enabled' in config)
     this.enabled(config['enabled']);
   if ('zIndex' in config)
     this.zIndex(config['zIndex']);
 
-  return this;
+  return goog.base(this, 'deserialize', config);
 };

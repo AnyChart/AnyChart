@@ -781,6 +781,8 @@ anychart.Chart.prototype.toXml = function(opt_asXmlNode) {
  * @inheritDoc
  */
 anychart.Chart.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   var margin = config['margin'];
@@ -789,12 +791,14 @@ anychart.Chart.prototype.deserialize = function(config) {
   var title = config['title'];
   var legend = config['legend'];
 
-  if (margin) this.margin(margin);
-  if (padding) this.padding(padding);
-  if (background) this.background(background);
-  if (title) this.title(title);
-  if (legend) this.legend(legend);
+  this.margin(margin);
+  this.padding(padding);
+  this.background(background);
+  this.title(title);
+  this.legend(legend);
   this.autoResize(config['autoResize']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };
@@ -806,12 +810,12 @@ anychart.Chart.prototype.deserialize = function(config) {
 anychart.Chart.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  if (this.margin_) json['margin'] = this.margin_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
-  if (this.title_) json['title'] = this.title_.serialize();
-  if (this.legend_) json['legend'] = this.legend_.serialize();
-  json['autoResize'] = this.autoResize_;
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
+  json['title'] = this.title().serialize();
+  json['legend'] = this.legend().serialize();
+  json['autoResize'] = this.autoResize();
 
   return json;
 };

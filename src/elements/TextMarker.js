@@ -563,17 +563,21 @@ anychart.elements.TextMarker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.TextMarker.prototype.deserialize = function(value) {
-  goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['direction'])) this.direction(value['direction']);
-  if (goog.isDef(value['align'])) this.align(value['align']);
-  if (goog.isDef(value['anchor'])) this.anchor(value['anchor']);
-  if (goog.isDef(value['value'])) this.value(value['value']);
-  if (goog.isDef(value['offsetX'])) this.offsetX(value['offsetX']);
-  if (goog.isDef(value['offsetY'])) this.offsetY(value['offsetY']);
-  if (goog.isDef(value['text'])) this.text(value['text']);
-  if (goog.isDef(value['width'])) this.width(value['width']);
-  if (goog.isDef(value['height'])) this.height(value['height']);
+  this.suspendSignalsDispatching();
 
+  goog.base(this, 'deserialize', value);
+
+  this.direction(value['direction']);
+  this.align(value['align']);
+  this.anchor(value['anchor']);
+  this.value(value['value']);
+  this.offsetX(value['offsetX']);
+  this.offsetY(value['offsetY']);
+  this.text(value['text']);
+  this.width(value['width']);
+  this.height(value['height']);
+
+  this.resumeSignalsDispatching(true);
   return this;
 };
 

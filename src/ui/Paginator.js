@@ -825,9 +825,9 @@ anychart.ui.Paginator.prototype.serialize = function() {
   json['pageCount'] = this.pageCount();
   json['currentPage'] = this.currentPage();
 
-  if (this.margin_) json['margin'] = this.margin_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
 
   return json;
 };
@@ -837,6 +837,8 @@ anychart.ui.Paginator.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.ui.Paginator.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.orientation(config['orientation']);
@@ -849,6 +851,8 @@ anychart.ui.Paginator.prototype.deserialize = function(config) {
   this.margin(config['margin']);
   this.padding(config['padding']);
   this.background(config['background']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

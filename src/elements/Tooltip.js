@@ -472,8 +472,8 @@ anychart.elements.Tooltip.prototype.serialize = function() {
   var itemJson = this.item_.serialize();
   goog.object.extend(json, itemJson);
 
-  json['allowLeaveScreen'] = this.allowLeaveScreen_;
-  json['isFloating'] = this.float_;
+  json['allowLeaveScreen'] = this.allowLeaveScreen();
+  json['isFloating'] = this.isFloating();
   json['content'] = this.content().serialize();
   json['title'] = this.title().serialize();
 
@@ -494,12 +494,18 @@ anychart.elements.Tooltip.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Tooltip.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', config);
+
   this.maybeCreateTooltipItem_();
   this.item_.deserialize(config);
   this.textFormatter_ = config['textFormatter'] || this.textFormatter_;
   this.titleFormatter_ = config['titleFormatter'] || this.titleFormatter_;
   this.isFloating(config['isFloating']);
   this.allowLeaveScreen(config['allowLeaveScreen']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

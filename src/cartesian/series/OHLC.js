@@ -317,6 +317,39 @@ anychart.cartesian.series.OHLC.prototype.getFinalFallingStroke = function(hover)
 anychart.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = 'ohlc';
+
+  if (goog.isFunction(this.risingStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize risingStroke function, you should reset it manually.');
+    }
+  } else {
+    json['risingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.risingStroke()));
+  }
+
+  if (goog.isFunction(this.hoverRisingStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverRisingStroke function, you should reset it manually.');
+    }
+  } else {
+    json['hoverRisingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverRisingStroke()));
+  }
+
+
+  if (goog.isFunction(this.fallingStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize fallingStroke function, you should reset it manually.');
+    }
+  } else {
+    json['fallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.fallingStroke()));
+  }
+
+  if (goog.isFunction(this.hoverFallingStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverFallingStroke function, you should reset it manually.');
+    }
+  } else {
+    json['hoverFallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverFallingStroke()));
+  }
   return json;
 };
 
@@ -325,7 +358,14 @@ anychart.cartesian.series.OHLC.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.OHLC.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', config);
+  this.risingStroke(config['risingStroke']);
+  this.hoverRisingStroke(config['hoverRisingStroke']);
+  this.fallingStroke(config['fallingStroke']);
+  this.hoverFallingStroke(config['hoverFallingStroke']);
+  this.resumeSignalsDispatching(true);
+  return this;
 };
 
 

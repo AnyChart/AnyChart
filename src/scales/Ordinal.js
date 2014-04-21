@@ -246,3 +246,27 @@ anychart.scales.Ordinal.prototype.ticksInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['values'] = this.autoDomain_ ? null : this.values();
+  data['ticks'] = this.ticks().serialize();
+  data['type'] = 'ordinal';
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', value);
+  this.values(value['values']);
+  this.ticks().deserialize(value['ticks']);
+  this.resumeSignalsDispatching(true);
+  return this;
+};

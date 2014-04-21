@@ -873,8 +873,7 @@ anychart.ui.Button.prototype.serialize = function() {
   json['height'] = this.height();
   json['position'] = this.position();
   json['stateSettings'] = this.stateSettings();
-
-  if (this.padding_) json['padding'] = this.padding_.serialize();
+  json['padding'] = this.padding().serialize();
 
   return json;
 };
@@ -884,14 +883,17 @@ anychart.ui.Button.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.ui.Button.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.width(config['width']);
   this.height(config['height']);
   this.position(config['position']);
   this.stateSettings(config['stateSettings']);
-
   this.padding(config['padding']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

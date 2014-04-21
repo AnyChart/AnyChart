@@ -1263,14 +1263,13 @@ anychart.elements.Legend.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['itemsLayout'] = this.itemsLayout();
-  //json['items'] = this.itemsProvider().getData();
 
-  if (this.margin_) json['margin'] = this.margin_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
-  if (this.title_) json['title'] = this.title_.serialize();
-  if (this.titleSeparator_) json['titleSeparator'] = this.titleSeparator_.serialize();
-  if (this.paginator_) json['paginator'] = this.paginator_.serialize();
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
+  json['title'] = this.title().serialize();
+  json['titleSeparator'] = this.titleSeparator().serialize();
+  json['paginator'] = this.paginator().serialize();
 
   return json;
 };
@@ -1280,6 +1279,8 @@ anychart.elements.Legend.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.Legend.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.position(config['position']);
@@ -1289,15 +1290,17 @@ anychart.elements.Legend.prototype.deserialize = function(config) {
   this.width(config['config']);
   this.height(config['config']);
   this.itemsLayout(config['itemsLayout']);
-  this.itemsProvider(config['itemsProvider']);
 
   this.textSettings(config);
-  this.margin(config['margin']);
-  this.padding(config['padding']);
+
+  if (config['margin']) this.margin().deserialize(config['margin']);
+  if (config['padding']) this.padding().deserialize(config['padding']);
   this.background(config['background']);
   this.title(config['title']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };
