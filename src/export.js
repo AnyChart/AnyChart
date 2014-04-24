@@ -984,3 +984,5 @@ anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/f
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
 anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
+anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
+anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;
