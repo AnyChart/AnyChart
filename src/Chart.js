@@ -773,7 +773,7 @@ anychart.Chart.prototype.toJson = function(opt_stringify) {
  * @return {string|Node} Chart configuration.
  */
 anychart.Chart.prototype.toXml = function(opt_asXmlNode) {
-  return anychart.utils.json2xml(this.serialize(), 'chart', opt_asXmlNode);
+  return anychart.utils.json2xml(this.serialize(), undefined, opt_asXmlNode);
 };
 
 
