@@ -1018,7 +1018,7 @@ anychart.elements.Multimarker.prototype.fill = function(opt_fillOrColorOrKeys, o
  * @return {acgraph.vector.Stroke|string} Markres strokeAt settings.
  *//**
  * Setter for stroke settings by index.<br/>
- * <b>Note:</b> Принцип работы fillAt описан в статье
+ * <b>Note:</b> Принцип работы strokeAt описан в статье
  * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}.<br/>
  * See example at {@link anychart.elements.Multimarker#fill}.
  * @param {number} index Index of marker.
@@ -1120,9 +1120,19 @@ anychart.elements.Multimarker.prototype.stroke = function(opt_strokeOrFill, opt_
 
 
 /**
+ * Getter for current enabled state by index.
+ * @param {number} index Index of marker.
+ * @return {boolean} Marker enabled state.
+ *//**
+ * Setter for enabled state by index.<br/>
+ * @param {number} index Index of marker.
+ * @param {boolean=} opt_value Value to set.
+ * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ *//**
+ * @ignoreDoc
  * @param {number} index
- * @param {boolean=} opt_value Enabled state.
- * @return {boolean|anychart.elements.Multimarker} Marker enabled state or itself for chaining call.
+ * @param {boolean=} opt_value .
+ * @return {boolean|anychart.elements.Multimarker} .
  */
 anychart.elements.Multimarker.prototype.enabledAt = function(index, opt_value) {
   if (!this.customMarkerSettings_[index]) this.customMarkerSettings_[index] = {};
@@ -1305,7 +1315,7 @@ anychart.elements.Multimarker.prototype.dropCustomSettingsAt = function(index) {
 
 /**
  * Удаляет всю последовательность маркеров.
-*/
+ */
 anychart.elements.Multimarker.prototype.clear = function() {
   var i, index;
   for (i in this.elementsPoll_) {
