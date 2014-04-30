@@ -1154,7 +1154,7 @@ anychart.elements.Multimarker.prototype.serialize = function(opt_withoutCustomSe
   data['size'] = this.size();
   data['offsetX'] = this.offsetX();
   data['offsetY'] = this.offsetY();
-  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   if (!opt_withoutCustomSettings)
     data['customMarkerSettings'] = this.customMarkerSettings_;

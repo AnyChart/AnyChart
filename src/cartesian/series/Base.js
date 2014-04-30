@@ -36,8 +36,12 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.realLabels_ = new anychart.elements.Multilabel();
   this.realLabels_.listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.realLabels_.listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
-  this.labels().textFormatter(function(provider) { return provider['value']; }).enabled(false);
-  this.hoverLabels().textFormatter(function(provider) { return provider['value']; }).enabled(false);
+  this.labels().textFormatter(function(provider) {
+    return provider['value'];
+  }).enabled(false);
+  this.hoverLabels().textFormatter(function(provider) {
+    return provider['value'];
+  }).enabled(false);
   this.labels().position(anychart.utils.NinePositions.CENTER);
   this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
   this.resumeSignalsDispatching(false);
@@ -51,8 +55,8 @@ goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
  */
 anychart.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.DATA_CHANGED |
-    anychart.Signal.NEEDS_RECALCULATION;
+        anychart.Signal.DATA_CHANGED |
+        anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -61,9 +65,9 @@ anychart.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
  */
 anychart.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.DATA;
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.LABELS |
+        anychart.ConsistencyState.DATA;
 
 
 /**
@@ -124,9 +128,9 @@ anychart.cartesian.series.Base.prototype.xScale_ = null;
 
 
 /**
-* @type {anychart.elements.Multilabel}
-* @private
-*/
+ * @type {anychart.elements.Multilabel}
+ * @private
+ */
 anychart.cartesian.series.Base.prototype.labels_ = null;
 
 
@@ -707,7 +711,7 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
     'value': iterator.get('value'),
     'x': iterator.get('x'),
     'index': index,
-    'name': this.name_ ? this.name_ : 'Series'
+    'name': this.name_ ? this.name_ : 'Series ' + index
   };
 };
 
@@ -970,10 +974,10 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
-* Gets or sets series data labels.
-* @param {(anychart.elements.Multilabel|Object|string|null)=} opt_value Series data labels settings.
-* @return {!(anychart.elements.Multilabel|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
-*/
+ * Gets or sets series data labels.
+ * @param {(anychart.elements.Multilabel|Object|string|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.elements.Multilabel|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
+ */
 anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.Multilabel();
@@ -1023,10 +1027,10 @@ anychart.cartesian.series.Base.prototype.hoverLabels = function(opt_value) {
 
 
 /**
-* Listener for labels invalidation.
-* @param {anychart.SignalEvent} event Invalidation event.
-* @private
-*/
+ * Listener for labels invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
 anychart.cartesian.series.Base.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
