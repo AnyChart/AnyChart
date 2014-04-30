@@ -93,7 +93,24 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
 
 
 /**
- * Gets or sets series data markers.
+ * Getter for series data markers.
+ * @example <t>listingOnly</t>
+ * series.markers().size(10);
+ * @return {!anychart.elements.Multimarker} Markers instance.
+ *//**
+ * Setter for series data markers.<br/>
+ * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * @example <t>listingOnly</t>
+ * series.markers(null);
+ * @example <t>listingOnly</t>
+ * var myMarkers = new anychart.elements.Multimarker()
+ *       .size(10)
+ *       .type('star5')
+ * series.markers(myMarkers);
+ * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
@@ -120,7 +137,24 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
 
 
 /**
- * Gets or sets series hover data markers.
+ * Getter for series data markers on hover.
+ * @example <t>listingOnly</t>
+ * series.hoverMarkers().size(20);
+ * @return {!anychart.elements.Multimarker} Markers instance.
+ *//**
+ * Setter for series data markers on hover.<br/>
+ * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * @example <t>listingOnly</t>
+ * series.hoverMarkers(null);
+ * @example <t>listingOnly</t>
+ * var myMarkers = new anychart.elements.Multimarker()
+ *       .size(10)
+ *       .type('star5')
+ * series.hoverMarkers(myMarkers);
+ * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */

@@ -8,6 +8,7 @@ import urllib
 import zipfile
 import platform
 import shutil
+import time
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
@@ -247,6 +248,7 @@ def __compileReleaseProjectFromCommandLine():
 @sync_required
 def __compileProjectFromCommandLine():
     print "Compile components..."
+    startDocsTimer = time.time()
 
     #Проверяем существует ли путь для выгрузки итогового файла, если нет, создаем.
     __checkPathExistence(OUT_PATH)
@@ -261,7 +263,7 @@ def __compileProjectFromCommandLine():
                ['--compiler_flags=--output_wrapper=(function(){%output%})()']
 
     __call_compiler(commands, outputFileName)
-
+    print "[PY] compile time: {:.3f} sec".format(time.time() - startDocsTimer)
 
 def __call_compiler(commands, outputFileName):
     tmp = 'Building graphics to ' + outputFileName
@@ -353,21 +355,47 @@ def __buildJSDocFromCommandLine():
 
 
 def __buildDocs():
+    FLAG_NEEDS_TREE = "";
+    CUSTOM_SRC = "";
+    PROFILER = "";
+    CHECK_ONLY = "";
+
     # Компилируем код, если вызван ключ
     args = sys.argv
     for arg in args[2:]:
+      if (arg == '-chk'):
+        CHECK_ONLY = "1"
       if (arg == '-c'):
         __compileProjectFromCommandLine()
+      if (arg == '-t'):
+        FLAG_NEEDS_TREE = "1";
+      if (arg == '-p'):
+        PROFILER = "1";
+      if (arg == '-src'):
+        if (len(args)-1 == args.index(arg)):
+          print 'Надо указать модуль'
+          return 0
+        CUSTOM_SRC = args[args.index(arg)+1]
 
-    # Собираем документацию
-    print 'Building JSDoc to ' + DOCS_OUT_PATH
+
     __checkPathExistence(OUT_PATH)
     __checkPathExistence(DOCS_OUT_PATH)
-    shutil.rmtree(DOCS_OUT_PATH)
-    os.mkdir(DOCS_OUT_PATH)
-    os.mkdir(os.path.join(DOCS_OUT_PATH,'scripts'))
-    shutil.copy(os.path.join(OUT_PATH, 'anychart.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'anychart.min.js'))
+    if (len(CHECK_ONLY) == 0):
+      print 'Building JSDoc'
+      if (len(CUSTOM_SRC) > 0):
+         print '  package: '+CUSTOM_SRC
+      shutil.rmtree(DOCS_OUT_PATH)
+      os.mkdir(DOCS_OUT_PATH)
+      os.mkdir(os.path.join(DOCS_OUT_PATH,'scripts'))
+      shutil.copy(os.path.join(OUT_PATH, 'anychart.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'anychart.min.js'))
+    else:
+      print "-----------------\nCheckOnly Mode\n-----------------\n"
 
+    f=open(os.path.join(DOCS_OUT_PATH,'commandLine.opts'), 'w')
+    f.write(FLAG_NEEDS_TREE+'\n'+CUSTOM_SRC+'\n'+PROFILER+'\n'+CHECK_ONLY)
+    f.close()
+
+    startDocsTimer = time.time()
     subprocess.call([
         os.path.join(JSDOC_TEMPLATE_PATH, 'jsdoc'),
         SRC_PATH,
@@ -377,10 +405,10 @@ def __buildDocs():
         '-c',
         os.path.join(JSDOC_TEMPLATE_PATH, 'conf.json'),
         '-d', DOCS_OUT_PATH,
-        '-l',
-        os.path.join(JSDOC_TEMPLATE_PATH, 'README.md')],
+        '-l'],
         shell=(platform.system() == 'Windows'))
-
+    os.remove(os.path.join(DOCS_OUT_PATH,'commandLine.opts'));
+    print "[PY] build docs time: {:.3f} sec".format(time.time() - startDocsTimer)
 #=======================================================================================================================
 #                            Logging.
 #=======================================================================================================================
@@ -424,23 +452,32 @@ def __get_version():
 
 def __printHelp():
     print "Команды выполняемые скриптом:\n"\
-          "\n"\
+            "\n"\
           "contrib          Сборка всех зависимостей проекта, таких как внешние билбиотеки, \n"\
           "                 компилятор, и другие утилитные вещи. (python build contrib) \n"\
-          "\n"\
+            "\n"\
           "deps             Генерация dependencies как для продуктовых модулей по отдельности,\n"\
           "                 так и для всего проекта (python build deps).\n"\
-          "\n"\
+            "\n"\
           "compile            Сборка продуктовых модулей  (python build compile).\n"\
-          "\n"\
+            "\n"\
           "lint             Проверка кода на соответствие google JavaScript style guide (python build lint)\n"\
-          "\n"\
+            "\n"\
           "autofix          Исправление не соответствией кода google JavaScript style guide (python build autofix).\n"\
           "                 Это эксперементальная функция. За ней нужно всегда проверять что же она там наисправляла\n"\
-          "\n"\
+            "\n"\
           "docs             Сборка документации по продуктовому модулю или по всему проекту (python build docs)."\
-          "\n\t"\
-          "-c       Выполнит compile перед сборкой документации.\n"\
+              "\n\t"\
+            "-c       Выполнит compile перед сборкой документации.\n"\
+              "\n\t"\
+            "-t       Соберет tree.js для UMLjs.\n"\
+              "\n\t"\
+            "-p       Включает внутренний профайлер.\n"\
+              "\n\t"\
+            "-src PACKAGE_NAME      Выполнит сборку документации только укащанного package.\n"\
+              "\n\t"\
+            "-chk     Выполнит проверку и не будет билдить документации. Игнорирует все флаги кроме -src.\n"\
+
 
 
 #=======================================================================================================================

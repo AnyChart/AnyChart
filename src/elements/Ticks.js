@@ -273,7 +273,7 @@ anychart.elements.Ticks.prototype.serialize = function() {
   var data = {};
   data['length'] = this.length();
   data['position'] = this.position();
-  data['stroke'] = anychart.color.serialize(/** @type{acgraph.vector.Stroke} */(this.stroke()));
+  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   data['enabled'] = this.enabled();
 
   return data;

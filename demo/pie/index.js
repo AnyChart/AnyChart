@@ -44,19 +44,20 @@ function load() {
       .fontSize(11)
       .fontFamily('Tahoma');
 
+
   for (var i = 0; i < pointData.length; i++) {
     summPointsValues += pointData[i];
   }
 
 //  chart.margin('1%', '2%');
-  //chart.labels()
-     /* .textFormatter(function(formatProvider, index) {
+  chart.labels()
+      .textFormatter(function(formatProvider, index) {
         var value = parseFloat(formatProvider(index, 'value'));
 
         return Math.ceil(1000 * value / summPointsValues) / 10 + '%';
-      })*/
-      //.fontSize(11)
-      //.fontColor('white');
+      })
+      .fontSize(11)
+      .fontColor('white');
 
   chart.background()
       .stroke('2 rgb(36,102,177)')

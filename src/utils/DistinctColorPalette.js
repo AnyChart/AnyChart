@@ -83,7 +83,15 @@ anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_colo
  * @return {Array.<acgraph.vector.Fill>} Color palette colors list.
  *//**
  * Setter for color palette colors list.
- * @example <t>listingOnly</t>
+ * @example <t>simple-h100</t>
+ * var palette = new anychart.utils.DistinctColorPalette()
+ *      .colors(['#00F', 'red', ['orange', 'red'], '#00C', '#00B', '#00A', '#009', '#008']);
+ * var len = palette.colors().length-1;
+ * for (var i = 1; i <= len; i++) {
+ *   stage.rect((i - 1) * stage.width() / len, 0, stage.width() / len - .5, stage.height())
+ *       .fill(palette.colorAt(i-1))
+ *       .stroke('1px #000');
+ * }
  * @param {Array.<acgraph.vector.Fill>=} opt_value Color palette colors list to set.
  * @return {!anychart.utils.DistinctColorPalette} An instance of the {@link anychart.utils.DistinctColorPalette} class for method chaining.
  *//**

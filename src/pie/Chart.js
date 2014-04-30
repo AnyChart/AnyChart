@@ -302,11 +302,11 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  *    [17, 22, 33],
  *    [21, 22, 43]
  *  ]);
- *  new anychart.pie.Chart(dataSet.mapAs({'value': 1}))
+ *  new anychart.pie.Chart(dataSet.mapAs({'value': [1]}))
  *      .container(stage)
  *      .bounds(0,0,'50%', '100%')
  *      .draw();
- *  new anychart.pie.Chart(dataSet.mapAs({'value': 2}))
+ *  new anychart.pie.Chart(dataSet.mapAs({'value': [2]}))
  *      .container(stage)
  *      .bounds('50%',0,'50%', '100%')
  *      .draw();
@@ -1358,7 +1358,7 @@ anychart.pie.Chart.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Internal palette invalidation handler.
- @param {anychart.SignalEvent} event Event object.
+ * @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
