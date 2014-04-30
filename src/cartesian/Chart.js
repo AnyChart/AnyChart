@@ -17,7 +17,21 @@ goog.require('anychart.scales.Ordinal');
 
 
 /**
- * Класс предназначен для создания и управления cartesian графиками.
+ * Конструктор cartesion чарта.<br/>
+ * Основная точка входа для создания cartesian чарта. Имеет алиасы на быстрое создание серий внутри чарта.<br/>
+ * Learn more about this type of charts at:
+ * {@link http://demos.anychart.dev/articles/Cartesian.html}.<br/>
+ * Each series are interactive, you can customize click and hover behavior.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title()
+ *    .text('Simple bar chart');
+ * chart.bar([10, 20, 30]);
+ * chart.yAxis()
+ *    .orientation('bottom')
+ *    .scale(chart.yScale())
+ *    .title('none');
+ * chart.container(stage).draw();
  * @extends {anychart.Chart}
  * @constructor
  */
@@ -133,8 +147,37 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets default chart X scale.
- * This scale will be passed to all scale depend chart elements if them not assigned they own scales.
+ * Getter for default chart X scale.
+ * @return {!anychart.scales.Base} Default chart scale value.
+ *//**
+ * Setter for default chart X scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale depend chart elements if them not assigned they own scales.
+ * @example
+ * var dtScale = new anychart.scales.DateTime();
+ * dtScale.minimum(Date.UTC(2000, 5));
+ * dtScale.maximum(Date.UTC(2003, 5));
+ * chart = new anychart.cartesian.Chart();
+ * chart.title(null);
+ * chart.bar([
+ *   {x: Date.UTC(2001, 0), y: 20},
+ *   {x: Date.UTC(2002, 0), y: 40},
+ *   {x: Date.UTC(2003, 0), y: 30}
+ * ]).width(25);
+ * chart.xScale(dtScale);
+ * chart.yAxis()
+ *     .orientation('left')
+ *     .scale(dtScale)
+ *     .title(null)
+ *     .labels().textFormatter(function(value) { return new Date(value).toDateString(); });
+ * chart.yAxis()
+ *     .orientation('bottom')
+ *     .scale(chart.yScale())
+ *     .title(null);
+ * chart.container(stage).draw();
+ * @param {anychart.scales.Base=} opt_value X Scale to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
  */
@@ -155,8 +198,28 @@ anychart.cartesian.Chart.prototype.xScale = function(opt_value) {
 
 
 /**
- * Gets or sets default chart Y scale.
- * This scale will be passed to all scale depend chart elements if them not assigned they own scales.
+ * Getter for default chart Y scale.
+ * @return {!anychart.scales.Base} Default chart scale value.
+ *//**
+ * Setter for default chart Y scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale depend chart elements if them not assigned they own scales.
+ * @example
+ * var valueScale = new anychart.scales.Logarithmic();
+ * valueScale.ticks().mode('log');
+ * chart = new anychart.cartesian.Chart();
+ * chart.title(null);
+ * chart.bar([0.001, 0.05, .0007]);
+ * chart.yScale(valueScale);
+ * chart.yAxis()
+ *     .orientation('bottom')
+ *     .scale(valueScale)
+ *     .title(null)
+ *     .drawFirstLabel(true);
+ * chart.container(stage).draw();
+ * @param {anychart.scales.Base=} opt_value Y Scale to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
  */
@@ -222,9 +285,52 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets chart grid by index.
- * @param {(anychart.elements.Grid|Object|string|number|null)=} opt_indexOrValue Grid settings.
- * @param {anychart.elements.Grid=} opt_value Grid settings to set.
+ * Getter for chart grid.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid()
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .direction(anychart.utils.Direction.VERTICAL);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.Grid} Axis instance by index.
+ *//**
+ * Setter for chart grid.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * var myGrid = new anychart.elements.Grid()
+ *    .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid(myGrid);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.Grid|Object)=} opt_value Chart grid settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart grid by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid()
+ *     .oddFill('none')
+ *     .evenFill('red')
+ *     .direction(anychart.utils.Direction.VERTICAL);
+ * chart.container(stage).draw();
+ * chart.grid(1, null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index.
+ * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Grid settings.
+ * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Grid settings to set.
  * @return {!(anychart.elements.Grid|anychart.cartesian.Chart)} Grid instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) {
@@ -261,10 +367,65 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
 
 
 /**
- * Gets or sets chart minor grid by index.
- * @param {(anychart.elements.Grid|Object|string|number|null)=} opt_indexOrValue Minor grid settings.
- * @param {anychart.elements.Grid=} opt_value Minor grid settings to set.
- * @return {!(anychart.elements.Grid|anychart.cartesian.Chart)} Grid instance by index or itself for chaining call.
+ * Getter for chart minor grid.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid()
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .direction(anychart.utils.Direction.VERTICAL);
+ * chart.minorGrid()
+ *    .oddFill('none')
+ *    .evenFill('none')
+ *    .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart minor grid index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.Grid} Axis instance by index.
+ *//**
+ * Setter for chart minor grid.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * var myGrid = new anychart.elements.Grid()
+ *    .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid(myGrid);
+ * myGrid.oddFill('none')
+ *    .evenFill('none')
+ *    .direction(anychart.utils.Direction.HORIZONTAL).minor(true);
+ * chart.minorGrid(myGrid)
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.Grid|Object)=} opt_value Chart minor grid settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart minor grid by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.grid()
+ *     .oddFill('none')
+ *     .evenFill('red')
+ *     .direction(anychart.utils.Direction.VERTICAL);
+ * chart.minorGrid()
+ *    .oddFill('none')
+ *    .evenFill('none')
+ *    .direction(anychart.utils.Direction.HORIZONTAL);
+ * chart.container(stage).draw();
+ * chart.minorGrid(0, null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart minor grid index.
+ * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart minor grid settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Minor grid settings.
+ * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Minor grid settings to set.
+ * @return {!(anychart.elements.Grid|anychart.cartesian.Chart)} Minor grid instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -316,10 +477,55 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets chart X axis by index.
- * @param {(anychart.elements.Axis|Object|string|number|null)=} opt_indexOrValue Chart axis instance to set.
- * @param {anychart.elements.Axis=} opt_value Axis settings to set.
- * @return {!(anychart.elements.Axis|anychart.cartesian.Chart)} Axis by index or itself for chaining call.
+ * Getter for chart X-axis.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.xAxis()
+ *    .orientation('bottom')
+ *    .scale(chart.xScale())
+ *    .title('X-Axis');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.Axis} Axis instance by index.
+ *//**
+ * Setter for chart X-axis.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.bar([1, 4, 5, 7, 2]);
+ * var myAxis = new anychart.elements.Axis()
+ *    .orientation('right')
+ *    .title().text('my Axis');
+ * chart.xAxis(myAxis);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.Axis|Object)=} opt_value Chart axis settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart X-axis by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.xAxis()
+ *    .orientation('left')
+ *    .title(null);
+ * chart.xAxis()
+ *    .orientation('bottom')
+ *    .title('X-Axis');
+ * chart.xAxis()
+ *    .orientation('right')
+ *    .title(null);
+ * chart.xAxis(1, null);
+ * chart.xAxis(2, 'None');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index.
+ * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
+ * @return {!(anychart.elements.Axis|anychart.cartesian.Chart)} Axis instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -357,10 +563,56 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
 
 
 /**
- * Gets or sets chart Y axis by index.
- * @param {(anychart.elements.Axis|Object|string|number|null)=} opt_indexOrValue Chart axis instance to set.
- * @param {anychart.elements.Axis=} opt_value Axis settings to set.
- * @return {!(anychart.elements.Axis|anychart.cartesian.Chart)} Axis by index or itself for chaining call.
+ * Getter for chart Y-axis.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.yAxis()
+ *    .orientation('right')
+ *    .title('Y-Axis');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.Axis} Axis instance by index.
+ *//**
+ * Setter for chart Y-axis.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.bar([1, 4, 5, 7, 2]);
+ * var myAxis = new anychart.elements.Axis()
+ *    .orientation('left')
+ *    .title().text('my Axis');
+ * chart.yAxis(myAxis);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.Axis|Object)=} opt_value Chart axis settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart Y-axis by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.yAxis()
+ *    .orientation('left')
+ *    .scale(chart.yScale().maximum(10))
+ *    .title(null);
+ * chart.yAxis()
+ *    .orientation('right')
+ *    .scale(chart.xScale())
+ *    .title('Y-Axis');
+ * chart.yAxis()
+ *    .orientation('right')
+ *    .scale(chart.yScale().maximum(20))
+ *    .title(null);
+ * chart.yAxis(2, 'None');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index.
+ * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
+ * @return {!(anychart.elements.Axis|anychart.cartesian.Chart)} Axis instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -423,9 +675,51 @@ anychart.cartesian.Chart.prototype.onAxisSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets chart line marker by index.
- * @param {(anychart.elements.LineMarker|Object|string|number|null)=} opt_indexOrValue Chart line marker settings to set.
- * @param {anychart.elements.LineMarker=} opt_value Chart line marker settings to set.
+ * Getter for chart line marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Line Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.lineMarker()
+ *     .value(4)
+ *     .stroke('2 blue')
+ *     .direction('horizontal');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart line marker index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.LineMarker} Line marker instance by index.
+ *//**
+ * Setter for chart line marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Line Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * var lineMarker = new anychart.elements.LineMarker()
+ *     .value(5.5)
+ *     .stroke('2 blue')
+ *     .direction('horizontal');
+ * chart.lineMarker(lineMarker);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.LineMarker|Object)=} opt_value Chart line marker settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart line marker by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Line Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.lineMarker().value(5);
+ * chart.lineMarker().value(2);
+ * // отключаем нулевой маркер.
+ * chart.lineMarker(0, null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart line marker index.
+ * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.LineMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
+ * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.elements.LineMarker|anychart.cartesian.Chart)} Line marker instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_value) {
@@ -462,9 +756,48 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
 
 
 /**
- * Gets or sets chart range marker by index.
- * @param {(anychart.elements.RangeMarker|Object|string|number|null)=} opt_indexOrValue Chart range marker settings to set.
- * @param {anychart.elements.RangeMarker=} opt_value Chart range marker settings to set.
+ * Getter for chart range marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Range Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.rangeMarker().from(2.2).to(5.5);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart range marker index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.RangeMarker} Range marker instance by index.
+ *//**
+ * Setter for chart range marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Range Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * var rangeMarker = new anychart.elements.RangeMarker()
+ *     .from(2.5)
+ *     .to(5.5)
+ *     .fill('blue .1');
+ * chart.rangeMarker(rangeMarker);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.RangeMarker|Object)=} opt_value Chart range marker settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart range marker by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeMarker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.rangeMarker().from(5).to(10);
+ * chart.rangeMarker().from(1).to(2);
+ * // отключаем нулевой маркер.
+ * chart.rangeMarker(0, null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart range marker index.
+ * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.RangeMarker|Object|string|null)=} opt_indexOrValue Chart range marker settings to set.
+ * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.
  * @return {!(anychart.elements.RangeMarker|anychart.cartesian.Chart)} Range marker instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_value) {
@@ -501,10 +834,56 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
 
 
 /**
- * Gets or sets chart text marker by index.
- * @param {(anychart.elements.TextMarker|Object|string|number|null)=} opt_indexOrValue Chart text marker settings to set.
- * @param {anychart.elements.TextMarker=} opt_value Chart text marker settings to set.
- * @return {!(anychart.elements.TextMarker|anychart.cartesian.Chart)} Text marker instance by index or itself for chaining call.
+ * Getter for chart text marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('TextMarker and LineMarker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.lineMarker().value(3.3);
+ * chart.textMarker()
+ *     .text('Marker')
+ *     .value(3.3)
+ *     .align(anychart.elements.TextMarker.Align.FAR)
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart text marker index. Если не задан, то создаст новый инстанс и добавит в конец массива.
+ * @return {!anychart.elements.TextMarker} Text marker instance by index.
+ *//**
+ * Setter for chart text marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Text Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * var txtMarker = new anychart.elements.TextMarker()
+ *     .text('Marker')
+ *     .value(3.3)
+ *     .align(anychart.elements.TextMarker.Align.NEAR)
+ *     .anchor(anychart.utils.NinePositions.LEFT_BOTTOM);
+ * chart.textMarker(txtMarker);
+ * chart.lineMarker().value(3.3);
+ * chart.container(stage).draw();
+ * @param {(anychart.elements.TextMarker|Object)=} opt_value Chart text marker settings to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * Setter for chart text marker by index.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Text Marker');
+ * chart.column([1, 4, 5, 7, 2]);
+ * chart.textMarker().value(6).text('Marker 0');
+ * chart.textMarker().value(2).text('Marker 1');
+ * // отключаем нулевой маркер.
+ * chart.textMarker(0, null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart text marker index.
+ * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
+ * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|anychart.elements.TextMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
+ * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart line marker settings to set.
+ * @return {!(anychart.elements.TextMarker|anychart.cartesian.Chart)} Line marker instance by index or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -569,10 +948,16 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * Добавляет в чарт серию типа Area.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Area series');
+ * chart.area([10, 4, 17, 20]);
+ * chart.container(stage).draw();
+ * @param {!(anychart.data.View|anychart.data.Set|Array)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Area} Column.
+ * @return {anychart.cartesian.series.Area} An instance of the {@link anychart.cartesian.series.Area} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Area(data, opt_csvSettings);
@@ -587,10 +972,16 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа Bar.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Bar series');
+ * chart.bar([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Bar} Column.
+ * @return {anychart.cartesian.series.Bar} An instance of the {@link anychart.cartesian.series.Bar} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bar(data, opt_csvSettings);
@@ -605,10 +996,21 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа Bubble.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Bubble series');
+ * chart.bubble([
+ *   [0, 4, 10],
+ *   [1, 5, 6],
+ *   [2, 6, 17],
+ *   [3, 7, 20]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Bubble} Column.
+ * @return {anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bubble(data, opt_csvSettings);
@@ -623,10 +1025,21 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа Candlestick.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Candlestick series');
+ * chart.candlestick([
+ *   [0, 14, 24, 14, 20],
+ *   [1, 15, 15, 5, 10],
+ *   [2, 16, 16, 6, 1],
+ *   [3, 7, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Candlestick} Column.
+ * @return {anychart.cartesian.series.Candlestick} An instance of the {@link anychart.cartesian.series.Candlestick} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
@@ -641,10 +1054,16 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
 
 
 /**
+ * Добавляет в чарт серию типа Column.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Column series');
+ * chart.column([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Column} Column.
+ * @return {anychart.cartesian.series.Column} An instance of the {@link anychart.cartesian.series.Column} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Column(data, opt_csvSettings);
@@ -659,10 +1078,16 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа Line.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Line series');
+ * chart.line([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Line} Column.
+ * @return {anychart.cartesian.series.Line} An instance of the {@link anychart.cartesian.series.Line} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Line(data, opt_csvSettings);
@@ -677,10 +1102,16 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа Marker.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Marker series');
+ * chart.marker([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Marker} Column.
+ * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Marker(data, opt_csvSettings);
@@ -695,10 +1126,21 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа OHLC.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('OHLC series');
+ * chart.ohlc([
+ *   [0, 14, 24, 14, 20],
+ *   [1, 15, 15, 5, 10],
+ *   [2, 16, 16, 6, 1],
+ *   [3, 7, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.OHLC} Column.
+ * @return {anychart.cartesian.series.OHLC} An instance of the {@link anychart.cartesian.series.OHLC} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.OHLC(data, opt_csvSettings);
@@ -713,10 +1155,21 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа RangeArea.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeArea series');
+ * chart.rangeArea([
+ *   [0,  24, 14, 20],
+ *   [1,  15, 5, 10],
+ *   [2,  16, 6, 1],
+ *   [3, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeArea} Column.
+ * @return {anychart.cartesian.series.RangeArea} An instance of the {@link anychart.cartesian.series.RangeArea} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
@@ -731,10 +1184,21 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа RangeBar.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeBar series');
+ * chart.rangeBar([
+ *   [0,  24, 14, 20],
+ *   [1,  15, 5, 10],
+ *   [2,  16, 6, 1],
+ *   [3, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeBar} Column.
+ * @return {anychart.cartesian.series.RangeBar} An instance of the {@link anychart.cartesian.series.RangeBar} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
@@ -749,10 +1213,21 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа RangeColumn.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeColumn series');
+ * chart.rangeColumn([
+ *   [0,  24, 14, 20],
+ *   [1,  15, 5, 10],
+ *   [2,  16, 6, 1],
+ *   [3, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeColumn} Column.
+ * @return {anychart.cartesian.series.RangeColumn} An instance of the {@link anychart.cartesian.series.RangeColumn} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeColumn(data, opt_csvSettings);
@@ -767,10 +1242,21 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
 
 
 /**
+ * Добавляет в чарт серию типа RangeSplineArea.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeSplineArea series');
+ * chart.rangeSplineArea([
+ *   [0,  24, 14, 20],
+ *   [1,  15, 5, 10],
+ *   [2,  16, 6, 1],
+ *   [3, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeSplineArea} Column.
+ * @return {anychart.cartesian.series.RangeSplineArea} An instance of the {@link anychart.cartesian.series.RangeSplineArea} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
@@ -785,10 +1271,21 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
 
 
 /**
+ * Добавляет в чарт серию типа RangeColumn.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('RangeColumn series');
+ * chart.rangeStepLineArea([
+ *   [0,  24, 14, 20],
+ *   [1,  15, 5, 10],
+ *   [2,  16, 6, 1],
+ *   [3, 17, 1, 10]
+ * ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeStepLineArea} Column.
+ * @return {anychart.cartesian.series.RangeStepLineArea} An instance of the {@link anychart.cartesian.series.RangeColumn} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
@@ -803,10 +1300,16 @@ anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSet
 
 
 /**
+ * Добавляет в чарт серию типа Spline.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Spline series');
+ * chart.spline([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.Spline} Column.
+ * @return {anychart.cartesian.series.Spline} An instance of the {@link anychart.cartesian.series.Spline} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Spline(data, opt_csvSettings);
@@ -821,10 +1324,16 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа SplineArea.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('SplineArea series');
+ * chart.splineArea([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.SplineArea} Column.
+ * @return {anychart.cartesian.series.SplineArea} An instance of the {@link anychart.cartesian.series.SplineArea} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
@@ -839,10 +1348,16 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
 
 
 /**
+ * Добавляет в чарт серию типа StepLine.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('StepLine series');
+ * chart.stepLine([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.StepLine} Column.
+ * @return {anychart.cartesian.series.StepLine} An instance of the {@link anychart.cartesian.series.StepLine} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLine(data, opt_csvSettings);
@@ -857,10 +1372,16 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
 
 
 /**
+ * Добавляет в чарт серию типа StepLineArea.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('StepLineArea series');
+ * chart.stepLineArea([10, 4, 17, 20]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.StepLineArea} Column.
+ * @return {anychart.cartesian.series.StepLineArea} An instance of the {@link anychart.cartesian.series.StepLineArea} class for method chaining.
  */
 anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
@@ -911,7 +1432,15 @@ anychart.cartesian.Chart.prototype.seriesInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Расстояние между группами баров на ординальном чарте в долях от ширины бара.
+ * Getter for space between bar groups on the ordinal scale by ratio of bars width.
+ * @return {number} Current bar groups padding.
+ *//**
+ * Setter for space between bar groups on the ordinal scale by ratio of bars width.<br/>
+ * See example at {@link anychart.cartesian.Chart#barsPadding}.
+ * @param {number=} opt_value [0.1] Value to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
  */
@@ -929,7 +1458,34 @@ anychart.cartesian.Chart.prototype.barGroupsPadding = function(opt_value) {
 
 
 /**
- * Расстояние между барами на ординальном чарте в долях от ширины бара.
+ * Getter for space between bars on the ordinal scale by ratio of bars width.
+ * @return {number} Current bars padding.
+ *//**
+ * Setter for space between bars on the ordinal scale by ratio of bars width.
+ * @illustration <t>singleChart</t>
+ * chart = new anychart.cartesian.Chart();
+ * chart.title().text('Chart title');
+ * chart.bar([1, 4, 5]);
+ * chart.bar([1, 4, 5]);
+ * chart.barsPadding(.6);
+ * chart.barGroupsPadding(.6);
+ * chart.container(stage).draw();
+ * var rect = layer.rect(15, 35, 300, 89).fill('none').stroke('grey', 2, '3 5');
+ * layer.text(335, 102, 'bars group');
+ * layer.path()
+ *     .moveTo(320, 108).lineTo(330, 108).stroke(rect.stroke());
+ * layer.text(330, 155, 'barsPadding');
+ * layer.circle(200, 164, 6);
+ * layer.path()
+ *     .moveTo(208, 164).lineTo(325, 164).stroke(rect.stroke());
+ * layer.text(300, 200, 'barGroupsPadding');
+ * layer.circle(70, 206, 6);
+ * layer.path()
+ *     .moveTo(76, 206).lineTo(295, 206).stroke(rect.stroke());
+ * @param {number=} opt_value [0.1] Value to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
  */

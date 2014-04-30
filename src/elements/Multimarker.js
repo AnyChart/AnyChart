@@ -571,7 +571,7 @@ anychart.elements.Multimarker.prototype.typeAt = function(index, opt_value) {
  *  Markers type settings.
  *//**
  * Setter for type settings of all markers.
- * @example <t>simple</t>
+ * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
  * bars.push(

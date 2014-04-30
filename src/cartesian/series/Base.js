@@ -8,7 +8,13 @@ goog.require('anychart.events.EventType');
 
 
 /**
- * Base class for all cartesian series.
+ * Base class for all cartesian series.<br/>
+ * Текущий класс определяет базовые методы для всех серий, которые позволяют настроить:
+ * <ul>
+ *   <li>Привязку серии к шкале: <i>xScale, yScale</i></li>
+ *   <li>Настройки базового цвета: <i>color</i></li>
+ * </ul>
+ * Помимо этого можно получить итераторы данных: <i>getIterator, getResetIterator</i>.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Series data.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -294,7 +300,16 @@ anychart.cartesian.series.Base.prototype.handleLabelMouseOut = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets series name.
+ * Getter for series name.
+ * @return {string|undefined} Series name value.
+ *//**
+ * Setter for series name.
+ * @example <t>listingOnly</t>
+ * series.name('My Custom series name');
+ * @param {string=} opt_value Value to set.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Series name value.
  * @return {!(string|anychart.cartesian.series.Base|undefined)} Series name value or itself for chaining call.
  */
@@ -312,13 +327,41 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
 
 
 /**
- * Getter and setter for series mapping.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value New data
- *    if used as a setter.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
- *    here as a hash map.
- * @return {(!anychart.cartesian.series.Base|!anychart.data.View)} Returns itself if used as a setter or the mapping
- *    if used as a getter.
+ * Getter for series mapping.
+ * @return {!anychart.data.View} Returns current mapping.
+ *//**
+ * Setter for series mapping.
+ * @example <t>listingOnly</t>
+ * series.data([20, 7, 10, 14]);
+ *  // or
+ * series.data([
+ *    [1, 22, 13],
+ *    [13, 22, 23],
+ *    [17, 22, 33],
+ *    [21, 22, 43]
+ *  ]);
+ *  // or
+ * series.data([
+ *    {name: 'Point 1', value: 10},
+ *    {name: 'Point 2', value: 7},
+ *    {name: 'Point 3', value: 20},
+ *    {name: 'Point 4', value: 14}
+ *  ]);
+ *   // or
+ *  series.data(
+ *    '17;21;11.1;4\n'+
+ *    '11;11;0.21;0\n'+
+ *    '21;17;23.1;1\n'+
+ *    '10;.4;14;4.4\n',
+ *    {'rowsSeparator': '\n', columnsSeparator: ';'})
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @return {(!anychart.cartesian.series.Base|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.cartesian.series.Base.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
@@ -364,7 +407,8 @@ anychart.cartesian.series.Base.prototype.categoriseData = function(categories) {
 
 
 /**
- * @return {!anychart.data.Iterator} New iterator.
+ * Возвращает итератор текщего мапппинга.
+ * @return {!anychart.data.Iterator} Currnet series iterator.
  */
 anychart.cartesian.series.Base.prototype.getIterator = function() {
   return this.iterator_ || this.getResetIterator();
@@ -372,6 +416,7 @@ anychart.cartesian.series.Base.prototype.getIterator = function() {
 
 
 /**
+ * Возвращает нвоый дефолтный итератор текщего мапппинга.
  * @return {!anychart.data.Iterator} New iterator.
  */
 anychart.cartesian.series.Base.prototype.getResetIterator = function() {
@@ -469,7 +514,44 @@ anychart.cartesian.series.Base.prototype.getReferenceCoords = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * @param {number=} opt_position .
+ * Возвращает текущее положение точки на ординальной шкале.
+ * @return {number} Current x-point position.
+ *//**
+ * Задает положение точки на ординальной шкале.
+ * @illustration <t>simple-h100</t>
+ * stage.path()
+ *     .moveTo(20, 50)
+ *     .lineTo(380, 50)
+ *     .moveTo(20, 55)
+ *     .lineTo(20,45)
+ *     .moveTo(100, 55)
+ *     .lineTo(100,45)
+ *     .moveTo(180, 55)
+ *     .lineTo(180,45)
+ *     .moveTo(260, 55)
+ *     .lineTo(260,45)
+ *     .stroke('2px black');
+ * stage.text(40, 60, 'Point 1');
+ * stage.text(118, 60, 'Point 2');
+ * stage.text(200, 60, 'Point 3');
+ * stage.text(350, 60, 'X-Axis');
+ * stage.path()
+ *     .moveTo(20, 20)
+ *     .lineTo(100, 20)
+ *     .stroke('blue');
+ * stage.text(12, 13, '0').color('blue');
+ * stage.text(102, 13, '1').color('blue');
+ * stage.text(142, 30, '0.7').color('blue');
+ * stage.circle(150, 47, 4).fill('lightblue');
+ * stage.text(182, 30, '0.1').color('blue');
+ * stage.circle(190, 47, 4).fill('lightblue');
+ * @illustrationDesc
+ * Точке на ординальной шкале отводится место, внутри которого может разместиться точка, данное значение можно выставить вручную.
+ * Если серий больше чем одна, то это положение рассчитывается пропорционально количеству серий, что бы точки могли размещаться рядом.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_position [0.5] Положение точки (число от 0 до 1).
  * @return {number|anychart.cartesian.series.Base} .
  */
 anychart.cartesian.series.Base.prototype.xPointPosition = function(opt_position) {
@@ -502,9 +584,10 @@ anychart.cartesian.series.Base.prototype.setAutoXPointPosition = function(positi
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Рисует серию в текущий контейнер. Если у серии не заданы шкалы - создает их автоматически.
- * (Внутри компонента не используется - чистый сахар).
- * @param {number=} opt_parentWidth Optional width of the parent container for series bounds calculation.
- * @param {number=} opt_parentHeight Optional height of the parent container for series bounds calculation.
+ * @example <t>listingOnly</t>
+ * series.draw(400, 200);
+ * @param {number=} opt_parentWidth [0] Optional width of the parent container for series bounds calculation.
+ * @param {number=} opt_parentHeight [0] Optional height of the parent container for series bounds calculation.
  */
 anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_parentHeight) {
   this.suspendSignalsDispatching();
@@ -553,7 +636,8 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
 
 
 /**
- * Draws all series points.
+ * Рисует точку, на которую указывает итератор.<br/>
+ * Корретно завершает полигон серии, если всретился missing;
  */
 anychart.cartesian.series.Base.prototype.drawPoint = function() {
   if (this.enabled()) {
@@ -569,7 +653,6 @@ anychart.cartesian.series.Base.prototype.drawPoint = function() {
 
 
 /**
- * Draws series point explicitly marked as missing.
  * Этот метод используется параллельным итератором в случае, если серии необходимо явно сказать, что нужно
  * нарисовать отсутствующую точку (для случая, когда в данных этой серии такой Х отстутсвует, а в других
  * сериях он есть).
@@ -586,7 +669,8 @@ anychart.cartesian.series.Base.prototype.drawMissing = function() {
 
 
 /**
- * Starts series drawing.
+ * Инициализирует начало рисования серии.<br/>
+ * Если шкала не задана явно, то создает дефолтную.
  */
 anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.firstPointDrawn = false;
@@ -610,7 +694,12 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
 
 
 /**
- * Finalizes drawing.
+ * Завершает рисование серии.
+ * @example <t>listingOnly</t>
+ * series.startDrawing();
+ * while(series.getIterator().advance())
+ *   series.drawPoint();
+ * series.finalizeDrawing();
  */
 anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
   this.realLabels_.end();
@@ -665,7 +754,7 @@ anychart.cartesian.series.Base.prototype.showTooltip = function(opt_event) {
 
 
 /**
- * Show data point tooltip.
+ * Hide data point tooltip.
  * @protected
  */
 anychart.cartesian.series.Base.prototype.hideTooltip = function() {
@@ -821,8 +910,8 @@ anychart.cartesian.series.Base.prototype.hoverStatus = NaN;
 
 
 /**
- * Hovers all points of the series.
- * @return {!anychart.cartesian.series.Base} Chaining.
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
  */
 anychart.cartesian.series.Base.prototype.hoverSeries = goog.abstractMethod;
 
@@ -830,15 +919,16 @@ anychart.cartesian.series.Base.prototype.hoverSeries = goog.abstractMethod;
 /**
  * Hovers a point of the series by its index.
  * @param {number} index Index of the point to hover.
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate point hovering.
- * @return {!anychart.cartesian.series.Base} Chaining.
+ * @param {goog.events.BrowserEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Используется только для отображения float tooltip.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
  */
 anychart.cartesian.series.Base.prototype.hoverPoint = goog.abstractMethod;
 
 
 /**
  * Removes hover from the series.
- * @return {!anychart.cartesian.series.Base} Chaining.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
  */
 anychart.cartesian.series.Base.prototype.unhover = goog.abstractMethod;
 
@@ -868,8 +958,15 @@ anychart.cartesian.series.Base.prototype.makeHoverable = function(element, opt_s
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets series X scale.
- * @param {anychart.scales.Base=} opt_value Series X Scale to set.
+ * Getter for current series X scale.
+ * @return {anychart.scales.Base} Current series X Scale.
+ *//**
+ * Setter for series X scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|anychart.cartesian.series.Base)} Series X Scale or itself for chaining call.
  */
 anychart.cartesian.series.Base.prototype.xScale = function(opt_value) {
@@ -890,8 +987,15 @@ anychart.cartesian.series.Base.prototype.xScale = function(opt_value) {
 
 
 /**
- * Gets or sets series Y scale.
- * @param {anychart.scales.Base=} opt_value Series Y Scale to set.
+ * Getter for current series Y scale.
+ * @return {anychart.scales.Base} Current series Y Scale.
+ *//**
+ * Setter for series Y scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|anychart.cartesian.series.Base)} Series Y Scale or itself for chaining call.
  */
 anychart.cartesian.series.Base.prototype.yScale = function(opt_value) {
@@ -1045,11 +1149,28 @@ anychart.cartesian.series.Base.prototype.labelsInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 // Здесь будут лежать настройки фила и строука, но экспортироваться они должны ТОЛЬКО в конечных сериях.
 /**
- * Цвет серии. Используется как базовый цвет серии в филах и строуках, а так же в легенде.
- * Если используется как геттер:
- *    1) Если цвет был явно задан ранее - возвращается заданный цвет.
- *    2) Если цвет не был задан, но серия была добавлена на график - возвращается цвет, распределенный серии чартом.
- *    3) Если пункты 1 и 2 не сработали - возращается дефолтный цвет.
+ * Getter for current series color.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series color.<br/>
+ * Цвет серии. Используется как базовый цвет серии в филах и строуках, а так же в легенде.<br/>
+ * О том как задавать цвет, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * <b>Note:</b> Метод <u>color</u> определет настройки <u>fill</u> и <b>stroke</b>, а это значит, что передавать в него
+ * заливку картинкой не благоразумно, так как stroke не поддерживает заливку картинкой.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Цвет, или градиент.
+ * @param {number=} opt_opacityOrAngleOrCx Прозрачность, или угол градиента, или X-координата центра радиального градиента.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Режим
+ *  заливки или Y-координата центра радиального градиента.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Прозрачность
+ *  или режим заливки.
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1082,7 +1203,37 @@ anychart.cartesian.series.Base.prototype.setAutoColor = function(value) {
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Getter for current series color.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Функция вида <code>function(){
+ *    // this.sourceColor - это цвет, который возвращается геттреом color().
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * Setter for series fill by one value.<br/>
+ * Цвет серии. Используется как базовый цвет серии в филах и строуках, а так же в легенде.<br/>
+ * О том как задавать цвет, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * <b>Note:</b> Метод <u>color</u> определет настройки <u>fill</u> и <b>stroke</b>, а это значит, что передавать в него
+ * заливку картинкой не благоразумно, так как stroke не поддерживает заливку картинкой.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Цвет, или градиент.
+ * @param {number=} opt_opacityOrAngleOrCx Прозрачность, или угол градиента, или X-координата центра радиального градиента.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Режим
+ *  заливки или Y-координата центра радиального градиента.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Прозрачность
+ *  или режим заливки
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1108,7 +1259,37 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Getter for current series fill.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return anychart.color.lighten(this.sourceColor);
+ * }] Функция вида <code>function(){
+ *    // this.sourceColor - это цвет, который возвращается геттером fill().
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * Setter for series fill by one value.<br/>
+ * Цвет серии. Используется как базовый цвет серии в филах и строуках, а так же в легенде.<br/>
+ * О том как задавать цвет, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * <b>Note:</b> Метод <u>color</u> определет настройки <u>fill</u> и <b>stroke</b>, а это значит, что передавать в него
+ * заливку картинкой не благоразумно, так как stroke не поддерживает заливку картинкой.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Цвет, или градиент.
+ * @param {number=} opt_opacityOrAngleOrCx Прозрачность, или угол градиента, или X-координата центра радиального градиента.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Режим
+ *  заливки или Y-координата центра радиального градиента.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Прозрачность
+ *  или режим заливки
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1154,19 +1335,37 @@ anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSetting
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Функция вида <code>function(){
+ *    // this.sourceColor - это цвет, который возвращается геттером fill().
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
@@ -1184,19 +1383,37 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Функция вида <code>function(){
+ *    // this.sourceColor - это цвет, который возвращается геттером fill().
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Base.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {

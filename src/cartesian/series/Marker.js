@@ -56,9 +56,48 @@ goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
 
 
 /**
+ * Getter for current marker type settings.
+ * @return {string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ *  Markers type settings.
+ *//**
+ * Setter for marker type settings.
+ * @example <c>By Enum value.</c>
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *    .type('star4')
+ *    .hoverType('star6');
+ * @example <c>By custom function.</c>
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *    .type(function(path, x, y, size) {
+ *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
+ *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
+ *      path.moveTo(point1.x, point1.y)
+ *          .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
+ *          .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
+ *          .moveTo(point1.x, point1.y)
+ *          .close();
+ *      return path;
+ *    });
+ * @param {(string|anychart.elements.Marker.Type|
+ *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
+ *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Функция, задающее произвольно
+ *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
+ *    // path - это acgraph.vector.Path
+ *    // x, y - текущее позиционирование маркера
+ *    // size - размер маркера
+ *    ... //do smth
+ *    return path;
+ *  }</code>.
+ * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
+ *//**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.cartesian.series.Marker|string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
+ * @param {(string|anychart.elements.Marker.Type|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.cartesian.series.Marker|anychart.elements.Marker.Type|string|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -74,9 +113,50 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
 
 
 /**
+ * Getter for current hovered marker type settings.
+ * @return {string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ *  Markers type settings.
+ *//**
+ * Setter for hovered marker type settings.
+ * @example <c>By Enum value.</c>
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *    .type('star4')
+ *    .hoverType('star6');
+ * @example <c>By custom function.</c>
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *    .size(20)
+ *    .hoverSize(20)
+ *    .hoverType(function(path, x, y, size) {
+ *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
+ *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
+ *      path.moveTo(point1.x, point1.y)
+ *          .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
+ *          .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
+ *          .moveTo(point1.x, point1.y)
+ *          .close();
+ *      return path;
+ *    });
+ * @param {(string|anychart.elements.Marker.Type|
+ *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
+ *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Функция, задающее произвольно
+ *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
+ *    // path - это acgraph.vector.Path
+ *    // x, y - текущее позиционирование маркера
+ *    // size - размер маркера
+ *    ... //do smth
+ *    return path;
+ *  }</code>.
+ * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
+ *//**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.cartesian.series.Marker|string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
+ * @param {(string|anychart.elements.Marker.Type|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.cartesian.series.Marker|anychart.elements.Marker.Type|string|
+ *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -91,6 +171,18 @@ anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
 
 
 /**
+ * Getter for marker size
+ * @return {number} Current marker size.
+ *//**
+ * Setter for marker size.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *     .size(14);
+ * @param {number=} opt_value [10] Value to set.
+ * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {anychart.cartesian.series.Marker|number} .
@@ -109,6 +201,19 @@ anychart.cartesian.series.Marker.prototype.size = function(opt_value) {
 
 
 /**
+ * Getter for hovered marker size
+ * @return {number} Current hovered marker size.
+ *//**
+ * Setter for hovered marker size.
+ * @example
+ * chart = new anychart.cartesian.Chart();
+ * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
+ * markerSeries
+ *     .size(10)
+ *     .hoverSize(20);
+ * @param {number=} opt_value [12] Value to set.
+ * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {anychart.cartesian.series.Marker|number} .
@@ -195,14 +300,20 @@ anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ */
 anychart.cartesian.series.Marker.prototype.hoverSeries = function() {
   this.unhover();
   return this;
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ */
 anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) return this;
   this.unhover();
@@ -216,7 +327,10 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ */
 anychart.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
   if (this.getResetIterator().select(this.hoverStatus)) {

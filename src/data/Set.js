@@ -144,7 +144,7 @@ anychart.data.Set.prototype.storage_;
 
 /**
  * Getter for the data in the Set.
- * @return {!Array} Data array of the Set or the Set for the method chaining.
+ * @return {!Array} Data array of the Set.
  *//**
  * Setter for Set data.
  * @example <t>listingOnly</t>
@@ -263,13 +263,13 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
  *    function(){ return 99;}   {close: 5, value: 99}
  *   ]
  * @param {!(Object.<Array.<number>>)=} opt_arrayMapping [{
- *   'x': [0],
- *   'value': [1, 0],
- *   'size': [2],
- *   'open': [1],
- *   'high': [2],
- *   'low': [3, 1],
- *   'close': [4]
+ *   'x': &#91;0&#93;,
+ *   'value': &#91;1, 0&#93;,
+ *   'size': &#91;2&#93;,
+ *   'open': &#91;1&#93;,
+ *   'high': &#91;2&#93;,
+ *   'low': &#91;3, 1&#93;,
+ *   'close': &#91;4&#93;
  * }] Column mapping for the rows which are arrays.
  * @param {!(Object.<Array.<string>>)=} opt_objectMapping [{'value': &#91;'value', 'y', 'close'&#93;}] Column mapping for the rows
  *  which are objects.
