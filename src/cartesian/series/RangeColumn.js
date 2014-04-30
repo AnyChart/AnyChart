@@ -52,11 +52,10 @@ anychart.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = function()
 
 
 /** @inheritDoc */
-anychart.cartesian.series.RangeColumn.prototype.createPositionProvider = function() {
+anychart.cartesian.series.RangeColumn.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   var shape = iterator.meta('shape');
   if (shape) {
-    var position = anychart.utils.NinePositions.TOP;
     var shapeBounds = shape.getBounds();
     return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
   } else {

@@ -86,6 +86,12 @@ anychart.cartesian.series.StepLine.prototype.drawSubsequentPoint = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
+  return this['sourceColor'];
+});
+
+
 /**
  * @inheritDoc
  */

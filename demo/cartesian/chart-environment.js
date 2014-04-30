@@ -55,6 +55,9 @@ function load() {
       series2.minimumSize(1);
       series2.maximumSize(20);
     }
+
+    console.log(JSON.stringify(chart.serialize()));
+    console.log("------------------------------------------------------");
   }
 
   areaChart = new anychart.cartesian.Chart();

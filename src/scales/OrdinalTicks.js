@@ -198,3 +198,23 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
   this.autoTicks_ = null;
   this.autoNames_ = null;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.OrdinalTicks.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['explicit'] = this.explicit_;
+  data['interval'] = this.interval();
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.OrdinalTicks.prototype.deserialize = function(value) {
+  this.explicit_ = value['explicit'] || null;
+  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
+  return goog.base(this, 'deserialize', value);
+};

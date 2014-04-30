@@ -613,12 +613,16 @@ anychart.elements.Background.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Background.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.fill(config['fill']);
   this.stroke(config['stroke']);
   this.corners(config['corners']);
   this.cornerType(config['cornerType']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

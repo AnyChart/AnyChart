@@ -34,6 +34,8 @@ function load() {
       .startAngle(0)
       .explode(15);
 
+  chart.listen(anychart.events.EventType.POINT_CLICK, function(e) { console.log(e); return false; });
+
   chart.title()
       .height(30)
       .vAlign('middle')

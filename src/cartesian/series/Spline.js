@@ -81,6 +81,12 @@ anychart.cartesian.series.Spline.prototype.drawSubsequentPoint = function() {
 
 
 /** @inheritDoc */
+anychart.cartesian.series.Spline.prototype.strokeInternal = (function() {
+  return this['sourceColor'];
+});
+
+
+/** @inheritDoc */
 anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
   this.queue_.finalizeProcessing();
 };

@@ -39,6 +39,11 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value', 'size'];
   this.referenceValueMeanings = ['x', 'y', 'n'];
   this.referenceValuesSupportStack = false;
+
+  this.markers().position(anychart.utils.NinePositions.CENTER);
+  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
+  this.labels().position(anychart.utils.NinePositions.CENTER);
+  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
 
@@ -342,10 +347,9 @@ anychart.cartesian.series.Bubble.prototype.colorizeShape = function(hover) {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Bubble.prototype.createPositionProvider = function() {
+anychart.cartesian.series.Bubble.prototype.createPositionProvider = function(position) {
   var shape = this.getIterator().meta('shape');
   if (shape) {
-    var position = anychart.utils.NinePositions.CENTER;
     var shapeBounds = shape.getBounds();
     return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
   } else {
@@ -527,6 +531,42 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeFill = function(hover
 anychart.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = 'bubble';
+  json['minimumSize'] = this.minimumSize();
+  json['maximumSize'] = this.maximumSize();
+  json['displayNegative'] = this.displayNegative();
+
+  if (goog.isFunction(this.negativeFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize negativeFill function, you should reset it manually.');
+    }
+  } else {
+    json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
+  }
+
+  if (goog.isFunction(this.hoverNegativeFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverNegativeFill function, you should reset it manually.');
+    }
+  } else {
+    json['hoverNegativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeFill()));
+  }
+
+  if (goog.isFunction(this.negativeStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize negativeStroke function, you should reset it manually.');
+    }
+  } else {
+    json['negativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.negativeStroke()));
+  }
+
+  if (goog.isFunction(this.hoverNegativeStroke())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverNegativeStroke function, you should reset it manually.');
+    }
+  } else {
+    json['hoverNegativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverNegativeStroke()));
+  }
+
   return json;
 };
 
@@ -535,6 +575,21 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Bubble.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', config);
+
+  this.minimumSize(config['minimumSize']);
+  this.maximumSize(config['maximumSize']);
+  this.displayNegative(config['displayNegative']);
+
+  this.negativeFill(config['negativeFill']);
+  this.hoverNegativeFill(config['hoverNegativeFill']);
+  this.negativeStroke(config['negativeStroke']);
+  this.hoverNegativeStroke(config['hoverNegativeStroke']);
+
+  this.resumeSignalsDispatching(true);
+
+  return this;
 };
 

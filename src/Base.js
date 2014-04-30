@@ -376,7 +376,7 @@ anychart.Base.prototype.deserialize = function(config) {
  * Dispatches external event with a timeout to detach it from other code execution frame.
  * @param {goog.events.EventLike} event Event object.
  */
-anychart.Base.prototype.dispatchExternalEvent = function(event) {
+anychart.Base.prototype.dispatchDetachedEvent = function(event) {
   setTimeout(goog.bind(this.dispatchEvent, this, event), 0);
 };
 

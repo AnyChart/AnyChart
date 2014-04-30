@@ -4,7 +4,6 @@
 import os
 import re
 import sys
-import subprocess
 
 MAINPATH = os.path.abspath(os.path.dirname(__file__))
 

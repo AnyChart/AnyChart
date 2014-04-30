@@ -102,6 +102,24 @@ anychart.elements.Legend = function() {
 
   this.drawedPage_ = NaN;
 
+  this.zIndex(10);
+
+  this.padding(5);
+  var bg = new anychart.elements.Background()
+      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
+        'keys': [
+          '0 #eaeaea',
+          '0.5 #fff',
+          '1 #eaeaea'],
+        'angle': '-90'
+      }))
+      .stroke('1 black 1')
+      .corners(5);
+  this.background(/** @type {anychart.elements.Background} */ (bg));
+  //
+  this.title().text('Legend').orientation('top').margin(0).background(null);
+  this.titleSeparator().orientation('top').margin(3, 0).height(1).fill('red');
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.elements.Legend, anychart.elements.Text);
@@ -661,6 +679,7 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
   switch (this.position_) {
     case anychart.utils.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
+      parentBounds.height -= this.pixelBounds_.height;
       break;
     case anychart.utils.Orientation.RIGHT:
       parentBounds.width -= this.pixelBounds_.width;
@@ -671,6 +690,7 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
       break;
     case anychart.utils.Orientation.LEFT:
       parentBounds.left += this.pixelBounds_.width;
+      parentBounds.width -= this.pixelBounds_.width;
       break;
   }
 
@@ -1231,32 +1251,6 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
 
 
 /**
- * Set defaults.
- */
-anychart.elements.Legend.prototype.restoreDefaults = function() {
-  this.zIndex(10);
-  this.margin(5);
-  this.padding(5);
-  var bg = new anychart.elements.Background()
-      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
-        'keys': [
-          '0 #eaeaea',
-          '0.5 #fff',
-          '1 #eaeaea'],
-        'angle': '-90'
-      }))
-      .stroke('1 black 1')
-      .corners(5);
-  this.background(/** @type {anychart.elements.Background} */ (bg));
-  //
-  this.title().text('Legend').orientation('top').margin(0).background(null);
-  this.titleSeparator().orientation('top').margin(3, 0).height(1).fill('red');
-
-  // set defaults;
-};
-
-
-/**
  * @inheritDoc
  */
 anychart.elements.Legend.prototype.serialize = function() {
@@ -1269,14 +1263,13 @@ anychart.elements.Legend.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['itemsLayout'] = this.itemsLayout();
-  json['items'] = this.itemsProvider().getData();
 
-  if (this.margin_) json['margin'] = this.margin_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
-  if (this.title_) json['title'] = this.title_.serialize();
-  if (this.titleSeparator_) json['titleSeparator'] = this.titleSeparator_.serialize();
-  if (this.paginator_) json['paginator'] = this.paginator_.serialize();
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
+  json['title'] = this.title().serialize();
+  json['titleSeparator'] = this.titleSeparator().serialize();
+  json['paginator'] = this.paginator().serialize();
 
   return json;
 };
@@ -1286,6 +1279,8 @@ anychart.elements.Legend.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.Legend.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.position(config['position']);
@@ -1295,15 +1290,17 @@ anychart.elements.Legend.prototype.deserialize = function(config) {
   this.width(config['config']);
   this.height(config['config']);
   this.itemsLayout(config['itemsLayout']);
-  this.itemsProvider(config['itemsProvider']);
 
   this.textSettings(config);
-  this.margin(config['margin']);
-  this.padding(config['padding']);
+
+  if (config['margin']) this.margin().deserialize(config['margin']);
+  if (config['padding']) this.padding().deserialize(config['padding']);
   this.background(config['background']);
   this.title(config['title']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

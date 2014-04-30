@@ -57,7 +57,7 @@ goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
 
 /**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|string|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @param {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.cartesian.series.Marker|string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
@@ -75,7 +75,7 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
 
 /**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|string|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @param {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.cartesian.series.Marker|string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
@@ -155,7 +155,7 @@ anychart.cartesian.series.Marker.prototype.remove = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Marker.prototype.createPositionProvider = function() {
+anychart.cartesian.series.Marker.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   return {x: iterator.meta('x'), y: iterator.meta('y')};
 };
@@ -249,7 +249,7 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered) {
     this.marker_.sizeAt(index, /** @type {number} */(this.hoverSize()));
   this.marker_.fillAt(index, this.getFinalFill(true, hovered));
   this.marker_.strokeAt(index, this.getFinalStroke(true, hovered));
-  this.marker_.draw(this.createPositionProvider(), index);
+  this.marker_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
 };
 
 
@@ -279,7 +279,26 @@ anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
  */
 anychart.cartesian.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'line';
+  json['seriesType'] = 'marker';
+
+  if (goog.isFunction(this.type())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize type function, you should reset it manually.');
+    }
+  } else {
+    json['type'] = this.type();
+  }
+
+  if (goog.isFunction(this.hoverType())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverType function, you should reset it manually.');
+    }
+  } else {
+    json['hoverType'] = this.hoverType();
+  }
+
+  json['size'] = this.size();
+  json['hoverSize'] = this.hoverSize();
   return json;
 };
 
@@ -288,7 +307,14 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', config);
+  this.size(config['size']);
+  this.hoverSize(config['hoverSize']);
+  this.type(config['type']);
+  this.hoverType(config['hoverType']);
+  this.resumeSignalsDispatching(true);
+  return this;
 };
 
 

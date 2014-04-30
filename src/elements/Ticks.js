@@ -271,10 +271,10 @@ anychart.elements.Ticks.prototype.restoreDefaults = function() {
  */
 anychart.elements.Ticks.prototype.serialize = function() {
   var data = {};
-  data['length'] = this.length_;
-  data['position'] = this.position_;
-  data['stroke'] = this.stroke_;
-  data['enabled'] = this.enabled_;
+  data['length'] = this.length();
+  data['position'] = this.position();
+  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  data['enabled'] = this.enabled();
 
   return data;
 };
@@ -282,10 +282,14 @@ anychart.elements.Ticks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Ticks.prototype.deserialize = function(value) {
-  if (goog.isDef(value['length'])) this.length(value['length']);
-  if (goog.isDef(value['position'])) this.position(value['position']);
-  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['enabled'])) this.enabled(value['enabled']);
+  this.suspendSignalsDispatching();
+
+  this.length(value['length']);
+  this.position(value['position']);
+  this.stroke(value['stroke']);
+  this.enabled(value['enabled']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

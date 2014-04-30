@@ -139,7 +139,7 @@ anychart.pie.Chart = function(opt_data) {
    * @private
    */
   this.formatProvider_ = goog.bind(function(index, fieldName) {
-    return this.get(index, fieldName);
+    return this['get'](index, fieldName);
   }, {
     'get': goog.bind(function(index, fieldName) {
       var iterator = this.data().getIterator();
@@ -203,6 +203,7 @@ anychart.pie.Chart = function(opt_data) {
       .fontColor('white')
       .fontSize(13);
   this.data(opt_data);
+  this.legend().enabled(true);
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -211,11 +212,11 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
 
 /**
  * Supported consistency states.
-* @type {number}
-*/
+ * @type {number}
+ */
 anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
     anychart.Chart.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.DATA_CHANGED;
+        anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -1006,6 +1007,23 @@ anychart.pie.Chart.prototype.explode = function(opt_value) {
 
 
 /**
+ * Explodes slice at index.
+ * @param {number} index Pie slice index that should be exploded or not.
+ * @param {boolean} explode Whether to explode.
+ * @return {anychart.pie.Chart} .
+ */
+anychart.pie.Chart.prototype.explodeSlice = function(index, explode) {
+  var iterator = this.view_.getIterator();
+  if (iterator.select(index)) {
+    iterator.meta('exploded', !!explode);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
  * Setter for the sort setting.<br/>
  * Ascending, Descending and No sorting is supported.
  * @example <t>stageOnly</t>
@@ -1237,7 +1255,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
 
       iterator.meta('start', start).meta('sweep', sweep);
-      if (!(exploded = iterator.meta('exploded'))) {
+      if (!goog.isDef(exploded = iterator.meta('exploded'))) {
         exploded = !!iterator.get('exploded');
         iterator.meta('exploded', exploded);
       }
@@ -1308,6 +1326,7 @@ anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, 
 
   acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
   acgraph.events.listen(pie, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
+  acgraph.events.listen(pie, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
 
   return true;
 };
@@ -1339,7 +1358,7 @@ anychart.pie.Chart.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Internal palette invalidation handler.
-  @param {anychart.SignalEvent} event Event object.
+ @param {anychart.SignalEvent} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
@@ -1355,13 +1374,15 @@ anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
  * @private
  */
 anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
-  var pie = event.target;
-  var index = pie['__index'];
+  if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
+    var pie = event.target;
+    var index = pie['__index'];
 
-  this.hovered_ = [pie, index, true];
+    this.hovered_ = [pie, index, true];
 
-  acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-  this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
+    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -1371,14 +1392,16 @@ anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
  * @private
  */
 anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
-  var pie = event.target;
-  var index = pie['__index'];
+  if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
+    var pie = event.target;
+    var index = pie['__index'];
 
-  this.hovered_ = [pie, index, false];
+    this.hovered_ = [pie, index, false];
 
-  acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
+    acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
 
-  this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -1388,11 +1411,41 @@ anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
  * @private
  */
 anychart.pie.Chart.prototype.mouseClickHandler_ = function(event) {
-  var pie = event.target;
-  var index = pie['__index'];
+  if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
+    var pie = event.target;
+    var index = pie['__index'];
 
-  this.clicked_ = [index];
-  this.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
+    this.clicked_ = [index];
+    this.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Mouse dblclick internal handler.
+ * @param {acgraph.events.Event} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.mouseDblClickHandler_ = function(event) {
+  this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event));
+};
+
+
+/** @inheritDoc */
+anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
+  var data = [];
+  var iterator = this.view_.getIterator();
+  iterator.reset();
+
+  while (iterator.advance()) {
+    var index = iterator.getIndex();
+    data.push({
+      'index': index,
+      'text': iterator.get('name') || 'Point - ' + index,
+      'iconColor': this.getFillColor_(index, false, iterator.get('fill'))
+    });
+  }
+  return new anychart.utils.LegendItemsProvider(data);
 };
 
 
@@ -1474,4 +1527,105 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(false);
 
   return this;
+};
+
+
+
+/**
+ * Encapsulates browser event for acgraph.
+ * @param {anychart.pie.Chart} target EventTarget to be set as a target of the event.
+ * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
+ * @constructor
+ * @extends {goog.events.BrowserEvent}
+ */
+anychart.pie.Chart.BrowserEvent = function(target, opt_e) {
+  goog.base(this);
+  if (opt_e)
+    this.copyFrom(opt_e, target);
+
+  /**
+   * Point index.
+   * @type {number}
+   */
+  this['pointIndex'] = opt_e && opt_e.target && opt_e.target['__index'];
+  if (isNaN(this['pointIndex']))
+    this['pointIndex'] = -1;
+
+  /**
+   * Series data iterator ready for the point capturing.
+   * @type {!anychart.data.Iterator}
+   */
+  this['iterator'] = target.data().getIterator();
+  this['iterator'].select(this['pointIndex']) || this['iterator'].reset();
+
+  /**
+   * Series.
+   * @type {anychart.pie.Chart}
+   */
+  this['pie'] = target;
+};
+goog.inherits(anychart.pie.Chart.BrowserEvent, goog.events.BrowserEvent);
+
+
+/**
+ * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
+ * @private
+ * @type {goog.events.BrowserEvent}
+ */
+anychart.pie.Chart.BrowserEvent.prototype.event_;
+
+
+/**
+ * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
+ * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
+ * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
+ */
+anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
+  var type = e.type;
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.events.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.events.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.events.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.events.EventType.POINT_DOUBLE_CLICK;
+      break;
+  }
+  this.type = type;
+  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
+  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
+  // from Node to EventTarget, which would make more sense.
+  /** @type {Node} */
+  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
+  this.target = target || e.target;
+  this.currentTarget = e.currentTarget || this.target;
+  this.relatedTarget = e.relatedTarget || this.target;
+
+  this.offsetX = e.offsetX;
+  this.offsetY = e.offsetY;
+
+  this.clientX = e.clientX;
+  this.clientY = e.clientY;
+
+  this.screenX = e.screenX;
+  this.screenY = e.screenY;
+
+  this.button = e.button;
+
+  this.keyCode = e.keyCode;
+  this.charCode = e.charCode;
+  this.ctrlKey = e.ctrlKey;
+  this.altKey = e.altKey;
+  this.shiftKey = e.shiftKey;
+  this.metaKey = e.metaKey;
+  this.platformModifierKey = e.platformModifierKey;
+  this.state = e.state;
+
+  this.event_ = e;
+  delete this.propagationStopped_;
 };

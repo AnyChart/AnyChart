@@ -107,7 +107,7 @@ anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
   if (this.autoCalcs_ == 0) {
     return this.checkScaleChanged(!!opt_silently);
   } else
-    return false; // todo: ???
+    return true; // todo: дополнительные действия при просчете разделяемых между графиками шкал!
 };
 
 
@@ -357,3 +357,31 @@ anychart.scales.Base.prototype.applyModePercent_ = function(value) {
   return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, -100, 100));
 };
 //endregion
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.Base.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['inverted'] = this.inverted();
+  data['stackMode'] = this.stackMode();
+
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.Base.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', value);
+
+  this.inverted(value['inverted']);
+  this.stackMode(value['stackMode']);
+
+  this.resumeSignalsDispatching(true);
+
+  return this;
+};

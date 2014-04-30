@@ -11,32 +11,28 @@ function load() {
       d1.push(i);
       data1.push([
         i,
-        Math.round(Math.random() * 1000) + 10,
-//        Math.round(Math.random() * 1000) - 500,
-//        Math.round(Math.random() * 1000) + 1000,
-//        Math.round(Math.random() * 1000) - 990,
-//        Math.round(Math.random() * 1000) + 10
+        Math.round(Math.random() * 1000) + 10
       ]);
     }
     if (t2 = (Math.random() > 0.2)) {
       d2.push(i);
       data2.push([
         i,
-        Math.round(Math.random() * 1000) + 10,
-//        Math.round(Math.random() * 1000) + 1000,
-//        Math.round(Math.random() * 1000) - 990,
-//        Math.round(Math.random() * 1000) + 10
+        Math.round(Math.random() * 1000) + 10
       ]);
     }
     vals.push(i);
   }
+  data1 = new anychart.data.Set(data1);
 
   areaChart = new anychart.cartesian.Chart();
   areaChart.container(stage);
   areaChart.bounds(0, 0, 1000, 300);
-  areaChart.column(data1);
+
+  var area = areaChart.area(data1);
+//  area.listen('click', function() { console.log(arguments); });
   areaChart.barsPadding(0.1);
-  areaChart.column(data2);
-//  areaChart.axis().orientation('bottom');
+  areaChart.xAxis();
+  areaChart.yAxis();
   areaChart.draw();
 }

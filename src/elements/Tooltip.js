@@ -157,8 +157,9 @@ anychart.elements.Tooltip.prototype.isFloating = function(opt_value) {
  * @return {!(anychart.elements.Title|anychart.elements.Tooltip)} Title instance or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.title = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.title(opt_value);
     return this;
   } else {
@@ -173,8 +174,9 @@ anychart.elements.Tooltip.prototype.title = function(opt_value) {
  * @return {!(anychart.elements.Separator|anychart.elements.Tooltip)} Separator instance or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.separator = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.separator(opt_value);
     return this;
   } else {
@@ -189,8 +191,9 @@ anychart.elements.Tooltip.prototype.separator = function(opt_value) {
  * @return {!(anychart.elements.Label|anychart.elements.Tooltip)} Labels instance or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.content = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.content(opt_value);
     return this;
   } else {
@@ -205,8 +208,9 @@ anychart.elements.Tooltip.prototype.content = function(opt_value) {
  * @return {!(anychart.elements.Background|anychart.elements.Tooltip)} Background instance or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.background = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.background(opt_value);
     return this;
   } else {
@@ -221,8 +225,8 @@ anychart.elements.Tooltip.prototype.background = function(opt_value) {
  * @return {!(anychart.utils.Padding|anychart.elements.Tooltip)} Padding instance or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.padding = function(opt_value) {
+  this.maybeCreateTooltipItem_();
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.padding(opt_value);
     return this;
   } else {
@@ -237,8 +241,9 @@ anychart.elements.Tooltip.prototype.padding = function(opt_value) {
  * @return {!(number|anychart.elements.Tooltip)} X offset of tooltip position of itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.offsetX = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.offsetX(opt_value);
     return this;
   } else {
@@ -253,8 +258,9 @@ anychart.elements.Tooltip.prototype.offsetX = function(opt_value) {
  * @return {!(number|anychart.elements.Tooltip)} Y offset of tooltip position of itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.offsetY = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.offsetY(opt_value);
     return this;
   } else {
@@ -269,8 +275,9 @@ anychart.elements.Tooltip.prototype.offsetY = function(opt_value) {
  * @return {!(anychart.elements.Tooltip|anychart.utils.NinePositions)} Tooltip anchor settings or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.anchor(opt_value);
     return this;
   } else {
@@ -285,12 +292,30 @@ anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
  * @return {!(number|anychart.elements.Tooltip)} delay in milliseconds before tooltip become invisible on visible(false) call or itself for chaining call.
  */
 anychart.elements.Tooltip.prototype.hideDelay = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
   if (goog.isDef(opt_value)) {
-    this.maybeCreateTooltipItem_();
     this.item_.hideDelay(opt_value);
     return this;
   } else {
     return /** @type {number}*/ (this.item_.hideDelay());
+  }
+};
+
+
+/**
+ * Enabled for tooltip.
+ * @param {boolean=} opt_value
+ * @return {anychart.elements.Tooltip|boolean}
+ */
+anychart.elements.Tooltip.prototype.enabled = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
+  if (goog.isDef(opt_value)) {
+    this.item_.enabled(opt_value);
+    return this;
+  } else {
+    return /** @type {boolean} */(this.item_.enabled());
   }
 };
 
@@ -302,20 +327,10 @@ anychart.elements.Tooltip.prototype.hideDelay = function(opt_value) {
 anychart.elements.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
   if (!this.item_) {
     this.item_ = anychart.utils.TooltipsContainer.getInstance().alloc();
+    this.item_.suspendSignalsDispatching();
     this.item_.visible(false);
     this.registerDisposable(this.item_);
-  }
-};
-
-
-/**
- * Internal title invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.elements.Tooltip.prototype.onTooltipItemSignal_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    this.item_.resumeSignalsDispatching(true);
   }
 };
 
@@ -457,18 +472,20 @@ anychart.elements.Tooltip.prototype.serialize = function() {
   var itemJson = this.item_.serialize();
   goog.object.extend(json, itemJson);
 
-  json['allowLeaveScreen'] = this.allowLeaveScreen_;
-  json['isFloating'] = this.float_;
+  json['allowLeaveScreen'] = this.allowLeaveScreen();
+  json['isFloating'] = this.isFloating();
+  json['content'] = this.content().serialize();
+  json['title'] = this.title().serialize();
 
   if (goog.isFunction(this.titleFormatter_)) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize titleFormatter function, you should reset it by hand.');
+      window.console.log('Warning: We cant serialize titleFormatter function, you should reset it manually.');
     }
   }
 
   if (goog.isFunction(this.textFormatter_)) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize textFormatter function, you should reset it by hand.');
+      window.console.log('Warning: We cant serialize textFormatter function, you should reset it manually.');
     }
   }
   return json;
@@ -477,10 +494,18 @@ anychart.elements.Tooltip.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.elements.Tooltip.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', config);
+
   this.maybeCreateTooltipItem_();
   this.item_.deserialize(config);
+  this.textFormatter_ = config['textFormatter'] || this.textFormatter_;
+  this.titleFormatter_ = config['titleFormatter'] || this.titleFormatter_;
   this.isFloating(config['isFloating']);
   this.allowLeaveScreen(config['allowLeaveScreen']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

@@ -923,15 +923,22 @@ anychart.elements.Multimarker.prototype.offsetY = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {number} index
- * @param {(acgraph.vector.Fill|string)=} opt_value .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.fillAt = function(index, opt_value) {
+anychart.elements.Multimarker.prototype.fillAt = function(index, opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx,
+    opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (!this.customMarkerSettings_[index]) this.customMarkerSettings_[index] = {};
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeFill(opt_value);
-    if (this.customMarkerSettings_[index].fill != opt_value) {
-      this.customMarkerSettings_[index].fill = opt_value;
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = anychart.color.normalizeFill.apply(arguments, goog.array.slice(arguments, 1));
+    if (this.customMarkerSettings_[index].fill != color) {
+      this.customMarkerSettings_[index].fill = color;
       this.appearanceStates_[index] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -980,14 +987,21 @@ anychart.elements.Multimarker.prototype.fillAt = function(index, opt_value) {
  * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Fill|string)=} opt_value .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeFill(opt_value);
-    if (this.fill_ != opt_value) {
-      this.fill_ = opt_value;
+anychart.elements.Multimarker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
+    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = anychart.color.normalizeFill.apply(null, arguments);
+    if (this.fill_ != color) {
+      this.fill_ = color;
       this.commonAppearanceState_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1013,15 +1027,23 @@ anychart.elements.Multimarker.prototype.fill = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {number} index
- * @param {(acgraph.vector.Stroke|string)=} opt_value .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
+ *    если используется как сеттер.
+ * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
+ *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
+ *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_value) {
+anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (!this.customMarkerSettings_[index]) this.customMarkerSettings_[index] = {};
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
-    if (this.customMarkerSettings_[index].stroke != opt_value) {
-      this.customMarkerSettings_[index].stroke = opt_value;
+  if (goog.isDef(opt_strokeOrFill)) {
+    var color = anychart.color.normalizeStroke.apply(null, goog.array.slice(arguments, 1));
+    if (this.customMarkerSettings_[index].stroke != color) {
+      this.customMarkerSettings_[index].stroke = color;
       this.appearanceStates_[index] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1071,14 +1093,22 @@ anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_value) {
  * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|string)=} opt_value .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
+ *    если используется как сеттер.
+ * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
+ *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
+ *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
-anychart.elements.Multimarker.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
-      this.stroke_ = opt_value;
+anychart.elements.Multimarker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var color = anychart.color.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != color) {
+      this.stroke_ = color;
       this.commonAppearanceState_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1117,17 +1147,17 @@ anychart.elements.Multimarker.prototype.enabledAt = function(index, opt_value) {
  */
 anychart.elements.Multimarker.prototype.serialize = function(opt_withoutCustomSettings) {
   var data = goog.base(this, 'serialize');
-  data['position'] = this.position_;
-  data['anchor'] = this.anchor_;
-  data['type'] = this.type_;
-  data['size'] = this.size_;
-  data['offsetX'] = this.offsetX_;
-  data['offsetY'] = this.offsetY_;
-  data['fill'] = this.fill_;
-  data['stroke'] = this.stroke_;
+
+  data['position'] = this.position();
+  data['anchor'] = this.anchor();
+  data['type'] = this.type();
+  data['size'] = this.size();
+  data['offsetX'] = this.offsetX();
+  data['offsetY'] = this.offsetY();
+  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   if (!opt_withoutCustomSettings)
     data['customMarkerSettings'] = this.customMarkerSettings_;
-  data['parentBounds'] = this.parentBounds_;
 
   return data;
 };
@@ -1172,8 +1202,8 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
       data['size'] = goog.isDef(point.size) ? point.size : this.size_;
       data['offsetX'] = goog.isDef(point.offsetX) ? point.offsetX : this.offsetX_;
       data['offsetY'] = goog.isDef(point.offsetY) ? point.offsetY : this.offsetY_;
-      data['fill'] = goog.isDef(point.fill) ? point.fill : this.fill_;
-      data['stroke'] = goog.isDef(point.stroke) ? point.stroke : this.stroke_;
+      data['fill'] = goog.isDef(point.fill) ? anychart.color.serialize(point.fill) : anychart.color.serialize(this.fill_);
+      data['stroke'] = goog.isDef(point.stroke) ? anychart.color.serialize(point.stroke) : anychart.color.serialize(this.stroke_);
       data['enabled'] = goog.isDef(point.enabled) ? point.enabled : this.enabled();
     }
   } else if (!opt_includeCustomOnly) {
@@ -1183,8 +1213,8 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
     data['size'] = this.size_;
     data['offsetX'] = this.offsetX_;
     data['offsetY'] = this.offsetY_;
-    data['fill'] = this.fill_;
-    data['stroke'] = this.stroke_;
+    data['fill'] = anychart.color.serialize(this.fill_);
+    data['stroke'] = anychart.color.serialize(this.stroke_);
     data['enabled'] = this.enabled();
   }
 
@@ -1197,8 +1227,9 @@ anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includ
  */
 anychart.elements.Multimarker.prototype.deserialize = function(data) {
   this.suspendSignalsDispatching();
-  //goog.base(this, 'deserialize');
-  this.enabled(data['enabled']);
+
+  goog.base(this, 'deserialize', data);
+
   this.position(data['position']);
   this.anchor(data['anchor']);
   this.type(data['type']);
@@ -1208,8 +1239,9 @@ anychart.elements.Multimarker.prototype.deserialize = function(data) {
   this.fill(data['fill']);
   this.stroke(data['stroke']);
   this.customMarkerSettings_ = data['customMarkerSettings'] || {};
-  this.parentBounds(data['parentBounds']);
+
   this.resumeSignalsDispatching(true);
+
   return this;
 };
 

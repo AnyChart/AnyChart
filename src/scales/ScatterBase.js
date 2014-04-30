@@ -170,6 +170,19 @@ anychart.scales.ScatterBase.prototype.maximumGap = function(opt_value) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
+  this.suspendSignalsDispatching();
+  if (opt_stackMode == anychart.scales.StackMode.PERCENT) {
+    this.minimumGap(0);
+    this.maximumGap(0);
+  }
+  var result = goog.base(this, 'stackMode', opt_stackMode);
+  this.resumeSignalsDispatching(true);
+  return result;
+};
+
+
 /**
  * Resets scale data range if it needs auto calculation.
  * @return {!anychart.scales.ScatterBase} Itself for chaining.
@@ -272,4 +285,35 @@ anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
   this.calculate();
   if (this.isInverted) ratio = 1 - ratio;
   return ratio * this.range + this.min;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['minimum'] = this.minimumModeAuto ? null : this.minimum();
+  data['maximum'] = this.maximumModeAuto ? null : this.maximum();
+  data['minimumGap'] = this.minimumGap();
+  data['maximumGap'] = this.maximumGap();
+  data['dataRangeMin'] = this.dataRangeMin;
+  data['dataRangeMax'] = this.dataRangeMax;
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.ScatterBase.prototype.deserialize = function(value) {
+  this.suspendSignalsDispatching();
+  goog.base(this, 'deserialize', value);
+
+  this.minimum(goog.isNull(value['minimum']) ? NaN : value['minimum']);
+  this.maximum(goog.isNull(value['maximum']) ? NaN : value['maximum']);
+
+  this.minimumGap(value['minimumGap']);
+  this.maximumGap(value['maximumGap']);
+  this.resumeSignalsDispatching(true);
+  return this;
 };

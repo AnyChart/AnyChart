@@ -576,8 +576,9 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Area(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -593,8 +594,9 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bar(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -610,8 +612,9 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bubble(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -627,8 +630,9 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -644,8 +648,9 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Column(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -661,8 +666,9 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Line(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -678,8 +684,9 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Marker(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -695,8 +702,9 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.OHLC(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -712,8 +720,9 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -729,8 +738,9 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -746,8 +756,9 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeColumn(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -763,8 +774,9 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -780,8 +792,9 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  */
 anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -797,8 +810,9 @@ anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSet
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Spline(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -814,8 +828,9 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -831,8 +846,9 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLine(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -848,8 +864,9 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
-  res.setAutoColor(this.palette().colorAt(this.series_.length));
   this.series_.push(res);
+  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  res.restoreDefaults();
   res.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
@@ -877,9 +894,12 @@ anychart.cartesian.Chart.prototype.seriesInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.SERIES;
   }
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.SERIES;
+    this.invalidateSeries_();
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.SCALES;
-    this.invalidateSeries_();
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -967,8 +987,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
   var value;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
-    for (i = this.series_.length; i--;)
-      this.series_[i].suspendSignalsDispatching();
+    anychart.Base.suspendSignalsDispatching(this.series_);
 
     this.makeScaleMaps_();
 
@@ -1093,8 +1112,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
       }
     }
 
-    for (i = this.series_.length; i--;)
-      this.series_[i].resumeSignalsDispatching(false);
+    anychart.Base.resumeSignalsDispatchingTrue(this.series_);
 
     this.markConsistent(anychart.ConsistencyState.SCALES);
     this.scalesFinalization_ = true;
@@ -1172,20 +1190,10 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
       item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
   }
 
-  for (i = 0, count = this.textAxesMarkers_.length; i < count; i++) {
-    item = this.textAxesMarkers_[i];
-    if (!item.scale()) {
-      if (item.isHorizontal()) {
-        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-      } else {
-        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-      }
-    }
-  }
-
   var directionBasedElements = goog.array.concat(
       this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
       this.grids_,
       this.minorGrids_);
 
@@ -1430,26 +1438,30 @@ anychart.cartesian.Chart.prototype.paletteInvalidated_ = function(event) {
 anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
   var i, count;
 
-  anychart.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
-
   this.calculate();
   if (this.scalesFinalization_) {
     var scale;
+    var scalesChanged = false;
     for (i in this.xScales_) {
       scale = this.xScales_[i];
       if (scale.needsAutoCalc())
-        scale.finishAutoCalc();
+        scalesChanged |= scale.finishAutoCalc();
     }
     for (i in this.yScales_) {
       scale = this.yScales_[i];
       if (scale.needsAutoCalc())
-        scale.finishAutoCalc();
+        scalesChanged |= scale.finishAutoCalc();
     }
     this.scalesFinalization_ = false;
+    if (scalesChanged) {
+      this.invalidateSeries_();
+    }
   }
 
   if (this.isConsistent())
     return;
+
+  anychart.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.PALETTE)) {
     for (i = this.series_.length; i--;) {
@@ -1541,10 +1553,10 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       axis.container(this.rootElement);
       if (axis.isHorizontal()) {
         axis.offsetX(leftOffset);
-        axis.length(this.dataBounds_.width);
+        axis.length(parseFloat(this.dataBounds_.width));
       } else {
         axis.offsetY(topOffset);
-        axis.length(this.dataBounds_.height);
+        axis.length(parseFloat(this.dataBounds_.height));
       }
       axis.draw(); ////НАГРУЗКА!!!!!!!!!!
       axis.resumeSignalsDispatching(false);
@@ -1754,12 +1766,11 @@ anychart.cartesian.Chart.prototype.restoreDefaultsForAxis = function(axis) {
 anychart.cartesian.Chart.prototype.deserialize = function(config) {
   var chart = config['chart'];
 
-  debugger;
   if (!chart) return this;
-  goog.base(this, 'deserialize', config);
+  goog.base(this, 'deserialize', chart);
 
   this.suspendSignalsDispatching();
-  var i;
+  var i, json, scale;
   var grids = chart['grids'];
   var minorGrids = chart['minorGrids'];
   var xAxes = chart['xAxes'];
@@ -1770,47 +1781,72 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
   var series = chart['series'];
   var barGroupsPadding = chart['barGroupsPadding'];
   var barsPadding = chart['barsPadding'];
+  var scales = chart['scales'];
 
+  var cls = anychart.ClassFactory.getInstance();
+  var scalesInstances = [];
+  for (i = 0; i < scales.length; i++) {
+    scalesInstances.push(cls.getScale(scales[i]));
+  }
+
+  this.xScale(scalesInstances[chart['xScale']]);
+  chart['yScale'] ?
+      this.yScale(scalesInstances[chart['yScale']]) :
+      this.yScale(scalesInstances[chart['xScale']]);
 
   if (grids) {
     for (i = 0; i < grids.length; i++) {
-      this.grid(grids[i]);
+      json = grids[i];
+      this.grid(json);
+      if (json['scale']) this.grid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (minorGrids) {
     for (i = 0; i < minorGrids.length; i++) {
-      this.minorGrid(minorGrids[i]);
+      json = minorGrids[i];
+      this.minorGrid(json);
+      if (json['scale']) this.minorGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (xAxes) {
     for (i = 0; i < xAxes.length; i++) {
-      this.xAxis(xAxes[i]);
+      json = xAxes[i];
+      this.xAxis(json);
+      if (json['scale']) this.xAxis(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (yAxes) {
     for (i = 0; i < yAxes.length; i++) {
-      this.yAxis(yAxes[i]);
+      json = yAxes[i];
+      this.yAxis(json);
+      if (json['scale']) this.yAxis(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (lineAxesMarkers) {
     for (i = 0; i < lineAxesMarkers.length; i++) {
-      this.lineMarker(lineAxesMarkers[i]);
+      json = lineAxesMarkers[i];
+      this.lineMarker(json);
+      if (json['scale']) this.lineMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (rangeAxesMarkers) {
     for (i = 0; i < rangeAxesMarkers.length; i++) {
-      this.rangeMarker(rangeAxesMarkers[i]);
+      json = rangeAxesMarkers[i];
+      this.rangeMarker(json);
+      if (json['scale']) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
   if (textAxesMarkers) {
     for (i = 0; i < textAxesMarkers.length; i++) {
-      this.textMarker(textAxesMarkers[i]);
+      json = textAxesMarkers[i];
+      this.textMarker(json);
+      if (json['scale']) this.textMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -1870,11 +1906,17 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
         case 'stepline':
           seriesInst = this.stepLine(data);
           break;
-        case 'ateplinearea':
+        case 'steplinearea':
           seriesInst = this.stepLineArea(data);
           break;
+        default:
+          if (window.console) {
+            window.console.log('Warning: We cant deserialize series type.');
+          }
       }
-      seriesInst.deserialize(s);
+      if (seriesInst) seriesInst.deserialize(s);
+      if (s['xScale']) seriesInst.xScale(scalesInstances[s['xScale']]);
+      if (s['yScale']) seriesInst.yScale(scalesInstances[s['yScale']]);
     }
   }
 
@@ -1890,59 +1932,173 @@ anychart.cartesian.Chart.prototype.serialize = function() {
   var json = {};
   var chart = goog.base(this, 'serialize');
   var i;
+  var scalesIds = {};
+  var scales = [];
+  var scale;
+  var config;
+  var objId;
+
+  scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.xScale())]);
+  chart['xScale'] = scales.length - 1;
+  if (this.xScale() != this.yScale()) {
+    scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.yScale())]);
+    chart['yScale'] = scales.length - 1;
+  }
 
   chart['type'] = 'cartesian';
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
-    grids.push(this.grids_[i].serialize());
+    var grid = this.grids_[i];
+    config = grid.serialize();
+    scale = grid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    grids.push(config);
   }
   chart['grids'] = grids;
 
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
-    minorGrids.push(this.minorGrids_[i].serialize());
+    var minorGrid = this.minorGrids_[i];
+    config = minorGrid.serialize();
+    scale = minorGrid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    minorGrids.push(config);
   }
   chart['minorGrids'] = minorGrids;
 
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
-    xAxes.push(this.xAxes_[i].serialize());
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    xAxes.push(config);
   }
   chart['xAxes'] = xAxes;
 
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
-    yAxes.push(this.yAxes_[i].serialize());
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    yAxes.push(config);
   }
   chart['yAxes'] = yAxes;
 
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
-    lineAxesMarkers.push(this.lineAxesMarkers_[i].serialize());
+    var lineAxesMarker = this.lineAxesMarkers_[i];
+    config = lineAxesMarker.serialize();
+    scale = lineAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    lineAxesMarkers.push(config);
   }
   chart['lineAxesMarkers'] = lineAxesMarkers;
 
   var rangeAxesMarkers = [];
   for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
-    rangeAxesMarkers.push(this.rangeAxesMarkers_[i].serialize());
+    var rangeAxesMarker = this.rangeAxesMarkers_[i];
+    config = rangeAxesMarker.serialize();
+    scale = rangeAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    rangeAxesMarkers.push(config);
   }
   chart['rangeAxesMarkers'] = rangeAxesMarkers;
 
   var textAxesMarkers = [];
   for (i = 0; i < this.textAxesMarkers_.length; i++) {
-    textAxesMarkers.push(this.textAxesMarkers_[i].serialize());
+    var textAxesMarker = this.textAxesMarkers_[i];
+    config = textAxesMarker.serialize();
+    scale = textAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    textAxesMarkers.push(config);
   }
   chart['textAxesMarkers'] = textAxesMarkers;
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {
-    series.push(this.series_[i].serialize());
-  }
-  chart['series'] = series;
+    var series_ = this.series_[i];
+    config = series_.serialize();
 
-  chart['barGroupsPadding'] = this.barGroupsPadding_;
-  chart['barsPadding'] = this.barsPadding_;
+    scale = series_.xScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['xScale'] = scales.length - 1;
+    } else {
+      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+
+    scale = series_.yScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['yScale'] = scales.length - 1;
+    } else {
+      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    series.push(config);
+  }
+
+  chart['series'] = series;
+  chart['scales'] = scales;
+  chart['barGroupsPadding'] = this.barGroupsPadding();
+  chart['barsPadding'] = this.barsPadding();
 
   json['chart'] = chart;
 

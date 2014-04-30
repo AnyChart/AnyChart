@@ -30,10 +30,10 @@ anychart.elements.TextMarker = function() {
   this.parentBounds_ = null;
 
   /**
-   * @type {anychart.utils.Orientation}
+   * @type {anychart.utils.Direction}
    * @private
    */
-  this.orientation_;
+  this.direction_;
 
   /**
    * @type {anychart.elements.TextMarker.Align}
@@ -202,20 +202,20 @@ anychart.elements.TextMarker.prototype.align = function(opt_value) {
 
 
 /**
- * Get/set orientation.
- * @param {anychart.utils.Orientation=} opt_value TextMarker orientation.
- * @return {anychart.utils.Orientation|anychart.elements.TextMarker} Orientation or this.
+ * Get/set direction.
+ * @param {anychart.utils.Direction=} opt_value TextMarker direction.
+ * @return {anychart.utils.Direction|anychart.elements.TextMarker} Direction or this.
  */
-anychart.elements.TextMarker.prototype.orientation = function(opt_value) {
+anychart.elements.TextMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.orientation_ != opt_value) {
-      this.orientation_ = opt_value;
+    if (this.direction_ != opt_value) {
+      this.direction_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.orientation_;
+    return this.direction_;
   }
 };
 
@@ -364,8 +364,7 @@ anychart.elements.TextMarker.prototype.applyTextSettings = function(textElement,
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.TextMarker.prototype.isHorizontal = function() {
-  return this.orientation_ == anychart.utils.Orientation.TOP ||
-      this.orientation_ == anychart.utils.Orientation.BOTTOM;
+  return this.direction_ == anychart.utils.Direction.HORIZONTAL;
 };
 
 
@@ -452,7 +451,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 
 
 /**
- * Рассчитывает позицию текста по заданныи параметрам orientation и align.
+ * Рассчитывает позицию текста по заданныи параметрам direction и align.
  * @param {number} ratio Scale ratio.
  * @param {number} shift Pixel shift.
  * @return {acgraph.math.Coordinate} text position.
@@ -461,9 +460,9 @@ anychart.elements.TextMarker.prototype.draw = function() {
 anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift) {
   var x, y;
   var parentBounds = this.parentBounds();
-  switch (this.orientation_) {
+  switch (this.direction_) {
     default:
-    case anychart.utils.Orientation.LEFT:
+    case anychart.utils.Direction.HORIZONTAL:
       y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
       ratio == 1 ? y -= shift : y += shift;
       if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
@@ -474,29 +473,29 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
         x = parentBounds.getRight();
       }
       break;
-    case anychart.utils.Orientation.TOP:
-      x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-      ratio == 1 ? x += shift : x -= shift;
-      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
-        y = parentBounds.getTop();
-      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
-        y = parentBounds.getTop() + parentBounds.height / 2;
-      } else {
-        y = parentBounds.getBottom();
-      }
-      break;
-    case anychart.utils.Orientation.RIGHT:
-      y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
-      ratio == 1 ? y -= shift : y += shift;
-      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
-        x = parentBounds.getRight();
-      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
-        x = parentBounds.getLeft() + parentBounds.width / 2;
-      } else {
-        x = parentBounds.getLeft();
-      }
-      break;
-    case anychart.utils.Orientation.BOTTOM:
+      //    case anychart.utils.Direction.HORIZONTAL:
+      //      x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
+      //      ratio == 1 ? x += shift : x -= shift;
+      //      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
+      //        y = parentBounds.getTop();
+      //      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
+      //        y = parentBounds.getTop() + parentBounds.height / 2;
+      //      } else {
+      //        y = parentBounds.getBottom();
+      //      }
+      //      break;
+      //    case anychart.utils.Orientation.RIGHT:
+      //      y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
+      //      ratio == 1 ? y -= shift : y += shift;
+      //      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
+      //        x = parentBounds.getRight();
+      //      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
+      //        x = parentBounds.getLeft() + parentBounds.width / 2;
+      //      } else {
+      //        x = parentBounds.getLeft();
+      //      }
+      //      break;
+    case anychart.utils.Direction.VERTICAL:
       x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
       ratio == 1 ? x += shift : x -= shift;
       if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
@@ -517,8 +516,8 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
  */
 anychart.elements.TextMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(70);
-  this.orientation(anychart.utils.Orientation.LEFT);
+  this.zIndex(27);
+  this.direction(anychart.utils.Direction.HORIZONTAL);
   this.align(anychart.elements.TextMarker.Align.CENTER);
   this.anchor(anychart.utils.NinePositions.CENTER);
   this.value(0);
@@ -549,28 +548,36 @@ anychart.elements.TextMarker.prototype.remove = function() {
  */
 anychart.elements.TextMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['orientation'] = this.orientation();
-  data['parentBounds'] = this.parentBounds();
+  data['direction'] = this.direction();
   data['align'] = this.align();
   data['anchor'] = this.anchor();
   data['value'] = this.value();
   data['offsetX'] = this.offsetX();
   data['offsetY'] = this.offsetY();
+  data['text'] = this.text();
+  data['width'] = this.width();
+  data['height'] = this.height();
   return data;
 };
 
 
 /** @inheritDoc */
 anychart.elements.TextMarker.prototype.deserialize = function(value) {
-  goog.base(this, 'deserialize', value);
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
-  if (goog.isDef(value['orientation'])) this.orientation(value['orientation']);
-  if (goog.isDef(value['align'])) this.align(value['align']);
-  if (goog.isDef(value['anchor'])) this.anchor(value['anchor']);
-  if (goog.isDef(value['value'])) this.value(value['value']);
-  if (goog.isDef(value['offsetX'])) this.offsetX(value['offsetX']);
-  if (goog.isDef(value['offsetY'])) this.offsetY(value['offsetY']);
+  this.suspendSignalsDispatching();
 
+  goog.base(this, 'deserialize', value);
+
+  this.direction(value['direction']);
+  this.align(value['align']);
+  this.anchor(value['anchor']);
+  this.value(value['value']);
+  this.offsetX(value['offsetX']);
+  this.offsetY(value['offsetY']);
+  this.text(value['text']);
+  this.width(value['width']);
+  this.height(value['height']);
+
+  this.resumeSignalsDispatching(true);
   return this;
 };
 

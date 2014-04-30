@@ -286,6 +286,40 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(h
 anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = 'candlestick';
+
+  if (goog.isFunction(this.risingFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize risingFill function, you should reset it manually.');
+    }
+  } else {
+    json['risingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.risingFill()));
+  }
+
+  if (goog.isFunction(this.hoverRisingFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverRisingFill function, you should reset it manually.');
+    }
+  } else {
+    json['hoverRisingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverRisingFill()));
+  }
+
+
+  if (goog.isFunction(this.fallingFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize fallingFill function, you should reset it manually.');
+    }
+  } else {
+    json['fallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fallingFill()));
+  }
+
+  if (goog.isFunction(this.hoverFallingFill())) {
+    if (window.console) {
+      window.console.log('Warning: We cant serialize hoverFallingFill function, you should reset it manually.');
+    }
+  } else {
+    json['hoverFallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFallingFill()));
+  }
+
   return json;
 };
 
@@ -294,5 +328,16 @@ anychart.cartesian.series.Candlestick.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+  this.suspendSignalsDispatching();
+
+  goog.base(this, 'deserialize', config);
+
+  this.risingFill(config['risingFill']);
+  this.hoverRisingFill(config['hoverRisingFill']);
+  this.fallingFill(config['fallingFill']);
+  this.hoverFallingFill(config['hoverFallingFill']);
+
+  this.resumeSignalsDispatching(true);
+
+  return this;
 };

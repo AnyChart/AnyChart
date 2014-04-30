@@ -67,3 +67,22 @@ anychart.cartesian.series.WidthBased.prototype.getPointWidth = function() {
       this.pixelBounds().width;
   return anychart.utils.normalize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.WidthBased.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['pointWidth'] = this.pointWidth();
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.WidthBased.prototype.deserialize = function(config) {
+  this.pointWidth(config['pointWidth']);
+  return goog.base(this, 'deserialize', config);
+};

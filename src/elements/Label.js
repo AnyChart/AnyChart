@@ -1148,8 +1148,8 @@ anychart.elements.Label.prototype.serialize = function() {
   json['maxFontSize'] = this.maxFontSize();
   json['adjustFontSize'] = this.adjustFontSize();
 
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
 
   return json;
 };
@@ -1159,6 +1159,8 @@ anychart.elements.Label.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.elements.Label.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   this.width(config['width']);
@@ -1172,8 +1174,12 @@ anychart.elements.Label.prototype.deserialize = function(config) {
   this.maxFontSize(config['maxFontSize']);
   this.adjustFontSize(config['adjustFontSize']);
 
-  this.padding(config['padding']);
-  this.background(config['background']);
+  if ('padding' in config)
+    this.padding().deserialize(config['padding']);
+  if ('background' in config)
+    this.background().deserialize(config['background']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };

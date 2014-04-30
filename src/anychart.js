@@ -34,6 +34,13 @@ goog.require('goog.json.hybrid');
 
 
 /**
+ * Current version of framework, replaced on compile time.
+ * @define {string} Current version of framework.
+ */
+anychart.VERSION = '';
+
+
+/**
  * If the globalLock is locked.
  * @type {number}
  */
@@ -119,6 +126,28 @@ anychart.ClassFactory.prototype.getClass = function(json) {
 
 
 /**
+ * Returns instance of the scale.
+ * @param {Object} json json config.
+ * @return {anychart.scales.Base} Class constructor.
+ */
+anychart.ClassFactory.prototype.getScale = function(json) {
+  var type = json['type'];
+  if (type) {
+    var scale;
+    if (type == 'ordinal') {
+      scale = new anychart.scales.Ordinal();
+    } else if (type == 'linear') {
+      scale = new anychart.scales.Linear();
+    } else if (type == 'datetime') {
+      scale = new anychart.scales.DateTime();
+    }
+    if (scale) return /** @type {anychart.scales.Base}*/(scale.deserialize(json));
+  }
+  return null;
+};
+
+
+/**
  * Creates element by config.
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
@@ -169,7 +198,7 @@ goog.global['anychart'] = goog.global['anychart'] || {};
  * @type {string|number}
  *
  */
-goog.global['anychart']['fontSize'] = '16px';
+goog.global['anychart']['fontSize'] = '12px';
 
 
 /**

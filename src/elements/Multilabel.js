@@ -1396,11 +1396,12 @@ anychart.elements.Multilabel.prototype.enabledAt = function(index, opt_value) {
  * @return {Object} Serialized data.
  */
 anychart.elements.Multilabel.prototype.serialize = function(opt_withoutCustomSettings) {
-  var json = {'textSettings': goog.base(this, 'serialize')};
+  var json = goog.base(this, 'serialize');
 
-  var padding = this.padding_;
-  var background = this.background_;
+  var padding = this.padding();
+  var background = this.background();
 
+  json['textSettings'] = goog.base(this, 'serialize');
   json['width'] = this.width();
   json['height'] = this.height();
   json['rotation'] = this.rotation();
@@ -1491,6 +1492,8 @@ anychart.elements.Multilabel.prototype.serializeAt = function(index, opt_include
 anychart.elements.Multilabel.prototype.deserialize = function(config) {
   this.suspendSignalsDispatching();
 
+  goog.base(this, 'deserialize', config);
+
   var padding = config['padding'];
   var background = config['background'];
 
@@ -1544,8 +1547,8 @@ anychart.elements.Multilabel.prototype.deserializeAt = function(index, data) {
   if (data['offsetX']) this.customLabelSettings_[index].offsetX = data['offsetX'];
   if (data['offsetY']) this.customLabelSettings_[index].offsetY = data['offsetY'];
   if (data['rotation']) this.customLabelSettings_[index].rotation = data['rotation'];
-  if (data['widthY']) this.customLabelSettings_[index].widthY = data['offsetY'];
-  if (data['heightY']) this.customLabelSettings_[index].heightY = data['offsetY'];
+  if (data['width']) this.customLabelSettings_[index].width = data['width'];
+  if (data['height']) this.customLabelSettings_[index].height = data['height'];
   if (goog.isDef(data['enabled'])) this.customLabelSettings_[index].enabled = data['enabled'];
 
   if (data['textSettings'])
@@ -1553,6 +1556,7 @@ anychart.elements.Multilabel.prototype.deserializeAt = function(index, data) {
 
   this.invalidate(anychart.ConsistencyState.ALL,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
   this.resumeSignalsDispatching(true);
 
   return this;

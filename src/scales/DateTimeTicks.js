@@ -366,3 +366,25 @@ anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval
     return date;
   }
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Serialize & Deserialize
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.scales.DateTimeTicks.prototype.serialize = function() {
+  var data = goog.base(this, 'serialize');
+  data['explicit'] = this.explicit_;
+  data['count'] = this.count_;
+  data['interval'] = this.interval_;
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.scales.DateTimeTicks.prototype.deserialize = function(value) {
+  this.explicit_ = value['explicit'] || null;
+  this.count_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
+  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
+  return goog.base(this, 'deserialize', value);
+};

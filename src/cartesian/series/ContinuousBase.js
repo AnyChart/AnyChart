@@ -70,6 +70,9 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
 
   var i;
   var len = this.paths.length;
+  for (i = 0; i < len; i++) {
+    this.makeHoverable(this.paths[i], true);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     for (i = 0; i < len; i++)
@@ -116,7 +119,7 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeDrawing = function() 
 
 
 /** @inheritDoc */
-anychart.cartesian.series.ContinuousBase.prototype.createPositionProvider = function() {
+anychart.cartesian.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   return {x: iterator.meta('x'), y: iterator.meta('y')};
 };
@@ -168,6 +171,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverSeries = function() {
     if (this.getResetIterator().select(this.hoverStatus)) {
       this.drawMarker(false);
       this.drawLabel(false);
+      this.hideTooltip();
     }
   } else {
     this.colorizeShape(true);
@@ -183,6 +187,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
   if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
     this.drawLabel(false);
+    this.hideTooltip();
   }
   if (isNaN(this.hoverStatus)) {
     this.colorizeShape(true);
@@ -190,6 +195,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
   if (this.getResetIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
+    this.showTooltip(event);
     this.hoverStatus = index;
   } else {
     this.hoverStatus = -1;
@@ -205,6 +211,7 @@ anychart.cartesian.series.ContinuousBase.prototype.unhover = function() {
   if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
     this.drawLabel(false);
+    this.hideTooltip();
   }
   this.colorizeShape(false);
   this.hoverStatus = NaN;
@@ -226,9 +233,9 @@ anychart.cartesian.series.ContinuousBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.ContinuousBase.prototype.deserialize = function(config) {
-  var connectMissing = config['connectMissing'];
   this.suspendSignalsDispatching();
-  if (connectMissing) this.connectMissingPoints(connectMissing);
+  goog.base(this, 'deserialize', config);
+  this.connectMissingPoints(config['connectMissing']);
   this.resumeSignalsDispatching(false);
-  return goog.base(this, 'deserialize', config);
+  return this;
 };

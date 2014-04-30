@@ -4,9 +4,12 @@ goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
+goog.require('anychart.events.EventType');
+goog.require('anychart.utils');
 goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
+goog.require('goog.json.hybrid');
 
 
 
@@ -55,6 +58,12 @@ anychart.Chart = function() {
    * @private
    */
   this.legend_ = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.autoResize_ = true;
 
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
@@ -613,10 +622,31 @@ anychart.Chart.prototype.draw = function() {
 
   boundsWithoutLegend = legend.enabled() ? legend.getRemainingBounds() : legendParentBounds;
 
-
-
   contentAreaBounds = boundsWithoutLegend.clone();
   this.drawContent(contentAreaBounds);
+
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    //can be null if you add chart to tooltip container on hover (Vitalya :) )
+    if (this.container() && this.container().getStage) {
+      //listen resize event
+      if (this.autoResize_ && this.bounds().dependsOnContainerSize()) {
+        this.container().getStage().listen(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      } else {
+        this.container().getStage().unlisten(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      }
+    }
+  }
 
   //after all chart items drawn, we can clear other states
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -629,7 +659,7 @@ anychart.Chart.prototype.draw = function() {
 
   this.resumeSignalsDispatching(false);
 
-  this.dispatchExternalEvent('CHART_DRAW');
+  this.dispatchDetachedEvent(new anychart.Chart.DrawEvent(this));
 
   return this;
 };
@@ -640,6 +670,40 @@ anychart.Chart.prototype.draw = function() {
  * @param {acgraph.math.Rect} bounds Chart content area bounds.
  */
 anychart.Chart.prototype.drawContent = goog.nullFunction;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Resize.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Define auto resize settings.
+ * @param {boolean=} opt_value
+ * @return {!(boolean|anychart.Chart)} Auto resize settings or itself for chaining call.
+ */
+anychart.Chart.prototype.autoResize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.autoResize_ != opt_value) {
+      this.autoResize_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.autoResize_;
+  }
+};
+
+
+/**
+ * @param {goog.events.Event} evt
+ * @private
+ */
+anychart.Chart.prototype.resizeHandler_ = function(evt) {
+  this.invalidate(anychart.ConsistencyState.ALL,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -684,10 +748,41 @@ anychart.Chart.prototype.invalidateHandler_ = function(event) {
 //end shit
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//  JSON/XML.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Return chart configuration as JSON object or string.
+ * Note for doc writers!: Гугловый компилятор считает что у Object есть метод toJSON который должен принимать строку и возвращать *.
+ * Для того, чтобы он на нас не ругался, приходится писать не правильные параметры.
+ * Во внешних доках параметр должен быть boolean, а возвращаемый тип Object|string.
+ * Другого способа обойти эту особенность компилятора пока не придумали.
+ * @param {string=} opt_stringify Return as JSON as string.
+ * @return {*} Chart JSON.
+ */
+anychart.Chart.prototype.toJson = function(opt_stringify) {
+  return opt_stringify ?
+      goog.json.hybrid.stringify(/** @type {!Object} */(this.serialize())) :
+      this.serialize();
+};
+
+
+/**
+ * Return chart configuration as XML string or XMLNode.
+ * @param {boolean=} opt_asXmlNode Return XML as XMLNode.
+ * @return {string|Node} Chart configuration.
+ */
+anychart.Chart.prototype.toXml = function(opt_asXmlNode) {
+  return anychart.utils.json2xml(this.serialize(), undefined, opt_asXmlNode);
+};
+
+
 /**
  * @inheritDoc
  */
 anychart.Chart.prototype.deserialize = function(config) {
+  this.suspendSignalsDispatching();
+
   goog.base(this, 'deserialize', config);
 
   var margin = config['margin'];
@@ -696,11 +791,14 @@ anychart.Chart.prototype.deserialize = function(config) {
   var title = config['title'];
   var legend = config['legend'];
 
-  if (margin) this.margin(margin);
-  if (padding) this.padding(padding);
-  if (background) this.background(background);
-  if (title) this.title(title);
-  if (legend) this.legend(legend);
+  this.margin(margin);
+  this.padding(padding);
+  this.background(background);
+  this.title(title);
+  this.legend(legend);
+  this.autoResize(config['autoResize']);
+
+  this.resumeSignalsDispatching(true);
 
   return this;
 };
@@ -712,11 +810,12 @@ anychart.Chart.prototype.deserialize = function(config) {
 anychart.Chart.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  if (this.margin_) json['margin'] = this.margin_.serialize();
-  if (this.padding_) json['padding'] = this.padding_.serialize();
-  if (this.background_) json['background'] = this.background_.serialize();
-  if (this.title_) json['title'] = this.title_.serialize();
-  if (this.legend_) json['legend'] = this.legend_.serialize();
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
+  json['title'] = this.title().serialize();
+  json['legend'] = this.legend().serialize();
+  json['autoResize'] = this.autoResize();
 
   return json;
 };
@@ -737,19 +836,23 @@ anychart.Chart.prototype.restoreDefaults = function() {
   this.title('Chart title');
 
   var legend = /** @type {anychart.elements.Legend} */(this.legend());
-  legend.position('right');
-  legend.itemsLayout('vertical');
-  legend.align('center');
   legend.enabled(false);
+  legend.itemsLayout('vertical');
+  legend.position('right');
+  legend.margin(0, 0, 0, 10);
+  legend.align('center');
   legend.fontSize(10);
   legend.fontFamily('verdana');
   legend.fontColor('rgb(35,35,35)');
 
   var legendSeparator = /** @type {anychart.elements.Separator} */(legend.titleSeparator());
+  legendSeparator.enabled(false);
   legendSeparator.height(1);
   legendSeparator.fill(['#000000 0', '#000000 1', '#000000 0']);
 
   var legendTitle = /** @type {anychart.elements.Title} */(legend.title());
+  legendTitle.enabled(false);
+  legendTitle.text('Legend title');
   legendTitle.fontSize(10);
   legendTitle.fontWeight('bold');
   legendTitle.fontFamily('verdana');
@@ -759,3 +862,20 @@ anychart.Chart.prototype.restoreDefaults = function() {
   legendBackground.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
   legendBackground.stroke('rgb(221,221,221)');
 };
+
+
+
+/**
+ * @param {anychart.Chart} chart
+ * @constructor
+ * @extends {goog.events.Event}
+ */
+anychart.Chart.DrawEvent = function(chart) {
+  goog.base(this, anychart.events.EventType.CHART_DRAW, chart);
+
+  /**
+   * @type {anychart.Chart}
+   */
+  this['chart'] = chart;
+};
+goog.inherits(anychart.Chart.DrawEvent, goog.events.Event);
