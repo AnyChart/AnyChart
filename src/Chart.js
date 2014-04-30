@@ -2,6 +2,7 @@ goog.provide('anychart.Chart');
 
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
 goog.require('anychart.events.EventType');
@@ -60,6 +61,12 @@ anychart.Chart = function() {
   this.legend_ = null;
 
   /**
+   * @type {Array.<anychart.elements.Label>}
+   * @private
+   */
+  this.chartLabels_ = [];
+
+  /**
    * @type {boolean}
    * @private
    */
@@ -86,6 +93,7 @@ anychart.Chart.prototype.SUPPORTED_SIGNALS = anychart.VisualBaseWithBounds.proto
 anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.ConsistencyState.LEGEND |
+        anychart.ConsistencyState.CHART_LABELS |
         anychart.ConsistencyState.BACKGROUND |
         anychart.ConsistencyState.TITLE;
 
@@ -151,7 +159,8 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -283,7 +292,8 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -357,7 +367,8 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
  * chart.background(background);
  * @param {(anychart.elements.Background)=} opt_value Background object to set.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(anychart.elements.Background)=} opt_value .
  * @return {anychart.Chart|anychart.elements.Background} .
@@ -423,7 +434,8 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
  * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(null|string|Object|anychart.elements.Title)=} opt_value .
  * @return {anychart.elements.Title|anychart.Chart} .
@@ -528,6 +540,60 @@ anychart.Chart.prototype.onLegendSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Labels.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Create chart label.
+ * @param {(anychart.elements.Label|Object|string|number|null)=} opt_indexOrValue Chart label instance to add.
+ * @param {anychart.elements.Label=} opt_value Chart label instance.
+ * @return {!(anychart.elements.Label|anychart.Chart)} Chart label instance or itself for chaining call.
+ */
+anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
+    index = +opt_indexOrValue;
+    value = opt_value;
+  } else {
+    index = this.chartLabels_.length;
+    value = opt_indexOrValue;
+  }
+  var label = this.chartLabels_[index];
+  if (!label) {
+    label = new anychart.elements.Label();
+    label.text('Chart label');
+    this.chartLabels_[index] = label;
+    this.registerDisposable(label);
+    label.listenSignals(this.onChartLabelSignal_, this);
+  }
+
+  if (goog.isDef(value)) {
+    if (value instanceof anychart.elements.Axis) {
+      label.deserialize(value.serialize());
+    } else if (goog.isObject(value)) {
+      label.deserialize(value);
+    } else if (anychart.isNone(value)) {
+      label.enabled(false);
+    }
+    return this;
+  } else {
+    return label;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.Chart.prototype.onChartLabelSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -583,8 +649,7 @@ anychart.Chart.prototype.draw = function() {
   boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var background = this.background();
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND) ||
-      this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
     background.suspendSignalsDispatching();
     if (!background.container()) background.container(this.rootElement);
     background.pixelBounds(boundsWithoutMargin);
@@ -596,8 +661,7 @@ anychart.Chart.prototype.draw = function() {
   boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
 
   var title = this.title();
-  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE) ||
-      this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
     title.suspendSignalsDispatching();
     title.parentBounds(boundsWithoutPadding);
     title.resumeSignalsDispatching(false);
@@ -612,7 +676,7 @@ anychart.Chart.prototype.draw = function() {
   var legendParentBounds = boundsWithoutTitle;
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND | anychart.ConsistencyState.BOUNDS)) {
     legend.suspendSignalsDispatching();
-    if (!legend.container() && this.legend_.enabled()) legend.container(this.rootElement);
+    if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
     legend.parentBounds(legendParentBounds);
     legend.itemsProvider(this.createLegendItemsProvider());
     legend.resumeSignalsDispatching(false);
@@ -625,6 +689,17 @@ anychart.Chart.prototype.draw = function() {
   contentAreaBounds = boundsWithoutLegend.clone();
   this.drawContent(contentAreaBounds);
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
+    for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
+      var label = this.chartLabels_[i];
+      label.suspendSignalsDispatching();
+      if (!label.container() && label.enabled()) label.container(this.rootElement);
+      label.parentBounds(totalBounds);
+      label.resumeSignalsDispatching(false);
+      label.draw();
+      this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
+    }
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )

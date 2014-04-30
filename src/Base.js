@@ -121,7 +121,10 @@ anychart.ConsistencyState = {
    * Состав хэндлеров событий изменился.
    */
   HANDLERS: 0x08000000,
-  RESERVED_29: 0x10000000,
+  /**
+   * Лейблы чарта (появились из-за того, что pie уже занял стейт LABELS)
+   */
+  CHART_LABELS: 0x10000000,
   RESERVED_30: 0x20000000,
   RESERVED_31: 0x40000000,
   /**
