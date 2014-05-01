@@ -1713,7 +1713,7 @@ anychart.elements.Multimarker.prototype.draw = function(positionProvider, opt_in
  * (registered via listenOnce), it will no longer be a one-off
  * listener after a call to listen().
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase
@@ -1741,7 +1741,7 @@ anychart.elements.Multimarker.prototype.listen = function(type, listener, opt_us
  * one-off listener, listenOnce does not modify the listeners (it is
  * still a once listener).
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase
@@ -1761,7 +1761,7 @@ anychart.elements.Multimarker.prototype.listenOnce = function(type, listener, op
 /**
  * Removes an event listener which was added with listen() or listenOnce().
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase

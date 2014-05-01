@@ -1336,6 +1336,7 @@ anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSetting
 
 /**
  * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for series stroke by function.
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
@@ -1384,6 +1385,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
 
 /**
  * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for series stroke by function.
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {

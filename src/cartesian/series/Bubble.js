@@ -142,7 +142,14 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function() {
 
 
 /**
- * Getter/setter for minimum bubble size.
+ * Getter for currnet minimum bubble size.
+ * @return {(string|number)} Minimum size of the bubble.
+ *//**
+ * Setter for minimum bubble size.
+ * @param {(string|number)=} opt_value ['10%'] Minimum size of the bubble.
+ * @return {!anychart.cartesian.series.Bubble}  An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|number)=} opt_value Minimum size of the bubble.
  * @return {(string|number|anychart.cartesian.series.Bubble)} Minimum size of the bubble or self for chaining.
  */
@@ -160,9 +167,16 @@ anychart.cartesian.series.Bubble.prototype.minimumSize = function(opt_value) {
 
 
 /**
- * Getter/setter for maximum bubble size.
- * @param {(string|number)=} opt_value Maximum size of the bubble.
- * @return {(string|number|anychart.cartesian.series.Bubble)} Maximum size of the bubble or self for chaining.
+ * Getter for currnet maximum bubble size.
+ * @return {(string|number)} Maximum size of the bubble.
+ *//**
+ * Setter for maximum bubble size.
+ * @param {(string|number)=} opt_value ['95%'] Maximum size of the bubble.
+ * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number)=} opt_value maximum size of the bubble.
+ * @return {(string|number|anychart.cartesian.series.Bubble)} maximum size of the bubble or self for chaining.
  */
 anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -178,7 +192,14 @@ anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
 
 
 /**
- * Getter/setter for negative value option.
+ * Getter for current negative value option.
+ * @return {boolean} Display negaitve setting .
+ *//**
+ * Setter for negative value option.
+ * @param {boolean=} opt_value Whether to display negative value.
+ * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {boolean=} opt_value Whether to display negative value.
  * @return {(boolean|anychart.cartesian.series.Bubble)} Display negaitve setting or self for chaining.
  */
@@ -372,19 +393,29 @@ anychart.cartesian.series.Bubble.prototype.categoriseData = function(categories)
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {
@@ -403,19 +434,29 @@ anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeO
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {

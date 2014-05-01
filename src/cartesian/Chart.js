@@ -1921,7 +1921,14 @@ anychart.cartesian.Chart.prototype.calcBubbleSizes_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Геттер-сеттер для палитры цветов серий.
+ * Getter for series colors palette.
+ * @return {!(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette)} Current palette.
+ *//**
+ * Setter for series colors palette.
+ * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
+ * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
  * @return {!(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|anychart.cartesian.Chart)} .
  */

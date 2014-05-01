@@ -120,7 +120,15 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
 //----------------------------------------------------------------------------------------------------------------------
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
-/** Gets/sets axis scale.
+/**
+ * Getter for axis scale.
+ * @return {anychart.scales.Base} Axis scale.
+ *//**
+ * Setter for axis scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.elements.TextMarker} An instance of the {@link anychart.elements.TextMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|anychart.elements.TextMarker} Axis scale or itself for chaining.
  */
@@ -161,7 +169,14 @@ anychart.elements.TextMarker.prototype.scaleInvalidated_ = function(event) {
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets/sets parentBounds.
+ * Getter for parentBounds.
+ * @return {acgraph.math.Rect} Current parent bounds.
+ *//**
+ * Setter for parentBounds.
+ * @param {acgraph.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.TextMarker} An instance of the {@link anychart.elements.TextMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {acgraph.math.Rect=} opt_value Bounds for marker.
  * @return {acgraph.math.Rect|anychart.elements.TextMarker} Bounds or this.
  */
@@ -311,7 +326,14 @@ anychart.elements.TextMarker.prototype.offsetY = function(opt_newValue) {
 
 
 /**
- * Getter/setter for the width of the text of the marker.
+ * Getter for separator width.
+ * @return {number|string|null} Current width.
+ *//**
+ * Setter for separator width.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {!anychart.elements.TextMarker} An instance of the {@link anychart.elements.TextMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.elements.TextMarker|number|string|null} .
  */
@@ -329,7 +351,14 @@ anychart.elements.TextMarker.prototype.width = function(opt_value) {
 
 
 /**
- * Getter/setter for the height of the text of the marker.
+ * Getter for separator height.
+ * @return {number|string|null} Current height.
+ *//**
+ * Setter for separator height.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {!anychart.elements.TextMarker} An instance of the {@link anychart.elements.TextMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.elements.TextMarker|number|string|null} .
  */

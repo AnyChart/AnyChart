@@ -312,8 +312,15 @@ anychart.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
+ * Getter for paginator layout.
+ * @return {anychart.ui.Paginator.Layout} Current layout or self for chaining.
+ *//**
+ * Setter for paginator layout.
+ * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Value to set.
+ * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
+ *//**
+ * @ignoreDoc
  * TODO(AntonKagakin): сделать флаг customDrawers, чтобы при смене layout  кастомном дровере он не заменил его.
- * Getter/setter for paginator layout.
  * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Layout value.
  * @return {(anychart.ui.Paginator|anychart.ui.Paginator.Layout)} Current layout or self for chaining.
  */
@@ -339,7 +346,14 @@ anychart.ui.Paginator.prototype.layout = function(opt_value) {
 
 
 /**
- * Getter/setter for page count.
+ * Getter for page count.
+ * @return {number} Current page count.
+ *//**
+ * Setter for page count.
+ * @param {(number|string)=} opt_value Value to set.
+ * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value Paginator page count to set.
  * @return {(number|anychart.ui.Paginator)} Current page count or self for chaining.
  */
@@ -370,7 +384,14 @@ anychart.ui.Paginator.prototype.pageCount = function(opt_value) {
 
 
 /**
- * User-friendly getter/setter for active page.
+ * Getter for active page.
+ * @return {number} Current page.
+ *//**
+ * Setter for active page.
+ * @param {(number|string)=} opt_value Value to set.
+ * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value Paginator page count to set.
  * @return {(number|anychart.ui.Paginator)} Current page or self for chaining.
  */

@@ -700,8 +700,8 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
 
 
 /**
- * Метод который работает с настройками аджастинга текста.
- * Если геттер: всегда возвращает массив состоящий их 2х элементов
+ * Getter.
+ * всегда возвращает массив состоящий их 2х элементов
  *   this.adjustByWidth_, который означает, что аджастинг будет/не будет по ширине и
  *   this.adjustByHeight_, который означает, что аджастинг будет/не будет по высоте
  *   таким образом имеем 4 массива на выходе:
@@ -709,8 +709,9 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
  *     [false, true] - аджастить по ширине
  *     [true, false] - аджастить по высоте
  *     [true, true] - аджастить по ближайшему попавшему значению.
- *
- * Если сеттер:
+ * @return {Array.<boolean, boolean>} adjustFontSite setting or self for chaining.
+ *//**
+ * Setter
  * Как сеттер он работает в 3х режимах:
  *   1) первый аргумент - массив, значит что он ожидает настройки [this.adjustByWidth_, this.adjustByHeight_]
  *   2) переданный аргумент - единственный - значит что настройку нужно применить и к this.adjustByWidth_ и к this.adjustByHeight_.
@@ -719,8 +720,11 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
  *      остальных случаях изменения сработают.
  *   3) передано 2 аргумента - стандартный сеттер 2х аргументов: если значение одной из настроек изменилось - произойдет инвалидация
  *      иначе ничего не случится, но при этом чейнинг сработает (если было true true и передать true true - вернется лейбл, а не массив значений)
- *
- * Getter/setter for adjustFontSize setting.
+ * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font need to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
+ * @param {boolean=} opt_adjustBeHeight Is font need to be adjusted by height.
+ * @return {!anychart.elements.Label} adjustFontSite setting or self for chaining.
+ *//**
+ * @ignoreDoc
  * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font need to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
  * @param {boolean=} opt_adjustBeHeight Is font need to be adjusted by height.
  * @return {(Array.<boolean, boolean>|anychart.elements.Label)} adjustFontSite setting or self for chaining.
