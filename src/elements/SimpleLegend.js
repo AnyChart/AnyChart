@@ -234,7 +234,14 @@ anychart.elements.Legend.prototype.itemsLayout = function(opt_value) {
 
 
 /**
- * Getter/setter for items provider.
+ * Getter for items provider.
+ * @return {anychart.elements.LegendItemsProviderObject} Legend items provider.
+ *//**
+ * Setter for items provider.
+ * @param {anychart.elements.LegendItemsProviderObject=} opt_value Items provider.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.elements.LegendItemsProviderObject=} opt_value Items provider.
  * @return {(anychart.elements.LegendItemsProviderObject|anychart.elements.Legend)} Legend items provider.
  */
@@ -265,7 +272,14 @@ anychart.elements.Legend.prototype.itemsProvider = function(opt_value) {
 
 
 /**
- * Getter/setter for items spacing setting.
+ * Getter for items spacing setting.
+ * @return {(string|number)} Items spacing setting.
+ *//**
+ * Setter for items spacing setting.
+ * @param {(string|number)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|number)=} opt_value Value of spacing between legend items.
  * @return {(string|number|anychart.elements.Legend)} Items spacing setting or self for chaining.
  */
@@ -283,7 +297,14 @@ anychart.elements.Legend.prototype.itemsSpacing = function(opt_value) {
 
 
 /**
- * Getter/setter for spacing between icon and text in legend item.
+ * Getter for spacing between icon and text in legend item.
+ * @return {number} Spacing setting.
+ *//**
+ * Setter for spacing between icon and text in legend item.
+ * @param {(string|number)=} opt_value Spacing setting.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|number)=} opt_value Spacing setting.
  * @return {(number|anychart.elements.Legend)} Spacing setting or self for chaining.
  */
@@ -368,7 +389,14 @@ anychart.elements.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBott
 
 
 /**
- * Getter/setter for legend background.
+ * Getter for legend background.
+ * @return {!anychart.elements.Background} Background or self for chaining.
+ *//**
+ * Setter for legend background.
+ * @param {anychart.elements.Background=} opt_value Background setting.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.elements.Background=} opt_value Background setting.
  * @return {!(anychart.elements.Legend|anychart.elements.Background)} Background or self for chaining.
  */
@@ -410,8 +438,16 @@ anychart.elements.Legend.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for legend title.
- * @param {(string|anychart.elements.Title)=} opt_value Title to set.
+ * Getter for legend title.
+ * @return {anychart.elements.Title} Title settings.
+ *//**
+ * Setter for legend title.<br/>
+ * <b>Note:</b> Что бы отключить title надо передать null или 'none'.
+ * @param {(string|null|anychart.elements.Title)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(string|null|anychart.elements.Title)=} opt_value Title to set.
  * @return {(anychart.elements.Title|anychart.elements.Legend)} Title or self for chaining.
  */
 anychart.elements.Legend.prototype.title = function(opt_value) {
@@ -463,7 +499,15 @@ anychart.elements.Legend.prototype.titleInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for title separator setting.
+ * Getter for title separator setting.
+ * @return {anychart.elements.Separator} Current settings.
+ *//**
+ * Setter for title separator setting.<br/>
+ * <b>Note:</b> Что бы отключить titleSeparator надо передать null или 'none'.
+ * @param {(Object|string|null|anychart.elements.Separator)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {*=} opt_value Separator setting.
  * @return {(*|anychart.elements.Legend)} Separator setting or self for chaining.
  */
@@ -512,7 +556,15 @@ anychart.elements.Legend.prototype.titleSeparatorInvalidated_ = function(event) 
 
 
 /**
- * Getter/setter for legend paginator.
+ * Getter for paginator setting.
+ * @return {anychart.elements.Separator} Current settings.
+ *//**
+ * Setter for paginator setting.<br/>
+ * <b>Note:</b> Что бы отключить Paginator надо передать null или 'none'.
+ * @param {(Object|anychart.elements.Paginator|string|null)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {*=} opt_value Paginator to set.
  * @return {(*|anychart.elements.Legend)} Paginator or self for chaining.
  */
@@ -560,9 +612,16 @@ anychart.elements.Legend.prototype.paginatorInvalidated_ = function(event) {
 
 
 /**
- * Getter/setter for legend width setting.
- * @param {(number|string|null)=} opt_value Width setting.
- * @return {(number|string|null|anychart.elements.Legend)} Width setting or self for chaining.
+ * Getter for legend width.
+ * @return {number|string|null} Current width.
+ *//**
+ * Setter for legend width.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Legend|number|string|null} .
  */
 anychart.elements.Legend.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -578,9 +637,16 @@ anychart.elements.Legend.prototype.width = function(opt_value) {
 
 
 /**
- * Getter/setter for legend height setting.
- * @param {(number|string|null)=} opt_value Height setting.
- * @return {(number|string|null|anychart.elements.Legend)} Height setting or self for chaining.
+ * Getter for legend height.
+ * @return {number|string|null} Current height.
+ *//**
+ * Setter for legend height.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string|null)=} opt_value .
+ * @return {!anychart.elements.Legend|number|string|null} .
  */
 anychart.elements.Legend.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -596,7 +662,14 @@ anychart.elements.Legend.prototype.height = function(opt_value) {
 
 
 /**
- * Getter/setter for legend's parent element bounds.
+ * Getter for legend's parent element bounds.
+ * @return {anychart.math.Rect} Parent element bounds.
+ *//**
+ * Setter for legend's parent element bounds.
+ * @param {anychart.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value Parent element bounds to set.
  * @return {(anychart.math.Rect|!anychart.elements.Legend)} Parent element bounds or self for chaining.
  */
@@ -614,7 +687,14 @@ anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
 
 
 /**
- * Getter/setter for legend position setting.
+ * Getter for legend position setting.
+ * @return {anychart.utils.Orientation} Legend position.
+ *//**
+ * Setter for legend position setting.
+ * @param {(anychart.utils.Orientation|string)=} opt_value Legend position.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.utils.Orientation|string)=} opt_value Legend position.
  * @return {(anychart.utils.Orientation|anychart.elements.Legend)} Legend position or self for chaining.
  */
@@ -634,7 +714,14 @@ anychart.elements.Legend.prototype.position = function(opt_value) {
 
 
 /**
- * Getter/setter for legend align setting.
+ * Getter for legend align setting.
+ * @return {anychart.elements.Legend.Align} Legend align.
+ *//**
+ * Setter for legend align setting.
+ * @param {(anychart.elements.Legend.Align|string)=} opt_value Value to set.
+ * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Legend.Align|string)=} opt_value Legend align.
  * @return {(anychart.elements.Legend.Align|anychart.elements.Legend)} Legend align or self for chaining.
  */

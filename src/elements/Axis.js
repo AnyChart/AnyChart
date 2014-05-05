@@ -291,7 +291,14 @@ anychart.elements.Axis.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * Set/get axis name.
+ * Getter for axis name.
+ * @return {string} Axis name.
+ *//**
+ * Setter for axis name.
+ * @param {string=} opt_value Name.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Name.
  * @return {string|anychart.elements.Axis} Axis name or itself for chaining.
  */
@@ -307,7 +314,14 @@ anychart.elements.Axis.prototype.name = function(opt_value) {
 
 
 /**
- * Gets/sets the title axis.
+ * Getter for the title axis.
+ * @return {string|anychart.elements.Title} Axis title.
+ *//**
+ * Setter for the title axis.
+ * @param {(string|anychart.elements.Title)=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|anychart.elements.Title)=} opt_value Axis title.
  * @return {string|anychart.elements.Title|anychart.elements.Axis} Axis title or itself for chaining.
  */
@@ -356,7 +370,14 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets axis labels.
+ * Getter for axis labels.
+ * @return {anychart.elements.Multilabel} Axis labels of itself for chaining.
+ *//**
+ * Setter for axis labels.
+ * @param {anychart.elements.Multilabel=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.elements.Multilabel=} opt_value Axis labels.
  * @return {anychart.elements.Multilabel|anychart.elements.Axis} Axis labels of itself for chaining.
  */
@@ -406,9 +427,16 @@ anychart.elements.Axis.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets minor axis labels.
- * @param {anychart.elements.Multilabel=} opt_value Minor axis labels.
- * @return {anychart.elements.Multilabel|anychart.elements.Axis} Minor axis labels or iself for chaining.
+ * Getter for axis minor labels.
+ * @return {anychart.elements.Multilabel} Axis labels.
+ *//**
+ * Setter for axis minor labels.
+ * @param {anychart.elements.Multilabel=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.elements.Multilabel=} opt_value Axis labels.
+ * @return {anychart.elements.Multilabel|anychart.elements.Axis} Axis labels of itself for chaining.
  */
 anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
@@ -459,7 +487,14 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets axis ticks.
+ * Getter for axis ticks.
+ * @return {anychart.elements.Ticks} Axis ticks.
+ *//**
+ * Setter for axis ticks.
+ * @param {anychart.elements.Ticks=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.elements.Ticks=} opt_value Axis ticks.
  * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for chaining.
  */
@@ -509,9 +544,16 @@ anychart.elements.Axis.prototype.ticksInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets minor axis ticks.
- * @param {anychart.elements.Ticks=} opt_value Minor axis ticks.
- * @return {anychart.elements.Ticks|anychart.elements.Axis} Minor axis ticks or itself for chaining.
+ * Getter for minor axis ticks.
+ * @return {anychart.elements.Ticks} Axis ticks.
+ *//**
+ * Setter for minor axis ticks.
+ * @param {anychart.elements.Ticks=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.elements.Ticks=} opt_value Axis ticks.
+ * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for chaining.
  */
 anychart.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
@@ -558,7 +600,14 @@ anychart.elements.Axis.prototype.minorTicksInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets axis line stroke.
+ * Getter for axis line stroke.
+ * @return {string|acgraph.vector.Stroke} Axis line stroke settings.
+ *//**
+ * Setter for axis line stroke.
+ * @param {(string|acgraph.vector.Stroke)=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
  * @return {string|acgraph.vector.Stroke|anychart.elements.Axis} Axis line stroke or itself for chaining.
  */
@@ -582,7 +631,14 @@ anychart.elements.Axis.prototype.stroke = function(opt_value) {
 
 
 /**
- * Gets/sets axis orientation.
+ * Getter for axis orientation.
+ * @return {string|anychart.utils.Orientation} Axis orientation.
+ *//**
+ * Setter for axis orientation.
+ * @param {(string|anychart.utils.Orientation)=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|anychart.utils.Orientation)=} opt_value Axis orientation.
  * @return {string|anychart.utils.Orientation|anychart.elements.Axis} Axis orientation oe itself for chaining.
  */
@@ -601,7 +657,15 @@ anychart.elements.Axis.prototype.orientation = function(opt_value) {
 };
 
 
-/** Gets/sets axis scale.
+/**
+ * Getter for axis scale.
+ * @return {anychart.scales.Base} Axis scale.
+ *//**
+ * Setter for axis scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|anychart.elements.Axis} Axis scale or itself for chaining.
  */
@@ -632,8 +696,15 @@ anychart.elements.Axis.prototype.scaleInvalidated_ = function(event) {
 
 
 /**
- * Gets/sets сдвиг баундов оси по оси x от края баундов родителя.
- * @param {number=} opt_value Сдвиг в пикселях.
+ * Getter сдвиг баундов оси по оси x от края баундов родителя.
+ * @return {number} Offset by X.
+ *//**
+ * Setter сдвиг баундов оси по оси x от края баундов родителя.
+ * @param {number=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value Value to set.
  * @return {number|anychart.elements.Axis} Offset or itself for chaining.
  */
 anychart.elements.Axis.prototype.offsetX = function(opt_value) {
@@ -650,8 +721,15 @@ anychart.elements.Axis.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Gets/sets сдвиг баундов оси по оси y от края баундов родителя.
- * @param {number=} opt_value Сдвиг в пикселях.
+ * Getter сдвиг баундов оси по оси y от края баундов родителя.
+ * @return {number} Offset by Y.
+ *//**
+ * Setter сдвиг баундов оси по оси y от края баундов родителя.
+ * @param {number=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value Value to set.
  * @return {number|anychart.elements.Axis} Offset or itself for chaining.
  */
 anychart.elements.Axis.prototype.offsetY = function(opt_value) {
@@ -668,9 +746,15 @@ anychart.elements.Axis.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Gets/sets длину оси. Для горизонтальной ориентации оси длиной будет являться ее ширина, для вертикальной - высота,
- * второй параметр - size (для горизонтальной ориентации - высота, для вертикальной - ширина) рассчитывается самой осью
- * автоматически.
+ * Getter for axis length.
+ * @return {number} Axis length.
+ *//**
+ * Setter for axis length.<br/>
+ * <b>Note:</b> Для горизонтальной ориентации оси длиной будет являться ее ширина, для вертикальной - высота.
+ * @param {number=} opt_value Длина оси.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value Длина оси.
  * @return {number|anychart.elements.Axis} Length or itself for chaining.
  */
@@ -688,9 +772,16 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
 
 
 /**
- * Gets/sets parent bounds.
- * @param {anychart.math.Rect=} opt_value Parent bounds.
- * @return {anychart.math.Rect|anychart.elements.Axis} Parent bounds or itself for chaining.
+ * Getter for parentBounds.
+ * @return {acgraph.math.Rect} Current parent bounds.
+ *//**
+ * Setter for parentBounds.
+ * @param {acgraph.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.math.Rect=} opt_value Bounds for marker.
+ * @return {acgraph.math.Rect|anychart.elements.Axis} Bounds or this.
  */
 anychart.elements.Axis.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1249,7 +1340,14 @@ anychart.elements.Axis.prototype.isPointOnLine_ = function(p1x, p1y, p2x, p2y, p
 
 
 /**
- * Gets/sets флаг рисования для первого лейбла оси.
+ * Getter флаг рисования для первого лейбла оси.
+ * @return {boolean} Drawing flag.
+ *//**
+ * Setter флаг рисования для первого лейбла оси.
+ * @param {boolean=} opt_value [true] Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|anychart.elements.Axis} Drawing flag or itself for chaining.
  */
@@ -1268,7 +1366,14 @@ anychart.elements.Axis.prototype.drawFirstLabel = function(opt_value) {
 
 
 /**
- * Gets/sets флаг рисования для последнего лейбла оси.
+ * Getter флаг рисования для последнего лейбла оси.
+ * @return {boolean} Drawing flag.
+ *//**
+ * Setter флаг рисования для последнего лейбла оси.
+ * @param {boolean=} opt_value [true] Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|anychart.elements.Axis} Drawing flag or itself for chaining.
  */
@@ -1287,9 +1392,16 @@ anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
 
 
 /**
- * Gets/sets overlap mode for labels.
- * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value Overlap mode.
- * @return {anychart.elements.Axis.OverlapMode|string|anychart.elements.Axis} Overlap mode or itself for chaining.
+ * Getter for overlap mode for labels.
+ * @return {anychart.elements.Axis.OverlapMode|string} OverlapMode flag.
+ *//**
+ * Setter for overlap mode for labels.
+ * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value [true] Value to set.
+ * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value Value to set.
+ * @return {anychart.elements.Axis.OverlapMode|string|anychart.elements.Axis} Drawing flag or itself for chaining.
  */
 anychart.elements.Axis.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {

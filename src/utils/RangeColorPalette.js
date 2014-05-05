@@ -70,6 +70,9 @@ anychart.utils.RangeColorPalette.prototype.colorPalette_;
  *//**
  * Setter for color palette colors list.
  * @example <t>listingOnly</t>
+ * var palette = new anychart.utils.RangeColorPalette()
+ *      .colors(['red', 'yellow'])
+ *      .count(10);
  * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
  * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value Color palette colors list to set.
  * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.

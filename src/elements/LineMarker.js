@@ -97,7 +97,15 @@ anychart.elements.LineMarker.prototype.direction = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
-/** Gets/sets axis scale.
+/**
+ * Getter for axis scale.
+ * @return {anychart.scales.Base} Axis scale.
+ *//**
+ * Setter for axis scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.elements.LineMarker} An instance of the {@link anychart.elements.LineMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|anychart.elements.LineMarker} Axis scale or itself for chaining.
  */
@@ -138,7 +146,14 @@ anychart.elements.LineMarker.prototype.scaleInvalidated_ = function(event) {
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets/sets parentBounds.
+ * Getter for parentBounds.
+ * @return {acgraph.math.Rect} Current parent bounds.
+ *//**
+ * Setter for parentBounds.
+ * @param {acgraph.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.LineMarker} An instance of the {@link anychart.elements.LineMarker} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {acgraph.math.Rect=} opt_value Bounds for marker.
  * @return {acgraph.math.Rect|anychart.elements.LineMarker} Bounds or this.
  */

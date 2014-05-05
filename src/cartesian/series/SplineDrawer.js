@@ -62,7 +62,7 @@ anychart.cartesian.series.SplineDrawer = function(mainPath, opt_rtl) {
 /**
  * If the drawer is rtl (draws right-to-left on forward direction).
  * @param {boolean=} opt_rtl .
- * @return {boolean|!anychart.cartesian.series.SplineDrawer} .
+ * @return {!anychart.cartesian.series.SplineDrawer|boolean} .
  */
 anychart.cartesian.series.SplineDrawer.prototype.rtl = function(opt_rtl) {
   if (goog.isDef(opt_rtl)) {

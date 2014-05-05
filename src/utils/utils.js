@@ -101,7 +101,13 @@ anychart.utils.Orientation = {
  * @enum {string}
  */
 anychart.utils.Direction = {
+  /**
+   * Vertical direction.
+   */
   VERTICAL: 'vertical',
+  /**
+   * Horizontal direction.
+   */
   HORIZONTAL: 'horizontal'
 };
 

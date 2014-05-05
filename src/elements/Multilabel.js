@@ -824,7 +824,16 @@ anychart.elements.Multilabel.prototype.height = function(opt_value) {
 
 
 /**
- * Set/get text settings for custom label.
+ * Getter for text settings of custom label by index.
+ * @param {number} index Index.
+ * @return {anychart.elements.Text} Custom label text settings.
+ *//**
+ * Setter for text settings of custom label by index.
+ * @param {number} index Index.
+ * @param {(anychart.elements.Text|Object)=} opt_value Text object or text settings.
+ * @return {!anychart.elements.Multilabel} An instance of the {@link anychart.elements.Multilabel} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number} index Index.
  * @param {(anychart.elements.Text|Object)=} opt_value Text object or text settings.
  * @return {anychart.elements.Text|anychart.elements.Multilabel} Custom label text settings or itself for chaining call.
@@ -1595,7 +1604,7 @@ anychart.elements.Multilabel.prototype.dropCustomSettingsAt = function(index) {
  * (registered via listenOnce), it will no longer be a one-off
  * listener after a call to listen().
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase
@@ -1623,7 +1632,7 @@ anychart.elements.Multilabel.prototype.listen = function(type, listener, opt_use
  * one-off listener, listenOnce does not modify the listeners (it is
  * still a once listener).
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase
@@ -1643,7 +1652,7 @@ anychart.elements.Multilabel.prototype.listenOnce = function(type, listener, opt
 /**
  * Removes an event listener which was added with listen() or listenOnce().
  *
- * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
  * @param {boolean=} opt_useCapture Whether to fire in capture phase

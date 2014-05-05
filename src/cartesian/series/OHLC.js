@@ -150,19 +150,29 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.OHLC} An instance of the {@link anychart.cartesian.series.OHLC} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {
@@ -181,19 +191,29 @@ anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFil
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.OHLC} An instance of the {@link anychart.cartesian.series.OHLC} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {
@@ -231,19 +251,29 @@ anychart.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(hover) 
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.OHLC} An instance of the {@link anychart.cartesian.series.OHLC} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {
@@ -262,19 +292,29 @@ anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFi
 
 
 /**
- * Общий строук, но! Может принять еще функцию первым параметром.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * Getter for current stroke settings.
+ * @return {acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for stroke settings.
+ * О том как задавать настройки, можно почитать тут:
+ * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * @shortDescription Setter for stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {anychart.cartesian.series.Base|acgraph.vector.Stroke|Function}
- *    Если используется как сеттер, то возвращает себя, для реализации цепного вызовы.
- *    Если используется как геттер, то возвращает текущую настройку линии.
+ * @return {!anychart.cartesian.series.OHLC} An instance of the {@link anychart.cartesian.series.OHLC} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
+ *    границ или просто настройки заливки.
+ * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.OHLC.prototype.hoverFallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
     opt_lineCap) {

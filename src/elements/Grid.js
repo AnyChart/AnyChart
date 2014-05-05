@@ -144,9 +144,16 @@ anychart.elements.Grid.prototype.invert = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets/sets scale for grid.
+ * Getter for axis scale.
+ * @return {anychart.scales.Base} Axis scale.
+ *//**
+ * Setter for axis scale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {!anychart.elements.Grid} An instance of the {@link anychart.elements.Grid} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.Grid} Grid scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.Grid} Axis scale or itself for chaining.
  */
 anychart.elements.Grid.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -186,8 +193,15 @@ anychart.elements.Grid.prototype.scaleInvalidated_ = function(event) {
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets/sets parentBounds.
- * @param {acgraph.math.Rect=} opt_value Bounds for grid.
+ * Getter for parentBounds.
+ * @return {acgraph.math.Rect} Current parent bounds.
+ *//**
+ * Setter for parentBounds.
+ * @param {acgraph.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.Grid} An instance of the {@link anychart.elements.Grid} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.math.Rect=} opt_value Bounds for marker.
  * @return {acgraph.math.Rect|anychart.elements.Grid} Bounds or this.
  */
 anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
