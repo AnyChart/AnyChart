@@ -55,115 +55,38 @@ anychart.onDocumentReady(function() {
   chart.rangeMarker().from(38).to(48).fill('#FFFFCD 0.7');
   chart.rangeMarker().from(48).to(75).fill('#FFCCCB 0.7');
 
+  //create text axes markers
+  chart.textMarker()
+      .fontWeight('bold')
+      .value(21)
+      .align('near')
+      .anchor('leftcenter')
+      .offsetX(10)
+      .text('Below 28% - Buy! Buy! Buy!');
+
+  chart.textMarker()
+      .value(33)
+      .fontWeight('bold')
+      .align('right')
+      .offsetX(-80)
+      .text('28%-38%\nMarginally affordable with\nfixed-rate mortgages.');
+
+  chart.textMarker()
+      .value(44)
+      .offsetX(20)
+      .fontWeight('bold')
+      .align('center')
+      .text('38%-48%\nNot affordable with fixed.\nInterest-only becomes common.');
+
+  chart.textMarker()
+      .value(62)
+      .fontWeight('bold')
+      .align('center')
+      .text('48% or greater\nNot affordable with fixed or interest only.\nNegative amortization only option.');
+
   //change yAxis title text settings
   chart.yAxis().title().text('Debt-To-Income Ratios');
 
   //initiate chart drawing
   chart.draw();
 });
-
-
-//<?xml version="1.0" encoding="UTF-8"?>
-//<anychart>
-//  <settings>
-//    <animation enabled="True" />
-//  </settings>
-//  <charts>
-//    <chart plot_type="CategorizedVertical">
-//      <data_plot_settings default_series_type="Line">
-//        <line_series>
-//          <marker_settings>
-//            <marker type="None" />
-//            <states>
-//              <hover>
-//                <marker type="Diamond" />
-//              </hover>
-//            </states>
-//          </marker_settings>
-//          <tooltip_settings enabled="True">
-//            <format>
-//Year {%Name}{enabled:false}
-//{%SeriesName} - {%Value}{numDecimals:0}%
-//</format>
-//          </tooltip_settings>
-//          <effects enabled="True">
-//            <drop_shadow enabled="False" />
-//            <bevel enabled="true" distance="1" blur_x="2" blur_y="2" />
-//          </effects>
-//          <line_style>
-//            <line thickness="3" />
-//          </line_style>
-//        </line_series>
-//      </data_plot_settings>
-//      <chart_settings>
-//        <title enabled="true">
-//          <text>Debt-To-Income Ratios 1986-2006</text>
-//        </title>
-//        <axes>
-//          <y_axis>
-//            <scale minimum="20" maximum="65" major_interval="5" />
-//            <labels>
-//              <format>{%Value}{numDecimals:0}%</format>
-//            </labels>
-//            <title>
-//              <text>Debt-To-Income Ratio</text>
-//            </title>
-//            <axis_markers>
-//              <ranges>
-//                <range minimum="20" maximum="28">
-//                  <fill color="#D9CDFF" opacity="0.7" />
-//                  <minimum_line color="#AEA4CC" opacity="1" />
-//                  <maximum_line color="#AEA4CC" opacity="1" />
-//                  <label enabled="True" position="Near">
-//                    <format>Below 28% - Buy! Buy! Buy!</format>
-//                    <font bold="True" color="#393939" />
-//                  </label>
-//                </range>
-//                <range minimum="28" maximum="38">
-//                  <fill color="#CBFFCF" opacity="0.7" />
-//                  <minimum_line color="#96BC99" opacity="1" />
-//                  <maximum_line color="#96BC99" opacity="1" />
-//                  <label enabled="True" position="Far" multi_line_align="Center">
-//                    <font bold="true" color="#393939" />
-//                    <format>
-//28%-38%
-//Marginally affordable with
-//fixed-rate mortgages.
-//</format>
-//                  </label>
-//                </range>
-//                <range minimum="38" maximum="48">
-//                  <fill color="#FFFFCD" opacity="0.7" />
-//                  <minimum_line color="#CCCCA4" opacity="1" />
-//                  <maximum_line color="#CCCCA4" opacity="1" />
-//                  <label enabled="True" position="Center" multi_line_align="Center">
-//                    <font bold="true" color="#393939" />
-//                    <format>
-//38%-48%
-//Not affordable with fixed.
-//Interest-only becomes common.
-//</format>
-//                  </label>
-//                </range>
-//                <range minimum="48" maximum="65">
-//                  <fill color="#FFCCCB" opacity="0.7" />
-//                  <minimum_line color="#C69E9E" opacity="1" />
-//                  <maximum_line color="#C69E9E" opacity="1" />
-//                  <label enabled="True" position="Center" multi_line_align="Center">
-//                    <font bold="true" color="#393939" />
-//                    <format>
-//48% or greater
-//Not affordable with fixed or interest only.
-//Negative amortization only option.
-//</format>
-//                  </label>
-//                </range>
-//              </ranges>
-//            </axis_markers>
-//          </y_axis>
-//          <x_axis tickmarks_placement="Center">
-//            <title enabled="False" />
-//          </x_axis>
-//    </chart>
-//  </charts>
-//</anychart>
