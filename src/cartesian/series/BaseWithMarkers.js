@@ -39,13 +39,6 @@ anychart.cartesian.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES
 
 
 /**
- * @type {anychart.elements.Marker.Type}
- * @private
- */
-anychart.cartesian.series.BaseWithMarkers.prototype.autoMarkerType_ = anychart.elements.Marker.Type.CIRCLE;
-
-
-/**
  * @type {anychart.elements.Multimarker}
  * @private
  */
@@ -96,14 +89,6 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOut = funct
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = function(event) {
   this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
-};
-
-
-/**
- * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the chart.
- */
-anychart.cartesian.series.BaseWithMarkers.prototype.setAutoMarkerType = function(value) {
-  this.autoMarkerType_ = value;
 };
 
 
@@ -311,7 +296,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
   markers.size(4);
   markers.fill(fillColor);
   markers.stroke(strokeColor);
-  markers.type(this.autoMarkerType_);
+  markers.type(this.autoMarkerType);
   markers.resumeSignalsDispatching(false);
 
   var hoverMarkers = (/** @type {anychart.elements.Multimarker} */(this.hoverMarkers()));
@@ -319,7 +304,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
   hoverMarkers.fill(fillColor);
   hoverMarkers.stroke(strokeColor);
   hoverMarkers.size(6);
-  hoverMarkers.type(this.autoMarkerType_);
+  hoverMarkers.type(this.autoMarkerType);
   hoverMarkers.resumeSignalsDispatching(false);
 
   return result;

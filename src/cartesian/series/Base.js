@@ -240,6 +240,13 @@ anychart.cartesian.series.Base.prototype.autoColor_ = null;
 
 
 /**
+ * @type {anychart.elements.Marker.Type}
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.autoMarkerType;
+
+
+/**
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
@@ -1199,6 +1206,15 @@ anychart.cartesian.series.Base.prototype.color = function(opt_fillOrColorOrKeys,
  */
 anychart.cartesian.series.Base.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
+};
+
+
+/**
+ * Sets series marker type that parent chart have set for it.
+ * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the chart.
+ */
+anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
+  this.autoMarkerType = value;
 };
 
 

@@ -977,13 +977,7 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Area(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1002,13 +996,7 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bar(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1032,13 +1020,7 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bubble(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1062,13 +1044,7 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1087,13 +1063,7 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Column(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1112,13 +1082,7 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Line(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1137,12 +1101,7 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Marker(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1166,13 +1125,7 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.OHLC(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1196,13 +1149,7 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1226,13 +1173,7 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1256,13 +1197,7 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeColumn(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1286,13 +1221,7 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1316,13 +1245,7 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  */
 anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1341,13 +1264,7 @@ anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSet
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Spline(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1366,13 +1283,7 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1391,13 +1302,7 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLine(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1416,14 +1321,23 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
+  this.registerSeries_(res);
+  return res;
+};
+
+
+/**
+ * @param {anychart.cartesian.series.Base} series Series to register.
+ * @private
+ */
+anychart.cartesian.Chart.prototype.registerSeries_ = function(series) {
+  this.series_.push(series);
+  series.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  series.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
+  series.restoreDefaults();
+  series.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
-  return res;
 };
 
 
@@ -2111,7 +2025,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(this.markerPalette().markerAt(i));
+      this.series_[i].setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.SERIES);
