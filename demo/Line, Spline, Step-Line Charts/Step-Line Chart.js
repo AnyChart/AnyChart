@@ -1,7 +1,7 @@
 var chart;
 
 anychart.onDocumentReady(function() {
-  //create DataSet on our data, also we can pud data directly to series
+  //create DataSet on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '51', '125'],
     ['P2' , '91', '132'],

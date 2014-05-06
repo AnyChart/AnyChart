@@ -1,7 +1,7 @@
 var chart;
 
 anychart.onDocumentReady(function() {
-  //create DataSet on our data, also we can pud data directly to series
+  //create DataSet on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '3.6', '2.3', '2.8' , '11.5'],
     ['P2' , '7.1', '4.0', '4.1' , '14.1'],
@@ -45,7 +45,7 @@ anychart.onDocumentReady(function() {
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Line chart');
+  chart.title().text('Line Chart');
 
   //create first series with mapped data
   chart.line(seriesData_1);

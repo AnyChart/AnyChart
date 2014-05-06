@@ -1,7 +1,7 @@
 var chart;
 
 anychart.onDocumentReady(function() {
-  //create DataSet on our data, also we can pud data directly to series
+  //create DataSet on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '10', '30'],
     ['P2' , '12', '32'],
@@ -49,7 +49,7 @@ anychart.onDocumentReady(function() {
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Spline chart');
+  chart.title().text('Spline Chart');
 
   //create first series with mapped data
   chart.spline(seriesData_1);

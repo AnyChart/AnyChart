@@ -2,13 +2,13 @@ var chart;
 
 anychart.onDocumentReady(function() {
   //create line chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.lineChart
+  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
 
   //set container for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Line chart with Logarithmic Y-Axis and Data Labels');
+  chart.title().text('Area chart with Logarithmic Y-Axis and Data Labels');
 
   //create logarithmic scale
   var logScale = new anychart.scales.Logarithmic();
@@ -18,7 +18,7 @@ anychart.onDocumentReady(function() {
   chart.yScale(logScale);
 
   //create first series with mapped data
-  var series = chart.line([
+  var series = chart.area([
     ['P1', '112.61 '],
     ['P2', '163.21 '],
     ['P3', '229.98 '],
