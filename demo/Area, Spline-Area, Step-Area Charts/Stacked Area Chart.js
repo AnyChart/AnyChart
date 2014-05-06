@@ -29,7 +29,7 @@ anychart.onDocumentReady(function() {
   //create area chart
   chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
 
-  //set container for chart
+  //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
