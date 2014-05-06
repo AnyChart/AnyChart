@@ -159,8 +159,7 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -292,8 +291,7 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -367,8 +365,7 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
  * chart.background(background);
  * @param {(anychart.elements.Background)=} opt_value Background object to set.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.elements.Background)=} opt_value .
  * @return {anychart.Chart|anychart.elements.Background} .
@@ -434,8 +431,7 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
  * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(null|string|Object|anychart.elements.Title)=} opt_value .
  * @return {anychart.elements.Title|anychart.Chart} .

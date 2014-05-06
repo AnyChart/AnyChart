@@ -942,12 +942,17 @@ goog.exportSymbol('anychart.utils.Direction.HORIZONTAL', anychart.utils.Directio
 goog.exportSymbol('anychart.utils.Direction.VERTICAL', anychart.utils.Direction.VERTICAL);//in docs/
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.utils ColorPalette
+//  anychart.utils Palettes
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);//in docs/
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;//in docs/
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;//in docs/
+goog.exportSymbol('anychart.utils.MarkerPalette', anychart.utils.MarkerPalette);
+anychart.utils.MarkerPalette.prototype['markerAt'] = anychart.utils.MarkerPalette.prototype.markerAt;
+anychart.utils.MarkerPalette.prototype['markers'] = anychart.utils.MarkerPalette.prototype.markers;
+anychart.utils.MarkerPalette.prototype['serialize'] = anychart.utils.MarkerPalette.prototype.serialize;
+anychart.utils.MarkerPalette.prototype['deserialize'] = anychart.utils.MarkerPalette.prototype.deserialize;
 goog.exportSymbol('anychart.utils.RangeColorPalette', anychart.utils.RangeColorPalette);//in docs/
 anychart.utils.RangeColorPalette.prototype['colorAt'] = anychart.utils.RangeColorPalette.prototype.colorAt;//in docs/
 anychart.utils.RangeColorPalette.prototype['colors'] = anychart.utils.RangeColorPalette.prototype.colors;//in docs/

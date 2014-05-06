@@ -24,6 +24,7 @@ goog.require('anychart.pie');
 goog.require('anychart.ui');
 goog.require('anychart.utils');
 goog.require('anychart.utils.DistinctColorPalette');
+goog.require('anychart.utils.MarkerPalette');
 goog.require('anychart.utils.RangeColorPalette');
 goog.require('goog.json.hybrid');
 
