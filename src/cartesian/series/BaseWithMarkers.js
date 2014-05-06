@@ -39,6 +39,13 @@ anychart.cartesian.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES
 
 
 /**
+ * @type {anychart.elements.Marker.Type}
+ * @private
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.autoMarkerType_ = anychart.elements.Marker.Type.CIRCLE;
+
+
+/**
  * @type {anychart.elements.Multimarker}
  * @private
  */
@@ -93,6 +100,14 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
 
 
 /**
+ * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the chart.
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.setAutoMarkerType = function(value) {
+  this.autoMarkerType_ = value;
+};
+
+
+/**
  * Getter for series data markers.
  * @example <t>listingOnly</t>
  * series.markers().size(10);
@@ -109,7 +124,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * series.markers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
@@ -153,7 +169,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * series.hoverMarkers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
- *//**
+ */
+/**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
@@ -294,7 +311,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
   markers.size(4);
   markers.fill(fillColor);
   markers.stroke(strokeColor);
-  markers.type(anychart.elements.Marker.Type.CIRCLE);
+  markers.type(this.autoMarkerType_);
   markers.resumeSignalsDispatching(false);
 
   var hoverMarkers = (/** @type {anychart.elements.Multimarker} */(this.hoverMarkers()));
@@ -302,7 +319,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
   hoverMarkers.fill(fillColor);
   hoverMarkers.stroke(strokeColor);
   hoverMarkers.size(6);
-  hoverMarkers.type(anychart.elements.Marker.Type.CIRCLE);
+  hoverMarkers.type(this.autoMarkerType_);
   hoverMarkers.resumeSignalsDispatching(false);
 
   return result;
