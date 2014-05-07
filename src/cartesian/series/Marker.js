@@ -443,5 +443,3 @@ anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
-
-

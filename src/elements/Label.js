@@ -1226,7 +1226,3 @@ anychart.elements.Label.prototype.disposeInternal = function() {
   //we should dispose padding, background and textElement
   //they all disposed with registerDisposable call
 };
-
-
-
-

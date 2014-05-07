@@ -407,5 +407,3 @@ anychart.cartesian.series.OHLC.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
-
-

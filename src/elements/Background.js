@@ -627,4 +627,3 @@ anychart.elements.Background.prototype.deserialize = function(config) {
 
   return this;
 };
-

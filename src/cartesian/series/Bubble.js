@@ -635,4 +635,3 @@ anychart.cartesian.series.Bubble.prototype.deserialize = function(config) {
 
   return this;
 };
-

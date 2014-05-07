@@ -165,4 +165,3 @@ anychart.cartesian.series.StepLineArea.prototype.serialize = function() {
 anychart.cartesian.series.StepLineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

@@ -901,6 +901,3 @@ anychart.elements.TooltipItem.prototype.deserialize = function(config) {
 
   return this;
 };
-
-
-

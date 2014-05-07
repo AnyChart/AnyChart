@@ -79,5 +79,3 @@ anychart.cartesian.series.Bar.prototype.serialize = function() {
 anychart.cartesian.series.Bar.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-
-

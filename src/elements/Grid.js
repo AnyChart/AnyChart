@@ -723,4 +723,3 @@ anychart.elements.Grid.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
-

@@ -2007,4 +2007,3 @@ anychart.elements.Multimarker.BrowserEvent.prototype.copyFrom = function(e, opt_
   this.event_ = e;
   delete this.propagationStopped_;
 };
-

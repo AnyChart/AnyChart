@@ -354,4 +354,3 @@ anychart.elements.LineMarker.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
-

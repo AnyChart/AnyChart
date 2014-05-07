@@ -510,21 +510,3 @@ anychart.elements.Tooltip.prototype.deserialize = function(config) {
 
   return this;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

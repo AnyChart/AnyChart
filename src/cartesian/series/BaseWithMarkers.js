@@ -307,4 +307,3 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
 
   return result;
 };
-
