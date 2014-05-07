@@ -1,6 +1,9 @@
 goog.provide('anychart.elements.Multimarker');
 goog.provide('anychart.elements.Multimarker.BrowserEvent');
+goog.require('anychart.VisualBase');
+goog.require('anychart.color');
 goog.require('anychart.elements.Marker.Type');
+goog.require('anychart.utils');
 goog.require('goog.events.BrowserEvent');
 
 

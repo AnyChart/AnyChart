@@ -2,6 +2,7 @@ goog.provide('anychart.elements.Background');
 
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.math.Rect');
 goog.require('goog.array');
 
 

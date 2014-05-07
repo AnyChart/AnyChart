@@ -1,5 +1,7 @@
 goog.provide('anychart.elements.LineMarker');
 goog.require('anychart.VisualBase');
+goog.require('anychart.color');
+goog.require('anychart.utils');
 
 
 

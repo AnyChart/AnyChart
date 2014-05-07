@@ -1,6 +1,7 @@
 goog.provide('anychart.elements.Ticks');
 
 goog.require('anychart.Base');
+goog.require('anychart.color');
 goog.require('anychart.utils');
 
 

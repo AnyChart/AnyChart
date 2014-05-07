@@ -109,8 +109,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * series.markers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
@@ -128,7 +127,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
       this.markers_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
       this.markers_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.markers_.enabled(false);
     }
     return this;
@@ -154,8 +153,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * series.hoverMarkers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
  * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
@@ -172,7 +170,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_
       this.hoverMarkers_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.hoverMarkers_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.hoverMarkers_.enabled(false);
     }
     return this;

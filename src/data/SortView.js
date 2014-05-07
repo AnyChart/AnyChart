@@ -1,6 +1,7 @@
 goog.provide('anychart.data.SortView');
 
 goog.require('anychart.data.View');
+goog.require('anychart.utils');
 goog.require('goog.array');
 
 

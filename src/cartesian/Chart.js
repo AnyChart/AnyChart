@@ -183,8 +183,7 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value X Scale to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
@@ -226,8 +225,7 @@ anychart.cartesian.Chart.prototype.xScale = function(opt_value) {
  * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value Y Scale to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
@@ -336,8 +334,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart grid settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Grid settings to set.
@@ -366,7 +363,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
       grid.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
     return this;
@@ -431,8 +428,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart minor grid settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Minor grid settings.
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Minor grid settings to set.
@@ -462,7 +458,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
       grid.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
     return this;
@@ -532,8 +528,7 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
@@ -564,7 +559,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
       axis.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
     return this;
@@ -620,8 +615,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
@@ -652,7 +646,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
       axis.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
     return this;
@@ -729,8 +723,7 @@ anychart.cartesian.Chart.prototype.onAxisSignal_ = function(event) {
  * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.LineMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.
@@ -759,7 +752,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
       lineMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       lineMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       lineMarker.enabled(false);
     }
     return this;
@@ -808,8 +801,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
  * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.RangeMarker|Object|string|null)=} opt_indexOrValue Chart range marker settings to set.
  * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.
@@ -838,7 +830,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
       rangeMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       rangeMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       rangeMarker.enabled(false);
     }
     return this;
@@ -894,8 +886,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
  * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.TextMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart line marker settings to set.
@@ -924,7 +915,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
       textMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       textMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       textMarker.enabled(false);
     }
     return this;
@@ -1385,8 +1376,7 @@ anychart.cartesian.Chart.prototype.seriesInvalidated_ = function(event) {
  * See example at {@link anychart.cartesian.Chart#barsPadding}.
  * @param {number=} opt_value [0.1] Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
@@ -1431,8 +1421,7 @@ anychart.cartesian.Chart.prototype.barGroupsPadding = function(opt_value) {
  *     .moveTo(76, 206).lineTo(295, 206).stroke(rect.stroke());
  * @param {number=} opt_value [0.1] Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
@@ -1875,8 +1864,7 @@ anychart.cartesian.Chart.prototype.calcBubbleSizes_ = function() {
  * Setter for series colors palette.
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
  * @return {!(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|anychart.cartesian.Chart)} .

@@ -383,7 +383,7 @@ anychart.Chart.prototype.background = function(opt_value) {
       this.background_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.background_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.background_.enabled(false);
     }
     this.background_.resumeSignalsDispatching(true);
@@ -449,7 +449,7 @@ anychart.Chart.prototype.title = function(opt_value) {
       this.title_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.title_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.title_.enabled(false);
     }
     this.resumeSignalsDispatching(true);
@@ -503,7 +503,7 @@ anychart.Chart.prototype.legend = function(opt_value) {
       this.legend_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.legend_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.legend_.enabled(false);
     }
     return this;
@@ -568,7 +568,7 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
       label.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       label.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       label.enabled(false);
     }
     return this;

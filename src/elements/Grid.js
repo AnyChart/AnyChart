@@ -1,5 +1,8 @@
 goog.provide('anychart.elements.Grid');
 goog.require('anychart.VisualBase');
+goog.require('anychart.color');
+goog.require('anychart.utils');
+goog.require('anychart.utils.TypedLayer');
 
 
 

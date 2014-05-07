@@ -1,8 +1,12 @@
 goog.provide('anychart.elements.TooltipItem');
 goog.require('anychart.VisualBaseWithBounds');
+goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Title');
+goog.require('anychart.math.Rect');
+goog.require('anychart.utils');
+goog.require('anychart.utils.Padding');
 goog.require('goog.async.Delay');
 
 
@@ -204,7 +208,7 @@ anychart.elements.TooltipItem.prototype.title = function(opt_value) {
       this.title_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.title_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.title_.enabled(false);
     } else if (goog.isString(opt_value)) {
       this.title_.text(opt_value);
@@ -260,7 +264,7 @@ anychart.elements.TooltipItem.prototype.separator = function(opt_value) {
       this.separator_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.separator_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.separator_.enabled(false);
     }
     return this;
@@ -314,7 +318,7 @@ anychart.elements.TooltipItem.prototype.content = function(opt_value) {
       this.label_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.label_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.label_.enabled(false);
     } else if (goog.isString(opt_value)) {
       this.label_.text(opt_value);
@@ -370,7 +374,7 @@ anychart.elements.TooltipItem.prototype.background = function(opt_value) {
       this.background_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.background_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.background_.enabled(false);
     }
     return this;
@@ -414,7 +418,7 @@ anychart.elements.TooltipItem.prototype.padding = function(opt_value) {
       this.padding_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.padding_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.padding_.enabled(false);
     }
     return this;

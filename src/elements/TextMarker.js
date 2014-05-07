@@ -1,5 +1,7 @@
 goog.provide('anychart.elements.TextMarker');
+goog.require('anychart.color');
 goog.require('anychart.elements.Text');
+goog.require('anychart.utils');
 
 
 

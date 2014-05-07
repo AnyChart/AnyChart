@@ -92,8 +92,7 @@ goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
  *    return path;
  *  }</code>.
  * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Marker.Type|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
@@ -152,8 +151,7 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *    return path;
  *  }</code>.
  * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Marker.Type|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
@@ -184,8 +182,7 @@ anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
  *     .size(14);
  * @param {number=} opt_value [10] Value to set.
  * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {anychart.cartesian.series.Marker|number} .
@@ -216,8 +213,7 @@ anychart.cartesian.series.Marker.prototype.size = function(opt_value) {
  *     .hoverSize(20);
  * @param {number=} opt_value [12] Value to set.
  * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {anychart.cartesian.series.Marker|number} .

@@ -1,6 +1,7 @@
 goog.provide('anychart.cartesian.series.Base');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.data');
 goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Tooltip');
 goog.require('anychart.events.EventType');
@@ -1058,7 +1059,7 @@ anychart.cartesian.series.Base.prototype.tooltip = function(opt_value) {
       this.tooltip_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.tooltip_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.tooltip_.enabled(false);
     }
     return this;
@@ -1102,7 +1103,7 @@ anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
       this.labels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
       this.labels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.labels_.enabled(false);
     }
     return this;
@@ -1128,7 +1129,7 @@ anychart.cartesian.series.Base.prototype.hoverLabels = function(opt_value) {
       this.hoverLabels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
       this.hoverLabels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.hoverLabels_.enabled(false);
     }
     return this;

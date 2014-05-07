@@ -3,6 +3,7 @@ goog.provide('anychart.data.Set');
 goog.require('anychart.Base');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
+//goog.require('anychart.globalLock'); should be here but commented cause of circular dependency in export.js
 goog.require('goog.array');
 
 

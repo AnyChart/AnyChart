@@ -1,7 +1,9 @@
 goog.provide('anychart.ui.Paginator');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Text');
 goog.require('anychart.math.Rect');
+goog.require('anychart.ui.PaginatorButton');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 
@@ -287,7 +289,7 @@ anychart.ui.Paginator.prototype.background = function(opt_value) {
       this.background_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.background_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.background_.enabled(false);
     }
     this.background_.resumeSignalsDispatching(false);

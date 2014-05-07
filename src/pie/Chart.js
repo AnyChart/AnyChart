@@ -1,7 +1,10 @@
 goog.provide('anychart.pie.Chart');
 goog.require('anychart.Chart');
 goog.require('anychart.color');
+goog.require('anychart.elements.Multilabel');
 goog.require('anychart.math');
+goog.require('anychart.utils.DistinctColorPalette');
+goog.require('anychart.utils.RangeColorPalette');
 goog.require('anychart.utils.Sort');
 
 
