@@ -3,11 +3,11 @@ var chart;
 anychart.onDocumentReady(function() {
   //create DataSet on our data
   var dataSet = new anychart.data.Set([
-    ['P1', 297, 243, 235, 223],
-    ['P2', 184, 255, 156, 249],
-    ['P3', 136, 199, 177, 276],
-    ['P4', 142, 186, 242, 249],
-    ['P5', 228, 145, 267, 297]
+    ['P1', 297, 243, 235, -223],
+    ['P2', 184, 255, 156, -249],
+    ['P3', 136, 199, -177, -276],
+    ['P4', 142, 186, -242, -249],
+    ['P5', 228, 145, -267, -297]
   ]);
 
   //map data for the first series, take value from first column of data set
@@ -26,13 +26,13 @@ anychart.onDocumentReady(function() {
   chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.columnChart
 
   //force chart to stack values by Y scale.
-  chart.yScale().stackMode('percent');
+  chart.yScale().stackMode('value');
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('100% Stacked Column Chart');
+  chart.title().text('Stacked Bar Chart');
 
   //create first series with mapped data
   chart.column(seriesData_1);
@@ -57,7 +57,7 @@ anychart.onDocumentReady(function() {
 //      <animation enabled="True" />
 //    </settings>
 //    <charts>
-//      <chart plot_type="CategorizedVertical">
+//      <chart plot_type="CategorizedHorizontal">
 //        <data_plot_settings default_series_type="Bar">
 //          <bar_series group_padding="0.3">
 //            <label_settings enabled="true">
@@ -68,51 +68,26 @@ anychart.onDocumentReady(function() {
 //                  <drop_shadow enabled="true" distance="1" angle="45" blur_x="1.5" blur_y="1.5" strength="2" opacity="0.5" />
 //                </effects>
 //              </font>
-//              <format>{%YPercentOfCategory}{numDecimals:1}%</format>
+//              <format>{%YValue}{numDecimals:0,useNegativeSign:false}</format>
 //            </label_settings>
-//            <marker_settings enabled="true">
-//              <marker type="None" size="10" />
-//              <states>
-//                <hover>
-//                  <marker type="Circle" />
-//                  <border thickness="2" />
-//                </hover>
-//                <pushed>
-//                  <marker type="Circle" size="6" />
-//                  <border thickness="2" />
-//                </pushed>
-//                <selected_normal>
-//                  <marker type="Star5" size="16" />
-//                  <border thickness="1" />
-//                </selected_normal>
-//                <selected_hover>
-//                  <marker type="Star5" size="12" />
-//                  <border thickness="1" />
-//                </selected_hover>
-//              </states>
-//            </marker_settings>
 //            <tooltip_settings enabled="True">
-//              <position anchor="CenterTop" valign="Top" halign="Center" padding="10" />
 //              <background>
-//                <border thickness="2" type="Solid" color="DarkColor(%Color)" />
+//                <border color="DarkColor(%Color)" />
 //              </background>
 //              <format>
 //              Name: {%Name}
-//              Value: {%YValue}{numDecimals:2} - {%YPercentOfCategory}{numDecimals:1}%
+//              Value: {%YValue}{numDecimals:2,useNegativeSign:false}
 //              </format>
 //            </tooltip_settings>
 //          </bar_series>
 //        </data_plot_settings>
 //        <chart_settings>
 //          <title enabled="true">
-//            <text>Multi-Series: 100% Stacked</text>
+//            <text>Multi-Series: Stacked with Negative Values</text>
 //          </title>
 //          <axes>
-//            <y_axis position="Left">
-//              <scale mode="PercentStacked" maximum="100" major_interval="10" />
-//              <labels show_last_label="false" align="Inside">
-//                <format>{%Value}{numDecimals:0}%</format>
-//              </labels>
+//            <y_axis position="Opposite">
+//              <scale mode="Stacked" />
 //            </y_axis>
 //          </axes>
 //        </chart_settings>
@@ -134,16 +109,16 @@ anychart.onDocumentReady(function() {
 //          <series name="Series 3">
 //            <point name="P1" y="235" />
 //            <point name="P2" y="156" />
-//            <point name="P3" y="177" />
-//            <point name="P4" y="242" />
-//            <point name="P5" y="267" />
+//            <point name="P3" y="-177" />
+//            <point name="P4" y="-242" />
+//            <point name="P5" y="-267" />
 //          </series>
 //          <series name="Series 4">
-//            <point name="P1" y="223" />
-//            <point name="P2" y="249" />
-//            <point name="P3" y="276" />
-//            <point name="P4" y="249" />
-//            <point name="P5" y="297" />
+//            <point name="P1" y="-223" />
+//            <point name="P2" y="-249" />
+//            <point name="P3" y="-276" />
+//            <point name="P4" y="-249" />
+//            <point name="P5" y="-297" />
 //          </series>
 //        </data>
 //      </chart>

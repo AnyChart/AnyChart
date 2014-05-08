@@ -23,7 +23,7 @@ anychart.onDocumentReady(function() {
   var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
 
   //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.columnChart
+  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.barChart
 
   //force chart to stack values by Y scale.
   chart.yScale().stackMode('percent');
@@ -32,19 +32,19 @@ anychart.onDocumentReady(function() {
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('100% Stacked Column Chart');
+  chart.title().text('100% Stacked bar Chart');
 
   //create first series with mapped data
-  chart.column(seriesData_1);
+  chart.bar(seriesData_1);
 
   //create second series with mapped data
-  chart.column(seriesData_2);
+  chart.bar(seriesData_2);
 
   //create third series with mapped data
-  chart.column(seriesData_3);
+  chart.bar(seriesData_3);
 
   //create fourth series with mapped data
-  chart.column(seriesData_4);
+  chart.bar(seriesData_4);
 
   //initiate chart drawing
   chart.draw();
