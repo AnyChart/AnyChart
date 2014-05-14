@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="../../out/anychart.min.js"></script>
+    <script src="../../../out/anychart.min.js"></script>
     <style>
         #container {
             width: 400px;
@@ -26,11 +26,12 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        chart.bar([5,2,2,1]);
-        chart.yAxis()
-                .orientation('left')
-                .scale(chart.xScale())
-                .title('Y-Axis');
+        chart.spline([5,2,3,1]);
+        chart.xAxis().title(null);
+        chart.yAxis().orientation('right').title(null);
+        chart.xAxis().orientation('top').title(null);
+        chart.yAxis();
+
         chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
         chart.draw();

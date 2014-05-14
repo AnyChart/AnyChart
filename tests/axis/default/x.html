@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="../../out/anychart.min.js"></script>
+    <script src="../../../out/anychart.min.js"></script>
     <style>
         #container {
             width: 400px;
@@ -23,18 +23,11 @@
     anychart.onDocumentLoad(function() {
         var chart = new anychart.cartesian.Chart();
         chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
-            document.getElementById('status').innerHTML = 'chart draw';
-            console.log('chart draw');
+           document.getElementById('status').innerHTML = 'chart draw';
+           console.log('chart draw');
         });
-        chart.bar([5,2,2,1]);
-        chart.xAxis()
-                .orientation('bottom')
-                .scale(chart.yScale())
-                .title('X-Axis');
-        chart.yAxis()
-                .orientation('left')
-                .scale(chart.xScale())
-                .title('Y-Axis');
+        chart.column([5,2,2,1]);
+        chart.xAxis();
 
         chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
@@ -42,3 +35,4 @@
     });
 </script>
 </html>
+
