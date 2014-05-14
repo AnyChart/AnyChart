@@ -26,17 +26,13 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        chart.bar([5,2,2,1]);
+        chart.column([5,2,2,1]);
         chart.xAxis()
-                .orientation('bottom')
-                .scale(chart.yScale())
-
-                .title('X-Axis')
-                .minorTicks().length(1);
+                .ticks(null);
         chart.yAxis()
-                .orientation('left')
-                .scale(chart.xScale())
-                .title('Y-Axis');
+                .ticks(null)
+                .minorTicks(null);
+
         console.log() ;
         chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');

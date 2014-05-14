@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="../../../out/anychart.min.js"></script>
+    <script src="../../out/anychart.min.js"></script>
     <style>
         #container {
             width: 400px;
@@ -28,11 +28,12 @@
         });
         chart.column([5,2,0,1,3, 2.5,2]);
 
-        var a = chart.yAxis();
-        a.minorLabels().enabled(true).fontSize(9);
-        a.minorTicks(null);
-        chart.xAxis().overlapMode('12');
-
+        var y = chart.yAxis();
+        y.minorLabels().enabled(true).fontSize(9);
+        y.minorTicks();
+        y.ticks().stroke('red');
+        y.stroke('blue');
+        chart.xAxis().labels(null).stroke('blue');
 
         chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
