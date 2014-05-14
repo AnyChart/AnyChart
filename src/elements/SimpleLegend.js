@@ -3,10 +3,13 @@ goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Text');
 goog.require('anychart.elements.Title');
+goog.require('anychart.math.Rect');
 goog.require('anychart.ui.Paginator');
+goog.require('anychart.utils');
 goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
+goog.require('goog.array');
 
 
 /**
@@ -413,7 +416,7 @@ anychart.elements.Legend.prototype.background = function(opt_value) {
       this.background_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.background_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.background_.enabled(false);
     }
     this.background_.resumeSignalsDispatching(false);
@@ -465,7 +468,7 @@ anychart.elements.Legend.prototype.title = function(opt_value) {
       this.title_.text(opt_value);
     } else if (goog.isObject(opt_value)) {
       this.title_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.title_.enabled(false);
     }
     this.title_.resumeSignalsDispatching(true);
@@ -523,7 +526,7 @@ anychart.elements.Legend.prototype.titleSeparator = function(opt_value) {
       this.titleSeparator_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.titleSeparator_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.titleSeparator_.enabled(false);
     }
     this.invalidate(anychart.ConsistencyState.TITLE, anychart.Signal.NEEDS_REDRAW);
@@ -580,7 +583,7 @@ anychart.elements.Legend.prototype.paginator = function(opt_value) {
       this.paginator_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.paginator_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.paginator_.enabled(false);
     }
     return this;

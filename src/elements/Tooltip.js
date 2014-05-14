@@ -1,4 +1,5 @@
 goog.provide('anychart.elements.Tooltip');
+goog.require('anychart.Base');
 goog.require('anychart.elements.TooltipItem');
 goog.require('anychart.utils.TooltipsContainer');
 
@@ -509,21 +510,3 @@ anychart.elements.Tooltip.prototype.deserialize = function(config) {
 
   return this;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

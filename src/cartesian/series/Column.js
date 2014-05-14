@@ -67,4 +67,3 @@ anychart.cartesian.series.Column.prototype.serialize = function() {
 anychart.cartesian.series.Column.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

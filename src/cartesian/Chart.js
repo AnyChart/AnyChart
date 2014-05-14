@@ -183,8 +183,7 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value X Scale to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
@@ -226,8 +225,7 @@ anychart.cartesian.Chart.prototype.xScale = function(opt_value) {
  * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value Y Scale to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.cartesian.Chart)} Default chart scale value or itself for chaining call.
@@ -336,8 +334,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart grid settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Grid settings to set.
@@ -366,7 +363,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
       grid.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
     return this;
@@ -431,8 +428,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Chart minor grid settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить grid необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Grid|Object|string|null)=} opt_indexOrValue Minor grid settings.
  * @param {(anychart.elements.Grid|Object|string|null)=} opt_value Minor grid settings to set.
@@ -462,7 +458,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
       grid.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
     return this;
@@ -532,8 +528,7 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
@@ -564,7 +559,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
       axis.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
     return this;
@@ -620,8 +615,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить axis необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.Axis|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
  * @param {(anychart.elements.Axis|Object|string|null)=} opt_value Chart axis settings to set.
@@ -652,7 +646,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
       axis.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
     return this;
@@ -729,8 +723,7 @@ anychart.cartesian.Chart.prototype.onAxisSignal_ = function(event) {
  * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.LineMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(anychart.elements.LineMarker|Object|string|null)=} opt_value Chart line marker settings to set.
@@ -759,7 +752,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
       lineMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       lineMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       lineMarker.enabled(false);
     }
     return this;
@@ -808,8 +801,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
  * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.RangeMarker|Object|string|null)=} opt_indexOrValue Chart range marker settings to set.
  * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range marker settings to set.
@@ -838,7 +830,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
       rangeMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       rangeMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       rangeMarker.enabled(false);
     }
     return this;
@@ -894,8 +886,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
  * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
  * <b>Note:</b> Для того, чтобы отключить маркер необходимо передать <b>null</b> или <b>'none'</b>.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(number|anychart.elements.TextMarker|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(anychart.elements.TextMarker|Object|string|null)=} opt_value Chart line marker settings to set.
@@ -924,7 +915,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
       textMarker.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       textMarker.deserialize(value);
-    } else if (anychart.isNone(value)) {
+    } else if (anychart.utils.isNone(value)) {
       textMarker.enabled(false);
     }
     return this;
@@ -977,13 +968,7 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Area(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1002,13 +987,7 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bar(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1032,13 +1011,7 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Bubble(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1062,13 +1035,7 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1087,13 +1054,7 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Column(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1112,13 +1073,7 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Line(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1137,12 +1092,7 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Marker(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1166,13 +1116,7 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.OHLC(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1196,13 +1140,7 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1226,13 +1164,7 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1256,13 +1188,7 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeColumn(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1286,13 +1212,7 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1316,13 +1236,7 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  */
 anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1341,13 +1255,7 @@ anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSet
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.Spline(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1366,13 +1274,7 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1391,13 +1293,7 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLine(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
-  this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
-      anychart.Signal.NEEDS_REDRAW);
+  this.registerSeries_(res);
   return res;
 };
 
@@ -1416,14 +1312,23 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
   var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
-  this.series_.push(res);
-  res.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-  res.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
-  res.restoreDefaults();
-  res.listenSignals(this.seriesInvalidated_, this);
+  this.registerSeries_(res);
+  return res;
+};
+
+
+/**
+ * @param {anychart.cartesian.series.Base} series Series to register.
+ * @private
+ */
+anychart.cartesian.Chart.prototype.registerSeries_ = function(series) {
+  this.series_.push(series);
+  series.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+  series.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
+  series.restoreDefaults();
+  series.listenSignals(this.seriesInvalidated_, this);
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
-  return res;
 };
 
 
@@ -1471,8 +1376,7 @@ anychart.cartesian.Chart.prototype.seriesInvalidated_ = function(event) {
  * See example at {@link anychart.cartesian.Chart#barsPadding}.
  * @param {number=} opt_value [0.1] Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
@@ -1517,8 +1421,7 @@ anychart.cartesian.Chart.prototype.barGroupsPadding = function(opt_value) {
  *     .moveTo(76, 206).lineTo(295, 206).stroke(rect.stroke());
  * @param {number=} opt_value [0.1] Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.cartesian.Chart} .
@@ -1961,8 +1864,7 @@ anychart.cartesian.Chart.prototype.calcBubbleSizes_ = function() {
  * Setter for series colors palette.
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
  * @return {!anychart.cartesian.Chart} An instance of the {@link anychart.cartesian.Chart} class for method chaining.
- */
-/**
+ *//**
  * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
  * @return {!(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|anychart.cartesian.Chart)} .
@@ -2111,7 +2013,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(this.markerPalette().markerAt(i));
+      this.series_[i].setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.SERIES);

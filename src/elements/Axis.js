@@ -2,10 +2,14 @@ goog.provide('anychart.elements.Axis');
 
 goog.require('acgraph.vector.Path');
 goog.require('anychart.VisualBase');
+goog.require('anychart.color');
 goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');
+goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
+goog.require('anychart.scales.ScatterBase');
+goog.require('anychart.utils');
 
 
 
@@ -340,7 +344,7 @@ anychart.elements.Axis.prototype.title = function(opt_value) {
       this.title_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.title_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.title_.enabled(false);
     }
     this.title_.resumeSignalsDispatching(true);
@@ -397,7 +401,7 @@ anychart.elements.Axis.prototype.labels = function(opt_value) {
       this.labels_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.labels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.labels_.enabled(false);
     }
     this.dropBoundsCache_();
@@ -455,7 +459,7 @@ anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
       this.minorLabels_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.minorLabels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.minorLabels_.enabled(false);
     }
     this.dropBoundsCache_();
@@ -512,7 +516,7 @@ anychart.elements.Axis.prototype.ticks = function(opt_value) {
       this.ticks_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.ticks_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.ticks_.enabled(false);
     }
     this.ticks_.resumeSignalsDispatching(true);
@@ -570,7 +574,7 @@ anychart.elements.Axis.prototype.minorTicks = function(opt_value) {
       this.minorTicks_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.minorTicks_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.minorTicks_.enabled(false);
     }
     this.minorTicks_.resumeSignalsDispatching(true);

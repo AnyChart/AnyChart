@@ -1,4 +1,7 @@
 goog.provide('anychart.utils.DistinctColorPalette');
+goog.require('anychart.Base');
+goog.require('anychart.color');
+goog.require('goog.array');
 
 
 

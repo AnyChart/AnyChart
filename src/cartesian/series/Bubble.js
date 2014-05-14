@@ -1,6 +1,8 @@
 goog.provide('anychart.cartesian.series.Bubble');
 
 goog.require('anychart.cartesian.series.DiscreteBase');
+goog.require('anychart.color');
+goog.require('anychart.utils');
 
 
 
@@ -633,4 +635,3 @@ anychart.cartesian.series.Bubble.prototype.deserialize = function(config) {
 
   return this;
 };
-

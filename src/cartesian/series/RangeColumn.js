@@ -80,4 +80,3 @@ anychart.cartesian.series.RangeColumn.prototype.serialize = function() {
 anychart.cartesian.series.RangeColumn.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

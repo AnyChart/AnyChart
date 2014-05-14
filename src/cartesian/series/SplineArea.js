@@ -169,4 +169,3 @@ anychart.cartesian.series.SplineArea.prototype.serialize = function() {
 anychart.cartesian.series.SplineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

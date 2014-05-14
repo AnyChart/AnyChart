@@ -195,4 +195,3 @@ anychart.data.Iterator.prototype.meta = function(name, opt_value) {
   } else
     return this.view_.meta(this.currentIndex_, name);
 };
-

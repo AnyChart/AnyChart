@@ -12,4 +12,3 @@ anychart.events.EventType = {
   POINT_DOUBLE_CLICK: 'pointDoubleClick',
   CHART_DRAW: 'chartDraw'
 };
-

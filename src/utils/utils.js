@@ -678,6 +678,16 @@ anychart.utils.color.parseColor = function(str) {
 
 
 /**
+ * Define, is passed value fit to the none definition.
+ * @param {*} value Value to define.
+ * @return {boolean} Is passed value fit to the none definition.
+ */
+anychart.utils.isNone = function(value) {
+  return value === null || (goog.isString(value) && value.toLowerCase() == 'none');
+};
+
+
+/**
  * Trims all whitespace from the left of the string.
  * @param {string} str source string.
  * @return {string} left trimmed string.

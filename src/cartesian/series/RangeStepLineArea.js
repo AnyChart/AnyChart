@@ -138,4 +138,3 @@ anychart.cartesian.series.RangeStepLineArea.prototype.serialize = function() {
 anychart.cartesian.series.RangeStepLineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

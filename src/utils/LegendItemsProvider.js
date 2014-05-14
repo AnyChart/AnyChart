@@ -1,4 +1,5 @@
 goog.provide('anychart.utils.LegendItemsProvider');
+goog.require('anychart.utils.DistinctColorPalette');
 goog.require('goog.Disposable');
 
 

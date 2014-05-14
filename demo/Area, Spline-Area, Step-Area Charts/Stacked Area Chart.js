@@ -38,7 +38,7 @@ anychart.onDocumentReady(function() {
   //force chart Y Scale to stack values
   chart.yScale().stackMode('value');
 
-  //create first series with mapped data and specified color
+  //create first series with mapped data
   chart.area(seriesData_1);
 
   //create second series with mapped data

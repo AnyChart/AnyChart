@@ -133,4 +133,3 @@ anychart.cartesian.series.RangeSplineArea.prototype.serialize = function() {
 anychart.cartesian.series.RangeSplineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
-

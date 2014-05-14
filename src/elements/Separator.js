@@ -1,5 +1,9 @@
 goog.provide('anychart.elements.Separator');
 goog.require('anychart.VisualBase');
+goog.require('anychart.color');
+goog.require('anychart.math.Rect');
+goog.require('anychart.utils');
+goog.require('anychart.utils.Margin');
 
 
 
@@ -450,8 +454,8 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
     parentWidth = parentHeight = undefined;
   }
 
-  var width = anychart.isNone(this.width_) ? '100%' : this.width_;
-  var height = anychart.isNone(this.height_) ? '100%' : this.height_;
+  var width = anychart.utils.isNone(this.width_) ? '100%' : this.width_;
+  var height = anychart.utils.isNone(this.height_) ? '100%' : this.height_;
 
   var separatorWidth = anychart.utils.normalize(/** @type {number} */ (width), parentWidth);
   if (parentBounds && parentWidth < margin.widenWidth(separatorWidth)) {

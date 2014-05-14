@@ -43,11 +43,10 @@ anychart.onDocumentReady(function() {
   ]);
 
   //setup series settings and series hover settings using chaining calls
-  series1.hoverSize(6)
-      .hoverFill('white')
-      .hoverType('circle')
-      .type('circle')
-      .size(4);
+  series1.size(4)
+      .hoverSize(6)
+      .hoverFill('white');
+
 
   //create second marker series and setup their settings using chaining calls on one line
   chart.marker([
@@ -76,7 +75,7 @@ anychart.onDocumentReady(function() {
     ['851.2419117614627', '420.779668260365'],
     ['1142.1515522524714', '279.29873764514'],
     ['1718.982090242207', '83.4420043975114']
-  ]).type('square').size(4).hoverType('square').hoverSize(6).hoverFill('white');
+  ]).size(4).hoverSize(6).hoverFill('white');
 
   //create third marker series and setup their settings using chaining calls on one line
   chart.marker([
@@ -105,7 +104,7 @@ anychart.onDocumentReady(function() {
     ['953.70374806225', '9.7034038789570'],
     ['1069.3543190136', '239.5621766336'],
     ['814.33140020817', '-484.1634132899']
-  ]).type('diamond').size(4).hoverType('diamond').hoverSize(6).hoverFill('white');
+  ]).size(4).hoverSize(6).hoverFill('white');
 
   //create fourth marker series and setup their settings using chaining calls on one line
   chart.marker([
@@ -134,7 +133,7 @@ anychart.onDocumentReady(function() {
     ['61.4025583490729', '-160.914412699639'],
     ['1898.99344835430', '341.789092402905'],
     ['346.938307397067', '150.88692586869']
-  ]).type('star4').size(4).hoverType('star4').hoverSize(6).hoverFill('white');
+  ]).size(4).hoverSize(6).hoverFill('white');
 
   //create range markers
   chart.rangeMarker()

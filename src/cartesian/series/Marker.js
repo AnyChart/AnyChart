@@ -27,7 +27,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
    * @type {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
-  this.type_ = anychart.elements.Marker.Type.STAR5;
+  this.type_;
 
   /**
    * @type {number}
@@ -39,7 +39,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
    * @type {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
-  this.hoverType_ = anychart.elements.Marker.Type.STAR5;
+  this.hoverType_;
 
   /**
    * @type {number}
@@ -417,6 +417,19 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.Marker.prototype.restoreDefaults = function() {
+  var res = goog.base(this, 'restoreDefaults');
+
+  var type = this.autoMarkerType || anychart.elements.Marker.Type.STAR5;
+
+  this.type_ = type;
+  this.hoverType_ = type;
+
+  return res;
+};
+
+
 /**
  * @inheritDoc
  */
@@ -430,5 +443,3 @@ anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
-
-

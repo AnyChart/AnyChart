@@ -1,5 +1,8 @@
 goog.provide('anychart.elements.Grid');
 goog.require('anychart.VisualBase');
+goog.require('anychart.color');
+goog.require('anychart.utils');
+goog.require('anychart.utils.TypedLayer');
 
 
 
@@ -720,4 +723,3 @@ anychart.elements.Grid.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
-

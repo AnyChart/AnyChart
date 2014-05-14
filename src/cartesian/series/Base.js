@@ -1,6 +1,7 @@
 goog.provide('anychart.cartesian.series.Base');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.data');
 goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Tooltip');
 goog.require('anychart.events.EventType');
@@ -237,6 +238,13 @@ anychart.cartesian.series.Base.prototype.color_ = null;
  * @private
  */
 anychart.cartesian.series.Base.prototype.autoColor_ = null;
+
+
+/**
+ * @type {anychart.elements.Marker.Type}
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.autoMarkerType;
 
 
 /**
@@ -1051,7 +1059,7 @@ anychart.cartesian.series.Base.prototype.tooltip = function(opt_value) {
       this.tooltip_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.tooltip_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.tooltip_.enabled(false);
     }
     return this;
@@ -1095,7 +1103,7 @@ anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
       this.labels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
       this.labels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.labels_.enabled(false);
     }
     return this;
@@ -1121,7 +1129,7 @@ anychart.cartesian.series.Base.prototype.hoverLabels = function(opt_value) {
       this.hoverLabels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
       this.hoverLabels_.deserialize(opt_value);
-    } else if (anychart.isNone(opt_value)) {
+    } else if (anychart.utils.isNone(opt_value)) {
       this.hoverLabels_.enabled(false);
     }
     return this;
@@ -1199,6 +1207,15 @@ anychart.cartesian.series.Base.prototype.color = function(opt_fillOrColorOrKeys,
  */
 anychart.cartesian.series.Base.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
+};
+
+
+/**
+ * Sets series marker type that parent chart have set for it.
+ * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the chart.
+ */
+anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
+  this.autoMarkerType = value;
 };
 
 
