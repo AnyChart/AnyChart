@@ -635,3 +635,14 @@ anychart.cartesian.series.Bubble.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  this.markers(null);
+  this.hoverMarkers(null);
+
+  return result;
+};

@@ -822,31 +822,54 @@ anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
   this.offsetY(5);
   this.hideDelay(0);
 
+  var title = /** @type {anychart.elements.Title}*/(this.title());
+  title.text('Tooltip Title');
+  title.fontFamily('Verdana');
+  title.fontSize(10);
+  title.fontWeight('bold');
+  title.fontColor('rgb(35,35,35)');
+  title.hAlign('center');
+  title.vAlign('top');
+  title.margin(0);
+  title.padding(5, 10, 5, 10);
+  title.background(null);
+  title.enabled(false);
+
   var separator = /** @type {anychart.elements.Separator} */(this.separator());
+  separator.orientation('top');
+  separator.width('100%');
   separator.height(1);
-  separator.margin(0, 5, 10, 5);
+  separator.margin(0, 5, 0, 5);
   separator.enabled(false);
 
-  var title = /** @type {anychart.elements.Title}*/(this.title());
-  title.text('Tooltip item title');
-  title.fontFamily('Lucida Grande, Lucida Sans Unicode, Verdana, Arial');
-  title.fontSize(12);
-  title.fontColor('rgb(51,51,51)');
-  title.margin(0);
-  title.padding(8, 8, 10, 10);
-  title.background(null);
-
   var content = /** @type {anychart.elements.Label}*/(this.content());
-  content.text('content text');
-  content.fontColor('#0d233a');
-  content.fontSize(14);
-  content.padding(0, 10, 10, 10);
+  content.text('Content Text');
+  content.fontFamily('Verdana');
+  content.fontSize(10);
+  content.fontWeight('bold');
+  content.fontColor('rgb(35,35,35)');
+  content.hAlign('center');
+  content.vAlign('top');
+  content.padding(5, 10, 5, 10);
   content.background(null);
+  content.enabled(true);
 
   var background = /** @type {anychart.elements.Background}*/(this.background());
-  background.fill('#fefefe');
-  background.stroke('#2f7ed8');
-  background.corners(4);
+  background.fill(/** @type {acgraph.vector.Fill} */ ({
+    'keys': [
+      '0 rgb(255,255,255) 1',
+      '0.5 rgb(243,243,243) 1',
+      '1 rgb(255,255,255) 1'
+    ]
+  }));
+  background.stroke(/** @type {acgraph.vector.Stroke} */ ({
+    'keys': [
+      '0 rgb(221,221,221) 1',
+      '1 rgb(208,208,208) 1'
+    ]
+  }));
+  background.corners(10);
+  background.cornerType('none');
 };
 
 

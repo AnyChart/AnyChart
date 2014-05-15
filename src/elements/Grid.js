@@ -595,9 +595,9 @@ anychart.elements.Grid.prototype.restoreDefaults = function() {
   this.direction(anychart.utils.Direction.HORIZONTAL);
   this.invert(false);
   this.minor(false);
-  this.oddFill('rgb(245,245,245)');
-  this.evenFill('rgb(255,255,255)');
-  this.stroke('rgb(193,193,193)');
+  this.oddFill('#FFFFFF 1');
+  this.evenFill('#F5F5F5 1');
+  this.stroke('#C1C1C1');
   this.drawFirstLine(true);
   this.drawLastLine(true);
   this.resumeSignalsDispatching(true);

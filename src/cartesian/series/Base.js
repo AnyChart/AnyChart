@@ -804,12 +804,16 @@ anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
 anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
-  return {
-    'value': iterator.get('value'),
-    'x': iterator.get('x'),
+  var provider = {
     'index': index,
     'name': this.name_ ? this.name_ : 'Series ' + index
   };
+  var referenceName;
+  for (var i in this.referenceValueNames) {
+    referenceName = this.referenceValueNames[i];
+    provider[referenceName] = iterator.get(referenceName);
+  }
+  return provider;
 };
 
 

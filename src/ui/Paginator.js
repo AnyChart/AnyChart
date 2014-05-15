@@ -96,12 +96,32 @@ anychart.ui.Paginator = function() {
    */
   this.text_ = null;
 
-  this.zIndex(20);
-  this.margin(10);
-  this.padding(5, 10, 5, 10);
+  this.zIndex(20)
+      .fontFamily('Verdana')
+      .fontSize('10')
+      .fontWeight('normal')
+      .fontColor('rgb(35,35,35)')
+      .orientation('right')
+      .margin(0)
+      .padding(2);
 
-  this.background({'fill': 'none', 'stroke': 'none'});
-  this.orientation('right');
+  this.background()
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle' : '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle' : '90'
+      });
 
   this.pageCount(1);
   this.currentPage(1);

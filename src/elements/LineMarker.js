@@ -283,7 +283,14 @@ anychart.elements.LineMarker.prototype.restoreDefaults = function() {
   this.zIndex(26);
   this.direction(anychart.utils.Direction.HORIZONTAL);
   this.value(0);
-  this.stroke('black');
+  this.stroke({
+    'color': '#DC0A0A',
+    'thickness': 1,
+    'opacity': 1,
+    'dash': '',
+    'lineJoin': 'miter',
+    'lineCap': 'square'
+  });
   this.resumeSignalsDispatching(true);
 };
 

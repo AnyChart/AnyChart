@@ -908,13 +908,13 @@ anychart.Chart.prototype.restoreDefaults = function() {
 
   var legend = /** @type {anychart.elements.Legend} */(this.legend());
   legend.enabled(false);
-  legend.itemsLayout('vertical');
-  legend.position('right');
+  legend.itemsLayout('horizontal');
+  legend.position('bottom');
   legend.margin(0, 0, 0, 10);
   legend.align('center');
-  legend.fontSize(10);
-  legend.fontFamily('verdana');
-  legend.fontColor('rgb(35,35,35)');
+  legend.fontSize(11);
+  legend.fontFamily('Tahoma');
+  legend.fontColor('rgb(34,34,34)');
 
   var legendSeparator = /** @type {anychart.elements.Separator} */(legend.titleSeparator());
   legendSeparator.enabled(false);

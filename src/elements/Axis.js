@@ -31,43 +31,97 @@ anychart.elements.Axis = function() {
   this.title()
       .suspendSignalsDispatching()
       .text('Axis title')
+      .fontFamily('Tahoma')
+      .fontSize('11')
+      .fontColor('rgb(34,34,34')
       .fontWeight('bold')
-      .margin(10, 5, 10, 5)
+      .padding(5)
+      .margin(10, 5, 10, 5);
+
+  this.title().background()
+      .suspendSignalsDispatching()
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle' : '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle' : '90'
+      })
+      .enabled(false)
       .resumeSignalsDispatching(false);
 
   this.labels()
       .suspendSignalsDispatching()
+      .enabled(true)
       .offsetX(0)
       .offsetY(0)
       .anchor(anychart.utils.NinePositions.CENTER)
       .padding(2, 3, 2, 3)
-      .background({'fill': 'gray 0.5', 'enabled': false})
+      .fontFamily('Tahoma')
+      .fontSize('11')
+      .fontColor('rgb(34,34,34)')
       .resumeSignalsDispatching(false);
 
-  this.ticks()
+  this.labels().background()
       .suspendSignalsDispatching()
-      .length(5)
-      .stroke({'color': 'rgb(49,49,49)', 'lineJoin': 'round', 'lineCap': 'butt'})
-      .enabled(true)
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle': '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle': '90'
+      })
       .resumeSignalsDispatching(false);
 
   this.minorLabels()
       .suspendSignalsDispatching()
+      .enabled(false)
       .offsetX(0)
       .offsetY(0)
       .padding(2, 3, 2, 3)
-      .background(null)
+      .fontFamily('Tahoma')
+      .fontSize('11')
+      .fontColor('rgb(34,34,34)')
+      .resumeSignalsDispatching(false);
+
+  this.minorLabels()
+      .suspendSignalsDispatching()
+      .background(this.labels().background())
+      .resumeSignalsDispatching(false);
+
+  this.ticks()
+      .suspendSignalsDispatching()
       .enabled(true)
+      .length(5)
+      .stroke({'color': '#313131', 'lineJoin': 'round', 'lineCap': 'butt'})
       .resumeSignalsDispatching(false);
 
   this.minorTicks()
       .suspendSignalsDispatching()
-      .length(2)
       .enabled(true)
-      .stroke({'color': 'rgb(60,60,60)', 'lineJoin': 'round', 'lineCap': 'butt'})
+      .length(2)
+      .stroke({'color': '#3C3C3C', 'lineJoin': 'round', 'lineCap': 'butt'})
       .resumeSignalsDispatching(false);
 
-  this.stroke({'color': 'rgb(71,71,71)', 'lineJoin': 'round', 'lineCap': 'square'});
+  this.overlapMode(anychart.elements.Axis.OverlapMode.OVERLAP);
+  this.stroke({'color': '#474747', 'lineJoin': 'round', 'lineCap': 'square'});
 
   this.resumeSignalsDispatching(true);
 

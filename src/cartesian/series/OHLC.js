@@ -407,3 +407,14 @@ anychart.cartesian.series.OHLC.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  this.markers(null);
+  this.hoverMarkers(null);
+
+  return result;
+};

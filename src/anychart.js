@@ -364,3 +364,259 @@ anychart.onDocumentReady = function(func, opt_scope) {
     anychart.attachDomEvents_();
   }
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  AnyChart defaults for basic types of charts and series.
+//
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/**
+ * Default empychart.
+ * @return {anychart.cartesian.Chart} Empty chart.
+ */
+anychart.chart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().enabled(false);
+  chart.background().enabled(false);
+  chart.legend().enabled(false);
+  chart.margin(0);
+  chart.padding(0);
+
+  return chart;
+};
+
+
+/**
+ * Default scatter chart.
+ * @return {anychart.cartesian.Chart} Scatter chart.
+ */
+anychart.scatterChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title').fontWeight('bold');
+  chart.xScale(new anychart.scales.Linear());
+
+  chart.xAxis();
+  chart.yAxis();
+
+  chart.grid()
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  return chart;
+};
+
+
+/**
+ * Default pie chart.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
+ * @return {anychart.pie.Chart} Default pie chart.
+ */
+anychart.pieChart = function(opt_data) {
+  var chart = new anychart.pie.Chart(opt_data);
+
+  chart.title()
+      .text('Pie Chart')
+      .fontWeight('bold');
+
+  chart.labels()
+      .enabled(true);
+
+  chart.legend()
+      .enabled(true)
+      .position('right')
+      .align('left')
+      .itemsLayout('vertical');
+
+  chart.legend().title()
+      .enabled(false);
+
+  chart.legend().titleSeparator()
+      .enabled(false)
+      .margin(3, 0);
+
+  return chart;
+};
+
+
+/**
+ * Default line chart.
+ * xAxis, yAxis, grids.
+ * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ */
+anychart.lineChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title');
+
+  chart.xAxis();
+  chart.yAxis();
+
+  chart.grid()
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.1')
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  return chart;
+};
+
+
+/**
+ * Default column chart.
+ * xAxis, yAxis, grids.
+ * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ */
+anychart.columnChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title').fontWeight('bold');
+
+  chart.xAxis();
+  chart.yAxis();
+
+  chart.grid()
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  return chart;
+};
+
+
+/**
+ * Default bar chart.
+ * xAxis, yAxis, grids.
+ * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ */
+anychart.barChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title').fontWeight('bold');
+
+  chart.xScale().inverted(true);
+
+  chart.xAxis().orientation('left');
+  chart.yAxis().orientation('bottom');
+
+  chart.grid()
+      .direction(anychart.utils.Direction.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .direction(anychart.utils.Direction.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
+
+  chart.grid()
+      .drawFirstLine(true)
+      .drawLastLine(true)
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.HORIZONTAL).scale(/** @type {anychart.scales.Base} */ (chart.xScale()));
+
+  return chart;
+};
+
+
+/**
+ * Default area chart.
+ * xAxis, yAxis, grids.
+ * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ */
+anychart.areaChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title').fontWeight('bold');
+
+  chart.xAxis();
+  chart.yAxis();
+
+  chart.grid()
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  return chart;
+};
+
+
+/**
+ * Default financial chart.
+ * xAxis, yAxis, grids.
+ * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ */
+anychart.financialChart = function() {
+  var chart = new anychart.cartesian.Chart();
+
+  chart.title().text('Chart Title').fontWeight('bold');
+  var scale = new anychart.scales.DateTime();
+
+  chart.xScale(scale);
+
+  var axis = chart.xAxis();
+
+  axis.labels()
+      .textFormatter(function(value) {
+        var date = new Date(value['value']);
+        var options = {year: 'numeric', month: 'short', day: 'numeric'};
+        return date.toLocaleDateString('en-US', options);
+      });
+
+  chart.yAxis();
+
+  chart.grid()
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .direction(anychart.utils.Direction.HORIZONTAL);
+
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .direction(anychart.utils.Direction.VERTICAL);
+
+  return chart;
+};

@@ -557,6 +557,10 @@ anychart.elements.TextMarker.prototype.restoreDefaults = function() {
   this.offsetY(0);
   this.width(null);
   this.height(null);
+  this.fontFamily('Tahoma');
+  this.fontSize('11');
+  this.fontWeight('bold');
+  this.fontColor('#222222');
   this.resumeSignalsDispatching(true);
 };
 
