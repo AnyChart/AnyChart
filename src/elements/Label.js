@@ -1196,21 +1196,23 @@ anychart.elements.Label.prototype.deserialize = function(config) {
  */
 anychart.elements.Label.prototype.restoreDefaults = function() {
   this.zIndex(50);
-  this.settingsObj['text'] = 'Label text';
-  this.padding_ = null;
-  this.width_ = null;
-  this.height_ = null;
-  this.background_ = null;
-  this.parentBounds_ = null;
-  this.rotation_ = 0;
-  this.position_ = anychart.utils.NinePositions.LEFT_TOP;
-  this.anchor_ = anychart.utils.NinePositions.LEFT_TOP;
-  this.offsetX_ = 0;
-  this.offsetY_ = 0;
-  this.adjustByWidth_ = false;
-  this.adjustByHeight_ = false;
-  this.minFontSize_ = 8;
-  this.maxFontSize_ = 72;
+  this.parentBounds(null);
+  this.width(null);
+  this.height(null);
+  this.padding(0);
+  this.background(null);
+  this.position(anychart.utils.NinePositions.LEFT_TOP);
+  this.anchor(anychart.utils.NinePositions.LEFT_TOP);
+  this.offsetX(0);
+  this.offsetY(0);
+  this.rotation(0);
+  this.adjustFontSize(false, false);
+  this.minFontSize(8);
+  this.maxFontSize(72);
+  this.text('Label text');
+  this.fontFamily('Tahoma');
+  this.fontSize('11');
+  this.fontWeight('bold');
   this.invalidate(anychart.ConsistencyState.ALL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 

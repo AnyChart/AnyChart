@@ -258,10 +258,11 @@ anychart.elements.Ticks.prototype.enabled = function(opt_value) {
  * Restore labels default settings.
  */
 anychart.elements.Ticks.prototype.restoreDefaults = function() {
-  this.length_ = 5;
-  this.position_ = anychart.elements.Ticks.Position.OUTSIDE;
-  this.stroke_ = 'black';
-  this.enabled_ = true;
+  this.enabled(true);
+  this.position(anychart.elements.Ticks.Position.OUTSIDE);
+  this.length(5);
+  this.stroke('black');
+
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 

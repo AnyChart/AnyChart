@@ -113,9 +113,11 @@ anychart.utils.RangeColorPalette.prototype.colors = function(opt_value) {
  */
 anychart.utils.RangeColorPalette.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.count_ = opt_value;
-    this.processColorRange_();
-    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    if (this.count_ != opt_value) {
+      this.count_ = opt_value;
+      this.processColorRange_();
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
     return this;
   } else {
     return this.count_;

@@ -167,3 +167,15 @@ anychart.scales.DateTime.prototype.deserialize = function(value) {
 
   return this;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Shortcut functions
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Shortcut way to create date/time scale.
+ * @return {anychart.scales.DateTime} DateTime scale.
+ */
+anychart.scales.dateTime = function() {
+  return new anychart.scales.DateTime();
+};

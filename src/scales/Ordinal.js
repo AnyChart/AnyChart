@@ -270,3 +270,15 @@ anychart.scales.Ordinal.prototype.deserialize = function(value) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Shortcut functions
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Shortcut way to create ordinal scale.
+ * @return {anychart.scales.Ordinal} Ordinal scale.
+ */
+anychart.scales.ordinal = function() {
+  return new anychart.scales.Ordinal();
+};

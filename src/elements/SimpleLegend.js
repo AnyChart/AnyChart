@@ -52,7 +52,7 @@ anychart.elements.Legend = function() {
    * @type {number}
    * @private
    */
-  this.itemsSpacing_ = 10;
+  this.itemsSpacing_ = 15;
 
   /**
    * Spacing between icon and text in legend item.
@@ -107,21 +107,73 @@ anychart.elements.Legend = function() {
 
   this.zIndex(10);
 
-  this.padding(5);
+  this.fontFamily('Verdana')
+      .fontSize('10')
+      .fontWeight('normal')
+      .fontColor('rgb(35,35,35)')
+      .padding(7)
+      .margin(5);
+
   var bg = new anychart.elements.Background()
+      .enabled(true)
       .fill(/** @type {acgraph.vector.LinearGradientFill} */({
         'keys': [
-          '0 #eaeaea',
-          '0.5 #fff',
-          '1 #eaeaea'],
-        'angle': '-90'
+          '0 rgb(255,255,255) 1',
+          '0.5 rgb(243,243,243) 1',
+          '1 rgb(255,255,255) 1'],
+        'angle': '90'
       }))
-      .stroke('1 black 1')
+      .stroke({
+        'keys': [
+          '0 rgb(221,221,221) 1',
+          '1 rgb(208,208,208) 1'
+        ],
+        'angle': '90'
+      })
       .corners(5);
   this.background(/** @type {anychart.elements.Background} */ (bg));
   //
-  this.title().text('Legend').orientation('top').margin(0).background(null);
-  this.titleSeparator().orientation('top').margin(3, 0).height(1).fill('red');
+  this.title()
+      .enabled(true)
+      .text('Legend Title')
+      .fontFamily('Verdana')
+      .fontSize('10')
+      .fontWeight('bold')
+      .fontColor('rgb(35,35,35)')
+      .orientation('top')
+      .margin(0, 0, 3, 0)
+      .padding(0);
+  this.title().background()
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle' : '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle' : '90'
+      });
+
+  this.titleSeparator()
+      .enabled(true)
+      .margin(0, 3, 3, 3)
+      .orientation('top')
+      .width('100%')
+      .height(1)
+      .fill({
+        'keys': [
+          '0 #333333 0',
+          '0.5 #333333 1',
+          '1 #333333 0'
+        ]
+      });
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -1281,10 +1333,30 @@ anychart.elements.Legend.prototype.initDefaultPaginator_ = function() {
     this.paginator()
         .container(this.rootElement)
         .zIndex(20)
+        .fontFamily('Verdana')
+        .fontSize('10')
+        .fontWeight('normal')
+        .fontColor('rgb(35,35,35)')
         .orientation('right')
-        .margin(null)
-        .padding(null)
-        .fontSize(12);
+        .margin(0)
+        .padding(2);
+    this.paginator().background()
+        .enabled(false)
+        .stroke({
+          'keys': [
+            '0 #DDDDDD 1',
+            '1 #D0D0D0 1'
+          ],
+          'angle' : '90'
+        })
+        .fill({
+          'keys': [
+            '0 #FFFFFF 1',
+            '0.5 #F3F3F3 1',
+            '1 #FFFFFF 1'
+          ],
+          'angle' : '90'
+        });
     this.invalidate(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
   }
 };

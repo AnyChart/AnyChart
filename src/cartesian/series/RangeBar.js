@@ -18,6 +18,14 @@ anychart.cartesian.series.RangeBar = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.suspendSignalsDispatching();
+  tooltip.content().useHtml(true);
+  tooltip.textFormatter(function() {
+    return this['x'] + '<br>low: ' + this['low'] + '<br>high: ' + this['high'];
+  });
+  tooltip.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.RangeBar, anychart.cartesian.series.BarBase);
 

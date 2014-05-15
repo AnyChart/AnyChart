@@ -2286,24 +2286,6 @@ anychart.cartesian.Chart.prototype.restoreDefaults = function() {
  */
 anychart.cartesian.Chart.prototype.restoreDefaultsForAxis = function(axis) {
   axis.suspendSignalsDispatching();
-  axis.drawFirstLabel(true);
-  axis.drawLastLabel(true);
-
-  var title = /** @type {anychart.elements.Title} */(axis.title());
-  title.margin(10, 0, 10, 0);
-  title.padding(0, 0, 0, 0);
-
-  var majorLabels = /** @type {anychart.elements.Multilabel} */(axis.labels());
-
-  var majorTicks = /** @type {anychart.elements.Ticks} */(axis.ticks());
-  majorTicks.length(5);
-
-  var minorLabels = /** @type {anychart.elements.Multilabel} */(axis.minorLabels());
-  minorLabels.enabled(false);
-
-  var minorTicks = /** @type {anychart.elements.Ticks} */(axis.minorTicks());
-  minorTicks.length(2);
-
   axis.resumeSignalsDispatching(true);
 };
 

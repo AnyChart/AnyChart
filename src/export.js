@@ -781,6 +781,7 @@ anychart.scales.Base.prototype['finishAutoCalc'] = anychart.scales.Base.prototyp
 goog.exportSymbol('anychart.scales.DateTime', anychart.scales.DateTime);
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
+goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.DateTimeTicks
@@ -798,6 +799,7 @@ anychart.scales.DateTimeTicks.prototype['get'] = anychart.scales.DateTimeTicks.p
 goog.exportSymbol('anychart.scales.Linear', anychart.scales.Linear);
 anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;
+goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Logarithmic
@@ -806,6 +808,7 @@ anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototyp
 goog.exportSymbol('anychart.scales.Logarithmic', anychart.scales.Logarithmic);
 anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;
 anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;
+goog.exportSymbol('anychart.scales.log', anychart.scales.log);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.Ordinal
@@ -817,6 +820,7 @@ anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.
 anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;
 anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;
 anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;
+goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.OrdinalTicks
@@ -983,6 +987,14 @@ goog.exportSymbol('anychart.json', anychart.json);//in docs/
 goog.exportSymbol('anychart.xml', anychart.xml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
+goog.exportSymbol('anychart.chart', anychart.chart);
+goog.exportSymbol('anychart.scatterChart', anychart.scatterChart);
+goog.exportSymbol('anychart.pieChart', anychart.pieChart);
+goog.exportSymbol('anychart.lineChart', anychart.lineChart);
+goog.exportSymbol('anychart.columnChart', anychart.columnChart);
+goog.exportSymbol('anychart.barChart', anychart.barChart);
+goog.exportSymbol('anychart.areaChart', anychart.areaChart);
+goog.exportSymbol('anychart.financialChart', anychart.financialChart);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.Chart

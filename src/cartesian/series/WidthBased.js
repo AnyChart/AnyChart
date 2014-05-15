@@ -86,3 +86,14 @@ anychart.cartesian.series.WidthBased.prototype.deserialize = function(config) {
   this.pointWidth(config['pointWidth']);
   return goog.base(this, 'deserialize', config);
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.WidthBased.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  this.markers(null);
+  this.hoverMarkers(null);
+
+  return result;
+};

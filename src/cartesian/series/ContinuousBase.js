@@ -239,3 +239,19 @@ anychart.cartesian.series.ContinuousBase.prototype.deserialize = function(config
   this.resumeSignalsDispatching(false);
   return this;
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() {
+  var res = goog.base(this, 'restoreDefaults');
+
+  var labels = /** @type {anychart.elements.Multilabel} */(this.labels());
+  labels.suspendSignalsDispatching();
+  labels.enabled(false);
+  labels.anchor('bottom');
+  labels.resumeSignalsDispatching(false);
+
+  return res;
+};

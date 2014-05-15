@@ -62,3 +62,14 @@ anychart.cartesian.series.AreaBase.prototype.colorizeShape = function(hover) {
   this.strokePath.stroke(this.getFinalStroke(false, hover));
   this.strokePath.fill(null);
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  this.markers(null);
+  this.hoverMarkers(null);
+
+  return result;
+};

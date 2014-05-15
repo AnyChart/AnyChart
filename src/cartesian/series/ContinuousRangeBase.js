@@ -370,3 +370,14 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.deserialize = function(c
   this.resumeSignalsDispatching(false);
   return this;
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.ContinuousRangeBase.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  this.markers(null);
+  this.hoverMarkers(null);
+
+  return result;
+};

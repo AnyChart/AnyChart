@@ -203,6 +203,10 @@ anychart.elements.Multilabel = function() {
   this.rotation(0);
   this.width(null);
   this.height(null);
+  this.fontFamily('Tahoma');
+  this.fontSize('11');
+  this.fontWeight('normal');
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };

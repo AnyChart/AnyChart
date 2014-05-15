@@ -40,11 +40,15 @@ anychart.elements.Title = function() {
   this.suspendSignalsDispatching();
   goog.base(this);
 
-  this.text('Title text');
-  this.zIndex(80);
-  this.margin(0, 0, 10, 0);
-  this.padding(0);
-  this.background(null);
+  this.text('Title text')
+      .fontFamily('Tahoma')
+      .fontSize('11')
+      .fontWeight('bold')
+      .fontColor('rgb(34,34,34)')
+      .zIndex(80)
+      .margin(5, 5, 5, 5)
+      .padding(5)
+      .background(null);
 
   this.resumeSignalsDispatching(false);
 };

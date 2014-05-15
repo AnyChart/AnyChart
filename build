@@ -9,6 +9,7 @@ import zipfile
 import platform
 import shutil
 import time
+import re
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
@@ -30,6 +31,8 @@ CLOSURE_BIN_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'bin')
 DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
 CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs')
+DEMOS_PATH = os.path.join(PROJECT_PATH, 'demos')
+ACDVF_PLAYGROUND_PATH = os.path.join(PROJECT_PATH, '..', 'acdvf-playground')
 
 QUNIT_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'qunit-externs.js')
 UTILS_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'utils-externs.js')
@@ -425,6 +428,53 @@ def __print_warnings_list():
 
 
 #=======================================================================================================================
+#                  Converting samples from demos to playground format and deploy changes.
+#=======================================================================================================================
+def __convert_demos_to_playground():
+    if not os.path.exists(ACDVF_PLAYGROUND_PATH):
+        print 'Error: No acdvf-playground repo found'
+        print 'You should clone playground repo to ' + ACDVF_PLAYGROUND_PATH
+        return
+
+    for root, dirs, files in os.walk(DEMOS_PATH):
+        if "/demos/dev" not in root:
+            category_name = root.replace(DEMOS_PATH, '').replace('/', '')
+            pg_category_path = os.path.join(ACDVF_PLAYGROUND_PATH, category_name)
+
+            __checkPathExistence(pg_category_path)
+
+            for sample in files:
+                if sample.endswith('.js'):
+                    sample_name = os.path.splitext(os.path.basename(sample))[0]
+                    pg_sample_path = os.path.join(pg_category_path, sample_name)
+
+                    f = open(os.path.join(root, sample), 'r')
+                    sample_text = f.read()
+                    f.close()
+                    sample_text = sample_text.replace('var chart', 'chart')
+                    sample_text = "$('#container').width(600).height(400);\n\n" + sample_text
+
+                    if os.path.exists(pg_sample_path):
+                        f = open(os.path.join(root, pg_sample_path), 'r')
+                        pg_sample_text = f.read()
+                        f.close()
+
+                        search_result = re.findall('^.[\n\s:a-zA-Z\[\]_"]*}', pg_sample_text)
+                        if len(search_result):
+                            sample_settings = search_result[0]
+                            result = sample_settings + '\n' + sample_text
+                        else:
+                            result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                    else:
+                        result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+
+                    f = open(pg_sample_path, 'w+')
+                    f.flush()
+                    f.write(result)
+                    f.close()
+
+
+#=======================================================================================================================
 #                            Version.
 #=======================================================================================================================
 def __get_version():
@@ -503,6 +553,8 @@ def __execMainScript():
         __autofixFromCommandLine()
     elif args[1] == 'docs':
         __buildJSDocFromCommandLine()
+    elif args[1] == 'convert-pg':
+        __convert_demos_to_playground()
     else:
         __printHelp()
 

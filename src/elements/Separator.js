@@ -553,14 +553,20 @@ anychart.elements.Separator.prototype.marginInvalidated_ = function(event) {
  */
 anychart.elements.Separator.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(60);
-  this.orientation(anychart.utils.Orientation.TOP);
-  this.margin(0, 0, 10, 0);
-  this.width(null);
-  this.height(null);
-
-  this.fill('#d0d0d0');
-  this.stroke('none');
+  this.zIndex(60)
+      .enabled(true)
+      .margin(0, 3, 3, 3)
+      .orientation(anychart.utils.Orientation.TOP)
+      .width('100%')
+      .height(1)
+      .fill({
+        'keys': [
+          '0 #333333 0',
+          '0.5 #333333 1',
+          '1 #333333 0'
+        ]
+      })
+      .stroke('none');
 
   this.drawer(function(path, bounds) {
     path
