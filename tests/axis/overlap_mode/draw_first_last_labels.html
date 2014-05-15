@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="../../out/anychart.min.js"></script>
+    <script src="../../../out/anychart.min.js"></script>
     <style>
         #container {
             width: 400px;
@@ -26,9 +26,23 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        chart.line([5,2,2,1,'6', 0]);
-        chart.yAxis();
-        chart.xAxis();
+
+
+        chart.line([1,2,2,1,'3.1', 0.2,2,4,3,3,4,3.5,4]).markers().enabled(false);
+
+        var y = chart.yAxis();
+        y.orientation('left');
+        y.title().enabled(false);
+        y.minorLabels().enabled(true).fontSize();
+        y.labels().fontSize(12);
+
+        var x = chart.xAxis();
+        x.title().enabled(false);
+        x.minorLabels().enabled(true);
+
+        chart.height('45%');
+        chart.yAxis().drawFirstLabel(false).drawLastLabel(false);
+
 
         chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
