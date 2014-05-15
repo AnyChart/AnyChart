@@ -9,6 +9,7 @@ import zipfile
 import platform
 import shutil
 import time
+import re
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
@@ -451,25 +452,26 @@ def __convert_demos_to_playground():
                     sample_text = f.read()
                     f.close()
                     sample_text = sample_text.replace('var chart', 'chart')
-                    sample_text = "$('#container').width(900).height(400);\n\n" + sample_text
-
+                    sample_text = "$('#container').width(600).height(400);\n\n" + sample_text
 
                     if os.path.exists(pg_sample_path):
-                        pass
-                    else:
-                        f = open(pg_sample_path, 'w+')
-                        f.write('{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n')
-                        f.write(sample_text)
+                        f = open(os.path.join(root, pg_sample_path), 'r')
+                        pg_sample_text = f.read()
                         f.close()
 
+                        search_result = re.findall('^.[\n\s:a-zA-Z\[\]_"]*}', pg_sample_text)
+                        if len(search_result):
+                            sample_settings = search_result[0]
+                            result = sample_settings + '\n' + sample_text
+                        else:
+                            result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                    else:
+                        result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
 
-
-            # print "========================================"
-            # print category_name
-            # print root
-            # print dirs
-            # print files
-            # print "========================================"
+                    f = open(pg_sample_path, 'w+')
+                    f.flush()
+                    f.write(result)
+                    f.close()
 
 
 #=======================================================================================================================
