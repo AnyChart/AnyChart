@@ -126,3 +126,15 @@ anychart.scales.Linear.prototype.deserialize = function(value) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Shortcut functions
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Shortcut way to create linear scale.
+ * @return {anychart.scales.Linear} Linear scale.
+ */
+anychart.scales.linear = function() {
+  return new anychart.scales.Linear();
+};

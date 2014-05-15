@@ -1,6 +1,5 @@
-var chart;
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1', 162, 142, 122],
     ['P2', 134, 154, 144],
@@ -24,17 +23,17 @@ anychart.onDocumentReady(function() {
     ['P20', 184, 144, 134]
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the second series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
+  var chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');
@@ -42,17 +41,36 @@ anychart.onDocumentReady(function() {
   //set chart title text settings
   chart.title().text('100% Stacked Area Chart');
 
-  //force chart Y Scale to stack values
-  chart.yScale().stackMode('percent');
+  //set chart Y scale settings
+  chart.yScale()
+      .stackMode('percent') //force chart to stack series values in percentage
+      .maximum(100)         //set maximum scale value
+      .ticks()              //access to scale ticks settings , note that chaining sequence now continue from ticks object
+      .interval(10);        //set scale ticks interval
 
-  //create first series with mapped data and specified color
-  chart.area(seriesData_1);
 
-  //create second series with mapped data
-  chart.area(seriesData_2);
+  //set yAxis labels formatting, force it to add % to values
+  chart.yAxis(0).labels().textFormatter(function(info) {
+    return info.value + '%';
+  });
 
-  //create third series with mapped data
-  chart.area(seriesData_3);
+  //using fill function we can create a pretty gradient for the series
+  //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
+  var fillFunction = function() {
+    return {keys: [
+      {offset: 0, color: this.sourceColor},
+      {offset: 1, color: anychart.color.darken(this.sourceColor)}
+    ], angle: -90, opacity: 1};
+  };
+
+  //create first area series on mapped data and specify series fill function
+  chart.area(seriesData_1).fill(fillFunction);
+
+  //create second area series on mapped data and specify series fill function
+  chart.area(seriesData_2).fill(fillFunction);
+
+  //create third area series on mapped data, specify series fill function and color
+  chart.area(seriesData_3).color('#EEEE25').fill(fillFunction);
 
   //initiate chart drawing
   chart.draw();

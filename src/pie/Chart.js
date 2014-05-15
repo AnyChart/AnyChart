@@ -1185,6 +1185,10 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     }
   }
 
+  if (this.palette_ && this.palette_ instanceof anychart.utils.RangeColorPalette) {
+    this.palette_.count(iterator.getRowsCount());
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
     if (this.hovered_) {
       var pieSlice = this.hovered_[0];
@@ -1444,7 +1448,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     var index = iterator.getIndex();
     data.push({
       'index': index,
-      'text': iterator.get('name') || 'Point - ' + index,
+      'text': iterator.get('name') || iterator.get('x').toString() || 'Point - ' + index,
       'iconColor': this.getFillColor_(index, false, iterator.get('fill'))
     });
   }

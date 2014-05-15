@@ -34,3 +34,15 @@ anychart.scales.Logarithmic.prototype.calculate = function() {
   goog.base(this, 'calculate');
   this.range = anychart.math.log(this.max) - anychart.math.log(this.min);
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Shortcut functions
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Shortcut way to create logarithmic scale.
+ * @return {anychart.scales.Logarithmic} Logarithmic scale.
+ */
+anychart.scales.log = function() {
+  return new anychart.scales.Logarithmic();
+};

@@ -20,8 +20,8 @@ anychart.onDocumentReady(function() {
   //map data for the fourth series, take value from fourth column of data set
   var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
 
-  //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.columnChart
+  //create column chart
+  chart = anychart.columnChart();
 
   //set container id for the chart
   chart.container('container');

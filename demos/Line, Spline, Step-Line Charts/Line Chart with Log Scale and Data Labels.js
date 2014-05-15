@@ -2,7 +2,7 @@ var chart;
 
 anychart.onDocumentReady(function() {
   //create line chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.lineChart
+  chart = new anychart.lineChart();
 
   //set container for the chart
   chart.container('container');

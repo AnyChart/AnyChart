@@ -1,8 +1,8 @@
 var chart;
 
 anychart.onDocumentReady(function() {
-  //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.barChart
+  //create bar chart
+  chart = anychart.barChart();
 
   //set container id for the chart
   chart.container('container');

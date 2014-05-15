@@ -1,23 +1,22 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create line chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
+  //create area chart
+  var chart = anychart.areaChart();
 
   //set container for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Area chart with Logarithmic Y-Axis and Data Labels');
+  chart.title().text('Area Chart with Logarithmic Y-Axis and Data Labels');
 
   //create logarithmic scale
-  var logScale = new anychart.scales.Logarithmic();
-  logScale.minimum(1);
+  var logScale = anychart.scales.log();
+  logScale.minimum(1); //set scale minimum value
 
-  //set scale for the chart, this scale will be used in all scale dependent entries such axes, grids, etc
+  //set scale for the chart
+  //it force to use passed scale in all scale dependent entries such axes, grids, crosshairs etc
   chart.yScale(logScale);
 
-  //create first series with mapped data
+  //create area series on passed data
   var series = chart.area([
     ['P1', '112.61 '],
     ['P2', '163.21 '],
@@ -36,10 +35,9 @@ anychart.onDocumentReady(function() {
     ['P15', '33.08']
   ]);
 
-  //enable series data labels
+  //set series data labels settings
   series.labels()
-      .enabled(true)
-      .anchor('bottom')
+      .enabled(true)       //enable data labels settings which is disabled by default
       .fontWeight('bold');
 
   //initiate chart drawing

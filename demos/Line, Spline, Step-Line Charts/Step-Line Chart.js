@@ -24,7 +24,7 @@ anychart.onDocumentReady(function() {
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
   //create line chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.lineChart
+  chart = new anychart.lineChart();
 
   //set container id for the chart
   chart.container('container');

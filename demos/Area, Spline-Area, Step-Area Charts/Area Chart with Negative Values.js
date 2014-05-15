@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '322', '242', '162'],
     ['P2' , '324', '254', '90'],
@@ -25,33 +23,41 @@ anychart.onDocumentReady(function() {
     ['P20', '334', '44', '-184']
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
+  var chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Spline-Area Chart');
+  chart.title().text('Area Chart with Negative Values');
 
-  //create first series with mapped data and specified color
-  var firstSeries = chart.splineArea(seriesData_1);
-  firstSeries.color('#EEEE25');
+  //using fill function we can create a pretty gradient for the series
+  //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
+  var fillFunction = function() {
+    return {keys: [
+      {offset: 0, color: this.sourceColor},
+      {offset: 1, color: anychart.color.darken(this.sourceColor)}
+    ], angle: -90, opacity: 1};
+  };
 
-  //create second series with mapped data
-  chart.splineArea(seriesData_2);
+  //create first area series on mapped data, specify series fill function and color
+  chart.area(seriesData_1).color('#EEEE25').fill(fillFunction);
 
-  //create third series with mapped data
-  chart.splineArea(seriesData_3);
+  //create second area series on mapped data and specify series fill function
+  chart.area(seriesData_2).fill(fillFunction);
+
+  //create second area series on mapped data and specify series fill function
+  chart.area(seriesData_3).fill(fillFunction);
 
   //initiate chart drawing
   chart.draw();

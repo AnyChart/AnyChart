@@ -28,7 +28,7 @@ CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
 CLOSURE_LINTER_WRAPPER_PATH = os.path.join(CONTRIB_PATH, 'closure-linter-wrapper')
 CLOSURE_BIN_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'bin')
 DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
-CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
+CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PTH, 'build', 'closurebuilder.py')
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs')
 
 QUNIT_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'qunit-externs.js')

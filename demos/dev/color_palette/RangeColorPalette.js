@@ -1,7 +1,7 @@
 var palette, stage, index, count;
 function load() {
   index;
-  count = 20;
+  count = 5;
 
   stage = acgraph.create('100%', '100%', 'container');
   palette = new anychart.utils.RangeColorPalette();

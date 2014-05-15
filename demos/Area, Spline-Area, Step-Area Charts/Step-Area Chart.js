@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '125', '51'],
     ['P2' , '132', '91'],
@@ -17,14 +15,14 @@ anychart.onDocumentReady(function() {
     ['P12', '91', '56']
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
   //create area chart
-  chart = new anychart.cartesian.Chart(); //todo: replace it to anychart.areaChart
+  var chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');
@@ -32,11 +30,11 @@ anychart.onDocumentReady(function() {
   //set chart title text settings
   chart.title().text('Step-Area Chart');
 
-  //create first series with mapped data
-  chart.stepLineArea(seriesData_1);//todo: replace with stepArea as it will be renamed
+  //create first series on mapped data
+  chart.stepLineArea(seriesData_1);
 
-  //create second series with mapped data
-  chart.stepLineArea(seriesData_2);//todo: replace with stepArea as it will be renamed
+  //create second series on mapped data
+  chart.stepLineArea(seriesData_2);
 
   //initiate chart drawing
   chart.draw();
