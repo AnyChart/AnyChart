@@ -23,7 +23,7 @@ DOCS_OUT_PATH = os.path.join(OUT_PATH, 'docs')
 QUNIT_PATH = os.path.join(CONTRIB_PATH, 'qunit')
 JSDOC_PATH = os.path.join(CONTRIB_PATH, 'jsdoc')
 GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphics', 'src')
-JSDOC_TEMPLATE_PATH = os.path.join(CONTRIB_PATH, 'ac-jsdoc3-customization')
+JSDOC_TEMPLATE_PATH = os.path.join(CONTRIB_PATH, 'api-reference-engine')
 CLOSURE_LIBRARY_PATH = os.path.join(CONTRIB_PATH, 'closure-library')
 CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
 CLOSURE_LINTER_WRAPPER_PATH = os.path.join(CONTRIB_PATH, 'closure-linter-wrapper')
@@ -445,7 +445,7 @@ def __convert_demos_to_playground():
 
             for sample in files:
                 if sample.endswith('.js'):
-                    sample_name = os.path.splitext(os.path.basename(sample))[0]
+                    sample_name = os.path.splitext(os.path.basename(sample))[0] + '.sample'
                     pg_sample_path = os.path.join(pg_category_path, sample_name)
 
                     f = open(os.path.join(root, sample), 'r')
