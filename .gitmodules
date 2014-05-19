@@ -17,3 +17,6 @@
 	path = contrib/graphics
 	url = git@github.com:AnyChart/graphics.git
 	branch = develop
+[submodule "api-reference-engine"]
+	path = contrib/api-reference-engine
+	url = git@github.com:AnyChart/api-reference-engine.git
