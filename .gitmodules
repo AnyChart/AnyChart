@@ -7,9 +7,9 @@
 [submodule "jsdoc"]
 	path = contrib/jsdoc
 	url = https://github.com/jsdoc3/jsdoc.git
-[submodule "api-reference-engine"]
-	path = contrib/api-reference-engine
-	url = git@github.com:AnyChart/api-reference-engine.git
+[submodule "jsdoc3-customization"]
+	path = contrib/ac-jsdoc3-customization
+	url = git@github.com:AnyChart/jsdoc3-customization.git
 [submodule "closure-linter-wrapper"]
 	path = contrib/closure-linter-wrapper
 	url = https://github.com/RomanLubushkin/closure-liner-wrapper.git
