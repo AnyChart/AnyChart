@@ -1,15 +1,9 @@
 [submodule "closure-library"]
 	path = contrib/closure-library
 	url = https://code.google.com/p/closure-library/
-[submodule "qunit"]
-	path = contrib/qunit
-	url = https://github.com/jquery/qunit.git
 [submodule "jsdoc"]
 	path = contrib/jsdoc
 	url = https://github.com/jsdoc3/jsdoc.git
-[submodule "jsdoc3-customization"]
-	path = contrib/ac-jsdoc3-customization
-	url = git@github.com:AnyChart/jsdoc3-customization.git
 [submodule "closure-linter-wrapper"]
 	path = contrib/closure-linter-wrapper
 	url = https://github.com/RomanLubushkin/closure-liner-wrapper.git
