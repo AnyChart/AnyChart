@@ -1,0 +1,56 @@
+<html>
+<head>
+    <script src="../../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = new anychart.cartesian.Chart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+        var dataSet = new anychart.data.Set([
+            ['37.61777°' , '13220000000'],
+            ['38.65437°' , '13240000000'],
+            ['39.69°' , '13290000000'],
+            ['40.85308°' , '12320000000'],
+            ['41.43219°' , '12680000000'],
+            ['42.61656°' , '12540000000'],
+            ['43.32445°' , '13250000000'],
+            ['44.76586°' , '13160000000'],
+            ['45.97564°' , '13180000000'],
+            ['47.6546095466°', '13300000000']
+        ]);
+        chart.line(dataSet);
+
+        var y = chart.yAxis();
+        y.title().text('Height');
+        y.minorLabels().enabled(true);
+
+        var x = chart.xAxis();
+        x.title().enabled(false);
+
+        chart.title().text('Some text title');
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>
+
