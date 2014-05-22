@@ -25,3 +25,4 @@ anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFi
 anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//in docs/final
 anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;//in docs/
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;
+anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;
