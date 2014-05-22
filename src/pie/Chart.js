@@ -138,19 +138,10 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Format provider for the the labels text formatter.
-   * @type {function(number, String):Object}
+   * @type {Object}
    * @private
    */
-  this.formatProvider_ = goog.bind(function(index, fieldName) {
-    return this['get'](index, fieldName);
-  }, {
-    'get': goog.bind(function(index, fieldName) {
-      var iterator = this.data().getIterator();
-      iterator.select(index);
-      return iterator.get(fieldName);
-    }, this)
-  }
-  );
+  this.formatProvider_ = {};
 
   /**
    * Flag identifies that information is not fully gathered to calculate/recalculate data.
@@ -682,7 +673,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.Multilabel();
     this.labels_.textFormatter(function(formatProvider, index) {
-      return formatProvider(index, 'value').toString();
+      return (formatProvider['value'] * 100 / formatProvider['sum']).toFixed(1) + '%';
     });
     this.labels_.positionFormatter(function(positionProvider, index) {
       return positionProvider(index);
@@ -1232,31 +1223,36 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.dataLayer_ = acgraph.layer().parent(this.rootElement);
     }
 
+    var value;
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+      var min = Number.MAX_VALUE;
+      var max = -Number.MAX_VALUE;
       var sum = 0;
       while (iterator.advance()) {
-        sum += parseFloat(iterator.get('value'));
+        value = parseFloat(iterator.get('value'));
+        min = Math.min(value, min);
+        max = Math.max(value, max);
+        sum += value;
       }
 
-      /**
-       * Sum of all pie slices value.
-       * @type {number}
-       * @private
-       */
-      this.valuesSum_ = sum;
+      var count = iterator.getRowsCount();
+      this.formatProvider_['count'] = count;
+      this.formatProvider_['min'] = min;
+      this.formatProvider_['max'] = max;
+      this.formatProvider_['sum'] = sum;
+      this.formatProvider_['average'] = (sum / count);
 
       iterator.reset();
       this.markConsistent(anychart.ConsistencyState.DATA);
     }
 
-    var value;
     var start = /** @type {number} */ (this.startAngle_);
     var sweep = 0;
 
     while (iterator.advance()) {
       value = parseFloat(iterator.get('value'));
 
-      sweep = value / this.valuesSum_ * 360;
+      sweep = value / this.formatProvider_['sum'] * 360;
 
       fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
       stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
@@ -1278,8 +1274,13 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       iterator.reset();
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
-
+      var index;
       while (iterator.advance()) {
+        index = iterator.getIndex();
+        this.formatProvider_['index'] = index;
+        this.formatProvider_['name'] = iterator.get('name') || iterator.get('x').toString() || 'Point - ' + index;
+        this.formatProvider_['x'] = iterator.get('x');
+        this.formatProvider_['value'] = iterator.get('value');
         this.labels_.draw(this.formatProvider_, this.positionProvider_);
       }
       this.labels_.end();

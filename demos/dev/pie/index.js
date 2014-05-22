@@ -51,11 +51,6 @@ function load() {
 
 //  chart.margin('1%', '2%');
   chart.labels()
-      .textFormatter(function(formatProvider, index) {
-        var value = parseFloat(formatProvider(index, 'value'));
-
-        return Math.ceil(1000 * value / summPointsValues) / 10 + '%';
-      })
       .fontSize(11)
       .fontColor('white');
 
@@ -64,9 +59,9 @@ function load() {
       .corners(10)
       .fill({
         keys: [
-          "rgb(255,255,255) 1",
-          "rgb(243,243,243) 1",
-          "rgb(255,255,255) 1"
+          'rgb(255,255,255) 1',
+          'rgb(243,243,243) 1',
+          'rgb(255,255,255) 1'
         ],
         angle: -90
       });
