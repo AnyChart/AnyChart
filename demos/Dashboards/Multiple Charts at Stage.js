@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet1 = new anychart.data.Set([
     [1, 10, 1.2],
     [2, 20, 1.3],

@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data,also we can pud data directly to series
+  //create data set on our data,also we can pud data directly to series
   var dataSet = new anychart.data.Set([
     ['Jan', '22', '43', '75'],
     ['Feb', '34', '45', '56'],
@@ -23,17 +21,18 @@ anychart.onDocumentReady(function() {
   //map data for the second series,take value from second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create line chart
-  chart = new anychart.lineChart();
+  var chart = anychart.lineChart();
+  chart.grid(0).enabled(false);
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Line Chart with Dashed Style and Data Labels');
+  chart.title().text('Line Chart with Dashed Style');
 
   //we can edit series stroke by function in which context available:
   //defaultSeries stroke settings - this.sourceColor
@@ -46,24 +45,22 @@ anychart.onDocumentReady(function() {
     };
   };
 
+  //temp variable to store series instance
+  var series;
+
   //we can use local variables to change series settings
-  var series = chart.line(seriesData_1);
+  series = chart.line(seriesData_1);
   series.stroke(seriesStrokeFunction);
 
-  var labels = series.labels();
-  labels.enabled(true);
-
   //or just use chaining calls
-  chart.line(seriesData_2)
-      .stroke(seriesStrokeFunction)
-      .labels().enabled(true);
+  series = chart.line(seriesData_2);
+  series.stroke(seriesStrokeFunction);
 
   //or access series by index from chart
-  chart.line(seriesData_3);
-  chart.getSeries(2)
-      .stroke(seriesStrokeFunction)
-      .labels().enabled(true);
+  series = chart.line(seriesData_3);
+  series.stroke(seriesStrokeFunction);
 
   //initiate chart drawing
   chart.draw();
 });
+

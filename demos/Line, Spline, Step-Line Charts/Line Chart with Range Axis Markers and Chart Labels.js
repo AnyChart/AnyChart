@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data,also we can pud data directly to series
+  //create data set on our data, also we can pud data directly to series
   var dataSet = new anychart.data.Set([
     ['1986', '41', '36', '31'],
     ['1987', '37', '34', '29'],
@@ -26,17 +24,17 @@ anychart.onDocumentReady(function() {
     ['2006', '62', '56', '48']
   ]);
 
-  //map data for the first series,take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series,take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create line chart
-  chart = new anychart.lineChart();
+  var chart = anychart.lineChart();
 
   //set container id for the chart
   chart.container('container');
@@ -44,21 +42,25 @@ anychart.onDocumentReady(function() {
   //set chart title text settings
   chart.title().text('Debt-To-Income Ratios 1986-2006');
 
+  //set chart y scale settings
+  chart.yScale().minimum(20).maximum(65);
+  chart.yScale().ticks().interval(5);
+
   //create liner series
-  chart.line(seriesData_1);
-  chart.line(seriesData_2);
-  chart.line(seriesData_3);
+  chart.line(seriesData_1).markers(null);
+  chart.line(seriesData_2).markers(null);
+  chart.line(seriesData_3).markers(null);
 
   //create range axes markers
-  chart.rangeMarker().from(12.5).to(28).fill('#D9CDFF 0.7');
+  chart.rangeMarker().from(20).to(28).fill('#D9CDFF 0.7');
   chart.rangeMarker().from(28).to(38).fill('#CBFFCF 0.7');
   chart.rangeMarker().from(38).to(48).fill('#FFFFCD 0.7');
-  chart.rangeMarker().from(48).to(75).fill('#FFCCCB 0.7');
+  chart.rangeMarker().from(48).to(65).fill('#FFCCCB 0.7');
 
   //create text axes markers
   chart.textMarker()
+      .value(24)
       .fontWeight('bold')
-      .value(21)
       .align('near')
       .anchor('leftcenter')
       .offsetX(10)
@@ -79,13 +81,13 @@ anychart.onDocumentReady(function() {
       .text('38%-48%\nNot affordable with fixed.\nInterest-only becomes common.');
 
   chart.textMarker()
-      .value(62)
+      .value(56)
       .fontWeight('bold')
       .align('center')
       .text('48% or greater\nNot affordable with fixed or interest only.\nNegative amortization only option.');
 
   //change yAxis title text settings
-  chart.yAxis().title().text('Debt-To-Income Ratios');
+  chart.yAxis(0).title().text('Debt-To-Income Ratios');
 
   //initiate chart drawing
   chart.draw();

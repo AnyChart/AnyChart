@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1', 174, 5854, 3242],
     ['P2', 197, 4171, 3171],
@@ -15,17 +13,17 @@ anychart.onDocumentReady(function() {
     ['P10', 322, 1628, 928]
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create column chart
-  chart = anychart.columnChart();
+  var chart = anychart.columnChart();
 
   //set container id for the chart
   chart.container('container');
@@ -34,7 +32,7 @@ anychart.onDocumentReady(function() {
   chart.title().text('Combination of Column, Spline-Area and Spline Chart (Dual Y-Axis)');
 
   //create scale for line series and extraYAxis
-  //it force line series to not stuck with over series
+  //it force line series to not stuck values with over series
   var scale = new anychart.scales.Linear();
 
   //create line series and set scale for it
@@ -42,8 +40,8 @@ anychart.onDocumentReady(function() {
   lineSeries.yScale(scale);
 
   //create extra axis on the right side of chart
-  //and set scale for it
   var extraYAxis = chart.yAxis();
+  extraYAxis.title().text('Secondary Y-Axis');
   extraYAxis.orientation('right');
   extraYAxis.scale(scale);
 
@@ -51,8 +49,11 @@ anychart.onDocumentReady(function() {
   chart.column(seriesData_2);
 
   //create third series with mapped data
-  chart.splineArea(seriesData_3);
+  var splineArea = chart.splineArea(seriesData_3);
+  splineArea.fill('#2AD62A 0.7');      //setup custom series color with opacity
+  splineArea.hoverFill('#2AD62A 0.7'); //setup custom series hover color with opacity
 
   //initiate chart drawing
   chart.draw();
 });
+

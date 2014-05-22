@@ -1,8 +1,6 @@
-var chart;
-
 anychart.onDocumentReady(function() {
   //create bar chart
-  chart = anychart.barChart();
+  var chart = anychart.barChart();
 
   //set container id for the chart
   chart.container('container');

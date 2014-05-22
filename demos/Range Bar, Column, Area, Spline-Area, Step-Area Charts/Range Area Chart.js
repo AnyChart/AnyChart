@@ -1,8 +1,6 @@
-var chart;
-
 anychart.onDocumentReady(function() {
   //create column chart
-  chart = anychart.areaChart();
+  var chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');

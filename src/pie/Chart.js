@@ -138,19 +138,10 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Format provider for the the labels text formatter.
-   * @type {function(number, String):Object}
+   * @type {Object}
    * @private
    */
-  this.formatProvider_ = goog.bind(function(index, fieldName) {
-    return this['get'](index, fieldName);
-  }, {
-    'get': goog.bind(function(index, fieldName) {
-      var iterator = this.data().getIterator();
-      iterator.select(index);
-      return iterator.get(fieldName);
-    }, this)
-  }
-  );
+  this.formatProvider_ = {};
 
   /**
    * Flag identifies that information is not fully gathered to calculate/recalculate data.
@@ -200,6 +191,18 @@ anychart.pie.Chart = function(opt_data) {
   this.hoverStroke_ = function() {
     return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
   };
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.suspendSignalsDispatching();
+  tooltip.isFloating(true);
+  tooltip.content().useHtml(true);
+  tooltip.titleFormatter(function() {
+    return this['name'];
+  });
+  tooltip.textFormatter(function() {
+    return this['name'] + '<br>' + this['value'];
+  });
+  tooltip.resumeSignalsDispatching(false);
 
   this.palette();
   this.labels()
@@ -682,7 +685,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.Multilabel();
     this.labels_.textFormatter(function(formatProvider, index) {
-      return formatProvider(index, 'value').toString();
+      return (formatProvider['value'] * 100 / formatProvider['sum']).toFixed(1) + '%';
     });
     this.labels_.positionFormatter(function(positionProvider, index) {
       return positionProvider(index);
@@ -1232,31 +1235,36 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.dataLayer_ = acgraph.layer().parent(this.rootElement);
     }
 
+    var value;
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+      var min = Number.MAX_VALUE;
+      var max = -Number.MAX_VALUE;
       var sum = 0;
       while (iterator.advance()) {
-        sum += parseFloat(iterator.get('value'));
+        value = parseFloat(iterator.get('value'));
+        min = Math.min(value, min);
+        max = Math.max(value, max);
+        sum += value;
       }
 
-      /**
-       * Sum of all pie slices value.
-       * @type {number}
-       * @private
-       */
-      this.valuesSum_ = sum;
+      var count = iterator.getRowsCount();
+      this.formatProvider_['count'] = count;
+      this.formatProvider_['min'] = min;
+      this.formatProvider_['max'] = max;
+      this.formatProvider_['sum'] = sum;
+      this.formatProvider_['average'] = (sum / count);
 
       iterator.reset();
       this.markConsistent(anychart.ConsistencyState.DATA);
     }
 
-    var value;
     var start = /** @type {number} */ (this.startAngle_);
     var sweep = 0;
 
     while (iterator.advance()) {
       value = parseFloat(iterator.get('value'));
 
-      sweep = value / this.valuesSum_ * 360;
+      sweep = value / this.formatProvider_['sum'] * 360;
 
       fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
       stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
@@ -1278,8 +1286,8 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       iterator.reset();
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
-
       while (iterator.advance()) {
+        this.createFormatProvider(iterator.getIndex());
         this.labels_.draw(this.formatProvider_, this.positionProvider_);
       }
       this.labels_.end();
@@ -1388,6 +1396,9 @@ anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
     this.hovered_ = [pie, index, true];
 
     acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
+    if (this.data().getIterator().select(index)) {
+      this.showTooltip(event);
+    }
     this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -1406,7 +1417,9 @@ anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
     this.hovered_ = [pie, index, false];
 
     acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-
+    if (this.data().getIterator().select(index)) {
+      this.hideTooltip();
+    }
     this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -1453,6 +1466,134 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     });
   }
   return new anychart.utils.LegendItemsProvider(data);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Pie chart tooltip.
+ * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
+ * @return {!(anychart.pie.Chart|anychart.elements.Tooltip)} Tooltip instance or self for chaining call.
+ */
+anychart.pie.Chart.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.elements.Tooltip();
+    this.registerDisposable(this.tooltip_);
+    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.Tooltip) {
+      this.tooltip_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.tooltip_.deserialize(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.tooltip_.enabled(false);
+    }
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Tooltip invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.pie.Chart.prototype.onTooltipSignal_ = function(event) {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.redraw();
+};
+
+
+/**
+ * Show data point tooltip.
+ * @protected
+ * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
+ */
+anychart.pie.Chart.prototype.showTooltip = function(opt_event) {
+  this.moveTooltip(opt_event);
+  acgraph.events.listen(
+      goog.dom.getDocument(),
+      acgraph.events.EventType.MOUSEMOVE,
+      this.moveTooltip,
+      false,
+      this);
+};
+
+
+/**
+ * Hide data point tooltip.
+ * @protected
+ */
+anychart.pie.Chart.prototype.hideTooltip = function() {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  acgraph.events.unlisten(
+      goog.dom.getDocument(),
+      acgraph.events.EventType.MOUSEMOVE,
+      this.moveTooltip,
+      false,
+      this);
+  tooltip.hide();
+};
+
+
+/**
+ * @protected
+ * @param {goog.events.BrowserEvent=} opt_event that initiate tooltip to show.
+ */
+anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  var index = this.hovered_[1];
+  if (tooltip.isFloating() && opt_event) {
+    tooltip.show(
+        this.createFormatProvider(index),
+        new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
+  } else {
+    tooltip.show(
+        this.createFormatProvider(index),
+        new acgraph.math.Coordinate(0, 0));
+  }
+};
+
+
+/**
+ * Create column series format provider.
+ * @param {number} index Slice index.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.pie.Chart.prototype.createFormatProvider = function(index) {
+  var iterator = this.data().getIterator();
+  // no need to store this information always in this.formatProvider_
+  if (goog.isDef(this.formatProvider_['gropedPoint'])) {
+    delete this.formatProvider_['groupedPoint'];
+    delete this.formatProvider_['names'];
+    delete this.formatProvider_['values'];
+  }
+  if (iterator.select(index)) {
+    this.formatProvider_['index'] = index;
+    this.formatProvider_['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + index;
+    this.formatProvider_['x'] = iterator.get('x');
+    this.formatProvider_['value'] = iterator.get('value');
+    if (iterator.meta('groupedPoint') == true) {
+      this.formatProvider_['name'] = 'Grouped Point';
+      this.formatProvider_['groupedPoint'] = true;
+      this.formatProvider_['names'] = iterator.meta('names');
+      this.formatProvider_['values'] = iterator.meta('values');
+    }
+  } else {
+    this.formatProvider_['index'] = -1;
+    this.formatProvider_['name'] = 'undefined';
+    this.formatProvider_['x'] = 'undefined';
+    this.formatProvider_['value'] = 'undefined';
+  }
+  return this.formatProvider_;
 };
 
 

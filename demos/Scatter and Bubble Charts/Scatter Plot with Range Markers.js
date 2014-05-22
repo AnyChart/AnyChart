@@ -1,8 +1,6 @@
-var chart;
-
 anychart.onDocumentReady(function() {
   //create scatter chart
-  chart = new anychart.cartesian.Chart(); //todo: replace with anychart.scatterChart
+  var chart = new anychart.cartesian.Chart(); //todo: replace with anychart.scatterChart
 
   //set container id for the chart
   chart.container('container');

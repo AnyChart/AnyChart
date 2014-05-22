@@ -547,7 +547,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
   if (!axis) {
     axis = new anychart.elements.Axis();
     axis.orientation(anychart.utils.Orientation.BOTTOM);
-    axis.title().text('X Axis');
+    axis.title().text('X-Axis');
     this.xAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);
@@ -634,7 +634,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
   if (!axis) {
     axis = new anychart.elements.Axis();
     axis.orientation(anychart.utils.Orientation.LEFT);
-    axis.title().text('Y Axis');
+    axis.title().text('Y-Axis');
     this.yAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);

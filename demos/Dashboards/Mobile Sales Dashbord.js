@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet1 = new anychart.data.Set([
     [1, 10, 1.2],
     [2, 20, 1.3],
@@ -67,40 +65,42 @@ anychart.onDocumentReady(function() {
   stage.text(320, 335, 'Market Share').fontSize(12);
   stage.text(320, 355, 'Customer Sat.').fontSize(12);
 
+  var series;
+
   //column 2
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 255, 100, 10));
   series.draw();
 
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 275, 100, 10));
   series.draw();
 
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 295, 100, 10));
   series.draw();
 
 
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 315, 100, 10));
   series.draw();
 
 
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 335, 100, 10));
   series.draw();
 
-  var series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
+  series = new anychart.cartesian.series.Line([2, 4, 3, 6, 12, 8, 9, 10, 14]);
   series.markers(null);
   series.container(stage);
   series.pixelBounds(new anychart.math.Rect(410, 355, 100, 10));

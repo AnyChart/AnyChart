@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1', 96.5, 2040, 1200, 1600],
     ['P2', 77.1, 1794, 1124, 1724],
@@ -17,26 +15,29 @@ anychart.onDocumentReady(function() {
     ['P12', 59.1, 691, 1091, 1691]
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
-  //map data for the fourth series, take value from fourth column of data set
+  //map data for the fourth series, take x from the zero column and value from the fourth column of data set
   var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
 
   //create column chart
-  chart = anychart.columnChart();
+  var chart = anychart.columnChart();
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
   chart.title().text('Combination of Stacked Column and Line Chart (Dual Y-Axis)');
+
+  //force chart scale to stuck series values
+  chart.yScale().stackMode('value');
 
   //create scale for line series and extraYAxis
   //it force line series to not stuck with over series
@@ -52,6 +53,7 @@ anychart.onDocumentReady(function() {
   //create extra axis on the right side of chart
   //and set scale for it
   var extraYAxis = chart.yAxis();
+  extraYAxis.title('Secondary Y-Axis');
   extraYAxis.orientation('right');
   extraYAxis.scale(scale);
 
@@ -72,4 +74,3 @@ anychart.onDocumentReady(function() {
   //initiate chart drawing
   chart.draw();
 });
-

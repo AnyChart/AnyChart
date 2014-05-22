@@ -92,9 +92,9 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.startDrawing = function(
 anychart.cartesian.series.ContinuousRangeBase.prototype.colorizeShape = function(hover) {
   this.path.stroke(null);
   this.path.fill(this.getFinalFill(false, hover));
-  this.lowPath.stroke(this.getFinalLowStroke(hover), 3);
+  this.lowPath.stroke(this.getFinalLowStroke(hover), 1);
   this.lowPath.fill(null);
-  this.highPath.stroke(this.getFinalHighStroke(hover), 3);
+  this.highPath.stroke(this.getFinalHighStroke(hover), 1);
   this.highPath.fill(null);
 };
 

@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['P1' , '3.6', '2.3', '2.8' , '11.5'],
     ['P2' , '7.1', '4.0', '4.1' , '14.1'],
@@ -29,17 +27,17 @@ anychart.onDocumentReady(function() {
     ['P24' , '12.0', '22.5', '8.9' , '1.5']
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   //create line chart
-  chart = new anychart.lineChart();
+  var chart = anychart.lineChart();
 
   //set container id for the chart
   chart.container('container');

@@ -1,7 +1,5 @@
-var chart;
-
 anychart.onDocumentReady(function() {
-  //create DataSet on our data
+  //create data set on our data
   var dataSet = new anychart.data.Set([
     ['1', -0.489863522578899, 0.848138677816903, 0.559142254786167, 1.15073035819645],
     ['2', -0.385774774190865, 0.779071607989758, 0.592110810844279, 0.742753777067528],
@@ -80,17 +78,17 @@ anychart.onDocumentReady(function() {
     ['75', 3.9432032257054, 4.94316527477613, 5.15369204112966, 5.53350321274879]
   ]);
 
-  //map data for the first series, take value from first column of data set
+  //map data for the first series, take x from the zero column and value from the first column of data set
   var seriesData_1 = dataSet.mapAs({x: [0], low: [1], high: [2]});
 
-  //map data for the second series, take value from second column of data set
+  //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [3]});
 
-  //map data for the third series, take value from third column of data set
+  //map data for the third series, take x from the zero column and value from the third column of data set
   var seriesData_3 = dataSet.mapAs({x: [0], value: [4]});
 
   //create column chart
-  chart = anychart.columnChart();
+  var chart = anychart.columnChart();
 
   //set container id for the chart
   chart.container('container');
@@ -98,315 +96,21 @@ anychart.onDocumentReady(function() {
   //set chart title text settings
   chart.title().text('Combination of Range Spline-Area, Spline and Marker Chart');
 
+  //set settings for chart Y scale
+  chart.yScale().minimum(-3).maximum(7).ticks().interval(1);
+
+  //set settings for chart X scale
+  chart.xScale().ticks().interval(5);
+
   //create line series and set scale for it
-  chart.rangeSplineArea(seriesData_1);
+  chart.rangeSplineArea(seriesData_1).fill('#1D8BD1 0.8');
 
   //create second series with mapped data
-  chart.marker(seriesData_2);
+  chart.marker(seriesData_2).size(2).hoverSize(5);
 
   //create third series with mapped data
-  chart.spline(seriesData_3);
+  chart.spline(seriesData_3).color('gold').markers(null);
 
   //initiate chart drawing
   chart.draw();
 });
-
-
-//<?xml version="1.0" encoding="UTF-8"?>
-//  <anychart>
-//    <settings>
-//      <animation enabled="True" />
-//    </settings>
-//    <charts>
-//      <chart plot_type="CategorizedVertical">
-//        <chart_settings>
-//          <title>
-//            <text>Combination of Range Spline-Area, Spline and Marker Chart</text>
-//            <background enabled="false" />
-//          </title>
-//          <axes>
-//            <x_axis tickmarks_placement="Center">
-//              <scale major_interval="5" />
-//            </x_axis>
-//            <y_axis position="Left">
-//              <scale minimum_offset="0" maximum_offset="0" />
-//            </y_axis>
-//          </axes>
-//        </chart_settings>
-//        <data_plot_settings default_series_type="RangeSplineArea">
-//          <range_area_series interpolation_mode="None">
-//            <range_area_style>
-//              <start_line thickness="1" enabled="true" color="DarkColor(%Color)" />
-//              <end_line thickness="1" enabled="true" color="DarkColor(%Color)" />
-//              <fill type="Solid" color="%Color" opacity="0.8" />
-//              <states>
-//                <hover>
-//                  <fill type="Solid" color="LightColor(%Color)" opacity="0.8" />
-//                </hover>
-//              </states>
-//            </range_area_style>
-//            <start_point>
-//              <tooltip_settings enabled="true">
-//                <position anchor="Float" valign="Top" halign="Center" />
-//                <format>{%YRangeStart}{numDecimals:3} - {%YRangeEnd}{numDecimals:3}</format>
-//              </tooltip_settings>
-//            </start_point>
-//            <end_point>
-//              <tooltip_settings enabled="false" />
-//            </end_point>
-//          </range_area_series>
-//          <line_series>
-//            <marker_settings enabled="true">
-//              <marker type="None" />
-//              <states>
-//                <hover>
-//                  <marker type="Circle" size="7" />
-//                </hover>
-//              </states>
-//            </marker_settings>
-//            <tooltip_settings enabled="true">
-//              <format>{%Value}{numDecimals:5}</format>
-//            </tooltip_settings>
-//          </line_series>
-//          <marker_series>
-//            <tooltip_settings enabled="true">
-//              <format>{%Value}{numDecimals:5}</format>
-//            </tooltip_settings>
-//          </marker_series>
-//        </data_plot_settings>
-//        <data>
-//          <series name="Series 1">
-//            <point name="1 "  start="-0.489863522578899" end=" 0.848138677816903" />
-//            <point name="2 "  start="-0.385774774190865" end=" 0.779071607989758" />
-//            <point name="3 "  start=" 0.085320462046806" end=" 0.665356275004035" />
-//            <point name="4 "  start=" 0.661951933364362" end=" 1.48857802967009" />
-//            <point name="5 "  start=" 0.275939368771361" end=" 1.78112017585948" />
-//            <point name="6 "  start=" 0.327782217100161" end=" 0.910945756785081" />
-//            <point name="7 "  start="-0.353034448974316" end=" 0.51492272900181" />
-//            <point name="8 "  start="-1.52464778559499"  end=" 0.260972126042923" />
-//            <point name="9 "  start="-0.593361686260142" end=" 0.162759391666744" />
-//            <point name="10" start="-0.282102011275525" end=" 0.828140289442679" />
-//            <point name="11" start="-1.23059300530264"  end=" 0.451152587985225" />
-//            <point name="12" start="-1.24995265027972"  end="-0.31266194270582" />
-//            <point name="13" start="-1.37795240635888"  end="-0.589722591726911" />
-//            <point name="14" start="-2.52518734732884"  end="-0.95184304656081" />
-//            <point name="15" start="-1.70164913297708"  end="-1.54184969446708" />
-//            <point name="16" start="-2.80066758524658"  end="-1.31031245938982" />
-//            <point name="17" start="-2.21871327339612"  end="-0.895693067878342" />
-//            <point name="18" start="-1.86045028588756"  end="-1.26512897818588" />
-//            <point name="19" start="-2.13514441304614"  end="-1.08943821214579" />
-//            <point name="20" start="-1.36106428148275"  end="-0.751109295408758" />
-//            <point name="21" start="-1.13448325969953"  end="-0.208866920419441" />
-//            <point name="22" start="-1.16113158648886"  end="-0.460193104790614" />
-//            <point name="23" start="-0.709834207179879" end=" 0.0739745344379797" />
-//            <point name="24" start="-0.855133081253214" end=" 0.568682381682416" />
-//            <point name="25" start="-0.460984145040151" end="-0.0533268121319483" />
-//            <point name="26" start="-0.274001486727037" end=" 0.790086619458202" />
-//            <point name="27" start="-0.0632578758817437"end=" 0.790173258069052" />
-//            <point name="28" start=" 0.533488666887157" end=" 1.09171550073275" />
-//            <point name="29" start=" 0.328739731259988" end=" 1.62978411402078" />
-//            <point name="30" start=" 1.07776428203926"  end=" 1.93809648786583" />
-//            <point name="31" start=" 1.1413167338545"   end=" 2.07317462613488" />
-//            <point name="32" start=" 2.01265969966196"  end=" 2.45369696032894" />
-//            <point name="33" start=" 1.02418266284474"  end=" 2.27795353731045" />
-//            <point name="34" start=" 1.45227269430285"  end=" 2.74092153168326" />
-//            <point name="35" start=" 1.45852270324646"  end=" 2.91238500034082" />
-//            <point name="36" start=" 1.21129207788561"  end=" 2.08667480157999" />
-//            <point name="37" start=" 0.462011042266158" end=" 1.98370918491097" />
-//            <point name="38" start=" 0.428062670597836" end=" 1.42756198832186" />
-//            <point name="39" start=" 0.571998651405796" end=" 1.20777016841237" />
-//            <point name="40" start="-0.123659449221408" end=" 1.10974150901183" />
-//            <point name="41" start=" 0.220265810946126" end=" 0.889550892119087" />
-//            <point name="42" start="-0.574641417979562" end=" 0.8583990372058" />
-//            <point name="43" start=" 0.19221674566726"  end=" 0.86959932086505" />
-//            <point name="44" start=" 0.186659862839924" end=" 1.04903473940167" />
-//            <point name="45" start=" 0.218706499887028" end=" 1.23923064220661" />
-//            <point name="46" start="-0.27220251796404"  end=" 1.3295116016313" />
-//            <point name="47" start=" 0.0909752720459248"end=" 0.930787133486377" />
-//            <point name="48" start=" 0.500678865937832" end=" 1.28945886403763" />
-//            <point name="49" start="-0.378876145639865" end=" 1.29116025999708" />
-//            <point name="50" start=" 0.385505543735579" end=" 1.03897914012846" />
-//            <point name="51" start=" 0.135932482376663" end=" 0.92778787386035" />
-//            <point name="52" start=" 0.0126490029565284"end=" 0.941856901134297" />
-//            <point name="53" start=" 0.773063369455311" end=" 1.5541058613705" />
-//            <point name="54" start=" 1.08056863447678"  end=" 1.60549846831965" />
-//            <point name="55" start=" 1.06819268645169"  end=" 2.21075515924522" />
-//            <point name="56" start=" 0.89600108139962"  end=" 2.0627506436141" />
-//            <point name="57" start=" 1.60601329459157"  end=" 2.69928369983066" />
-//            <point name="58" start=" 2.12052520649532"  end=" 3.00114926835576" />
-//            <point name="59" start=" 2.90989593458823"  end=" 3.50255848816715" />
-//            <point name="60" start=" 2.54278602988589"  end=" 3.70206371820628" />
-//            <point name="61" start=" 3.09657732168984"  end=" 3.93689422073629" />
-//            <point name="62" start=" 3.32321329150499"  end=" 3.90890881368374" />
-//            <point name="63" start=" 3.14178105822847"  end=" 4.27111998864967" />
-//            <point name="64" start=" 2.95886009091458"  end=" 4.15810698557557" />
-//            <point name="65" start=" 3.83183059088505"  end=" 4.53247535253525" />
-//            <point name="66" start=" 4.40063335904881"  end=" 5.20075380392408" />
-//            <point name="67" start=" 4.47478320238869"  end=" 5.05301123068342" />
-//            <point name="68" start=" 4.47232398366198"  end=" 5.44402577422747" />
-//            <point name="69" start=" 3.98286212328023"  end=" 5.01902798238165" />
-//            <point name="70" start=" 3.59183589955411"  end=" 4.85673224919323" />
-//            <point name="71" start=" 4.10246999007764"  end=" 4.80323089976014" />
-//            <point name="72" start=" 4.751210298739"    end=" 5.33256459577594" />
-//            <point name="73" start=" 3.95250246625044"  end=" 5.47631574490867" />
-//            <point name="74" start=" 3.65861405462893"  end=" 4.93258521330197" />
-//            <point name="75" start=" 3.9432032257054"   end=" 4.94316527477613" />
-//          </series>
-//          <series name="Series 2" type="Marker">
-//            <point name="1"  y=" 0.559142254786167" />
-//            <point name="2"  y=" 0.592110810844279" />
-//            <point name="3"  y=" 0.963570246688821" />
-//            <point name="4"  y=" 1.21299384683976" />
-//            <point name="5"  y=" 1.54658801436731" />
-//            <point name="6"  y=" 1.27208083065789" />
-//            <point name="7"  y=" 0.121225112639938" />
-//            <point name="8"  y="-0.508864567386389" />
-//            <point name="9"  y=" 0.218089944784571" />
-//            <point name="10" y=" 0.721611369970074" />
-//            <point name="11" y="-0.140103248944554" />
-//            <point name="12" y="-0.0300106962816838" />
-//            <point name="13" y="-0.191006845650732" />
-//            <point name="14" y="-0.814311553870472" />
-//            <point name="15" y="-1.08826628121932" />
-//            <point name="16" y="-1.96278720556888" />
-//            <point name="17" y="-0.950375849823643" />
-//            <point name="18" y="-0.92443255447989" />
-//            <point name="19" y="-1.30296034566265" />
-//            <point name="20" y="-0.866142934125915" />
-//            <point name="21" y="-0.358324443622643" />
-//            <point name="22" y="-0.0795243445688507" />
-//            <point name="23" y=" 0.0871865696214076" />
-//            <point name="24" y=" 0.332247453197952" />
-//            <point name="25" y=" 0.1927909935791" />
-//            <point name="26" y=" 0.372433776442163" />
-//            <point name="27" y=" 1.30182293816554" />
-//            <point name="28" y=" 1.23616453434162" />
-//            <point name="29" y=" 1.83852277548915" />
-//            <point name="30" y=" 2.46108589692092" />
-//            <point name="31" y=" 1.79941129279295" />
-//            <point name="32" y=" 3.03709651601366" />
-//            <point name="33" y=" 2.34181116863238" />
-//            <point name="34" y=" 2.76797387808001" />
-//            <point name="35" y=" 2.9853266952491" />
-//            <point name="36" y=" 2.09530458603767" />
-//            <point name="37" y=" 1.53394095461533" />
-//            <point name="38" y=" 1.91677613366245" />
-//            <point name="39" y=" 0.959778428990291" />
-//            <point name="40" y=" 0.503938262585522" />
-//            <point name="41" y=" 0.625835436920559" />
-//            <point name="42" y=" 0.654221831427059" />
-//            <point name="43" y=" 1.47852533542482" />
-//            <point name="44" y=" 0.68172447764395" />
-//            <point name="45" y=" 0.853395074770504" />
-//            <point name="46" y=" 1.19709576605684" />
-//            <point name="47" y=" 1.13540425926233" />
-//            <point name="48" y=" 1.86872639477659" />
-//            <point name="49" y=" 0.520386030441329" />
-//            <point name="50" y=" 1.2105370970492" />
-//            <point name="51" y=" 1.16066757224531" />
-//            <point name="52" y=" 0.617806318969375" />
-//            <point name="53" y=" 1.39784724912506" />
-//            <point name="54" y=" 1.98786092502431" />
-//            <point name="55" y=" 2.5816314847123" />
-//            <point name="56" y=" 2.39647499467082" />
-//            <point name="57" y=" 2.9546767824584" />
-//            <point name="58" y=" 2.97818682108921" />
-//            <point name="59" y=" 3.23630685370243" />
-//            <point name="60" y=" 3.62703352404155" />
-//            <point name="61" y=" 4.42818757143253" />
-//            <point name="62" y=" 4.21758475211336" />
-//            <point name="63" y=" 3.80688097575068" />
-//            <point name="64" y=" 3.66153037695285" />
-//            <point name="65" y=" 4.67163846440224" />
-//            <point name="66" y=" 5.47861446159827" />
-//            <point name="67" y=" 5.55733815443578" />
-//            <point name="68" y=" 5.68401509811357" />
-//            <point name="69" y=" 4.92824550854426" />
-//            <point name="70" y=" 5.21664200314164" />
-//            <point name="71" y=" 4.84179665234023" />
-//            <point name="72" y=" 5.08356909085231" />
-//            <point name="73" y=" 5.12512520171009" />
-//            <point name="74" y=" 4.72926384244545" />
-//            <point name="75" y=" 5.15369204112966" />
-//          </series>
-//          <series name="Series 3" type="Spline" color="Gold">
-//            <point name="1"  y=" 1.15073035819645" />
-//            <point name="2"  y=" 0.742753777067528" />
-//            <point name="3"  y=" 1.27494822331159" />
-//            <point name="4"  y=" 1.37876710872108" />
-//            <point name="5"  y=" 1.87892635502492" />
-//            <point name="6"  y=" 1.61986408054512" />
-//            <point name="7"  y=" 0.90211963105735" />
-//            <point name="8"  y=" 0.417885699969663" />
-//            <point name="9"  y=" 0.360869923308897" />
-//            <point name="10" y=" 0.891552722962365" />
-//            <point name="11" y=" 0.834414544127764" />
-//            <point name="12" y="-0.41142281971162" />
-//            <point name="13" y="-0.516505539657783" />
-//            <point name="14" y="-1.27462030634033" />
-//            <point name="15" y="-1.5093101152107" />
-//            <point name="16" y="-1.75105038956633" />
-//            <point name="17" y="-0.800329750310783" />
-//            <point name="18" y="-0.574178518063472" />
-//            <point name="19" y="-0.739220801309009" />
-//            <point name="20" y="-0.833248083867714" />
-//            <point name="21" y="-0.3304939374004" />
-//            <point name="22" y="-0.671877235487046" />
-//            <point name="23" y=" 0.706678090635692" />
-//            <point name="24" y=" 0.355934290536338" />
-//            <point name="25" y=" 0.520116262690529" />
-//            <point name="26" y=" 0.503192650078109" />
-//            <point name="27" y=" 0.89441218858635" />
-//            <point name="28" y=" 1.07309866451647" />
-//            <point name="29" y=" 1.45231138640967" />
-//            <point name="30" y=" 1.81206626995097" />
-//            <point name="31" y=" 2.01052999279642" />
-//            <point name="32" y=" 2.57524967204869" />
-//            <point name="33" y=" 2.31776394989237" />
-//            <point name="34" y=" 2.4385315669259" />
-//            <point name="35" y=" 2.74537569070796" />
-//            <point name="36" y=" 2.6727308809475" />
-//            <point name="37" y=" 1.54720222137272" />
-//            <point name="38" y=" 1.69525540140237" />
-//            <point name="39" y=" 1.38939401587598" />
-//            <point name="40" y=" 1.06081365610511" />
-//            <point name="41" y=" 0.778387089467167" />
-//            <point name="42" y=" 1.37533696416859" />
-//            <point name="43" y=" 0.83455121493955" />
-//            <point name="44" y=" 1.03171445911985" />
-//            <point name="45" y=" 1.50111427755768" />
-//            <point name="46" y=" 0.990366511352841" />
-//            <point name="47" y=" 1.01885304957885" />
-//            <point name="48" y=" 1.66757062636358" />
-//            <point name="49" y=" 1.72399982300463" />
-//            <point name="50" y=" 1.49365049359714" />
-//            <point name="51" y=" 1.25969273609095" />
-//            <point name="52" y=" 1.14962996968517" />
-//            <point name="53" y=" 2.21431623455804" />
-//            <point name="54" y=" 1.78155744981404" />
-//            <point name="55" y=" 1.897312677728" />
-//            <point name="56" y=" 2.00303588512805" />
-//            <point name="57" y=" 3.13972422952751" />
-//            <point name="58" y=" 3.57049829244482" />
-//            <point name="59" y=" 3.7031428949146" />
-//            <point name="60" y=" 3.65412513259214" />
-//            <point name="61" y=" 4.56240590486167" />
-//            <point name="62" y=" 4.3691811133343" />
-//            <point name="63" y=" 4.44824771836784" />
-//            <point name="64" y=" 4.65229859699136" />
-//            <point name="65" y=" 4.70724246311339" />
-//            <point name="66" y=" 5.12239434498163" />
-//            <point name="67" y=" 5.23378335462593" />
-//            <point name="68" y=" 5.31899376787198" />
-//            <point name="69" y=" 4.85197161798612" />
-//            <point name="70" y=" 5.336122542621" />
-//            <point name="71" y=" 5.44519702784959" />
-//            <point name="72" y=" 6.0515889109663" />
-//            <point name="73" y=" 5.54641631954027" />
-//            <point name="74" y=" 5.36960110939244" />
-//            <point name="75" y=" 5.53350321274879" />
-//          </series>
-//        </data>
-//      </chart>
-//    </charts>
-//  </anychart>

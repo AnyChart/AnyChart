@@ -1,8 +1,6 @@
-var chart;
-
 anychart.onDocumentReady(function() {
   //create line chart
-  chart = new anychart.lineChart();
+  var chart = anychart.lineChart();
 
   //set container for the chart
   chart.container('container');

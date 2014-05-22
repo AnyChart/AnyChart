@@ -1,9 +1,7 @@
-var chart;
-
 anychart.onDocumentReady(function() {
 
   //create pie chart with passed data
-  chart = anychart.pieChart([
+  var chart = anychart.pieChart([
     ['Department Stores', 6371664],
     ['Discount Stores', 7216301],
     ['Men\'s/Women\'s Stores', 1486621],
