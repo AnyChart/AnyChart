@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script src="../../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = anychart.columnChart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+
+        chart.column([
+            ['A1' , 5,   5],
+            ['A2' , 0,   5],
+            ['A3' , '-1',  3],
+            ['A4' , '1.5', 3],
+            ['A5' , '10',  3],
+            ['A6' , 11.6,  6],
+            ['A7' , 12,    7],
+            ['A8' , 10,    8],
+            ['A9' , 13.2, 6],
+            ['A10' , 12, 5],
+            ['A11' , '-5', 3],
+            ['A12' , -4, 3],
+            ['A13' , 6,  2],
+            ['A14' , 9,  2],
+            ['A15' , '13', 2]
+        ]);
+
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>
+
