@@ -5,18 +5,20 @@
   "properties": {
     "chart": {
       "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.Chart" }
+      ],
       "oneOf": [
         { "$ref": "#/definitions/anychart.pie.Chart" },
         { "$ref": "#/definitions/anychart.cartesian.Chart" }
       ]
     }
   },
+  "required": ["chart"],
   "definitions": {
     "anychart.Chart": {
       "type": "object",
-      "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
-      ],
       "properties": {
         "background": { "$ref": "#/definitions/anychart.elements.Background" },
         "margin": { "$ref": "#/definitions/anychart.utils.Space" },
@@ -27,9 +29,6 @@
     },
     "anychart.cartesian.Chart": {
       "type": "object",
-      "allOf": [
-        { "$ref": "#/definitions/anychart.Chart" }
-      ],
       "properties": {
         "type": { "enum": [ "cartesian" ] },
         "grids": {
@@ -64,10 +63,13 @@
           "type": "array",
           "items": {
             "type": "object",
-            "anyOf": [
-              { "$ref": "#/definitions/anychart.cartesian.series.Base" },
-              { "$ref": "#/definitions/anychart.cartesian.series.BaseWithMarkers" }
-            ]
+            "allOf": [
+              { "$ref": "#/definitions/anychart.elements.Base" }
+            ],
+            "properties": {
+              "markers": { "$ref": "#/definitions/anychart.elements.Multimarker" },
+              "hoverMarkers": { "$ref": "#/definitions/anychart.elements.Multimarker" }
+            }
           }
         },
         "barGroupsPadding": {
@@ -81,9 +83,6 @@
     },
     "anychart.cartesian.series.Base": {
       "type": "object",
-      "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
-      ],
       "properties": {
         "data": { "$ref": "#/definitions/data" },
         "name": {
@@ -104,21 +103,8 @@
         }
       }
     },
-    "anychart.cartesian.series.BaseWithMarkers": {
-      "type": "object",
-      "allOf": [
-        { "$ref": "#/definitions/anychart.cartesian.series.Base" }
-      ],
-      "properties": {
-        "markers": { "$ref": "#/definitions/anychart.elements.Multimarker" },
-        "hoverMarkers": { "$ref": "#/definitions/anychart.elements.Multimarker" }
-      }
-    },
     "anychart.pie.Chart": {
       "type": "object",
-      "allOf": [
-        { "$ref": "#/definitions/anychart.Chart" }
-      ],
       "properties": {
         "type": { "enum": [ "pie" ] },
         "radius": {
@@ -314,7 +300,6 @@
     "anychart.elements.Multilabel": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
         { "$ref": "#/definitions/anychart.elements.Text" }
       ],
       "properties": {
@@ -602,28 +587,8 @@
         },
         "margin":  { "$ref": "#/definitions/anychart.utils.Space" },
         "padding": { "$ref": "#/definitions/anychart.utils.Space" },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "x": {
-          "type": "number"
-        },
-        "y": {
-          "type": "number"
-        },
-        "anchor": { "$ref": "#/definitions/anychart.utils.NinePositions" },
-        "visible": {
-          "type": "boolean"
-        },
-        "hideDelay": {
-          "type": "number"
-        },
-        "allowLeaveScreen": {
-          "type": "boolean"
-        },
-        "isFloating": {
-          "type": "boolean"
-        }
-      },
-      "required": ["x", "y", "anchor", "visible", "hideDelay"]
+        "background": { "$ref": "#/definitions/anychart.elements.Background" }
+      }
     },
     "anychart.ui.Paginator.Layout": { "enum": [ "vertical", "horizontal"] },
 
@@ -911,6 +876,23 @@
         },
         "required": ["color"]
       }
+    },
+    "acgraph.math.Rect": {
+      "properties": {
+        "left": {
+          "type": "number"
+        },
+        "top": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      },
+      "required": ["left", "top", "width", "height"]
     }
   }
 }
