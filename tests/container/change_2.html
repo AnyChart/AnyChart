@@ -8,13 +8,13 @@
             border: 1px solid #000000;
         }
         #container2 {
-            width: 500px;
-            height: 400px;
+            width: 450px;
+            height: 350px;
             border: 1px solid #000099;
         }
         #container3 {
-            width: 500px;
-            height: 400px;
+            width: 450px;
+            height: 350px;
             border: 1px solid #006400;
         }
         #status{
@@ -58,7 +58,7 @@
             ['A14' , 9.4],
             ['A15' , 11.5]
         ]);
-        chart.title('Changing container');
+        chart.title().text('Changing container');
         chart.rangeMarker()
                 .from('10')
                 .to('15')
@@ -67,6 +67,9 @@
         chart.container('container');
         chart.draw();
         chart.container('container2');
+        chart.container('container3');
+        chart.container('container');
+
     });
 </script>
 </html>

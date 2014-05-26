@@ -21,25 +21,32 @@
 </body>
 <script>
     anychart.onDocumentLoad(function() {
-        var chart = anychart.barChart();
+        var chart = anychart.lineChart();
         chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        var dataSet = new anychart.data.Set([
-            ['A1' , 1,   5, 2],
-            ['A2' , 2,   5,  4],
-            ['A3' , 1,   3, 5],
-            ['A4' , 1.5, 3, 2],
-            ['A5' , 4,  7, 1],
-            ['A6' , 4,   6, 5],
-            ['A7' , 5,  2, 5]
+        var graph = chart.candlestick([
+            ['A1', 3, 8, 2, 6],
+            ['A2', 4, 7, 5, 6],
+            ['A3', 6, 4, 6.5, 7],
+            ['A4', 9, 8, 5, 6],
+            ['A5', 6, 3, 4, 6],
+            {x: 'A6', open: 6, high:6, low: 2, close: 3}
+
         ]);
 
-        chart.yScale().stackMode('value');
-        chart.bar(dataSet.mapAs({x: [0], value: [1]}));
-        chart.bar(dataSet.mapAs({x: [0], value: [2]}));
-        chart.bar(dataSet.mapAs({x: [0], value: [3]}));
+        graph.fallingStroke('red .5', 2);
+        graph.risingStroke('green .5', 2);
+
+        graph.hoverFallingStroke('blue', 3);
+        graph.hoverRisingStroke('blue', 3);
+
+        graph.hoverFallingFill('red');
+        graph.hoverRisingFill('green');
+
+        graph.risingFill('green .3');
+        graph.fallingFill('red .3');
 
         chart.container('container');
         chart.draw();

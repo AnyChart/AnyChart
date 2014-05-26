@@ -21,26 +21,38 @@
 </body>
 <script>
     anychart.onDocumentLoad(function() {
-        var chart = anychart.barChart();
+        var chart = anychart.lineChart();
         chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        var dataSet = new anychart.data.Set([
-            ['A1' , 1,   5, 2],
-            ['A2' , 2,   5,  4],
-            ['A3' , 1,   3, 5],
-            ['A4' , 1.5, 3, 2],
-            ['A5' , 4,  7, 1],
-            ['A6' , 4,   6, 5],
-            ['A7' , 5,  2, 5]
+
+        chart.line([
+            ['A1' , 3.6],
+            ['A2' , 0],
+            ['A3' , 5.5],
+            ['A4' , 9.2],
+            ['A5' , 10.1],
+            ['A6' , 11.6],
+            ['A7' , 12],
+            ['A8' , 16.0],
+            ['A9' , 13.2],
+            ['A10' , 12.0]
+
         ]);
 
-        chart.yScale().stackMode('value');
-        chart.bar(dataSet.mapAs({x: [0], value: [1]}));
-        chart.bar(dataSet.mapAs({x: [0], value: [2]}));
-        chart.bar(dataSet.mapAs({x: [0], value: [3]}));
+        chart.rangeMarker()
+                .from(3.0)
+                .to(-3.5)
+                .fill('red .2')
+                .direction('horizontal');
+        chart.rangeMarker()
+                .from(10)
+                .to(27)
+                .fill('green .2')
+                .direction('horizontal');
 
+        chart.yAxis(0).enabled(false);
         chart.container('container');
         chart.draw();
     });
