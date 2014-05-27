@@ -46,8 +46,8 @@ function load() {
     chart.legend().enabled(true);
     chart.yAxis().orientation('left');
     chart.xAxis().orientation('bottom');
-//    chart.axis().orientation('top');
-//    chart.axis().orientation('right');
+    chart.xAxis().orientation('top');
+    chart.yAxis().orientation('right');
 
     if (seriesName == 'bubble') {
       series1.minimumSize(1);
@@ -55,9 +55,6 @@ function load() {
       series2.minimumSize(1);
       series2.maximumSize(20);
     }
-
-    console.log(JSON.stringify(chart.serialize()));
-    console.log("------------------------------------------------------");
   }
 
   areaChart = new anychart.cartesian.Chart();
