@@ -1123,6 +1123,22 @@ anychart.elements.Multimarker.prototype.stroke = function(opt_strokeOrFill, opt_
 
 
 /**
+ * Specifies under what circumstances a given graphics element can be the target element for a pointer event.
+ * @param {?string=} opt_pointerEvents Pointer events property value.
+ * @return {anychart.elements.Multimarker|string} If opt_pointerEvents defined then returns Element object for chaining else
+ * pointer events property value.
+ */
+anychart.elements.Multimarker.prototype.pointerEvents = function(opt_pointerEvents) {
+  if (goog.isDef(opt_pointerEvents)) {
+    this.pointerEvents_ = opt_pointerEvents;
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return this.pointerEvents_;
+};
+
+
+/**
  * Getter for current enabled state by index.
  * @param {number} index Index of marker.
  * @return {boolean} Marker enabled state.
@@ -1592,6 +1608,7 @@ anychart.elements.Multimarker.prototype.draw = function(positionProvider, opt_in
   //create internal elements only if draw ever called
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
+    this.layer_.pointerEvents(/** @type {string} */(this.pointerEvents()));
     this.invalidate(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.Z_INDEX);
   }
 

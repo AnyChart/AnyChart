@@ -65,6 +65,17 @@ anychart.cartesian.series.AreaBase.prototype.colorizeShape = function(hover) {
 
 
 /** @inheritDoc */
+anychart.cartesian.series.AreaBase.prototype.finalizeHatchFill = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    if (this.hatchFillPath) {
+      this.hatchFillPath.deserialize(this.path.serialize());
+      this.applyHatchFill(false);
+    }
+  }
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 

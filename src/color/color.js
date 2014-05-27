@@ -129,6 +129,35 @@ anychart.color.darken = function(fillOrStroke, opt_factor) {
 
 
 /**
+ * Normalize hatch fill.
+ * @param {(!acgraph.vector.HatchFill|!acgraph.vector.PatternFill|acgraph.vector.HatchFill.HatchFillType|string|
+ * null)=} opt_patternFillOrType
+ * @param {string=} opt_color
+ * @param {(string|number)=} opt_thickness
+ * @param {(string|number)=} opt_size
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill}
+ */
+anychart.color.normalizeHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
+  var newFill = null;
+  if (anychart.utils.isNone(opt_patternFillOrType)) {
+    newFill = null;
+  } else if (goog.isString(opt_patternFillOrType) || goog.isNumber(opt_patternFillOrType)) {
+    var type = goog.object.containsValue(acgraph.vector.HatchFill.HatchFillType, opt_patternFillOrType) ?
+        opt_patternFillOrType :
+        acgraph.vector.HatchFill.HatchFillType.BACKWARD_DIAGONAL;
+    newFill = acgraph.hatchFill(
+        /** @type {acgraph.vector.HatchFill.HatchFillType} */(type),
+        opt_color,
+        goog.isDef(opt_thickness) ? parseFloat(opt_thickness) : undefined,
+        goog.isDef(opt_size) ? parseFloat(opt_size) : undefined);
+  } else if (opt_patternFillOrType instanceof acgraph.vector.PatternFill) {
+    newFill = opt_patternFillOrType;
+  }
+  return newFill;
+};
+
+
+/**
  * See fill() method for params description.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .

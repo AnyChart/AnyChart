@@ -13,3 +13,7 @@ anychart.cartesian.series.Bubble.prototype['negativeFill'] = anychart.cartesian.
 anychart.cartesian.series.Bubble.prototype['hoverNegativeFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeFill;
 anychart.cartesian.series.Bubble.prototype['negativeStroke'] = anychart.cartesian.series.Bubble.prototype.negativeStroke;
 anychart.cartesian.series.Bubble.prototype['hoverNegativeStroke'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke;
+anychart.cartesian.series.Bubble.prototype['hatchFill'] = anychart.cartesian.series.Bubble.prototype.hatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverHatchFill;
+anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;

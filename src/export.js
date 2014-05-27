@@ -50,11 +50,13 @@ goog.exportSymbol('anychart.cartesian.series.Area', anychart.cartesian.series.Ar
 //  anychart.cartesian.series.AreaBase
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.cartesian.series.Base.prototype.startDrawing;
-anychart.cartesian.series.AreaBase.prototype['fill'] = anychart.cartesian.series.Base.prototype.fill;
-anychart.cartesian.series.AreaBase.prototype['hoverFill'] = anychart.cartesian.series.Base.prototype.hoverFill;
-anychart.cartesian.series.AreaBase.prototype['stroke'] = anychart.cartesian.series.Base.prototype.stroke;
-anychart.cartesian.series.AreaBase.prototype['hoverStroke'] = anychart.cartesian.series.Base.prototype.hoverStroke;
+anychart.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.cartesian.series.AreaBase.prototype.startDrawing;
+anychart.cartesian.series.AreaBase.prototype['fill'] = anychart.cartesian.series.AreaBase.prototype.fill;
+anychart.cartesian.series.AreaBase.prototype['hoverFill'] = anychart.cartesian.series.AreaBase.prototype.hoverFill;
+anychart.cartesian.series.AreaBase.prototype['stroke'] = anychart.cartesian.series.AreaBase.prototype.stroke;
+anychart.cartesian.series.AreaBase.prototype['hoverStroke'] = anychart.cartesian.series.AreaBase.prototype.hoverStroke;
+anychart.cartesian.series.AreaBase.prototype['hatchFill'] = anychart.cartesian.series.AreaBase.prototype.hatchFill;
+anychart.cartesian.series.AreaBase.prototype['hoverHatchFill'] = anychart.cartesian.series.AreaBase.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.Bar
@@ -65,6 +67,8 @@ anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Base
 anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Base.prototype.hoverFill;
 anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Base.prototype.stroke;
 anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Base.prototype.hoverStroke;
+anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;
+anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.Base
@@ -85,6 +89,8 @@ anychart.cartesian.series.Base.prototype['getResetIterator'] = anychart.cartesia
 anychart.cartesian.series.Base.prototype['xPointPosition'] = anychart.cartesian.series.Base.prototype.xPointPosition;//in docs/
 anychart.cartesian.series.Base.prototype['xScale'] = anychart.cartesian.series.Base.prototype.xScale;//in docs/
 anychart.cartesian.series.Base.prototype['yScale'] = anychart.cartesian.series.Base.prototype.yScale;//in docs/
+anychart.cartesian.series.Base.prototype['hatchFill'] = anychart.cartesian.series.Base.prototype.hatchFill;
+anychart.cartesian.series.Base.prototype['hoverHatchFill'] = anychart.cartesian.series.Base.prototype.hoverHatchFill();
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.BaseWithMarkers
@@ -112,6 +118,10 @@ anychart.cartesian.series.Bubble.prototype['negativeFill'] = anychart.cartesian.
 anychart.cartesian.series.Bubble.prototype['hoverNegativeFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeFill;
 anychart.cartesian.series.Bubble.prototype['negativeStroke'] = anychart.cartesian.series.Bubble.prototype.negativeStroke;
 anychart.cartesian.series.Bubble.prototype['hoverNegativeStroke'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke;
+anychart.cartesian.series.Bubble.prototype['hatchFill'] = anychart.cartesian.series.Bubble.prototype.hatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverHatchFill;
+anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.Candlestick
@@ -122,6 +132,10 @@ anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesi
 anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;
 anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;
 anychart.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingFill;
+anychart.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.risingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.fallingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.Column
@@ -132,6 +146,8 @@ anychart.cartesian.series.Column.prototype['fill'] = anychart.cartesian.series.C
 anychart.cartesian.series.Column.prototype['hoverFill'] = anychart.cartesian.series.Column.prototype.hoverFill;
 anychart.cartesian.series.Column.prototype['stroke'] = anychart.cartesian.series.Column.prototype.stroke;
 anychart.cartesian.series.Column.prototype['hoverStroke'] = anychart.cartesian.series.Column.prototype.hoverStroke;
+anychart.cartesian.series.Column.prototype['hatchFill'] = anychart.cartesian.series.Column.prototype.hatchFill;
+anychart.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.cartesian.series.Column.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.ContinuousBase
@@ -154,6 +170,8 @@ anychart.cartesian.series.ContinuousRangeBase.prototype['highStroke'] = anychart
 anychart.cartesian.series.ContinuousRangeBase.prototype['hoverHighStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke;
 anychart.cartesian.series.ContinuousRangeBase.prototype['lowStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke;
 anychart.cartesian.series.ContinuousRangeBase.prototype['hoverLowStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hatchFill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hatchFill;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hoverHatchFill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.DiscreteBase
@@ -189,6 +207,8 @@ anychart.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.cartesi
 anychart.cartesian.series.Marker.prototype['hoverSeries'] = anychart.cartesian.series.Marker.prototype.hoverSeries;//in docs/
 anychart.cartesian.series.Marker.prototype['hoverPoint'] = anychart.cartesian.series.Marker.prototype.hoverPoint;//in docs/
 anychart.cartesian.series.Marker.prototype['unhover'] = anychart.cartesian.series.Marker.prototype.unhover;//in docs/
+anychart.cartesian.series.Marker.prototype['hatchFill'] = anychart.cartesian.series.Marker.prototype.hatchFill;
+anychart.cartesian.series.Marker.prototype['hoverHatchFill'] = anychart.cartesian.series.Marker.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.OHLC
@@ -211,20 +231,24 @@ goog.exportSymbol('anychart.cartesian.series.RangeArea', anychart.cartesian.seri
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.cartesian.series.RangeBar', anychart.cartesian.series.RangeBar);
-anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.Base.prototype.fill;
-anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.Base.prototype.hoverFill;
-anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.Base.prototype.stroke;
-anychart.cartesian.series.RangeBar.prototype['hoverStroke'] = anychart.cartesian.series.Base.prototype.hoverStroke;
+anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.RangeBar.prototype.fill;
+anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.RangeBar.prototype.hoverFill;
+anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.RangeBar.prototype.stroke;
+anychart.cartesian.series.RangeBar.prototype['hoverStroke'] = anychart.cartesian.series.RangeBar.prototype.hoverStroke;
+anychart.cartesian.series.RangeBar.prototype['hatchFill'] = anychart.cartesian.series.RangeBar.prototype.hatchFill;
+anychart.cartesian.series.RangeBar.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeBar.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.RangeColumn
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.cartesian.series.RangeColumn', anychart.cartesian.series.RangeColumn);
-anychart.cartesian.series.RangeColumn.prototype['fill'] = anychart.cartesian.series.Base.prototype.fill;
-anychart.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.cartesian.series.Base.prototype.hoverFill;
-anychart.cartesian.series.RangeColumn.prototype['stroke'] = anychart.cartesian.series.Base.prototype.stroke;
-anychart.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.cartesian.series.Base.prototype.hoverStroke;
+anychart.cartesian.series.RangeColumn.prototype['fill'] = anychart.cartesian.series.RangeColumn.prototype.fill;
+anychart.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverFill;
+anychart.cartesian.series.RangeColumn.prototype['stroke'] = anychart.cartesian.series.RangeColumn.prototype.stroke;
+anychart.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.cartesian.series.RangeColumn.prototype.hoverStroke;
+anychart.cartesian.series.RangeColumn.prototype['hatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hatchFill;
+anychart.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.RangeSplineArea
