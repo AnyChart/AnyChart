@@ -29,11 +29,11 @@ anychart.cartesian.Chart.prototype['rangeArea'] = anychart.cartesian.Chart.proto
 anychart.cartesian.Chart.prototype['rangeBar'] = anychart.cartesian.Chart.prototype.rangeBar;//in docs/
 anychart.cartesian.Chart.prototype['rangeColumn'] = anychart.cartesian.Chart.prototype.rangeColumn;//in docs/
 anychart.cartesian.Chart.prototype['rangeSplineArea'] = anychart.cartesian.Chart.prototype.rangeSplineArea;//in docs/
-anychart.cartesian.Chart.prototype['rangeStepLineArea'] = anychart.cartesian.Chart.prototype.rangeStepLineArea;//in docs/
+anychart.cartesian.Chart.prototype['rangeStepArea'] = anychart.cartesian.Chart.prototype.rangeStepArea;//in docs/
 anychart.cartesian.Chart.prototype['spline'] = anychart.cartesian.Chart.prototype.spline;//in docs/
 anychart.cartesian.Chart.prototype['splineArea'] = anychart.cartesian.Chart.prototype.splineArea;//in docs/
 anychart.cartesian.Chart.prototype['stepLine'] = anychart.cartesian.Chart.prototype.stepLine;//in docs/
-anychart.cartesian.Chart.prototype['stepLineArea'] = anychart.cartesian.Chart.prototype.stepLineArea;//in docs/
+anychart.cartesian.Chart.prototype['stepArea'] = anychart.cartesian.Chart.prototype.stepArea;//in docs/
 anychart.cartesian.Chart.prototype['lineMarker'] = anychart.cartesian.Chart.prototype.lineMarker;//in docs/
 anychart.cartesian.Chart.prototype['rangeMarker'] = anychart.cartesian.Chart.prototype.rangeMarker;//in docs/
 anychart.cartesian.Chart.prototype['textMarker'] = anychart.cartesian.Chart.prototype.textMarker;//in docs/
@@ -257,10 +257,10 @@ anychart.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.car
 goog.exportSymbol('anychart.cartesian.series.RangeSplineArea', anychart.cartesian.series.RangeSplineArea);
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.cartesian.series.RangeStepLineArea
+//  anychart.cartesian.series.RangeStepArea
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.cartesian.series.RangeStepLineArea', anychart.cartesian.series.RangeStepLineArea);
+goog.exportSymbol('anychart.cartesian.series.RangeStepArea', anychart.cartesian.series.RangeStepArea);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.Spline
@@ -285,10 +285,10 @@ anychart.cartesian.series.StepLine.prototype['stroke'] = anychart.cartesian.seri
 anychart.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.cartesian.series.StepLine.prototype.hoverStroke;
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.cartesian.series.StepLineArea
+//  anychart.cartesian.series.StepArea
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.cartesian.series.StepLineArea', anychart.cartesian.series.StepLineArea);
+goog.exportSymbol('anychart.cartesian.series.StepArea', anychart.cartesian.series.StepArea);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.WidthBased

@@ -1,4 +1,4 @@
-goog.provide('anychart.cartesian.series.RangeStepLineArea');
+goog.provide('anychart.cartesian.series.RangeStepArea');
 
 goog.require('anychart.cartesian.series.ContinuousRangeBase');
 
@@ -11,7 +11,7 @@ goog.require('anychart.cartesian.series.ContinuousRangeBase');
  * @constructor
  * @extends {anychart.cartesian.series.ContinuousRangeBase}
  */
-anychart.cartesian.series.RangeStepLineArea = function(data, opt_csvSettings) {
+anychart.cartesian.series.RangeStepArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
   // Определяем значения опорных полей серии.
@@ -19,11 +19,11 @@ anychart.cartesian.series.RangeStepLineArea = function(data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
 };
-goog.inherits(anychart.cartesian.series.RangeStepLineArea, anychart.cartesian.series.ContinuousRangeBase);
+goog.inherits(anychart.cartesian.series.RangeStepArea, anychart.cartesian.series.ContinuousRangeBase);
 
 
 /** @inheritDoc */
-anychart.cartesian.series.RangeStepLineArea.prototype.drawFirstPoint = function() {
+anychart.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function() {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -54,7 +54,7 @@ anychart.cartesian.series.RangeStepLineArea.prototype.drawFirstPoint = function(
 
 
 /** @inheritDoc */
-anychart.cartesian.series.RangeStepLineArea.prototype.drawSubsequentPoint = function() {
+anychart.cartesian.series.RangeStepArea.prototype.drawSubsequentPoint = function() {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -87,7 +87,7 @@ anychart.cartesian.series.RangeStepLineArea.prototype.drawSubsequentPoint = func
 
 
 /** @inheritDoc */
-anychart.cartesian.series.RangeStepLineArea.prototype.finalizeSegment = function() {
+anychart.cartesian.series.RangeStepArea.prototype.finalizeSegment = function() {
   if (this.lowsStack) {
     /** @type {number} */
     var prevX = NaN;
@@ -125,9 +125,9 @@ anychart.cartesian.series.RangeStepLineArea.prototype.finalizeSegment = function
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.RangeStepLineArea.prototype.serialize = function() {
+anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangesteplinearea';
+  json['seriesType'] = 'rangesteparea';
   return json;
 };
 
@@ -135,6 +135,6 @@ anychart.cartesian.series.RangeStepLineArea.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.RangeStepLineArea.prototype.deserialize = function(config) {
+anychart.cartesian.series.RangeStepArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

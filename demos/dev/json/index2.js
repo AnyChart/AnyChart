@@ -1,6 +1,6 @@
 var stage, stage2;
 var area, bar, bubble, candlestick, column, line, markers, ohlc, rangeArea, rangeBar, rangeColumn, rangeSplineArea,
-    rangeStepLineArea, spline, splineArea, stepLine, stepLineArea;
+    rangeStepArea, spline, splineArea, stepLine, stepArea;
 
 
 function load() {

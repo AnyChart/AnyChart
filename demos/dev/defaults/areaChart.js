@@ -30,6 +30,6 @@ anychart.onDocumentReady(function() {
       .container('container');
 
   chart.splineArea(s1);
-  chart.stepLineArea(s2);
+  chart.stepArea(s2);
   chart.draw();
 });

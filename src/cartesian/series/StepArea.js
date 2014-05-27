@@ -1,4 +1,4 @@
-goog.provide('anychart.cartesian.series.StepLineArea');
+goog.provide('anychart.cartesian.series.StepArea');
 
 goog.require('anychart.cartesian.series.AreaBase');
 
@@ -11,7 +11,7 @@ goog.require('anychart.cartesian.series.AreaBase');
  * @constructor
  * @extends {anychart.cartesian.series.AreaBase}
  */
-anychart.cartesian.series.StepLineArea = function(data, opt_csvSettings) {
+anychart.cartesian.series.StepArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
   // Определяем значения опорных полей серии.
@@ -19,25 +19,25 @@ anychart.cartesian.series.StepLineArea = function(data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'z', 'y'];
   this.referenceValuesSupportStack = true;
 };
-goog.inherits(anychart.cartesian.series.StepLineArea, anychart.cartesian.series.AreaBase);
+goog.inherits(anychart.cartesian.series.StepArea, anychart.cartesian.series.AreaBase);
 
 
 /**
  * @type {number}
  * @private
  */
-anychart.cartesian.series.StepLineArea.prototype.prevX_;
+anychart.cartesian.series.StepArea.prototype.prevX_;
 
 
 /**
  * @type {number}
  * @private
  */
-anychart.cartesian.series.StepLineArea.prototype.prevY_;
+anychart.cartesian.series.StepArea.prototype.prevY_;
 
 
 /** @inheritDoc */
-anychart.cartesian.series.StepLineArea.prototype.drawFirstPoint = function() {
+anychart.cartesian.series.StepArea.prototype.drawFirstPoint = function() {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
@@ -72,7 +72,7 @@ anychart.cartesian.series.StepLineArea.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.StepLineArea.prototype.drawSubsequentPoint = function() {
+anychart.cartesian.series.StepArea.prototype.drawSubsequentPoint = function() {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
@@ -109,7 +109,7 @@ anychart.cartesian.series.StepLineArea.prototype.drawSubsequentPoint = function(
 
 
 /** @inheritDoc */
-anychart.cartesian.series.StepLineArea.prototype.finalizeSegment = function() {
+anychart.cartesian.series.StepArea.prototype.finalizeSegment = function() {
   if (!isNaN(this.lastDrawnX)) {
     this.path
         .lineTo(this.lastDrawnX, this.zeroY)
@@ -152,9 +152,9 @@ anychart.cartesian.series.StepLineArea.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.StepLineArea.prototype.serialize = function() {
+anychart.cartesian.series.StepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'steplinearea';
+  json['seriesType'] = 'steparea';
   return json;
 };
 
@@ -162,6 +162,6 @@ anychart.cartesian.series.StepLineArea.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.StepLineArea.prototype.deserialize = function(config) {
+anychart.cartesian.series.StepArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

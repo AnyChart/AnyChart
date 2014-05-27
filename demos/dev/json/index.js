@@ -1,6 +1,6 @@
 var stage, stage2;
 var area, bar, bubble, candlestick, column, line, markers, ohlc, rangeArea, rangeBar, rangeColumn, rangeSplineArea,
-    rangeStepLineArea, spline, splineArea, stepLine, stepLineArea;
+    rangeStepArea, spline, splineArea, stepLine, stepArea;
 
 
 function load() {
@@ -234,15 +234,15 @@ function load() {
 
   y += 210;
 
-  rangeStepLineArea = new anychart.cartesian.Chart();
-  rangeStepLineArea
+  rangeStepArea = new anychart.cartesian.Chart();
+  rangeStepArea
       .bounds(0, y, '100%', 200)
       .container(stage)
       .title({text: 'range step line area chart', fontSize: 14, fontColor: 'red', hAlign: 'center'})
-      .rangeStepLineArea(data2).markers({type: 'star5', size: 11, enabled: true, fill: 'orange'});
-  rangeStepLineArea.draw();
+      .rangeStepArea(data2).markers({type: 'star5', size: 11, enabled: true, fill: 'orange'});
+  rangeStepArea.draw();
 
-  json = rangeStepLineArea.serialize();
+  json = rangeStepArea.serialize();
   anychart.json(json).container(stage2).draw();
 
   y += 210;
@@ -286,14 +286,14 @@ function load() {
 
   y += 210;
 
-  stepLineArea = new anychart.cartesian.Chart();
-  stepLineArea
+  stepArea = new anychart.cartesian.Chart();
+  stepArea
       .bounds(0, y, '100%', 200)
       .container(stage)
       .title({text: 'step line area chart', fontSize: 14, fontColor: 'red', hAlign: 'center'})
-      .stepLineArea(data2);
-  stepLineArea.draw();
+      .stepArea(data2);
+  stepArea.draw();
 
-  json = stepLineArea.serialize();
+  json = stepArea.serialize();
   anychart.json(json).container(stage2).draw();
 }

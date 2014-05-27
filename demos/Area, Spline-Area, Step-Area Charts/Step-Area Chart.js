@@ -31,10 +31,10 @@ anychart.onDocumentReady(function() {
   chart.title().text('Step-Area Chart');
 
   //create first series on mapped data
-  chart.stepLineArea(seriesData_1);
+  chart.stepArea(seriesData_1);
 
   //create second series on mapped data
-  chart.stepLineArea(seriesData_2);
+  chart.stepArea(seriesData_2);
 
   //initiate chart drawing
   chart.draw();

@@ -122,11 +122,11 @@
             <xsd:enumeration value="rangeBar"/>
             <xsd:enumeration value="rangeColumn"/>
             <xsd:enumeration value="rangeSplineArea"/>
-            <xsd:enumeration value="rangeStepLineArea"/>
+            <xsd:enumeration value="rangeStepArea"/>
             <xsd:enumeration value="spline"/>
             <xsd:enumeration value="splineArea"/>
             <xsd:enumeration value="stepLine"/>
-            <xsd:enumeration value="stepLineArea"/>
+            <xsd:enumeration value="stepArea"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -1,7 +1,7 @@
 // independent series
 var bubble, rangeColumn, rangeBar, rangeStepSplineArea, rangeSplineArea, rangeArea;
 //series in chart
-var bubbleChart, rangeColumnChart, rangeBarChart, rangeStepLineAreaChart, rangeSplineAreaChart, rangeAreaChart;
+var bubbleChart, rangeColumnChart, rangeBarChart, rangeStepAreaChart, rangeSplineAreaChart, rangeAreaChart;
 
 
 function load() {
@@ -74,7 +74,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeStepSplineArea = new anychart.cartesian.series.RangeStepLineArea(data2);
+  rangeStepSplineArea = new anychart.cartesian.series.RangeStepArea(data2);
   rangeStepSplineArea.markers(null);
   rangeStepSplineArea.container(stage);
   rangeStepSplineArea.bounds(0, 190, 200, 150);
@@ -134,13 +134,13 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data2).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepLineAreaChart = new anychart.cartesian.Chart();
-  rangeStepLineAreaChart.container(stage);
-  rangeStepLineAreaChart.bounds(630, 190, 200, 150);
-  rangeStepLineAreaChart.title('Range step line \n area chart');
-  rangeStepLineAreaChart.title().fontSize(14).hAlign('center');
-  rangeStepLineAreaChart.rangeStepLineArea(data2).markers(null);
-  rangeStepLineAreaChart.draw();
+  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart.container(stage);
+  rangeStepAreaChart.bounds(630, 190, 200, 150);
+  rangeStepAreaChart.title('Range step line \n area chart');
+  rangeStepAreaChart.title().fontSize(14).hAlign('center');
+  rangeStepAreaChart.rangeStepArea(data2).markers(null);
+  rangeStepAreaChart.draw();
 
   rangeBarChart = new anychart.cartesian.Chart();
   rangeBarChart.container(stage);
@@ -198,14 +198,14 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data1).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepLineAreaChart = new anychart.cartesian.Chart();
-  rangeStepLineAreaChart.container(stage);
-  rangeStepLineAreaChart.bounds(0, 590, 200, 150);
-  rangeStepLineAreaChart.title('Range step line \n area chart');
-  rangeStepLineAreaChart.title().fontSize(14).hAlign('center');
-  rangeStepLineAreaChart.rangeStepLineArea(data2).markers(null);
-  rangeStepLineAreaChart.rangeStepLineArea(data1).markers(null);
-  rangeStepLineAreaChart.draw();
+  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart.container(stage);
+  rangeStepAreaChart.bounds(0, 590, 200, 150);
+  rangeStepAreaChart.title('Range step line \n area chart');
+  rangeStepAreaChart.title().fontSize(14).hAlign('center');
+  rangeStepAreaChart.rangeStepArea(data2).markers(null);
+  rangeStepAreaChart.rangeStepArea(data1).markers(null);
+  rangeStepAreaChart.draw();
 
   rangeBarChart = new anychart.cartesian.Chart();
   rangeBarChart.container(stage);
@@ -265,15 +265,15 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data2).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepLineAreaChart = new anychart.cartesian.Chart();
-  rangeStepLineAreaChart.container(stage);
-  rangeStepLineAreaChart.bounds(630, 590, 200, 150);
-  rangeStepLineAreaChart.title('Range step line \n area chart');
-  rangeStepLineAreaChart.title().fontSize(14).hAlign('center');
-  rangeStepLineAreaChart.axis().orientation('left');
-  rangeStepLineAreaChart.axis().orientation('bottom');
-  rangeStepLineAreaChart.rangeStepLineArea(data2).markers(null);
-  rangeStepLineAreaChart.draw();
+  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart.container(stage);
+  rangeStepAreaChart.bounds(630, 590, 200, 150);
+  rangeStepAreaChart.title('Range step line \n area chart');
+  rangeStepAreaChart.title().fontSize(14).hAlign('center');
+  rangeStepAreaChart.axis().orientation('left');
+  rangeStepAreaChart.axis().orientation('bottom');
+  rangeStepAreaChart.rangeStepArea(data2).markers(null);
+  rangeStepAreaChart.draw();
 
   rangeBarChart = new anychart.cartesian.Chart();
   rangeBarChart.container(stage);
