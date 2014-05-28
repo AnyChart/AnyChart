@@ -765,13 +765,8 @@ goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);//in docs/final
-goog.exportSymbol('anychart.pie.Chart.OtherPointType.DROP', anychart.pie.Chart.OtherPointType.DROP);//in docs/final
-goog.exportSymbol('anychart.pie.Chart.OtherPointType.GROUP', anychart.pie.Chart.OtherPointType.GROUP);//in docs/final
-goog.exportSymbol('anychart.pie.Chart.OtherPointType.NONE', anychart.pie.Chart.OtherPointType.NONE);//in docs/final
 anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//in docs/final
-anychart.pie.Chart.prototype['otherPointType'] = anychart.pie.Chart.prototype.otherPointType;//in docs/final
-anychart.pie.Chart.prototype['otherPointFilter'] = anychart.pie.Chart.prototype.otherPointFilter;//in docs/final
-anychart.pie.Chart.prototype['setOtherPoint'] = anychart.pie.Chart.prototype.setOtherPoint;//in docs/final
+anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;
 anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//in docs/final
 anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//in docs/final
 anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//in docs/final

@@ -26,22 +26,12 @@ anychart.pie.Chart = function(opt_data) {
   this.suspendSignalsDispatching();
 
   /**
-   * Type of the other point.
-   * @type {anychart.pie.Chart.OtherPointType}
-   * @private
-   */
-  this.otherPointType_ = anychart.pie.Chart.OtherPointType.NONE;
-
-  /**
    * Filter function that should accept a field value and return true if the row
    *    should be included into the resulting view as a and false otherwise..
-   * @param {*} val Value supposed to be filtered.
-   * @return {boolean} Filtering result.
+   * @type {(function(*):boolean)?}
    * @private
    */
-  this.otherPointFilter_ = function(val) {
-    return (/** @type {number} */ (val)) > 3;
-  };
+  this.groupedPointFilter_ = null;
 
   /**
    * Start angle for the first slice of a pie chart.
@@ -73,7 +63,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * The sort type for the pie points.
-   * Other point included into sort.
+   * Grouped point included into sort.
    * @type {anychart.utils.Sort}
    * @private
    */
@@ -142,15 +132,6 @@ anychart.pie.Chart = function(opt_data) {
    * @private
    */
   this.formatProvider_ = {};
-
-  /**
-   * Flag identifies that information is not fully gathered to calculate/recalculate data.
-   * Used in setOtherPoint to prevent call of data set method twice.
-   * @see #setOtherPoint
-   * @type {boolean}
-   * @private
-   */
-  this.preparingData_ = false;
 
   /**
    * Default fill function.
@@ -239,47 +220,6 @@ anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Defines the way to treat points filtered out by a filter function.
- * @enum {string}
- */
-anychart.pie.Chart.OtherPointType = {
-  /**
-   * Ignore filtered out point.
-   */
-  DROP: 'drop',
-
-  /**
-   * Group filtered out point into one point.
-   */
-  GROUP: 'group',
-
-  /**
-   * Don't do anything with filtered out points.<br/>
-   * This is a default behavior.
-   */
-  NONE: 'none'
-};
-
-
-/**
- * Normalizes user input of other point type to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
- * @param {string} otherPointType Other point type to normalize.
- * @param {anychart.pie.Chart.OtherPointType=} opt_default Default value to return.
- * @return {anychart.pie.Chart.OtherPointType} Normalized other point type.
- */
-anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_default) {
-  if (goog.isString(otherPointType)) {
-    otherPointType = otherPointType.toLowerCase();
-    for (var i in anychart.pie.Chart.OtherPointType) {
-      if (otherPointType == anychart.pie.Chart.OtherPointType[i])
-        return anychart.pie.Chart.OtherPointType[i];
-    }
-  }
-  return opt_default || anychart.pie.Chart.OtherPointType.NONE;
-};
-
-
-/**
  * Sets data for the current chart.
  * Learn more about mapping at {@link anychart.data.Mapping}.
  * @example <c>Set data using simple array</c>
@@ -327,7 +267,6 @@ anychart.pie.Chart.normalizeOtherPointType = function(otherPointType, opt_defaul
  * @return {(anychart.data.View|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.data = function(opt_value) {
-  if (this.preparingData_) return this;
   if (goog.isDef(opt_value)) {
     if (this.parentView_ != opt_value) {
       goog.dispose(this.parentViewToDispose_);
@@ -368,16 +307,11 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
  * @private
  */
 anychart.pie.Chart.prototype.prepareData_ = function(data) {
-  if (this.otherPointType_ == 'drop') {
-    data = data.filter('value', this.otherPointFilter_);
-    data.transitionMeta(true);
-  } else if (this.otherPointType_ == 'group') {
-    data = data.preparePie('value', this.otherPointFilter_, undefined, function() {
+  if (this.groupedPointFilter_ != null) {
+    data = data.preparePie('value', this.groupedPointFilter_, undefined, function() {
       return {'value': 0};
     });
     data.transitionMeta(true);
-  } else if (this.otherPointType_ != 'none') {
-    throw Error('No acceptable data passed to the pie plot');
   }
 
   if (this.sort_ == 'none') {
@@ -706,109 +640,32 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 
 /**
- * Combined call of {@link anychart.pie.Chart#otherPointType} and {@link anychart.pie.Chart#otherPointFilter} methods.
- * <br>
- * We recommend to use this method to set of "Other" point parameters, because this way
- * chart is redrawn only once, in case of sequential call - it is redrawn twice.
- * @example
- *  var data = [10, 1, 7, 10, 2, 4, 20, 3, 14];
- *  chart = new anychart.pie.Chart(data);
- *  chart.setOtherPoint('drop', function(value){
- *    return (value >= 10);
- *  });
- * @param {(anychart.pie.Chart.OtherPointType|string)} typeValue Type of the other point filtering.
- * @param {(function(*):boolean)} filterValue Filter function which returns boolean flag
- * based on a value of a point, flag is used to decide whether a point falls into "Other". In general this function looks like this:
- * <code>function(pointValue){
- *   ...
- *   return BOOLEAN;
- * }.
- * </code>
+ * Setter/getter for points grouping function.
+ * Если передается функция - задаёт её фильтрующей функцией для группировки точки.
+ * Если передаётся срока 'none' или null то отключает группировку.
+ * Если ничего не передается возвращает последнее установленное значение фильтрующей функции либо null.
+ * @param {(string|null|function(*):boolean)=} opt_value Filtering function or disabling value (null, 'none').
+ * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for chaining.
  */
-anychart.pie.Chart.prototype.setOtherPoint = function(typeValue, filterValue) {
-  this.suspendSignalsDispatching();
-  this.preparingData_ = true;
-  this.otherPointType(typeValue);
-  this.preparingData_ = false;
-  this.otherPointFilter(filterValue);
-  this.resumeSignalsDispatching(true);
-};
-
-
-/**
- * Sets the way to create the "Other" point.<br/>
- * <b>Note:</b> If you plan to use a filter function for an "Other" point we recommend to use
- * {@link anychart.pie.Chart#setOtherPoint} method which combines two methods.
- * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value [{@link anychart.pie.Chart.OtherPointType}.NONE] The way to create the "Other" point.
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
- *//**
- * Returns the current way to create the "Other" point.
- * @return {(anychart.pie.Chart.OtherPointType|string)} The current way to create the "Other" point.
- *//**
- * @ignoreDoc
- * @param {(anychart.pie.Chart.OtherPointType|string)=} opt_value .
- * @return {(anychart.pie.Chart.OtherPointType|string|anychart.pie.Chart)} .
- */
-anychart.pie.Chart.prototype.otherPointType = function(opt_value) {
+anychart.pie.Chart.prototype.group = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.pie.Chart.normalizeOtherPointType(opt_value);
-    if (this.otherPointType_ != opt_value) {
-      this.otherPointType_ = opt_value;
+    if (goog.isFunction(opt_value) && opt_value != this.groupedPointFilter_) {
+      this.groupedPointFilter_ = opt_value;
+      this.data(this.parentView_);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.groupedPointFilter_ = null;
       this.data(this.parentView_);
     }
     return this;
   } else {
-    return this.otherPointType_;
-  }
-};
-
-
-/**
- * Sets the filter function of the "Other" point.<br/>
- * <b>Note:</b> If you plan to use grouping on the "Other" point we recommend to use
- * {@link anychart.pie.Chart#setOtherPoint} method, which combines two methods.
- * @example
- *  var data = [10, 1, 7, 10, 2, 4, 20, 3, 14];
- *  chart = new anychart.pie.Chart(data);
- *  // Leave only the points that pass the filter-function
- *  chart.otherPointType('drop');
- *  // Leave only the points with values greater than 10.
- *  chart.otherPointFilter(function(value){
- *     return (value >= 10);
- *   });
- * @param {function(*):boolean=} opt_value [//only the point with values greater than 3
- * function(val) {
- *   return val > 3;
- * }] Filter-function that returns boolean
- * flag to decide if it is a point to be placed in the "Other" point. In general this function looks like this:
- * <code>function(pointValue){
- *   ...
- *   return BOOLEAN;
- * }.
- * </code>
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
- *//**
- * Returns the current filter-function of the "Other" point.
- * @return {Function} Filter-function.
- *//**
- * @ignoreDoc
- * @param {function(*):boolean=} opt_value .
- * @return {(Function|anychart.pie.Chart)} .
- */
-anychart.pie.Chart.prototype.otherPointFilter = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.otherPointFilter_ = opt_value;
-    this.data(this.parentView_);
-    return this;
-  } else {
-    return this.otherPointFilter_;
+    return this.groupedPointFilter_;
   }
 };
 
 
 /**
  * Setter for the outer pie radius.<br/>
- * Radious can be set as a number (considered as number of pixels),
+ * Radius can be set as a number (considered as number of pixels),
  * or as a string, e.g.'42%' or '152px'.
  * @example <t>stageOnly</t>
  *  var data = [10, 7, 4];
