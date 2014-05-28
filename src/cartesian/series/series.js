@@ -14,8 +14,8 @@ goog.require('anychart.cartesian.series.RangeSplineArea');
 goog.require('anychart.cartesian.series.RangeStepArea');
 goog.require('anychart.cartesian.series.Spline');
 goog.require('anychart.cartesian.series.SplineArea');
-goog.require('anychart.cartesian.series.StepLine');
 goog.require('anychart.cartesian.series.StepArea');
+goog.require('anychart.cartesian.series.StepLine');
 /**
  * @namespace
  * @name anychart.cartesian.series
