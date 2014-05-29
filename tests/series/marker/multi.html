@@ -1,0 +1,58 @@
+<html>
+<head>
+    <script src="../../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = anychart.areaChart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+        var data = new anychart.data.Set([
+            ['A1' , 3.6, 10, 13],
+            ['A2' , 0, 11, 15],
+            ['A3' , 5.5, 7, 14],
+            ['A4' , 9.2, 9, 12],
+            ['A5' , '10.1', 5, 10],
+            ['A6' , 11.6, 0, 9],
+            ['A7' , 12, 2, 11],
+            ['A8' , 16.0, 3, 17],
+            ['A9' , 13.2, 5, 16],
+            ['A10' , 12.0, 4, 13],
+            ['A11' , 1, '2.5', 10],
+            ['A12' , 4.1, 6, 9],
+            ['A13' , 6.3, 6, 7],
+            ['A14' , 9.4, 7, 11],
+            ['A15' , 11.5, 8, 14]
+        ]);
+        chart.marker(data.mapAs({x: [0], value: [1]}))
+                .size(3);
+        chart.marker(data.mapAs({x: [0], value: [2]}))
+                .size(3);
+        chart.spline(data.mapAs({x: [0], value: [3]}))
+                .markers().enabled(false);
+
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>
+
