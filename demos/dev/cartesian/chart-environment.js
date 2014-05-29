@@ -46,8 +46,8 @@ function load() {
     chart.legend().enabled(true);
     chart.yAxis().orientation('left');
     chart.xAxis().orientation('bottom');
-//    chart.axis().orientation('top');
-//    chart.axis().orientation('right');
+    chart.xAxis().orientation('top');
+    chart.yAxis().orientation('right');
 
     if (seriesName == 'bubble') {
       series1.minimumSize(1);
@@ -55,9 +55,6 @@ function load() {
       series2.minimumSize(1);
       series2.maximumSize(20);
     }
-
-    console.log(JSON.stringify(chart.serialize()));
-    console.log("------------------------------------------------------");
   }
 
   areaChart = new anychart.cartesian.Chart();
@@ -115,10 +112,10 @@ function load() {
   rangeSplineArea.bounds(0, 2050, 500, 400);
   rangeSplineArea.draw();
 
-  var rangeStepLineArea = new anychart.cartesian.Chart();
-  drawChart(rangeStepLineArea, 'rangeStepLineArea');
-  rangeStepLineArea.bounds(510, 2050, 500, 400);
-  rangeStepLineArea.draw();
+  var rangeStepArea = new anychart.cartesian.Chart();
+  drawChart(rangeStepArea, 'rangeStepArea');
+  rangeStepArea.bounds(510, 2050, 500, 400);
+  rangeStepArea.draw();
 
   var spline = new anychart.cartesian.Chart();
   drawChart(spline, 'spline');
@@ -135,10 +132,10 @@ function load() {
   stepLine.bounds(0, 2870, 500, 400);
   stepLine.draw();
 
-  var stepLineArea = new anychart.cartesian.Chart();
-  drawChart(stepLineArea, 'stepLineArea');
-  stepLineArea.bounds(510, 2870, 500, 400);
-  stepLineArea.draw();
+  var stepArea = new anychart.cartesian.Chart();
+  drawChart(stepArea, 'stepArea');
+  stepArea.bounds(510, 2870, 500, 400);
+  stepArea.draw();
 
   var markerChart = new anychart.cartesian.Chart();
   drawChart(markerChart, 'marker');

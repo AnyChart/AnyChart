@@ -54,6 +54,21 @@ anychart.cartesian.series.RangeBar.prototype.drawSubsequentPoint = function() {
     this.makeHoverable(rect);
   }
 
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    var hatchFillShape = this.hatchFillRootElement ?
+        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+        null;
+    var iterator = this.getIterator();
+    iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    if (goog.isDef(shape) && hatchFillShape) {
+      hatchFillShape.deserialize(shape.serialize());
+    }
+
+    this.applyHatchFill(false);
+  }
+
   return true;
 };
 

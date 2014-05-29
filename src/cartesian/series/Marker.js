@@ -245,6 +245,9 @@ anychart.cartesian.series.Marker.prototype.drawSubsequentPoint = function() {
     this.drawMarker_(false);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    this.applyHatchFill(false);
+  }
   return true;
 };
 
@@ -287,6 +290,21 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
     this.marker_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    var fill = this.getFinalHatchFill(false, false);
+    if (!this.hatchFillElement_ && !anychart.utils.isNone(fill)) {
+      this.hatchFillElement_ = new anychart.elements.Multimarker();
+      this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.hatchFillElement_.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillElement_.pointerEvents('none');
+    }
+
+    if (this.hatchFillElement_) {
+      this.hatchFillElement_.suspendSignalsDispatching();
+    }
+  }
 };
 
 
@@ -295,6 +313,13 @@ anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.marker_.end();
     this.marker_.resumeSignalsDispatching(false);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    if (this.hatchFillElement_) {
+      this.hatchFillElement_.end();
+      this.hatchFillElement_.resumeSignalsDispatching(false);
+    }
   }
   goog.base(this, 'finalizeDrawing');
 };
@@ -319,6 +344,7 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
   this.unhover();
   if (this.getResetIterator().select(index)) {
     this.drawMarker_(true);
+    this.applyHatchFill(true);
     this.drawLabel(true);
     this.showTooltip(event);
   }
@@ -335,6 +361,7 @@ anychart.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
   if (this.getResetIterator().select(this.hoverStatus)) {
     this.drawMarker_(false);
+    this.applyHatchFill(false);
     this.drawLabel(false);
     this.hideTooltip();
   }
@@ -352,18 +379,43 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered) {
   var pointType = this.getIterator().get(hovered ? 'hoverType' : 'type');
   var pointSize = this.getIterator().get(hovered ? 'hoverMarkerSize' : 'markerSize');
   var index = this.getIterator().getIndex();
+
   this.marker_.dropCustomSettingsAt(index);
+
   if (goog.isDef(pointType))
     this.marker_.typeAt(index, /** @type {anychart.elements.Marker.Type} */(pointType));
   else if (hovered && goog.isDef(this.hoverType()))
     this.marker_.typeAt(index, /** @type {anychart.elements.Marker.Type} */(this.hoverType()));
+
   if (goog.isDef(pointSize))
     this.marker_.sizeAt(index, /** @type {number} */(pointSize));
   else if (hovered && goog.isDef(this.hoverSize()))
     this.marker_.sizeAt(index, /** @type {number} */(this.hoverSize()));
+
   this.marker_.fillAt(index, this.getFinalFill(true, hovered));
   this.marker_.strokeAt(index, this.getFinalStroke(true, hovered));
+
   this.marker_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
+};
+
+
+/**
+ * Apply hatch fill to shape in accordance to current point colorization settings.
+ * Shape is get from current meta 'hatchFillShape'.
+ * @param {boolean} hovered If the point is hovered.
+ * @protected
+ */
+anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+
+  if (this.hatchFillElement_) {
+    this.hatchFillElement_.deserializeAt(index, this.marker_.serializeAt(index));
+    this.hatchFillElement_.fillAt(index, this.getFinalHatchFill(true, hovered));
+    this.hatchFillElement_.strokeAt(index, null);
+
+    this.hatchFillElement_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
+  }
 };
 
 

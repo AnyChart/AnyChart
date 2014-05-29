@@ -38,12 +38,25 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
     var barWidth = this.getPointWidth();
 
     this.getIterator().meta('x', x).meta('zero', zero).meta('y', y).meta('shape', rect);
-
     rect.setY(x - barWidth / 2).setX(Math.min(zero, y)).setHeight(barWidth).setWidth(Math.abs(zero - y));
 
     this.colorizeShape(false);
 
     this.makeHoverable(rect);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    var hatchFillShape = this.hatchFillRootElement ?
+        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+        null;
+    var iterator = this.getIterator();
+    iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    if (goog.isDef(shape) && hatchFillShape) {
+      hatchFillShape.deserialize(shape.serialize());
+    }
+
+    this.applyHatchFill(false);
   }
 
   return true;

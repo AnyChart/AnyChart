@@ -22,10 +22,22 @@ anychart.cartesian.series.ContinuousBase = function(data, opt_csvSettings) {
   this.path = acgraph.path();
 
   /**
+   * @type {acgraph.vector.Path}
+   * @protected
+   */
+  this.hatchFillPath = null;
+
+  /**
    * @type {Array.<!acgraph.vector.Path>}
    * @protected
    */
   this.paths = [this.path];
+
+  /**
+   * @type {Array.<!acgraph.vector.Path>}
+   * @protected
+   */
+  this.hatchFillPaths = [this.hatchFillPath];
 
   /**
    * @type {boolean}
@@ -77,6 +89,7 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     for (i = 0; i < len; i++)
       this.paths[i].zIndex(/** @type {number} */(this.zIndex()));
+    if (this.hatchFillPath) this.hatchFillPath.zIndex(/** @type {number} */(this.zIndex() + 1));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -97,8 +110,20 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     for (i = 0; i < len; i++)
       this.paths[i].parent(container);
+    if (this.hatchFillPath) this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    var fill = this.getFinalHatchFill(false, false);
+    if (!this.hatchFillPath && !anychart.utils.isNone(fill)) {
+      this.hatchFillPath = acgraph.path();
+      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.hatchFillPath.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillPath.pointerEvents('none');
+    }
+  }
+
 };
 
 
@@ -114,6 +139,7 @@ anychart.cartesian.series.ContinuousBase.prototype.drawMissing = function() {
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.finalizeDrawing = function() {
   this.finalizeSegment();
+  this.finalizeHatchFill();
   goog.base(this, 'finalizeDrawing');
 };
 
@@ -130,6 +156,13 @@ anychart.cartesian.series.ContinuousBase.prototype.createPositionProvider = func
  * @protected
  */
 anychart.cartesian.series.ContinuousBase.prototype.finalizeSegment = goog.nullFunction;
+
+
+/**
+ * Finalizes hatch fill element.
+ * @protected
+ */
+anychart.cartesian.series.ContinuousBase.prototype.finalizeHatchFill = goog.nullFunction;
 
 
 /**
@@ -164,6 +197,20 @@ anychart.cartesian.series.ContinuousBase.prototype.colorizeShape = function(hove
 };
 
 
+/**
+ * Apply hatch fill to shape in accordance to current point colorization settings.
+ * Shape is get from current meta 'hatchFillShape'.
+ * @param {boolean} hover If the point is hovered.
+ * @protected
+ */
+anychart.cartesian.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
+  if (this.hatchFillPath) {
+    this.hatchFillPath.stroke(null);
+    this.hatchFillPath.fill(this.getFinalHatchFill(true, hover));
+  }
+};
+
+
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
@@ -174,6 +221,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverSeries = function() {
       this.hideTooltip();
     }
   } else {
+    this.applyHatchFill(true);
     this.colorizeShape(true);
   }
   this.hoverStatus = -1;
@@ -190,6 +238,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
     this.hideTooltip();
   }
   if (isNaN(this.hoverStatus)) {
+    this.applyHatchFill(true);
     this.colorizeShape(true);
   }
   if (this.getResetIterator().select(index)) {
@@ -213,6 +262,7 @@ anychart.cartesian.series.ContinuousBase.prototype.unhover = function() {
     this.drawLabel(false);
     this.hideTooltip();
   }
+  this.applyHatchFill(false);
   this.colorizeShape(false);
   this.hoverStatus = NaN;
   return this;

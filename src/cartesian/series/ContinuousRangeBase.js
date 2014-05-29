@@ -313,6 +313,17 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.getFinalLowStroke = func
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.ContinuousRangeBase.prototype.finalizeHatchFill = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    if (this.hatchFillPath) {
+      this.hatchFillPath.deserialize(this.path.serialize());
+      this.applyHatchFill(false);
+    }
+  }
+};
+
+
 /**
  * @inheritDoc
  */

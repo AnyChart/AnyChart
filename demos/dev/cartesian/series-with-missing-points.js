@@ -53,8 +53,8 @@ function load() {
   createChart('stepLine', 820, 0, 400, 400);
   createChart('area', 0, 410, 400, 400);
   createChart('splineArea', 410, 410, 400, 400);
-  createChart('stepLineArea', 820, 410, 400, 400);
+  createChart('stepArea', 820, 410, 400, 400);
   createChart('rangeArea', 0, 820, 400, 400);
   createChart('rangeSplineArea', 410, 820, 400, 400);
-  createChart('rangeStepLineArea', 820, 820, 400, 400);
+  createChart('rangeStepArea', 820, 820, 400, 400);
 }

@@ -1,4 +1,4 @@
-goog.provide('anychart.exports.CartesianSeriesRangeStepLineArea');
-goog.require('anychart.cartesian.series.RangeStepLineArea');
+goog.provide('anychart.exports.CartesianSeriesRangeStepArea');
+goog.require('anychart.cartesian.series.RangeStepArea');
 
-goog.exportSymbol('anychart.cartesian.series.RangeStepLineArea', anychart.cartesian.series.RangeStepLineArea);
+goog.exportSymbol('anychart.cartesian.series.RangeStepArea', anychart.cartesian.series.RangeStepArea);

@@ -66,6 +66,7 @@ anychart.data.PieView = function(parentView, fieldName, opt_func, opt_other, opt
    * @private
    */
   this.otherPointView_ = new anychart.data.PieView.Mapping_();
+  this.otherPointView_.meta(0, 'groupedPoint', true);
 };
 goog.inherits(anychart.data.PieView, anychart.data.View);
 
@@ -74,24 +75,40 @@ goog.inherits(anychart.data.PieView, anychart.data.View);
 anychart.data.PieView.prototype.buildMask = function() {
   var mask = [];
   var iterator = this.parentView.getIterator();
-  var otherPoint = undefined;
+  var otherPointValues = undefined;
+  var otherPointNames = undefined;
   if (this.func_) {
     while (iterator.advance()) {
       var val = iterator.get(this.fieldName_);
+      var name = iterator.get('name');
+      if (!goog.isDef(name)) {
+        name = 'Point ' + (iterator.getIndex());
+      }
       if (this.func_(val))
         mask.push(iterator.getIndex());
-      else if (otherPoint)
-        otherPoint.push(val);
-      else
-        otherPoint = [val];
+      else if (otherPointValues) {
+        otherPointValues.push(val);
+        otherPointNames.push(name);
+      }
+      else {
+        otherPointValues = [val];
+        otherPointNames = [name];
+      }
     }
   } else {
     for (var i = 0, l = iterator.getRowsCount(); i < l; i++)
       mask.push(i);
   }
-  this.otherPointView_.row(0, otherPoint ?
-      goog.array.reduce(otherPoint, this.otherFunc_, this.otherInitial_()) :
-      otherPoint);
+
+  if (otherPointValues) {
+    this.otherPointView_.row(0, goog.array.reduce(otherPointValues, this.otherFunc_, this.otherInitial_()));
+    this.otherPointView_.meta(0, 'names', otherPointNames);
+    this.otherPointView_.meta(0, 'values', otherPointValues);
+  } else {
+    this.otherPointView_.row(0, otherPointValues);
+    this.otherPointView_.meta(0, 'names', []);
+    this.otherPointView_.meta(0, 'values', []);
+  }
   return mask;
 };
 
@@ -132,6 +149,9 @@ anychart.data.PieView.prototype.row = function(rowIndex, opt_value) {
  */
 anychart.data.PieView.prototype.parentMeta = function(index, name, opt_value) {
   var len = (this.mask ? this.mask.length : this.parentView.getRowsCount());
+  if (index > len) {
+    throw Error('Index can not be masked by this View');
+  }
   if (index >= len) {
     index -= len;
     if (arguments.length > 2) {

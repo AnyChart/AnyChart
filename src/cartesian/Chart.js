@@ -1222,7 +1222,7 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  * @example
  * chart = new anychart.cartesian.Chart();
  * chart.title().text('RangeColumn series');
- * chart.rangeStepLineArea([
+ * chart.rangeStepArea([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
  *   [2,  16, 6, 1],
@@ -1232,10 +1232,10 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.RangeStepLineArea} An instance of the {@link anychart.cartesian.series.RangeColumn} class for method chaining.
+ * @return {anychart.cartesian.series.RangeStepArea} An instance of the {@link anychart.cartesian.series.RangeColumn} class for method chaining.
  */
-anychart.cartesian.Chart.prototype.rangeStepLineArea = function(data, opt_csvSettings) {
-  var res = new anychart.cartesian.series.RangeStepLineArea(data, opt_csvSettings);
+anychart.cartesian.Chart.prototype.rangeStepArea = function(data, opt_csvSettings) {
+  var res = new anychart.cartesian.series.RangeStepArea(data, opt_csvSettings);
   this.registerSeries_(res);
   return res;
 };
@@ -1299,19 +1299,19 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
 
 
 /**
- * Добавляет в чарт серию типа StepLineArea.
+ * Добавляет в чарт серию типа StepArea.
  * @example
  * chart = new anychart.cartesian.Chart();
- * chart.title().text('StepLineArea series');
- * chart.stepLineArea([10, 4, 17, 20]);
+ * chart.title().text('StepArea series');
+ * chart.stepArea([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.cartesian.series.StepLineArea} An instance of the {@link anychart.cartesian.series.StepLineArea} class for method chaining.
+ * @return {anychart.cartesian.series.StepArea} An instance of the {@link anychart.cartesian.series.StepArea} class for method chaining.
  */
-anychart.cartesian.Chart.prototype.stepLineArea = function(data, opt_csvSettings) {
-  var res = new anychart.cartesian.series.StepLineArea(data, opt_csvSettings);
+anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
+  var res = new anychart.cartesian.series.StepArea(data, opt_csvSettings);
   this.registerSeries_(res);
   return res;
 };
@@ -2424,8 +2424,8 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
         case 'rangesplinearea':
           seriesInst = this.rangeSplineArea(data);
           break;
-        case 'rangesteplinearea':
-          seriesInst = this.rangeStepLineArea(data);
+        case 'rangesteparea':
+          seriesInst = this.rangeStepArea(data);
           break;
         case 'spline':
           seriesInst = this.spline(data);
@@ -2436,8 +2436,8 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
         case 'stepline':
           seriesInst = this.stepLine(data);
           break;
-        case 'steplinearea':
-          seriesInst = this.stepLineArea(data);
+        case 'steparea':
+          seriesInst = this.stepArea(data);
           break;
         default:
           if (window.console) {

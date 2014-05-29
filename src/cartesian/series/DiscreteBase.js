@@ -30,6 +30,13 @@ anychart.cartesian.series.DiscreteBase.prototype.rootElement = null;
 
 
 /**
+ * @type {anychart.utils.TypedLayer}
+ * @protected
+ */
+anychart.cartesian.series.DiscreteBase.prototype.hatchFillRootElement = null;
+
+
+/**
  * Discrete-pointed series are based on a typed layer, that constructs children by this initializer.
  * @return {!acgraph.vector.IElement} Returns a new instance of element.
  * @protected
@@ -73,6 +80,8 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */(this.zIndex()));
+    if (this.hatchFillRootElement)
+      this.hatchFillRootElement.zIndex(/** @type {number} */(this.zIndex() + 1));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -86,7 +95,25 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    if (this.hatchFillRootElement)
+      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+    var fill = this.getFinalHatchFill(false, false);
+    if (!this.hatchFillRootElement && !anychart.utils.isNone(fill)) {
+      this.hatchFillRootElement = new anychart.utils.TypedLayer(
+          this.rootTypedLayerInitializer,
+          goog.nullFunction);
+
+      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.hatchFillRootElement.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillRootElement.pointerEvents('none');
+    }
+
+    if (this.hatchFillRootElement)
+      this.hatchFillRootElement.clear();
   }
 };
 
@@ -106,6 +133,22 @@ anychart.cartesian.series.DiscreteBase.prototype.colorizeShape = function(hover)
 };
 
 
+/**
+ * Apply hatch fill to shape in accordance to current point colorization settings.
+ * Shape is get from current meta 'hatchFillShape'.
+ * @param {boolean} hover If the point is hovered.
+ * @protected
+ */
+anychart.cartesian.series.DiscreteBase.prototype.applyHatchFill = function(hover) {
+  var hatchFillShape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('hatchFillShape'));
+  if (goog.isDefAndNotNull(hatchFillShape)) {
+    hatchFillShape
+        .stroke(null)
+        .fill(this.getFinalHatchFill(true, hover));
+  }
+};
+
+
 /** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
   this.unhover();
@@ -119,6 +162,7 @@ anychart.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, ev
   this.unhover();
   if (this.getResetIterator().select(index)) {
     this.colorizeShape(true);
+    this.applyHatchFill(true);
     this.drawMarker(true);
     this.drawLabel(true);
     this.showTooltip(event);
@@ -135,6 +179,7 @@ anychart.cartesian.series.DiscreteBase.prototype.unhover = function() {
     var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
     if (goog.isDef(rect)) {
       this.colorizeShape(false);
+      this.applyHatchFill(false);
       this.drawMarker(false);
       this.drawLabel(false);
     }

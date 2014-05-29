@@ -34,3 +34,4 @@ anychart.elements.Multimarker.prototype['listenOnce'] = anychart.elements.Multim
 anychart.elements.Multimarker.prototype['unlisten'] = anychart.elements.Multimarker.prototype.unlisten;
 anychart.elements.Multimarker.prototype['unlistenByKey'] = anychart.elements.Multimarker.prototype.unlistenByKey;
 anychart.elements.Multimarker.prototype['removeAllListeners'] = anychart.elements.Multimarker.prototype.removeAllListeners;
+anychart.elements.Multimarker.prototype['pointerEvents'] = anychart.elements.Multimarker.prototype.pointerEvents;
