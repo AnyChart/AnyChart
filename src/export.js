@@ -412,6 +412,9 @@ anychart.VisualBase.prototype['listenOnce'] = anychart.VisualBase.prototype.list
 anychart.VisualBase.prototype['unlisten'] = anychart.VisualBase.prototype.unlisten;
 anychart.VisualBase.prototype['unlistenByKey'] = anychart.VisualBase.prototype.unlistenByKey;
 anychart.VisualBase.prototype['removeAllListeners'] = anychart.VisualBase.prototype.removeAllListeners;
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.VisualBaseWithBounds
