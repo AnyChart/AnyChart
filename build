@@ -464,9 +464,9 @@ def __convert_demos_to_playground():
                             sample_settings = search_result[0]
                             result = sample_settings + '\n' + sample_text
                         else:
-                            result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                            result = '{:tags []\n  :is_new true\n  :exports "chart"}\n' + sample_text
                     else:
-                        result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                        result = '{:tags []\n  :is_new true\n  :exports "chart"}\n' + sample_text
 
                     f = open(pg_sample_path, 'w+')
                     f.flush()
