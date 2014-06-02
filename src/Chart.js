@@ -10,6 +10,7 @@ goog.require('anychart.utils');
 goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
+goog.require('anychart.utils.PrintHelper');
 goog.require('goog.json.hybrid');
 
 
@@ -932,6 +933,17 @@ anychart.Chart.prototype.restoreDefaults = function() {
   var legendBackground = /** @type {anychart.elements.Background} */(legend.background());
   legendBackground.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
   legendBackground.stroke('rgb(221,221,221)');
+};
+
+
+/**
+ * Prints a chart or stage.
+ * @param {acgraph.vector.Stage=} opt_stage - Stage to be printed.
+ */
+anychart.Chart.prototype.print = function(opt_stage) {
+  var stage = opt_stage || ((this.container() && this.container().getStage) ? this.container().getStage() : this.rootElement.getStage());
+
+  anychart.utils.PrintHelper.getInstance().print(stage);
 };
 
 

@@ -6,6 +6,7 @@ anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/fin
 anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/final
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
+anychart.Chart.prototype['print'] = anychart.Chart.prototype.print;
 anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
 anychart.Chart.prototype['chartLabel'] = anychart.Chart.prototype.chartLabel;
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
