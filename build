@@ -214,7 +214,7 @@ def __getDefaultCompilerArgs(addTests=False):
         '--compiler_jar=' + COMPILER_PATH,
         '--compiler_flags=--charset=UTF-8',
         '--compiler_flags=--define="goog.DEBUG=true"',
-        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(),
+        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(True),
         '--compiler_flags=--extra_annotation_name="includeDoc"',
         '--compiler_flags=--extra_annotation_name="illustration"',
         '--compiler_flags=--extra_annotation_name="illustrationDesc"',
@@ -477,22 +477,30 @@ def __convert_demos_to_playground():
 #=======================================================================================================================
 #                            Version.
 #=======================================================================================================================
-def __get_version():
-    #get major, minor versions from version.ini
+def __get_version(opt_commit_count=False):
+    #get global, major, minor versions from version.ini
     version_file = os.path.join(PROJECT_PATH, 'version.ini')
     f = open(version_file, 'r')
     lines = f.readlines()
     f.close()
 
-    #get commits count from git repo
-    p = subprocess.Popen(
-        ['git', 'rev-list', 'HEAD', '--count'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        cwd=PROJECT_PATH)
-    (output, err) = p.communicate()
+    globalVersion = lines[0].split('=')[1].strip()
+    major = lines[1].split('=')[1].strip()
+    minor = lines[2].split('=')[1].strip()
 
-    return lines[0].split('=')[1].strip() + '.' + lines[1].split('=')[1].strip() + '.' + output.strip()
+    if opt_commit_count:
+        #get commits count from git repo
+        p = subprocess.Popen(
+            ['git', 'rev-list', 'HEAD', '--count'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=PROJECT_PATH)
+        (output, err) = p.communicate()
+        commit_count = output.strip()
+
+        return "%s.%s.%s.%s" % (globalVersion, major, minor, commit_count)
+    else:
+        return "%s.%s.%s" % (globalVersion, major, minor)
 
 
 #=======================================================================================================================
