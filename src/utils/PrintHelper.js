@@ -193,8 +193,8 @@ anychart.utils.PrintHelper.prototype.load_ = function(svgText) {
 
         } else if (result) {
 
-//          ths.iframe_.setAttribute('width', response['width']);
-//          ths.iframe_.setAttribute('height', response['height']);
+          //          ths.iframe_.setAttribute('width', response['width']);
+          //          ths.iframe_.setAttribute('height', response['height']);
 
           ths.iframe_.setAttribute('width', '800px');
           ths.iframe_.setAttribute('height', '1110px');
@@ -208,45 +208,45 @@ anychart.utils.PrintHelper.prototype.load_ = function(svgText) {
       data.toString()
   );
 
-//  $.ajax({
-//    type: 'POST',
-//    url: 'http://176.9.224.4/pdf',
-//    data: {
-//      'data': svgText,
-//      'productName': 'acdvf',
-//      'dataType': 'svg',
-//      'responseType': 'base64'
-//    },
-//    success: function(response) {
-//      var result = response['result'];
-//      var error = response['error'];
-//      if (error) {
-//        console.log(error);
-//      } else if (result) {
-//        console.log(result);
-//        ths.iframe_.setAttribute('width', response['width']);
-//        ths.iframe_.setAttribute('height', response['height']);
-//        ths.iframe_.setAttribute('src', 'data:application/pdf;base64,' + response['result']);
-//      }
-//    },
-//    dataType: 'json'
-//  });
+  //  $.ajax({
+  //    type: 'POST',
+  //    url: 'http://176.9.224.4/pdf',
+  //    data: {
+  //      'data': svgText,
+  //      'productName': 'acdvf',
+  //      'dataType': 'svg',
+  //      'responseType': 'base64'
+  //    },
+  //    success: function(response) {
+  //      var result = response['result'];
+  //      var error = response['error'];
+  //      if (error) {
+  //        console.log(error);
+  //      } else if (result) {
+  //        console.log(result);
+  //        ths.iframe_.setAttribute('width', response['width']);
+  //        ths.iframe_.setAttribute('height', response['height']);
+  //        ths.iframe_.setAttribute('src', 'data:application/pdf;base64,' + response['result']);
+  //      }
+  //    },
+  //    dataType: 'json'
+  //  });
 
-//  var dataUrl = 'http://176.9.224.4/pdf';
+  //  var dataUrl = 'http://176.9.224.4/pdf';
 
-//  var ths = this;
-//  console.log(JSON.stringify());
+  //  var ths = this;
+  //  console.log(JSON.stringify());
 
-//  goog.net.XhrIo.send(dataUrl, function(e) { //Callback
-//    var xhr = e.target;
-//    var obj = xhr.getResponseJson();
+  //  goog.net.XhrIo.send(dataUrl, function(e) { //Callback
+  //    var xhr = e.target;
+  //    var obj = xhr.getResponseJson();
 
-//  }, 'POST', JSON.stringify({
-//    'data': svgText,
-//    'productName': 'acdvf',
-//    'dataType': 'svg',
-//    'responseType': 'base64'
-//  }));
+  //  }, 'POST', JSON.stringify({
+  //    'data': svgText,
+  //    'productName': 'acdvf',
+  //    'dataType': 'svg',
+  //    'responseType': 'base64'
+  //  }));
 };
 
 
