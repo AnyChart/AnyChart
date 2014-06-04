@@ -14,3 +14,6 @@
 [submodule "api-reference-engine"]
 	path = contrib/api-reference-engine
 	url = git@github.com:AnyChart/api-reference-engine.git
+[submodule "contrib/docs-playground-samples"]
+	path = contrib/docs-playground-samples
+	url = git@github.com:AnyChart/ACDVF-docs-playground-samples.git
