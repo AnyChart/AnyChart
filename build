@@ -32,7 +32,7 @@ DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
 CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs')
 DEMOS_PATH = os.path.join(PROJECT_PATH, 'demos')
-ACDVF_PLAYGROUND_PATH = os.path.join(PROJECT_PATH, '..', 'acdvf-playground')
+ACDVF_PLAYGROUND_PATH = os.path.join(PROJECT_PATH, '..', 'ACDVF-playground-samples')
 
 QUNIT_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'qunit-externs.js')
 UTILS_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'utils-externs.js')
@@ -432,7 +432,7 @@ def __print_warnings_list():
 #=======================================================================================================================
 def __convert_demos_to_playground():
     if not os.path.exists(ACDVF_PLAYGROUND_PATH):
-        print 'Error: No acdvf-playground repo found'
+        print 'Error: No ACDVF-playground-samples repo found'
         print 'You should clone playground repo to ' + ACDVF_PLAYGROUND_PATH
         return
 
