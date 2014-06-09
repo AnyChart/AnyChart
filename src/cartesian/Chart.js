@@ -129,6 +129,21 @@ anychart.cartesian.Chart = function() {
    * @private
    */
   this.barsPadding_ = 0.1;
+
+  // Add handler to listen legend item click for legend and enable/disable series.
+  var legend = /** @type {anychart.elements.Legend} */ (this.legend());
+  legend.listen(anychart.events.EventType.LEGEND_ITEM_CLICK, function(event) {
+    // function that enables or disabled series by index of clicked legend item
+
+    var cartesianChart = /** @type {anychart.cartesian.Chart} */ (this);
+    var index = event['index'];
+    var series = cartesianChart.series_[index];
+    if (series) {
+      series.enabled(!series.enabled());
+    }
+
+  }, false, this);
+
 };
 goog.inherits(anychart.cartesian.Chart, anychart.Chart);
 
@@ -2239,6 +2254,9 @@ anychart.cartesian.Chart.prototype.invalidateSeries_ = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.cartesian.Chart.prototype.createLegendItemsProvider = function() {
+  /**
+   * @type {!Array.<anychart.elements.Legend.LegendItemProvider>}
+   */
   var data = [];
   for (var i = 0, count = this.series_.length; i < count; i++) {
     /** @type {anychart.cartesian.series.Base} */
@@ -2247,10 +2265,13 @@ anychart.cartesian.Chart.prototype.createLegendItemsProvider = function() {
     data.push({
       'index': i,
       'text': seriesName ? seriesName : 'Series: ' + i,
-      'iconColor': series.getLegendItemColor()
+      'iconType': undefined, //TODO(AntonKagakin): Place here type of series to make icon looks like series
+      'iconStroke': series.getLegendItemColor(),
+      'iconFill': series.getLegendItemColor(),
+      'iconMarker': null //TODO(AntonKagakin): Place here marker type for line, spline, step line series
     });
   }
-  return new anychart.utils.LegendItemsProvider(data);
+  return data;
 };
 
 

@@ -42,6 +42,7 @@ function load() {
       series2.markers().type('triangledown').enabled(true).fill({color: series2.color(), opacity: 0.5});
     }
 
+    chart.title().text(seriesName);
     chart.background().fill('gray .5');
     chart.legend().enabled(true);
     chart.yAxis().orientation('left');
