@@ -1338,6 +1338,7 @@ anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.registerSeries_ = function(series) {
   this.series_.push(series);
+  series.index(this.series_.length - 1);
   series.setAutoColor(this.palette().colorAt(this.series_.length - 1));
   series.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
   series.restoreDefaults();
@@ -1643,10 +1644,59 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   var seriesOfYScaleMap = {};
   var scale;
   var item;
+  var series;
+
+  var max = NaN;
+  var min = NaN;
+  var sum = NaN;
+  var pointsCount = 0;
+  var seriesMax, seriesMin, seriesSum, seriesPointsCount;
+
 
   //search for scales in series
   for (i = 0, count = this.series_.length; i < count; i++) {
-    var series = this.series_[i];
+    //----------------------------------calc statistics for series
+    series = this.series_[i];
+    seriesMax = NaN;
+    seriesMin = NaN;
+    seriesSum = NaN;
+    seriesPointsCount = 0;
+
+
+    var iterator = series.getResetIterator();
+    while (iterator.advance()) {
+      if (!(series instanceof anychart.cartesian.series.OHLC ||
+          series instanceof anychart.cartesian.series.RangeBar ||
+          series instanceof anychart.cartesian.series.RangeColumn ||
+          series instanceof anychart.cartesian.series.ContinuousRangeBase)) {
+        var values = series.getReferenceScaleValues();
+        var y = parseFloat(values[0]);
+        if (!isNaN(y)) {
+          if (isNaN(seriesMax) || (seriesMax < y)) seriesMax = y;
+          if (isNaN(seriesMin) || (seriesMin > y)) seriesMin = y;
+          if (isNaN(seriesSum)) seriesSum = y;
+          else seriesSum += y;
+        }
+      }
+      seriesPointsCount++;
+    }
+
+    var seriesAverage = seriesSum / seriesPointsCount;
+
+    if (!isNaN(seriesMax)) series.statistics('seriesMax', seriesMax);
+    if (!isNaN(seriesMin)) series.statistics('seriesMin', seriesMin);
+    if (!isNaN(seriesSum)) series.statistics('seriesSum', seriesSum);
+    if (!isNaN(seriesAverage)) series.statistics('seriesAverage', seriesAverage);
+    series.statistics('seriesPointsCount', seriesPointsCount);
+
+    if (!isNaN(seriesMax) && (isNaN(max) || (max < seriesMax))) max = seriesMax;
+    if (!isNaN(seriesMin) && (isNaN(min) || (min > y))) min = seriesMin;
+    if (!isNaN(seriesSum)) isNaN(sum) ? sum = seriesSum : sum += seriesSum;
+
+
+    pointsCount += seriesPointsCount;
+    //----------------------------------end calc statistics for series
+
 
     //series X scale
     if (!series.xScale()) {
@@ -1685,6 +1735,19 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
       seriesOfYScaleMap[id] = [series];
 
   }
+
+  //----------------------------------calc statistics for series
+  var average = sum / pointsCount;
+  for (i = 0, count = this.series_.length; i < count; i++) {
+    series = this.series_[i];
+
+    if (!isNaN(max)) series.statistics('max', max);
+    if (!isNaN(min)) series.statistics('min', min);
+    if (!isNaN(sum)) series.statistics('sum', sum);
+    if (!isNaN(average)) series.statistics('average', average);
+    series.statistics('pointsCount', pointsCount);
+  }
+  //----------------------------------end calc statistics for series
 
   for (i = 0, count = this.xAxes_.length; i < count; i++) {
     item = this.xAxes_[i];
