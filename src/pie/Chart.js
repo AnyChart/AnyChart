@@ -191,6 +191,20 @@ anychart.pie.Chart = function(opt_data) {
       .fontSize(13);
   this.data(opt_data);
   this.legend().enabled(true);
+
+  // Add handler to listen legend item click for legend and explode slice.
+  this.legend().listen(anychart.events.EventType.LEGEND_ITEM_CLICK, function(event) {
+    // function that explodes pie slice by index of the clicked legend item
+
+    var index = event['index'];
+    var pieChart = /** @type {anychart.pie.Chart} */ (this);
+    var iterator = pieChart.data().getIterator();
+    if (iterator.select(index)) {
+      var isExploded = !!iterator.meta('exploded');
+      pieChart.explodeSlice(index, !isExploded);
+    }
+  }, false, this);
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -1310,6 +1324,9 @@ anychart.pie.Chart.prototype.mouseDblClickHandler_ = function(event) {
 
 /** @inheritDoc */
 anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
+  /**
+   * @type {!Array.<anychart.elements.Legend.LegendItemProvider>}
+   */
   var data = [];
   var iterator = this.view_.getIterator();
   iterator.reset();
@@ -1318,11 +1335,14 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     var index = iterator.getIndex();
     data.push({
       'index': index,
-      'text': iterator.get('name') || iterator.get('x').toString() || 'Point - ' + index,
-      'iconColor': this.getFillColor_(index, false, iterator.get('fill'))
+      'text': iterator.get('name') || 'Point - ' + index,
+      'iconType': 'circle',
+      'iconStroke': 'none',
+      'iconFill': this.getFillColor_(index),
+      'iconMarker': null
     });
   }
-  return new anychart.utils.LegendItemsProvider(data);
+  return data;
 };
 
 
@@ -1407,13 +1427,14 @@ anychart.pie.Chart.prototype.hideTooltip = function() {
 anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   var index = this.hovered_[1];
+  var formatProvider = this.createFormatProvider(index);
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
-        this.createFormatProvider(index),
+        formatProvider,
         new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
   } else {
     tooltip.show(
-        this.createFormatProvider(index),
+        formatProvider,
         new acgraph.math.Coordinate(0, 0));
   }
 };

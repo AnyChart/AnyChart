@@ -75,6 +75,7 @@ anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.s
 //
 //----------------------------------------------------------------------------------------------------------------------
 anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//in docs/
+anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;
 anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//in docs/
 anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//in docs/
 anychart.cartesian.series.Base.prototype['drawPoint'] = anychart.cartesian.series.Base.prototype.drawPoint;//in docs/
@@ -412,6 +413,9 @@ anychart.VisualBase.prototype['listenOnce'] = anychart.VisualBase.prototype.list
 anychart.VisualBase.prototype['unlisten'] = anychart.VisualBase.prototype.unlisten;
 anychart.VisualBase.prototype['unlistenByKey'] = anychart.VisualBase.prototype.unlistenByKey;
 anychart.VisualBase.prototype['removeAllListeners'] = anychart.VisualBase.prototype.removeAllListeners;
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.VisualBaseWithBounds
@@ -478,6 +482,7 @@ anychart.elements.Legend.prototype['background'] = anychart.elements.Legend.prot
 anychart.elements.Legend.prototype['title'] = anychart.elements.Legend.prototype.title;
 anychart.elements.Legend.prototype['titleSeparator'] = anychart.elements.Legend.prototype.titleSeparator;
 anychart.elements.Legend.prototype['paginator'] = anychart.elements.Legend.prototype.paginator;
+anychart.elements.Legend.prototype['tooltip'] = anychart.elements.Legend.prototype.tooltip;
 anychart.elements.Legend.prototype['width'] = anychart.elements.Legend.prototype.width;
 anychart.elements.Legend.prototype['height'] = anychart.elements.Legend.prototype.height;
 anychart.elements.Legend.prototype['parentBounds'] = anychart.elements.Legend.prototype.parentBounds;
@@ -485,6 +490,27 @@ anychart.elements.Legend.prototype['position'] = anychart.elements.Legend.protot
 anychart.elements.Legend.prototype['align'] = anychart.elements.Legend.prototype.align;
 anychart.elements.Legend.prototype['getRemainingBounds'] = anychart.elements.Legend.prototype.getRemainingBounds;
 anychart.elements.Legend.prototype['draw'] = anychart.elements.Legend.prototype.draw;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.LegendItem
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.LegendItem', anychart.elements.LegendItem);
+anychart.elements.LegendItem.prototype['parentBounds'] = anychart.elements.LegendItem.prototype.parentBounds;
+anychart.elements.LegendItem.prototype['x'] = anychart.elements.LegendItem.prototype.x;
+anychart.elements.LegendItem.prototype['y'] = anychart.elements.LegendItem.prototype.y;
+anychart.elements.LegendItem.prototype['iconType'] = anychart.elements.LegendItem.prototype.iconType;
+anychart.elements.LegendItem.prototype['iconFill'] = anychart.elements.LegendItem.prototype.iconFill;
+anychart.elements.LegendItem.prototype['iconStroke'] = anychart.elements.LegendItem.prototype.iconStroke;
+anychart.elements.LegendItem.prototype['iconTextSpacing'] = anychart.elements.LegendItem.prototype.iconTextSpacing;
+anychart.elements.LegendItem.prototype['maxWidth'] = anychart.elements.LegendItem.prototype.maxWidth;
+anychart.elements.LegendItem.prototype['maxHeight'] = anychart.elements.LegendItem.prototype.maxHeight;
+anychart.elements.LegendItem.prototype['text'] = anychart.elements.LegendItem.prototype.text;
+anychart.elements.LegendItem.prototype['getTextElement'] = anychart.elements.LegendItem.prototype.getTextElement;
+anychart.elements.LegendItem.prototype['getContentBounds'] = anychart.elements.LegendItem.prototype.getContentBounds;
+anychart.elements.LegendItem.prototype['getWidth'] = anychart.elements.LegendItem.prototype.getWidth;
+anychart.elements.LegendItem.prototype['getHeight'] = anychart.elements.LegendItem.prototype.getHeight;
+anychart.elements.LegendItem.prototype['draw'] = anychart.elements.LegendItem.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.LineMarker
@@ -908,6 +934,34 @@ anychart.ui.Paginator.prototype['layout'] = anychart.ui.Paginator.prototype.layo
 anychart.ui.Paginator.prototype['pageCount'] = anychart.ui.Paginator.prototype.pageCount;
 anychart.ui.Paginator.prototype['currentPage'] = anychart.ui.Paginator.prototype.currentPage;
 anychart.ui.Paginator.prototype['draw'] = anychart.ui.Paginator.prototype.draw;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.ui.Splitter
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.ui.Splitter', anychart.ui.Splitter);
+goog.exportSymbol('anychart.ui.Splitter.CHANGE', anychart.ui.Splitter.CHANGE);
+anychart.ui.Splitter.prototype['layout'] = anychart.ui.Splitter.prototype.layout;
+anychart.ui.Splitter.prototype['position'] = anychart.ui.Splitter.prototype.position;
+anychart.ui.Splitter.prototype['dragAreaLength'] = anychart.ui.Splitter.prototype.dragAreaLength;
+anychart.ui.Splitter.prototype['stroke'] = anychart.ui.Splitter.prototype.stroke;
+anychart.ui.Splitter.prototype['fill'] = anychart.ui.Splitter.prototype.fill;
+anychart.ui.Splitter.prototype['dragPreviewStroke'] = anychart.ui.Splitter.prototype.dragPreviewStroke;
+anychart.ui.Splitter.prototype['dragPreviewFill'] = anychart.ui.Splitter.prototype.dragPreviewFill;
+anychart.ui.Splitter.prototype['dragAreaStroke'] = anychart.ui.Splitter.prototype.dragAreaStroke;
+anychart.ui.Splitter.prototype['dragAreaFill'] = anychart.ui.Splitter.prototype.dragAreaFill;
+anychart.ui.Splitter.prototype['handlePositionChange'] = anychart.ui.Splitter.prototype.handlePositionChange;
+anychart.ui.Splitter.prototype['considerSplitterWidth'] = anychart.ui.Splitter.prototype.considerSplitterWidth;
+anychart.ui.Splitter.prototype['splitterWidth'] = anychart.ui.Splitter.prototype.splitterWidth;
+anychart.ui.Splitter.prototype['leftLimitSize'] = anychart.ui.Splitter.prototype.leftLimitSize;
+anychart.ui.Splitter.prototype['topLimitSize'] = anychart.ui.Splitter.prototype.topLimitSize;
+anychart.ui.Splitter.prototype['rightLimitSize'] = anychart.ui.Splitter.prototype.rightLimitSize;
+anychart.ui.Splitter.prototype['bottomLimitSize'] = anychart.ui.Splitter.prototype.bottomLimitSize;
+anychart.ui.Splitter.prototype['getLeftBounds'] = anychart.ui.Splitter.prototype.getLeftBounds;
+anychart.ui.Splitter.prototype['getTopBounds'] = anychart.ui.Splitter.prototype.getTopBounds;
+anychart.ui.Splitter.prototype['getRightBounds'] = anychart.ui.Splitter.prototype.getRightBounds;
+anychart.ui.Splitter.prototype['getBottomBounds'] = anychart.ui.Splitter.prototype.getBottomBounds;
+anychart.ui.Splitter.prototype['draw'] = anychart.ui.Splitter.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.scales.ScatterTicksMode

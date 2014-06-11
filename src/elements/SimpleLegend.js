@@ -1,27 +1,16 @@
 goog.provide('anychart.elements.Legend');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.LegendItem');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Text');
 goog.require('anychart.elements.Title');
 goog.require('anychart.math.Rect');
 goog.require('anychart.ui.Paginator');
 goog.require('anychart.utils');
-goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 goog.require('goog.array');
-
-
-/**
- * Type definition for legend items provider.
- * @includeDoc
- * @typedef {!(
- *   Array |
- *   function():Array |
- *   anychart.utils.LegendItemsProvider
- * )}
- */
-anychart.elements.LegendItemsProviderObject;
+goog.require('goog.object');
 
 
 
@@ -42,10 +31,10 @@ anychart.elements.Legend = function() {
 
   /**
    * Align of the legend.
-   * @type {anychart.elements.Legend.Align}
+   * @type {anychart.utils.Align}
    * @private
    */
-  this.align_ = anychart.elements.Legend.Align.CENTER;
+  this.align_ = anychart.utils.Align.CENTER;
 
   /**
    * Spacing between items.
@@ -91,7 +80,7 @@ anychart.elements.Legend = function() {
 
   /**
    * Wrapped legend items.
-   * @type {Array.<anychart.elements.Legend.LegendItem_>}
+   * @type {Array.<anychart.elements.LegendItem>}
    * @private
    */
   this.items_ = null;
@@ -111,6 +100,8 @@ anychart.elements.Legend = function() {
       .fontSize('10')
       .fontWeight('normal')
       .fontColor('rgb(35,35,35)')
+      // нужно чтобы текст LegendItem`ов умел ловить событие mouseover и mouseclick (потому что в elements.Text если не hoverable то pointerEvents выключается
+      .hoverable(true)
       .padding(7)
       .margin(5);
 
@@ -131,10 +122,12 @@ anychart.elements.Legend = function() {
         'angle': '90'
       })
       .corners(5);
-  this.background(/** @type {anychart.elements.Background} */ (bg));
+  this.background(/** @type {anychart.elements.Background} */ (bg))
+      .zIndex(0);
   //
   this.title()
       .enabled(true)
+      .zIndex(10)
       .text('Legend Title')
       .fontFamily('Verdana')
       .fontSize('10')
@@ -150,7 +143,7 @@ anychart.elements.Legend = function() {
           '0 #DDDDDD 1',
           '1 #D0D0D0 1'
         ],
-        'angle' : '90'
+        'angle': '90'
       })
       .fill({
         'keys': [
@@ -158,12 +151,13 @@ anychart.elements.Legend = function() {
           '0.5 #F3F3F3 1',
           '1 #FFFFFF 1'
         ],
-        'angle' : '90'
+        'angle': '90'
       });
 
   this.titleSeparator()
       .enabled(true)
-      .margin(0, 3, 3, 3)
+      .zIndex(10)
+      .margin(3, 0, 3, 0)
       .orientation('top')
       .width('100%')
       .height(1)
@@ -174,6 +168,50 @@ anychart.elements.Legend = function() {
           '1 #333333 0'
         ]
       });
+  this.paginator()
+      .enabled(false)
+      .zIndex(20)
+      .fontFamily('Verdana')
+      .fontSize('10')
+      .fontWeight('normal')
+      .fontColor('rgb(35,35,35)')
+      .orientation('right')
+      .margin(0)
+      .padding(0);
+  this.paginator().background()
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle': '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle': '90'
+      });
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.suspendSignalsDispatching();
+  tooltip.isFloating(true);
+  tooltip.content().useHtml(true);
+  tooltip.titleFormatter(function() {
+    return this['text'];
+  });
+  tooltip.textFormatter(function() {
+    return this['text'];
+  });
+  tooltip.resumeSignalsDispatching(false);
+
+  var tooltipTitle = /** @type {anychart.elements.Title} */(tooltip.title());
+  tooltipTitle.enabled(false);
+  tooltipTitle.padding(0);
+  tooltipTitle.margin(3, 3, 0, 3);
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -184,7 +222,7 @@ goog.inherits(anychart.elements.Legend, anychart.elements.Text);
  * Supported signals.
  * @type {number}
  */
-anychart.elements.Legend.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.prototype.SUPPORTED_SIGNALS;
+anychart.elements.Legend.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.prototype.SUPPORTED_SIGNALS; // NEEDS_REDRAW BOUNDS_CHANGED
 
 
 /**
@@ -192,7 +230,7 @@ anychart.elements.Legend.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.pr
  * @type {number}
  */
 anychart.elements.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |  // ENABLED CONTAINER Z_INDEX APPEARANCE BOUNDS
     anychart.ConsistencyState.BACKGROUND |
     anychart.ConsistencyState.TITLE |
     anychart.ConsistencyState.SEPARATOR |
@@ -241,35 +279,6 @@ anychart.elements.Legend.normalizeItemsLayout = function(layout, opt_default) {
 
 
 /**
- * Types of legend alignment.
- * @enum {string}
- */
-anychart.elements.Legend.Align = {
-  LEFT: 'left',
-  CENTER: 'center',
-  RIGHT: 'right'
-};
-
-
-/**
- * Normalize align value for legend.
- * @param {string} align Align to normalize.
- * @param {anychart.elements.Legend.Align=} opt_default Default align to set.
- * @return {anychart.elements.Legend.Align} Normalized align.
- */
-anychart.elements.Legend.normalizeAlign = function(align, opt_default) {
-  if (goog.isString(align)) {
-    align = align.toLowerCase();
-    for (var i in anychart.elements.Legend.Align) {
-      if (align == anychart.elements.Legend.Align[i])
-        return anychart.elements.Legend.Align[i];
-    }
-  }
-  return opt_default || anychart.elements.Legend.Align.CENTER;
-};
-
-
-/**
  * Sets items layout.
  * @param {string=} opt_value Layout type for legend items.
  * @return {(anychart.elements.Legend.Layout|anychart.elements.Legend)} Items layout or self for chaining.
@@ -290,36 +299,22 @@ anychart.elements.Legend.prototype.itemsLayout = function(opt_value) {
 
 /**
  * Getter for items provider.
- * @return {anychart.elements.LegendItemsProviderObject} Legend items provider.
+ * @return {Array.<anychart.elements.Legend.LegendItemProvider>} Array of legend item provider.
  *//**
  * Setter for items provider.
- * @param {anychart.elements.LegendItemsProviderObject=} opt_value Items provider.
+ * @param {Array.<anychart.elements.Legend.LegendItemProvider>=} opt_value Items provider.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.elements.LegendItemsProviderObject=} opt_value Items provider.
- * @return {(anychart.elements.LegendItemsProviderObject|anychart.elements.Legend)} Legend items provider.
+ * @param {Array.<anychart.elements.Legend.LegendItemProvider>=} opt_value Items provider.
+ * @return {(Array.<anychart.elements.Legend.LegendItemProvider>|anychart.elements.Legend)} Legend items provider.
  */
 anychart.elements.Legend.prototype.itemsProvider = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val;
-    if (goog.isFunction(opt_value)) val = opt_value();
-    if (goog.isArrayLike(opt_value) || goog.isString(opt_value)) val = goog.array.slice(/** @type {goog.array.ArrayLike} */ (opt_value), 0);
-
-    if (goog.isArray(val) && val.length > 0) {
-      goog.dispose(this.itemsProvider_);
-      this.itemsProvider_ = new anychart.utils.LegendItemsProvider(val);
-      this.registerDisposable(this.itemsProvider_);
-      this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.NEEDS_REDRAW);
-    } else if (opt_value instanceof anychart.utils.LegendItemsProvider && opt_value != this.itemsProvider_) {
-      goog.dispose(this.itemsProvider_);
+    if (opt_value != this.itemsProvider_ && goog.isArray(opt_value) && opt_value.length > 0) {
       this.itemsProvider_ = opt_value;
       this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.NEEDS_REDRAW);
-    } else {
-      this.itemsProvider_ = null;
-      this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.NEEDS_REDRAW);
     }
-
     return this;
   }
   return this.itemsProvider_;
@@ -368,6 +363,11 @@ anychart.elements.Legend.prototype.iconTextSpacing = function(opt_value) {
     opt_value = !isNaN(parseFloat(opt_value)) ? opt_value : 5;
     if (this.iconTextSpacing_ != opt_value) {
       this.iconTextSpacing_ = parseFloat(opt_value);
+      if (goog.isDefAndNotNull(this.items_)) {
+        for (var i = 0, len = this.items_.length; i < len; i++) {
+          this.items_[i].iconTextSpacing(this.iconTextSpacing_);
+        }
+      }
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -667,6 +667,91 @@ anychart.elements.Legend.prototype.paginatorInvalidated_ = function(event) {
 
 
 /**
+ * Legend tooltip.
+ * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
+ * @return {!(anychart.elements.Legend|anychart.elements.Tooltip)} Tooltip instance or self for chaining call.
+ */
+anychart.elements.Legend.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.elements.Tooltip();
+    this.registerDisposable(this.tooltip_);
+    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.Tooltip) {
+      this.tooltip_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.tooltip_.deserialize(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.tooltip_.enabled(false);
+    }
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Tooltip invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.elements.Legend.prototype.onTooltipSignal_ = function(event) {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.redraw();
+};
+
+
+/**
+ * Show data point tooltip.
+ * @protected
+ * @param {goog.events.BrowserEvent} event Event that initiate tooltip to show.
+ */
+anychart.elements.Legend.prototype.showTooltip = function(event) {
+  this.moveTooltip(event);
+};
+
+
+/**
+ * Hide data point tooltip.
+ * @protected
+ */
+anychart.elements.Legend.prototype.hideTooltip = function() {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.hide();
+};
+
+
+/**
+ * @protected
+ * @param {goog.events.BrowserEvent} event that initiate tooltip to show.
+ */
+anychart.elements.Legend.prototype.moveTooltip = function(event) {
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  var index = event['index'];
+  var item = event['item'];
+  var formatProvider = {
+    'text': item.text(),
+    'iconType': item.iconType(),
+    'iconStroke': item.iconStroke(),
+    'iconFill': item.iconFill(),
+    'iconMarker': item.iconMarker(),
+    'meta': this.legendItemsMeta_[index]
+  };
+  if (tooltip.isFloating() && event) {
+    tooltip.show(
+        formatProvider,
+        new acgraph.math.Coordinate(event.clientX, event.clientY));
+  } else {
+    tooltip.show(
+        formatProvider,
+        new acgraph.math.Coordinate(0, 0));
+  }
+};
+
+
+/**
  * Getter for legend width.
  * @return {number|string|null} Current width.
  *//**
@@ -770,19 +855,19 @@ anychart.elements.Legend.prototype.position = function(opt_value) {
 
 /**
  * Getter for legend align setting.
- * @return {anychart.elements.Legend.Align} Legend align.
+ * @return {anychart.utils.Align} Legend align.
  *//**
  * Setter for legend align setting.
- * @param {(anychart.elements.Legend.Align|string)=} opt_value Value to set.
+ * @param {(anychart.utils.Align|string)=} opt_value Value to set.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Legend.Align|string)=} opt_value Legend align.
- * @return {(anychart.elements.Legend.Align|anychart.elements.Legend)} Legend align or self for chaining.
+ * @param {(anychart.utils.Align|string)=} opt_value Legend align.
+ * @return {(anychart.utils.Align|anychart.elements.Legend)} Legend align or self for chaining.
  */
 anychart.elements.Legend.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.elements.Legend.normalizeAlign(opt_value);
+    opt_value = anychart.utils.normalizeAlign(opt_value);
     if (this.align_ != opt_value) {
       this.align_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -801,7 +886,7 @@ anychart.elements.Legend.prototype.align = function(opt_value) {
  */
 anychart.elements.Legend.prototype.getRemainingBounds = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.calculateLegendBounds_();
+    this.calculateBounds_();
   /** @type {anychart.math.Rect} */
   var parentBounds;
   if (this.parentBounds_) {
@@ -845,28 +930,140 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
-  if (this.itemsProvider_) {
+  if (this.itemsProvider_ && this.itemsProvider_.length > 0) {
     goog.disposeAll(this.items_);
+    /**
+     * Array of legend item.
+     * @type {Array.<anychart.elements.LegendItem>}
+     * @private
+     */
     this.items_ = [];
+    /**
+     * Array of legend items metadata. Used for legend item tooltips.
+     * @type {Array.<Object>}
+     * @private
+     */
+    this.legendItemsMeta_ = [];
     var settingsObj = this.textSettings();
-    for (var i = 0; i < this.itemsProvider_.getItemsCount(); i++) {
-      this.items_.push(
-          new anychart.elements.Legend.LegendItem_(
-              this.itemsProvider_.getItemText(i),
-              this.itemsProvider_.getItemIconColor(i),
-              this.iconTextSpacing_,
-              /** @type {Object} */ (settingsObj),
-              this.itemsProvider_.getItem(i)
-          )
-      );
-      this.items_[i].container(this.layer_);
-      this.items_[i].enabled(false);
+    var item; // legend item
+    var provider; // legend item provider object
+    for (var i = 0; i < this.itemsProvider_.length; i++) {
+      provider = this.itemsProvider_[i];
+      item = new anychart.elements.LegendItem();
+
+      item.iconType(provider['iconType'] ? provider['iconType'] : anychart.elements.LegendItem.IconType.SQUARE);
+      item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
+      item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
+      item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : 'none');
+
+      item.text(provider['text'] ? provider['text'] : 'Item ' + i);
+      item.iconTextSpacing(this.iconTextSpacing_);
+
+      item.textSettings(/** @type {Object} */(settingsObj));
+      item.applyTextSettings(item.getTextElement(), true);
+
+      item.container(this.layer_);
+      item.enabled(false);
+
+      this.setupMouseEventsListeners_(item);
+
+      this.items_.push(item);
+      this.legendItemsMeta_.push(provider['meta'] ? provider['meta'] : {});
     }
   } else {
     goog.disposeAll(this.items_);
     this.items_ = null;
+    this.legendItemsMeta_ = null;
   }
   this.invalidate(anychart.ConsistencyState.BOUNDS);
+};
+
+
+/**
+ * Setup listening of mouse events on legend item.
+ * @param {anychart.elements.LegendItem} item
+ * @private
+ */
+anychart.elements.Legend.prototype.setupMouseEventsListeners_ = function(item) {
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OVER, this.onLegendItemMouseOver_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OUT, this.onLegendItemMouseOut_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_MOVE, this.onLegendItemMouseMove_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_CLICK, this.onLegendItemClick_, false, this);
+};
+
+
+/**
+ * Returns index of legend item that dispatched an event.
+ * @param {anychart.elements.LegendItem} item Event.
+ * @private
+ * @return {number} Item index in legend or NaN.
+ */
+anychart.elements.Legend.prototype.getItemIndexInLegend_ = function(item) {
+  return parseInt(goog.object.findKey(this.items_, function(value, key, obj) {
+    return item == value;
+  }), 10);
+};
+
+
+/**
+ * LegendItem click handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemClick_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  this.dispatchEvent(event);
+};
+
+
+/**
+ * LegendItem mouse over handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseOver_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.showTooltip(event);
+  }
+};
+
+
+/**
+ * LegendItem mouse out handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseOut_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.hideTooltip();
+  }
+};
+
+
+/**
+ * LegendItem mouse move handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseMove_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.moveTooltip(event);
+  }
 };
 
 
@@ -924,6 +1121,7 @@ anychart.elements.Legend.prototype.calculateContentHeight_ = function() {
 
 /**
  * Calculate actual bounds.
+ * @deprecated Old method to calculate legend bounds. Use calculateBounds_ instead.
  * @private
  */
 anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
@@ -983,44 +1181,61 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
   var padding = this.padding();
   var margin = this.margin();
 
-  var titleBounds, separatorBounds, paginatorBounds;
+  var titleBounds;
+  var title = /** @type {anychart.elements.Title} */(this.title());
+  if (title.enabled()) {
+    title.suspendSignalsDispatching();
+    title.parentBounds(null);
+    title.resumeSignalsDispatching(false);
+    titleBounds = title.getContentBounds();
+  } else titleBounds = null;
 
-  if (this.title_ && this.title_.enabled()) {
-    titleBounds = this.title_.getContentBounds();
-  } else titleBounds = undefined;
+  var separatorBounds;
+  var separator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
+  if (separator.enabled()) {
+    separator.suspendSignalsDispatching();
+    separator.parentBounds(null);
+    separator.resumeSignalsDispatching(false);
+    separatorBounds = separator.getContentBounds();
+  } else separatorBounds = null;
 
-  if (this.titleSeparator_ && this.titleSeparator_.enabled()) {
-    separatorBounds = this.titleSeparator_.getContentBounds();
-  } else separatorBounds = undefined;
+  var paginatorBounds;
+  var paginator = /** @type {anychart.ui.Paginator} */(this.paginator());
+  paginator.suspendSignalsDispatching();
+  paginator.parentBounds(null);
+  paginatorBounds = paginator.getPixelBounds();
+  paginator.resumeSignalsDispatching(false);
 
-  if (this.paginator_ && this.paginator_.enabled()) {
-    paginatorBounds = this.paginator_.getPixelBounds();
-  } else paginatorBounds = undefined;
+
+  var contentWidth = this.calculateContentWidth_();
+  var contentHeight = this.calculateContentHeight_();
+  var tightenWidth;
 
   if (autoWidth) {
-    width += this.calculateContentWidth_();
+    width += contentWidth;
 
     if (paginatorBounds) {
-      switch (this.paginator_.orientation()) {
+      switch (paginator.orientation()) {
         case anychart.utils.Orientation.LEFT:
         case anychart.utils.Orientation.RIGHT:
           width += paginatorBounds.width;
           break;
       }
     }
-    width = Math.max.call(null, width, titleBounds ? titleBounds.width : 0);
+    width = Math.max(width, titleBounds ? titleBounds.width : 0);
     width = padding.widenWidth(width);
+    tightenWidth = padding.tightenWidth(width);
   } else {
-    width = padding.tightenWidth(width);
+    tightenWidth = padding.tightenWidth(width);
   }
-
+  var tightenHeight;
   if (autoHeight) {
     height += titleBounds ? titleBounds.height : 0;
     height += separatorBounds ? separatorBounds.height : 0;
 
     var paginatorHeight = 0;
     if (paginatorBounds) {
-      switch (this.paginator_.orientation()) {
+      switch (paginator.orientation()) {
         case anychart.utils.Orientation.TOP:
         case anychart.utils.Orientation.BOTTOM:
           height += paginatorBounds.height;
@@ -1030,23 +1245,120 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
           break;
       }
     }
-    height += Math.max(this.calculateContentHeight_(), paginatorHeight);
+    height += Math.max(contentHeight, paginatorHeight);
     height = padding.widenHeight(height);
+    tightenHeight = padding.tightenHeight(height);
   } else {
-    height = padding.tightenHeight(height);
-  }
-
-  if (parentBounds && parentWidth < width) {
-    width = margin.tightenWidth(parentWidth);
-  }
-
-  if (parentBounds && parentHeight < height) {
-    height = margin.tightenHeight(parentHeight);
+    tightenHeight = padding.tightenHeight(height);
   }
 
   var widthWithMargin = margin.widenWidth(width);
   var heightWithMargin = margin.widenHeight(height);
-  var bounds;
+
+  if (parentBounds && parentWidth < widthWithMargin) {
+    width = margin.tightenWidth(parentWidth);
+    tightenWidth = padding.tightenWidth(width);
+    widthWithMargin = margin.widenWidth(width);
+  }
+
+  if (parentBounds && parentHeight < heightWithMargin) {
+    height = margin.tightenHeight(parentHeight);
+    tightenHeight = padding.tightenHeight(height);
+    heightWithMargin = margin.widenHeight(height);
+  }
+
+  var shouldEnablePaginator = false;
+  switch (this.itemsLayout_) {
+    case anychart.elements.Legend.Layout.TABLE:
+    case anychart.elements.Legend.Layout.HORIZONTAL:
+      switch (paginator.orientation()) {
+        case anychart.utils.Orientation.TOP:
+        case anychart.utils.Orientation.BOTTOM:
+          if (contentWidth > width) {
+            shouldEnablePaginator = true;
+          }
+          break;
+        case anychart.utils.Orientation.LEFT:
+        case anychart.utils.Orientation.RIGHT:
+          if (contentWidth > width) {
+            shouldEnablePaginator = true;
+          }
+          break;
+      }
+      break;
+    case anychart.elements.Legend.Layout.VERTICAL:
+      switch (paginator.orientation()) {
+        case anychart.utils.Orientation.TOP:
+        case anychart.utils.Orientation.BOTTOM:
+          if (contentHeight > height) {
+            shouldEnablePaginator = true;
+          }
+          break;
+        case anychart.utils.Orientation.LEFT:
+        case anychart.utils.Orientation.RIGHT:
+          if (contentHeight > height) {
+            shouldEnablePaginator = true;
+          }
+          break;
+      }
+      break;
+  }
+  paginator.suspendSignalsDispatching();
+  paginator.enabled(shouldEnablePaginator);
+  paginator.resumeSignalsDispatching(false);
+
+  if (!shouldEnablePaginator) {
+    if (autoWidth) {
+      if (paginatorBounds) {
+        switch (paginator.orientation()) {
+          case anychart.utils.Orientation.LEFT:
+          case anychart.utils.Orientation.RIGHT:
+            width -= paginatorBounds.width;
+            widthWithMargin -= paginatorBounds.width;
+            tightenWidth -= paginatorBounds.width;
+            break;
+        }
+      }
+    }
+    if (autoHeight) {
+      if (paginatorBounds) {
+        switch (paginator.orientation()) {
+          case anychart.utils.Orientation.TOP:
+          case anychart.utils.Orientation.BOTTOM:
+            height -= paginatorBounds.height;
+            heightWithMargin -= paginatorBounds.height;
+            tightenHeight -= paginatorBounds.height;
+            break;
+        }
+      }
+    }
+  }
+
+  var pageWidth = tightenWidth;
+  var pageHeight = tightenHeight - (titleBounds ? titleBounds.height : 0) - (separatorBounds ? separatorBounds.height : 0);
+
+  if (paginator.enabled()) {
+    switch (paginator.orientation()) {
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        pageWidth -= (paginatorBounds ? paginatorBounds.width : 0);
+        break;
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        pageHeight -= (paginatorBounds ? paginatorBounds.height : 0);
+        break;
+    }
+  }
+
+  do {
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+    this.distributeItemsInBounds_(pageWidth, pageHeight);
+    paginator.suspendSignalsDispatching();
+    paginator.parentBounds(null);
+    paginator.resumeSignalsDispatching(false);
+    paginatorBounds = paginator.getPixelBounds();
+    pageWidth = tightenWidth - (paginatorBounds ? paginatorBounds.width : 0);
+  } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
 
   if (parentBounds) {
     var left = parentBounds.getLeft();
@@ -1055,10 +1367,11 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
       case anychart.utils.Orientation.LEFT:
       case anychart.utils.Orientation.RIGHT:
         switch (this.align_) {
-          case anychart.elements.Legend.Align.CENTER:
+          case anychart.utils.Align.CENTER:
             top = top + (parentHeight - heightWithMargin) / 2;
             break;
-          case anychart.elements.Legend.Align.RIGHT:
+          case anychart.utils.Align.RIGHT:
+          case anychart.utils.Align.BOTTOM:
             top = parentBounds.getBottom() - heightWithMargin;
             break;
         }
@@ -1066,10 +1379,11 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
       case anychart.utils.Orientation.TOP:
       case anychart.utils.Orientation.BOTTOM:
         switch (this.align_) {
-          case anychart.elements.Legend.Align.CENTER:
+          case anychart.utils.Align.CENTER:
             left = left + (parentWidth - widthWithMargin) / 2;
             break;
-          case anychart.elements.Legend.Align.RIGHT:
+          case anychart.utils.Align.RIGHT:
+          case anychart.utils.Align.BOTTOM:
             left = parentBounds.getRight() - widthWithMargin;
             break;
         }
@@ -1087,10 +1401,271 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
     left = anychart.utils.normalize(/** @type {string|number} */ (margin.left()), 0);
     top = anychart.utils.normalize(/** @type {string|number} */ (margin.top()), 0);
   }
-  bounds = new anychart.math.Rect(left, top, width, height);
-  this.pixelBounds_ = margin.widenBounds(bounds);
-  this.backgroundWidth_ = width;
-  this.backgroundHeight_ = height;
+  this.pixelBounds_ = new anychart.math.Rect(left, top, widthWithMargin, heightWithMargin);
+};
+
+
+/**
+ * Calculate legend bounds.
+ * @private
+ */
+anychart.elements.Legend.prototype.calculateBounds_ = function() {
+  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
+  var stage = container ? container.getStage() : null;
+
+  /** @type {anychart.math.Rect} */
+  var parentBounds;
+  /** @type {number} */
+  var parentWidth;
+  /** @type {number} */
+  var parentHeight;
+
+  if (this.parentBounds_) {
+    parentBounds = this.parentBounds_;
+  } else if (stage) {
+    parentBounds = stage.getBounds();
+  } else {
+    parentBounds = null;
+  }
+
+  var autoWidth, autoHeight;
+  var width, height;
+
+  if (parentBounds) {
+    parentWidth = parentBounds.width;
+    parentHeight = parentBounds.height;
+    if (goog.isDefAndNotNull(this.width_)) {
+      width = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
+      autoWidth = false;
+    } else {
+      width = 0;
+      autoWidth = true;
+    }
+    if (goog.isDefAndNotNull(this.height_)) {
+      height = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
+      autoHeight = false;
+    } else {
+      height = 0;
+      autoHeight = true;
+    }
+  } else {
+    if (goog.isNumber(this.width_) && !isNaN(this.width_)) {
+      autoWidth = false;
+      width = this.width_;
+    } else {
+      autoWidth = true;
+      width = 0;
+    }
+    if (goog.isNumber(this.height_) && !isNaN(this.height_)) {
+      autoHeight = false;
+      height = this.height_;
+    } else {
+      autoHeight = true;
+      height = 0;
+    }
+  }
+
+  var titleBounds;
+  var title = /** @type {anychart.elements.Title} */(this.title());
+  if (title.enabled()) {
+    title.suspendSignalsDispatching();
+    title.parentBounds(null);
+    title.resumeSignalsDispatching(false);
+    titleBounds = title.getContentBounds();
+  } else titleBounds = null;
+
+  var separatorBounds;
+  var separator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
+  if (separator.enabled()) {
+    separator.suspendSignalsDispatching();
+    separator.parentBounds(null);
+    separator.resumeSignalsDispatching(false);
+    separatorBounds = separator.getContentBounds();
+  } else separatorBounds = null;
+
+  var paginatorBounds;
+  var paginator = /** @type {anychart.ui.Paginator} */(this.paginator());
+  paginator.suspendSignalsDispatching();
+  paginator.parentBounds(null);
+  paginatorBounds = paginator.getPixelBounds();
+
+  paginator.resumeSignalsDispatching(false);
+
+  var padding = this.padding();
+  var margin = this.margin();
+
+  var contentWidth = this.calculateContentWidth_();
+  var contentHeight = this.calculateContentHeight_();
+  var orientation;
+  var enablePaginator;
+
+  // force disable paginator
+  paginator.suspendSignalsDispatching().enabled(false).resumeSignalsDispatching(false);
+  if (autoWidth) {
+    width += contentWidth;
+
+    if (paginator.enabled()) {
+      orientation = paginator.orientation();
+      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += paginatorBounds.width;
+      else Math.max(width, paginatorBounds.width);
+    }
+
+    if (title.enabled()) {
+      orientation = title.orientation();
+      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += titleBounds.width;
+      else width = Math.max(width, titleBounds.width);
+    }
+
+    if (separator.enabled()) {
+      orientation = separator.orientation();
+      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += separatorBounds.width;
+      else Math.max(width, separatorBounds.width);
+    }
+
+    width = margin.widenWidth(padding.widenWidth(width));
+    if (parentWidth &&
+        width > parentWidth &&
+        this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) paginator.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
+  } else {
+    enablePaginator = false;
+    if (paginatorBounds) {
+      orientation = paginator.orientation();
+      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+        if (contentWidth + paginatorBounds.width > width) enablePaginator = true;
+      } else {
+        if (contentWidth > width) enablePaginator = true;
+      }
+    }
+    if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) paginator.suspendSignalsDispatching().enabled(enablePaginator).resumeSignalsDispatching(false);
+  }
+
+  if (autoHeight) {
+    height += contentHeight;
+    if (paginator.enabled()) {
+      orientation = paginator.orientation();
+      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += paginatorBounds.height;
+      else height = Math.max(height, paginatorBounds.height);
+    }
+    if (title.enabled()) {
+      orientation = title.orientation();
+      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += titleBounds.height;
+      else height = Math.max(height, titleBounds.height);
+    }
+    if (separator.enabled()) {
+      orientation = separator.orientation();
+      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += separatorBounds.height;
+      else {
+        separator.suspendSignalsDispatching().width(height).resumeSignalsDispatching(false);
+        separatorBounds = separator.getContentBounds();
+        height = Math.max(height, separatorBounds.height);
+      }
+    }
+
+    height = margin.widenHeight(padding.widenHeight(height));
+    if (parentHeight &&
+        height > parentHeight &&
+        this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) {
+      paginator.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
+      if (autoWidth) width += paginatorBounds.width;
+    }
+  } else {
+    enablePaginator = false;
+    if (paginatorBounds) {
+      orientation = paginator.orientation();
+      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) {
+        if (contentHeight + paginatorBounds.height > height) enablePaginator = true;
+      } else {
+        if (contentHeight > height) enablePaginator = true;
+      }
+    }
+    if (this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) paginator.suspendSignalsDispatching().enabled(enablePaginator).resumeSignalsDispatching(false);
+  }
+
+  if (parentWidth && width > parentWidth) width = parentWidth;
+  if (parentHeight && height > parentHeight) height = parentHeight;
+
+  var widthWithoutMargin = margin.tightenWidth(width);
+  var heightWithoutMargin = margin.tightenHeight(height);
+
+  var widthWithoutPadding = padding.tightenWidth(widthWithoutMargin);
+  var heightWithoutPadding = padding.tightenHeight(heightWithoutMargin);
+
+  var contentAreaWidth = widthWithoutPadding;
+  var contentAreaHeight = heightWithoutPadding;
+
+  if (title.enabled()) {
+    orientation = title.orientation();
+    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= titleBounds.height;
+    else contentAreaWidth -= titleBounds.width;
+  }
+  if (separator.enabled()) {
+    orientation = separator.orientation();
+    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= separatorBounds.height;
+    else contentAreaWidth -= separatorBounds.width;
+  }
+  var pageWidth = contentAreaWidth, pageHeight = contentAreaHeight;
+  orientation = paginator.orientation();
+
+  if (paginator.enabled()) {
+    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) pageHeight = contentAreaHeight - paginatorBounds.height;
+    else pageWidth = contentAreaWidth - paginatorBounds.width;
+  }
+
+  do {
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+    this.distributeItemsInBounds_(pageWidth, pageHeight);
+    paginator.suspendSignalsDispatching();
+    paginator.parentBounds(null);
+    paginator.resumeSignalsDispatching(false);
+    paginatorBounds = paginator.getPixelBounds();
+    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) pageHeight = contentAreaHeight - (paginatorBounds ? paginatorBounds.height : 0);
+    else pageWidth = contentAreaWidth - (paginatorBounds ? paginatorBounds.width : 0);
+  } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
+
+  var left, top;
+  if (parentBounds) {
+    left = parentBounds.getLeft();
+    top = parentBounds.getTop();
+    switch (this.position_) {
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        switch (this.align_) {
+          case anychart.utils.Align.CENTER:
+            top = top + (parentHeight - height) / 2;
+            break;
+          case anychart.utils.Align.RIGHT:
+          case anychart.utils.Align.BOTTOM:
+            top = parentBounds.getBottom() - height;
+            break;
+        }
+        break;
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        switch (this.align_) {
+          case anychart.utils.Align.CENTER:
+            left = left + (parentWidth - width) / 2;
+            break;
+          case anychart.utils.Align.RIGHT:
+          case anychart.utils.Align.BOTTOM:
+            left = parentBounds.getRight() - width;
+            break;
+        }
+        break;
+    }
+    switch (this.position_) {
+      case anychart.utils.Orientation.RIGHT:
+        left = parentBounds.getRight() - width;
+        break;
+      case anychart.utils.Orientation.BOTTOM:
+        top = parentBounds.getBottom() - height;
+        break;
+    }
+  } else {
+    left = anychart.utils.normalize(/** @type {string|number} */ (margin.left()), 0);
+    top = anychart.utils.normalize(/** @type {string|number} */ (margin.top()), 0);
+  }
+
+  this.pixelBounds_ = new anychart.math.Rect(left, top, width, height);
 };
 
 
@@ -1110,9 +1685,23 @@ anychart.elements.Legend.prototype.draw = function() {
     return;
 
   if (!this.rootElement) {
+    /**
+     * Layer of legend.
+     * @type {!acgraph.vector.Layer}
+     */
     this.rootElement = acgraph.layer();
-    if (!this.layer_) (this.layer_ = acgraph.layer()).parent(this.rootElement).zIndex(30);
-    this.registerDisposable(this.layer_);
+    this.registerDisposable(this.rootElement);
+
+    if (!this.layer_) {
+      /**
+       * Legend items layer.
+       * @type {!acgraph.vector.Layer}
+       * @private
+       */
+      this.layer_ = acgraph.layer();
+      this.layer_.parent(this.rootElement).zIndex(30);
+      this.registerDisposable(this.layer_);
+    }
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -1127,26 +1716,6 @@ anychart.elements.Legend.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.background_ && !this.background_.container()) {
-    this.background_.container(this.rootElement);
-    this.background_.zIndex(0);
-  }
-
-  if (this.title_ && !this.title_.container()) {
-    this.title_.container(this.rootElement);
-    this.title_.zIndex(10);
-  }
-
-  if (this.titleSeparator_ && !this.titleSeparator_.container()) {
-    this.titleSeparator_.container(this.rootElement);
-    this.titleSeparator_.zIndex(10);
-  }
-
-  if (this.paginator_ && !this.paginator_.container()) {
-    this.paginator_.container(this.rootElement);
-    this.paginator_.zIndex(20);
-  }
-
   var stage = container ? container.getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
@@ -1154,22 +1723,22 @@ anychart.elements.Legend.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
     this.initializeLegendItems_();
     this.markConsistent(anychart.ConsistencyState.DATA);
-    this.needRedistribution_ = true;
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (goog.isDefAndNotNull(this.items_)) {
+      var textSettings = /** @type {Object} */ (this.textSettings());
       for (var i = 0, len = this.items_.length; i < len; i++) {
-        var textElement = this.items_[i].getTextElement();
-        this.items_[i].textSettings(/** @type {Object} */ (this.textSettings()));
-        this.items_[i].applyTextSettings.call(this.items_[i], /** @type {!acgraph.vector.Text} */ (textElement), false);
+        this.items_[i].textSettings(textSettings);
+        this.items_[i].applyTextSettings(this.items_[i].getTextElement(), false);
       }
     }
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  this.clearLastDrawedPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.calculateLegendBounds_();
+    this.calculateBounds_();
     this.invalidate(anychart.ConsistencyState.BACKGROUND |
         anychart.ConsistencyState.TITLE |
         anychart.ConsistencyState.SEPARATOR |
@@ -1177,83 +1746,66 @@ anychart.elements.Legend.prototype.draw = function() {
     this.rootElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.rootElement.translate(this.pixelBounds_.left, this.pixelBounds_.top);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
-    this.needRedistribution_ = true;
   }
 
   var totalBounds = this.pixelBounds_.clone();
-  var parentBounds = this.parentBounds();
-  var parentWidth = /** @type {number} */ (parentBounds ? parentBounds.width : undefined);
-  var parentHeight = /** @type {number} */ (parentBounds ? parentBounds.height : undefined);
-  var margin = this.margin();
-  totalBounds.left = anychart.utils.normalize(/** @type {string|number} */(margin.left()), parentWidth);
-  totalBounds.top = anychart.utils.normalize(/** @type {string|number} */(margin.top()), parentHeight);
+  totalBounds.left = 0;
+  totalBounds.top = 0;
 
   var boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
-    this.background_.suspendSignalsDispatching();
-    this.background_.pixelBounds(boundsWithoutMargin);
-    this.background_.resumeSignalsDispatching(false);
-    this.background_.draw();
+    var background = /** @type {anychart.elements.Background} */(this.background());
+    background.suspendSignalsDispatching();
+    background.pixelBounds(boundsWithoutMargin);
+    if (this.enabled()) background.container(this.rootElement);
+    background.resumeSignalsDispatching(false);
+    background.draw();
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
   }
 
   var boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
 
-  if (this.title_ && this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
-    this.title_.suspendSignalsDispatching();
-    this.title_.parentBounds(boundsWithoutPadding);
-    this.title_.resumeSignalsDispatching(false);
-    this.title_.draw();
+  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
+    var title = /** @type {anychart.elements.Title} */(this.title());
+    title.suspendSignalsDispatching();
+    title.parentBounds(boundsWithoutPadding);
+    if (this.enabled()) title.container(this.rootElement);
+    title.resumeSignalsDispatching(false);
+    title.draw();
     this.markConsistent(anychart.ConsistencyState.TITLE);
   }
 
   var boundsWithoutTitle = this.title_ ? this.title_.getRemainingBounds() : boundsWithoutPadding;
 
-  if (this.titleSeparator_ && this.hasInvalidationState(anychart.ConsistencyState.SEPARATOR)) {
-    this.titleSeparator_.suspendSignalsDispatching();
-    this.titleSeparator_.parentBounds(boundsWithoutTitle);
-    this.titleSeparator_.resumeSignalsDispatching(false);
-    this.titleSeparator_.draw();
+  if (this.hasInvalidationState(anychart.ConsistencyState.SEPARATOR)) {
+    var titleSeparator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
+    titleSeparator.suspendSignalsDispatching();
+    titleSeparator.parentBounds(boundsWithoutTitle);
+    if (this.enabled()) titleSeparator.container(this.rootElement);
+    titleSeparator.resumeSignalsDispatching(false);
+    titleSeparator.draw();
     this.markConsistent(anychart.ConsistencyState.SEPARATOR);
   }
 
   var boundsWithoutSeparator = this.titleSeparator_ ? this.titleSeparator_.getRemainingBounds() : boundsWithoutTitle;
 
-  if (this.paginator_ && this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR)) {
-    this.paginator_.suspendSignalsDispatching();
-    this.paginator_.parentBounds(boundsWithoutSeparator);
-    this.paginator_.resumeSignalsDispatching(false);
-    this.paginator_.draw();
+  if (this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR)) {
+    var paginator = /** @type {anychart.ui.Paginator} */(this.paginator());
+    paginator.suspendSignalsDispatching();
+    paginator.parentBounds(boundsWithoutSeparator);
+    if (this.enabled()) paginator.container(this.rootElement);
+    paginator.resumeSignalsDispatching(false);
+    paginator.draw();
     this.markConsistent(anychart.ConsistencyState.PAGINATOR);
-  } else this.markConsistent(anychart.ConsistencyState.PAGINATOR);
-
-  var contentBounds = this.paginator_ ? this.paginator_.getRemainingBounds() : boundsWithoutSeparator;
-
-  this.clearLastDrawedPage_();
-
-  if (this.needRedistribution_) {
-    //TODO(AntonKagakin): учесть бесконечный цикл ^_^
-    do {
-      this.markConsistent(anychart.ConsistencyState.BOUNDS);
-      this.distributeItemsInBounds_(contentBounds);
-      if (this.paginator_) this.paginator_.parentBounds(boundsWithoutSeparator);
-      contentBounds = this.paginator_ ? this.paginator_.getRemainingBounds() : boundsWithoutSeparator;
-    } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
-
-    this.needRedistribution_ = false;
   }
+
+  var contentBounds = this.paginator().enabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;
   this.layer_.clip(/** @type {acgraph.math.Rect} */ (contentBounds));
 
-  if (this.paginator_ && this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR)) {
-    this.paginator_.suspendSignalsDispatching();
-    this.paginator_.parentBounds(boundsWithoutSeparator);
-    this.paginator_.resumeSignalsDispatching(false);
-    this.paginator_.draw();
-    this.markConsistent(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
-  } else this.markConsistent(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
-
-  this.drawLegendContent_(this.paginator_ ? this.paginator_.currentPage() - 1 : 0, contentBounds);
+  var pageToDraw = this.paginator().enabled() ? this.paginator().currentPage() - 1 : 0;
+  //TODO(AntonKagakin): вынести contentBounds в this, чтобы сделать метод рисования контента самостоятельным и вызываемым откуда угодно
+  this.drawLegendContent_(pageToDraw, contentBounds);
 
   if (manualSuspend) stage.resume();
 };
@@ -1261,28 +1813,19 @@ anychart.elements.Legend.prototype.draw = function() {
 
 /**
  * Distribute items per pages.
- * @param {anychart.math.Rect} bounds Bounds of the content area.
+ * @param {number} width Width of the content area.
+ * @param {number} height Height of the content area.
  * @private
  */
-anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(bounds) {
-  var contentWidth = this.calculateContentWidth_();
-  var contentHeight = this.calculateContentHeight_();
-  var pageWidth = bounds.width;
-  var pageHeight = bounds.height;
+anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(width, height) {
   var i, len;
   var w, h;
   var page;
 
   this.distributedItems_ = [];
-  if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
-    if (contentWidth > pageWidth) this.initDefaultPaginator_();
-  } else {
-    if (contentHeight > pageHeight) this.initDefaultPaginator_();
-  }
 
   page = 0;
 
-  var hasPaginator = !!(this.paginator_);
   this.suspendSignalsDispatching();
 
   if (this.items_) {
@@ -1291,7 +1834,7 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(bounds) {
     if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
       w = this.items_[0].getWidth();
       for (i = 1, len = this.items_.length; i < len; i++) {
-        if (w + this.itemsSpacing_ + this.items_[i].getWidth() > pageWidth) {
+        if (w + this.itemsSpacing_ + this.items_[i].getWidth() > width) {
           page++;
           this.distributedItems_[page] = [];
           this.distributedItems_[page][0] = this.items_[i];
@@ -1304,7 +1847,7 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(bounds) {
     } else {
       h = this.items_[0].getHeight();
       for (i = 1, len = this.items_.length; i < len; i++) {
-        if (h + this.itemsSpacing_ + this.items_[i].getHeight() > pageHeight) {
+        if (h + this.itemsSpacing_ + this.items_[i].getHeight() > height) {
           page++;
           this.distributedItems_[page] = [];
           this.distributedItems_[page][0] = this.items_[i];
@@ -1317,48 +1860,8 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(bounds) {
     }
   }
 
-  if (hasPaginator) {
-    this.paginator().pageCount(page + 1);
-  }
+  this.paginator().pageCount(page + 1);
   this.resumeSignalsDispatching(false);
-};
-
-
-/**
- * Create default paginator.
- * @private
- */
-anychart.elements.Legend.prototype.initDefaultPaginator_ = function() {
-  if (!this.paginator_) {
-    this.paginator()
-        .container(this.rootElement)
-        .zIndex(20)
-        .fontFamily('Verdana')
-        .fontSize('10')
-        .fontWeight('normal')
-        .fontColor('rgb(35,35,35)')
-        .orientation('right')
-        .margin(0)
-        .padding(2);
-    this.paginator().background()
-        .enabled(false)
-        .stroke({
-          'keys': [
-            '0 #DDDDDD 1',
-            '1 #D0D0D0 1'
-          ],
-          'angle' : '90'
-        })
-        .fill({
-          'keys': [
-            '0 #FFFFFF 1',
-            '0.5 #F3F3F3 1',
-            '1 #FFFFFF 1'
-          ],
-          'angle' : '90'
-        });
-    this.invalidate(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
-  }
 };
 
 
@@ -1387,21 +1890,38 @@ anychart.elements.Legend.prototype.clearLastDrawedPage_ = function() {
 anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, contentBounds) {
   // draw legend content
   if (goog.isDefAndNotNull(this.items_)) {
-    var x = contentBounds.left;
-    var y = contentBounds.top;
+    var x = 0;
+    var y = 0;
     var i;
     var items = this.distributedItems_[pageNumber];
+    var item;
     if (items) {
       switch (this.itemsLayout_) {
         case anychart.elements.Legend.Layout.HORIZONTAL:
           for (i = 0; i < items.length; i++) {
-            items[i].enabled(true).draw(x, y);
+            item = items[i];
+            item
+                .suspendSignalsDispatching()
+                .parentBounds(contentBounds)
+                .x(x)
+                .y(y)
+                .enabled(true)
+                .resumeSignalsDispatching()
+                .draw();
             x += items[i].getWidth() + this.itemsSpacing_;
           }
           break;
         case anychart.elements.Legend.Layout.VERTICAL:
           for (i = 0; i < items.length; i++) {
-            items[i].enabled(true).draw(x, y);
+            item = items[i];
+            item
+                .suspendSignalsDispatching()
+                .parentBounds(contentBounds)
+                .x(x)
+                .y(y)
+                .enabled(true)
+                .resumeSignalsDispatching(false)
+                .draw();
             y += items[i].getHeight() + this.itemsSpacing_;
           }
           break;
@@ -1468,169 +1988,17 @@ anychart.elements.Legend.prototype.deserialize = function(config) {
 };
 
 
-
 /**
- * Inner class for representing legend item.
- * @param {string} itemText Legend item text.
- * @param {acgraph.vector.Fill} itemIconColor Legend item icon color.
- * @param {number} iconTextSpacing Space between item icon and item text.
- * @param {Object} settingsObj Text settings object.
- * @param {Object} rawItem Raw item as it was set in provider.
- * @extends {anychart.elements.Text}
- * @constructor
- * @private
+ * Type definition for legend item provider.
+ * @includeDoc
+ * @typedef {{
+ *    index: (number|null|undefined),
+ *    text: (string|null|undefined),
+ *    iconType: (string|null|undefined),
+ *    iconStroke: (acgraph.vector.Stroke|null|undefined),
+ *    iconFill: (acgraph.vector.Fill|null|undefined),
+ *    iconMarker: (string|null|undefined),
+ *    meta: (Object|null|undefined)
+ * }}
  */
-anychart.elements.Legend.LegendItem_ = function(itemText, itemIconColor, iconTextSpacing, settingsObj, rawItem) {
-  goog.base(this);
-  this.textSettings(settingsObj);
-  this.itemText_ = itemText;
-  this.itemIconColor_ = itemIconColor;
-  this.iconTextSpacing_ = iconTextSpacing;
-
-  /**
-   * Legen icon path.
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.icon_ = acgraph.path();
-  this.registerDisposable(this.icon_);
-
-  /**
-   * Legend icon text element.
-   * @type {acgraph.vector.Text}
-   * @private
-   */
-  this.textElement_ = acgraph.text();
-  this.registerDisposable(this.textElement_);
-
-  this.textElement_.text(this.itemText_);
-  this.applyTextSettings(this.textElement_, true);
-
-
-  /**
-   * Size of the icon.
-   * @type {number}
-   * @private
-   */
-  this.iconSize_ = this.textElement_.getBounds().height;
-
-  /**
-   * Raw item as it set in items provider.
-   * @type {*}
-   * @private
-   */
-  this.rawItem_ = rawItem;
-
-  this.invalidate(anychart.ConsistencyState.ALL);
-};
-goog.inherits(anychart.elements.Legend.LegendItem_, anychart.elements.Text);
-
-
-/**
- * Supported signals.
- * @type {number}
- */
-anychart.elements.Legend.LegendItem_.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.prototype.SUPPORTED_SIGNALS;
-
-
-/**
- * Supported consistency states.
- * @type {number}
- */
-anychart.elements.Legend.LegendItem_.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES;
-
-
-/**
- * Legend item text element.
- * @return {acgraph.vector.Text} Text element.
- */
-anychart.elements.Legend.LegendItem_.prototype.getTextElement = function() {
-  return this.textElement_;
-};
-
-
-/**
- * Calculating width of legend item.
- * @return {number} Width.
- */
-anychart.elements.Legend.LegendItem_.prototype.getWidth = function() {
-  return this.getHeight() + this.iconTextSpacing_ + this.textElement_.getBounds().width;
-};
-
-
-/**
- * Calculating height of legend item.
- * @return {number} Height.
- */
-anychart.elements.Legend.LegendItem_.prototype.getHeight = function() {
-  return (this.iconSize_ = this.textElement_.getBounds().height);
-};
-
-
-/**
- * Draws icon.
- * @param {acgraph.vector.Path} path Path of the icon.
- * @param {number} size Size of icon.
- * @private
- */
-anychart.elements.Legend.LegendItem_.prototype.drawIcon_ = function(path, size) {
-  path.clear();
-
-  // square
-  path.moveTo(0, 0)
-      .lineTo(size, 0)
-      .lineTo(size, size)
-      .lineTo(0, size)
-      .close();
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.elements.Legend.LegendItem_.prototype.remove = function() {
-  this.icon_.parent(null);
-  this.textElement_.parent(null);
-};
-
-
-/**
- * Draws item.
- * @param {number} x x coordinate.
- * @param {number} y y coordinate.
- */
-anychart.elements.Legend.LegendItem_.prototype.draw = function(x, y) {
-  if (!this.checkDrawingNeeded())
-    return;
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */ (this.zIndex());
-    this.icon_.zIndex(zIndex);
-    this.textElement_.zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.icon_.parent(container);
-    this.textElement_.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.drawIcon_(this.icon_, this.iconSize_);
-    this.icon_.fill(this.itemIconColor_);
-    this.icon_.stroke('none');
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.icon_.translate(x, y);
-  this.textElement_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.textElement_.translate(x + this.iconSize_ + this.iconTextSpacing_, y);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-};
+anychart.elements.Legend.LegendItemProvider;

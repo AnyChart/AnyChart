@@ -3,6 +3,7 @@ goog.provide('anychart.VisualBase');
 goog.require('acgraphexport');
 goog.require('anychart.Base');
 goog.require('goog.dom');
+goog.require('goog.json.hybrid');
 
 
 
@@ -270,4 +271,75 @@ anychart.VisualBase.prototype.deserialize = function(config) {
     this.zIndex(config['zIndex']);
 
   return goog.base(this, 'deserialize', config);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Export.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Return data for stage export.
+ * @return {Array.<string>} .
+ * @protected
+ */
+anychart.VisualBase.prototype.getExportData = function() {
+  var stage = this.container() ? this.container().getStage() : null;
+  var result = [];
+
+  if (stage) {
+    var type = acgraph.type();
+    if (type == acgraph.StageType.VML) {
+      var jsonData = stage.data() || {};
+      result = [goog.json.hybrid.stringify(jsonData), 'json', 'graphics'];
+
+    } else if (type == acgraph.StageType.SVG) {
+      var serializer = new XMLSerializer();
+      var svgNode = stage.domElement();
+      result = [serializer.serializeToString(svgNode), 'svg', 'graphics'];
+    }
+  }
+
+  return result;
+};
+
+
+/**
+ * Save visual base stage as png file.
+ */
+anychart.VisualBase.prototype.saveAsPNG = function() {
+  var data = this.getExportData();
+  var stage = this.container() ? this.container().getStage() : null;
+
+  if (data.length && stage) {
+    stage.saveAsPNG(data[0], data[1], data[2]);
+  }
+
+};
+
+
+/**
+ * Save visual base stage as jpg file.
+ */
+anychart.VisualBase.prototype.saveAsJPG = function() {
+  var data = this.getExportData();
+  var stage = this.container() ? this.container().getStage() : null;
+
+  if (data.length && stage) {
+    stage.saveAsJPG(data[0], data[1], data[2]);
+  }
+};
+
+
+/**
+ * Save visual base stage as pdf file.
+ */
+anychart.VisualBase.prototype.saveAsPDF = function() {
+  var data = this.getExportData();
+  var stage = this.container() ? this.container().getStage() : null;
+
+  if (data.length && stage) {
+    stage.saveAsPDF(data[0], data[1], data[2]);
+  }
 };

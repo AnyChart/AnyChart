@@ -19,7 +19,6 @@ COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'compiler.jar')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 TESTS_PATH =  os.path.join(PROJECT_PATH, 'tests')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
-DOCS_OUT_PATH = os.path.join(OUT_PATH, 'docs')
 QUNIT_PATH = os.path.join(CONTRIB_PATH, 'qunit')
 JSDOC_PATH = os.path.join(CONTRIB_PATH, 'jsdoc')
 GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphics', 'src')
@@ -32,7 +31,7 @@ DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
 CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs')
 DEMOS_PATH = os.path.join(PROJECT_PATH, 'demos')
-ACDVF_PLAYGROUND_PATH = os.path.join(PROJECT_PATH, '..', 'acdvf-playground')
+ACDVF_PLAYGROUND_PATH = os.path.join(PROJECT_PATH, '..', 'ACDVF-playground-samples')
 
 QUNIT_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'qunit-externs.js')
 UTILS_EXTERNS_PATH = os.path.join(EXTERNS_PATH, 'utils-externs.js')
@@ -214,7 +213,7 @@ def __getDefaultCompilerArgs(addTests=False):
         '--compiler_jar=' + COMPILER_PATH,
         '--compiler_flags=--charset=UTF-8',
         '--compiler_flags=--define="goog.DEBUG=true"',
-        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(),
+        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(True),
         '--compiler_flags=--extra_annotation_name="includeDoc"',
         '--compiler_flags=--extra_annotation_name="illustration"',
         '--compiler_flags=--extra_annotation_name="illustrationDesc"',
@@ -318,12 +317,21 @@ def __callLinter(root):
 
 #Проверяем наличие ошибок в документации после автоформатирования кода в Idea/WebStrom
 def __checkDocsOverridesErrors():
+    print '============================================================='
     print '\nCheck overrides fails in docs'
-    subprocess.call([
-        'python',
-        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
-        '--lint'
-    ])
+    source = []
+    MAINPATH = os.path.abspath(os.path.dirname(__file__))
+    for dirname, dirnames, filenames in os.walk(os.path.join(MAINPATH, 'src')):
+      for filename in filenames:
+          source.append(os.path.join(dirname, filename))
+    filesWithErrors = ""
+    for filename in source:
+        path = os.path.join(MAINPATH, filename)
+        data = open(path).read()
+        # для начала просто ищем косяк документации в файле
+        if re.search('\*\/\n\/\*\*', data):
+          filesWithErrors += path + " "
+    print filesWithErrors.replace(' ', '\n')+'RUN AUTOFIX to fix this\n' if (len(filesWithErrors)>0) else 'ok'
 #=======================================================================================================================
 #                            JSDoc auto fix.
 #=======================================================================================================================
@@ -343,11 +351,21 @@ def __callAutoFix(root):
         root
     ])
     #Чиним документацию, посе автоформатирования кода в Idea/WebStorm
-    subprocess.call([
-        'python',
-        os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fix-docs-overrides.py'),
-        '--autofix'
-    ])
+    MAINPATH = os.path.abspath(os.path.dirname(__file__))
+    source = []
+    for dirname, dirnames, filenames in os.walk(os.path.join(MAINPATH, 'src')):
+      for filename in filenames:
+        source.append(os.path.join(dirname, filename))
+    filesWithErrors = ""
+    for filename in source:
+        path = os.path.join(MAINPATH, filename)
+        data = open(path).read()
+        if re.search('\*\/\n\/\*\*', data):
+          filesWithErrors += path + " "
+          o = open(path, "w")
+          o.write(re.sub('\*\/\n\/\*\*', '*//**' , data))
+          o.close()
+          print "fixied "+path
 
 #=======================================================================================================================
 #                            JSDoc build.
@@ -362,42 +380,93 @@ def __buildDocs():
     CUSTOM_SRC = "";
     PROFILER = "";
     CHECK_ONLY = "";
+    GENERATE_PLAYGROUND_SAMPLES = "";
+    IS_RELEASE = "";
 
     # Компилируем код, если вызван ключ
+    buildSetting = "";
     args = sys.argv
-    for arg in args[2:]:
-      if (arg == '-chk'):
-        CHECK_ONLY = "1"
-      if (arg == '-c'):
-        __compileProjectFromCommandLine()
-      if (arg == '-t'):
-        FLAG_NEEDS_TREE = "1";
-      if (arg == '-p'):
-        PROFILER = "1";
-      if (arg == '-src'):
-        if (len(args)-1 == args.index(arg)):
-          print 'Надо указать модуль'
-          return 0
-        CUSTOM_SRC = args[args.index(arg)+1]
+    if ('--release' in args[2:]):
+      IS_RELEASE = "1";
+      buildSetting += "\tRELEASE build\n"
+    if ('-chk' in args[2:]):
+      CHECK_ONLY = "1"
+      buildSetting += "\tcheck-only mode\n"
+    if ('-c' in args[2:]):
+      __compileProjectFromCommandLine()
+    if ('-t' in args[2:] or IS_RELEASE):
+      FLAG_NEEDS_TREE = "1";
+      buildSetting += "\tgenerate tree of classes\n"
+    if ('-p' in args[2:]):
+      PROFILER = "1";
+      buildSetting += "\tJS profiler on\n"
+    if ('-g' in args[2:] or IS_RELEASE):
+      GENERATE_PLAYGROUND_SAMPLES = "1";
+      buildSetting += "\tgenerate playground samples\n"
+    if ('-src' in args[2:] and not IS_RELEASE):
+      if (len(args)-1 == args.index('-src')):
+        print 'Надо указать модуль'
+        return 0
+      CUSTOM_SRC = args[args.index(arg)+1]
 
-
+    DOCS_OUT_PATH = os.path.join(OUT_PATH, 'docs')
     __checkPathExistence(OUT_PATH)
     __checkPathExistence(DOCS_OUT_PATH)
+
+    print "JSDoc with settings:\n"+buildSetting
     if (len(CHECK_ONLY) == 0):
-      print 'Building JSDoc'
       if (len(CUSTOM_SRC) > 0):
-         print '  package: '+CUSTOM_SRC
+         print "\tonly package:"+CUSTOM_SRC+"\n"
+      # clear dir: out/docs/version
+      if IS_RELEASE:
+        DOCS_OUT_PATH = os.path.join(DOCS_OUT_PATH, __get_version())
+      else:
+        DOCS_OUT_PATH = os.path.join(DOCS_OUT_PATH, 'master')
+      __checkPathExistence(DOCS_OUT_PATH)
       shutil.rmtree(DOCS_OUT_PATH)
       os.mkdir(DOCS_OUT_PATH)
       os.mkdir(os.path.join(DOCS_OUT_PATH,'scripts'))
       shutil.copy(os.path.join(OUT_PATH, 'anychart.min.js'), os.path.join(DOCS_OUT_PATH, 'scripts', 'anychart.min.js'))
-    else:
-      print "-----------------\nCheckOnly Mode\n-----------------\n"
 
+    p = subprocess.Popen(
+        ['git', 'tag'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=PROJECT_PATH)
+    (output, err) = p.communicate()
+    TAG_LIST = output.strip()
+
+    # write commindLine parameters
+    # !!! order strictly required !!!
     f=open(os.path.join(DOCS_OUT_PATH,'commandLine.opts'), 'w')
-    f.write(FLAG_NEEDS_TREE+'\n'+CUSTOM_SRC+'\n'+PROFILER+'\n'+CHECK_ONLY)
+    f.write("\n".join([
+      FLAG_NEEDS_TREE,
+      CUSTOM_SRC,
+      PROFILER,
+      CHECK_ONLY,
+      '","'.join(TAG_LIST.split('\n')),
+      GENERATE_PLAYGROUND_SAMPLES
+      # EXPORTS write here
+    ]))
     f.close()
 
+    PLAYGRAUND_SAMPLES_DIR = os.path.join(CONTRIB_PATH, 'docs-playground-samples', 'api')
+    if (GENERATE_PLAYGROUND_SAMPLES == "1"):
+        print 'GIT: update contrib with samples'
+        p = subprocess.Popen(
+            "git checkout master && git pull origin master",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            cwd=PLAYGRAUND_SAMPLES_DIR)
+        (output, err) = p.communicate()
+        if not (p.returncode == 0):
+          print "exit-code: %d\n  err: %s\n output: %s" % (p.returncode, err, output)
+        # clear directory
+        shutil.rmtree(PLAYGRAUND_SAMPLES_DIR)
+        os.mkdir(PLAYGRAUND_SAMPLES_DIR)
+
+    # running JSDoc engine
     startDocsTimer = time.time()
     subprocess.call([
         os.path.join(JSDOC_TEMPLATE_PATH, 'jsdoc'),
@@ -412,6 +481,20 @@ def __buildDocs():
         shell=(platform.system() == 'Windows'))
     os.remove(os.path.join(DOCS_OUT_PATH,'commandLine.opts'));
     print "[PY] build docs time: {:.3f} sec".format(time.time() - startDocsTimer)
+
+    if (GENERATE_PLAYGROUND_SAMPLES == "1"):
+        print 'GIT: trying push samples'
+        p = subprocess.Popen(
+            "git add -A && git commit -am 'autobuild samples' && git push origin master",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            cwd=PLAYGRAUND_SAMPLES_DIR)
+        (output, err) = p.communicate()
+        if not (p.returncode == 0):
+          print "exit-code: %d\n  err: %s\n output: %s" % (p.returncode, err, output)
+
+    print "\nAll done! Bye-bye! :)"
 #=======================================================================================================================
 #                            Logging.
 #=======================================================================================================================
@@ -432,7 +515,7 @@ def __print_warnings_list():
 #=======================================================================================================================
 def __convert_demos_to_playground():
     if not os.path.exists(ACDVF_PLAYGROUND_PATH):
-        print 'Error: No acdvf-playground repo found'
+        print 'Error: No ACDVF-playground-samples repo found'
         print 'You should clone playground repo to ' + ACDVF_PLAYGROUND_PATH
         return
 
@@ -464,9 +547,9 @@ def __convert_demos_to_playground():
                             sample_settings = search_result[0]
                             result = sample_settings + '\n' + sample_text
                         else:
-                            result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                            result = '{:tags []\n  :is_new true\n  :exports "chart"}\n' + sample_text
                     else:
-                        result = '{\n  :tags []\n  :is_new true\n  :exports "chart"\n}\n' + sample_text
+                        result = '{:tags []\n  :is_new true\n  :exports "chart"}\n' + sample_text
 
                     f = open(pg_sample_path, 'w+')
                     f.flush()
@@ -477,22 +560,30 @@ def __convert_demos_to_playground():
 #=======================================================================================================================
 #                            Version.
 #=======================================================================================================================
-def __get_version():
-    #get major, minor versions from version.ini
+def __get_version(opt_commit_count=False):
+    #get global, major, minor versions from version.ini
     version_file = os.path.join(PROJECT_PATH, 'version.ini')
     f = open(version_file, 'r')
     lines = f.readlines()
     f.close()
 
-    #get commits count from git repo
-    p = subprocess.Popen(
-        ['git', 'rev-list', 'HEAD', '--count'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        cwd=PROJECT_PATH)
-    (output, err) = p.communicate()
+    globalVersion = lines[0].split('=')[1].strip()
+    major = lines[1].split('=')[1].strip()
+    minor = lines[2].split('=')[1].strip()
 
-    return lines[0].split('=')[1].strip() + '.' + lines[1].split('=')[1].strip() + '.' + output.strip()
+    if opt_commit_count:
+        #get commits count from git repo
+        p = subprocess.Popen(
+            ['git', 'rev-list', 'HEAD', '--count'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=PROJECT_PATH)
+        (output, err) = p.communicate()
+        commit_count = output.strip()
+
+        return "%s.%s.%s.%s" % (globalVersion, major, minor, commit_count)
+    else:
+        return "%s.%s.%s" % (globalVersion, major, minor)
 
 
 #=======================================================================================================================
@@ -527,7 +618,11 @@ def __printHelp():
             "-src PACKAGE_NAME      Выполнит сборку документации только укащанного package.\n"\
               "\n\t"\
             "-chk     Выполнит проверку и не будет билдить документации. Игнорирует все флаги кроме -src.\n"\
-
+              "\n\t"\
+            "-g       Включает генерацию сэмплов плейграунда.\n"\
+              "\n\t"\
+            "--release Автоматически расставляет необходимые настройки.\n"\
+              "\n\t"\
 
 
 #=======================================================================================================================

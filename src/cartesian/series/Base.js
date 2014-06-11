@@ -43,6 +43,7 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.realLabels_ = new anychart.elements.Multilabel();
   this.realLabels_.listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.realLabels_.listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
+  this.statistics_ = {};
   this.labels().textFormatter(function(provider) {
     return provider['value'];
   }).enabled(false);
@@ -94,10 +95,33 @@ anychart.cartesian.series.Base.prototype.name_;
 
 
 /**
+ * Series index.
+ * @type {number}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.index_;
+
+
+/**
+ * Series meta map.
+ * @type {Object}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.meta_;
+
+
+/**
  * @type {!anychart.data.View}
  * @private
  */
 anychart.cartesian.series.Base.prototype.data_;
+
+
+/**
+ * @type {Object}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.statistics_;
 
 
 /**
@@ -344,6 +368,26 @@ anychart.cartesian.series.Base.prototype.handleLabelMouseOut = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Series statistics.
+ * @param {string=} opt_name Statistics parameter name.
+ * @param {number=} opt_value Statistics parameter value.
+ * @return {anychart.cartesian.series.Base|Object.<number>|number}
+ */
+anychart.cartesian.series.Base.prototype.statistics = function(opt_name, opt_value) {
+  if (goog.isDef(opt_name)) {
+    if (goog.isDef(opt_value)) {
+      this.statistics_[opt_name] = opt_value;
+      return this;
+    } else {
+      return this.statistics_[opt_name];
+    }
+  } else {
+    return this.statistics_;
+  }
+};
+
+
+/**
  * Getter for series name.
  * @return {string|undefined} Series name value.
  *//**
@@ -366,6 +410,57 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
     return this;
   } else {
     return this.name_;
+  }
+};
+
+
+/**
+ * Sets/gets series number.
+ * @param {number=} opt_value
+ * @return {anychart.cartesian.series.Base|number}
+ */
+anychart.cartesian.series.Base.prototype.index = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.index_ != opt_value) {
+      this.index_ = opt_value;
+    }
+    return this;
+  } else {
+    return this.index_;
+  }
+};
+
+
+/**
+ * Sets/Gets series meta data.
+ * @param {*=} opt_object_or_key Object to replace metadata or metadata key.
+ * @param {*=} opt_value Meta data value.
+ * @return {*} Metadata object, key value or itself for chaining call.
+ */
+anychart.cartesian.series.Base.prototype.meta = function(opt_object_or_key, opt_value) {
+  if (!this.meta_) this.meta_ = {};
+
+  if (goog.isDef(opt_object_or_key)) {
+    if (goog.isDef(opt_value)) {
+      var value = this.meta_[opt_object_or_key];
+      if (!goog.isDef(value) || value != opt_value) {
+        this.meta_[opt_object_or_key] = opt_value;
+        //todo: send signal to redraw components which depends on meta (legend)
+      }
+      return this;
+    } else {
+      if (goog.isObject(opt_object_or_key)) {
+        if (this.meta_ != opt_object_or_key) {
+          this.meta_ = opt_object_or_key;
+          //todo: send signal to redraw components which depends on meta (legend)
+        }
+        return this;
+      } else {
+        return this.meta_[opt_object_or_key];
+      }
+    }
+  } else {
+    return this.meta_;
   }
 };
 
@@ -842,13 +937,35 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
   var index = iterator.getIndex();
   var provider = {
     'index': index,
-    'name': this.name_ ? this.name_ : 'Series ' + index
+    'seriesName': this.name_ ? this.name_ : 'Series: ' + this.index_,
+    'seriesPointsCount': this.statistics('seriesPointsCount'),
+    'pointsCount': this.statistics('pointsCount')
   };
+
+  var seriesMax = this.statistics('seriesMax');
+  var seriesMin = this.statistics('seriesMin');
+  var seriesSum = this.statistics('seriesSum');
+  var seriesAverage = this.statistics('seriesAverage');
+  var max = this.statistics('max');
+  var min = this.statistics('min');
+  var sum = this.statistics('sum');
+  var average = this.statistics('average');
+
+  if (seriesMax) provider['seriesMax'] = seriesMax;
+  if (seriesMin) provider['seriesMin'] = seriesMin;
+  if (seriesSum) provider['seriesSum'] = seriesSum;
+  if (seriesAverage) provider['seriesAverage'] = seriesAverage;
+  if (max) provider['max'] = max;
+  if (min) provider['min'] = min;
+  if (sum) provider['sum'] = sum;
+  if (average) provider['average'] = average;
+
   var referenceName;
   for (var i in this.referenceValueNames) {
     referenceName = this.referenceValueNames[i];
     provider[referenceName] = iterator.get(referenceName);
   }
+
   return provider;
 };
 
@@ -1638,10 +1755,18 @@ anychart.cartesian.series.Base.prototype.normalizeColor = function(color, var_ar
 
 /**
  * Return color for legend item.
- * @return {!acgraph.vector.Fill} Color for legend item.
+ * @return {!anychart.elements.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.cartesian.series.Base.prototype.getLegendItemColor = function() {
-  return this.getFinalFill(false, false);
+anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
+  return {
+    'index': this.index_,
+    'text': goog.isDef(this.name_) ? this.name_ : 'Series: ' + this.index_,
+    'iconType': null,
+    'iconStroke': this.getFinalStroke(false, false),
+    'iconFill': this.getFinalFill(false, false),
+    'iconMarker': null,
+    'meta': this.meta_
+  };
 };
 
 

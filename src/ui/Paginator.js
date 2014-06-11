@@ -598,7 +598,8 @@ anychart.ui.Paginator.prototype.measureMaxDimensions_ = function() {
       break;
     }
   }
-  if (reCache || !this.boundsCache_[this.pageCount_]) {
+  var cacheIndex = this.pageCount_ + this.layout_.substr(0, 1);
+  if (reCache || !this.boundsCache_[cacheIndex]) {
     var measureText = acgraph.text();
     var stngs = this.changedSettings;
     this.applyTextSettings(measureText, true);
@@ -619,9 +620,9 @@ anychart.ui.Paginator.prototype.measureMaxDimensions_ = function() {
       maxWidth = Math.max(buttonSize, bounds.width);
       maxHeight = buttonSize * 2 + this.spacing_ * 2 + bounds.height;
     }
-    return (this.boundsCache_[this.pageCount_] = [maxWidth, maxHeight]);
+    return (this.boundsCache_[cacheIndex] = [maxWidth, maxHeight]);
   }
-  return this.boundsCache_[this.pageCount_];
+  return this.boundsCache_[cacheIndex];
 };
 
 

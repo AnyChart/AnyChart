@@ -1,7 +1,7 @@
-var legend, listener, stage, rb, rect;
+var legend, listener, stage, rb, rect, items;
 
 function load() {
-  var items = [
+  items = [
     'Series 1', 'Series 2', 'Series 3', 'Series 4', 'Series 5',
     'Series 6', 'Series 7', 'Series 8', 'Series 9', 'Series 10',
     'Series 11', 'Series 12', 'Series 13', 'Series 14', 'Series 15',
@@ -11,23 +11,26 @@ function load() {
 
   legend = new anychart.elements.Legend();
   legend.container('container');
-  legend.parentBounds(new anychart.math.Rect(50, 50, 900, 500));
-  legend.width(300);
+  //legend.width(500);
   legend.itemsProvider([
-    1,
-    {index: 1, iconColor: 'red', text: 'Series 2'},
-    {index: 2, iconColor: 'red', text: 'Series 3'},
-    {index: 3, text: 'Series 4'},
-    {index: 4, text: 'Series 5'},
-    {name: 'chidori', iconColor: 'black'},
-    {index: 7},
-    {index: 8}
+    {text: 'line', iconType: 'column', iconStroke: 'pink', iconFill: 'red'},
+    {text: 'spline', iconType: 'spline', iconStroke: 'black', iconFill: 'none', iconMarker: 'circle'},
+    {text: 'ohlc', iconType: 'ohlc', iconStroke: 'black'},
+    {text: 'candlestick', iconType: 'candlestick', iconStroke: 'pink', iconFill: 'pink'},
+    {text: 'chidori', iconFill: 'black', meta: {
+      'name': 'Anton Kagakin',
+      'profession': 'developer',
+      'employer': 'anychart.com'
+    }}
   ]);
-  // another example of itemsProvider
-  //legend.itemsProvider(items);
-  //legend.itemsProvider('legend items');
-  //legend.itemsProvider([undefined, {}, null, 'qwer']);
-  //legend.itemsProvider([1, 2, 3, 4, 5]);
+  legend.tooltip().textFormatter(function() {
+    var meta = this['meta'];
+    if (this['text'] == 'chidori') {
+      return this['text'] + ' a.k.a ' + meta['name'] + '<br>' + meta['profession'] + ' @ ' + meta['employer'];
+    } else {
+      return this['text'];
+    }
+  });
   legend.draw();
 
   stage = legend.container().getStage();
@@ -40,6 +43,9 @@ function load() {
     rect.setBounds(rb);
   };
   legend.listen('signal', listener, false);
+  legend.listen('legendItemClick', function(event) {
+    alert('the world is mine!');
+  }, false);
 
 
   rb = legend.getRemainingBounds();

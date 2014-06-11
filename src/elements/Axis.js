@@ -33,7 +33,7 @@ anychart.elements.Axis = function() {
       .text('Axis title')
       .fontFamily('Tahoma')
       .fontSize('11')
-      .fontColor('rgb(34,34,34')
+      .fontColor('rgb(34,34,34)')
       .fontWeight('bold')
       .padding(5)
       .margin(10, 5, 10, 5);
