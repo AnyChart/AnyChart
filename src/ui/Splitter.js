@@ -1101,6 +1101,7 @@ anychart.ui.Splitter.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
