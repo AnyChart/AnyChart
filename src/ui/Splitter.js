@@ -686,6 +686,7 @@ anychart.ui.Splitter.prototype.bottomLimitSize = function(opt_value) {
  * @private
  */
 anychart.ui.Splitter.prototype.getStartBounds_ = function() {
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
   var add = this.considerSplitterWidth_ ? this.splitterWidth_ : 0;
   if (this.isVertical_()) {
     return new anychart.math.Rect(
@@ -715,6 +716,7 @@ anychart.ui.Splitter.prototype.getStartBounds_ = function() {
  */
 anychart.ui.Splitter.prototype.getEndBounds_ = function() {
   var w, h;
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
   if (this.considerSplitterWidth_) {
     w = parseFloat(((this.pixelBoundsCache_.getWidth() - this.splitterWidth_) * this.position_).toFixed(1));
     h = parseFloat(((this.pixelBoundsCache_.getHeight() - this.splitterWidth_) * this.position_).toFixed(1));
