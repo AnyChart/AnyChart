@@ -208,6 +208,11 @@ anychart.elements.Legend = function() {
   });
   tooltip.resumeSignalsDispatching(false);
 
+  var tooltipTitle = /** @type {anychart.elements.Title} */(tooltip.title());
+  tooltipTitle.enabled(false);
+  tooltipTitle.padding(0);
+  tooltipTitle.margin(3, 3, 0, 3);
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.elements.Legend, anychart.elements.Text);
@@ -946,7 +951,7 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       provider = this.itemsProvider_[i];
       item = new anychart.elements.LegendItem();
 
-      item.iconType(provider['iconType'] ? provider['iconType'] : 'circle');
+      item.iconType(provider['iconType'] ? provider['iconType'] : anychart.elements.LegendItem.IconType.SQUARE);
       item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
       item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
       item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : 'none');

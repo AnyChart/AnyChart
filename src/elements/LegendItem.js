@@ -39,20 +39,9 @@ anychart.elements.LegendItem = function() {
    * @type {(anychart.elements.LegendItem.IconType|string|function(acgraph.vector.Path, number))}
    */
   this.iconType_;
-
-  // defaults
-  var drawer = function(path, size) {
-    path.clear();
-
-    path.moveTo(0, 0)
-        .lineTo(size, 0)
-        .lineTo(size, size)
-        .lineTo(0, size)
-        .close();
-  };
   this.x(0);
   this.y(0);
-  this.iconType(drawer);
+  this.iconType(anychart.elements.LegendItem.IconType.SQUARE);
   this.iconFill('black');
   this.iconStroke('none');
   this.iconMarker(null);
@@ -101,7 +90,8 @@ anychart.elements.LegendItem.IconType = {
   SPLINE_AREA: 'splinearea',
   STEP_LINE: 'stepline',
   STEP_AREA: 'steparea',
-  CIRCLE: 'circle'
+  CIRCLE: 'circle',
+  SQUARE: 'square'
 };
 
 
@@ -372,6 +362,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
+    case anychart.elements.LegendItem.IconType.SQUARE:
     default:
       //default drawer is square
       drawer = function(path, size) {

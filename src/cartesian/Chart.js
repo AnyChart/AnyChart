@@ -2324,16 +2324,9 @@ anychart.cartesian.Chart.prototype.createLegendItemsProvider = function() {
   for (var i = 0, count = this.series_.length; i < count; i++) {
     /** @type {anychart.cartesian.series.Base} */
     var series = this.series_[i];
-    var seriesName = series.name();
-    data.push({
-      'index': i,
-      'text': seriesName ? seriesName : 'Series: ' + i,
-      'iconType': undefined, //TODO(AntonKagakin): Place here type of series to make icon looks like series
-      'iconStroke': series.getLegendItemColor(),
-      'iconFill': series.getLegendItemColor(),
-      'iconMarker': null //TODO(AntonKagakin): Place here marker type for line, spline, step line series
-    });
+    data.push(series.getLegendItemData());
   }
+
   return data;
 };
 

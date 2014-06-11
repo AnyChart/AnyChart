@@ -755,6 +755,7 @@ anychart.elements.TooltipItem.prototype.calculateContentBounds_ = function() {
 
     var label = /** @type {anychart.elements.Label} */(this.content());
     if (label.enabled()) {
+      label.parentBounds(null);
       var contentContentBounds = label.getContentBounds();
       result.width = Math.max(result.width, contentContentBounds.width);
       result.height += contentContentBounds.height;

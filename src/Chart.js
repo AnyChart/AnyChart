@@ -798,13 +798,7 @@ anychart.Chart.prototype.remove = function() {
  * @protected
  * @return {!Array.<anychart.elements.Legend.LegendItemProvider>} Legend items provider.
  */
-anychart.Chart.prototype.createLegendItemsProvider = function() {
-  return [
-    'chart legend item',
-    'chart legend item',
-    'chart legend item'
-  ];
-};
+anychart.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 
 
 //todo(Anton Saukh): rework this shit!

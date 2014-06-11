@@ -103,6 +103,14 @@ anychart.cartesian.series.Base.prototype.index_;
 
 
 /**
+ * Series meta map.
+ * @type {Object}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.meta_;
+
+
+/**
  * @type {!anychart.data.View}
  * @private
  */
@@ -419,6 +427,40 @@ anychart.cartesian.series.Base.prototype.index = function(opt_value) {
     return this;
   } else {
     return this.index_;
+  }
+};
+
+
+/**
+ * Sets/Gets series meta data.
+ * @param {*=} opt_object_or_key Object to replace metadata or metadata key.
+ * @param {*=} opt_value Meta data value.
+ * @return {*} Metadata object, key value or itself for chaining call.
+ */
+anychart.cartesian.series.Base.prototype.meta = function(opt_object_or_key, opt_value) {
+  if (!this.meta_) this.meta_ = {};
+
+  if (goog.isDef(opt_object_or_key)) {
+    if (goog.isDef(opt_value)) {
+      var value = this.meta_[opt_object_or_key];
+      if (!goog.isDef(value) || value != opt_value) {
+        this.meta_[opt_object_or_key] = opt_value;
+        //todo: send signal to redraw components which depends on meta (legend)
+      }
+      return this;
+    } else {
+      if (goog.isObject(opt_object_or_key)) {
+        if (this.meta_ != opt_object_or_key) {
+          this.meta_ = opt_object_or_key;
+          //todo: send signal to redraw components which depends on meta (legend)
+        }
+        return this;
+      } else {
+        return this.meta_[opt_object_or_key];
+      }
+    }
+  } else {
+    return this.meta_;
   }
 };
 
@@ -1713,10 +1755,18 @@ anychart.cartesian.series.Base.prototype.normalizeColor = function(color, var_ar
 
 /**
  * Return color for legend item.
- * @return {!acgraph.vector.Fill} Color for legend item.
+ * @return {!anychart.elements.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.cartesian.series.Base.prototype.getLegendItemColor = function() {
-  return this.getFinalFill(false, false);
+anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
+  return {
+    'index': this.index_,
+    'text': goog.isDef(this.name_) ? this.name_ : 'Series: ' + this.index_,
+    'iconType': null,
+    'iconStroke': this.getFinalStroke(false, false),
+    'iconFill': this.getFinalFill(false, false),
+    'iconMarker': null,
+    'meta': this.meta_
+  };
 };
 
 
