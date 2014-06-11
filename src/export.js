@@ -75,6 +75,7 @@ anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.s
 //
 //----------------------------------------------------------------------------------------------------------------------
 anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//in docs/
+anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;
 anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//in docs/
 anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//in docs/
 anychart.cartesian.series.Base.prototype['drawPoint'] = anychart.cartesian.series.Base.prototype.drawPoint;//in docs/
@@ -481,6 +482,7 @@ anychart.elements.Legend.prototype['background'] = anychart.elements.Legend.prot
 anychart.elements.Legend.prototype['title'] = anychart.elements.Legend.prototype.title;
 anychart.elements.Legend.prototype['titleSeparator'] = anychart.elements.Legend.prototype.titleSeparator;
 anychart.elements.Legend.prototype['paginator'] = anychart.elements.Legend.prototype.paginator;
+anychart.elements.Legend.prototype['tooltip'] = anychart.elements.Legend.prototype.tooltip;
 anychart.elements.Legend.prototype['width'] = anychart.elements.Legend.prototype.width;
 anychart.elements.Legend.prototype['height'] = anychart.elements.Legend.prototype.height;
 anychart.elements.Legend.prototype['parentBounds'] = anychart.elements.Legend.prototype.parentBounds;
