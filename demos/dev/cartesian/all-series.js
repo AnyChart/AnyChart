@@ -1,4 +1,4 @@
-var areaChart, data1;
+var areaChart, data1, area;
 function load() {
   var stage = acgraph.create('100%', '100%', 'container');
   data1 = [];
@@ -29,7 +29,8 @@ function load() {
   areaChart.container(stage);
   areaChart.bounds(0, 0, 1000, 300);
 
-  var area = areaChart.area(data1);
+  area = areaChart.area(data1);
+  area.markers().enabled(true);
 //  area.listen('click', function() { console.log(arguments); });
   areaChart.barsPadding(0.1);
   areaChart.xAxis();
