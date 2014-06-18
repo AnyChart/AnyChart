@@ -3,6 +3,7 @@ goog.provide('anychart.elements.Ticks');
 goog.require('anychart.Base');
 goog.require('anychart.color');
 goog.require('anychart.utils');
+goog.require('anychart.utils.Bounds');
 
 
 
@@ -10,7 +11,7 @@ goog.require('anychart.utils');
  * Класс определяющий тики на оси.<br/>
  * У тиков можно настроить положение, длинну и характеристики линий.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.VisualBase}
  */
 anychart.elements.Ticks = function() {
   goog.base(this);
@@ -38,22 +39,36 @@ anychart.elements.Ticks = function() {
 
   /**
    * Ticks enabled.
-   * @type {boolean}
+   * @type {anychart.utils.Orientation}
    * @private
    */
-  this.enabled_;
+  this.orientation_;
+
+  /**
+   * Path with ticks.
+   * @type {!acgraph.vector.Path}
+   * @private
+   */
+  this.path_ = acgraph.path();
+  this.registerDisposable(this.path_);
+
   this.restoreDefaults();
 };
-goog.inherits(anychart.elements.Ticks, anychart.Base);
+goog.inherits(anychart.elements.Ticks, anychart.VisualBase);
 
 
 /**
  * Supported consistency states.
  * @type {number}
  */
-anychart.elements.Ticks.prototype.SUPPORTED_SIGNALS =
-    anychart.Signal.NEEDS_REDRAW |
-    anychart.Signal.BOUNDS_CHANGED;
+anychart.elements.Ticks.prototype.SUPPORTED_SIGNALS = anychart.VisualBase.prototype.SUPPORTED_SIGNALS;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.elements.Ticks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES; // ENABLED CONTAINER Z_INDEX
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,19 +252,21 @@ anychart.elements.Ticks.prototype.position = function(opt_value) {
 
 
 /**
- * Gets or Sets element enabled state.
- * @param {boolean=} opt_value Element enabled state value.
- * @return {anychart.elements.Ticks|boolean} Element enabled state.
+ * Internal use.
+ * Change orientation and set drawer to null.
+ * @param {(string|anychart.utils.Orientation)=} opt_value Orientation.
+ * @return {anychart.elements.Ticks|anychart.utils.Orientation} Orientation or self for chaining.
  */
-anychart.elements.Ticks.prototype.enabled = function(opt_value) {
+anychart.elements.Ticks.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.enabled_ != opt_value) {
-      this.enabled_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    opt_value = anychart.utils.normalizeOrientation(opt_value);
+    if (this.orientation_ != opt_value) {
+      this.orientation_ = opt_value;
+      this.drawer_ = null;
     }
     return this;
   } else {
-    return this.enabled_;
+    return this.orientation_;
   }
 };
 
@@ -258,12 +275,200 @@ anychart.elements.Ticks.prototype.enabled = function(opt_value) {
  * Restore labels default settings.
  */
 anychart.elements.Ticks.prototype.restoreDefaults = function() {
-  this.enabled(true);
+  this.orientation(anychart.utils.Orientation.TOP);
   this.position(anychart.elements.Ticks.Position.OUTSIDE);
   this.length(5);
   this.stroke('black');
 
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/** @inheritDoc */
+anychart.elements.Ticks.prototype.remove = function() {
+  if (this.path_) this.path_.parent(null);
+};
+
+
+/**
+ * Renders ticks.
+ * @return {!anychart.elements.Ticks} An instance of {@link anychart.elements.Ticks} class for method chaining.
+ */
+anychart.elements.Ticks.prototype.draw = function() {
+  this.path_.clear();
+  this.path_.stroke(this.stroke_);
+
+  if (!this.checkDrawingNeeded())
+    return this;
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    this.path_.zIndex(/** @type {number} */ (this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.path_.parent(/** @type {acgraph.vector.ILayer} */ (this.container()));
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  return this;
+};
+
+
+/**
+ * Get drawer depends on orientation
+ * @return {Function}
+ */
+anychart.elements.Ticks.prototype.getTicksDrawer = function() {
+  if (!this.drawer_) {
+    switch (this.orientation_) {
+      case anychart.utils.Orientation.TOP:
+        this.drawer_ = this.drawTopTick_;
+        break;
+      case anychart.utils.Orientation.RIGHT:
+        this.drawer_ = this.drawRightTick_;
+        break;
+      case anychart.utils.Orientation.BOTTOM:
+        this.drawer_ = this.drawBottomTick_;
+        break;
+      case anychart.utils.Orientation.LEFT:
+        this.drawer_ = this.drawLeftTick_;
+        break;
+    }
+  }
+  return this.drawer_;
+};
+
+
+/**
+ * Axis ticks drawer for top orientation.
+ * @param {number} ratio Scale ratio.
+ * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} lineBounds Axis line bounds.
+ * @param {number} lineThickness Axis line thickness.
+ * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @private
+ */
+anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+  /** @type {number} */
+  var x = Math.round(bounds.left() + ratio * (bounds.width()));
+  /** @type {number} */
+  var y = lineBounds.top;
+  /** @type {number} */
+  var dy;
+
+  if (ratio == 1) x += pixelShift;
+  else x -= pixelShift;
+
+  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+    y -= lineThickness / 2;
+    dy = /** @type {number} */(-this.length_);
+  } else {
+    y += lineThickness / 2;
+    dy = /** @type {number} */(this.length_);
+  }
+
+  this.path_.moveTo(x, y);
+  this.path_.lineTo(x, y + dy);
+};
+
+
+/**
+ * Axis ticks drawer for right orientation.
+ * @param {number} ratio Scale ratio.
+ * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} lineBounds Axis line bounds.
+ * @param {number} lineThickness Axis line thickness.
+ * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @private
+ */
+anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+  /** @type {number} */
+  var x = lineBounds.left;
+  /** @type {number} */
+  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
+  /** @type {number} */
+  var dx;
+
+  if (ratio == 1) y -= pixelShift;
+  else y += pixelShift;
+
+  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+    x += lineThickness / 2;
+    dx = /** @type {number} */(this.length_);
+  } else {
+    x -= lineThickness / 2;
+    dx = /** @type {number} */(-this.length_);
+  }
+
+  this.path_.moveTo(x, y);
+  this.path_.lineTo(x + dx, y);
+};
+
+
+/**
+ * Axis ticks drawer for bottom orientation.
+ * @param {number} ratio Scale ratio.
+ * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} lineBounds Axis line bounds.
+ * @param {number} lineThickness Axis line thickness.
+ * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @private
+ */
+anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+  /** @type {number} */
+  var x = Math.round(bounds.left() + ratio * (bounds.width()));
+  /** @type {number} */
+  var y = lineBounds.top;
+  /** @type {number} */
+  var dy;
+
+  if (ratio == 1) x += pixelShift;
+  else x -= pixelShift;
+
+  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+    y += lineThickness / 2;
+    dy = /** @type {number} */(this.length_);
+  } else {
+    y -= lineThickness / 2;
+    dy = /** @type {number} */(-this.length_);
+  }
+
+  this.path_.moveTo(x, y);
+  this.path_.lineTo(x, y + dy);
+};
+
+
+/**
+ * Axis ticks drawer for left orientation.
+ * @param {number} ratio Scale ratio.
+ * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} lineBounds Axis line bounds.
+ * @param {number} lineThickness Axis line thickness.
+ * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @private
+ */
+anychart.elements.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+  /** @type {number} */
+  var x = lineBounds.left;
+  /** @type {number} */
+  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
+  /** @type {number} */
+  var dx;
+
+  if (ratio == 1) y -= pixelShift;
+  else y += pixelShift;
+
+  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+    x -= lineThickness / 2;
+    dx = /** @type {number} */(-this.length_);
+  } else {
+    x += lineThickness / 2;
+    dx = /** @type {number} */(this.length_);
+  }
+
+  this.path_.moveTo(x, y);
+  this.path_.lineTo(x + dx, y);
 };
 
 
@@ -276,7 +481,6 @@ anychart.elements.Ticks.prototype.serialize = function() {
   data['length'] = this.length();
   data['position'] = this.position();
   data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  data['enabled'] = this.enabled();
 
   return data;
 };
@@ -289,7 +493,6 @@ anychart.elements.Ticks.prototype.deserialize = function(value) {
   this.length(value['length']);
   this.position(value['position']);
   this.stroke(value['stroke']);
-  this.enabled(value['enabled']);
 
   this.resumeSignalsDispatching(true);
 

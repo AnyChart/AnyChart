@@ -237,24 +237,10 @@ anychart.elements.Axis.prototype.ticks_ = null;
 
 
 /**
- * @type {acgraph.vector.Path}
- * @private
- */
-anychart.elements.Axis.prototype.ticksElement_ = null;
-
-
-/**
  * @type {anychart.elements.Ticks}
  * @private
  */
 anychart.elements.Axis.prototype.minorTicks_ = null;
-
-
-/**
- * @type {acgraph.vector.Path}
- * @private
- */
-anychart.elements.Axis.prototype.minorTicksElement_ = null;
 
 
 /**
@@ -1543,278 +1529,6 @@ anychart.elements.Axis.prototype.drawLeftLine_ = function(pixelShift) {
 
 
 /**
- * Axis ticks drawer for top orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawTopTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
-  /** @type {number} */
-  var y = lineBounds.top;
-  /** @type {number} */
-  var dy;
-
-  if (ratio == 1) x += pixelShift;
-  else x -= pixelShift;
-
-  if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.ticks_.length());
-  } else {
-    y += lineThickness / 2;
-    dy = /** @type {number} */(this.ticks_.length());
-  }
-
-  this.ticksElement_.moveTo(x, y);
-  this.ticksElement_.lineTo(x, y + dy);
-};
-
-
-/**
- * Axis ticks drawer for right orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawRightTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = lineBounds.left;
-  /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
-  /** @type {number} */
-  var dx;
-
-  if (ratio == 1) y -= pixelShift;
-  else y += pixelShift;
-
-  if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    x += lineThickness / 2;
-    dx = /** @type {number} */(this.ticks_.length());
-  } else {
-    x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.ticks_.length());
-  }
-
-  this.ticksElement_.moveTo(x, y);
-  this.ticksElement_.lineTo(x + dx, y);
-};
-
-
-/**
- * Axis ticks drawer for bottom orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawBottomTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
-  /** @type {number} */
-  var y = lineBounds.top;
-  /** @type {number} */
-  var dy;
-
-  if (ratio == 1) x += pixelShift;
-  else x -= pixelShift;
-
-  if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    y += lineThickness / 2;
-    dy = /** @type {number} */(this.ticks_.length());
-  } else {
-    y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.ticks_.length());
-  }
-
-  this.ticksElement_.moveTo(x, y);
-  this.ticksElement_.lineTo(x, y + dy);
-};
-
-
-/**
- * Axis ticks drawer for left orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawLeftTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = lineBounds.left;
-  /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
-  /** @type {number} */
-  var dx;
-
-  if (ratio == 1) y -= pixelShift;
-  else y += pixelShift;
-
-  if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.ticks_.length());
-  } else {
-    x += lineThickness / 2;
-    dx = /** @type {number} */(this.ticks_.length());
-  }
-
-  this.ticksElement_.moveTo(x, y);
-  this.ticksElement_.lineTo(x + dx, y);
-};
-
-
-/**
- * Axis minor ticks drawer for top orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawTopMinorTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
-  /** @type {number} */
-  var y = lineBounds.top;
-  /** @type {number} */
-  var dy;
-
-  if (ratio == 1) x += pixelShift;
-  else x -= pixelShift;
-
-  if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.minorTicks().length());
-  } else {
-    y += lineThickness / 2;
-    dy = /** @type {number} */(this.minorTicks().length());
-  }
-
-  this.minorTicksElement_.moveTo(x, y);
-  this.minorTicksElement_.lineTo(x, y + dy);
-};
-
-
-/**
- * Axis minor ticks drawer for right orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawRightMinorTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = lineBounds.left;
-  /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
-  /** @type {number} */
-  var dx;
-
-  if (ratio == 1) y -= pixelShift;
-  else y += pixelShift;
-
-  if (this.minorTicks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    x += lineThickness / 2;
-    dx = /** @type {number} */(this.minorTicks_.length());
-  } else {
-    x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.minorTicks_.length());
-  }
-
-  this.minorTicksElement_.moveTo(x, y);
-  this.minorTicksElement_.lineTo(x + dx, y);
-};
-
-
-/**
- * Axis minor ticks drawer for bottom orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawBottomMinorTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
-  /** @type {number} */
-  var y = lineBounds.top;
-  /** @type {number} */
-  var dy;
-
-  if (ratio == 1) x += pixelShift;
-  else x -= pixelShift;
-
-  if (this.minorTicks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    y += lineThickness / 2;
-    dy = /** @type {number} */(this.minorTicks_.length());
-  } else {
-    y -= lineThickness / 2;
-    dy = /** @type {number} */(-this.minorTicks_.length());
-  }
-
-  this.minorTicksElement_.moveTo(x, y);
-  this.minorTicksElement_.lineTo(x, y + dy);
-};
-
-
-/**
- * Axis minor ticks drawer for left orientation.
- * @param {number} ratio Scale ratio.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
- * @private
- */
-anychart.elements.Axis.prototype.drawLeftMinorTick_ = function(ratio, pixelShift) {
-  var lineBounds = this.line_.getBounds();
-  var bounds = this.getPixelBounds_();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
-
-  /** @type {number} */
-  var x = lineBounds.left;
-  /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
-  /** @type {number} */
-  var dx;
-
-  if (ratio == 1) y -= pixelShift;
-  else y += pixelShift;
-
-  if (this.minorTicks_.position() == anychart.elements.Ticks.Position.OUTSIDE) {
-    x -= lineThickness / 2;
-    dx = /** @type {number} */(-this.minorTicks_.length());
-  } else {
-    x += lineThickness / 2;
-    dx = /** @type {number} */(this.minorTicks_.length());
-  }
-
-  this.minorTicksElement_.moveTo(x, y);
-  this.minorTicksElement_.lineTo(x + dx, y);
-};
-
-
-/**
  * Gets format provider for label.
  * @param {number} index Label index.
  * @param {string|number} value Label value.
@@ -2113,19 +1827,20 @@ anychart.elements.Axis.prototype.draw = function() {
 
   var orientation, lineDrawer, ticksDrawer, labelsDrawer, minorTicksDrawer, minorLabelsDrawer;
   var minorTicks, ticks;
+  var lineThickness;
 
   switch (this.orientation_) {
     case anychart.utils.Orientation.TOP:
-      orientation = [this.drawTopLine_, this.drawTopTick_, this.drawTopLabels_, this.drawTopMinorTick_, this.drawTopMinorLabels_];
+      orientation = [this.drawTopLine_, this.drawTopLabels_, this.drawTopMinorLabels_];
       break;
     case anychart.utils.Orientation.RIGHT:
-      orientation = [this.drawRightLine_, this.drawRightTick_, this.drawRightLabels_, this.drawRightMinorTick_, this.drawRightMinorLabels_];
+      orientation = [this.drawRightLine_, this.drawRightLabels_, this.drawRightMinorLabels_];
       break;
     case anychart.utils.Orientation.BOTTOM:
-      orientation = [this.drawBottomLine_, this.drawBottomTick_, this.drawBottomLabels_, this.drawBottomMinorTick_, this.drawBottomMinorLabels_];
+      orientation = [this.drawBottomLine_, this.drawBottomLabels_, this.drawBottomMinorLabels_];
       break;
     case anychart.utils.Orientation.LEFT:
-      orientation = [this.drawLeftLine_, this.drawLeftTick_, this.drawLeftLabels_, this.drawLeftMinorTick_, this.drawLeftMinorLabels_];
+      orientation = [this.drawLeftLine_, this.drawLeftLabels_, this.drawLeftMinorLabels_];
       break;
   }
 
@@ -2143,7 +1858,7 @@ anychart.elements.Axis.prototype.draw = function() {
     this.line_.clear();
     this.line_.stroke(this.stroke_);
 
-    var lineThickness = this.line_.stroke().thickness ? parseFloat(this.line_.stroke().thickness) : 1;
+    lineThickness = this.line_.stroke().thickness ? parseFloat(this.line_.stroke().thickness) : 1;
     var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
 
     lineDrawer = orientation[0];
@@ -2156,8 +1871,8 @@ anychart.elements.Axis.prototype.draw = function() {
     var zIndex = /** @type {number} */(this.zIndex());
     this.title().zIndex(zIndex);
     this.line_.zIndex(zIndex);
-    if (this.ticksElement_) this.ticksElement_.zIndex(zIndex);
-    if (this.minorTicksElement_) this.minorTicksElement_.zIndex(zIndex);
+    this.ticks().zIndex(zIndex);
+    this.minorTicks().zIndex(zIndex);
     this.labels().zIndex(zIndex);
     this.minorLabels().zIndex(zIndex);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
@@ -2167,9 +1882,8 @@ anychart.elements.Axis.prototype.draw = function() {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     this.title().container(container);
     this.line_.parent(container);
-
-    if (this.ticks().enabled()) this.ticksElement_.parent(container);
-    if (this.minorTicks().enabled()) this.minorTicksElement_.parent(container);
+    this.ticks().container(container);
+    this.minorTicks().container(container);
 
     this.labels().container(container);
     this.minorLabels().container(container);
@@ -2186,27 +1900,17 @@ anychart.elements.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TICKS)) {
     ticks = this.ticks();
-    if (ticks.enabled()) {
-      this.ticksElement_.clear();
-      this.ticksElement_.stroke(ticks.stroke_);
-      this.ticksElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container())); // дублирование
-      ticksDrawer = orientation[1];
-    } else {
-      if (this.ticksElement_) this.ticksElement_.parent(null);
-    }
+    ticks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
+    ticks.draw();
+    ticksDrawer = ticks.getTicksDrawer();
     this.markConsistent(anychart.ConsistencyState.TICKS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MINOR_TICKS)) {
     minorTicks = this.minorTicks();
-    if (minorTicks.enabled()) {
-      this.minorTicksElement_.clear();
-      this.minorTicksElement_.stroke(minorTicks.stroke_);
-      this.minorTicksElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container())); // дублирование
-      minorTicksDrawer = orientation[3];
-    } else {
-      if (this.minorTicksElement_) this.minorTicksElement_.parent(null);
-    }
+    minorTicks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
+    minorTicks.draw();
+    minorTicksDrawer = minorTicks.getTicksDrawer();
     this.markConsistent(anychart.ConsistencyState.MINOR_TICKS);
   }
 
@@ -2214,7 +1918,7 @@ anychart.elements.Axis.prototype.draw = function() {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(this.parentBounds_);
-    labelsDrawer = orientation[2];
+    labelsDrawer = orientation[1];
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
 
@@ -2222,7 +1926,7 @@ anychart.elements.Axis.prototype.draw = function() {
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(this.parentBounds_);
-    minorLabelsDrawer = orientation[4];
+    minorLabelsDrawer = orientation[2];
     this.markConsistent(anychart.ConsistencyState.MINOR_LABELS);
   }
 
@@ -2235,6 +1939,9 @@ anychart.elements.Axis.prototype.draw = function() {
       var ticksArrLen = scaleTicksArr.length;
       var tickThickness = this.ticks_.stroke().thickness ? parseFloat(this.ticks_.stroke().thickness) : 1;
       var tickVal, ratio, drawLabel;
+      var pixelBounds = this.getPixelBounds_();
+      var lineBounds = this.line_.getBounds();
+      lineThickness = this.line_.stroke().thickness ? parseFloat(this.line_.stroke().thickness) : 1;
 
       if (scale instanceof anychart.scales.ScatterBase) {
         overlappedLabels = this.getOverlappedLabels_();
@@ -2264,7 +1971,13 @@ anychart.elements.Axis.prototype.draw = function() {
           if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
             var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
             if (ticksDrawer)
-              ticksDrawer.call(this, ratio, majorPixelShift);
+              ticksDrawer.call(
+                  ticks,
+                  ratio,
+                  pixelBounds,
+                  lineBounds,
+                  lineThickness,
+                  majorPixelShift);
 
             drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
             if (labelsDrawer && drawLabel)
@@ -2273,7 +1986,13 @@ anychart.elements.Axis.prototype.draw = function() {
           } else {
             var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
             if (minorTicksDrawer && ratio != minorRatio)
-              minorTicksDrawer.call(this, minorRatio, minorPixelShift);
+              ticksDrawer.call(
+                  minorTicks,
+                  minorRatio,
+                  pixelBounds,
+                  lineBounds,
+                  lineThickness,
+                  minorPixelShift);
 
             drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
             if (minorLabelsDrawer && drawLabel)
@@ -2302,8 +2021,22 @@ anychart.elements.Axis.prototype.draw = function() {
           pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 
           if (ticksDrawer) {
-            ticksDrawer.call(this, ratio, pixelShift);
-            if (i == ticksArrLen - 1) ticksDrawer.call(this, scale.transform(rightTick, 1), pixelShift);
+            ticksDrawer.call(
+                ticks,
+                ratio,
+                pixelBounds,
+                lineBounds,
+                lineThickness,
+                pixelShift);
+
+            if (i == ticksArrLen - 1)
+              ticksDrawer.call(
+                  ticks,
+                  scale.transform(rightTick, 1),
+                  pixelBounds,
+                  lineBounds,
+                  lineThickness,
+                  pixelShift);
           }
 
           drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
