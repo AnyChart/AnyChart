@@ -545,7 +545,6 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
 anychart.elements.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.elements.Ticks();
-    this.ticksElement_ ? this.ticksElement_.clear() : this.ticksElement_ = acgraph.path();
     this.ticks_.listen(anychart.Base.SIGNAL, this.ticksInvalidated_, false, this);
     this.registerDisposable(this.ticks_);
   }
@@ -602,8 +601,6 @@ anychart.elements.Axis.prototype.ticksInvalidated_ = function(event) {
 anychart.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.elements.Ticks();
-    this.minorTicksElement_ ? this.minorTicksElement_.clear() : this.minorTicksElement_ = acgraph.path();
-    this.minorTicksElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.minorTicks_.listen(anychart.Base.SIGNAL, this.minorTicksInvalidated_, false, this);
     this.registerDisposable(this.minorTicks_);
   }
@@ -1802,11 +1799,15 @@ anychart.elements.Axis.prototype.checkDrawingNeeded = function() {
       this.remove();
       this.markConsistent(anychart.ConsistencyState.ENABLED);
       this.title().invalidate(anychart.ConsistencyState.CONTAINER);
+      this.ticks().invalidate(anychart.ConsistencyState.CONTAINER);
+      this.minorTicks().invalidate(anychart.ConsistencyState.CONTAINER);
       this.labels().invalidate(anychart.ConsistencyState.CONTAINER);
       this.minorLabels().invalidate(anychart.ConsistencyState.CONTAINER);
       this.invalidate(
           anychart.ConsistencyState.CONTAINER |
           anychart.ConsistencyState.TITLE |
+          anychart.ConsistencyState.TICKS |
+          anychart.ConsistencyState.MINOR_TICKS |
           anychart.ConsistencyState.LABELS |
           anychart.ConsistencyState.MINOR_LABELS
       );
@@ -2060,8 +2061,8 @@ anychart.elements.Axis.prototype.draw = function() {
 anychart.elements.Axis.prototype.remove = function() {
   if (this.title_) this.title_.remove();
   if (this.line_) this.line_.parent(null);
-  if (this.ticksElement_) this.ticksElement_.parent(null);
-  if (this.minorTicksElement_) this.minorTicksElement_.parent(null);
+  this.ticks().remove();
+  this.minorTicks().remove();
   if (this.labels_) this.labels_.remove();
   if (this.minorLabels_) this.minorLabels_.remove();
 };
@@ -2136,12 +2137,8 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
   this.line_ = null;
 
   this.ticks_ = null;
-  goog.dispose(this.ticksElement_);
-  this.ticksElement_ = null;
 
   this.minorTicks_ = null;
-  goog.dispose(this.minorTicksElement_);
-  this.minorTicksElement_ = null;
 
   this.parentBounds_ = null;
   this.pixelBounds_ = null;
