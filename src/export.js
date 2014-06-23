@@ -75,6 +75,7 @@ anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.s
 //
 //----------------------------------------------------------------------------------------------------------------------
 anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//in docs/
+anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;
 anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//in docs/
 anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//in docs/
 anychart.cartesian.series.Base.prototype['drawPoint'] = anychart.cartesian.series.Base.prototype.drawPoint;//in docs/
@@ -481,6 +482,7 @@ anychart.elements.Legend.prototype['background'] = anychart.elements.Legend.prot
 anychart.elements.Legend.prototype['title'] = anychart.elements.Legend.prototype.title;
 anychart.elements.Legend.prototype['titleSeparator'] = anychart.elements.Legend.prototype.titleSeparator;
 anychart.elements.Legend.prototype['paginator'] = anychart.elements.Legend.prototype.paginator;
+anychart.elements.Legend.prototype['tooltip'] = anychart.elements.Legend.prototype.tooltip;
 anychart.elements.Legend.prototype['width'] = anychart.elements.Legend.prototype.width;
 anychart.elements.Legend.prototype['height'] = anychart.elements.Legend.prototype.height;
 anychart.elements.Legend.prototype['parentBounds'] = anychart.elements.Legend.prototype.parentBounds;
@@ -488,6 +490,27 @@ anychart.elements.Legend.prototype['position'] = anychart.elements.Legend.protot
 anychart.elements.Legend.prototype['align'] = anychart.elements.Legend.prototype.align;
 anychart.elements.Legend.prototype['getRemainingBounds'] = anychart.elements.Legend.prototype.getRemainingBounds;
 anychart.elements.Legend.prototype['draw'] = anychart.elements.Legend.prototype.draw;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.LegendItem
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.LegendItem', anychart.elements.LegendItem);
+anychart.elements.LegendItem.prototype['parentBounds'] = anychart.elements.LegendItem.prototype.parentBounds;
+anychart.elements.LegendItem.prototype['x'] = anychart.elements.LegendItem.prototype.x;
+anychart.elements.LegendItem.prototype['y'] = anychart.elements.LegendItem.prototype.y;
+anychart.elements.LegendItem.prototype['iconType'] = anychart.elements.LegendItem.prototype.iconType;
+anychart.elements.LegendItem.prototype['iconFill'] = anychart.elements.LegendItem.prototype.iconFill;
+anychart.elements.LegendItem.prototype['iconStroke'] = anychart.elements.LegendItem.prototype.iconStroke;
+anychart.elements.LegendItem.prototype['iconTextSpacing'] = anychart.elements.LegendItem.prototype.iconTextSpacing;
+anychart.elements.LegendItem.prototype['maxWidth'] = anychart.elements.LegendItem.prototype.maxWidth;
+anychart.elements.LegendItem.prototype['maxHeight'] = anychart.elements.LegendItem.prototype.maxHeight;
+anychart.elements.LegendItem.prototype['text'] = anychart.elements.LegendItem.prototype.text;
+anychart.elements.LegendItem.prototype['getTextElement'] = anychart.elements.LegendItem.prototype.getTextElement;
+anychart.elements.LegendItem.prototype['getContentBounds'] = anychart.elements.LegendItem.prototype.getContentBounds;
+anychart.elements.LegendItem.prototype['getWidth'] = anychart.elements.LegendItem.prototype.getWidth;
+anychart.elements.LegendItem.prototype['getHeight'] = anychart.elements.LegendItem.prototype.getHeight;
+anychart.elements.LegendItem.prototype['draw'] = anychart.elements.LegendItem.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.LineMarker

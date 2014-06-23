@@ -11,6 +11,7 @@ goog.require('acgraph.math.Rect');
  * @param {number} w Width.
  * @param {number} h Height.
  * @constructor
+ * @includeDoc
  */
 anychart.math.Rect = acgraph.math.Rect;
 

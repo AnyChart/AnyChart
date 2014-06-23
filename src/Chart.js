@@ -7,7 +7,6 @@ goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
 goog.require('anychart.events.EventType');
 goog.require('anychart.utils');
-goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 goog.require('anychart.utils.PrintHelper');
@@ -797,15 +796,9 @@ anychart.Chart.prototype.remove = function() {
 /**
  * Create legend items provider specific for chart type.
  * @protected
- * @return {!anychart.utils.LegendItemsProvider} Legend items provider.
+ * @return {!Array.<anychart.elements.Legend.LegendItemProvider>} Legend items provider.
  */
-anychart.Chart.prototype.createLegendItemsProvider = function() {
-  return new anychart.utils.LegendItemsProvider([
-    'chart legend item',
-    'chart legend item',
-    'chart legend item'
-  ]);
-};
+anychart.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 
 
 //todo(Anton Saukh): rework this shit!
