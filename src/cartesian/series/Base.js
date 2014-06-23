@@ -851,7 +851,13 @@ anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
     this.labels_.markConsistent(anychart.ConsistencyState.ALL);
   if (this.hoverLabels_)
     this.hoverLabels_.markConsistent(anychart.ConsistencyState.ALL);
-  this.markConsistent(anychart.ConsistencyState.ALL);
+  // This check need to prevent finalizeDrawing to mark CONTAINER consistency state in case when series was disabled by
+  // series.enabled(false).
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.markConsistent(anychart.ConsistencyState.ALL & !anychart.ConsistencyState.CONTAINER);
+  } else {
+    this.markConsistent(anychart.ConsistencyState.ALL);
+  }
 };
 
 
