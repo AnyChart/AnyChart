@@ -35,12 +35,10 @@
             ['A6' , 4,   6, 5],
             ['A7' , 5,  2, 5]
         ]);
-
         chart.yScale().stackMode('percent');
         chart.column(dataSet.mapAs({x: [0], value: [1]}));
         chart.column(dataSet.mapAs({x: [0], value: [2]}));
         chart.column(dataSet.mapAs({x: [0], value: [3]}));
-
 
         chart.container('container');
         chart.draw();

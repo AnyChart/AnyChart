@@ -26,19 +26,11 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        chart.line([1,2,2,1,'3.1', 0.2,2,4,3,3,4,3.5,4]).markers().enabled(false);
+        chart.line([1,2,2,1,'3.1', 0.2,4,3.5,4]);
+        chart.yAxis()
+                .minorLabels().enabled(true);
+        chart.xAxis();
 
-        var y = chart.yAxis();
-        y.orientation('left');
-        y.title().enabled(false);
-        y.minorLabels().enabled(true).fontSize(7);
-        y.labels().fontSize(12);
-
-        var x = chart.xAxis();
-        x.title().enabled(false);
-        x.minorLabels().enabled(true);
-
-        chart.title().text('Some text title');
         chart.container('container');
         chart.draw();
     });

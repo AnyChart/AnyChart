@@ -26,23 +26,13 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-        chart.bar([5,2,2,1,'6', 0.2,5,4,3,5,4,11,4]).markers().enabled(false);
+        chart.spline([5,2,2,1,'6', 0.2,5,4,3,5,4,1,4]);
 
-        var y = chart.yAxis();
-        y.orientation('left');
-        y.scale(chart.xScale());
-        y.title().enabled(false);
-        y.labels().fontSize(15);
+        chart.yAxis()
+                .labels().fontSize(32);
+        chart.xAxis()
+                .labels().fontSize(17);
 
-        var x = chart.xAxis();
-        x.scale(chart.yScale());
-        x.title().enabled(false);
-        x.labels().fontSize(17);
-
-        chart.width('200px');
-        chart.height('200px');
-
-        chart.title().text('Some text title');
         chart.container('container');
         chart.draw();
     });

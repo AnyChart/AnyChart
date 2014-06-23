@@ -27,18 +27,19 @@
             console.log('chart draw');
         });
         var graph = chart.ohlc([
-            ['A1', 3, 8, 2, 6],
-            ['A2', 4, 7, '4', 6],
-            ['A3', 5, 6.5, 2, 6],
-            ['A4', 8, 9, '5.2', 6],
-            ['A5', 6, 7, 4, 6]
+            ['A1', 6, 7, 4, 4],
+            ['A2', 5, 5, 3, 4]
         ]);
-
-        graph.fallingStroke('red', 2);
-        graph.risingStroke('green', 3);
+        var secondGraph = chart.ohlc([
+            ['A3', 6, 7, 4,4],
+            ['A4', 5, 5, 3, 4]
+        ]);
+        graph.fallingStroke('green .5', 3);
+        secondGraph.hoverFallingStroke('blue', 3);
         chart.container('container');
         chart.draw();
     });
 </script>
 </html>
+
 

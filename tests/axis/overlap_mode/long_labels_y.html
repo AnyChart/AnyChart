@@ -39,18 +39,10 @@
             ['47.65460°', '13300000000000']
         ]);
         chart.bar(dataSet);
-
-        var y = chart.yAxis();
-        y.scale(chart.xScale());
-        y.title().text('Height');
-
-
-        var x = chart.xAxis();
-        x.scale(chart.yScale());
-        x.title('Latitude');
-        x.minorTicks().enabled(true);
-
-        chart.title().text('Some text title');
+        chart.yAxis()
+                .scale(chart.xScale());
+        chart.xAxis()
+                .scale(chart.yScale());
         chart.container('container');
         chart.draw();
     });

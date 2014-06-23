@@ -26,8 +26,7 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-
-        var graph = chart.marker([
+        chart.marker([
             ['A1' , 3.6],
             ['A2' , 0],
             ['A3' , 5.5],
@@ -44,7 +43,6 @@
             ['A14' , 9.4],
             ['A15' , 11.5]
         ]);
-
         chart.container('container');
         chart.draw();
     });

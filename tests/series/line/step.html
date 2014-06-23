@@ -26,7 +26,6 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-
         chart.stepLine([
             ['A1' , '3.6'],
             ['A2' , '0'],
@@ -44,8 +43,6 @@
             ['A14' , '9.4'],
             ['A15' , '11.5']
         ]);
-
-        chart.title().text('Some text title');
         chart.container('container');
         chart.draw();
     });

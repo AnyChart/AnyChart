@@ -26,7 +26,6 @@
             document.getElementById('status').innerHTML = 'chart draw';
             console.log('chart draw');
         });
-
         var graph = chart.line([
             ['A1' , 3.6],
             ['A2' , 0],
@@ -44,15 +43,8 @@
             ['A14' , 9.4],
             ['A15' , 11.5]
         ]);
-        graph.markers().size(5);
-        graph.hoverMarkers().size(11);
-        graph.markers().stroke('2 black');
-        graph.markers().fill('red');
-        graph.markers().type('star5');
-        graph.hoverMarkers().type('star4').fill('red');
-        graph.stroke('green');
-        graph.hoverStroke('red', 5);
-
+        graph.stroke('green', 3);
+        graph.hoverStroke('red', 4);
         chart.container('container');
         chart.draw();
     });

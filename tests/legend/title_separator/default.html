@@ -28,18 +28,10 @@
         });
         chart.data([
             {name: 'Zyuganov', value: 10},
-            {name: 'Prokhorov', value: 8},
-            {name: 'Putin', value: 20},
-            {name: 'Medvedev', value: 14},
             {name: 'Zhirinovsky', value:7}
         ]);
-        chart.legend().title()
-                .text('Candidates').enabled(true)
-                .vAlign('middle');
         chart.legend()
-                .position('left')
                 .titleSeparator().enabled(true);
-        chart.title().text('Voting in Russia');
         chart.container('container');
         chart.draw();
     });
