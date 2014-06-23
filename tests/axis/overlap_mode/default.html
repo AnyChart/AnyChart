@@ -42,17 +42,13 @@
 
         var y = chart.yAxis();
         y.scale(chart.xScale());
-        y.title().text('Height');
-
 
         var x = chart.xAxis();
         x.scale(chart.yScale());
-        x.title('Latitude');
         x.minorTicks().enabled(true);
         x.minorLabels().enabled(true).fontColor('red');
         x.labels().fontColor('green');
 
-        chart.title().text('Some text title');
         chart.container('container');
         chart.draw();
     });

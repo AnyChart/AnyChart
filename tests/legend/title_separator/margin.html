@@ -33,15 +33,9 @@
             {name: 'Medvedev', value: 14},
             {name: 'Zhirinovsky', value:7}
         ]);
-        chart.legend().title()
-                .vAlign('middle')
-                .text('Candidates').enabled(true);
         chart.legend()
-                .position('bottom').itemsLayout('horizontal')
                 .titleSeparator().enabled(true)
-                .margin(5,'10px', 5, 10)
-                .height('2px');
-        chart.title().text('Voting in Russia');
+                .margin(5,'40px', 10, 10);
         chart.container('container');
         chart.draw();
     });

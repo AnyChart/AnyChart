@@ -1,0 +1,48 @@
+<html>
+<head>
+    <script src="../../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = anychart.areaChart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+        var graph = chart.marker([
+            ['A1' , 3.6],
+            ['A2' , 0],
+            ['A3' , 5.5],
+            ['A4' , 9.2]
+        ]);
+        var secondGraph = chart.marker([
+            ['A1' , 6],
+            ['A2' , 3],
+            ['A3' , 2],
+            ['A4' , 1.8]
+        ]);
+        graph.stroke('green', 3);
+        secondGraph.hoverStroke('black', 3);
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>
+

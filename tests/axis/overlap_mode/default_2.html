@@ -30,33 +30,19 @@
             ['37' , '132'],
             ['38' , '132'],
             ['39' , '132'],
-            ['40' , '126'],
-            ['41' , '126'],
-            ['42' , '125'],
-            ['43' , '132'],
-            ['44' , '131'],
-            ['45' , '131'],
-            ['47', '133']
+            ['40' , '131'],
+            ['41', '133']
         ]);
         chart.bar(dataSet);
 
         var y = chart.yAxis();
         y.scale(chart.xScale());
-        y.title().text('Height').enabled(false);
-
 
         var x = chart.xAxis();
         x.scale(chart.yScale());
-        x.title('Latitude');
-        x.minorTicks().enabled(true);
         x.minorLabels().enabled(true).fontColor('red');
         x.labels().enabled(true).fontColor('green');
-        x.minorLabels().textFormatter(function(label) {
-            return (label.value.toFixed(0));
-        });
 
-
-        chart.title().text('Some text title');
         chart.container('container');
         chart.draw();
     });

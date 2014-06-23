@@ -33,15 +33,11 @@
             {name: 'Medvedev', value: 14},
             {name: 'Zhirinovsky', value:7}
         ]);
-        chart.legend().title()
-                .text('Candidates').enabled(true);
         chart.palette(
                 new anychart.utils.RangeColorPalette()
                         .count(5)
-                        .colors(['red', 'green'])
+                        .colors(['red', 'blue'])
         );
-
-        chart.title().text('Voting in Russia');
         chart.labels().enabled(false);
         chart.container('container');
         chart.draw();
