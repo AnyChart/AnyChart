@@ -407,7 +407,7 @@ def __buildDocs():
       if (len(args)-1 == args.index('-src')):
         print 'Надо указать модуль'
         return 0
-      CUSTOM_SRC = args[args.index(arg)+1]
+      CUSTOM_SRC = args[args.index('-src')+1]
 
     DOCS_OUT_PATH = os.path.join(OUT_PATH, 'docs')
     __checkPathExistence(OUT_PATH)
