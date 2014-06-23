@@ -19,7 +19,7 @@ goog.require('anychart.utils.Padding');
  *   <li>{@link anychart.elements.Label#offsetX} и {@link anychart.elements.Label#offsetY}</li>
  *   <li>{@link anychart.elements.Label#parentBounds}</li>
  * </ul>
- * @example <c>Создание самостоятельного заголовка.</c><t>simple-h100</t>
+ * @example <c>Создание самостоятельного Label.</c><t>simple-h100</t>
  * new anychart.elements.Label()
  *     .text('My custom Label')
  *     .fontSize(27)
@@ -620,18 +620,24 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
 
 /**
  * Getter for current label position settings.
- * @return {anychart.math.Coordinate} Current label position settings.
+ * @return {anychart.utils.NinePositions} Current label position settings.
  *//**
- * Setter for label position settings.
- * @example <t>simple-h100</t>
- * var label = new anychart.elements.Label()
- *     .padding(5)
- *     .position([100, 50])
- * label.background().stroke('1 #aaa')
+ * Setter for label position settings.<br/>
+ * <b>Note:</b> Работает только если явно задан {@link anychart.elements.Label#container} или {@link anychart.elements.Label#parentBounds}.
+ * @illustration <t>simple-h100</t>
+ * var rect = stage.rect(5, 5, 90, 90).stroke('1 blue');
+ * var rectBounds = rect.getBounds();
+ * var label = new anychart.elements.Label();
+ * label.position(anychart.utils.NinePositions.CENTER);
+ * label.parentBounds(rectBounds);
  * label.container(stage).draw();
- * // обозначим красным точку поционирования лейбла.
- * stage.circle(100, 50, 2).stroke('3 red')
- * @param {anychart.math.Coordinate=} opt_value [{x: 0, y: 0} относительно заанных баундов] Value to set.
+ * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
+ * @illustrationDesc
+ * Синим квадратом обозначена область заданая через {@link anychart.elements.Label#parentBounds}.<br/>
+ * Красной точкой обозначен <i>CENTER</i> этой области, по которому и спозиционирован лейбл.
+ * // обозначим красным точку позиционирования лейбла.
+ * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
+ * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
  * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
  *//**
  * @ignoreDoc
