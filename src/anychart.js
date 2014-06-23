@@ -184,7 +184,7 @@ anychart.fromJson = function(jsonConfig) {
  * @return {*} Element created by config.
  */
 anychart.fromXml = function(xmlConfig) {
-  return anychart.json(anychart.utils.xml2json(xmlConfig));
+  return anychart.fromJson(anychart.utils.xml2json(xmlConfig));
 };
 //----------------------------------------------------------------------------------------------------------------------
 //
