@@ -153,7 +153,7 @@ anychart.ClassFactory.prototype.getScale = function(json) {
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
-anychart.json = function(jsonConfig) {
+anychart.fromJson = function(jsonConfig) {
   /**
    * Parsed json config.
    * @type {Object}
@@ -183,7 +183,7 @@ anychart.json = function(jsonConfig) {
  * @param {string|Node} xmlConfig Config.
  * @return {*} Element created by config.
  */
-anychart.xml = function(xmlConfig) {
+anychart.fromXml = function(xmlConfig) {
   return anychart.json(anychart.utils.xml2json(xmlConfig));
 };
 //----------------------------------------------------------------------------------------------------------------------

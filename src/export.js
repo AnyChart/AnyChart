@@ -1057,8 +1057,8 @@ goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);
 goog.exportSymbol('anychart.version', anychart.VERSION);
-goog.exportSymbol('anychart.json', anychart.json);//in docs/
-goog.exportSymbol('anychart.xml', anychart.xml);
+goog.exportSymbol('anychart.fromJson', anychart.fromJson);
+goog.exportSymbol('anychart.fromXml', anychart.fromXml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
 goog.exportSymbol('anychart.chart', anychart.chart);
