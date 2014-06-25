@@ -1108,22 +1108,31 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
     var value;
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+      var missingPoints = 0; // count of missing points
       var min = Number.MAX_VALUE;
       var max = -Number.MAX_VALUE;
       var sum = 0;
       while (iterator.advance()) {
         value = parseFloat(iterator.get('value'));
+        // if missing
+        if (isNaN(value)) {
+          missingPoints++;
+          continue;
+        }
         min = Math.min(value, min);
         max = Math.max(value, max);
         sum += value;
       }
 
-      var count = iterator.getRowsCount();
+      var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+      var avg;
+      if (count == 0) min = max = sum = avg = undefined;
+      else avg = sum / count;
       this.formatProvider_['count'] = count;
       this.formatProvider_['min'] = min;
       this.formatProvider_['max'] = max;
       this.formatProvider_['sum'] = sum;
-      this.formatProvider_['average'] = (sum / count);
+      this.formatProvider_['average'] = avg;
 
       iterator.reset();
       this.markConsistent(anychart.ConsistencyState.DATA);
@@ -1134,7 +1143,8 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
     while (iterator.advance()) {
       value = parseFloat(iterator.get('value'));
-
+      // if missing then continue without drawing
+      if (isNaN(value)) continue;
       sweep = value / this.formatProvider_['sum'] * 360;
 
       fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
@@ -1158,8 +1168,11 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
       while (iterator.advance()) {
+        // if missing - do not draw label
+        if (!goog.isDef(iterator.get('value'))) continue;
         this.createFormatProvider(iterator.getIndex());
-        this.labels_.draw(this.formatProvider_, this.positionProvider_);
+        // index for positionProvider function, cause label set it as an argument
+        this.labels_.draw(this.formatProvider_, this.positionProvider_, iterator.getIndex());
       }
       this.labels_.end();
     }
