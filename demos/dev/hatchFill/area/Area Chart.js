@@ -2,7 +2,7 @@ var series, series2, chart;
 
 anychart.onDocumentReady(function() {
   //create area chart
-  chart = anychart.columnChart();
+  chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');
@@ -11,7 +11,7 @@ anychart.onDocumentReady(function() {
   chart.title().text('Area Chart');
 
   //create area series with passed data
-  series = chart.ohlc([
+  series = chart.column([
     ['P1' , '262', '362', '62', '162'],
     ['P2' , '234', '334', '34', '134'],
     ['P3' , '216', '316', '16', '116'],
@@ -34,8 +34,20 @@ anychart.onDocumentReady(function() {
     ['P20', '284', '384', '84', '184']
   ]);
 
-  var xAxis = chart.yAxis(0);
-  xAxis.minorLabels().enabled(true);
+  series.tooltip().enabled(false);
+
+  /*var labels = series.labels()
+      .enabled(false)
+      .rotation(135)
+      .background().enabled(true);
+  var hoverLabels = series.hoverLabels()
+      .enabled(false)
+      .fontSize(25)
+      .fontOpacity(0.3)
+      .rotation(45)
+      .background().enabled(true).fill('green 0.2');
+*/
+
 
 //  series.displayNegative(true);
 

@@ -339,7 +339,7 @@
         <xsd:attribute name="enabled" type="xsd:boolean"/>
     </xsd:complexType>
 
-    <xsd:complexType name="MultiLabel">
+    <xsd:complexType name="LabelsFactory">
         <xsd:complexContent>
             <xsd:extension base="Text">
                 <xsd:all>
@@ -363,8 +363,8 @@
                 <xsd:all>
                     <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
                     <xsd:element minOccurs="0" name="title" type="Title"/>
-                    <xsd:element minOccurs="0" name="labels" type="MultiLabel"/>
-                    <xsd:element minOccurs="0" name="minor_labels" type="MultiLabel"/>
+                    <xsd:element minOccurs="0" name="labels" type="LabelsFactory"/>
+                    <xsd:element minOccurs="0" name="minor_labels" type="LabelsFactory"/>
                     <xsd:element minOccurs="0" name="ticks" type="Ticks"/>
                     <xsd:element minOccurs="0" name="minor_ticks" type="Ticks"/>
                     <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
@@ -729,7 +729,7 @@
             <xsd:element minOccurs="0" name="tooltip" type="Tooltip"/>
             <xsd:element minOccurs="0" name="data" type="Data"/>
             <xsd:element minOccurs="0" name="bounds" type="Bounds"/>
-            <xsd:element minOccurs="0" name="labels" type="MultiLabel" />
+            <xsd:element minOccurs="0" name="labels" type="LabelsFactory" />
 
             <!-- BaseWithMarkers -->
             <xsd:element minOccurs="0" name="markers" type="MultiMarker"/>
@@ -835,7 +835,7 @@
             <xsd:element minOccurs="0" name="hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" name="hover_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" name="labels" type="MultiLabel"/>
+            <xsd:element minOccurs="0" name="labels" type="LabelsFactory"/>
             <xsd:element minOccurs="0" name="data" type="Data"/>
             <!-- PIE SPECIFIC ELEMENTS END-->
 

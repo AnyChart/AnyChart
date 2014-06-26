@@ -3,7 +3,7 @@ goog.provide('anychart.elements.Axis');
 goog.require('acgraph.vector.Path');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
-goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');
 goog.require('anychart.math.Rect');
@@ -136,7 +136,8 @@ anychart.elements.Axis = function() {
       anychart.ConsistencyState.MINOR_LABELS |
       anychart.ConsistencyState.TICKS |
       anychart.ConsistencyState.MINOR_TICKS |
-      anychart.ConsistencyState.BOUNDS;
+      anychart.ConsistencyState.BOUNDS |
+      anychart.ConsistencyState.OVERLAP;
 };
 goog.inherits(anychart.elements.Axis, anychart.VisualBase);
 
@@ -216,14 +217,14 @@ anychart.elements.Axis.prototype.title_ = null;
 
 
 /**
- * @type {anychart.elements.Multilabel}
+ * @type {anychart.elements.LabelsFactory}
  * @private
  */
 anychart.elements.Axis.prototype.labels_ = null;
 
 
 /**
- * @type {anychart.elements.Multilabel}
+ * @type {anychart.elements.LabelsFactory}
  * @private
  */
 anychart.elements.Axis.prototype.minorLabels_ = null;
@@ -321,14 +322,14 @@ anychart.elements.Axis.prototype.drawLastLabel_ = true;
 
 
 /**
- * @type {Array.<anychart.math.Rect>}
+ * @type {Array.<Array.<number>>}
  * @private
  */
 anychart.elements.Axis.prototype.labelsBounds_ = null;
 
 
 /**
- * @type {Array.<anychart.math.Rect>}
+ * @type {Array.<Array.<number>>}
  * @private
  */
 anychart.elements.Axis.prototype.minorLabelsBounds_ = null;
@@ -415,19 +416,19 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
 
 /**
  * Getter for axis labels.
- * @return {anychart.elements.Multilabel} Axis labels of itself for chaining.
+ * @return {anychart.elements.LabelsFactory} Axis labels of itself for chaining.
  *//**
  * Setter for axis labels.
- * @param {anychart.elements.Multilabel=} opt_value Value to set.
+ * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
  * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.elements.Multilabel=} opt_value Axis labels.
- * @return {anychart.elements.Multilabel|anychart.elements.Axis} Axis labels of itself for chaining.
+ * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for chaining.
  */
 anychart.elements.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.elements.Multilabel();
+    this.labels_ = new anychart.elements.LabelsFactory();
     this.labels_.textFormatter(this.labelsTextFormatter_);
     this.labels_.positionFormatter(function(positionProvider) {
       return positionProvider;
@@ -437,7 +438,7 @@ anychart.elements.Axis.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.elements.Multilabel) {
+    if (opt_value instanceof anychart.elements.LabelsFactory) {
       this.labels_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.labels_.deserialize(opt_value);
@@ -472,30 +473,30 @@ anychart.elements.Axis.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis minor labels.
- * @return {anychart.elements.Multilabel} Axis labels.
+ * @return {anychart.elements.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
- * @param {anychart.elements.Multilabel=} opt_value Value to set.
+ * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
  * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.elements.Multilabel=} opt_value Axis labels.
- * @return {anychart.elements.Multilabel|anychart.elements.Axis} Axis labels of itself for chaining.
+ * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for chaining.
  */
 anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
-    this.minorLabels_ = new anychart.elements.Multilabel();
+    this.minorLabels_ = new anychart.elements.LabelsFactory();
     this.isHorizontal() ? this.minorLabels_.rotation(0) : this.minorLabels_.rotation(-90);
     this.minorLabels_.textFormatter(this.minorLabelsTextFormatter_);
     this.minorLabels_.positionFormatter(function(positionProvider) {
       return positionProvider;
     });
-    this.minorLabels_.listen(anychart.Base.SIGNAL, this.minorLabelsInvalidated_, false, this);
+    this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
 
-  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.Multilabel || goog.isNull(opt_value))) {
-    if (opt_value instanceof anychart.elements.Multilabel) {
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.LabelsFactory) {
       this.minorLabels_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.minorLabels_.deserialize(opt_value);
@@ -503,8 +504,6 @@ anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
       this.minorLabels_.enabled(false);
     }
     this.dropBoundsCache_();
-    this.invalidate(anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.minorLabels_;
@@ -903,6 +902,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
     } else {
       this.pixelBounds_ = new anychart.utils.Bounds(0, 0, 0, 0);
     }
+    this.dropBoundsCache_();
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
   return this.pixelBounds_;
@@ -980,13 +980,13 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
             if (nextDrawableLabel == -1 && isLabels) {
               k = i;
               while (nextDrawableLabel == -1 && k < ticksArrLen) {
-                bounds1 = this.getLabelBounds_(k, true, opt_bounds).toCoordinateBox();
+                bounds1 = this.getLabelBounds_(k, true, opt_bounds);
 
                 if (prevDrawableLabel != -1)
-                  bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds).toCoordinateBox();
+                  bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
 
                 if (k != ticksArrLen - 1 && this.drawLastLabel())
-                  bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds).toCoordinateBox();
+                  bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
 
                 if (!(this.checkLabelsIntersection_(bounds1, bounds2) ||
                     this.checkLabelsIntersection_(bounds1, bounds3))) {
@@ -1001,7 +1001,7 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
             }
 
             if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
-              if (isLabels && i == nextDrawableLabel && this.labels().enabledAt(i)) {
+              if (isLabels && i == nextDrawableLabel && this.labels().enabled()) {
                 prevDrawableLabel = i;
                 nextDrawableLabel = -1;
                 labels.push(true);
@@ -1009,26 +1009,33 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                 labels.push(false);
               }
               i++;
-              if (ratio == minorRatio && (this.labels().enabledAt(i) || this.ticks().enabled())) {
+              if (ratio == minorRatio && (this.labels().enabled() || this.ticks().enabled())) {
                 minorLabels.push(false);
                 j++;
               }
             } else {
               if (isMinorLabels) {
-                bounds1 = this.getLabelBounds_(j, false, opt_bounds).toCoordinateBox();
+                bounds1 = this.getLabelBounds_(j, false, opt_bounds);
 
                 if (prevDrawableLabel != -1)
-                  bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds).toCoordinateBox();
+                  bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
 
                 if (nextDrawableLabel != -1)
-                  bounds3 = this.getLabelBounds_(nextDrawableLabel, true, opt_bounds).toCoordinateBox();
+                  bounds3 = this.getLabelBounds_(nextDrawableLabel, true, opt_bounds);
 
                 if (prevDrawableMinorLabel != -1)
-                  bounds4 = this.getLabelBounds_(prevDrawableMinorLabel, false, opt_bounds).toCoordinateBox();
+                  bounds4 = this.getLabelBounds_(prevDrawableMinorLabel, false, opt_bounds);
+
+                var label = this.minorLabels().getLabel(j);
+                var isLabelEnabled = label ?
+                    goog.isDef(label.enabled()) ?
+                        label.enabled() :
+                        true :
+                    true;
 
                 if (!(this.checkLabelsIntersection_(bounds1, bounds2) ||
                     this.checkLabelsIntersection_(bounds1, bounds3) ||
-                    this.checkLabelsIntersection_(bounds1, bounds4)) && this.minorLabels().enabledAt(j)) {
+                    this.checkLabelsIntersection_(bounds1, bounds4)) && isLabelEnabled) {
 
                   tempRatio = scale.transform(scaleMinorTicksArr[j]);
                   if ((tempRatio <= 0 && this.drawFirstLabel()) || (tempRatio >= 1 && this.drawLastLabel())) {
@@ -1052,11 +1059,11 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
           }
         } else if (scale instanceof anychart.scales.Ordinal) {
           for (i = 0; i < ticksArrLen; i++) {
-            if (isLabels && this.labels().enabledAt(i)) {
-              bounds1 = this.getLabelBounds_(i, true, opt_bounds).toCoordinateBox();
+            if (isLabels && this.labels().enabled()) {
+              bounds1 = this.getLabelBounds_(i, true, opt_bounds);
 
               if (prevDrawableLabel != -1)
-                bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds).toCoordinateBox();
+                bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
 
               if (!this.checkLabelsIntersection_(bounds1, bounds2)) {
                 prevDrawableLabel = i;
@@ -1138,7 +1145,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     for (i = 0; i < ticksArr.length; i++) {
       var drawLabel = goog.isArray(drawLabels) ? drawLabels[i] : drawLabels;
       if (drawLabel) {
-        bounds = labels.measure(this.getLabelsFormatProvider_(i, ticksArr[i]), {x: 0, y: 0}, i);
+        bounds = labels.measure(this.getLabelsFormatProvider_(i, ticksArr[i]), {x: 0, y: 0});
         size = this.isHorizontal() ?
             bounds.height - (bounds.top + bounds.height / 2) :
             bounds.width - (bounds.left + bounds.width / 2);
@@ -1153,7 +1160,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     for (i = 0; i < drawMinorLabels.length; i++) {
       var drawMinorLabel = goog.isArray(drawMinorLabels) ? drawMinorLabels[i] : drawMinorLabels;
       if (drawMinorLabel) {
-        bounds = minorLabels.measure(this.getLabelsFormatProvider_(i, minorTicksArr[i]), {x: 0, y: 0}, i);
+        bounds = minorLabels.measure(this.getLabelsFormatProvider_(i, minorTicksArr[i]), {x: 0, y: 0});
         size = this.isHorizontal() ?
             bounds.height - (bounds.top + bounds.height / 2) :
             bounds.width - (bounds.left + bounds.width / 2);
@@ -1239,7 +1246,7 @@ anychart.elements.Axis.prototype.getPixelShift_ = function(index, count, value) 
  * @param {number} index Label index.
  * @param {boolean} isMajor Major labels or minor.
  * @param {anychart.math.Rect=} opt_parentBounds Родительские баунды.
- * @return {anychart.math.Rect} Label bounds.
+ * @return {Array.<number>} Label bounds.
  * @private
  */
 anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_parentBounds) {
@@ -1270,7 +1277,9 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
     ratio = scale.transform(value, .5);
   }
 
-  var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var isEnabled = ticks.enabled();
   var position = ticks.position();
@@ -1308,8 +1317,10 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
       }
       break;
   }
+  positionProvider.x = x;
+  positionProvider.y = y;
 
-  return boundsCache[index] = labels.measure(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider);
 };
 
 
@@ -1587,9 +1598,9 @@ anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, 
   var ticksLength = this.ticks().length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
-
-
-  var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
@@ -1598,7 +1609,10 @@ anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, 
     y -= ticksLength;
   }
 
-  labels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+
+  labels.add(formatProvider, positionProvider);
 };
 
 
@@ -1616,8 +1630,10 @@ anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index
   var ticksLength = this.ticks().length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = labels.measure(formatProvider, positionProvider);
 
-  var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
@@ -1625,7 +1641,9 @@ anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index
     x += ticksLength;
   }
 
-  labels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  labels.add(formatProvider, positionProvider);
 };
 
 
@@ -1643,8 +1661,10 @@ anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, inde
   var ticksLength = this.ticks().length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = labels.measure(formatProvider, positionProvider);
 
-  var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
@@ -1652,7 +1672,9 @@ anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, inde
     y += ticksLength;
   }
 
-  labels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  labels.add(formatProvider, positionProvider);
 };
 
 
@@ -1670,8 +1692,9 @@ anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index,
   var ticksLength = this.ticks().length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
-
-  var labelBounds = labels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
@@ -1680,7 +1703,9 @@ anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index,
     x -= ticksLength;
   }
 
-  labels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  labels.add(formatProvider, positionProvider);
 };
 
 
@@ -1698,8 +1723,10 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
   var ticksLength = this.minorTicks().length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
-  var labelBounds = minorLabels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
 
@@ -1707,7 +1734,9 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
     y -= ticksLength;
   }
 
-  minorLabels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  minorLabels.add(formatProvider, positionProvider);
 };
 
 
@@ -1725,15 +1754,19 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   var ticksLength = this.minorTicks_.length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
-  var labelBounds = minorLabels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     x += ticksLength;
   }
-  minorLabels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  minorLabels.add(formatProvider, positionProvider);
 };
 
 
@@ -1751,15 +1784,19 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   var ticksLength = this.minorTicks_.length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
-  var labelBounds = minorLabels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     y += ticksLength;
   }
-  minorLabels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  minorLabels.add(formatProvider, positionProvider);
 };
 
 
@@ -1777,15 +1814,19 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   var ticksLength = this.minorTicks_.length();
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {x: 0, y: 0};
+  var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
-  var labelBounds = minorLabels.measure(this.getLabelsFormatProvider_(index, value), {x: 0, y: 0}, index);
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     x -= ticksLength;
   }
-  minorLabels.draw(this.getLabelsFormatProvider_(index, value), {x: x, y: y}, index);
+  positionProvider.x = x;
+  positionProvider.y = y;
+  minorLabels.add(formatProvider, positionProvider);
 };
 
 
@@ -1920,6 +1961,7 @@ anychart.elements.Axis.prototype.draw = function() {
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(this.parentBounds_);
     labelsDrawer = orientation[1];
+    labels.clear();
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
 
@@ -1928,6 +1970,7 @@ anychart.elements.Axis.prototype.draw = function() {
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(this.parentBounds_);
     minorLabelsDrawer = orientation[2];
+    minorLabels.clear();
     this.markConsistent(anychart.ConsistencyState.MINOR_LABELS);
   }
 
@@ -2001,7 +2044,7 @@ anychart.elements.Axis.prototype.draw = function() {
             j++;
           }
         }
-        if (minorLabelsDrawer) this.minorLabels().end();
+        if (minorLabelsDrawer) this.minorLabels().draw();
 
       } else if (scale instanceof anychart.scales.Ordinal) {
         overlappedLabels = this.getOverlappedLabels_();
@@ -2045,7 +2088,7 @@ anychart.elements.Axis.prototype.draw = function() {
             labelsDrawer.call(this, leftTick, labelPosition, i, pixelShift);
         }
       }
-      if (goog.isDef(labelsDrawer)) this.labels().end();
+      if (goog.isDef(labelsDrawer)) this.labels().draw();
     }
   }
 

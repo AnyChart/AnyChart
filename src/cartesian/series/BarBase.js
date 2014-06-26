@@ -14,9 +14,7 @@ goog.require('anychart.cartesian.series.WidthBased');
 anychart.cartesian.series.BarBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
   this.markers().position(anychart.utils.NinePositions.RIGHT_CENTER);
-  this.hoverMarkers().position(anychart.utils.NinePositions.RIGHT_CENTER);
   this.labels().position(anychart.utils.NinePositions.RIGHT_CENTER);
-  this.hoverLabels().position(anychart.utils.NinePositions.RIGHT_CENTER);
 };
 goog.inherits(anychart.cartesian.series.BarBase, anychart.cartesian.series.WidthBased);
 

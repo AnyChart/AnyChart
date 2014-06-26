@@ -29,8 +29,13 @@ function load() {
   areaChart.container(stage);
   areaChart.bounds(0, 0, 1000, 300);
 
-  area = areaChart.area(data1);
-  area.markers().enabled(true);
+  area = areaChart.column(data1);
+  area.labels().anchor('bottom').position('top').enabled(true);
+  area.labels().background().enabled(true).fill('blue');
+
+  area.hoverLabels().fontColor('green');
+  area.hoverLabels().background().enabled(true).fill('red');
+
 //  area.listen('click', function() { console.log(arguments); });
   areaChart.barsPadding(0.1);
   areaChart.xAxis();

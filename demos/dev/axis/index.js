@@ -73,20 +73,20 @@ function minorTickSet(value) {
 }
 var scale;
 function load() {
-  scale = new anychart.scales.Ordinal();
-  scale.values([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  scale.ticks().interval(2);
+  scale = new anychart.scales.Linear();
+//  scale.values([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+//  scale.ticks().interval(2);
 
-//  var ticks = [0, "25", "50", "75", "100"];
-//  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
+  var ticks = [0, "25", "50", "75", "100"];
+  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
 
-//  scale.ticks().set(ticks);
-//  scale.minorTicks().set(minorTicks);
-//  var ticksArr = scale.ticks().get();
-//  var minorTicksArr = scale.minorTicks().get();
-//  scale
-//      .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
-//      .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
+  scale.ticks().set(ticks);
+  scale.minorTicks().set(minorTicks);
+  var ticksArr = scale.ticks().get();
+  var minorTicksArr = scale.minorTicks().get();
+  scale
+      .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
+      .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
 
 
 
@@ -94,9 +94,13 @@ function load() {
 
   axis1 = new anychart.elements.Axis();
   axis1.scale(scale);
+  axis1.offsetY(250);
   axis1.container('container');
   axis1.orientation('top');
   axis1.length(500);
+  axis1.ticks(null);
+  axis1.labels().rotation(45).fontColor('red').enabled(false);
+  axis1.minorLabels().rotation(135).enabled(true);
 
   var container = axis1.container();
 
@@ -260,7 +264,10 @@ function load() {
     }
 
     setAxisInput.checked = axis1.enabled();
+
     setLabelsInput.checked = axis1.labels().enabled();
+    setMinorLabelsInput.checked = axis1.minorLabels().enabled();
+
     setTicksInput.checked = axis1.ticks().enabled();
     setTitleInput.checked = axis1.title().enabled();
 

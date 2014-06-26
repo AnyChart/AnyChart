@@ -15,9 +15,7 @@ goog.require('anychart.cartesian.series.BaseWithMarkers');
 anychart.cartesian.series.DiscreteBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
   this.markers().position(anychart.utils.NinePositions.TOP);
-  this.hoverMarkers().position(anychart.utils.NinePositions.TOP);
   this.labels().position(anychart.utils.NinePositions.TOP);
-  this.hoverLabels().position(anychart.utils.NinePositions.TOP);
 };
 goog.inherits(anychart.cartesian.series.DiscreteBase, anychart.cartesian.series.BaseWithMarkers);
 

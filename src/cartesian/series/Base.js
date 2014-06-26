@@ -2,7 +2,7 @@ goog.provide('anychart.cartesian.series.Base');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
 goog.require('anychart.data');
-goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.elements.Tooltip');
 goog.require('anychart.events.EventType');
 
@@ -39,19 +39,17 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
     return this['x'] + ': ' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
-
-  this.realLabels_ = new anychart.elements.Multilabel();
-  this.realLabels_.listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
-  this.realLabels_.listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
   this.statistics_ = {};
+
+  this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
+  this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
   this.labels().textFormatter(function(provider) {
     return provider['value'];
-  }).enabled(false);
-  this.hoverLabels().textFormatter(function(provider) {
-    return provider['value'];
-  }).enabled(false);
+  });
   this.labels().position(anychart.utils.NinePositions.CENTER);
-  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
+  this.labels().enabled(false);
+  this.hoverLabels().enabled(null);
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
@@ -167,21 +165,21 @@ anychart.cartesian.series.Base.prototype.xScale_ = null;
 
 
 /**
- * @type {anychart.elements.Multilabel}
+ * @type {anychart.elements.LabelsFactory}
  * @private
  */
 anychart.cartesian.series.Base.prototype.labels_ = null;
 
 
 /**
- * @type {anychart.elements.Multilabel}
+ * @type {anychart.elements.LabelsFactory}
  * @private
  */
 anychart.cartesian.series.Base.prototype.hoverLabels_ = null;
 
 
 /**
- * @type {anychart.elements.Multilabel}
+ * @type {anychart.elements.LabelsFactory}
  * @private
  */
 anychart.cartesian.series.Base.prototype.realLabels_ = null;
@@ -825,10 +823,9 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
 
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
-  this.realLabels_.suspendSignalsDispatching();
-  this.realLabels_.deserialize(this.labels_.serialize(true));
-  this.realLabels_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  this.realLabels_.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  this.labels().clear();
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 
 
@@ -841,12 +838,10 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
  * series.finalizeDrawing();
  */
 anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
-  this.realLabels_.end();
+  this.labels().draw();
   this.labels().resumeSignalsDispatching(false);
   this.hoverLabels().resumeSignalsDispatching(false);
-  this.realLabels_.resumeSignalsDispatching(false);
 
-  this.realLabels_.markConsistent(anychart.ConsistencyState.ALL);
   if (this.labels_)
     this.labels_.markConsistent(anychart.ConsistencyState.ALL);
   if (this.hoverLabels_)
@@ -867,18 +862,59 @@ anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
  * @protected
  */
 anychart.cartesian.series.Base.prototype.drawLabel = function(hovered) {
-  var pointLabel = this.getIterator().get(hovered ? 'hoverLabel' : 'label');
+  var pointLabel = this.getIterator().get('label');
+  var hoverPointLabel = hovered ? this.getIterator().get('hoverLabel') : null;
   var index = this.getIterator().getIndex();
-  var labels = /** @type {anychart.elements.Multilabel} */(hovered ? this.hoverLabels() : this.labels());
-  if (goog.isDef(pointLabel))
-    labels.deserializeAt(index, /** @type {Object} */(pointLabel));
-  this.realLabels_.dropCustomSettingsAt(index);
-  this.realLabels_.deserializeAt(index, labels.serializeAt(index, !hovered));
-  this.realLabels_.textFormatter(/** @type {Function} */(labels.textFormatter()));
-  this.realLabels_.positionFormatter(/** @type {Function} */(labels.positionFormatter()));
-  this.realLabels_.draw(this.createFormatProvider(),
-      this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(this.realLabels_.positionAt(index))),
-      index);
+  var labelsFactory = /** @type {anychart.elements.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+
+  var label = this.labels().getLabel(index);
+
+  var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var labelHoverEnabledState = hoverPointLabel && goog.isDef(hoverPointLabel['enabled']) ? hoverPointLabel['enabled'] : null;
+
+  var isDraw = hovered ?
+      goog.isNull(labelHoverEnabledState) ?
+          goog.isNull(this.hoverLabels().enabled()) ?
+              goog.isNull(labelEnabledState) ?
+                  this.labels().enabled() :
+                  labelEnabledState :
+              this.hoverLabels().enabled() :
+          labelHoverEnabledState :
+      goog.isNull(labelEnabledState) ?
+          this.labels().enabled() :
+          labelEnabledState;
+
+  if (isDraw) {
+    var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
+    var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
+    var position = hovered ?
+        labelHoverPosition ?
+            labelHoverPosition :
+            this.hoverLabels().position() ?
+                this.hoverLabels().position() :
+                labelPosition ?
+                    labelPosition :
+                    this.labels().position() :
+        labelPosition ?
+            labelPosition :
+            this.labels().position();
+
+    var positionProvider = this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(position));
+    var formatProvider = this.createFormatProvider();
+    if (label) {
+      label.formatProvider(formatProvider);
+      label.positionProvider(positionProvider);
+    } else {
+      label = this.labels().add(formatProvider, positionProvider, index);
+    }
+
+    label.resetSettings();
+    label.currentLabelsFactory(labelsFactory);
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hoverPointLabel));
+    label.draw();
+  } else if (label) {
+    label.clear();
+  }
 };
 
 
@@ -1250,18 +1286,18 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Gets or sets series data labels.
- * @param {(anychart.elements.Multilabel|Object|string|null)=} opt_value Series data labels settings.
- * @return {!(anychart.elements.Multilabel|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
+ * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.elements.LabelsFactory|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.elements.Multilabel();
+    this.labels_ = new anychart.elements.LabelsFactory();
     this.registerDisposable(this.labels_);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.elements.Multilabel) {
+    if (opt_value instanceof anychart.elements.LabelsFactory) {
       var data = opt_value.serialize();
       this.labels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
@@ -1277,17 +1313,17 @@ anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
 
 /**
  * Gets or sets series hover data labels.
- * @param {(anychart.elements.Multilabel|Object|string|null)=} opt_value Series data labels settings.
- * @return {!(anychart.elements.Multilabel|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
+ * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.elements.LabelsFactory|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.cartesian.series.Base.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.elements.Multilabel();
+    this.hoverLabels_ = new anychart.elements.LabelsFactory();
     this.registerDisposable(this.hoverLabels_);
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.elements.Multilabel) {
+    if (opt_value instanceof anychart.elements.LabelsFactory) {
       var data = opt_value.serialize();
       this.hoverLabels_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
@@ -1851,6 +1887,7 @@ anychart.cartesian.series.Base.prototype.serialize = function() {
 
   json['tooltip'] = this.tooltip().serialize();
   json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().serialize();
   return json;
 };
 
@@ -1874,6 +1911,7 @@ anychart.cartesian.series.Base.prototype.deserialize = function(config) {
   this.hoverHatchFill(config['hoverHatchFill']);
   this.tooltip(config['tooltip']);
   this.labels(config['labels']);
+  this.hoverLabels(config['hoverLabels']);
 
   this.resumeSignalsDispatching(false);
 

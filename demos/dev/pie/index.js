@@ -57,6 +57,10 @@ function load() {
         angle: -90
       });
 
+  chart.labels()
+      .enabled(true)
+      .background().fill('green 0.8').enabled(true);
+
   chart.draw();
   var stage = chart.container();
   var trialText = stage.text(0, 0, 'AnyChart Trial Version', {
