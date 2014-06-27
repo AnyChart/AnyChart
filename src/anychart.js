@@ -8,10 +8,11 @@ goog.require('anychart.elements.Axis');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Grid');
 goog.require('anychart.elements.Label');
+goog.require('anychart.elements.LabelsFactory');
+goog.require('anychart.elements.LabelsFactory.Label');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.LineMarker');
 goog.require('anychart.elements.Marker');
-goog.require('anychart.elements.Multilabel');
 goog.require('anychart.elements.Multimarker');
 goog.require('anychart.elements.RangeMarker');
 goog.require('anychart.elements.Separator');
@@ -153,7 +154,7 @@ anychart.ClassFactory.prototype.getScale = function(json) {
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
-anychart.json = function(jsonConfig) {
+anychart.fromJson = function(jsonConfig) {
   /**
    * Parsed json config.
    * @type {Object}
@@ -183,8 +184,8 @@ anychart.json = function(jsonConfig) {
  * @param {string|Node} xmlConfig Config.
  * @return {*} Element created by config.
  */
-anychart.xml = function(xmlConfig) {
-  return anychart.json(anychart.utils.xml2json(xmlConfig));
+anychart.fromXml = function(xmlConfig) {
+  return anychart.fromJson(anychart.utils.xml2json(xmlConfig));
 };
 //----------------------------------------------------------------------------------------------------------------------
 //

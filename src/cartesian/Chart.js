@@ -2119,6 +2119,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     for (i = axes.length; i--;) {
       axis = axes[i];
       if (axis.enabled()) {
+        axis.suspendSignalsDispatching();
         axis.parentBounds(contentAreaBounds);
 
         remainingBounds = axis.getRemainingBounds(); ////НАГРУЗКА!!!!!!!!!!
@@ -2137,6 +2138,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
           axis.offsetX(rightOffset);
           rightOffset += contentAreaBounds.width - remainingBounds.width;
         }
+
+        axis.resumeSignalsDispatching(false);
       }
     }
 
@@ -2152,6 +2155,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       this.series_[i].pixelBounds(this.dataBounds_);
     }
     this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.AXES);
     this.invalidate(anychart.ConsistencyState.GRIDS);
     this.invalidate(anychart.ConsistencyState.SERIES);
   }

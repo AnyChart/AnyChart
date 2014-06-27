@@ -91,7 +91,7 @@ anychart.cartesian.series.Base.prototype['xPointPosition'] = anychart.cartesian.
 anychart.cartesian.series.Base.prototype['xScale'] = anychart.cartesian.series.Base.prototype.xScale;//in docs/
 anychart.cartesian.series.Base.prototype['yScale'] = anychart.cartesian.series.Base.prototype.yScale;//in docs/
 anychart.cartesian.series.Base.prototype['hatchFill'] = anychart.cartesian.series.Base.prototype.hatchFill;
-anychart.cartesian.series.Base.prototype['hoverHatchFill'] = anychart.cartesian.series.Base.prototype.hoverHatchFill();
+anychart.cartesian.series.Base.prototype['hoverHatchFill'] = anychart.cartesian.series.Base.prototype.hoverHatchFill;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.cartesian.series.BaseWithMarkers
@@ -594,34 +594,52 @@ anychart.elements.Multimarker.prototype['unlistenByKey'] = anychart.elements.Mul
 anychart.elements.Multimarker.prototype['removeAllListeners'] = anychart.elements.Multimarker.prototype.removeAllListeners;
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  anychart.elements.Multilabel
+//  anychart.elements.LabelsFactory
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.Multilabel', anychart.elements.Multilabel);
-anychart.elements.Multilabel.prototype['background'] = anychart.elements.Multilabel.prototype.background;
-anychart.elements.Multilabel.prototype['backgroundAt'] = anychart.elements.Multilabel.prototype.backgroundAt;
-anychart.elements.Multilabel.prototype['textFormatter'] = anychart.elements.Multilabel.prototype.textFormatter;
-anychart.elements.Multilabel.prototype['positionFormatter'] = anychart.elements.Multilabel.prototype.positionFormatter;
-anychart.elements.Multilabel.prototype['position'] = anychart.elements.Multilabel.prototype.position;
-anychart.elements.Multilabel.prototype['positionAt'] = anychart.elements.Multilabel.prototype.positionAt;
-anychart.elements.Multilabel.prototype['anchor'] = anychart.elements.Multilabel.prototype.anchor;
-anychart.elements.Multilabel.prototype['anchorAt'] = anychart.elements.Multilabel.prototype.anchorAt;
-anychart.elements.Multilabel.prototype['offsetX'] = anychart.elements.Multilabel.prototype.offsetX;
-anychart.elements.Multilabel.prototype['offsetXAt'] = anychart.elements.Multilabel.prototype.offsetXAt;
-anychart.elements.Multilabel.prototype['offsetY'] = anychart.elements.Multilabel.prototype.offsetY;
-anychart.elements.Multilabel.prototype['offsetYAt'] = anychart.elements.Multilabel.prototype.offsetYAt;
-anychart.elements.Multilabel.prototype['width'] = anychart.elements.Multilabel.prototype.width;
-anychart.elements.Multilabel.prototype['widthAt'] = anychart.elements.Multilabel.prototype.widthAt;
-anychart.elements.Multilabel.prototype['height'] = anychart.elements.Multilabel.prototype.height;
-anychart.elements.Multilabel.prototype['heightAt'] = anychart.elements.Multilabel.prototype.heightAt;
-anychart.elements.Multilabel.prototype['enabledAt'] = anychart.elements.Multilabel.prototype.enabledAt;
-anychart.elements.Multilabel.prototype['textSettingsAt'] = anychart.elements.Multilabel.prototype.textSettingsAt;
-anychart.elements.Multilabel.prototype['serializeAt'] = anychart.elements.Multilabel.prototype.serializeAt;
-anychart.elements.Multilabel.prototype['deserializeAt'] = anychart.elements.Multilabel.prototype.deserializeAt;
-anychart.elements.Multilabel.prototype['serialize'] = anychart.elements.Multilabel.prototype.serialize;
-anychart.elements.Multilabel.prototype['deserialize'] = anychart.elements.Multilabel.prototype.deserialize;
-anychart.elements.Multilabel.prototype['end'] = anychart.elements.Multilabel.prototype.end;
-anychart.elements.Multilabel.prototype['draw'] = anychart.elements.Multilabel.prototype.draw;
+goog.exportSymbol('anychart.elements.LabelsFactory', anychart.elements.LabelsFactory);
+anychart.elements.LabelsFactory.prototype['background'] = anychart.elements.LabelsFactory.prototype.background;
+anychart.elements.LabelsFactory.prototype['padding'] = anychart.elements.LabelsFactory.prototype.padding;
+anychart.elements.LabelsFactory.prototype['textFormatter'] = anychart.elements.LabelsFactory.prototype.textFormatter;
+anychart.elements.LabelsFactory.prototype['positionFormatter'] = anychart.elements.LabelsFactory.prototype.positionFormatter;
+anychart.elements.LabelsFactory.prototype['position'] = anychart.elements.LabelsFactory.prototype.position;
+anychart.elements.LabelsFactory.prototype['anchor'] = anychart.elements.LabelsFactory.prototype.anchor;
+anychart.elements.LabelsFactory.prototype['offsetX'] = anychart.elements.LabelsFactory.prototype.offsetX;
+anychart.elements.LabelsFactory.prototype['offsetY'] = anychart.elements.LabelsFactory.prototype.offsetY;
+anychart.elements.LabelsFactory.prototype['rotation'] = anychart.elements.LabelsFactory.prototype.rotation;
+anychart.elements.LabelsFactory.prototype['width'] = anychart.elements.LabelsFactory.prototype.width;
+anychart.elements.LabelsFactory.prototype['height'] = anychart.elements.LabelsFactory.prototype.height;
+anychart.elements.LabelsFactory.prototype['serialize'] = anychart.elements.LabelsFactory.prototype.serialize;
+anychart.elements.LabelsFactory.prototype['deserialize'] = anychart.elements.LabelsFactory.prototype.deserialize;
+anychart.elements.LabelsFactory.prototype['add'] = anychart.elements.LabelsFactory.prototype.add;
+anychart.elements.LabelsFactory.prototype['draw'] = anychart.elements.LabelsFactory.prototype.draw;
+anychart.elements.LabelsFactory.prototype['clear'] = anychart.elements.LabelsFactory.prototype.clear;
+anychart.elements.LabelsFactory.prototype['measure'] = anychart.elements.LabelsFactory.prototype.measure;
+anychart.elements.LabelsFactory.prototype['enabled'] = anychart.elements.LabelsFactory.prototype.enabled;
+anychart.elements.LabelsFactory.prototype['measureWithTransform'] = anychart.elements.LabelsFactory.prototype.measureWithTransform;
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  anychart.elements.LabelsFactory.Label
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.elements.LabelsFactory.Label', anychart.elements.LabelsFactory.Label);
+anychart.elements.LabelsFactory.Label.prototype['background'] = anychart.elements.LabelsFactory.Label.prototype.background;
+anychart.elements.LabelsFactory.Label.prototype['padding'] = anychart.elements.LabelsFactory.Label.prototype.padding;
+anychart.elements.LabelsFactory.Label.prototype['textFormatter'] = anychart.elements.LabelsFactory.Label.prototype.textFormatter;
+anychart.elements.LabelsFactory.Label.prototype['positionFormatter'] = anychart.elements.LabelsFactory.Label.prototype.positionFormatter;
+anychart.elements.LabelsFactory.Label.prototype['position'] = anychart.elements.LabelsFactory.Label.prototype.position;
+anychart.elements.LabelsFactory.Label.prototype['anchor'] = anychart.elements.LabelsFactory.Label.prototype.anchor;
+anychart.elements.LabelsFactory.Label.prototype['offsetX'] = anychart.elements.LabelsFactory.Label.prototype.offsetX;
+anychart.elements.LabelsFactory.Label.prototype['offsetY'] = anychart.elements.LabelsFactory.Label.prototype.offsetY;
+anychart.elements.LabelsFactory.Label.prototype['rotation'] = anychart.elements.LabelsFactory.Label.prototype.rotation;
+anychart.elements.LabelsFactory.Label.prototype['width'] = anychart.elements.LabelsFactory.Label.prototype.width;
+anychart.elements.LabelsFactory.Label.prototype['height'] = anychart.elements.LabelsFactory.Label.prototype.height;
+anychart.elements.LabelsFactory.Label.prototype['enabled'] = anychart.elements.LabelsFactory.Label.prototype.enabled;
+anychart.elements.LabelsFactory.Label.prototype['serialize'] = anychart.elements.LabelsFactory.Label.prototype.serialize;
+anychart.elements.LabelsFactory.Label.prototype['deserialize'] = anychart.elements.LabelsFactory.Label.prototype.deserialize;
+anychart.elements.LabelsFactory.Label.prototype['draw'] = anychart.elements.LabelsFactory.Label.prototype.draw;
+anychart.elements.LabelsFactory.Label.prototype['clear'] = anychart.elements.LabelsFactory.Label.prototype.clear;
+anychart.elements.LabelsFactory.Label.prototype['getIndex'] = anychart.elements.LabelsFactory.Label.prototype.getIndex;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.elements.RangeMarker
@@ -1056,8 +1074,8 @@ goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);
 goog.exportSymbol('anychart.version', anychart.VERSION);
-goog.exportSymbol('anychart.json', anychart.json);//in docs/
-goog.exportSymbol('anychart.xml', anychart.xml);
+goog.exportSymbol('anychart.fromJson', anychart.fromJson);
+goog.exportSymbol('anychart.fromXml', anychart.fromXml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
 goog.exportSymbol('anychart.chart', anychart.chart);

@@ -226,6 +226,47 @@ anychart.utils.normalizeNinePositions = function(position, opt_default) {
 
 
 /**
+ * Костыль. Соотносит позицию из anychart.utils.NinePositions к acgraph.vector.Anchor.
+ * @param {anychart.utils.NinePositions} position Позиция из енума anychart.utils.NinePositions.
+ * @return {acgraph.vector.Anchor} Позиция из енума acgraph.vector.Anchor.
+ */
+anychart.utils.ninePositionsToAnchor = function(position) {
+  var resultPos = acgraph.vector.Anchor.CENTER;
+  switch (position) {
+    case anychart.utils.NinePositions.LEFT_TOP:
+      resultPos = acgraph.vector.Anchor.LEFT_TOP;
+      break;
+    case anychart.utils.NinePositions.TOP:
+      resultPos = acgraph.vector.Anchor.LEFT_CENTER;
+      break;
+    case anychart.utils.NinePositions.RIGHT_TOP:
+      resultPos = acgraph.vector.Anchor.RIGHT_TOP;
+      break;
+    case anychart.utils.NinePositions.LEFT_CENTER:
+      resultPos = acgraph.vector.Anchor.LEFT_CENTER;
+      break;
+    case anychart.utils.NinePositions.CENTER:
+      resultPos = acgraph.vector.Anchor.CENTER;
+      break;
+    case anychart.utils.NinePositions.RIGHT_CENTER:
+      resultPos = acgraph.vector.Anchor.RIGHT_CENTER;
+      break;
+    case anychart.utils.NinePositions.LEFT_BOTTOM:
+      resultPos = acgraph.vector.Anchor.LEFT_BOTTOM;
+      break;
+    case anychart.utils.NinePositions.BOTTOM:
+      resultPos = acgraph.vector.Anchor.CENTER_BOTTOM;
+      break;
+    case anychart.utils.NinePositions.RIGHT_BOTTOM:
+      resultPos = acgraph.vector.Anchor.RIGHT_BOTTOM;
+      break;
+  }
+
+  return resultPos;
+};
+
+
+/**
  * Like normalizeNinePositions method but allow to return custom position string value (inside, outside, custom, etc).
  *
  * @param {*} position One of nine positions to normalize.

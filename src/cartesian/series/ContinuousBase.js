@@ -297,7 +297,7 @@ anychart.cartesian.series.ContinuousBase.prototype.deserialize = function(config
 anychart.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() {
   var res = goog.base(this, 'restoreDefaults');
 
-  var labels = /** @type {anychart.elements.Multilabel} */(this.labels());
+  var labels = /** @type {anychart.elements.LabelsFactory} */(this.labels());
   labels.suspendSignalsDispatching();
   labels.enabled(false);
   labels.anchor('bottom');

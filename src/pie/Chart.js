@@ -1,7 +1,7 @@
 goog.provide('anychart.pie.Chart');
 goog.require('anychart.Chart');
 goog.require('anychart.color');
-goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
@@ -70,7 +70,7 @@ anychart.pie.Chart = function(opt_data) {
   this.sort_ = anychart.utils.Sort.NONE;
 
   /**
-   * @type {anychart.elements.Multilabel}
+   * @type {anychart.elements.LabelsFactory}
    * @private
    */
   this.labels_ = null;
@@ -131,7 +131,7 @@ anychart.pie.Chart = function(opt_data) {
    * @type {Object}
    * @private
    */
-  this.formatProvider_ = {};
+  this.statistic_ = {};
 
   /**
    * Default fill function.
@@ -597,11 +597,11 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *  chart3.labels()
  *     .fontSize(10)
  *     .fontColor('white');
- * @return {anychart.elements.Multilabel} An instance of {@link anychart.elements.Multilabel} class for method chaining.
+ * @return {anychart.elements.LabelsFactory} An instance of {@link anychart.elements.LabelsFactory} class for method chaining.
  *//**
  * Setter for the pie labels.<br/>
- * <b>Note:</b> positioing is done using {@link anychart.elements.Multilabel#positionFormatter} method
- * and text is formatted using {@link anychart.elements.Multilabel#textFormatter} method.
+ * <b>Note:</b> positioing is done using {@link anychart.elements.LabelsFactory#positionFormatter} method
+ * and text is formatted using {@link anychart.elements.LabelsFactory#textFormatter} method.
  * @example
  *  var data = [
  *    {name: 'Point 1', value: 10},
@@ -610,7 +610,7 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *    {name: 'Point 4', value: 14}
  *  ];
  *  chart = new anychart.pie.Chart(data);
- *  var labels = new anychart.elements.Multilabel();
+ *  var labels = new anychart.elements.LabelsFactory();
  *  labels.textFormatter(function(formatProvider, index){
  *        var lblText = formatProvider(index, 'name');
  *        lblText += ': ' + formatProvider(index, 'value');
@@ -622,21 +622,21 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *      .fontSize(10)
  *      .fontColor('white');
  *  chart.labels(labels);
- * @param {anychart.elements.Multilabel=} opt_value [] Multilabel instance.
+ * @param {anychart.elements.LabelsFactory=} opt_value [] LabelsFactory instance.
  * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.elements.Multilabel=} opt_value .
- * @return {(anychart.elements.Multilabel|anychart.pie.Chart)} .
+ * @param {anychart.elements.LabelsFactory=} opt_value .
+ * @return {(anychart.elements.LabelsFactory|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.elements.Multilabel();
-    this.labels_.textFormatter(function(formatProvider, index) {
+    this.labels_ = new anychart.elements.LabelsFactory();
+    this.labels_.textFormatter(function(formatProvider) {
       return (formatProvider['value'] * 100 / formatProvider['sum']).toFixed(1) + '%';
     });
-    this.labels_.positionFormatter(function(positionProvider, index) {
-      return positionProvider(index);
+    this.labels_.positionFormatter(function(positionProvider) {
+      return positionProvider(this.getIndex());
     });
 
     this.labels_.listenSignals(this.labelsInvalidated_, this);
@@ -644,7 +644,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
-  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.Multilabel || goog.isNull(opt_value))) {
+  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.LabelsFactory || goog.isNull(opt_value))) {
     this.labels_.deserialize(opt_value ? opt_value.serialize() : {});
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -1096,7 +1096,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1108,22 +1108,31 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
     var value;
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+      var missingPoints = 0; // count of missing points
       var min = Number.MAX_VALUE;
       var max = -Number.MAX_VALUE;
       var sum = 0;
       while (iterator.advance()) {
         value = parseFloat(iterator.get('value'));
+        // if missing
+        if (isNaN(value)) {
+          missingPoints++;
+          continue;
+        }
         min = Math.min(value, min);
         max = Math.max(value, max);
         sum += value;
       }
 
-      var count = iterator.getRowsCount();
-      this.formatProvider_['count'] = count;
-      this.formatProvider_['min'] = min;
-      this.formatProvider_['max'] = max;
-      this.formatProvider_['sum'] = sum;
-      this.formatProvider_['average'] = (sum / count);
+      var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+      var avg;
+      if (count == 0) min = max = sum = avg = undefined;
+      else avg = sum / count;
+      this.statistic_['count'] = count;
+      this.statistic_['min'] = min;
+      this.statistic_['max'] = max;
+      this.statistic_['sum'] = sum;
+      this.statistic_['average'] = avg;
 
       iterator.reset();
       this.markConsistent(anychart.ConsistencyState.DATA);
@@ -1134,8 +1143,9 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
 
     while (iterator.advance()) {
       value = parseFloat(iterator.get('value'));
-
-      sweep = value / this.formatProvider_['sum'] * 360;
+      // if missing then continue without drawing
+      if (isNaN(value)) continue;
+      sweep = value / this.statistic_['sum'] * 360;
 
       fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
       stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
@@ -1149,19 +1159,25 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, exploded, this.explodeValue_, null);
       start += sweep;
     }
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
+
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     if (this.labels_) {
       iterator.reset();
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
+      this.labels_.clear();
       while (iterator.advance()) {
-        this.createFormatProvider(iterator.getIndex());
-        this.labels_.draw(this.formatProvider_, this.positionProvider_);
+        // if missing - do not draw label
+        if (!goog.isDef(iterator.get('value'))) continue;
+        var formatProvider = this.createFormatProvider(iterator.getIndex());
+        // index for positionProvider function, cause label set it as an argument
+        this.labels_.add(formatProvider, this.positionProvider_);
       }
-      this.labels_.end();
+      this.labels_.draw();
     }
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
@@ -1448,30 +1464,29 @@ anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
  */
 anychart.pie.Chart.prototype.createFormatProvider = function(index) {
   var iterator = this.data().getIterator();
-  // no need to store this information always in this.formatProvider_
-  if (goog.isDef(this.formatProvider_['gropedPoint'])) {
-    delete this.formatProvider_['groupedPoint'];
-    delete this.formatProvider_['names'];
-    delete this.formatProvider_['values'];
-  }
+  // no need to store this information always in this.statistic_
+  var formatProvider = {};
+
   if (iterator.select(index)) {
-    this.formatProvider_['index'] = index;
-    this.formatProvider_['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + index;
-    this.formatProvider_['x'] = iterator.get('x');
-    this.formatProvider_['value'] = iterator.get('value');
+    formatProvider['index'] = index;
+    formatProvider['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + index;
+    formatProvider['x'] = iterator.get('x');
+    formatProvider['value'] = iterator.get('value');
     if (iterator.meta('groupedPoint') == true) {
-      this.formatProvider_['name'] = 'Grouped Point';
-      this.formatProvider_['groupedPoint'] = true;
-      this.formatProvider_['names'] = iterator.meta('names');
-      this.formatProvider_['values'] = iterator.meta('values');
+      formatProvider['name'] = 'Grouped Point';
+      formatProvider['groupedPoint'] = true;
+      formatProvider['names'] = iterator.meta('names');
+      formatProvider['values'] = iterator.meta('values');
     }
   } else {
-    this.formatProvider_['index'] = -1;
-    this.formatProvider_['name'] = 'undefined';
-    this.formatProvider_['x'] = 'undefined';
-    this.formatProvider_['value'] = 'undefined';
+    formatProvider['index'] = -1;
+    formatProvider['name'] = 'undefined';
+    formatProvider['x'] = 'undefined';
+    formatProvider['value'] = 'undefined';
   }
-  return this.formatProvider_;
+
+  goog.object.extend(formatProvider, this.statistic_);
+  return formatProvider;
 };
 
 
@@ -1525,7 +1540,6 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   var stroke = chart['stroke'];
   var hoverFill = chart['hoverFill'];
   var hoverStroke = chart['hoverStroke'];
-
   var labels = chart['labels'];
 
   this.suspendSignalsDispatching();
@@ -1542,13 +1556,7 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.stroke(stroke);
   this.hoverFill(hoverFill);
   this.hoverStroke(hoverStroke);
-
-  //if (labels) {
-  //  var multiLabels = this.labels();
-  //  multiLabels.textFormatter(/** @type {Function} */ (this.labels().textFormatter()));
-  //  multiLabels.positionFormatter(/** @type {Function} */ (this.labels().positionFormatter()));
-  //  multiLabels.deserialize(labels);
-  //}
+  this.labels(labels);
 
   this.resumeSignalsDispatching(false);
 

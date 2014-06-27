@@ -43,9 +43,7 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = false;
 
   this.markers().position(anychart.utils.NinePositions.CENTER);
-  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
   this.labels().position(anychart.utils.NinePositions.CENTER);
-  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
 
