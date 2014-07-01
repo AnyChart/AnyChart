@@ -432,9 +432,32 @@ anychart.data.View.prototype.transitionMeta = function(on) {
 anychart.data.View.prototype.serialize = function() {
   var arr = [];
   var iterator = this.getIterator();
-
+  var index;
+  var row;
+  var arrayMapping;
+  var key;
+  var rowObject;
+  var i;
   while (iterator.advance()) {
-    arr.push(this.row(iterator.getIndex()));
+    index = iterator.getIndex();
+    row = this.row(index);
+    // if row represented by array - convert it to object with help of array mapping.
+    if (goog.isArray(row)) {
+      // get array mapping for the row
+      arrayMapping = this.getRowMapping(index).getArrayMapping();
+      rowObject = {};
+      for (key in arrayMapping) {
+        for (i = 0; i < arrayMapping[key].length; i++) {
+          if (arrayMapping[key][i] in row) {
+            rowObject[key] = row[arrayMapping[key][i]];
+            break;
+          }
+        }
+      }
+    } else {
+      rowObject = row;
+    }
+    arr.push(rowObject);
   }
 
   return arr;

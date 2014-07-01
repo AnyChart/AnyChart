@@ -963,7 +963,7 @@ anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#_(),. -]*$/;
 anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
   if (goog.isNull(json)) return null;
   var root = doc.createElement(rootNodeName);
-  if (goog.isString(json)) {
+  if (goog.isString(json) || goog.isNumber(json)) {
     root.appendChild(doc.createCDATASection(String(json)));
   } else {
     var j;

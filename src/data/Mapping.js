@@ -151,3 +151,12 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    */
   this.indexProps_ = opt_indexProps || ['x'];
 };
+
+
+/**
+ * Getter for array mapping.
+ * @return {!Object.<Array.<number>>} Array mapping.
+ */
+anychart.data.Mapping.prototype.getArrayMapping = function() {
+  return this.arrayMapping_;
+};
