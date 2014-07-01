@@ -15,12 +15,6 @@ anychart.elements.Grid = function() {
   goog.base(this);
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  this.invert_;
-
-  /**
    * @type {anychart.utils.TypedLayer}
    * @private
    */
@@ -120,25 +114,6 @@ anychart.elements.Grid.prototype.direction = function(opt_value) {
     return this;
   } else {
     return this.direction_;
-  }
-};
-
-
-/**
- * Get/set grid invert.
- * @param {boolean=} opt_value Grid invert.
- * @return {boolean|anychart.elements.Grid} Invert settings or this.
- */
-anychart.elements.Grid.prototype.invert = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.invert_ != opt_value) {
-      this.invert_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.invert_;
   }
 };
 
@@ -349,14 +324,8 @@ anychart.elements.Grid.prototype.minor = function(opt_value) {
 anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds();
   /** @type {number}*/
-  var y;
-  if (this.invert()) {
-    y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-    ratio == 1 ? y -= shift : y += shift;
-  } else {
-    y = Math.round(parentBounds.getTop() + ratio * parentBounds.height);
-    ratio == 0 ? y -= shift : y += shift;
-  }
+  var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
+  ratio == 1 ? y -= shift : y += shift;
   this.lineElement_.moveTo(parentBounds.getLeft(), y);
   this.lineElement_.lineTo(parentBounds.getRight(), y);
 };
@@ -371,14 +340,8 @@ anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
 anychart.elements.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds();
   /** @type {number}*/
-  var x;
-  if (this.invert()) {
-    x = Math.round(parentBounds.getRight() - ratio * parentBounds.width);
-    ratio == 0 ? x += shift : x -= shift;
-  } else {
-    x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-  }
+  var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
+  ratio == 1 ? x += shift : x -= shift;
   this.lineElement_.moveTo(x, parentBounds.getBottom());
   this.lineElement_.lineTo(x, parentBounds.getTop());
 };
@@ -411,15 +374,9 @@ anychart.elements.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevR
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds();
     var y1, y2, checkIndex;
-    if (this.invert()) {
-      y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
-      y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-      checkIndex = 1;
-    } else {
-      y1 = Math.round(parentBounds.getTop() + prevRatio * parentBounds.height);
-      y2 = Math.round(parentBounds.getTop() + ratio * parentBounds.height);
-      checkIndex = 0;
-    }
+    y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
+    y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
+    checkIndex = 1;
     ratio == checkIndex ? y2 -= shift : y2 += shift;
     prevRatio == checkIndex ? y1 -= shift : y1 += shift;
 
@@ -447,15 +404,9 @@ anychart.elements.Grid.prototype.drawInterlaceVertical = function(ratio, prevRat
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds();
     var x1, x2, checkIndex;
-    if (!this.invert()) {
-      x1 = Math.round(parentBounds.getRight() - prevRatio * parentBounds.width);
-      x2 = Math.round(parentBounds.getRight() - ratio * parentBounds.width);
-      checkIndex = 0;
-    } else {
-      x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
-      x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-      checkIndex = 1;
-    }
+    x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
+    x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
+    checkIndex = 1;
     ratio == checkIndex ? x2 += shift : x2 -= shift;
     prevRatio == checkIndex ? x1 += shift : x1 -= shift;
 
@@ -593,7 +544,6 @@ anychart.elements.Grid.prototype.restoreDefaults = function() {
   this.zIndex(10);
   this.suspendSignalsDispatching();
   this.direction(anychart.utils.Direction.HORIZONTAL);
-  this.invert(false);
   this.minor(false);
   this.oddFill('#FFFFFF 1');
   this.evenFill('#F5F5F5 1');

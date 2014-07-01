@@ -18,7 +18,8 @@ goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
-  return (anychart.math.log(/** @type {number} */(value)) - anychart.math.log(this.min)) / this.range;
+  var result = (anychart.math.log(/** @type {number} */(value)) - anychart.math.log(this.min)) / this.range;
+  return this.isInverted ? 1 - result : result;
 };
 
 
