@@ -149,6 +149,13 @@ goog.inherits(anychart.cartesian.Chart, anychart.Chart);
 
 
 /**
+ * Максимальное число попыток рассчитать длины для осей чарта.
+ * @type {number}
+ * @private
+ */
+anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_ = 2;
+
+/**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS  to anychart.Chart states.
  * @type {number}
  */
@@ -2098,55 +2105,80 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.MARKER_PALETTE);
   }
 
-  //total bounds of content area
-  var contentAreaBounds = bounds.clone();
-  //bounds of content area with subtracted axes bounds
-  var boundsWithoutAxes = bounds.clone();
-
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
 
   //calculate axes space first, the result is data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    //axes local vars
-    var remainingBounds;
-    var axis;
-    var orientation;
-    var topOffset = 0;
-    var bottomOffset = 0;
-    var leftOffset = 0;
-    var rightOffset = 0;
+    //total bounds of content area
+    var contentAreaBounds = bounds.clone();
+    var attempt = 0;
+    do {
+      //axes local vars
+      var remainingBounds;
+      var axis;
+      var orientation;
+      var topOffset = 0;
+      var bottomOffset = 0;
+      var leftOffset = 0;
+      var rightOffset = 0;
+      var complete = true;
+      var boundsWithoutAxes = bounds.clone();
 
-    for (i = axes.length; i--;) {
-      axis = axes[i];
-      if (axis.enabled()) {
-        axis.suspendSignalsDispatching();
-        axis.parentBounds(contentAreaBounds);
+      for (i = axes.length; i--;) {
+        axis = axes[i];
+        if (axis.enabled()) {
+          axis.suspendSignalsDispatching();
+          axis.parentBounds(contentAreaBounds);
 
-        remainingBounds = axis.getRemainingBounds(); ////НАГРУЗКА!!!!!!!!!!
-        orientation = axis.orientation();
+          remainingBounds = axis.getRemainingBounds(); ////НАГРУЗКА!!!!!!!!!!
+          orientation = axis.orientation();
 
-        if (orientation == anychart.utils.Orientation.TOP) {
-          axis.offsetY(topOffset);
-          topOffset += contentAreaBounds.height - remainingBounds.height;
-        } else if (orientation == anychart.utils.Orientation.BOTTOM) {
-          axis.offsetY(bottomOffset);
-          bottomOffset += contentAreaBounds.height - remainingBounds.height;
-        } else if (orientation == anychart.utils.Orientation.LEFT) {
-          axis.offsetX(leftOffset);
-          leftOffset += contentAreaBounds.width - remainingBounds.width;
-        } else if (orientation == anychart.utils.Orientation.RIGHT) {
-          axis.offsetX(rightOffset);
-          rightOffset += contentAreaBounds.width - remainingBounds.width;
+          if (orientation == anychart.utils.Orientation.TOP) {
+            axis.offsetY(topOffset);
+            topOffset += contentAreaBounds.height - remainingBounds.height;
+          } else if (orientation == anychart.utils.Orientation.BOTTOM) {
+            axis.offsetY(bottomOffset);
+            bottomOffset += contentAreaBounds.height - remainingBounds.height;
+          } else if (orientation == anychart.utils.Orientation.LEFT) {
+            axis.offsetX(leftOffset);
+            leftOffset += contentAreaBounds.width - remainingBounds.width;
+          } else if (orientation == anychart.utils.Orientation.RIGHT) {
+            axis.offsetX(rightOffset);
+            rightOffset += contentAreaBounds.width - remainingBounds.width;
+          }
+          axis.resumeSignalsDispatching(false);
         }
-
-        axis.resumeSignalsDispatching(false);
       }
-    }
 
-    boundsWithoutAxes.left += leftOffset;
-    boundsWithoutAxes.top += topOffset;
-    boundsWithoutAxes.width -= rightOffset + leftOffset;
-    boundsWithoutAxes.height -= bottomOffset + topOffset;
+      boundsWithoutAxes.left += leftOffset;
+      boundsWithoutAxes.top += topOffset;
+      boundsWithoutAxes.width -= rightOffset + leftOffset;
+      boundsWithoutAxes.height -= bottomOffset + topOffset;
+
+      for (i = axes.length; i--;) {
+        axis = axes[i];
+        if (axis.enabled()) {
+          axis.suspendSignalsDispatching();
+          var remainingBoundsBeforeSetLength = axis.getRemainingBounds();
+          if (axis.isHorizontal()) {
+            axis.length(parseFloat(boundsWithoutAxes.width));
+            remainingBounds = axis.getRemainingBounds();
+            if (remainingBounds.height != remainingBoundsBeforeSetLength.height) {
+              complete = false;
+            }
+          } else {
+            axis.length(parseFloat(boundsWithoutAxes.height));
+            remainingBounds = axis.getRemainingBounds();
+            if (remainingBounds.width != remainingBoundsBeforeSetLength.width) {
+              complete = false;
+            }
+          }
+          axis.resumeSignalsDispatching(false);
+        }
+      }
+      attempt++;
+    } while (!complete && attempt < anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_);
+
 
     //bounds of data area
     this.dataBounds_ = boundsWithoutAxes.clone();
@@ -2154,6 +2186,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     for (i = this.series_.length; i--;) {
       this.series_[i].pixelBounds(this.dataBounds_);
     }
+
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.AXES);
     this.invalidate(anychart.ConsistencyState.GRIDS);

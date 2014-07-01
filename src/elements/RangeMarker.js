@@ -2,6 +2,7 @@ goog.provide('anychart.elements.RangeMarker');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -277,16 +278,14 @@ anychart.elements.RangeMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-
     var minValue = this.from_, maxValue = this.to_;
     if (this.from_ > this.to_) {
       minValue = this.from_;
       maxValue = this.to_;
     }
-
-    var ratioMinValue = this.scale().transform(minValue, isOrdinal ? 0 : 0);
-    var ratioMaxValue = this.scale().transform(maxValue, isOrdinal ? 1 : 0);
+    // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
+    var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
+    var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
 
     if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return;
 

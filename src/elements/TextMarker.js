@@ -2,6 +2,7 @@ goog.provide('anychart.elements.TextMarker');
 goog.require('anychart.color');
 goog.require('anychart.elements.Text');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -416,8 +417,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-    var ratio = scale.transform(this.value_, isOrdinal ? 0.5 : 0);
+    var ratio = goog.math.clamp(scale.transform(this.value_, 0.5), 0, 1);
     if (isNaN(ratio)) return;
 
     var shift = -.5;
