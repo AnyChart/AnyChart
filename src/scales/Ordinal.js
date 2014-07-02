@@ -19,6 +19,12 @@ anychart.scales.Ordinal = function() {
   this.values_ = [];
 
   /**
+   * @type {!(Array.<*>|string)}
+   * @private
+   */
+  this.names_ = [];
+
+  /**
    * @type {!Array.<anychart.scales.Ordinal.ValuesMapNode>}
    * @private
    */
@@ -150,12 +156,89 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
 
 
 /**
+ * Getter/setter for scale names.
+ * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
+ * @return {(Array.<*>|anychart.scales.Ordinal)} Scale names or self for chaining.
+ */
+anychart.scales.Ordinal.prototype.names = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isNull(opt_value))
+      this.names_ = [];
+    else if (goog.isArray(opt_value))
+      this.names_ = goog.array.clone(opt_value);
+    else {
+      // if field name does not set by string or set value the same - return self.
+      if (!goog.isString(opt_value) || this.names_ == opt_value)
+        return this;
+      this.names_ = opt_value;
+    }
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    return this;
+  }
+  if (goog.isArray(this.names_)) {
+    if (!this.resultNames_) {
+      /**
+       * Resulting names to return.
+       * Need to avoid original set of names to be changed.
+       */
+      this.resultNames_ = goog.array.clone(this.names_);
+    }
+
+    if (this.resultNames_.length < this.values_.length) {
+      while (this.resultNames_.length != this.values_.length) {
+        this.resultNames_.push(this.values_[this.resultNames_.length]);
+      }
+    }
+
+    return this.resultNames_;
+  } else {
+    return this.autoNames_ || [];
+  }
+};
+
+
+/**
+ * Getter for scale names field name.
+ * @return {?string} Field name for alias or null if names set explicit.
+ */
+anychart.scales.Ordinal.prototype.getNamesField = function() {
+  if (goog.isArray(this.names_)) return null;
+  else return this.names_;
+};
+
+
+/**
+ * Setter for auto calculated scale names (names from dataset using field name)
+ * @param {Array.<*>} value Array of auto names.
+ */
+anychart.scales.Ordinal.prototype.setAutoNames = function(value) {
+  this.autoNames_ = value;
+};
+
+
+/**
+ * Search value in the values and returns it index.
+ * @param {*} value Value which index should be found.
+ * @return {number} Index of value or NaN.
+ */
+anychart.scales.Ordinal.prototype.getIndexByValue = function(value) {
+  this.aNode_.key = value;
+  var index = goog.array.binarySearch(this.valuesMap_, this.aNode_, this.comparator_);
+  if (index < 0)
+    return NaN;
+  return this.valuesMap_[index].value;
+};
+
+
+/**
  * @return {!anychart.scales.Ordinal} Resets input domain.
  */
 anychart.scales.Ordinal.prototype.resetDataRange = function() {
   this.oldValues_ = this.values_;
   this.values_ = [];
   this.valuesMap_.length = 0;
+  this.autoNames_ = null;
+  this.resultNames_ = null;
   return this;
 };
 

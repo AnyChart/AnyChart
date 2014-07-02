@@ -1552,7 +1552,7 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
     labelText = parseFloat(value);
     labelValue = parseFloat(value);
   } else if (scale instanceof anychart.scales.Ordinal) {
-    labelText = scale.values()[index];
+    labelText = scale.ticks().names()[index];
     labelValue = value;
   } else if (scale instanceof anychart.scales.DateTime) {
     var date = new Date(value);

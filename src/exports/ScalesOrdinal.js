@@ -6,4 +6,5 @@ anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototy
 anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;
 anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;
 anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;
+anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;
 anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;

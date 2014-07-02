@@ -1233,6 +1233,8 @@ anychart.cartesian.series.Base.prototype.scaleInvalidated_ = function(event) {
     signal |= anychart.Signal.NEEDS_RECALCULATION;
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
     signal |= anychart.Signal.NEEDS_REDRAW;
+  else
+    this.dispatchSignal(signal);
   this.invalidate(anychart.ConsistencyState.APPEARANCE, signal);
 };
 

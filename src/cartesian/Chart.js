@@ -1628,6 +1628,25 @@ anychart.cartesian.Chart.prototype.calculate = function() {
       }
     }
 
+    // calculate auto names for scales with predefined names field
+    for (id in this.ordinalScalesWithNamesField_) {
+      scale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
+      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(scale)];
+      var fieldName = scale.getNamesField();
+      var autoNames = [];
+      for (i = 0; i < series.length; i++) {
+        aSeries = series[i];
+        iterator = aSeries.getResetIterator();
+        while (iterator.advance()) {
+          var valueIndex = scale.getIndexByValue(iterator.get('x'));
+          var name = iterator.get(fieldName);
+          if (!goog.isDef(autoNames[valueIndex]))
+            autoNames[valueIndex] = name || iterator.get('x') || iterator.get('value');
+        }
+      }
+      scale.setAutoNames(autoNames);
+    }
+
     anychart.Base.resumeSignalsDispatchingTrue(this.series_);
 
     this.markConsistent(anychart.ConsistencyState.SCALES);
@@ -1646,6 +1665,8 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   var count;
   var xScales = {};
   var yScales = {};
+  var ordinalScalesWithNamesField = {};
+  var seriesOfOrdinalScalesWithNamesField = {};
   var seriesOfStackedScaleMap = {};
   var seriesOfXScaleMap = {};
   var seriesOfYScaleMap = {};
@@ -1720,6 +1741,15 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
     else
       seriesOfXScaleMap[id] = [series];
 
+    // series ordinal scales with predefined field name for scale names.
+    if (scale instanceof anychart.scales.Ordinal && scale.getNamesField()) {
+      ordinalScalesWithNamesField[id] = scale;
+      if (id in seriesOfOrdinalScalesWithNamesField)
+        seriesOfOrdinalScalesWithNamesField[id].push(series);
+      else
+        seriesOfOrdinalScalesWithNamesField[id] = [series];
+    }
+
     //series Y scale
     if (!series.yScale()) {
       series.yScale(/** @type {anychart.scales.Base} */(this.yScale()));
@@ -1741,6 +1771,14 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
     else
       seriesOfYScaleMap[id] = [series];
 
+    // series ordinal scales with predefined field name for scale names.
+    if (scale instanceof anychart.scales.Ordinal && scale.getNamesField()) {
+      ordinalScalesWithNamesField[id] = scale;
+      if (id in seriesOfOrdinalScalesWithNamesField)
+        seriesOfOrdinalScalesWithNamesField[id].push(series);
+      else
+        seriesOfOrdinalScalesWithNamesField[id] = [series];
+    }
   }
 
   //----------------------------------calc statistics for series
@@ -1792,6 +1830,8 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   this.xScales_ = xScales;
   this.seriesOfXScaleMap_ = seriesOfXScaleMap;
   this.seriesOfYScaleMap_ = seriesOfYScaleMap;
+  this.ordinalScalesWithNamesField_ = ordinalScalesWithNamesField;
+  this.seriesOfOrdinalScalesWithNamesField_ = seriesOfOrdinalScalesWithNamesField;
 };
 
 

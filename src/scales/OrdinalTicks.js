@@ -134,12 +134,20 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
     }
     return this;
   }
-  if (!this.names_ && !this.autoNames_) {
-    var values = this.get();
+  var values = this.get();
+  if (!this.names_ || this.names_.length < values.length || !this.autoNames_) {
+    var scaleNames = this.scale_.names();
     this.autoNames_ = [];
     for (var i = 0; i < values.length; i++) {
-      var val = values[i];
-      this.autoNames_.push(goog.isArray(val) ? val[0] : val);
+      var val = goog.isArray(values[i]) ? values[i][0] : values[i];
+      var index = this.scale_.getIndexByValue(val);
+      if (!isNaN(index)) this.autoNames_.push(scaleNames[index]);
+      else this.autoNames_.push(val);
+    }
+  }
+  if (this.names_) {
+    while (this.names_.length < values.length) {
+      this.names_.push(this.autoNames_[this.names_.length]);
     }
   }
   return /** @type {!Array} */(this.names_ || this.autoNames_);
