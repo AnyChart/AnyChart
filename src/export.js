@@ -796,6 +796,8 @@ goog.exportSymbol('anychart.events.EventType.POINT_MOUSE_OVER', anychart.events.
 goog.exportSymbol('anychart.events.EventType.POINT_CLICK', anychart.events.EventType.POINT_CLICK);
 goog.exportSymbol('anychart.events.EventType.POINT_DOUBLE_CLICK', anychart.events.EventType.POINT_DOUBLE_CLICK);
 goog.exportSymbol('anychart.events.EventType.CHART_DRAW', anychart.events.EventType.CHART_DRAW);
+goog.exportSymbol('anychart.events.EventType.SCROLL_CHANGE', anychart.events.EventType.SCROLL_CHANGE);
+goog.exportSymbol('anychart.events.EventType.SPLITTER_CHANGE', anychart.events.EventType.SPLITTER_CHANGE);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.math.Rect
@@ -954,11 +956,40 @@ anychart.ui.Paginator.prototype['currentPage'] = anychart.ui.Paginator.prototype
 anychart.ui.Paginator.prototype['draw'] = anychart.ui.Paginator.prototype.draw;
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  anychart.ui.ScrollBar
+//
+//----------------------------------------------------------------------------------------------------------------------
+goog.exportSymbol('anychart.ui.ScrollBar', anychart.ui.ScrollBar);
+goog.exportSymbol('anychart.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.ui.ScrollBar.SCROLL_PIXEL_STEP);
+goog.exportSymbol('anychart.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.ui.ScrollBar.SCROLL_RATIO_STEP);
+anychart.ui.ScrollBar.prototype['layout'] = anychart.ui.ScrollBar.prototype.layout;
+anychart.ui.ScrollBar.prototype['backgroundStroke'] = anychart.ui.ScrollBar.prototype.backgroundStroke;
+anychart.ui.ScrollBar.prototype['backgroundFill'] = anychart.ui.ScrollBar.prototype.backgroundFill;
+anychart.ui.ScrollBar.prototype['sliderStroke'] = anychart.ui.ScrollBar.prototype.sliderStroke;
+anychart.ui.ScrollBar.prototype['sliderFill'] = anychart.ui.ScrollBar.prototype.sliderFill;
+anychart.ui.ScrollBar.prototype['contentBounds'] = anychart.ui.ScrollBar.prototype.contentBounds;
+anychart.ui.ScrollBar.prototype['visibleBounds'] = anychart.ui.ScrollBar.prototype.visibleBounds;
+anychart.ui.ScrollBar.prototype['startRatio'] = anychart.ui.ScrollBar.prototype.startRatio;
+anychart.ui.ScrollBar.prototype['endRatio'] = anychart.ui.ScrollBar.prototype.endRatio;
+anychart.ui.ScrollBar.prototype['setRatio'] = anychart.ui.ScrollBar.prototype.setRatio;
+
+anychart.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.ui.ScrollBar.prototype.scrollPixelStartTo;
+anychart.ui.ScrollBar.prototype['scrollStartTo'] = anychart.ui.ScrollBar.prototype.scrollStartTo;
+
+anychart.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.ui.ScrollBar.prototype.scrollPixelEndTo;
+anychart.ui.ScrollBar.prototype['scrollEndTo'] = anychart.ui.ScrollBar.prototype.scrollEndTo;
+
+anychart.ui.ScrollBar.prototype['scrollPixel'] = anychart.ui.ScrollBar.prototype.scrollPixel;
+anychart.ui.ScrollBar.prototype['scroll'] = anychart.ui.ScrollBar.prototype.scroll;
+
+anychart.ui.ScrollBar.prototype['buttonsVisible'] = anychart.ui.ScrollBar.prototype.buttonsVisible;
+anychart.ui.ScrollBar.prototype['draw'] = anychart.ui.ScrollBar.prototype.draw;
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  anychart.ui.Splitter
 //
 //----------------------------------------------------------------------------------------------------------------------
 goog.exportSymbol('anychart.ui.Splitter', anychart.ui.Splitter);
-goog.exportSymbol('anychart.ui.Splitter.CHANGE', anychart.ui.Splitter.CHANGE);
 anychart.ui.Splitter.prototype['layout'] = anychart.ui.Splitter.prototype.layout;
 anychart.ui.Splitter.prototype['position'] = anychart.ui.Splitter.prototype.position;
 anychart.ui.Splitter.prototype['dragAreaLength'] = anychart.ui.Splitter.prototype.dragAreaLength;
@@ -1036,6 +1067,8 @@ goog.exportSymbol('anychart.utils.NinePositions.BOTTOM', anychart.utils.NinePosi
 goog.exportSymbol('anychart.utils.NinePositions.RIGHT_BOTTOM', anychart.utils.NinePositions.RIGHT_BOTTOM);//in docs/
 goog.exportSymbol('anychart.utils.Direction.HORIZONTAL', anychart.utils.Direction.HORIZONTAL);//in docs/
 goog.exportSymbol('anychart.utils.Direction.VERTICAL', anychart.utils.Direction.VERTICAL);//in docs/
+goog.exportSymbol('anychart.utils.Layout.HORIZONTAL', anychart.utils.Layout.HORIZONTAL);
+goog.exportSymbol('anychart.utils.Layout.VERTICAL', anychart.utils.Layout.VERTICAL);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.utils Palettes

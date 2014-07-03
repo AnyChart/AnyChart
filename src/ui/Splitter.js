@@ -4,9 +4,11 @@ goog.require('acgraph.events');
 goog.require('acgraph.math.Rect');
 goog.require('acgraph.vector.Cursor');
 goog.require('acgraph.vector.Layer');
+
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
-goog.require('anychart.math.Rect');
+goog.require('anychart.math');
+goog.require('anychart.utils');
 
 goog.require('goog.math');
 
@@ -24,10 +26,10 @@ anychart.ui.Splitter = function() {
 
   /**
    * Layout.
-   * @type {anychart.ui.Splitter.Layout}
+   * @type {anychart.utils.Layout}
    * @private
    */
-  this.layout_ = anychart.ui.Splitter.Layout.VERTICAL;
+  this.layout_ = anychart.utils.Layout.VERTICAL;
 
 
   /**
@@ -81,7 +83,7 @@ anychart.ui.Splitter = function() {
 
   /**
    * Pixel bounds cache. Allows to avoid re-calculation of pixel bounds.
-   * @type {anychart.math.Rect}
+   * @type {acgraph.math.Rect}
    * @private
    */
   this.pixelBoundsCache_;
@@ -89,8 +91,8 @@ anychart.ui.Splitter = function() {
 
   /**
    * Start limit in this case is an area from the start side unavailable to move there with dragging despite the bounds set.
-   * For example: here are bounds anychart.math.Rect(0, 0, 100, 50) available for vertical splitter.
-   * If we set this.startLimitSize_ = 10, then available drag area becomes anychart.math.Rect(10, 0, 100, 50) because
+   * For example: here are bounds acgraph.math.Rect(0, 0, 100, 50) available for vertical splitter.
+   * If we set this.startLimitSize_ = 10, then available drag area becomes acgraph.math.Rect(10, 0, 100, 50) because
    * 'start' for vertical splitter is 'left', 'end' is 'right' (for horizontal one - 'start' is 'top', 'end' is 'bottom')
    * @type {number}
    * @private
@@ -100,8 +102,8 @@ anychart.ui.Splitter = function() {
 
   /**
    * End limit in this case is an area from the end side unavailable to move there with dragging despite the bounds set.
-   * For example: here are bounds anychart.math.Rect(0, 0, 100, 50) available for vertical splitter.
-   * If we set this.endLimitSize_ = 10, then available drag area becomes anychart.math.Rect(0, 0, 90, 50) because
+   * For example: here are bounds acgraph.math.Rect(0, 0, 100, 50) available for vertical splitter.
+   * If we set this.endLimitSize_ = 10, then available drag area becomes acgraph.math.Rect(0, 0, 90, 50) because
    * 'start' for vertical splitter is 'left', 'end' is 'right' (for horizontal one - 'start' is 'top', 'end' is 'bottom')
    * @type {number}
    * @private
@@ -153,6 +155,22 @@ anychart.ui.Splitter = function() {
 
 
   /**
+   * Width of the center line (visually is splitter itself).
+   * @type {number}
+   * @private
+   */
+  this.splitterWidth_ = 3;
+
+
+  /**
+   * Flag if a splitter width must be considered for this.getStartBounds_() and this.getEndBounds_() calculation.
+   * @type {boolean}
+   * @private
+   */
+  this.considerSplitterWidth_ = true;
+
+
+  /**
    * Center line's stroke.
    * @type {acgraph.vector.Stroke}
    * @private
@@ -170,22 +188,6 @@ anychart.ui.Splitter = function() {
     'angle': -90,
     'opacity': 1
   }));
-
-
-  /**
-   * Width of the center line (visually is splitter itself).
-   * @type {number}
-   * @private
-   */
-  this.splitterWidth_ = 3;
-
-
-  /**
-   * Flag if a splitter width must be considered for this.getStartBounds_() and this.getEndBounds_() calculation.
-   * @type {boolean}
-   * @private
-   */
-  this.considerSplitterWidth_ = true;
 
 
   /**
@@ -249,51 +251,15 @@ anychart.ui.Splitter.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Enum representing layout of the split container.
- * @enum {string}
- */
-anychart.ui.Splitter.Layout = {
-  HORIZONTAL: 'horizontal',
-  VERTICAL: 'vertical'
-};
-
-
-/**
- * Constant for splitter's event type.
- * @type {string}
- */
-anychart.ui.Splitter.CHANGE = 'splitterchange';
-
-
-/**
- * Normalizes string value to Layout enum. Default value is 'vertical'.
- *
- * @param {string} layout - Layout to be normalized.
- * @param {anychart.ui.Splitter.Layout=} opt_default - Default value to be used.
- * @return {anychart.ui.Splitter.Layout} - Normalized layout.
- */
-anychart.ui.Splitter.normalizeLayout = function(layout, opt_default) {
-  if (goog.isString(layout)) {
-    layout = layout.toLowerCase();
-    for (var i in anychart.ui.Splitter.Layout) {
-      if (layout == anychart.ui.Splitter.Layout[i])
-        return anychart.ui.Splitter.Layout[i];
-    }
-  }
-  return opt_default || anychart.ui.Splitter.Layout.VERTICAL;
-};
-
-
-/**
  * Getter/setter for layout.
  * NOTE: Doesn't modify actual bounds.
  *
- * @param {(anychart.ui.Splitter.Layout|string)=} opt_value - Value to be set.
- * @return {(anychart.ui.Splitter.Layout|anychart.ui.Splitter)} - Current layout or itself for chaining.
+ * @param {(anychart.utils.Layout|string)=} opt_value - Value to be set.
+ * @return {(anychart.utils.Layout|anychart.ui.Splitter)} - Current layout or itself for chaining.
  */
 anychart.ui.Splitter.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.ui.Splitter.normalizeLayout(opt_value);
+    opt_value = anychart.utils.normalizeLayout(opt_value);
     if (opt_value != this.layout_) {
       this.layout_ = opt_value;
       this.position(this.position_); //Used to dispatch event.
@@ -331,7 +297,7 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
     if (!isNaN(pos)) {
       if (this.pixelBoundsCache_) { //TODO (A.Kudryavtsev): Move after this.invalidate() ?
         this.position_ = pos; //Here we must do it before handler call.
-        if (this.handlePositionChange_) this.dispatchEvent(anychart.ui.Splitter.CHANGE); //Trigger user defined event if offset is not zero.
+        if (this.handlePositionChange_) this.dispatchEvent(anychart.events.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
       }
       this.position_ = pos;
       this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
@@ -351,11 +317,14 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
  * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaLength = function(opt_value) {
-  if (goog.isNumber(opt_value) && !isNaN(opt_value)) {
-    opt_value = Math.abs(opt_value);
-    if (this.dragAreaLength_ != opt_value) {
-      this.dragAreaLength_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value)) {
+      opt_value = Math.abs(opt_value);
+      if (this.dragAreaLength_ != opt_value) {
+        this.dragAreaLength_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -374,13 +343,13 @@ anychart.ui.Splitter.prototype.dragAreaLength = function(opt_value) {
  * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set stroke until anychart.color.equals() won't be fixed.
-    this.stroke_ = anychart.color.normalizeStroke.apply(null, arguments);
-
-    //Invalidates a position because changed line thickness affects a changes in drag area and line's positioning.
-    this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.stroke_, val)) {
+      this.stroke_ = val;
+      //Invalidates a position because changed line thickness affects a changes in drag area and line's positioning.
+      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.stroke_ || 'none';
@@ -400,12 +369,12 @@ anychart.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thickness
  * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set fill until anychart.color.equals() won't be fixed.
-    this.fill_ = anychart.color.normalizeFill.apply(null, arguments);
-
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = anychart.color.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(this.fill_, val)) {
+      this.fill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.fill_ || 'none';
@@ -423,12 +392,12 @@ anychart.ui.Splitter.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacit
  * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set stroke until anychart.color.equals() won't be fixed.
-    this.dragPreviewStroke_ = anychart.color.normalizeStroke.apply(null, arguments);
-
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.dragPreviewStroke_, val)) {
+      this.dragPreviewStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.dragPreviewStroke_ || 'none';
@@ -447,12 +416,12 @@ anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, op
  * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set fill until anychart.color.equals() won't be fixed.
-    this.dragPreviewFill_ = anychart.color.normalizeFill.apply(null, arguments);
-
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = anychart.color.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(this.dragPreviewFill_, val)) {
+      this.dragPreviewFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.dragPreviewFill_ || 'none';
@@ -470,12 +439,12 @@ anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys,
  * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set stroke until anychart.color.equals() won't be fixed.
-    this.dragAreaStroke_ = anychart.color.normalizeStroke.apply(null, arguments);
-
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.dragAreaStroke_, val)) {
+      this.dragAreaStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.dragAreaStroke_ || 'none';
@@ -494,12 +463,12 @@ anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_t
  * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (arguments.length) {
-
-    //TODO (A.Kudryavtsev): For now it ALWAYS applies a newly set fill until anychart.color.equals() won't be fixed.
-    this.dragAreaFill_ = anychart.color.normalizeFill.apply(null, arguments);
-
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = anychart.color.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(this.dragAreaFill_, val)) {
+      this.dragAreaFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.dragAreaFill_ || 'none';
@@ -512,8 +481,8 @@ anychart.ui.Splitter.prototype.dragAreaFill = function(opt_fillOrColorOrKeys, op
  * @return {boolean|anychart.ui.Splitter} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.handlePositionChange = function(opt_value) {
-  if (goog.isBoolean(opt_value)) {
-    this.handlePositionChange_ = opt_value;
+  if (goog.isDef(opt_value)) {
+    if (goog.isBoolean(opt_value)) this.handlePositionChange_ = opt_value;
     return this;
   }
   return this.handlePositionChange_;
@@ -526,8 +495,8 @@ anychart.ui.Splitter.prototype.handlePositionChange = function(opt_value) {
  * @return {anychart.ui.Splitter|boolean} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.considerSplitterWidth = function(opt_value) {
-  if (goog.isBoolean(opt_value)) {
-    if (this.considerSplitterWidth_ != opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isBoolean(opt_value) && this.considerSplitterWidth_ != opt_value) {
       this.considerSplitterWidth_ = opt_value;
       this.position(this.position_);
     }
@@ -543,8 +512,9 @@ anychart.ui.Splitter.prototype.considerSplitterWidth = function(opt_value) {
  * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
  */
 anychart.ui.Splitter.prototype.splitterWidth = function(opt_value) {
-  if (goog.isNumber(opt_value)) {
-    if (this.splitterWidth_ != opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value) && this.splitterWidth_ != opt_value) {
       this.splitterWidth_ = opt_value;
       this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
     }
@@ -561,11 +531,14 @@ anychart.ui.Splitter.prototype.splitterWidth = function(opt_value) {
  * @private
  */
 anychart.ui.Splitter.prototype.startLimit_ = function(opt_value) {
-  if (goog.isNumber(opt_value) && !isNaN((opt_value))) {
-    opt_value = Math.abs(opt_value);
-    if (this.startLimitSize_ != opt_value) {
-      this.newStartLimitSize_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef((opt_value))) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value)) {
+      opt_value = Math.abs(opt_value);
+      if (this.startLimitSize_ != opt_value) {
+        this.newStartLimitSize_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -580,11 +553,14 @@ anychart.ui.Splitter.prototype.startLimit_ = function(opt_value) {
  * @private
  */
 anychart.ui.Splitter.prototype.endLimit_ = function(opt_value) {
-  if (goog.isNumber(opt_value) && !isNaN((opt_value))) {
-    opt_value = Math.abs(opt_value);
-    if (this.endLimitSize_ != opt_value) {
-      this.newEndLimitSize_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef((opt_value))) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value)) {
+      opt_value = Math.abs(opt_value);
+      if (this.endLimitSize_ != opt_value) {
+        this.newEndLimitSize_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -682,25 +658,25 @@ anychart.ui.Splitter.prototype.bottomLimitSize = function(opt_value) {
  * Calculates a currents start bounds.
  * Start bounds is lefter rectangle for vertical splitting and an upper rectangle for horizontal splitting.
  *
- * @return {anychart.math.Rect} - Start bounds rect.
+ * @return {acgraph.math.Rect} - Start bounds rect.
  * @private
  */
 anychart.ui.Splitter.prototype.getStartBounds_ = function() {
   if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
   var add = this.considerSplitterWidth_ ? this.splitterWidth_ : 0;
   if (this.isVertical_()) {
-    return new anychart.math.Rect(
-        parseFloat(this.pixelBoundsCache_.getLeft().toFixed(1)),
-        parseFloat(this.pixelBoundsCache_.getTop().toFixed(1)),
-        parseFloat(((this.pixelBoundsCache_.getWidth() - add) * this.position_).toFixed(1)),
-        parseFloat(this.pixelBoundsCache_.getHeight().toFixed(1))
+    return new acgraph.math.Rect(
+        anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
+        anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
+        anychart.math.round((this.pixelBoundsCache_.getWidth() - add) * this.position_, 1),
+        anychart.math.round(this.pixelBoundsCache_.getHeight(), 1)
     );
   } else {
-    return new anychart.math.Rect(
-        parseFloat(this.pixelBoundsCache_.getLeft().toFixed(1)),
-        parseFloat(this.pixelBoundsCache_.getTop().toFixed(1)),
-        parseFloat(this.pixelBoundsCache_.getWidth().toFixed(1)),
-        parseFloat(((this.pixelBoundsCache_.getHeight() - add) * this.position_).toFixed(1))
+    return new acgraph.math.Rect(
+        anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
+        anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
+        anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
+        anychart.math.round((this.pixelBoundsCache_.getHeight() - add) * this.position_, 1)
     );
   }
 
@@ -711,50 +687,50 @@ anychart.ui.Splitter.prototype.getStartBounds_ = function() {
  * Calculates a currents end bounds.
  * End bounds is righter rectangle for vertical splitting and an lower rectangle for horizontal splitting.
  *
- * @return {anychart.math.Rect} - End bounds rect.
+ * @return {acgraph.math.Rect} - End bounds rect.
  * @private
  */
 anychart.ui.Splitter.prototype.getEndBounds_ = function() {
   var w, h;
   if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
   if (this.considerSplitterWidth_) {
-    w = parseFloat(((this.pixelBoundsCache_.getWidth() - this.splitterWidth_) * this.position_).toFixed(1));
-    h = parseFloat(((this.pixelBoundsCache_.getHeight() - this.splitterWidth_) * this.position_).toFixed(1));
+    w = anychart.math.round((this.pixelBoundsCache_.getWidth() - this.splitterWidth_) * this.position_, 1);
+    h = anychart.math.round((this.pixelBoundsCache_.getHeight() - this.splitterWidth_) * this.position_, 1);
 
     if (this.isVertical_()) {
       w += this.splitterWidth_;
-      return new anychart.math.Rect(
-          parseFloat((this.pixelBoundsCache_.getLeft() + w).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getTop().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getWidth() - w).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getHeight().toFixed(1))
+      return new acgraph.math.Rect(
+          anychart.math.round(this.pixelBoundsCache_.getLeft() + w, 1),
+          anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getWidth() - w, 1),
+          anychart.math.round(this.pixelBoundsCache_.getHeight(), 1)
       );
     } else {
       h += this.splitterWidth_;
-      return new anychart.math.Rect(
-          parseFloat(this.pixelBoundsCache_.getLeft().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getTop() + h).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getWidth().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getHeight() - h).toFixed(1))
+      return new acgraph.math.Rect(
+          anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getTop() + h, 1),
+          anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getHeight() - h, 1)
       );
 
     }
   } else {
     if (this.isVertical_()) {
       w = this.pixelBoundsCache_.getWidth() * this.position_;
-      return new anychart.math.Rect(
-          parseFloat((this.pixelBoundsCache_.getLeft() + w).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getTop().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getWidth() - w).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getHeight().toFixed(1))
+      return new acgraph.math.Rect(
+          anychart.math.round(this.pixelBoundsCache_.getLeft() + w, 1),
+          anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getWidth() - w, 1),
+          anychart.math.round(this.pixelBoundsCache_.getHeight(), 1)
       );
     } else {
       h = this.pixelBoundsCache_.getHeight() * this.position_;
-      return new anychart.math.Rect(
-          parseFloat(this.pixelBoundsCache_.getLeft().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getTop() + h).toFixed(1)),
-          parseFloat(this.pixelBoundsCache_.getWidth().toFixed(1)),
-          parseFloat((this.pixelBoundsCache_.getHeight() - h).toFixed(1))
+      return new acgraph.math.Rect(
+          anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getTop() + h, 1),
+          anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
+          anychart.math.round(this.pixelBoundsCache_.getHeight() - h, 1)
       );
 
     }
@@ -765,7 +741,7 @@ anychart.ui.Splitter.prototype.getEndBounds_ = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the left side of vertical splitter.
- * @return {anychart.math.Rect} - Bounds rect.
+ * @return {acgraph.math.Rect} - Bounds rect.
  */
 anychart.ui.Splitter.prototype.getLeftBounds = function() {
   return this.getStartBounds_();
@@ -774,7 +750,7 @@ anychart.ui.Splitter.prototype.getLeftBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the upper side of horizontal splitter.
- * @return {anychart.math.Rect} - Bounds rect.
+ * @return {acgraph.math.Rect} - Bounds rect.
  */
 anychart.ui.Splitter.prototype.getTopBounds = function() {
   return this.getStartBounds_();
@@ -783,7 +759,7 @@ anychart.ui.Splitter.prototype.getTopBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the right side of vertical splitter.
- * @return {anychart.math.Rect} - Bounds rect.
+ * @return {acgraph.math.Rect} - Bounds rect.
  */
 anychart.ui.Splitter.prototype.getRightBounds = function() {
   return this.getEndBounds_();
@@ -792,7 +768,7 @@ anychart.ui.Splitter.prototype.getRightBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the lower side of horizontal splitter.
- * @return {anychart.math.Rect} - Bounds rect.
+ * @return {acgraph.math.Rect} - Bounds rect.
  */
 anychart.ui.Splitter.prototype.getBottomBounds = function() {
   return this.getEndBounds_();
@@ -993,7 +969,7 @@ anychart.ui.Splitter.prototype.dragEndHandler_ = function() {
         newPos / (this.pixelBoundsCache_.getTop() + this.pixelBoundsCache_.getHeight());
   }
 
-  this.position(parseFloat(newRatio.toFixed(4)));
+  this.position(anychart.math.round(newRatio, 4));
 };
 
 
@@ -1148,7 +1124,7 @@ anychart.ui.Splitter.prototype.draw = function() {
  */
 anychart.ui.Splitter.prototype.isVertical_ = function() {
   //Is horizontal if layout is directly set as 'horizontal'. Is vertical in all of other cases.
-  return !(this.layout_.toLowerCase() == anychart.ui.Splitter.Layout.HORIZONTAL);
+  return !(this.layout_.toLowerCase() == anychart.utils.Layout.HORIZONTAL);
 };
 
 
@@ -1168,10 +1144,10 @@ anychart.ui.Splitter.prototype.serialize = function() {
   json['dragAreaLength'] = this.dragAreaLength_;
   json['startLimitSize'] = this.startLimitSize_;
   json['endLimitSize'] = this.endLimitSize_;
-  json['stroke'] = anychart.color.serialize(this.stroke_);
-  json['fill'] = anychart.color.serialize(this.fill_);
   json['splitterWidth'] = this.splitterWidth_;
   json['considerSplitterWidth'] = this.considerSplitterWidth_;
+  json['stroke'] = anychart.color.serialize(this.stroke_);
+  json['fill'] = anychart.color.serialize(this.fill_);
   json['dragPreviewFill'] = anychart.color.serialize(this.dragPreviewFill_);
   json['dragPreviewStroke'] = anychart.color.serialize(this.dragPreviewStroke_);
   json['dragAreaFill'] = anychart.color.serialize(this.dragAreaFill_);

@@ -133,6 +133,46 @@ anychart.utils.normalizeOrientation = function(orientation, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Layout.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Layout enumeration.
+ * @enum {string}
+ */
+anychart.utils.Layout = {
+  /**
+   * Vertical layout.
+   */
+  VERTICAL: 'vertical',
+  /**
+   * Horizontal layout.
+   */
+  HORIZONTAL: 'horizontal'
+};
+
+
+/**
+ * Normalizes user input layout to its enumeration values. Also accepts null. Defaults to opt_default or 'vertical'.
+ *
+ * @param {string} layout - Layout to normalize.
+ * @param {anychart.utils.Layout=} opt_default Orientation to normalize.
+ * @return {anychart.utils.Layout} Normalized orientation.
+ */
+anychart.utils.normalizeLayout = function(layout, opt_default) {
+  if (goog.isString(layout)) {
+    layout = layout.toLowerCase();
+    for (var i in anychart.utils.Layout) {
+      if (layout == anychart.utils.Layout[i])
+        return anychart.utils.Layout[i];
+    }
+  }
+  return opt_default || anychart.utils.Layout.VERTICAL;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Nine position.
 //
 //----------------------------------------------------------------------------------------------------------------------

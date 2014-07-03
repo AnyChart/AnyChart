@@ -89,7 +89,6 @@ anychart.ui.Button.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * State of button.
- * @protected
  * @enum {number}
  */
 anychart.ui.Button.State = {

@@ -44,7 +44,7 @@ anychart.onDocumentReady(function() {
   split.listen('signal', split.draw, false, split);
 
 
-  split.listen(anychart.ui.Splitter.CHANGE, function() {
+  split.listen(anychart.events.EventType.SPLITTER_CHANGE, function() {
     var b1 = split.getLeftBounds();
     var b2 = split.getRightBounds();
     r1.setBounds(b1);
@@ -52,13 +52,10 @@ anychart.onDocumentReady(function() {
 
     console.log(b1);
     console.log(b2);
-    
+
     console.log('Position = ' + split.position());
     console.log('');
   });
-
-
-
 
 });
 

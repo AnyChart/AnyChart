@@ -16,5 +16,9 @@ anychart.events.EventType = {
   LEGEND_ITEM_MOUSE_OVER: 'legendItemMouseOver',
   LEGEND_ITEM_MOUSE_MOVE: 'legendItemMouseMove',
   LEGEND_ITEM_CLICK: 'legendItemClick',
-  LEGEND_ITEM_DOUBLE_CLICK: 'legendItemDoubleClick'
+  LEGEND_ITEM_DOUBLE_CLICK: 'legendItemDoubleClick',
+
+  SCROLL_CHANGE: 'scrollChange',
+
+  SPLITTER_CHANGE: 'splitterChange'
 };
