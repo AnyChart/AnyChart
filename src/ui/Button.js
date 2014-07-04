@@ -177,7 +177,7 @@ anychart.ui.Button.prototype.state = function(state, opt_enable) {
  */
 anychart.ui.Button.prototype.supportedStates = function(state, opt_enable) {
   if (goog.isDef(opt_enable)) {
-    // If a setter 
+    // If a setter
     if (!opt_enable && this.state(state)) {
       // If we are removing state support and button is in this state now - we need to remove it first.
       this.state(state, false);
@@ -426,7 +426,7 @@ anychart.ui.Button.prototype.height = function(opt_value) {
  * Text drawing method.
  * To change text display for all states you need to override this method.
  * NOTE:
- * when overriding you need to manage if this is a first time drawing (create textElement and backgroundPath), 
+ * when overriding you need to manage if this is a first time drawing (create textElement and backgroundPath),
  * as well as APPEARANCE and PIXEL_BOUNDS states.
  * @param {Object} textSettings Text settings.
  * @protected

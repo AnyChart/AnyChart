@@ -285,7 +285,7 @@ anychart.elements.Multimarker.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  *//**
  * Setter for position formatter function of all markers.<br/>
  * <b>Note:</b> you can pass anything to positionProvider using
- * {@link anychart.elements.Multimarker#draw}, this extends positioning options 
+ * {@link anychart.elements.Multimarker#draw}, this extends positioning options
  * @param {function(*,number):anychart.math.CoordinateObject=} opt_value [function(positionProvider, index) {
  *  return {x: 80 * index, y: 0};
  * }] Function to position marker depending on index and context, it should look like this:
@@ -307,7 +307,7 @@ anychart.elements.Multimarker.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  *     .anchor('center');
  * for (var i = 0; i < 5; i++)
  *   marker.draw();
- * @return {anychart.elements.Multimarker}{@link anychart.elements.Multimarker} instance for method chaining.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {Function=} opt_value .
@@ -1385,7 +1385,7 @@ anychart.elements.Multimarker.prototype.parentBounds = function(opt_value) {
 /**
  * Calculates bounds for the current marker, they can be used, for example, to check overlap.
  * @param {*} positionProvider Object with information about marker with current index,
- *  it must contain <b>x</b> and <b>y</b> fields (with no offsets taken in account). 
+ *  it must contain <b>x</b> and <b>y</b> fields (with no offsets taken in account).
  *  You can add any custom information of needed.
  * @param {number=} opt_index Marker index to calculate.
  * @return {anychart.math.Rect} Markers bounds.
@@ -1557,7 +1557,7 @@ anychart.elements.Multimarker.prototype.end = function() {
  *  MMarker.draw(positionProvider);
  * }
  * @param {*} positionProvider Object with information about current marker position, which
- *  must contain <b>x</b> and <b>y</b> fields (offsets are not taken in account). 
+ *  must contain <b>x</b> and <b>y</b> fields (offsets are not taken in account).
  *  It can also contain any other additional information.
  * @param {number=} opt_index Marker index to draw.
  * @return {!anychart.elements.Multimarker} Return self for method chaining.

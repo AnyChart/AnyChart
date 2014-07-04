@@ -1225,7 +1225,7 @@ anychart.elements.Axis.prototype.getRemainingBounds = function() {
 
 /**
  * Returns half-pixel shift direction. In order to make the display of elements sharp
- * we use half-pixel shift, when element size/position doesn't calculate into integer number of pixels. 
+ * we use half-pixel shift, when element size/position doesn't calculate into integer number of pixels.
  * For example, line of 1px width can occupy two pixels (half of one, and half of another) - it will not look sharp.
  * But we can move this line 0.5px to left or rigth, it will occupy 1 whole pixel and look sharp.
  * In case of moving ticks: if all ticks are moved in one direction - the last tick will be visible off,
@@ -1331,7 +1331,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
  * relative to which all vertices of another label lie towards the same direction or lie on this side.
  * @param {Array.<number>=} opt_first First label.
  * @param {Array.<number>=} opt_second Second label.
- * @return {boolean} Returns true if labels intersect, false 
+ * @return {boolean} Returns true if labels intersect, false
  * if labels do not intersect.
  * @private
  */
@@ -1353,7 +1353,7 @@ anychart.elements.Axis.prototype.checkLabelsIntersection_ = function(opt_first, 
 
 
 /**
- * Check an array of points position in relation to 
+ * Check an array of points position in relation to
  * a line defined by two points.
  * @param {number} p1x X coordinate of the first point.
  * @param {number} p1y Y coordinate of the first point.

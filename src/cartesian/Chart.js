@@ -1989,7 +1989,7 @@ anychart.cartesian.Chart.prototype.calcBubbleSizes_ = function() {
  *//**
  * Setter for series colors palette.
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
- * @return {!anychart.cartesian.Chart}{@link anychart.cartesian.Chart} instance for method chaining.
+ * @return {!anychart.cartesian.Chart} {@link anychart.cartesian.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value .
@@ -2242,7 +2242,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       grid.suspendSignalsDispatching();
       grid.parentBounds(this.dataBounds_);
       grid.container(this.rootElement);
-      grid.draw(); 
+      grid.draw();
       grid.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.GRIDS);
@@ -2262,7 +2262,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
         axis.offsetY(topOffset);
         axis.length(parseFloat(this.dataBounds_.height));
       }
-      axis.draw(); 
+      axis.draw();
       axis.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.AXES);
@@ -2279,7 +2279,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       axesMarker.suspendSignalsDispatching();
       axesMarker.parentBounds(this.dataBounds_);
       axesMarker.container(this.rootElement);
-      axesMarker.draw(); 
+      axesMarker.draw();
       axesMarker.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);

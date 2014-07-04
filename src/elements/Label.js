@@ -10,7 +10,7 @@ goog.require('anychart.utils.Padding');
 
 /**
  * Label element class.<br/>
- * Label can be a part of another element (such as chart, legend, axis, etc) or it can 
+ * Label can be a part of another element (such as chart, legend, axis, etc) or it can
  * be used independently.<br/>
  * Label has a background and a large number of positioning options:
  * <ul>

@@ -9,7 +9,7 @@ goog.require('goog.array');
 
 /**
  * Background element class.<br/>
- * Background can be a part of another complex element (chart, legend, title and so on), 
+ * Background can be a part of another complex element (chart, legend, title and so on),
  * or used separately.<br/>
  * Background has a fill, a border and corner shape settings.<br/>
  * <b>Note:</b> Always specify display bounds if you use Background separately.
