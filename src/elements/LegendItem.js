@@ -667,11 +667,15 @@ anychart.elements.LegendItem.prototype.calculateBounds_ = function() {
 
   this.textElement_.width(textWidth);
   this.textElement_.height(textHeight);
-
-  return (this.pixelBounds_ = new anychart.math.Rect(
-      parentBounds.getLeft() + x,
-      parentBounds.getTop() + y,
-      width, height));
+  if (parentBounds) {
+    this.pixelBounds_ = new anychart.math.Rect(
+        parentBounds.getLeft() + x,
+        parentBounds.getTop() + y,
+        width, height);
+  } else {
+    this.pixelBounds_ = new anychart.math.Rect(x, y, width, height);
+  }
+  return this.pixelBounds_;
 };
 
 
