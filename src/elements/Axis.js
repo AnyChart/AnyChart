@@ -826,7 +826,7 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
 anychart.elements.Axis.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
+      this.parentBounds_ = opt_value.clone();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -856,6 +856,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
 
     if (parentBounds) {
       var parentLength;
+
       parentBounds.top = Math.round(parentBounds.top);
       parentBounds.left = Math.round(parentBounds.left);
       parentBounds.width = Math.round(parentBounds.width);
@@ -1517,8 +1518,8 @@ anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
   var bounds = this.getPixelBounds_().toRect();
   var y = bounds.top + pixelShift;
   this.line_
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      .moveTo(bounds.left + pixelShift, y - 1)
+      .lineTo(bounds.left - pixelShift + bounds.width, y - 1);
 };
 
 

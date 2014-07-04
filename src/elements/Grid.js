@@ -185,7 +185,10 @@ anychart.elements.Grid.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      if (opt_value) {
+        this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
+      }
+
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
