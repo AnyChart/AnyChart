@@ -155,6 +155,7 @@ goog.inherits(anychart.cartesian.Chart, anychart.Chart);
  */
 anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_ = 2;
 
+
 /**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS  to anychart.Chart states.
  * @type {number}
