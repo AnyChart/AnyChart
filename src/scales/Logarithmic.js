@@ -41,7 +41,7 @@ anychart.scales.Logarithmic.prototype.calculate = function() {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create logarithmic scale.
+ * Shortcut to create a logarithmic scale.
  * @return {anychart.scales.Logarithmic} Logarithmic scale.
  */
 anychart.scales.log = function() {

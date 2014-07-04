@@ -462,9 +462,9 @@ anychart.elements.Label.prototype['offsetY'] = anychart.elements.Label.prototype
 anychart.elements.Label.prototype['position'] = anychart.elements.Label.prototype.position;//in docs/
 anychart.elements.Label.prototype['text'] = anychart.elements.Label.prototype.text;//in docs/
 anychart.elements.Label.prototype['draw'] = anychart.elements.Label.prototype.draw;//in docs/
-anychart.elements.Label.prototype['minFontSize'] = anychart.elements.Label.prototype.minFontSize;
-anychart.elements.Label.prototype['maxFontSize'] = anychart.elements.Label.prototype.maxFontSize;
-anychart.elements.Label.prototype['adjustFontSize'] = anychart.elements.Label.prototype.adjustFontSize;
+anychart.elements.Label.prototype['minFontSize'] = anychart.elements.Label.prototype.minFontSize;//in docs/
+anychart.elements.Label.prototype['maxFontSize'] = anychart.elements.Label.prototype.maxFontSize;//in docs/
+anychart.elements.Label.prototype['adjustFontSize'] = anychart.elements.Label.prototype.adjustFontSize;//in docs/
 //anychart.elements.Label.prototype['rotation'] = anychart.elements.Label.prototype.rotation;
 //----------------------------------------------------------------------------------------------------------------------
 //

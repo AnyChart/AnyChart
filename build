@@ -450,7 +450,7 @@ def __buildDocs():
     ]))
     f.close()
 
-    PLAYGRAUND_SAMPLES_DIR = os.path.join(CONTRIB_PATH, 'docs-playground-samples', 'api')
+    PLAYGRAUND_SAMPLES_DIR = os.path.join(CONTRIB_PATH, 'docs-playground-samples')
     if (GENERATE_PLAYGROUND_SAMPLES == "1"):
         print 'GIT: update contrib with samples'
         p = subprocess.Popen(
@@ -462,11 +462,18 @@ def __buildDocs():
         (output, err) = p.communicate()
         if not (p.returncode == 0):
           print "exit-code: %d\n  err: %s\n output: %s" % (p.returncode, err, output)
+
         # clear directory
-        shutil.rmtree(PLAYGRAUND_SAMPLES_DIR)
-        os.mkdir(PLAYGRAUND_SAMPLES_DIR)
+        for tmp_list_item in os.listdir(PLAYGRAUND_SAMPLES_DIR):
+            if not tmp_list_item == '.git' and not tmp_list_item == '.gitignore':
+                tmp_list_item_path = os.path.join(PLAYGRAUND_SAMPLES_DIR, tmp_list_item)
+                if os.path.isdir(tmp_list_item_path):
+                    shutil.rmtree(tmp_list_item_path)
+                else:
+                    os.remove(tmp_list_item_path)
 
     # running JSDoc engine
+    print "Generate documentation"
     startDocsTimer = time.time()
     subprocess.call([
         os.path.join(JSDOC_TEMPLATE_PATH, 'jsdoc'),

@@ -8,8 +8,8 @@ goog.require('anychart.utils.Bounds');
 
 
 /**
- * Класс определяющий тики на оси.<br/>
- * У тиков можно настроить положение, длинну и характеристики линий.
+ * Axis ticks class.<br/>
+ * You can change position, lenght and line features.
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -77,16 +77,16 @@ anychart.elements.Ticks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.Visual
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Опредляет положение тиков на оси относительно Chart area.
+ * Ticks position (inside ot outside).
  * @enum {string}
  */
 anychart.elements.Ticks.Position = {
   /**
-   * Внутри области чарта, вне зависимости от положения самой оси.
+   * Inside a chart, no matter where an axis is.
    */
   INSIDE: 'inside',
   /**
-   * Снаружи области чарта, вне зависимости от положения самой оси.
+   * Outside of a chart, no matter where an axis is.
    */
   OUTSIDE: 'outside'
 };
@@ -147,13 +147,13 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
 
 
 /**
- * Возаращает текущий stroke.
- * @return {acgraph.vector.Stroke} Возвращает текущую настройку линии.
+ * Returns a current stroke settings.
+ * @return {acgraph.vector.Stroke} Returns the current stroke settings.
  *//**
- * Устанавливает настройки stroke одним параметром.<br/>
- * Допустимы следующие варианты:
+ * Sets stroke settings via single parameter.<br/>
+ * The following options are acceptable:
  * <ul>
- *  <li>Строкой в формате '[thickness ]color[ opacity]':
+ *  <li>String formatted as '[thickness ]color[ opacity]':
  *    <ol>
  *      <li><b>'color'</b> - {@link http://www.w3schools.com/html/html_colors.asp}.</li>
  *      <li><b>'thickness color'</b> - like a css border, e.g. '3 red' or '3px red'</li>
@@ -161,12 +161,12 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
  *      <li><b>'thickness color opacity'</b> - as a complex string, e.g. '3px #00ff00 0.5'</li>
  *    </ol>
  *  </li>
- *  <li>Объект {@link acgraph.vector.Stroke}</li>
- *  <li>Массив ключей {@link acgraph.vector.GradientKey}</li>
- *  <li><b>null</b> - сбросит текущие настройки stroke.</li>
+ *  <li>{@link acgraph.vector.Stroke} object</li>
+ *  <li>Keys array {@link acgraph.vector.GradientKey}</li>
+ *  <li><b>null</b> - reset current stroke settings.</li>
  * </ul>
  * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
- * @shortDescription Устанавливает настройки stroke.
+ * @shortDescription Sets stroke settings.
  * @illustration <t>simple-h100</t>
  * stage.text(10,0, 'axis');
  * stage.text(10,40, 'tick');
@@ -188,7 +188,7 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
  *     .stroke('2 blue .7');
  * @example <t>listingOnly</t>
  *  ticks.stroke('2 blue .7');
- * @param {(acgraph.vector.Stroke)=} opt_value ['black'] Стиль заливки в формате '[thickness ]color[ opacity]'.
+ * @param {(acgraph.vector.Stroke)=} opt_value ['black'] Fill style as '[thickness ]color[ opacity]'.
  * @return {anychart.elements.Ticks} An instance of the {@link anychart.elements.Ticks} class for method chaining.
  *//**
  * @ignoreDoc
@@ -206,11 +206,11 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
 
 
 /**
- * Getter for current ticks position.
+ * Getter for the current ticks position.
  * @return {(anychart.elements.Ticks.Position|string)} Current position.
  *//**
  * Setter for ticks position.<br/>
- * You can set ticks inside of chart area or outside it's position.
+ * You can set ticks inside of a chart area or outside its position.
  * @illustration <t>simple</t>
  * stage.text(10,40, 'axis');
  * stage.text(10,2, 'tick');

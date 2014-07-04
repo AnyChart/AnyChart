@@ -108,7 +108,7 @@ anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
+ * Getter for the axis scale.
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
@@ -117,7 +117,7 @@ anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.RangeMarker} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.RangeMarker} Axis scale or itself for method chaining.
  */
 anychart.elements.RangeMarker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -187,7 +187,7 @@ anychart.elements.RangeMarker.prototype.parentBounds = function(opt_value) {
 /**
  * Get/set range marker fill.
  * @param {string|acgraph.vector.Fill=} opt_value RangeMarker line settings.
- * @return {string|acgraph.vector.Fill|anychart.elements.RangeMarker} RangeMarker line settings or RangeMarker instance for chaining.
+ * @return {string|acgraph.vector.Fill|anychart.elements.RangeMarker} RangeMarker line settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.fill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -203,9 +203,9 @@ anychart.elements.RangeMarker.prototype.fill = function(opt_value) {
 
 
 /**
- * Get/set начальное значение маркера.
+ * Get/set starting marker value.
  * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for chaining.
+ * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.from = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -222,9 +222,9 @@ anychart.elements.RangeMarker.prototype.from = function(opt_newValue) {
 
 
 /**
- * Get/set конечное значение маркера.
+ * Get/set ending marker value.
  * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for chaining.
+ * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -241,7 +241,7 @@ anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
 
 
 /**
- * Определяет расположения маркера
+ * Defines marker direction
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.RangeMarker.prototype.isHorizontal = function() {

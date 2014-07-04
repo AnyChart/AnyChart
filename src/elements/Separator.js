@@ -8,7 +8,7 @@ goog.require('anychart.utils.Margin');
 
 
 /**
- * Class is responsible for separator element.
+ * Class for a separator element.
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -64,14 +64,14 @@ anychart.elements.Separator = function() {
   this.margin_;
 
   /**
-   * Separator`s left position.
+   * Separator left position.
    * @type {number}
    * @private
    */
   this.actualLeft_ = NaN;
 
   /**
-   * Separator`s top position.
+   * Separator top position.
    * @type {number}
    * @private
    */
@@ -125,7 +125,7 @@ anychart.elements.Separator.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Устанавливает/Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Gets/Sets bounds to calculate position.
  * @param {anychart.math.Rect=} opt_value .
  * @return {!anychart.elements.Separator|anychart.math.Rect} .
  */
@@ -291,7 +291,7 @@ anychart.elements.Separator.prototype.stroke = function(opt_strokeOrFill, opt_th
  *//**
  * @ignoreDoc
  * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
- * @return {(function(acgraph.vector.Path, anychart.math.Rect)|anychart.elements.Separator)} Drawer function or self for chaining.
+ * @return {(function(acgraph.vector.Path, anychart.math.Rect)|anychart.elements.Separator)} Drawer function or self for method chaining.
  */
 anychart.elements.Separator.prototype.drawer = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -307,7 +307,7 @@ anychart.elements.Separator.prototype.drawer = function(opt_value) {
 
 /**
  * Draw separator.
- * @return {!anychart.elements.Separator} Экземпляр класса {@link anychart.elements.Separator} для цепочного вызова.
+ * @return {!anychart.elements.Separator} {@link anychart.elements.Separator} instance for method chaining.
  */
 anychart.elements.Separator.prototype.draw = function() {
   if (!this.checkDrawingNeeded())

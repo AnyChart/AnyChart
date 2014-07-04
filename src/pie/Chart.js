@@ -11,8 +11,6 @@ goog.require('anychart.utils.Sort');
 
 /**
  * Pie (Donut) Chart Class.<br/>
- * Learn more about this type of charts at:
- * {@link http://demos.anychart.dev/articles/Pie-Donut.html}.<br/>
  * Pie is interactive, you can customize click and hover behavior.
  * @example
  *  var data = [20, 7, 10, 14];
@@ -27,7 +25,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Filter function that should accept a field value and return true if the row
-   *    should be included into the resulting view as a and false otherwise..
+   *    should be included into the resulting view as and false otherwise.
    * @type {(function(*):boolean)?}
    * @private
    */
@@ -212,7 +210,7 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
 
 
 /**
- * Supported consistency states.
+ * Supported signals.
  * @type {number}
  */
 anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
@@ -274,7 +272,7 @@ anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * Returns current chart data.
- * @return {anychart.data.View} Current view or self for chaining.
+ * @return {anychart.data.View} Current view or self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
@@ -317,7 +315,7 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 /**
  * Method that prepares the final view of data.
  * @param {(anychart.data.View)} data Data.
- * @return {anychart.data.View} Prepared view.
+ * @return {anychart.data.View} Ready to use view.
  * @private
  */
 anychart.pie.Chart.prototype.prepareData_ = function(data) {
@@ -655,11 +653,11 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 /**
  * Setter/getter for points grouping function.
- * Если передается функция - задаёт её фильтрующей функцией для группировки точки.
- * Если передаётся срока 'none' или null то отключает группировку.
- * Если ничего не передается возвращает последнее установленное значение фильтрующей функции либо null.
+ * If function is passed - sets it as a filter for grouping.
+ * If 'none' string or null is passed - turns grouping off.
+ * If nothing is passed - returns the last values set by grouping functionor null.
  * @param {(string|null|function(*):boolean)=} opt_value Filtering function or disabling value (null, 'none').
- * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for chaining.
+ * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
  */
 anychart.pie.Chart.prototype.group = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -729,7 +727,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
  *  chart2.innerRadius(function(outerRadius){
  *    return parseFloat(outerRadius)/2;
  *  });
- * @param {(string|number|function(number):number)=} opt_value [0] he value of the inner radius in pixels, percents or
+ * @param {(string|number|function(number):number)=} opt_value [0] The value of the inner radius in pixels, percents or
  * function. In general the function should look like this:
  * <code>function(outerRadius){
  *   ...
@@ -1370,7 +1368,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
 /**
  * Pie chart tooltip.
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
- * @return {!(anychart.pie.Chart|anychart.elements.Tooltip)} Tooltip instance or self for chaining call.
+ * @return {!(anychart.pie.Chart|anychart.elements.Tooltip)} Tooltip instance or self for method chaining.
  */
 anychart.pie.Chart.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
@@ -1438,7 +1436,7 @@ anychart.pie.Chart.prototype.hideTooltip = function() {
 
 /**
  * @protected
- * @param {goog.events.BrowserEvent=} opt_event that initiate tooltip to show.
+ * @param {goog.events.BrowserEvent=} opt_event initiates tooltip show.
  */
 anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());

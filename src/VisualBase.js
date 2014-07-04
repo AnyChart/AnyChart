@@ -45,7 +45,7 @@ anychart.VisualBase.prototype.enabled_ = true;
 
 
 /**
- * Double signals dispatching for enables state signals special treatment.
+ * Double signals dispatching for enabled state signals special treatment.
  * @type {boolean}
  * @private
  */
@@ -72,13 +72,13 @@ anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for the element's current container.
+ * Getter for the element current container.
  * @return {acgraph.vector.ILayer} The current container.
  *//**
  * Setter for the element container.<br/>
- * Each element appends all it's content to this container.<br/>
+ * Each element appends all its content to this container.<br/>
  * The order of adding is not defined, but usually it will be the order in which elements are drawn for the first time.
- * So if you need to specify the order use {@link anychart.VisualBase#zIndex}.
+ * If you need to specify the order use {@link anychart.VisualBase#zIndex}.
  * @example <t>listingOnly</t>
  * // string
  *  element.container('containerIdentifier');

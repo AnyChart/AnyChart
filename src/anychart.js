@@ -36,8 +36,8 @@ goog.require('goog.json.hybrid');
 
 
 /**
- * Current version of framework, replaced on compile time.
- * @define {string} Current version of framework.
+ * Current version of the framework, replaced on compile time.
+ * @define {string} Current version of the framework.
  */
 anychart.VERSION = '';
 
@@ -57,7 +57,7 @@ anychart.globalLock.subscribers = [];
 
 
 /**
- * Locks the globalLock. You should then free the lock. The lock should be freed the same number of times, that it
+ * Locks the globalLock. You should then free the lock. The lock should be freed the same number of times that it
  * was locked.
  */
 anychart.globalLock.lock = function() {
@@ -116,7 +116,7 @@ goog.addSingletonGetter(anychart.ClassFactory);
 
 
 /**
- * Returns instance of the class.
+ * Returns an instance of the class.
  * @param {Object} json json config.
  * @return {*} Class constructor.
  */
@@ -128,7 +128,7 @@ anychart.ClassFactory.prototype.getClass = function(json) {
 
 
 /**
- * Returns instance of the scale.
+ * Returns an instance of the scale.
  * @param {Object} json json config.
  * @return {anychart.scales.Base} Class constructor.
  */
@@ -150,7 +150,7 @@ anychart.ClassFactory.prototype.getScale = function(json) {
 
 
 /**
- * Creates element by config.
+ * Creates an element by config.
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
@@ -180,7 +180,7 @@ anychart.fromJson = function(jsonConfig) {
 
 
 /**
- * Creates element by config.
+ * Creates an element by config.
  * @param {string|Node} xmlConfig Config.
  * @return {*} Element created by config.
  */
@@ -196,7 +196,7 @@ goog.global['anychart'] = goog.global['anychart'] || {};
 
 
 /**
- * Default value for size of font.
+ * Default value for the font size.
  * @type {string|number}
  *
  */
@@ -204,7 +204,7 @@ goog.global['anychart']['fontSize'] = '12px';
 
 
 /**
- * Default value for color of font
+ * Default value for the font color.
  * @type {string}
  *
  */
@@ -212,7 +212,7 @@ goog.global['anychart']['fontColor'] = '#000';
 
 
 /**
- * Default value for style of font.
+ * Default value for the font style.
  * @type {string}
  *
  */
@@ -220,7 +220,7 @@ goog.global['anychart']['fontFamily'] = 'Arial';
 
 
 /**
- * Default value for direction of text. Text direction may be left-to-right or right-to-left.
+ * Default value for the text direction. Text direction may be left-to-right or right-to-left.
  * @type {string}
  *
  */
@@ -241,8 +241,8 @@ anychart.documentLoadCallbacks_;
 
 
 /**
- * Add callback for document load event.
- * @param {Function} func Function which will called on document load event.
+ * Add callback for the document load event.
+ * @param {Function} func Function which will be called on document load event.
  * @param {*=} opt_scope Function call context.
  */
 anychart.onDocumentLoad = function(func, opt_scope) {
@@ -268,11 +268,11 @@ anychart.attachDomEvents_ = function() {
   var window = goog.dom.getWindow();
   var document = window['document'];
 
-  // goog.events.EventType.DOMCONTENTLOADED - for browsers that supports DOMContentLoaded event. IE9+
+  // goog.events.EventType.DOMCONTENTLOADED - for browsers that support DOMContentLoaded event. IE9+
   // goog.events.EventType.READYSTATECHANGE - for IE9-
   acgraph.events.listen(document, [goog.events.EventType.DOMCONTENTLOADED, goog.events.EventType.READYSTATECHANGE], anychart.completed_, false);
 
-  // A fallback to window.onload, that will always work
+  // A fallback to window.onload that will always work
   acgraph.events.listen(/** @type {EventTarget}*/ (window), goog.events.EventType.LOAD, anychart.completed_, false);
 };
 
@@ -326,7 +326,7 @@ anychart.ready_ = function(event) {
 
   var document = goog.dom.getWindow()['document'];
 
-  // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+  // Make sure the document body at least exists in case IE gets a little overzealous (ticket #5443).
   if (!document['body']) {
     return setTimeout(function() {
       anychart.ready_(event);
@@ -343,15 +343,19 @@ anychart.ready_ = function(event) {
 
 
 /**
- * В общем надо быть бдительным и осторожным когда юзаешь этот метод.
- * Коллбэк будет вызван до того как произойдет полная загрузка страницы LOAD. - то есть не будет доступа
- * к CSS и прочем подгружаемым вне head`а либо асинхронно элементов
+ * Please be watchful and careful with this method.
+ * Callback is invoked prior to full page LOAD, which means you
+ * have no access to CSS and other elemnents outside page head and async loaded elements
  *
  * Add callback for document load event.
  * @param {Function} func Function which will called on document load event.
  * @param {*=} opt_scope Function call context.
  */
 anychart.onDocumentReady = function(func, opt_scope) {
+  if (anychart.isReady_) {
+    func.call(opt_scope);
+  }
+
   if (!anychart.documentReadyCallbacks_) {
     anychart.documentReadyCallbacks_ = [];
   }
@@ -374,7 +378,7 @@ anychart.onDocumentReady = function(func, opt_scope) {
 
 
 /**
- * Default empychart.
+ * Default empty chart.
  * @return {anychart.cartesian.Chart} Empty chart.
  */
 anychart.chart = function() {
@@ -398,7 +402,6 @@ anychart.scatterChart = function() {
   var chart = new anychart.cartesian.Chart();
 
   chart.title().text('Chart Title').fontWeight('bold');
-  chart.xScale(new anychart.scales.Linear());
 
   chart.xAxis();
   chart.yAxis();

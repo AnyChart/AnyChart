@@ -256,7 +256,7 @@ anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
  *     .fontColor('gray')
  *     .draw();
  * @illustrationDesc
- * Title is inside a layer (marked with a blue framt), two title positioning options are shown:<br/>
+ * Title is inside a layer (marked with a blue frame), two title positioning options are shown:<br/>
  *   a. Gray - within the parent container.<br/>
  *   b. Black - when the stage bounds act as parent.
  * @example <t>listingOnly</t>
@@ -430,7 +430,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @return {anychart.utils.Margin} The current title margin.
  *//**
  * Setter for the title margin in pixels using one value.<br/>
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Value to set.
+ * @param {(string|number|anychart.utils.Space)=} opt_allValues Value to set.
  * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * Setter for the title margin in pixels using several numbers.<br/>
@@ -552,7 +552,7 @@ anychart.elements.Title.prototype.align = function(opt_value) {
 
 /**
  * Getter for the title orientation.
- * @return {anychart.utils.Orientation} The orientation or the title for chaining.
+ * @return {anychart.utils.Orientation} The orientation or the title for method chaining.
  *//**
  * Setter for the title orientation.
  * @example <t>simple</t>
@@ -608,7 +608,7 @@ anychart.elements.Title.prototype.draw = function() {
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  // Checking APPEARANCE state. It excludes text width and height inconsistency, that will be checked later.
+  // Checking APPEARANCE state. It excludes text width and height inconsistency that will be checked later.
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     // Applying text settings if needed.
     this.applyTextSettings(this.text_, isInitial);
@@ -637,7 +637,7 @@ anychart.elements.Title.prototype.draw = function() {
     this.invalidate(anychart.ConsistencyState.CONTAINER);
     needsPositionReset = true;
   } else if (!hasBackground && this.layer_) {
-    // Else we should render only the text element, so if there is a layer, than we should remove the background
+    // Else we should render only the text element, so if there is a layer then we should remove the background
     // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
     // container later in this method
     if (background.container() == this.layer_)
@@ -724,7 +724,7 @@ anychart.elements.Title.prototype.remove = function() {
  *     .text('First title')
  *     .container(stage)
  *     .draw();
- * // Placing the second title over the remainging part - under the first title.
+ * // Placing the second title over the remaining part - under the first title.
  * new anychart.elements.Title()
  *     .text('Second title')
  *     .container(stage)

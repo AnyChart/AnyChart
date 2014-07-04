@@ -63,7 +63,7 @@ goog.inherits(anychart.elements.Tooltip, anychart.Base);
 
 /**
  * Supported signals. On NEEDS_REDRAW signal you just need to call redraw method,
- * on BOUNDS_CHANGED method you need recalculate position and textInfo and call show method.
+ * on BOUNDS_CHANGED method you need to recalculate position and textInfo and call show method.
  * @type {number}
  */
 anychart.elements.Tooltip.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REDRAW |
@@ -78,7 +78,7 @@ anychart.elements.Tooltip.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
 /**
  * Function to format title text.
  * @param {Function=} opt_value Function to format title text.
- * @return {Function|anychart.elements.Tooltip} Function to format title text or itself for chaining call.
+ * @return {Function|anychart.elements.Tooltip} Function to format title text or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.titleFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -96,7 +96,7 @@ anychart.elements.Tooltip.prototype.titleFormatter = function(opt_value) {
 /**
  * Function to format content text.
  * @param {Function=} opt_value Function to format content text.
- * @return {Function|anychart.elements.Tooltip} Function to format content text or itself for chaining call.
+ * @return {Function|anychart.elements.Tooltip} Function to format content text or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.textFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -112,9 +112,9 @@ anychart.elements.Tooltip.prototype.textFormatter = function(opt_value) {
 
 
 /**
- * Allow tooltip to leave screen then moving.
- * @param {boolean=} opt_value Allow tooltip to leave screen then moving.
- * @return {!(boolean|anychart.elements.Tooltip)} Allow tooltip to leave screen then moving or itself for chaining call.
+ * Allow tooltip to leave screen when moving.
+ * @param {boolean=} opt_value Allow tooltip to leave screen when moving.
+ * @return {!(boolean|anychart.elements.Tooltip)} Allow tooltip to leave screen when moving or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.allowLeaveScreen = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -130,9 +130,9 @@ anychart.elements.Tooltip.prototype.allowLeaveScreen = function(opt_value) {
 
 
 /**
- * Define, should tooltip follow the mouse or not.
- * @param {boolean=} opt_value Should tooltip follow the mouse or not.
- * @return {!(boolean|anychart.elements.Tooltip)} Should tooltip follow the mouse or itself for chaining call.
+ * Defines whether tooltip follows the mouse or not.
+ * @param {boolean=} opt_value Follow the mouse or not.
+ * @return {!(boolean|anychart.elements.Tooltip)} Follow the mouse or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.isFloating = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -155,7 +155,7 @@ anychart.elements.Tooltip.prototype.isFloating = function(opt_value) {
 /**
  * Tooltip title.
  * @param {(anychart.elements.Title|Object|string|null)=} opt_value Tooltip settings.
- * @return {!(anychart.elements.Title|anychart.elements.Tooltip)} Title instance or itself for chaining call.
+ * @return {!(anychart.elements.Title|anychart.elements.Tooltip)} Title instance or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.title = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -172,7 +172,7 @@ anychart.elements.Tooltip.prototype.title = function(opt_value) {
 /**
  * Tooltip title separator.
  * @param {(anychart.elements.Separator|Object|string|null)=} opt_value Tooltip separator settings.
- * @return {!(anychart.elements.Separator|anychart.elements.Tooltip)} Separator instance or itself for chaining call.
+ * @return {!(anychart.elements.Separator|anychart.elements.Tooltip)} Separator instance or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.separator = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -189,7 +189,7 @@ anychart.elements.Tooltip.prototype.separator = function(opt_value) {
 /**
  * Tooltip content.
  * @param {(anychart.elements.Label|Object|string|null)=} opt_value Content settings.
- * @return {!(anychart.elements.Label|anychart.elements.Tooltip)} Labels instance or itself for chaining call.
+ * @return {!(anychart.elements.Label|anychart.elements.Tooltip)} Labels instance or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.content = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -206,7 +206,7 @@ anychart.elements.Tooltip.prototype.content = function(opt_value) {
 /**
  * Tooltip background.
  * @param {(anychart.elements.Background|Object|string|null)=} opt_value Tooltip background settings.
- * @return {!(anychart.elements.Background|anychart.elements.Tooltip)} Background instance or itself for chaining call.
+ * @return {!(anychart.elements.Background|anychart.elements.Tooltip)} Background instance or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.background = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -223,7 +223,7 @@ anychart.elements.Tooltip.prototype.background = function(opt_value) {
 /**
  * Tooltip padding.
  * @param {(anychart.utils.Padding|Object|string|null)=} opt_value Tooltip padding settings.
- * @return {!(anychart.utils.Padding|anychart.elements.Tooltip)} Padding instance or itself for chaining call.
+ * @return {!(anychart.utils.Padding|anychart.elements.Tooltip)} Padding instance or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.padding = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -239,7 +239,7 @@ anychart.elements.Tooltip.prototype.padding = function(opt_value) {
 /**
  * Offset by X of tooltip position.
  * @param {number=} opt_value New value of X offset of tooltip position.
- * @return {!(number|anychart.elements.Tooltip)} X offset of tooltip position of itself for chaining call.
+ * @return {!(number|anychart.elements.Tooltip)} X offset of tooltip position of itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.offsetX = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -256,7 +256,7 @@ anychart.elements.Tooltip.prototype.offsetX = function(opt_value) {
 /**
  * Y offset of tooltip position.
  * @param {number=} opt_value New value of Y offset of tooltip position.
- * @return {!(number|anychart.elements.Tooltip)} Y offset of tooltip position of itself for chaining call.
+ * @return {!(number|anychart.elements.Tooltip)} Y offset of tooltip position of itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.offsetY = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -273,7 +273,7 @@ anychart.elements.Tooltip.prototype.offsetY = function(opt_value) {
 /**
  * Gets or sets Tooltip anchor settings.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Tooltip anchor settings.
- * @return {!(anychart.elements.Tooltip|anychart.utils.NinePositions)} Tooltip anchor settings or itself for chaining call.
+ * @return {!(anychart.elements.Tooltip|anychart.utils.NinePositions)} Tooltip anchor settings or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -288,9 +288,9 @@ anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
 
 
 /**
- * Sets/gets delay in milliseconds before tooltip become invisible on visible(false) call.
- * @param {number=} opt_value Delay in milliseconds before tooltip become invisible on visible(false) call.
- * @return {!(number|anychart.elements.Tooltip)} delay in milliseconds before tooltip become invisible on visible(false) call or itself for chaining call.
+ * Sets/gets delay in milliseconds before tooltip becomes invisible on visible(false) call.
+ * @param {number=} opt_value Delay in milliseconds before tooltip becomes invisible on visible(false) call.
+ * @return {!(number|anychart.elements.Tooltip)} delay in milliseconds before tooltip becomes invisible on visible(false) call or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.hideDelay = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -322,7 +322,7 @@ anychart.elements.Tooltip.prototype.enabled = function(opt_value) {
 
 
 /**
- * Create tooltip item if it not created yet.
+ * Create tooltip item if it is not created yet.
  * @private
  */
 anychart.elements.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
@@ -344,8 +344,8 @@ anychart.elements.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
 /**
  * Show tooltip using textInfo and position info objects.
  * @param {Object} textInfo Object with info about series and charts to format title and content text.
- * @param {acgraph.math.Coordinate} position Position of tooltip.
- * @return {!anychart.elements.Tooltip} Itself for chaining call.
+ * @param {acgraph.math.Coordinate} position Position of a tooltip.
+ * @return {!anychart.elements.Tooltip} Itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.show = function(textInfo, position) {
   this.maybeCreateTooltipItem_();
@@ -372,7 +372,7 @@ anychart.elements.Tooltip.prototype.show = function(textInfo, position) {
 
 /**
  * Show tooltip using textInfo and position info objects.
- * @return {!anychart.elements.Tooltip} Itself for chaining call.
+ * @return {!anychart.elements.Tooltip} Itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.hide = function() {
   if (this.item_ && this.item_.visible()) {
@@ -386,7 +386,7 @@ anychart.elements.Tooltip.prototype.hide = function() {
 
 
 /**
- * Redraw tooltip item with applying all new settings.
+ * Redraw tooltip item and apply all new settings.
  */
 anychart.elements.Tooltip.prototype.redraw = function() {
   if (this.item_ && this.item_.visible() && this.item_.enabled()) {
@@ -480,13 +480,13 @@ anychart.elements.Tooltip.prototype.serialize = function() {
 
   if (goog.isFunction(this.titleFormatter_)) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize titleFormatter function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize titleFormatter function, please reset it manually.');
     }
   }
 
   if (goog.isFunction(this.textFormatter_)) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize textFormatter function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize textFormatter function, please reset it manually.');
     }
   }
   return json;

@@ -255,7 +255,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(
 
 
 /**
- * Метод, получающий финальное значение rising hatch fill для текущей точки с учетом всех fallback.
+ * Method to get final rising hatch fill, with all fallbacks taken into account.
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final rising hatch fill for the current row.
  */
@@ -317,7 +317,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function
 
 
 /**
- * Метод, получающий финальное значение falling hatch fill для текущей точки с учетом всех fallback.
+ * Method to get final falling hatch fill, with all fallbacks taken into account.
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final falling hatch fill for the current row.
  */
@@ -337,7 +337,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = funct
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -364,7 +364,7 @@ anychart.cartesian.series.Candlestick.prototype.risingFill = function(opt_fillOr
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -379,7 +379,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingFill = function(opt_f
     this.hoverRisingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
         anychart.color.normalizeFill.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverRisingFill_;
@@ -387,7 +387,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingFill = function(opt_f
 
 
 /**
- * Метод, получающий финальное значение цвета заливки для растущей текущей точки с учетом всех fallback.
+ * Method to get final stroke, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
@@ -409,7 +409,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingFill = function(ho
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -436,7 +436,7 @@ anychart.cartesian.series.Candlestick.prototype.fallingFill = function(opt_fillO
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -460,7 +460,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_
 
 
 /**
- * Метод, получающий финальное значение цвета заливки для растущей текущей точки с учетом всех fallback.
+ * Method to get final rising point stroke, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected

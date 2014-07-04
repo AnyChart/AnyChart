@@ -50,7 +50,7 @@ anychart.ui.Splitter = function() {
 
   /**
    * Area that simplifies drag pointer navigation.
-   * Actually is a transparent rectangle that can be dragged.
+   * Actually it is a transparent rectangle that can be dragged.
    * @type {acgraph.vector.Rect}
    * @private
    */
@@ -66,7 +66,7 @@ anychart.ui.Splitter = function() {
 
 
   /**
-   * Position ratio of resizer's line.
+   * Position ratio of resizer line.
    * @type {number}
    * @private
    */
@@ -90,9 +90,9 @@ anychart.ui.Splitter = function() {
 
 
   /**
-   * Start limit in this case is an area from the start side unavailable to move there with dragging despite the bounds set.
-   * For example: here are bounds acgraph.math.Rect(0, 0, 100, 50) available for vertical splitter.
-   * If we set this.startLimitSize_ = 10, then available drag area becomes acgraph.math.Rect(10, 0, 100, 50) because
+   * In this case start limit is an area at the start side, can't move there with dragging despite the bounds set.
+   * For example: here are bounds anychart.math.Rect(0, 0, 100, 50) available for vertical splitter.
+   * If we set this.startLimitSize_ = 10, then available drag area becomes anychart.math.Rect(10, 0, 100, 50) because
    * 'start' for vertical splitter is 'left', 'end' is 'right' (for horizontal one - 'start' is 'top', 'end' is 'bottom')
    * @type {number}
    * @private
@@ -101,9 +101,9 @@ anychart.ui.Splitter = function() {
 
 
   /**
-   * End limit in this case is an area from the end side unavailable to move there with dragging despite the bounds set.
-   * For example: here are bounds acgraph.math.Rect(0, 0, 100, 50) available for vertical splitter.
-   * If we set this.endLimitSize_ = 10, then available drag area becomes acgraph.math.Rect(0, 0, 90, 50) because
+   * In this case end limit  is an area from the end side, can't move there with dragging despite the bounds set.
+   * For example: here are bounds anychart.math.Rect(0, 0, 100, 50) available for vertical splitter.
+   * If we set this.endLimitSize_ = 10, then available drag area becomes anychart.math.Rect(0, 0, 90, 50) because
    * 'start' for vertical splitter is 'left', 'end' is 'right' (for horizontal one - 'start' is 'top', 'end' is 'bottom')
    * @type {number}
    * @private
@@ -171,7 +171,7 @@ anychart.ui.Splitter = function() {
 
 
   /**
-   * Center line's stroke.
+   * Center line stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
@@ -179,7 +179,7 @@ anychart.ui.Splitter = function() {
 
 
   /**
-   * Center line's fill.
+   * Center line fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
@@ -255,7 +255,7 @@ anychart.ui.Splitter.prototype.SUPPORTED_CONSISTENCY_STATES =
  * NOTE: Doesn't modify actual bounds.
  *
  * @param {(anychart.utils.Layout|string)=} opt_value - Value to be set.
- * @return {(anychart.utils.Layout|anychart.ui.Splitter)} - Current layout or itself for chaining.
+ * @return {(anychart.utils.Layout|anychart.ui.Splitter)} - Current layout or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -270,12 +270,12 @@ anychart.ui.Splitter.prototype.layout = function(opt_value) {
 };
 
 
-//TODO (A.Kudryavtsev): Add to description somehow: position is always limited by this.startLimitSize_ and this.endLimitSize_
+//TODO (A.Kudryavtsev): Add to description: position is always limited by this.startLimitSize_ and this.endLimitSize_
 /**
  * Sets a position of splitter in its bounds and returns itself or returns a current value.
  * @param {(number|string)=} opt_value - Value to be set. Must be a number [0..1] or a percent value ("57.3%"). Any
- *  unsuitable string values will be ignored, as well as any unsuitable numeric values will be clamped to [0..1].
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ *  unsuitable string values will be ignored, as well as any unsuitable numeric values will be put in [0..1] range.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -283,7 +283,7 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
 
     var startLimitPos = 0, endLimitPos = 1;
 
-    if (this.pixelBoundsCache_) { //Init check condition: we don't trigger event if there's no init position.
+    if (this.pixelBoundsCache_) { //Init check condition: we don't trigger event if there is no init position.
       var isVertical = this.isVertical_();
       var sideSize = isVertical ? this.pixelBoundsCache_.getWidth() : this.pixelBoundsCache_.getHeight();
       startLimitPos = this.startLimitSize_ / sideSize;
@@ -292,8 +292,8 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
 
     pos = goog.math.clamp(/** @type {number} */ (pos), startLimitPos, endLimitPos);
 
-    //Here is no condition (this.position_ != pos) because changing the startLimit and endLimit calls this.position(this.position_).
-    //In this case, visual offset can absent, but new drag bounds must be applied: this.invalidate() must be called.
+    //No condition (this.position_ != pos) because changing the startLimit and endLimit calls this.position(this.position_).
+    //In this case, visual offset can be absent, but new drag bounds must be applied: this.invalidate() must be called.
     if (!isNaN(pos)) {
       if (this.pixelBoundsCache_) { //TODO (A.Kudryavtsev): Move after this.invalidate() ?
         this.position_ = pos; //Here we must do it before handler call.
@@ -314,7 +314,7 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
  * Gets/sets a drag area length.
  * Drag area is actually an invisible area around visible splitter's line to simplify mouse targeting.
  * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaLength = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -389,7 +389,7 @@ anychart.ui.Splitter.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacit
  * @param {string=} opt_dashpattern .
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for chaining.
+ * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
@@ -413,7 +413,7 @@ anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, op
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for chaining.
+ * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
@@ -436,7 +436,7 @@ anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys,
  * @param {string=} opt_dashpattern .
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for chaining.
+ * @return {acgraph.vector.Stroke|anychart.ui.Splitter|string} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
@@ -460,7 +460,7 @@ anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_t
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for chaining.
+ * @return {acgraph.vector.Fill|anychart.ui.Splitter|string} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.dragAreaFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
@@ -478,7 +478,7 @@ anychart.ui.Splitter.prototype.dragAreaFill = function(opt_fillOrColorOrKeys, op
 /**
  * Gets/sets a flag if splitter position change must be handled.
  * @param {boolean=} opt_value - Value to be set.
- * @return {boolean|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {boolean|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.handlePositionChange = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -492,7 +492,7 @@ anychart.ui.Splitter.prototype.handlePositionChange = function(opt_value) {
 /**
  * Gets/sets a flag if a splitter's width must be considered for sizes calculation.
  * @param {boolean=} opt_value - Value to be set.
- * @return {anychart.ui.Splitter|boolean} - Current value or itself for chaining.
+ * @return {anychart.ui.Splitter|boolean} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.considerSplitterWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -509,7 +509,7 @@ anychart.ui.Splitter.prototype.considerSplitterWidth = function(opt_value) {
 /**
  * Gets/sets a splitter width.
  * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.splitterWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -527,7 +527,7 @@ anychart.ui.Splitter.prototype.splitterWidth = function(opt_value) {
 /**
  * Sets a new start limit for bounds set.
  * @param {number=} opt_value - New value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  * @private
  */
 anychart.ui.Splitter.prototype.startLimit_ = function(opt_value) {
@@ -549,7 +549,7 @@ anychart.ui.Splitter.prototype.startLimit_ = function(opt_value) {
 /**
  * Sets a new end limit for bounds set.
  * @param {number=} opt_value - New value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  * @private
  */
 anychart.ui.Splitter.prototype.endLimit_ = function(opt_value) {
@@ -569,7 +569,7 @@ anychart.ui.Splitter.prototype.endLimit_ = function(opt_value) {
 
 
 /**
- * Actual applying of limit size changes.
+ * Actual applying limit size changes.
  * @private
  */
 anychart.ui.Splitter.prototype.drawStartLimit_ = function() {
@@ -584,7 +584,7 @@ anychart.ui.Splitter.prototype.drawStartLimit_ = function() {
         this.newEndLimitSize_ = size - this.newStartLimitSize_;
       }
 
-      //This will automatically recalculate new position to fit new limit.
+      //This will automatically recalculate new position to fit a new limit.
       this.position(this.position_);
     }
   }
@@ -592,7 +592,7 @@ anychart.ui.Splitter.prototype.drawStartLimit_ = function() {
 
 
 /**
- * Actual applying of limit size changes.
+ * Actual applying limit size changes.
  * @private
  */
 anychart.ui.Splitter.prototype.drawEndLimit_ = function() {
@@ -607,7 +607,7 @@ anychart.ui.Splitter.prototype.drawEndLimit_ = function() {
         this.newStartLimitSize_ = size - this.newEndLimitSize_;
       }
 
-      //This will automatically recalculate new position to fit new limit.
+      //This will automatically recalculate a new position to fit new limit.
       this.position(this.position_);
     }
   }
@@ -617,7 +617,7 @@ anychart.ui.Splitter.prototype.drawEndLimit_ = function() {
 /**
  * Gets/sets a new value to left limit size.
  * @param {number=} opt_value - value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.leftLimitSize = function(opt_value) {
   return this.startLimit_(opt_value);
@@ -627,7 +627,7 @@ anychart.ui.Splitter.prototype.leftLimitSize = function(opt_value) {
 /**
  * Gets/sets a new value to top limit size.
  * @param {number=} opt_value - value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.topLimitSize = function(opt_value) {
   return this.startLimit_(opt_value);
@@ -637,7 +637,7 @@ anychart.ui.Splitter.prototype.topLimitSize = function(opt_value) {
 /**
  * Gets/sets a new value to left limit size.
  * @param {number=} opt_value - value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.rightLimitSize = function(opt_value) {
   return this.endLimit_(opt_value);
@@ -647,7 +647,7 @@ anychart.ui.Splitter.prototype.rightLimitSize = function(opt_value) {
 /**
  * Gets/sets a new value to bottom limit size.
  * @param {number=} opt_value - value to be set.
- * @return {number|anychart.ui.Splitter} - Current value or itself for chaining.
+ * @return {number|anychart.ui.Splitter} - Current value or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.bottomLimitSize = function(opt_value) {
   return this.endLimit_(opt_value);
@@ -785,7 +785,7 @@ anychart.ui.Splitter.prototype.globalCursor_ = function(opt_isVertical, opt_clea
   var cursor = opt_isVertical ? acgraph.vector.Cursor.E_RESIZE : acgraph.vector.Cursor.N_RESIZE;
   goog.style.setStyle(goog.global['document']['body'], 'cursor', opt_clear ? this.cursorBackup_ : cursor);
 
-  //TODO (A.Kudryavtsev): Check: Some old browsers don't change cursor over the stage if cursor was chanded globally.
+  //TODO (A.Kudryavtsev): Check: Some old browsers don't change cursor over the stage if cursor was changed globally.
   //TODO (A.Kudryavtsev): In this case something like this can be used: this.base_.parent().cursor(opt_clear ? acgraph.vector.Cursor.DEFAULT : cursor);
 };
 

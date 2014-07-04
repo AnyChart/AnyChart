@@ -47,7 +47,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
    */
   this.hoverSize_ = 12;
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
@@ -83,15 +83,15 @@ goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
  *    });
  * @param {(string|anychart.elements.Marker.Type|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Функция, задающее произвольно
- *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
- *    // path - это acgraph.vector.Path
- *    // x, y - текущее позиционирование маркера
- *    // size - размер маркера
- *    ... //do smth
+ *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Function for a custom
+ *  marker should look like this: <code>function(path, x, y, size){
+ *    // path - acgraph.vector.Path
+ *    // x, y - marker position
+ *    // size - marker size
+ *    ... //do something
  *    return path;
  *  }</code>.
- * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
+ * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Marker.Type|
@@ -142,15 +142,15 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *    });
  * @param {(string|anychart.elements.Marker.Type|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Функция, задающее произвольно
- *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
- *    // path - это acgraph.vector.Path
- *    // x, y - текущее позиционирование маркера
- *    // size - размер маркера
- *    ... //do smth
+ *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Function for a custom
+ *  marker should look like this: <code>function(path, x, y, size){
+ *    // path - acgraph.vector.Path
+ *    // x, y - marker position
+ *    // size - marker size
+ *    ... //do something
  *    return path;
  *  }</code>.
- * @return {!anychart.cartesian.series.Marker} Экземпляр класса {@link anychart.cartesian.series.Marker} для цепочного вызова.
+ * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Marker.Type|
@@ -181,7 +181,7 @@ anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
  * markerSeries
  *     .size(14);
  * @param {number=} opt_value [10] Value to set.
- * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ * @return {anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -212,7 +212,7 @@ anychart.cartesian.series.Marker.prototype.size = function(opt_value) {
  *     .size(10)
  *     .hoverSize(20);
  * @param {number=} opt_value [12] Value to set.
- * @return {anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ * @return {anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -327,7 +327,7 @@ anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
 
 /**
  * @inheritDoc
- * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  */
 anychart.cartesian.series.Marker.prototype.hoverSeries = function() {
   this.unhover();
@@ -337,7 +337,7 @@ anychart.cartesian.series.Marker.prototype.hoverSeries = function() {
 
 /**
  * @inheritDoc
- * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  */
 anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) return this;
@@ -355,7 +355,7 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
 
 /**
  * @inheritDoc
- * @return {!anychart.cartesian.series.Marker} An instance of the {@link anychart.cartesian.series.Marker} class for method chaining.
+ * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  */
 anychart.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
@@ -449,7 +449,7 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 
   if (goog.isFunction(this.type())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize type function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize type function, please reset it manually.');
     }
   } else {
     json['type'] = this.type();
@@ -457,7 +457,7 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverType())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverType function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverType function, please reset it manually.');
     }
   } else {
     json['hoverType'] = this.hoverType();

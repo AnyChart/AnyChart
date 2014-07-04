@@ -22,8 +22,8 @@ anychart.scales.Base = function() {
   goog.base(this);
 
   /**
-   * The number of current calculation sessions. Each chart starts a calculation session in it's calculate() method and
-   * finishes it in it's draw() method beginning.
+   * The number of current calculation sessions. Each chart starts a calculation session in its calculate() method and
+   * finishes it in its draw() method beginning.
    * @type {number}
    * @private
    */
@@ -42,7 +42,7 @@ goog.inherits(anychart.scales.Base, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Supported signals mask.
  * @type {number}
  */
 anychart.scales.Base.prototype.SUPPORTED_SIGNALS =
@@ -69,7 +69,7 @@ anychart.scales.Base.prototype.inverseTransform = goog.abstractMethod;
  * Getter and setter for scale inversion. If the scale is inverted, axes and series go upside-down or right-to-left
  * instead of bottom-to-top and left-to-right.
  * @param {boolean=} opt_value Inverted state to set.
- * @return {(!anychart.scales.Base|boolean)} Inverted state or itself for chaining.
+ * @return {(!anychart.scales.Base|boolean)} Inverted state or itself for method chaining.
  */
 anychart.scales.Base.prototype.inverted = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -85,7 +85,7 @@ anychart.scales.Base.prototype.inverted = function(opt_value) {
 
 
 /**
- * Informs scale that an auto range calculation started for the chart, so it should reset it's data range on the first
+ * Informs scale that an auto range calculation started for the chart, so it should reset its data range on the first
  * call of this method if needed.
  * @return {!anychart.scales.Base} Chaining.
  */
@@ -98,8 +98,8 @@ anychart.scales.Base.prototype.startAutoCalc = function() {
 
 
 /**
- * Informs the scale, that an auto range calculation started for the chart in past was ended.
- * @param {boolean=} opt_silently If this flag is set, does not dispatch an event if reapplication needed.
+ * Informs the scale that an auto range calculation started for the chart in past was ended.
+ * @param {boolean=} opt_silently If this flag is set, do not dispatch an event if reapplication needed.
  * @return {boolean} If the calculation changed the scale and it needs to be reapplied.
  */
 anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
@@ -107,12 +107,12 @@ anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
   if (this.autoCalcs_ == 0) {
     return this.checkScaleChanged(!!opt_silently);
   } else
-    return true; // todo: дополнительные действия при просчете разделяемых между графиками шкал!
+    return true; // todo: additional stuff when calculating shared scales!
 };
 
 
 /**
- * Checks if previous data range differs from current, dispatches a REAPPLICATION signal and returns the result.
+ * Checks if previous data range differs from the current, dispatches a REAPPLICATION signal and returns the result.
  * @param {boolean} silently If set, the signal is not dispatched.
  * @return {boolean} If the scale was changed and it needs to be reapplied.
  * @protected
@@ -135,14 +135,14 @@ anychart.scales.Base.prototype.needsAutoCalc = goog.abstractMethod;
 /**
  * Extends the scale range.
  * @param {...*} var_args Values that are supposed to extend the input domain.
- * @return {!anychart.scales.Base} Itself for chaining.
+ * @return {!anychart.scales.Base} Itself for method chaining.
  */
 anychart.scales.Base.prototype.extendDataRange = goog.abstractMethod;
 
 
 /**
  * Resets scale data range if it needs auto calculation.
- * @return {!anychart.scales.Base} Itself for chaining.
+ * @return {!anychart.scales.Base} Itself for method chaining.
  * @protected
  */
 anychart.scales.Base.prototype.resetDataRange = goog.abstractMethod;
@@ -161,7 +161,7 @@ anychart.scales.Base.prototype.getCategorisation = function() {
  * @return {number} Returns category width in ratio to the total space of the scale.
  */
 anychart.scales.Base.prototype.getPointWidthRatio = function() {
-  // TODO(Anton Saukh): non-Ordinal scales must have min distance between points calculation mechanism.
+  // TODO(Anton Saukh): non-Ordinal scales must have min distance between points calculation algorithm.
   return 0;
 };
 //endregion
@@ -230,8 +230,8 @@ anychart.scales.Base.prototype.canBeStacked = false;
 
 /**
  * Accepts 'none', 'value', 'percent'.
- * @param {anychart.scales.StackMode=} opt_stackMode Stack mode if used as setter.
- * @return {anychart.scales.Base|anychart.scales.StackMode} StackMode or itself for chaining.
+ * @param {anychart.scales.StackMode=} opt_stackMode Stack mode if used as a setter.
+ * @return {anychart.scales.Base|anychart.scales.StackMode} StackMode or itself for method chaining.
  */
 anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
   if (goog.isDef(opt_stackMode)) {
@@ -262,7 +262,7 @@ anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
  * Applies positive stack top as a stack max for current iteration.
  * @param {number} min Negative stack limit.
  * @param {number} max Positive stack limit.
- * @return {anychart.scales.Base} Returns itself for chaining.
+ * @return {anychart.scales.Base} Returns itself for method chaining.
  */
 anychart.scales.Base.prototype.setStackRange = function(min, max) {
   this.stackMin_ = Math.min(min, max, 0);
@@ -272,7 +272,7 @@ anychart.scales.Base.prototype.setStackRange = function(min, max) {
 
 
 /**
- * Resets current stack to initial value.
+ * Resets current stack to the initial value.
  * @return {anychart.scales.Base} .
  */
 anychart.scales.Base.prototype.resetStack = function() {
@@ -294,7 +294,7 @@ anychart.scales.Base.prototype.applyStacking;
 /**
  * Returns previously stacked value.
  * @param {*} value Data value.
- * @return {number} Previously stacked data value. Returns 0, if prev value was NaN.
+ * @return {number} Previously stacked data value. Returns 0, if previous value was NaN.
  */
 anychart.scales.Base.prototype.getPrevVal = function(value) {
   if (this.stackMode_ != anychart.scales.StackMode.NONE && goog.isNumber(value) && !isNaN(value)) {

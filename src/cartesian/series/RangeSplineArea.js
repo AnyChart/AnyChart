@@ -15,7 +15,7 @@ goog.require('anychart.cartesian.series.SplineDrawer');
 anychart.cartesian.series.RangeSplineArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;

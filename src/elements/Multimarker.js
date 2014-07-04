@@ -9,16 +9,16 @@ goog.require('goog.events.BrowserEvent');
 
 
 /**
- * Класс, описывающий элемент - множественные маркеры.<br/>
- * Множественные маркеры - это набор маркеров, которым можно задать обзие настройки, такие как тип (предопределенный или
- * свой), размер и заливку, а также можно спозиционировать широким набором инструментов:
+ * Multiple markers class.<br/>
+ * Multiple markers are the set of markers with a common settings, such as type (predefined or
+ * custom), size, fill and position:
  * <ul>
  *   <li>{@link anychart.elements.Multimarker#anchor}</li>
  *   <li>{@link anychart.elements.Multimarker#position}</li>
  *   <li>{@link anychart.elements.Multimarker#offsetX} и {@link anychart.elements.Multimarker#offsetY}</li>
  *   <li>{@link anychart.elements.Multimarker#parentBounds}</li>
  * </ul>
- * Кроме того, можно получить доступ к отдельному маркеру в текущем множестве и изменить его индивидуальные настройки.
+ * Also you can access any marker from the set and change it:
  * @example <t>simple-h100</t>
  * var MMarker = new anychart.elements.Multimarker()
  *     .type('star5')
@@ -202,7 +202,7 @@ goog.inherits(anychart.elements.Multimarker, anychart.VisualBase);
 
 
 /**
- * Supported consistency states.
+ * Supported signals.
  * @type {number}
  */
 anychart.elements.Multimarker.prototype.SUPPORTED_SIGNALS = anychart.VisualBase.prototype.SUPPORTED_SIGNALS;
@@ -224,25 +224,25 @@ anychart.elements.Multimarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @private
  */
 anychart.elements.Multimarker.HANDLED_EVENT_TYPES_ = {
-  /** Вызывается когда по элементу кликнули. */
+  /** Click */
   'click': 0x01,
 
-  /** Вызывается когда по элементу дважды кликнули. */
+  /** Double click */
   'dblclick': 0x02,
 
-  /** Fires when mouse downed on element */
+  /** Mouse down */
   'mousedown': 0x04,
 
-  /** Fires when mouse upped on element */
+  /** Mouse up */
   'mouseup': 0x08,
 
-  /** Вызывается когда на элемент навели указатель мыши. */
+  /** Mouse over */
   'mouseover': 0x10,
 
-  /** Вызывается когда с элемента увели указатель мыши. */
+  /** Moise out */
   'mouseout': 0x20,
 
-  /** Fires when mouse moved on element */
+  /** Mouse move */
   'mousemove': 0x40,
 
   /** Fires on touch start */
@@ -284,19 +284,19 @@ anychart.elements.Multimarker.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * @return {Function} Marker position formatter function.
  *//**
  * Setter for position formatter function of all markers.<br/>
- * <b>Note:</b> в positionProvider может быть передана любая информация, через метод
- * {@link anychart.elements.Multimarker#draw}, что расширяет возможности по позиционированию
+ * <b>Note:</b> you can pass anything to positionProvider using
+ * {@link anychart.elements.Multimarker#draw}, this extends positioning options 
  * @param {function(*,number):anychart.math.CoordinateObject=} opt_value [function(positionProvider, index) {
  *  return {x: 80 * index, y: 0};
- * }] Функция определяющая позиционирование маркеров в зависимости от индекса и контекста. Функция должна иметь вид:
+ * }] Function to position marker depending on index and context, it should look like this:
  * <code>function(positionProvider, index) {
- *    ... //do somthing
+ *    ... //do something
  *    return {x: smth, y: smth};
  * }</code>
- * Параметры данной функции:<br/>
- * <b>positionProvider</b> - объект, содержащий информацию о позиционировании маркера с текщим индеком, который в
- *  обязательном порядке содержит поля <b>x</b> и <b>y</b>, не учитывающие настройки позиционирования offsets.<br/>
- * <b>index</b> - текущий индекс маркера.
+ * Parameters:<br/>
+ * <b>positionProvider</b> - object with information about current (by index) marker position,
+ *  this object must contain <b>x</b> and <b>y</b> field (with no offsets taken in account).<br/>
+ * <b>index</b> - current marker index.
  * @example <t>simple</t>
  * var marker = new anychart.elements.Multimarker()
  *     .container(stage)
@@ -307,7 +307,7 @@ anychart.elements.Multimarker.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  *     .anchor('center');
  * for (var i = 0; i < 5; i++)
  *   marker.draw();
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker}{@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {Function=} opt_value .
@@ -330,13 +330,13 @@ anychart.elements.Multimarker.prototype.positionFormatter = function(opt_value) 
  * @param {number} index Index of marker.
  * @return {string} Current markers's position settings.
  *//**
- * Setter for markers's position settings by index.<br/>
+ * Setter for markers position settings by index.<br/>
  * See example at {@link anychart.elements.Multimarker#position}.<br/>
- * <b>Note:</b> Принцип работы position описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-position}
+ * <b>Note:</b> Read how positioning works at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-position}
  * @param {number} index Index of marker.
  * @param {string=} opt_value Value to set.
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for methd chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -365,8 +365,8 @@ anychart.elements.Multimarker.prototype.positionAt = function(index, opt_value) 
  * @return {string} Markres position settings.
  *//**
  * Setter for position settings of all markers.<br/>
- * <b>Note:</b> Принцип работы position описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-position}.
+ * <b>Note:</b> Read more at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-position}.
  * @example <t>simple</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -406,11 +406,11 @@ anychart.elements.Multimarker.prototype.positionAt = function(index, opt_value) 
  *   MMarker.draw(positionProvider);
  * }
  * @param {string=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.NinePositions|string)=} opt_value Markers position settings.
- * @return {anychart.elements.Multimarker|anychart.utils.NinePositions|string} Markres position settings or itself for chaining call.
+ * @return {anychart.elements.Multimarker|anychart.utils.NinePositions|string} Markres position settings or itself for method chaining.
  */
 anychart.elements.Multimarker.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -435,11 +435,11 @@ anychart.elements.Multimarker.prototype.position = function(opt_value) {
  *//**
  * Setter for markers's anchor settings by index.<br/>
  * See example at {@link anychart.elements.Multimarker#anchor}.<br/>
- * <b>Note:</b> Принцип работы position описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-anchor}
+ * <b>Note:</b> Read more about position at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-anchor}
  * @param {number} index Index of marker.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Value to set.
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -468,8 +468,8 @@ anychart.elements.Multimarker.prototype.anchorAt = function(index, opt_value) {
  * @return {anychart.utils.NinePositions} Current marker anchor settings.
  *//**
  * Setter for anchor settings of all markers.<br/>
- * <b>Note:</b> Принцип работы position описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-anchor}
+ * <b>Note:</b> Read more about position at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-anchor}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -496,12 +496,12 @@ anychart.elements.Multimarker.prototype.anchorAt = function(index, opt_value) {
  *     x: barBounds.left,
  *     y: barBounds.top
  *   };
- *   // обозначим красным точку поционирования лейбла.
+ *   // mark label postion with red
  *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
  *   MMarker.draw(positionProvider);
  * }
  * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.NinePositions|string)=} opt_value .
@@ -524,7 +524,7 @@ anychart.elements.Multimarker.prototype.anchor = function(opt_value) {
 
 
 /**
- * Getter for markers's type settings by index.
+ * Getter for markers type settings by index.
  * @param {number} index Index of marker.
  * @return {anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
  *  Markers type settings.
@@ -534,15 +534,15 @@ anychart.elements.Multimarker.prototype.anchor = function(opt_value) {
  * @param {number} index Index of marker.
  * @param {(anychart.elements.Marker.Type|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Функция, задающее произвольно
- *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
- *    // path - это acgraph.vector.Path
- *    // x, y - текущее позиционирование маркера
- *    // size - размер маркера
- *    ... //do smth
+ *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom marker
+ *  must look like this: <code>function(path, x, y, size){
+ *    // path - acgraph.vector.Path
+ *    // x, y - current marker position
+ *    // size - marker size
+ *    ... //do something
  *    return path;
  *  }</code>.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -613,15 +613,15 @@ anychart.elements.Multimarker.prototype.typeAt = function(index, opt_value) {
  * }
  * @param {(anychart.elements.Marker.Type|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Функция, задающее произвольно
- *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
- *    // path - это acgraph.vector.Path
- *    // x, y - текущее позиционирование маркера
- *    // size - размер маркера
- *    ... //do smth
+ *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom marker
+ *  must look like this: <code>function(path, x, y, size){
+ *    // path - acgraph.vector.Path
+ *    // x, y - current marker position
+ *    // size - marker size
+ *    ... //do something
  *    return path;
  *  }</code>.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
@@ -643,15 +643,15 @@ anychart.elements.Multimarker.prototype.type = function(opt_value) {
 
 
 /**
- * Getter for markers's size settings by index.
+ * Getter for markers size settings by index.
  * @param {number} index Index of marker.
- * @return {number} Current markers's size settings.
+ * @return {number} Current markers size settings.
  *//**
  * Setter for markers's size settings by index.<br/>
  * See example at {@link anychart.elements.Multimarker#size}.
  * @param {number} index Index of marker.
  * @param {number=} opt_value Value to set.
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -706,7 +706,7 @@ anychart.elements.Multimarker.prototype.sizeAt = function(index, opt_value) {
  *   MMarker.draw(positionProvider);
  * }
  * @param {number=} opt_value [10] Value to set.
- * @return {anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value .
@@ -728,17 +728,17 @@ anychart.elements.Multimarker.prototype.size = function(opt_value) {
 
 
 /**
- * Getter for current offsetX settings by index.
+ * Getter for current offsetXAt settings by index.
  * @param {number} index Index of marker.
- * @return {number|string} Markres offsetXAt settings.
+ * @return {number|string} Marker offsetXAt settings.
  *//**
  * Setter for offsetX settings by index.<br/>
- * <b>Note:</b> Принцип работы offsetXAt описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-offsets}.<br/>
+ * <b>Note:</b> offsetXAt is describe at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}.<br/>
  * See example at {@link anychart.elements.Multimarker#offsetX}.
  * @param {number} index Index of marker.
  * @param {(number|string)=} opt_value Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -763,11 +763,11 @@ anychart.elements.Multimarker.prototype.offsetXAt = function(index, opt_value) {
 
 /**
  * Getter for current offsetX settings of all markers.
- * @return {number|string} Markres offsetX settings.
+ * @return {number|string} Marker offsetX settings.
  *//**
  * Setter for offsetX settings of all markers.<br/>
- * <b>Note:</b> Принцип работы offsetX описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-offsets}
+ * <b>Note:</b> offsetX is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -793,12 +793,12 @@ anychart.elements.Multimarker.prototype.offsetXAt = function(index, opt_value) {
  *     x: barBounds.left+barBounds.width/2,
  *     y: barBounds.top
  *   };
- *   // обозначим красным точку поционирования маркера.
+ *   // mark marker position with red
  *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
  *   MMarker.draw(positionProvider);
  * }
  * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -822,15 +822,15 @@ anychart.elements.Multimarker.prototype.offsetX = function(opt_value) {
 /**
  * Getter for current offsetY settings by index.
  * @param {number} index Index of marker.
- * @return {number|string} Markres offsetYAt settings.
+ * @return {number|string} Marker offsetYAt settings.
  *//**
  * Setter for offsetY settings by index.<br/>
- * <b>Note:</b> Принцип работы offsetYAt описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-offsets}.<br/>
+ * <b>Note:</b> offsetYAt is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}.<br/>
  * See example at {@link anychart.elements.Multimarker#offsetY}.
  * @param {number} index Index of marker.
  * @param {(number|string)=} opt_value Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -858,8 +858,8 @@ anychart.elements.Multimarker.prototype.offsetYAt = function(index, opt_value) {
  * @return {number|string} Markres offsetY settings.
  *//**
  * Setter for offsetY settings of all markers.<br/>
- * <b>Note:</b> Принцип работы offsetY описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-positioning#m-offsets}
+ * <b>Note:</b> offsetY is desribed at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -885,12 +885,12 @@ anychart.elements.Multimarker.prototype.offsetYAt = function(index, opt_value) {
  *     x: barBounds.left+barBounds.width/2,
  *     y: barBounds.top
  *   };
- *   // обозначим красным точку поционирования маркера.
+ *   // mark position point with red
  *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
  *   MMarker.draw(positionProvider);
  * }
  * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -914,15 +914,15 @@ anychart.elements.Multimarker.prototype.offsetY = function(opt_value) {
 /**
  * Getter for current fill settings by index.
  * @param {number} index Index of marker.
- * @return {acgraph.vector.Fill|string} Markres fillAt settings.
+ * @return {acgraph.vector.Fill|string} Marker fillAt settings.
  *//**
  * Setter for fill settings by index.<br/>
- * <b>Note:</b> Принцип работы fillAt описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}.<br/>
+ * <b>Note:</b> fillAt is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}.<br/>
  * See example at {@link anychart.elements.Multimarker#fill}.
  * @param {number} index Index of marker.
  * @param {(acgraph.vector.Fill|string)=} opt_value Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -957,8 +957,8 @@ anychart.elements.Multimarker.prototype.fillAt = function(index, opt_fillOrColor
  * @return {acgraph.vector.Fill|string} Markres fill settings.
  *//**
  * Setter for fill settings of all markers.<br/>
- * <b>Note:</b> Принцип работы fill описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}
+ * <b>Note:</b> fill is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -987,7 +987,7 @@ anychart.elements.Multimarker.prototype.fillAt = function(index, opt_fillOrColor
  *   MMarker.draw(positionProvider);
  * }
  * @param {(acgraph.vector.Fill|string)=} opt_value ['black'] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
@@ -1018,26 +1018,26 @@ anychart.elements.Multimarker.prototype.fill = function(opt_fillOrColorOrKeys, o
 /**
  * Getter for current stroke settings by index.
  * @param {number} index Index of marker.
- * @return {acgraph.vector.Stroke|string} Markres strokeAt settings.
+ * @return {acgraph.vector.Stroke|string} Marker strokeAt settings.
  *//**
  * Setter for stroke settings by index.<br/>
- * <b>Note:</b> Принцип работы strokeAt описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}.<br/>
+ * <b>Note:</b> strokeAt is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}.<br/>
  * See example at {@link anychart.elements.Multimarker#fill}.
  * @param {number} index Index of marker.
  * @param {(acgraph.vector.Stroke|string)=} opt_value Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
+ *    if used as a setter.
+ * @param {number=} opt_thickness Line thickness. If none - set to 1.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
  *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
  *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Linejoin style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
@@ -1062,8 +1062,8 @@ anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_strokeOrF
  * @return {acgraph.vector.Stroke|string} Markres fill settings.
  *//**
  * Setter for stroke settings of all markers.<br/>
- * <b>Note:</b> Принцип работы stroke описан в статье
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}
+ * <b>Note:</b> stroke is described at
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -1093,17 +1093,17 @@ anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_strokeOrF
  *   MMarker.draw(positionProvider);
  * }
  * @param {(acgraph.vector.Stroke|string)=} opt_value ['black'] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
+ *    if used as a setter.
+ * @param {number=} opt_thickness Line thickness. If empty - set to 1.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
  *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
  *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke|string|anychart.elements.Multimarker} .
  */
@@ -1146,7 +1146,7 @@ anychart.elements.Multimarker.prototype.pointerEvents = function(opt_pointerEven
  * Setter for enabled state by index.<br/>
  * @param {number} index Index of marker.
  * @param {boolean=} opt_value Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number} index
@@ -1199,9 +1199,9 @@ anychart.elements.Multimarker.prototype.serialize = function(opt_withoutCustomSe
  * @return {Object} Serialized data.
  */
 anychart.elements.Multimarker.prototype.serializeAt = function(index, opt_includeCustomOnly) {
-  //Вот так это должно быть:
+  //TODO: At some point this should come to:
   //var data = goog.base(this, 'serialize');
-  //но пока что у base нету сериализации, поэтому делаю так:
+  //but as long as base has no serialization:
   var data = {};
   if (this.customMarkerSettings_[index]) {
     var point = this.customMarkerSettings_[index];
@@ -1301,10 +1301,10 @@ anychart.elements.Multimarker.prototype.deserializeAt = function(index, data) {
 
 
 /**
- * Сбрасывает все настройки, которые были заданый маркерам по их индексам, с помощью таких методов
- * как {@link anychart.elements.Multimarker#fillAt},
+ * Resets all settings made by index (made by
+ *{@link anychart.elements.Multimarker#fillAt},
  * {@link anychart.elements.Multimarker#strokeAt},
- * {@link anychart.elements.Multimarker#anchorAt} и тд.
+ * {@link anychart.elements.Multimarker#anchorAt} and alike).
  */
 anychart.elements.Multimarker.prototype.dropCustomSettings = function() {
   for (var i in this.customMarkerSettings_) {
@@ -1333,7 +1333,7 @@ anychart.elements.Multimarker.prototype.dropCustomSettingsAt = function(index) {
 
 
 /**
- * Удаляет всю последовательность маркеров.
+ * Removes all markers.
  */
 anychart.elements.Multimarker.prototype.clear = function() {
   var i, index;
@@ -1353,12 +1353,12 @@ anychart.elements.Multimarker.prototype.clear = function() {
 
 
 /**
- * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Returns positioning bounds.
  * @return {anychart.math.Rect} Current parent bounds.
  *//**
- * Устанавливает баунды отностительно которых идут рассчеты offsets, если они заданы в процентах.
+ * Sets bounds to calculate offsets, if those are set in percents.
  * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.Multimarker} Экземпляр класса {@link anychart.elements.Multimarker} для цепочного вызова.
+ * @return {!anychart.elements.Multimarker} {@link anychart.elements.Multimarker} for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value .
@@ -1383,10 +1383,10 @@ anychart.elements.Multimarker.prototype.parentBounds = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Рассчитывает баунды для текущего маркера, которые можно использовать, например, для проверки overlap.
- * @param {*} positionProvider Объект, содержащий информацию о позиционировании маркера с текщим индеком, который в
- *  обязательном порядке содержит поля <b>x</b> и <b>y</b>, не учитывающие настройки позиционирования offsets. Также
- *  может содержать любую иную информацию, которую Вы сами можете обрабатывать.
+ * Calculates bounds for the current marker, they can be used, for example, to check overlap.
+ * @param {*} positionProvider Object with information about marker with current index,
+ *  it must contain <b>x</b> and <b>y</b> fields (with no offsets taken in account). 
+ *  You can add any custom information of needed.
  * @param {number=} opt_index Marker index to calculate.
  * @return {anychart.math.Rect} Markers bounds.
  */
@@ -1464,9 +1464,9 @@ anychart.elements.Multimarker.prototype.measure = function(positionProvider, opt
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Заканчивает последовательность маркеров, сбрасывая все внутренние счетчики.<br/>
- * То есть, последующие вызовы метода {@link anychart.elements.Multimarker#draw} будут перерисовывать текущие
- * маркеры, а не рисовать новые.
+ * Finishes current marker set, resets all internal counters,<br/>
+ * ehich means {@link anychart.elements.Multimarker#draw} will redraw
+ * current markers, not draw new.
  * @example <t>simple-h100</t>
  * // sets global settings
  * var MMarker = new anychart.elements.Multimarker()
@@ -1479,7 +1479,7 @@ anychart.elements.Multimarker.prototype.measure = function(positionProvider, opt
  *  // нарисуем 6 звезд, а не 9
  *  if (i==6){
  *     MMarker.end();
- *     // первые звезды перерисуются с новым филом.
+ *     // first starts will be redrawn with new fill
  *     MMarker.fill('blue');
  *  }
  *  var positionProvider = {
@@ -1538,9 +1538,9 @@ anychart.elements.Multimarker.prototype.end = function() {
 
 
 /**
- * Рисует новый маркер и добавляет в последовательность с учетом positionProvider.<br/>
- * <b>Note:</b> В случае, если был вызван метод {@link anychart.elements.Multimarker.end}, то перерисовывает
- * очередной в поседовательности маркер.
+ * Draws a new marker and adds it to a set, positionProvider is taken in account.<br/>
+ * <b>Note:</b> If {@link anychart.elements.Multimarker.end} was invoked, the
+ * next marker in the set is redrawn.
  * @example <t>simple-h100</t>
  * // sets global settings
  * var MMarker = new anychart.elements.Multimarker()
@@ -1556,11 +1556,11 @@ anychart.elements.Multimarker.prototype.end = function() {
  *  };
  *  MMarker.draw(positionProvider);
  * }
- * @param {*} positionProvider Объект, содержащий информацию о позиционировании маркера с текщим индеком, который в
- *  обязательном порядке содержит поля <b>x</b> и <b>y</b>, не учитывающие настройки позиционирования offsets. Также
- *  может содержать любую иную информацию, которую Вы сами можете обрабатывать.
+ * @param {*} positionProvider Object with information about current marker position, which
+ *  must contain <b>x</b> and <b>y</b> fields (offsets are not taken in account). 
+ *  It can also contain any other additional information.
  * @param {number=} opt_index Marker index to draw.
- * @return {!anychart.elements.Multimarker} Return self for chaining call.
+ * @return {!anychart.elements.Multimarker} Return self for method chaining.
  */
 anychart.elements.Multimarker.prototype.draw = function(positionProvider, opt_index) {
   //index

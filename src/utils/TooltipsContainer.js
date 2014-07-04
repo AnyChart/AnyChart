@@ -7,8 +7,8 @@ goog.require('goog.dom');
 
 
 /**
- * Контейнер самого верхнего уровня размером с весь документ.
- * Не должен блочить никаких событий на странице.
+ * Top-level container has the same size as the document.
+ * It should not block any events on a page.
  * @constructor
  * @extends {goog.Disposable}
  */
@@ -94,7 +94,7 @@ anychart.utils.TooltipsContainer.prototype.clear = function() {
 anychart.utils.TooltipsContainer.prototype.disposeInternal = function() {
   this.stage_.dispose();
   this.stage_ = null;
-  //we no need to iterate on children and dispose them, it made by this.stage_.dispose() call
+  //we don't need to iterate  children and dispose them, it is done by this.stage_.dispose() call
   this.children_ = null;
   goog.dom.removeNode(this.root_);
   this.root_ = null;

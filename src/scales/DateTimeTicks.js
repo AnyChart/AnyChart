@@ -26,7 +26,7 @@ goog.inherits(anychart.scales.DateTimeTicks, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Supported signals mask.
  * @type {number}
  */
 anychart.scales.DateTimeTicks.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -108,7 +108,7 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
 /**
  * Gets or sets ticks count value. If opt_value is defined but not a number or less than 2, it defaults to 5.
  * @param {number=} opt_value Ticks interval value if used as a getter.
- * @return {(number|anychart.scales.DateTimeTicks)} Interval value or itself for chaining.
+ * @return {(number|anychart.scales.DateTimeTicks)} Interval value or itself for method chaining.
  */
 anychart.scales.DateTimeTicks.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -128,7 +128,7 @@ anychart.scales.DateTimeTicks.prototype.count = function(opt_value) {
 /**
  * Setups ticks as an explicit array of fixed ticks.
  * @param {Array} ticks Explicit ticks array.
- * @return {!anychart.scales.DateTimeTicks} Returns itself for chaining.
+ * @return {!anychart.scales.DateTimeTicks} Returns itself for method chaining.
  */
 anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
   if (this.explicit_ != ticks) {
@@ -159,7 +159,7 @@ anychart.scales.DateTimeTicks.prototype.get = function() {
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the maximum can be modified.
+ * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
@@ -316,7 +316,7 @@ anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max,
     }
   }
   // Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) is always >= 0.5, because the last
-  // anychart.scales.DateTimeTicks.RANGES_ is half a year, so there shouldn't be a situation, when interval will be 0.
+  // anychart.scales.DateTimeTicks.RANGES_ is half a year, so there shouldn't be a situation when interval is 0.
   if (asMinor)
     return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)));
   else

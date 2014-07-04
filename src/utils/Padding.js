@@ -6,8 +6,8 @@ goog.require('anychart.utils.Space');
 
 
 /**
- * Stores padding info for 4 sides. Can accept numbers and strings as side padding.
- * For initializing values meaning see anychart.utils.Padding#set() method.
+ * Stores padding info for 4 sides. Can accept numbers and strings as padding.
+ * For initializing values see anychart.utils.Padding#set() method.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.

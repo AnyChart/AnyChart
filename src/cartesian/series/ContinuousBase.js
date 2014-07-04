@@ -69,7 +69,7 @@ anychart.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
       this.drawMarker(false);
       this.drawLabel(false);
     }
-    // if connectMissing == true, то firstPointDrawn уже не станет false в процессе рисования.
+    // if connectMissing == true, firstPointDrawn will never be false when drawing.
     this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;
   }
 };
@@ -170,7 +170,7 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeHatchFill = goog.null
  * If set to true, the series will not be interrupted on missing points.
  * Defaults to false. Markers will not be drawn for missing points in both cases.
  * @param {boolean=} opt_value The value to be set.
- * @return {!anychart.cartesian.series.Base|boolean} The setting, or itself for chaining.
+ * @return {!anychart.cartesian.series.Base|boolean} The setting, or itself for method chaining.
  */
 anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints = function(opt_value) {
   if (goog.isDef(opt_value)) {

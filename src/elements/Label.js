@@ -9,17 +9,17 @@ goog.require('anychart.utils.Padding');
 
 
 /**
- * Класс, описывающий элемент - лейбл.<br/>
- * Лейбл может быть как частью другого, более сложного, элемента (чарт, легенда, ось и тд), так и самостоятельным
- * элементом визаулизации.<br/>
- * Лейблу можно задать background, а также его можно спозиционировать широким набором инструментов:
+ * Label element class.<br/>
+ * Label can be a part of another element (such as chart, legend, axis, etc) or it can 
+ * be used independently.<br/>
+ * Label has a background and a large number of positioning options:
  * <ul>
  *   <li>{@link anychart.elements.Label#anchor}</li>
  *   <li>{@link anychart.elements.Label#position}</li>
- *   <li>{@link anychart.elements.Label#offsetX} и {@link anychart.elements.Label#offsetY}</li>
+ *   <li>{@link anychart.elements.Label#offsetX} and {@link anychart.elements.Label#offsetY}</li>
  *   <li>{@link anychart.elements.Label#parentBounds}</li>
  * </ul>
- * @example <c>Создание самостоятельного Label.</c><t>simple-h100</t>
+ * @example <c>Creating an autonomous label.</c><t>simple-h100</t>
  * new anychart.elements.Label()
  *     .text('My custom Label')
  *     .fontSize(27)
@@ -124,14 +124,14 @@ anychart.elements.Label = function() {
   this.adjustByHeight_ = false;
 
   /**
-   * Min font size for adjusting from.
+   * Minimimum font size for adjusting from.
    * @type {number}
    * @private
    */
   this.minFontSize_ = 8;
 
   /**
-   * Max font size for adjusting to.
+   * Maximum font size for adjusting to.
    * @type {number}
    * @private
    */
@@ -143,7 +143,7 @@ goog.inherits(anychart.elements.Label, anychart.elements.Text);
 
 
 /**
- * Supported consistency states.
+ * Supported signals.
  * @type {number}
  */
 anychart.elements.Label.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.prototype.SUPPORTED_SIGNALS;
@@ -164,10 +164,10 @@ anychart.elements.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets text content for current label.
- * @return {string} Current text content of label.
+ * Gets text content for a current label.
+ * @return {string} Current text content of a label.
  *//**
- * Sets text content for label.
+ * Sets text content for a label.
  * @example <t>simple-h100</t>
  * new anychart.elements.Label()
  *      .text('My custom label Text')
@@ -175,7 +175,7 @@ anychart.elements.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
  *      .background(null)
  *      .draw();
  * @param {string=} opt_value ['Label text'] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {string=} opt_value .
@@ -192,9 +192,29 @@ anychart.elements.Label.prototype.text = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets the Label background settings.
+ * Getter for the Label background settings.<br/>
+ * <b>Note:</b> By default background is disabled. Set <b>enabled(true)</b> to start working with it.
+ * @return {!anychart.elements.Background} Returns the background settings.
+ *//**
+ * Setter for Label background settings.
+ * @example <t>simple-h100</t>
+ * var bg = new anychart.elements.Background();
+ * bg.fill(['rgb(255,250,250)', 'rgb(205,250,250)', 'rgb(255,250,250)']);
+ * bg.stroke('1 lightgrey');
+ * bg.cornerType('round').corners(10);
+ * new anychart.elements.Label()
+ *      .text('Label backgruond sample')
+ *      .fontSize(12)
+ *      .background(bg)
+ *      .padding(10)
+ *      .container(stage)
+ *      .draw();
+ * @param {anychart.elements.Background=} opt_value Value to set.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!(anychart.elements.Label|anychart.elements.Background)} Returns the background or itself for chaining.
+ * @return {!(anychart.elements.Label|anychart.elements.Background)} Returns the background or itself for method chaining.
  */
 anychart.elements.Label.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -234,14 +254,14 @@ anychart.elements.Label.prototype.backgroundInvalidated_ = function(event) {
 
 /**
  * Getter for current label padding.<br/>
- * Иллюстрацию работы с margins см тут {@link anychart.Chart#padding}.
+ * See how paddings work at {@link anychart.Chart#padding}.
  * @return {anychart.utils.Padding} Current label padding.
  *//**
  * Setter for label padding in pixels by one value.<br/>
  * @param {(string|number|anychart.utils.Space)=} opt_value [null] Value to set.
- * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
- * Setter for label padding in pixels by few numbers.<br/>
+ * Setter for label padding in pixels.<br/>
  * @example <t>listingOnly</t>
  * // 1) top and bottom 10px, left and right 15px
  * label.padding(10, '15px');
@@ -253,7 +273,7 @@ anychart.elements.Label.prototype.backgroundInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
@@ -299,15 +319,15 @@ anychart.elements.Label.prototype.boundsInvalidated_ = function(event) {
  * @return {number|string|null} Current label width.
  *//**
  * Setter for label width.<br/>
- * <b>Note:</b> Если будет переданно <b>null</b>, то ширина будет рассчитываться автоматически.
+ * <b>Note:</b> if <b>null</b> is passed, width is calculated automatically.
  * @example <t>simple-h100</t>
  * label = new anychart.elements.Label()
- *      .width('200px');
- * // отметим область, занимаемую лейблом, синей рамкой.
- * label.background().stroke('1 #00F')
+ *      .width(200);
+ * // mark the area occupied by the label with a blue frame
+ * label.background().enabled(true).fill('none').stroke('1 #00F');
  * label.container(stage).draw();
  * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -331,15 +351,15 @@ anychart.elements.Label.prototype.width = function(opt_value) {
  * @return {number|string|null} Current label width.
  *//**
  * Setter for label height.<br/>
- * <b>Note:</b> Если будет переданно <b>null</b>, то высота будет рассчитываться автоматически.
+ * <b>Note:</b> if <b>null</b> is passed, height is calculated automatically.
  * @example <t>simple-h100</t>
  * label = new anychart.elements.Label()
- *      .height('90px');
- * // отметим область, занимаемую лейблом, синей рамкой.
- * label.background().stroke('1 #00F')
+ *      .height(90);
+ * // mark the area occupied by the label with a blue frame
+ * label.background().enabled(true).fill('none').stroke('1 #00F');
  * label.container(stage).draw();
  * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -359,11 +379,11 @@ anychart.elements.Label.prototype.height = function(opt_value) {
 
 
 /**
- * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Returns positioning bounds.
  * @return {anychart.math.Rect} Current parent bounds.
  *//**
- * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.<br/>
- * Width, height, offsets заданные в проуентах считаются относительно этих заданных баундов.
+ * Sets positioning bounds.<br/>
+ * If width, height or offsets are set in percents - these are percents of these bounds.
  * @illustration <t>simple-h100</t>
  * var layer = stage.layer();
  * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
@@ -387,9 +407,9 @@ anychart.elements.Label.prototype.height = function(opt_value) {
  *     .fontColor('gray')
  *     .draw();
  * @illustrationDesc
- * Label находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции label:<br/>
- *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
- *   b. Черным - когда в качестве родительских заданы баунды stage.
+ * Label is inside a layer (marked with blue), two positioning options are shown:<br/>
+ *   a. Gray - inside parent container bounds.<br/>
+ *   b. Black - when stage acts as a parent.
  * @example <t>listingOnly</t>
  * new anychart.elements.Label()
  *     .container(layer)
@@ -397,7 +417,7 @@ anychart.elements.Label.prototype.height = function(opt_value) {
  *     .background(null)
  *     .draw();
  * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value .
@@ -425,7 +445,7 @@ anychart.elements.Label.prototype.parentBounds = function(opt_value) {
 /**
  * Gets or sets label rotation settings.
  * @param {(number)=} opt_value Label rotation settings.
- * @return {number|anychart.elements.Label} Label rotation settings or itself for chaining call.
+ * @return {number|anychart.elements.Label} Label rotation settings or itself for method chaining.
  */
 anychart.elements.Label.prototype.rotation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -444,18 +464,36 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * @return {anychart.utils.NinePositions} Current label anchor settings.
  *//**
  * Setter for label anchor settings.<br/>
- * <b>Note:</b> Совмещает точку позиционирования лейбла ({@link anychart.elements.Label#position}) с указанным якорем.
+ * <b>Note:</b> merges label positioning point ({@link anychart.elements.Label#position}) with an anchor.
  * @example <t>simple-h100</t>
+ * // to the left
+ * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * var label = new anychart.elements.Label()
  *     .padding(5)
- *     .position([100, 50])
- *     .anchor(anychart.utils.NinePositions.LEFT_BOTTOM);
- * label.background().stroke('1 #aaa')
+ *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
+ *     .parentBounds(parentBounds.getBounds())
+ *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ * label.background().enabled(true).fill('none').stroke('1 #aaa');
  * label.container(stage).draw();
- * // обозначим красным точку поционирования лейбла.
- * stage.circle(100, 50, 2).stroke('3 red')
+ * stage.circle(105, 75, 2).stroke('3 red');
+ * // to the right
+ * parentBounds = stage.rect(120, 5, 100, 70).stroke('rgba(0,0,200,.4)');
+ * label = new anychart.elements.Label()
+ *     .padding(5)
+ *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
+ *     .parentBounds(parentBounds.getBounds())
+ *     .anchor(anychart.utils.NinePositions.CENTER);
+ * label.background().enabled(true).fill('none').stroke('1 #aaa');
+ * label.container(stage).draw();
+ * stage.circle(220, 75, 2).stroke('3 red');
+ * @illustrationDesc
+ * parentBounds are markerd with blue<br/>
+ * Label position in Bottom Right.<br/>
+ * Anchor is marked with red.<br/>
+ * Left: anchor is Bottom Right<br/>
+ * Right: anchor in Center<br/>
  * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.NinePositions|string)=} opt_value .
@@ -549,21 +587,19 @@ anychart.elements.Label.prototype.anchor = function(opt_value) {
  * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
  *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
  * @illustrationDesc
- * Стрелочками обозначено направление положительно заданных офсетов относительно якоря в котором спозиционирован лейбл.
+ * Arrows show offsets direction.
  * @example <t>simple-h100</t>
+ * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * var label = new anychart.elements.Label()
  *     .padding(5)
- *     .position([100, 50])
- *     // выставляем оффсеты по 10px.
+ *     .parentBounds(parentBounds.getBounds())
  *     .offsetX(10)
- *     .offsetY(10)
- *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
- * label.background().stroke('1 #aaa')
+ *     .offsetY(5);
+ * label.background().enabled(true).fill('none').stroke('1 #aaa');
  * label.container(stage).draw();
- * // обозначим красным точку поционирования лейбла.
- * stage.circle(100, 50, 2).stroke('3 red')
+ * stage.circle(5, 5, 2).stroke('3 red');
  * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -588,19 +624,17 @@ anychart.elements.Label.prototype.offsetX = function(opt_value) {
  * Setter for label offsetY settings.
  * See illustration in {@link anychart.elements.Label#offsetX}.
  * @example <t>simple-h100</t>
+ * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * var label = new anychart.elements.Label()
  *     .padding(5)
- *     .position([100, 50])
- *     // выставляем оффсеты по 10px.
+ *     .parentBounds(parentBounds.getBounds())
  *     .offsetX(10)
- *     .offsetY(10)
- *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
- * label.background().stroke('1 #aaa')
+ *     .offsetY(5);
+ * label.background().enabled(true).fill('none').stroke('1 #aaa');
  * label.container(stage).draw();
- * // обозначим красным точку поционирования лейбла.
- * stage.circle(100, 50, 2).stroke('3 red')
+ * stage.circle(5, 5, 2).stroke('3 red');
  * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value .
@@ -623,7 +657,7 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
  * @return {anychart.utils.NinePositions} Current label position settings.
  *//**
  * Setter for label position settings.<br/>
- * <b>Note:</b> Работает только если явно задан {@link anychart.elements.Label#container} или {@link anychart.elements.Label#parentBounds}.
+ * <b>Note:</b> works only if {@link anychart.elements.Label#container} or {@link anychart.elements.Label#parentBounds} are explicitly set.
  * @illustration <t>simple-h100</t>
  * var rect = stage.rect(5, 5, 90, 90).stroke('1 blue');
  * var rectBounds = rect.getBounds();
@@ -633,12 +667,10 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
  * label.container(stage).draw();
  * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
  * @illustrationDesc
- * Синим квадратом обозначена область заданая через {@link anychart.elements.Label#parentBounds}.<br/>
- * Красной точкой обозначен <i>CENTER</i> этой области, по которому и спозиционирован лейбл.
- * // обозначим красным точку позиционирования лейбла.
- * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
+ * Blue area is an area set in {@link anychart.elements.Label#parentBounds}.<br/>
+ * Red dot marks the <i>CENTER</i> of this area.
  * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.NinePositions|string)=} opt_value .
@@ -670,7 +702,15 @@ anychart.elements.Label.prototype.adjustEnabled_ = function() {
 
 
 /**
- * Min font size setting for adjust text from.
+ * Gets font size setting for adjust text from.
+ * @return {number} Current value.
+ *//**
+ * Sets font size setting for adjust text from.<br/>
+ * <b>Note:</b> Работает только с включеным adjusting. См {@link anychart.elements.Label#adjustFontSize}.
+ * @param {(number|string)=} opt_value Value to set.
+ * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value
  * @return {number|anychart.elements.Label}
  */
@@ -678,7 +718,7 @@ anychart.elements.Label.prototype.minFontSize = function(opt_value) {
   if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
     if (this.minFontSize_ != +opt_value) {
       this.minFontSize_ = +opt_value;
-      // незачем инвалидейтить лишний раз баунды, если аджастинг не включен
+      // we don't need to invalidate bounds if adjusting is not enabled
       if (this.adjustEnabled_())
         this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -689,7 +729,15 @@ anychart.elements.Label.prototype.minFontSize = function(opt_value) {
 
 
 /**
- * Max font size setting for adjust text to.
+ * Gets font size setting for adjust text to.
+ * @return {number} Current value.
+ *//**
+ * Sets font size setting for adjust text to.<br/>
+ * <b>Note:</b> works only when adjusting is enabled. См {@link anychart.elements.Label#adjustFontSize}.
+ * @param {(number|string)=} opt_value Value to set.
+ * @return {anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value
  * @return {number|anychart.elements.Label}
  */
@@ -697,7 +745,7 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
   if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
     if (this.maxFontSize_ != +opt_value) {
       this.maxFontSize_ = +opt_value;
-      // незачем инвалидейтить лишний раз баунды, если аджастинг не включен
+      // we don't need to invalidate bounds if adjusting is not enabled
       if (this.adjustEnabled_())
         this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -708,54 +756,74 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
 
 
 /**
- * Getter.
- * всегда возвращает массив состоящий их 2х элементов
- *   this.adjustByWidth_, который означает, что аджастинг будет/не будет по ширине и
- *   this.adjustByHeight_, который означает, что аджастинг будет/не будет по высоте
- *   таким образом имеем 4 массива на выходе:
- *     [false, false] - не аджастить (выключен аджаст)
- *     [false, true] - аджастить по ширине
- *     [true, false] - аджастить по высоте
- *     [true, true] - аджастить по ближайшему попавшему значению.
- * @return {Array.<boolean, boolean>} adjustFontSite setting or self for chaining.
+ * Returns an array of two elements <b>[isAdjustByWidth, isAdjustByHeight]</b>.
+ * <pre>
+ *    [false, false] - do not adjust (adjust is off )
+ *    [false, true] - adjust width
+ *    [true, false] - adjust height
+ *    [true, true] - adjust the first suitable value.
+ * </pre>
+ * @shortDescription Getter for current adjust font settings.
+ * @return {Array.<boolean, boolean>} adjustFontSite setting or self for method chaining.
  *//**
- * Setter
- * Как сеттер он работает в 3х режимах:
- *   1) первый аргумент - массив, значит что он ожидает настройки [this.adjustByWidth_, this.adjustByHeight_]
- *   2) переданный аргумент - единственный - значит что настройку нужно применить и к this.adjustByWidth_ и к this.adjustByHeight_.
- *      в таком случае изменение произойдёт и label счейнится только в том случае если какая-либо из найстроек реально поменялась.
- *      это значит что если они обе выключены и прийдет false - ничего не произойдет, если обе включены и пришло true - тоже, в
- *      остальных случаях изменения сработают.
- *   3) передано 2 аргумента - стандартный сеттер 2х аргументов: если значение одной из настроек изменилось - произойдет инвалидация
- *      иначе ничего не случится, но при этом чейнинг сработает (если было true true и передать true true - вернется лейбл, а не массив значений)
- * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font need to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
- * @param {boolean=} opt_adjustBeHeight Is font need to be adjusted by height.
- * @return {!anychart.elements.Label} adjustFontSite setting or self for chaining.
+ * Sets adjusting settings.<br/>
+ * Minimal and maximal font sizes can be configured using:
+ *  {@link anychart.elements.Label#minFontSize} and {@link anychart.elements.Label#maxFontSize}.<br/>
+ * <b>Note:</b> Works only when {@link anychart.elements.Label#width} and {@link anychart.elements.Label#height} are set.<br/>
+ * <b>Note: </b> {@link anychart.elements.Label#fontSize} does not work when adjusting is enabled.
+ * @shortDescription Setter for the adjust font settings.
+ * @example <t>listingOnly</t>
+ * label.adjustFontSize(false);
+ * // the same
+ * label.adjustFontSize(false, false);
+ * // the same
+ * label.adjustFontSize([false, false]);
+ * @example <t>simple-h100</t>
+ * // to the right
+ * var rect;
+ * rect = stage.rect(5, 5, 190, 90).fill('none').stroke('1 grey');
+ * new anychart.elements.Label()
+ *     .text('Not adjusted text')
+ *     .parentBounds(rect.getBounds())
+ *     .container(stage).draw();
+ * // to the right
+ * rect = stage.rect(205, 5, 190, 90).fill('none').stroke('1 grey');
+ * new anychart.elements.Label()
+ *     .text('Adjusted text')
+ *     .adjustFontSize(true, false)
+ *     .width('100%')
+ *     .height('100%')
+ *     .parentBounds(rect.getBounds())
+ *     .container(stage).draw();
+ * @param {(boolean|Array.<boolean, boolean>)=} opt_bothOrByWidth If only one param is set,
+ *   its value goes for another too (see source code).
+ * @param {boolean=} opt_byHeight Is font needs to be adjusted by height.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font need to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
- * @param {boolean=} opt_adjustBeHeight Is font need to be adjusted by height.
- * @return {(Array.<boolean, boolean>|anychart.elements.Label)} adjustFontSite setting or self for chaining.
+ * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
+ * @param {boolean=} opt_adjustByHeight Is font needs to be adjusted by height.
+ * @return {(Array.<boolean, boolean>|anychart.elements.Label)} adjustFontSite setting or self for method chaining.
  */
-anychart.elements.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustByWidth, opt_adjustBeHeight) {
-  // Если значения заданы массивом ( [true, true] [true, false] [false, true] [false, false]  )а не набором 2х агументов просто развернем их
+anychart.elements.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustByWidth, opt_adjustByHeight) {
+  // if values are set as an array ( [true, true] [true, false] [false, true] [false, false]  )а не набором 2х агументов просто развернем их
   if (goog.isArray(opt_adjustOrAdjustByWidth)) {
     return this.adjustFontSize.apply(this, opt_adjustOrAdjustByWidth);
   }
   var stateToInvalidate = 0;
-  // если просто задано 2 аргумента
-  if (goog.isDef(opt_adjustBeHeight)) {
+  // if 2 params are set
+  if (goog.isDef(opt_adjustByHeight)) {
     if (this.adjustByWidth_ != !!opt_adjustOrAdjustByWidth) {
       this.adjustByWidth_ = !!opt_adjustOrAdjustByWidth;
       stateToInvalidate |= anychart.ConsistencyState.BOUNDS;
     }
-    if (this.adjustByHeight_ != !!opt_adjustBeHeight) {
-      this.adjustByHeight_ = !!opt_adjustBeHeight;
+    if (this.adjustByHeight_ != !!opt_adjustByHeight) {
+      this.adjustByHeight_ = !!opt_adjustByHeight;
       stateToInvalidate |= anychart.ConsistencyState.BOUNDS;
     }
     this.invalidate(stateToInvalidate, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
-  // если задан только один аргумент - значит это просто adjusting для обеих величин
+  // if only one param is set -  adjusting for the both
   } else if (goog.isDef(opt_adjustOrAdjustByWidth)) {
     if (!(this.adjustByWidth_ == this.adjustByHeight_ && this.adjustByWidth_ == opt_adjustOrAdjustByWidth)) {
       this.adjustByWidth_ = this.adjustByHeight_ = /** @type {boolean} */ (opt_adjustOrAdjustByWidth);
@@ -815,7 +883,7 @@ anychart.elements.Label.prototype.check_ = function(width, height, originWidth, 
  */
 anychart.elements.Label.prototype.calculateFontSize_ = function(originWidth, originHeight) {
   /** @type {number} */
-  var fontSize = Math.round(this.maxFontSize_ - this.minFontSize_);
+  var fontSize = Math.round((this.maxFontSize_ + this.minFontSize_) / 2);
 
   /** @type {number} */
   var from = this.minFontSize_;
@@ -831,9 +899,18 @@ anychart.elements.Label.prototype.calculateFontSize_ = function(originWidth, ori
   this.applyTextSettings(text, true);
   this.changedSettings = settings;
 
+  // check if the maximal value is ok
+  text.fontSize(this.maxFontSize_);
+  if (this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight) <= 0) {
+    return this.maxFontSize_;
+  }
+  // set initial fontSize - that's half way between min and max
+  text.fontSize(fontSize);
+  // check sign
+  var sign = checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight);
+
+  // divide in half and iterate waiting for the sign to change
   while (from != to) {
-    text.fontSize(fontSize);
-    checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight);
     if (checked < 0) {
       from = Math.min(fontSize + 1, to);
       fontSize += Math.floor((to - fontSize) / 2);
@@ -843,9 +920,30 @@ anychart.elements.Label.prototype.calculateFontSize_ = function(originWidth, ori
     } else {
       break;
     }
+    text.fontSize(fontSize);
+    checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight);
+    // sign chaneged if product is negative, 0 is an exit too
+    if (sign * checked <= 0) {
+      break;
+    }
   }
 
+  if (checked == 0) {
+    // size is exactly ok for the bounds set
+    goog.dispose(text);
+    return fontSize;
+  }
+
+  // iterate increase/decrease font size until sign changes again
+  do {
+    fontSize += sign;
+    text.fontSize(fontSize);
+    checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight);
+  } while (sign * checked < 0);
+
   goog.dispose(text);
+  // decrease font size only if we've been increasing it - we are looking for size to fit in bounds
+  if (sign > 0) fontSize -= sign;
   return fontSize;
 };
 
@@ -937,7 +1035,7 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
 
 /**
  * Render label content.
- * @return {!anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  */
 anychart.elements.Label.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
@@ -1102,8 +1200,8 @@ anychart.elements.Label.prototype.applyTextSettings = function(textElement, isIn
 
 
 /**
- * Create text element if it not exists yet. Return flag, was text element created or not.
- * @return {boolean} Was text element really created or not.
+ * Create text element if it does not exists yet. Return flag, if text element is created or not.
+ * @return {boolean} Whether text element created or not.
  * @private
  */
 anychart.elements.Label.prototype.createTextElement_ = function() {

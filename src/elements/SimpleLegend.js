@@ -65,7 +65,7 @@ anychart.elements.Legend = function() {
   this.height_ = null;
 
   /**
-   * Bounds of legend's parent element.
+   * Bounds of legend parent element.
    * @type {anychart.math.Rect}
    * @private
    */
@@ -100,7 +100,7 @@ anychart.elements.Legend = function() {
       .fontSize('10')
       .fontWeight('normal')
       .fontColor('rgb(35,35,35)')
-      // нужно чтобы текст LegendItem`ов умел ловить событие mouseover и mouseclick (потому что в elements.Text если не hoverable то pointerEvents выключается
+      // we need LegendItem text could catch mouseover and mouseclick (cause elements.Text turns  pointerEvents off with non-hoverable text)
       .hoverable(true)
       .padding(7)
       .margin(5);
@@ -244,17 +244,17 @@ anychart.elements.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.elements.Legend.Layout = {
   /**
-   * Horizontal distributing of items.
+   * Horizontal allocation of items.
    */
   HORIZONTAL: 'horizontal',
 
   /**
-   * Vertical distributing of items.
+   * Vertical allocation of items.
    */
   VERTICAL: 'vertical',
 
   /**
-   * Table distributing.
+   * Table allocation.
    */
   TABLE: 'table'
 };
@@ -281,7 +281,7 @@ anychart.elements.Legend.normalizeItemsLayout = function(layout, opt_default) {
 /**
  * Sets items layout.
  * @param {string=} opt_value Layout type for legend items.
- * @return {(anychart.elements.Legend.Layout|anychart.elements.Legend)} Items layout or self for chaining.
+ * @return {(anychart.elements.Legend.Layout|anychart.elements.Legend)} Items layout or self for method chaining.
  */
 anychart.elements.Legend.prototype.itemsLayout = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -331,7 +331,7 @@ anychart.elements.Legend.prototype.itemsProvider = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value Value of spacing between legend items.
- * @return {(string|number|anychart.elements.Legend)} Items spacing setting or self for chaining.
+ * @return {(string|number|anychart.elements.Legend)} Items spacing setting or self for method chaining.
  */
 anychart.elements.Legend.prototype.itemsSpacing = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -356,7 +356,7 @@ anychart.elements.Legend.prototype.itemsSpacing = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value Spacing setting.
- * @return {(number|anychart.elements.Legend)} Spacing setting or self for chaining.
+ * @return {(number|anychart.elements.Legend)} Spacing setting or self for method chaining.
  */
 anychart.elements.Legend.prototype.iconTextSpacing = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -383,7 +383,7 @@ anychart.elements.Legend.prototype.iconTextSpacing = function(opt_value) {
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.elements.Legend|anychart.utils.Margin)} Margin or self for chaining.
+ * @return {!(anychart.elements.Legend|anychart.utils.Margin)} Margin or self for method chaining.
  */
 anychart.elements.Legend.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -423,7 +423,7 @@ anychart.elements.Legend.prototype.boundsInvalidated_ = function(event) {
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.elements.Legend|anychart.utils.Padding)} Padding or self for chaining.
+ * @return {!(anychart.elements.Legend|anychart.utils.Padding)} Padding or self for method chaining.
  */
 anychart.elements.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -445,7 +445,7 @@ anychart.elements.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBott
 
 /**
  * Getter for legend background.
- * @return {!anychart.elements.Background} Background or self for chaining.
+ * @return {!anychart.elements.Background} Background or self for method chaining.
  *//**
  * Setter for legend background.
  * @param {anychart.elements.Background=} opt_value Background setting.
@@ -453,7 +453,7 @@ anychart.elements.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBott
  *//**
  * @ignoreDoc
  * @param {anychart.elements.Background=} opt_value Background setting.
- * @return {!(anychart.elements.Legend|anychart.elements.Background)} Background or self for chaining.
+ * @return {!(anychart.elements.Legend|anychart.elements.Background)} Background or self for method chaining.
  */
 anychart.elements.Legend.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -497,13 +497,13 @@ anychart.elements.Legend.prototype.backgroundInvalidated_ = function(event) {
  * @return {anychart.elements.Title} Title settings.
  *//**
  * Setter for legend title.<br/>
- * <b>Note:</b> Что бы отключить title надо передать null или 'none'.
+ * <b>Note:</b> to turn title off you have to send null or 'none'.
  * @param {(string|null|anychart.elements.Title)=} opt_value Value to set.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|null|anychart.elements.Title)=} opt_value Title to set.
- * @return {(anychart.elements.Title|anychart.elements.Legend)} Title or self for chaining.
+ * @return {(anychart.elements.Title|anychart.elements.Legend)} Title or self for method chaining.
  */
 anychart.elements.Legend.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -548,7 +548,7 @@ anychart.elements.Legend.prototype.titleInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals, the state == 0 and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -558,13 +558,13 @@ anychart.elements.Legend.prototype.titleInvalidated_ = function(event) {
  * @return {anychart.elements.Separator} Current settings.
  *//**
  * Setter for title separator setting.<br/>
- * <b>Note:</b> Что бы отключить titleSeparator надо передать null или 'none'.
+ * <b>Note:</b> To turn off titleSeparatoryou have to send null or 'none'.
  * @param {(Object|string|null|anychart.elements.Separator)=} opt_value Value to set.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {*=} opt_value Separator setting.
- * @return {(*|anychart.elements.Legend)} Separator setting or self for chaining.
+ * @return {(*|anychart.elements.Legend)} Separator setting or self for method chaining.
  */
 anychart.elements.Legend.prototype.titleSeparator = function(opt_value) {
   if (!this.titleSeparator_) {
@@ -605,7 +605,7 @@ anychart.elements.Legend.prototype.titleSeparatorInvalidated_ = function(event) 
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals, state == 0 and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -615,13 +615,13 @@ anychart.elements.Legend.prototype.titleSeparatorInvalidated_ = function(event) 
  * @return {anychart.elements.Separator} Current settings.
  *//**
  * Setter for paginator setting.<br/>
- * <b>Note:</b> Что бы отключить Paginator надо передать null или 'none'.
+ * <b>Note:</b> To turn Paginator off you need to send null or 'none'.
  * @param {(Object|anychart.elements.Paginator|string|null)=} opt_value Value to set.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {*=} opt_value Paginator to set.
- * @return {(*|anychart.elements.Legend)} Paginator or self for chaining.
+ * @return {(*|anychart.elements.Legend)} Paginator or self for method chaining.
  */
 anychart.elements.Legend.prototype.paginator = function(opt_value) {
   if (!this.paginator_) {
@@ -661,7 +661,7 @@ anychart.elements.Legend.prototype.paginatorInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals, state == 0 and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -669,7 +669,7 @@ anychart.elements.Legend.prototype.paginatorInvalidated_ = function(event) {
 /**
  * Legend tooltip.
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
- * @return {!(anychart.elements.Legend|anychart.elements.Tooltip)} Tooltip instance or self for chaining call.
+ * @return {!(anychart.elements.Legend|anychart.elements.Tooltip)} Tooltip instance or self for method chaining.
  */
 anychart.elements.Legend.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
@@ -706,7 +706,7 @@ anychart.elements.Legend.prototype.onTooltipSignal_ = function(event) {
 /**
  * Show data point tooltip.
  * @protected
- * @param {goog.events.BrowserEvent} event Event that initiate tooltip to show.
+ * @param {goog.events.BrowserEvent} event Event that initiates tooltip display.
  */
 anychart.elements.Legend.prototype.showTooltip = function(event) {
   this.moveTooltip(event);
@@ -725,7 +725,7 @@ anychart.elements.Legend.prototype.hideTooltip = function() {
 
 /**
  * @protected
- * @param {goog.events.BrowserEvent} event that initiate tooltip to show.
+ * @param {goog.events.BrowserEvent} event that initiates tooltip display.
  */
 anychart.elements.Legend.prototype.moveTooltip = function(event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
@@ -802,7 +802,7 @@ anychart.elements.Legend.prototype.height = function(opt_value) {
 
 
 /**
- * Getter for legend's parent element bounds.
+ * Getter for legend parent element bounds.
  * @return {anychart.math.Rect} Parent element bounds.
  *//**
  * Setter for legend's parent element bounds.
@@ -811,7 +811,7 @@ anychart.elements.Legend.prototype.height = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value Parent element bounds to set.
- * @return {(anychart.math.Rect|!anychart.elements.Legend)} Parent element bounds or self for chaining.
+ * @return {(anychart.math.Rect|!anychart.elements.Legend)} Parent element bounds or self for method chaining.
  */
 anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -836,7 +836,7 @@ anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(anychart.utils.Orientation|string)=} opt_value Legend position.
- * @return {(anychart.utils.Orientation|anychart.elements.Legend)} Legend position or self for chaining.
+ * @return {(anychart.utils.Orientation|anychart.elements.Legend)} Legend position or self for method chaining.
  */
 anychart.elements.Legend.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -882,7 +882,7 @@ anychart.elements.Legend.prototype.align = function(opt_value) {
 
 /**
  *
- * @return {anychart.math.Rect} Bounds that remaining after legend.
+ * @return {anychart.math.Rect} Bounds that remain after legend.
  */
 anychart.elements.Legend.prototype.getRemainingBounds = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
@@ -932,11 +932,6 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
 anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
   if (this.itemsProvider_ && this.itemsProvider_.length > 0) {
     goog.disposeAll(this.items_);
-    /**
-     * Array of legend item.
-     * @type {Array.<anychart.elements.LegendItem>}
-     * @private
-     */
     this.items_ = [];
     /**
      * Array of legend items metadata. Used for legend item tooltips.
@@ -965,8 +960,6 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       item.container(this.layer_);
       item.enabled(false);
 
-      this.setupMouseEventsListeners_(item);
-
       this.items_.push(item);
       this.legendItemsMeta_.push(provider['meta'] ? provider['meta'] : {});
     }
@@ -976,94 +969,6 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
     this.legendItemsMeta_ = null;
   }
   this.invalidate(anychart.ConsistencyState.BOUNDS);
-};
-
-
-/**
- * Setup listening of mouse events on legend item.
- * @param {anychart.elements.LegendItem} item
- * @private
- */
-anychart.elements.Legend.prototype.setupMouseEventsListeners_ = function(item) {
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OVER, this.onLegendItemMouseOver_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OUT, this.onLegendItemMouseOut_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_MOVE, this.onLegendItemMouseMove_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_CLICK, this.onLegendItemClick_, false, this);
-};
-
-
-/**
- * Returns index of legend item that dispatched an event.
- * @param {anychart.elements.LegendItem} item Event.
- * @private
- * @return {number} Item index in legend or NaN.
- */
-anychart.elements.Legend.prototype.getItemIndexInLegend_ = function(item) {
-  return parseInt(goog.object.findKey(this.items_, function(value, key, obj) {
-    return item == value;
-  }), 10);
-};
-
-
-/**
- * LegendItem click handler.
- * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
- * @private
- */
-anychart.elements.Legend.prototype.onLegendItemClick_ = function(event) {
-  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
-  // save index of legend item and itself to event and dispatch event
-  event['index'] = this.getItemIndexInLegend_(item);
-  event['item'] = item;
-  this.dispatchEvent(event);
-};
-
-
-/**
- * LegendItem mouse over handler.
- * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
- * @private
- */
-anychart.elements.Legend.prototype.onLegendItemMouseOver_ = function(event) {
-  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
-  // save index of legend item and itself to event and dispatch event
-  event['index'] = this.getItemIndexInLegend_(item);
-  event['item'] = item;
-  if (this.dispatchEvent(event)) {
-    this.showTooltip(event);
-  }
-};
-
-
-/**
- * LegendItem mouse out handler.
- * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
- * @private
- */
-anychart.elements.Legend.prototype.onLegendItemMouseOut_ = function(event) {
-  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
-  // save index of legend item and itself to event and dispatch event
-  event['index'] = this.getItemIndexInLegend_(item);
-  event['item'] = item;
-  if (this.dispatchEvent(event)) {
-    this.hideTooltip();
-  }
-};
-
-
-/**
- * LegendItem mouse move handler.
- * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
- * @private
- */
-anychart.elements.Legend.prototype.onLegendItemMouseMove_ = function(event) {
-  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
-  // save index of legend item and itself to event and dispatch event
-  event['index'] = this.getItemIndexInLegend_(item);
-  event['item'] = item;
-  if (this.dispatchEvent(event)) {
-    this.moveTooltip(event);
-  }
 };
 
 
@@ -1143,7 +1048,7 @@ anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
   var width, height;
   var autoWidth, autoHeight;
 
-  // Определяем будет ли авторасчет или нет.
+  // Define if there is autocalculation or not
   if (parentBounds) {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
@@ -1813,8 +1718,8 @@ anychart.elements.Legend.prototype.draw = function() {
 
 /**
  * Distribute items per pages.
- * @param {number} width Width of the content area.
- * @param {number} height Height of the content area.
+ * @param {number} width Bounds of the content area.
+ * @param {number} height Bounds of the content area.
  * @private
  */
 anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(width, height) {
@@ -1866,6 +1771,44 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(width, he
 
 
 /**
+ * Create default paginator.
+ * @private
+ */
+anychart.elements.Legend.prototype.initDefaultPaginator_ = function() {
+  if (!this.paginator_) {
+    this.paginator()
+        .container(this.rootElement)
+        .zIndex(20)
+        .fontFamily('Verdana')
+        .fontSize('10')
+        .fontWeight('normal')
+        .fontColor('rgb(35,35,35)')
+        .orientation('right')
+        .margin(0)
+        .padding(2);
+    this.paginator().background()
+        .enabled(false)
+        .stroke({
+          'keys': [
+            '0 #DDDDDD 1',
+            '1 #D0D0D0 1'
+          ],
+          'angle' : '90'
+        })
+        .fill({
+          'keys': [
+            '0 #FFFFFF 1',
+            '0.5 #F3F3F3 1',
+            '1 #FFFFFF 1'
+          ],
+          'angle' : '90'
+        });
+    this.invalidate(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
+  }
+};
+
+
+/**
  * Clears last drawed page.
  * @private
  */
@@ -1882,7 +1825,7 @@ anychart.elements.Legend.prototype.clearLastDrawedPage_ = function() {
 
 
 /**
- * Draws distributed legend items on set page.
+ * Draws allocated legend items on set page.
  * @param {number} pageNumber Page number.
  * @param {anychart.math.Rect} contentBounds Bounds of the content area.
  * @private

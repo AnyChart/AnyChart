@@ -87,7 +87,7 @@ anychart.Chart.prototype.SUPPORTED_SIGNALS = anychart.VisualBaseWithBounds.proto
 
 
 /**
- * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND  to BaseWithBounds states.
+ * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND to BaseWithBounds states.
  * @type {number}
  */
 anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
@@ -476,7 +476,7 @@ anychart.Chart.prototype.onTitleSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals – state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -529,7 +529,7 @@ anychart.Chart.prototype.onLegendSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals – state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -724,9 +724,9 @@ anychart.Chart.prototype.draw = function() {
 
   if (manualSuspend) stage.resume();
 
-  //todo(Anton Saukh): rework this shit!
+  //todo(Anton Saukh): refactor this mess!
   this.listenSignals(this.invalidateHandler_, this);
-  //end shit
+  //end mess
 
   this.resumeSignalsDispatching(false);
 
@@ -794,14 +794,14 @@ anychart.Chart.prototype.remove = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Create legend items provider specific for chart type.
+ * Create legend items provider specific to chart type.
  * @protected
  * @return {!Array.<anychart.elements.Legend.LegendItemProvider>} Legend items provider.
  */
 anychart.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 
 
-//todo(Anton Saukh): rework this shit!
+//todo(Anton Saukh): refactor this mess!
 /**
  * Internal invalidation event handler, redraw chart on all invalidate events.
  * @param {anychart.SignalEvent} event Event object.
@@ -810,7 +810,7 @@ anychart.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 anychart.Chart.prototype.invalidateHandler_ = function(event) {
   anychart.globalLock.onUnlock(this.draw, this);
 };
-//end shit
+//end mess
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -818,10 +818,10 @@ anychart.Chart.prototype.invalidateHandler_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Return chart configuration as JSON object or string.
- * Note for doc writers!: Гугловый компилятор считает что у Object есть метод toJSON который должен принимать строку и возвращать *.
- * Для того, чтобы он на нас не ругался, приходится писать не правильные параметры.
- * Во внешних доках параметр должен быть boolean, а возвращаемый тип Object|string.
- * Другого способа обойти эту особенность компилятора пока не придумали.
+ * Note for documentation writers!: Google compiler thinks that "Object" has "toJSON" method that must accept string and return *.
+ * To avoid this we have to put in the "wrong" params.
+ * In external documentation parameter must be boolean, and method must return Object|string.
+ * For the moment we have no way around this "nice feature" of the compiler.
  * @param {string=} opt_stringify Return as JSON as string.
  * @return {*} Chart JSON.
  */

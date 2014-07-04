@@ -1,4 +1,4 @@
-var chart;
+var label1, label2;
 var radiusPixel = 0;
 
 function load() {
@@ -8,13 +8,21 @@ function load() {
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-  * var rect = stage.rect(75, 25, 100, 100).stroke('1 blue');
-  * var rectBounds = rect.getBounds();
-  * var label = new anychart.elements.Label();
-  * label.position(anychart.utils.NinePositions.CENTER);
-  * label.parentBounds(rectBounds);
-  * label.container(stage).draw();
-  * // обозначим красным точку поционирования лейбла.
-  * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
+ // Слева
+ var rect = stage.rect(5, 5, 200, 90).fill('none').stroke('1 grey')
+ label1 = new anychart.elements.Label()
+     .text('Not adjusted text')
+     .parentBounds(rect.getBounds())
+     .container(stage);
+ label1.draw();
+ // Справа
+ rect = stage.rect(210, 5, 200, 90).fill('none').stroke('1 grey')
+ label2 = new anychart.elements.Label()
+     .text('Adjusted text')
+     .adjustFontSize(true)
+     .width('100%')
+     .height('100%')
+     .parentBounds(rect.getBounds())
+     .container(stage).draw();
 
 }

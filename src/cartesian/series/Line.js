@@ -14,7 +14,7 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 anychart.cartesian.series.Line = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;

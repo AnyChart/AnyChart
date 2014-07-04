@@ -92,12 +92,12 @@ anychart.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_y, 
  * Getter for element left bound settings.
  * @return {number|string|undefined} Current element's left bound settings.
  *//**
- * Устанавливает значение левой границы элемента.<br/>
+ * Sets element left.<br/>
  * @example <t>listingOnly</t>
  * element.left(100);
  * element.left('50%');
  * @param {(number|string|null)=} opt_value Left bound settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -116,12 +116,12 @@ anychart.VisualBaseWithBounds.prototype.left = function(opt_value) {
  * Getter for element right bound settings.
  * @return {number|string|undefined} Current element's right bound settings.
  *//**
- * Устанавливает значение правой границы элемента.<br/>
+ * Sets element right.<br/>
  * @example <t>listingOnly</t>
  * element.right(700);
  * element.right('80%');
  * @param {(number|string|null)=} opt_value Right bound settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -140,12 +140,12 @@ anychart.VisualBaseWithBounds.prototype.right = function(opt_value) {
  * Getter for element top bound settings.
  * @return {number|string|undefined} Current element's top bound settings.
  *//**
- * Устанавливает значение верхней границы элемента.<br/>
+ * Sets element top.<br/>
  * @example <t>listingOnly</t>
  * element.top(100);
  * element.top('50%');
  * @param {(number|string|null)=} opt_value Top bound settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -164,12 +164,12 @@ anychart.VisualBaseWithBounds.prototype.top = function(opt_value) {
  * Getter for element bottom bound settings.
  * @return {number|string|undefined} Current element's bottom bound settings.
  *//**
- * Устанавливает значение нижней границы элемента.<br/>
+ * Sets element bottom.<br/>
  * @example <t>listingOnly</t>
  * element.bottom(700);
  * element.bottom('80%');
  * @param {(number|string|null)=} opt_value Bottom bound settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -188,12 +188,12 @@ anychart.VisualBaseWithBounds.prototype.bottom = function(opt_value) {
  * Getter for element width settings.
  * @return {number|string|undefined} Current element's width settings.
  *//**
- * Устанавливает значение ширины элемента.<br/>
+ * Sets element width.<br/>
  * @example <t>listingOnly</t>
  * element.width(500);
  * element.width('80%');
  * @param {(number|string|null)=} opt_value Width settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -212,12 +212,12 @@ anychart.VisualBaseWithBounds.prototype.width = function(opt_value) {
  * Getter for element height settings.
  * @return {number|string|undefined} Current element's height settings.
  *//**
- * Устанавливает значение высоты элемента.<br/>
+ * Sets element height.<br/>
  * @example <t>listingOnly</t>
  * element.height(500);
  * element.height('80%');
  * @param {(number|string|null)=} opt_value Height settings for the element.
- * @return {!anychart.VisualBaseWithBounds} Возвращает себя для цепочного вызова.
+ * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string|null)=} opt_value .
@@ -235,8 +235,8 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
 /**
  * Returns the current bounds.<br/>
  * <b>Note:</b> If the width and/or height were set in percents using {@link anychart.VisualBaseWithBounds#bounds} method,
- * then we might have problems with autocalculation, in case the size was never passed in pixels for any of the
- * nesting containers. In such case we need to pass pixel size of the container
+ * we may have problems with autocalculation (size has never been never passed in pixels for any of the
+ * nesting containers). In such case we need to pass pixel size of the container
  * using <b>containerWidth</b> and <b>containerHeight</b>. In any other case you
  * <b>don't need to set them!</b><br/>
  * <b>Note:</b> If this method was used as a setter then no matter what parameters set you

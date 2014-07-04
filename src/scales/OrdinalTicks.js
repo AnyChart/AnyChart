@@ -25,7 +25,7 @@ goog.inherits(anychart.scales.OrdinalTicks, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Supported signals mask.
  * @type {number}
  */
 anychart.scales.OrdinalTicks.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;

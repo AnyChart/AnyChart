@@ -7,7 +7,7 @@ goog.require('anychart.scales.ScatterTicks');
 
 /**
  * Represents simple linear scale that transforms values from domain [a, b] to domain [0, 1].
- * Note, that a can be greater than b. The only condition for the scale is that a != b.
+ * Note that a can be greater than b. The only condition for the scale is that a != b.
  * @constructor
  * @extends {anychart.scales.ScatterBase}
  */
@@ -36,7 +36,7 @@ goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
@@ -55,7 +55,7 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
 /**
  * Gets or sets a set of scale minor ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
@@ -132,7 +132,7 @@ anychart.scales.Linear.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create linear scale.
+ * Shortcut to create a linear scale.
  * @return {anychart.scales.Linear} Linear scale.
  */
 anychart.scales.linear = function() {

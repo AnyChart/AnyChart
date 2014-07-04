@@ -89,7 +89,7 @@ goog.inherits(anychart.elements.TextMarker, anychart.elements.Text);
 //  Enums.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Определяет положение маркера относительно оси
+ * Sets marker position relative to an axis
  * @enum {string}
  */
 anychart.elements.TextMarker.Align = {
@@ -124,7 +124,7 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
+ * Getter for the axis scale.
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
@@ -133,7 +133,7 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.TextMarker} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.TextMarker} Axis scale or itself for method chaining.
  */
 anychart.elements.TextMarker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -201,7 +201,7 @@ anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set align.
+ * Get/Set align.
  * @param {anychart.elements.TextMarker.Align=} opt_value TextMarker align.
  * @return {anychart.elements.TextMarker.Align|anychart.elements.TextMarker} Align or this.
  */
@@ -241,7 +241,7 @@ anychart.elements.TextMarker.prototype.direction = function(opt_value) {
 /**
  * Get/set text marker anchor settings.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Text marker anchor settings.
- * @return {anychart.elements.TextMarker|anychart.utils.NinePositions} Text marker anchor settings or itself for chaining call.
+ * @return {anychart.elements.TextMarker|anychart.utils.NinePositions} Text marker anchor settings or itself for method chaining.
  */
 anychart.elements.TextMarker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -262,9 +262,9 @@ anychart.elements.TextMarker.prototype.anchor = function(opt_value) {
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set text marker settings.
+ * Get/Set text marker settings.
  * @param {(string)=} opt_value TextMarker text settings.
- * @return {string|anychart.elements.TextMarker} TextMarker line settings or TextMarker instance for chaining.
+ * @return {string|anychart.elements.TextMarker} TextMarker line settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.text = function(opt_value) {
   return /** @type {anychart.elements.TextMarker|string} */(this.textSettings('text', opt_value));
@@ -274,7 +274,7 @@ anychart.elements.TextMarker.prototype.text = function(opt_value) {
 /**
  * Get/set value.
  * @param {number=} opt_newValue TextMarker value settings.
- * @return {number|anychart.elements.TextMarker} TextMarker value settings or LineMarker instance for chaining.
+ * @return {number|anychart.elements.TextMarker} TextMarker value settings or LineMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.value = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -293,7 +293,7 @@ anychart.elements.TextMarker.prototype.value = function(opt_newValue) {
 /**
  * Get/set offset x.
  * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for chaining.
+ * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.offsetX = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -312,7 +312,7 @@ anychart.elements.TextMarker.prototype.offsetX = function(opt_newValue) {
 /**
  * Get/set offset y.
  * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for chaining.
+ * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.offsetY = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -392,7 +392,7 @@ anychart.elements.TextMarker.prototype.applyTextSettings = function(textElement,
 
 
 /**
- * Определяет расположения маркера
+ * Defines marker direction
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.TextMarker.prototype.isHorizontal = function() {
@@ -482,7 +482,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 
 
 /**
- * Рассчитывает позицию текста по заданныи параметрам direction и align.
+ * Calculates text position using direction and align.
  * @param {number} ratio Scale ratio.
  * @param {number} shift Pixel shift.
  * @return {acgraph.math.Coordinate} text position.

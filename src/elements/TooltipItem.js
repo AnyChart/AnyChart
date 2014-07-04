@@ -96,7 +96,7 @@ anychart.elements.TooltipItem = function() {
   this.visible_ = true;
 
   /**
-   * Delay in milliseconds before tooltip item become invisible on visible(false) call.
+   * Delay in milliseconds before tooltip item becomes invisible on visible(false) call.
    * @type {number}
    * @private
    */
@@ -131,14 +131,14 @@ anychart.elements.TooltipItem = function() {
   this.boundsWithoutPadding_ = null;
 
   /**
-   * Cache of content bounds with applied padding mines title bounds.
+   * Cache of content bounds with applied padding without title bounds.
    * @type {anychart.math.Rect}
    * @private
    */
   this.titleRemainingBounds_ = null;
 
   /**
-   * Cache of content bounds with applied padding mines title and separator bounds.
+   * Cache of content bounds with applied padding without title and separator bounds.
    * @type {anychart.math.Rect}
    * @private
    */
@@ -164,10 +164,10 @@ goog.inherits(anychart.elements.TooltipItem, anychart.VisualBase);
  * @type {number}
  */
 anychart.elements.TooltipItem.prototype.SUPPORTED_SIGNALS = 0;
-// Если придется использовать его как отдельную сущность, то нужно вернуть сюда поддержку сигналов.
-// Если тултип так не будет поддерживать несколько разных TooltipItem, то эти два класса вообще нужно слить вместе.
-// Сейчас здесь убрана поддержка сигналов, потому что итем управляется напрямую тултипом и ему не важно, что у него
-// там где меняется, он сам вызывает у него draw() и доступа до item нету.
+// If we ever want to use it as a separate entity  we need to put back signals support.
+// If tooltip will never support different TooltipItem these classes have to be merged.
+// Signals support is dropped now, cause item is manage directly by tooltip and it doesn't
+// matter where it is changed, it invokes draw() itself and there is no access to item.
 
 
 /**
@@ -193,7 +193,7 @@ anychart.elements.TooltipItem.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Tooltip item title.
  * @param {(anychart.elements.Title|Object|string|null)=} opt_value Tooltip settings.
- * @return {!(anychart.elements.Title|anychart.elements.TooltipItem)} Title instance or itself for chaining call.
+ * @return {!(anychart.elements.Title|anychart.elements.TooltipItem)} Title instance or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -249,7 +249,7 @@ anychart.elements.TooltipItem.prototype.onTitleSignal_ = function(event) {
 /**
  * Tooltip item title separator.
  * @param {(anychart.elements.Separator|Object|string|null)=} opt_value Separator settings.
- * @return {!(anychart.elements.Separator|anychart.elements.TooltipItem)} Separator instance or itself for chaining call.
+ * @return {!(anychart.elements.Separator|anychart.elements.TooltipItem)} Separator instance or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.separator = function(opt_value) {
   if (!this.separator_) {
@@ -303,7 +303,7 @@ anychart.elements.TooltipItem.prototype.onSeparatorSignal_ = function(event) {
 /**
  * Tooltip item content.
  * @param {(anychart.elements.Label|Object|string|null)=} opt_value Content settings.
- * @return {!(anychart.elements.Label|anychart.elements.TooltipItem)} Labels instance or itself for chaining call.
+ * @return {!(anychart.elements.Label|anychart.elements.TooltipItem)} Labels instance or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.content = function(opt_value) {
   if (!this.label_) {
@@ -359,7 +359,7 @@ anychart.elements.TooltipItem.prototype.onContentSignal_ = function(event) {
 /**
  * Tooltip item background.
  * @param {(anychart.elements.Background|Object|string|null)=} opt_value Tooltip item background settings.
- * @return {!(anychart.elements.Background|anychart.elements.TooltipItem)} Background instance or itself for chaining call.
+ * @return {!(anychart.elements.Background|anychart.elements.TooltipItem)} Background instance or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.background = function(opt_value) {
   if (!this.background_) {
@@ -404,7 +404,7 @@ anychart.elements.TooltipItem.prototype.backgroundInvalidated_ = function(event)
 /**
  * Tooltip item padding.
  * @param {(anychart.utils.Padding|Object|string|null)=} opt_value Tooltip item padding settings.
- * @return {!(anychart.utils.Padding|anychart.elements.TooltipItem)} Padding instance or itself for chaining call.
+ * @return {!(anychart.utils.Padding|anychart.elements.TooltipItem)} Padding instance or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.padding = function(opt_value) {
   if (!this.padding_) {
@@ -450,7 +450,7 @@ anychart.elements.TooltipItem.prototype.onPaddingSignal_ = function(event) {
 /**
  * X coordinate of tooltip item position.
  * @param {number=} opt_value New value of X coordinate of tooltip item position.
- * @return {number|anychart.elements.TooltipItem} X coordinate of tooltip item position of itself for chaining call.
+ * @return {number|anychart.elements.TooltipItem} X coordinate of tooltip item position of itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.x = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -470,7 +470,7 @@ anychart.elements.TooltipItem.prototype.x = function(opt_value) {
 /**
  * Y coordinate of tooltip item position.
  * @param {number=} opt_value New value of Y coordinate of tooltip item position.
- * @return {number|anychart.elements.TooltipItem} Y coordinate of tooltip item position of itself for chaining call.
+ * @return {number|anychart.elements.TooltipItem} Y coordinate of tooltip item position of itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.y = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -490,7 +490,7 @@ anychart.elements.TooltipItem.prototype.y = function(opt_value) {
 /**
  * Offset by X of tooltip item position.
  * @param {number=} opt_value New value of X offset of tooltip item position.
- * @return {number|anychart.elements.TooltipItem} X offset of tooltip item position of itself for chaining call.
+ * @return {number|anychart.elements.TooltipItem} X offset of tooltip item position of itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -510,7 +510,7 @@ anychart.elements.TooltipItem.prototype.offsetX = function(opt_value) {
 /**
  * Y offset of tooltip item position.
  * @param {number=} opt_value New value of Y offset of tooltip item position.
- * @return {number|anychart.elements.TooltipItem} Y offset of tooltip item position of itself for chaining call.
+ * @return {number|anychart.elements.TooltipItem} Y offset of tooltip item position of itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -529,7 +529,7 @@ anychart.elements.TooltipItem.prototype.offsetY = function(opt_value) {
 /**
  * Gets or sets Tooltip item anchor settings.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Tooltip item anchor settings.
- * @return {anychart.elements.TooltipItem|anychart.utils.NinePositions} Tooltip item anchor settings or itself for chaining call.
+ * @return {anychart.elements.TooltipItem|anychart.utils.NinePositions} Tooltip item anchor settings or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -555,7 +555,7 @@ anychart.elements.TooltipItem.prototype.anchor = function(opt_value) {
 /**
  * Change tooltip item visibility settings.
  * @param {boolean=} opt_value Tooltip item visibility settings.
- * @return {boolean|anychart.elements.TooltipItem} Tooltip item visibility settings or itself for chaining call.
+ * @return {boolean|anychart.elements.TooltipItem} Tooltip item visibility settings or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.visible = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -571,13 +571,13 @@ anychart.elements.TooltipItem.prototype.visible = function(opt_value) {
 
 
 /**
- * Sets/gets delay in milliseconds before tooltip item become invisible on visible(false) call.
- * @param {number=} opt_value Delay in milliseconds before tooltip item become invisible on visible(false) call.
- * @return {number|anychart.elements.TooltipItem} delay in milliseconds before tooltip item become invisible on visible(false) call or itself for chaining call.
+ * Sets/gets delay in milliseconds before tooltip item becomes invisible on visible(false) call.
+ * @param {number=} opt_value Delay in milliseconds before tooltip item becomes invisible on visible(false) call.
+ * @return {number|anychart.elements.TooltipItem} delay in milliseconds before tooltip item becomes invisible on visible(false) call or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.hideDelay = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    //we no need to invalidate something here
+    //we have no need to invalidate anything here
     if (this.hideDelay_ != opt_value) {
       this.hideDelay_ = opt_value;
       this.createTimerObject_();
@@ -590,8 +590,8 @@ anychart.elements.TooltipItem.prototype.hideDelay = function(opt_value) {
 
 
 /**
- * Create timer object for hiding with delay, if hiding process already started,
- * mark timer to recreate after hiding process will end.
+ * Create timer object for hiding with delay, if hiding process has already started,
+ * mark timer to recreate after hiding process ends.
  * @private
  */
 anychart.elements.TooltipItem.prototype.createTimerObject_ = function() {
@@ -617,7 +617,7 @@ anychart.elements.TooltipItem.prototype.createTimerObject_ = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Draw tooltip item.
- * @return {anychart.elements.TooltipItem} Return itself for chaining call.
+ * @return {anychart.elements.TooltipItem} Return itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
@@ -650,7 +650,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
-    this.calculatePosition_();//НАГРУЗКА!!!
+    this.calculatePosition_();
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.layer_.translate(this.position_.x, this.position_.y);
@@ -659,7 +659,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.calculateContentBounds_();//НАГРУЗКА!!!
+    this.calculateContentBounds_();
     this.boundsWithoutPadding_ = this.padding_ ?
         this.padding_.tightenBounds(/** @type {!anychart.math.Rect} */(this.contentBounds_)) :
         this.contentBounds_;
@@ -675,7 +675,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
     background.pixelBounds(this.contentBounds_);
     if (this.enabled() && this.visible()) background.container(this.layer_);
     background.resumeSignalsDispatching(false);
-    background.draw();//НАГРУЗКА!!!
+    background.draw();
 
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
   }
@@ -687,7 +687,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
     if (this.enabled() && this.visible()) title.container(this.layer_);
     title.parentBounds(this.boundsWithoutPadding_);
     title.resumeSignalsDispatching(false);
-    title.draw();//НАГРУЗКА!!!
+    title.draw();
 
     //title bounds
     if (!this.titleRemainingBounds_ && title.enabled())
@@ -702,7 +702,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
     if (this.enabled() && this.visible()) separator.container(this.layer_);
     separator.parentBounds(this.titleRemainingBounds_ || this.contentBounds_);
     separator.resumeSignalsDispatching(false);
-    separator.draw();//НАГРУЗКА!!!
+    separator.draw();
 
     //separator bounds
     if (!this.separatorRemainingBounds_ && separator.enabled())
@@ -718,7 +718,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
     if (this.enabled() && this.visible()) label.container(this.layer_);
     label.parentBounds(remainingBounds);
     label.resumeSignalsDispatching(false);
-    label.draw();//НАГРУЗКА!!!
+    label.draw();
 
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
@@ -798,7 +798,7 @@ anychart.elements.TooltipItem.prototype.calculatePosition_ = function() {
  * @return {anychart.math.Rect} Tooltip item content bounds.
  */
 anychart.elements.TooltipItem.prototype.getPixelBounds = function() {
-  this.calculatePosition_(); //also calculate content bounds, because it need it.
+  this.calculatePosition_(); //also calculate content bounds, because it needs it.
   return new anychart.math.Rect(this.position_.x, this.position_.y, this.contentBounds_.width, this.contentBounds_.height);
 };
 

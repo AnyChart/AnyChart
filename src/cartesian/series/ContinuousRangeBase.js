@@ -115,25 +115,25 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.createPositionProvider =
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke} Current stroke settings.
  *//**
- * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Setter for stroke settings.<br/>
+ * Read more about stroke here:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.ContinuousRangeBase} An instance of the {@link anychart.cartesian.series.ContinuousRangeBase} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.ContinuousRangeBase} {@link anychart.cartesian.series.ContinuousRangeBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.ContinuousRangeBase.prototype.highStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -156,25 +156,25 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.highStroke = function(op
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke} Current stroke settings.
  *//**
- * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Setter for stroke settings.<br/>
+ * Read more about stroke:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.ContinuousRangeBase} An instance of the {@link anychart.cartesian.series.ContinuousRangeBase} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.ContinuousRangeBase} {@link anychart.cartesian.series.ContinuousRangeBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -183,7 +183,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = functi
     this.hoverHighStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
         anychart.color.normalizeStroke.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverHighStroke_;
@@ -191,7 +191,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = functi
 
 
 /**
- * Метод, получающий финальное значение цвета линии для текущей точки с учетом всех fallback.
+ * Method that gets final color of the line, all fallbacks are taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
@@ -216,25 +216,25 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke = fun
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke} Current stroke settings.
  *//**
- * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Setter for stroke settings.<br/>
+ * Read more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.ContinuousRangeBase} An instance of the {@link anychart.cartesian.series.ContinuousRangeBase} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.ContinuousRangeBase} {@link anychart.cartesian.series.ContinuousRangeBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -257,25 +257,25 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke = function(opt
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke} Current stroke settings.
  *//**
- * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Setter for stroke settings.<br/>
+ * Read more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.ContinuousRangeBase} An instance of the {@link anychart.cartesian.series.ContinuousRangeBase} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.ContinuousRangeBase} {@link anychart.cartesian.series.ContinuousRangeBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -284,7 +284,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = functio
     this.hoverLowStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
         anychart.color.normalizeStroke.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverLowStroke_;
@@ -292,7 +292,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = functio
 
 
 /**
- * Метод, получающий финальное значение цвета линии для текущей точки с учетом всех fallback.
+ * Method that gets final color of the line, all fallbacks are taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
@@ -332,7 +332,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
 
   if (goog.isFunction(this.highStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize highStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize highStroke function, please reset it manually.');
     }
   } else {
     json['highStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.highStroke()));
@@ -340,7 +340,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverHighStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverHighStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverHighStroke function, please reset it manually.');
     }
   } else {
     json['hoverHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverHighStroke()));
@@ -348,7 +348,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
 
   if (goog.isFunction(this.lowStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize lowStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize lowStroke function, please reset it manually.');
     }
   } else {
     json['lowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.lowStroke()));
@@ -356,7 +356,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverLowStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverLowStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverLowStroke function, please reset it manually.');
     }
   } else {
     json['hoverLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverLowStroke()));

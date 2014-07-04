@@ -19,7 +19,7 @@ anychart.onDocumentReady(function() {
   //set chart title text settings
   chart.title().text('Pie Chart');
 
-  chart.setOtherPoint('group', function(value) {
+  chart.group(function(value) {
     return (value >= 1000);
   });
 

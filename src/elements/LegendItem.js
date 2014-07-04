@@ -98,7 +98,7 @@ anychart.elements.LegendItem.IconType = {
 /**
  * Method to get icon drawer
  * @this {anychart.elements.LegendItem}
- * @param {(anychart.elements.LegendItem.IconType|string)=} opt_iconType Type of icon.
+ * @param {(anychart.elements.LegendItem.IconType|string)=} opt_iconType Type of an icon.
  * @return {function(acgraph.vector.Path, number)} Drawer function.
  */
 anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
@@ -364,7 +364,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
 
     case anychart.elements.LegendItem.IconType.SQUARE:
     default:
-      //default drawer is square
+      //default drawer is a square
       drawer = function(path, size) {
         path.clear();
 
@@ -388,7 +388,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
 /**
  * Getter/setter for parentBounds.
  * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {(anychart.math.Rect|anychart.elements.LegendItem)} Parent bounds or self for chaining.
+ * @return {(anychart.math.Rect|anychart.elements.LegendItem)} Parent bounds or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -406,7 +406,7 @@ anychart.elements.LegendItem.prototype.parentBounds = function(opt_value) {
 /**
  * Getter/setter for X coordinate of legend item.
  * @param {(number|string)=} opt_value New x coordinate.
- * @return {(number|string|anychart.elements.LegendItem)} X coordinate or self for chaining.
+ * @return {(number|string|anychart.elements.LegendItem)} X coordinate or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.x = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -423,7 +423,7 @@ anychart.elements.LegendItem.prototype.x = function(opt_value) {
 /**
  * Getter/setter for Y coordinate of legend item.
  * @param {(number|string)=} opt_value New y coordinate.
- * @return {(number|string|anychart.elements.LegendItem)} Y coordinate or self for chaining.
+ * @return {(number|string|anychart.elements.LegendItem)} Y coordinate or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.y = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -453,7 +453,7 @@ anychart.elements.LegendItem.prototype.getContentBounds = function() {
 /**
  * Getter/setter for icon type.
  * @param {(string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
- * @return {(string|function(acgraph.vector.Path, number)|anychart.elements.LegendItem)} icon type or drawer function or self for chaining.
+ * @return {(string|function(acgraph.vector.Path, number)|anychart.elements.LegendItem)} icon type or drawer function or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.iconType = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -472,7 +472,7 @@ anychart.elements.LegendItem.prototype.iconType = function(opt_value) {
 /**
  * Getter/setter for icon fill setting.
  * @param {(acgraph.vector.Fill)=} opt_value Icon fill setting.
- * @return {(acgraph.vector.Fill|anychart.elements.LegendItem)} Icon fill setting or self for chaining.
+ * @return {(acgraph.vector.Fill|anychart.elements.LegendItem)} Icon fill setting or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.iconFill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -489,7 +489,7 @@ anychart.elements.LegendItem.prototype.iconFill = function(opt_value) {
 /**
  * Getter/setter for icon stroke setting.
  * @param {(acgraph.vector.Stroke)=} opt_value Icon stroke setting.
- * @return {(acgraph.vector.Stroke|anychart.elements.LegendItem)} Icon stroke setting or self for chaining.
+ * @return {(acgraph.vector.Stroke|anychart.elements.LegendItem)} Icon stroke setting or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.iconStroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -507,7 +507,7 @@ anychart.elements.LegendItem.prototype.iconStroke = function(opt_value) {
  * Getter/setter for marker type.
  * Usable with line, spline, step line icon types.
  * @param {?string=} opt_value Marker type.
- * @return {(string|anychart.elements.LegendItem)} . or self for chaining.
+ * @return {(string|anychart.elements.LegendItem)} IconMarker or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.iconMarker = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -524,7 +524,7 @@ anychart.elements.LegendItem.prototype.iconMarker = function(opt_value) {
 /**
  * Getter/setter for iconTextSpacing setting.
  * @param {number=} opt_value Value of spacing between icon and text.
- * @return {(anychart.elements.LegendItem|number)} Spacing between icon and text or self for chaining.
+ * @return {(anychart.elements.LegendItem|number)} Spacing between icon and text or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.iconTextSpacing = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -542,7 +542,7 @@ anychart.elements.LegendItem.prototype.iconTextSpacing = function(opt_value) {
 /**
  * Getter/setter for max width of legend item.
  * @param {(number)=} opt_value Max width setting.
- * @return {(number|anychart.elements.LegendItem)} Max width or self for chaining.
+ * @return {(number|anychart.elements.LegendItem)} Max width or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.maxWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -559,7 +559,7 @@ anychart.elements.LegendItem.prototype.maxWidth = function(opt_value) {
 /**
  * Getter/setter for max height of legend item.
  * @param {(number)=} opt_value Max height setting.
- * @return {(number|anychart.elements.LegendItem)} Max height or self for chaining.
+ * @return {(number|anychart.elements.LegendItem)} Max height or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.maxHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -576,7 +576,7 @@ anychart.elements.LegendItem.prototype.maxHeight = function(opt_value) {
 /**
  * Getter/setter for legend item text.
  * @param {string=} opt_value Legend item text.
- * @return {(string|anychart.elements.LegendItem)} Legend item text or self for chaining.
+ * @return {(string|anychart.elements.LegendItem)} Legend item text or self for method chaining.
  */
 anychart.elements.LegendItem.prototype.text = function(opt_value) {
   return /** @type {!anychart.elements.LegendItem|string} */(this.textSettings('text', opt_value));
@@ -873,7 +873,7 @@ anychart.elements.LegendItem.BrowserEvent.prototype.event_;
 
 
 /**
- * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
+ * Copies all info from a BrowserEvent to represent a new event, that can be redispatched.
  * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
  * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
  */

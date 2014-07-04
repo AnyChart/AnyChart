@@ -10,15 +10,15 @@ goog.require('anychart.data.SortView');
 goog.require('anychart.data.csv.Parser');
 
 /**
- Набор классов для работы с данными.<br/>
- Данные могут быть:
+ Classes for handling data structures/sources<br/>
+ The following data types/hierarchy is supported:
  <ul>
-  <li>Линейными ({@link anychart.data.Set})</li>
-  <li>Древовидными ({@link anychart.data.Tree})</li>
-  <li>Табличными ({@link anychart.data.Table})</li>
+  <li>Linear ({@link anychart.data.Set})</li>
+  <li>Tree ({@link anychart.data.Tree})</li>
+  <li>Table ({@link anychart.data.Table})</li>
  </ul>
- С помощью маппинга из этих данных формируется представление ({@link anychart.data.View}), работать с которыми
- можно через итератор ({@link anychart.data.Iterator}).
+ You can map any of these data sets to ({@link anychart.data.View}), and then
+ work with it using {@link anychart.data.Iterator} iterator.
  @namespace
  @name anychart.data
  */

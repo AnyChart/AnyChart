@@ -7,7 +7,7 @@ goog.require('goog.color');
 
 
 /**
- * Класс определяющий работу градиентной палитры.
+ * Gradient palette.
  * @example <t>simple-h100</t>
  * var palette = new anychart.utils.RangeColorPalette()
  *     .colors(['red', 'yellow'])
@@ -52,7 +52,7 @@ goog.inherits(anychart.utils.RangeColorPalette, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Signal mask.
  * @type {number}
  */
 anychart.utils.RangeColorPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -67,7 +67,7 @@ anychart.utils.RangeColorPalette.prototype.colorPalette_;
 
 
 /**
- * Getter for color palette colors list.
+ * Getter for the color palette colors list.
  * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
  * Array.<acgraph.vector.GradientKey>|Array.<string>} Color palette colors list.
  *//**
@@ -99,11 +99,11 @@ anychart.utils.RangeColorPalette.prototype.colors = function(opt_value) {
 
 
 /**
- * Getter for color palette's colors counts.
- * @return {number} Current color palette's colors count.
+ * Getter for color palette colors counts.
+ * @return {number} Current color palette colors count.
  *//**
  * Setter for color palette's colors counts.<br/>
- * <b>Note:</b> Определяет на сколько частей разбить градиент.
+ * <b>Note:</b> Defines how many steps we need in gradient.
  * @param {number=} opt_value [NaN] Color palette colors counts.
  * @return {!anychart.utils.RangeColorPalette} An instance of the {@link anychart.utils.RangeColorPalette} class for method chaining.
  *//**
@@ -298,7 +298,7 @@ anychart.utils.RangeColorPalette.prototype.restoreDefaults = function(opt_doNotD
 /**
  * Copies settings from the passed palette to itself.
  * @param {anychart.utils.RangeColorPalette} palette Color palette to copy settings from.
- * @return {!anychart.utils.RangeColorPalette} Returns itself for chaining.
+ * @return {!anychart.utils.RangeColorPalette} Returns itself for method chaining.
  */
 anychart.utils.RangeColorPalette.prototype.cloneFrom = function(palette) {
   if (goog.isDefAndNotNull(palette)) {

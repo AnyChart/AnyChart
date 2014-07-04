@@ -41,7 +41,7 @@ goog.inherits(anychart.scales.ScatterTicks, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Supported signals mask.
  * @type {number}
  */
 anychart.scales.ScatterTicks.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -96,7 +96,7 @@ anychart.scales.ScatterTicks.prototype.mode_ = anychart.scales.ScatterTicksMode.
 
 
 /**
- * Gets or sets ticks interval value. Note, that interval value can be read only if it was set explicitly.
+ * Gets or sets ticks interval value. Note that interval value can be read only if it was set explicitly.
  * It is returned as NaN otherwise. If opt_value is defined but is not a number or less than 0, it defaults to NaN and
  * count() resets to 5.
  * @param {number=} opt_value Ticks interval value if used as a getter.
@@ -123,9 +123,9 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
 
 
 /**
- * Gets or sets ticks count value. If opt_value is defined but not a number or less than 2, it defaults to 5.
+ * Gets or sets ticks count value. If opt_value is defined, but not a number or less than 2, it defaults to 5.
  * @param {number=} opt_value Ticks interval value if used as a getter.
- * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for chaining.
+ * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for method chaining.
  */
 anychart.scales.ScatterTicks.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -165,7 +165,7 @@ anychart.scales.ScatterTicks.prototype.base = function(opt_value) {
 /**
  * Setups ticks as an explicit array of fixed ticks.
  * @param {Array} ticks Explicit ticks array.
- * @return {!anychart.scales.ScatterTicks} Returns itself for chaining.
+ * @return {!anychart.scales.ScatterTicks} Returns itself for method chaining.
  */
 anychart.scales.ScatterTicks.prototype.set = function(ticks) {
   if (!goog.array.equals(this.explicit_, ticks)) {
@@ -220,7 +220,7 @@ anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the maximum can be modified.
+ * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
@@ -257,7 +257,7 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_origi
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the maximum can be modified.
+ * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  * @private
@@ -269,13 +269,13 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
     var ticks = [];
     var interval = this.interval_;
     if (isNaN(interval)) {
-      // todo(Anton Saukh): Этот код может возвращать либо count интервалов, либо count+1 - надо это потом фиксить.
+      // TODO(Anton Saukh): this code can return either count of intervals, or count+1 - this must be fixed.
       var count = this.count_ - 1; // it should be valid here
       var range = max - min;
       interval = range / count;
-      // Здесь можно дописывать разные другие варианты округления интервала и выбирать лучший
-      // Например на дробных значениях степени двойки дают лучший результат, потому что делят интервал на 2, 4, 8, а на
-      // больших значениях лучше использовать степени десятки и т.п.
+      // Here we can add other interval rounding options and choose the best
+      // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
+      // with big values: powers of 10 work better, and so long.
       var log = Math.log(interval);
       var majorIntervalValuable10_1 = Math.pow(10, Math.floor(log / Math.LN10));
       var majorIntervalValuable10_2 = Math.pow(10, Math.ceil(log / Math.LN10));
@@ -309,7 +309,7 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the maximum can be modified.
+ * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  * @private
@@ -327,9 +327,9 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, op
       var count = this.count_ - 1; // it should be valid here
       var range = max - min;
       interval = range / count;
-      // Здесь можно дописывать разные другие варианты округления интервала и выбирать лучший
-      // Например на дробных значениях степени двойки дают лучший результат, потому что делят интервал на 2, 4, 8, а на
-      // больших значениях лучше использовать степени десятки и т.п.
+      // Here we can add other interval rounding options and choose the best
+      // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
+      // with big values: powers of 10 work better, and so long.
       var log = Math.log(interval);
       var majorIntervalValuable10_1 = Math.pow(10, Math.floor(log / Math.LN10));
       var majorIntervalValuable10_2 = Math.pow(10, Math.ceil(log / Math.LN10));

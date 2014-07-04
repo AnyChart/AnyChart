@@ -99,7 +99,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * @return {!anychart.elements.Multimarker} Markers instance.
  *//**
  * Setter for series data markers.<br/>
- * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
  * @example <t>listingOnly</t>
  * series.markers(null);
  * @example <t>listingOnly</t>
@@ -108,7 +108,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  *       .type('star5')
  * series.markers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
@@ -143,7 +143,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * @return {!anychart.elements.Multimarker} Markers instance.
  *//**
  * Setter for series data markers on hover.<br/>
- * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
  * @example <t>listingOnly</t>
  * series.hoverMarkers(null);
  * @example <t>listingOnly</t>
@@ -152,7 +152,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  *       .type('star5')
  * series.hoverMarkers(myMarkers);
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
@@ -162,7 +162,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_
   if (!this.hoverMarkers_) {
     this.hoverMarkers_ = new anychart.elements.Multimarker();
     this.registerDisposable(this.hoverMarkers_);
-    // мы его не слушаем, потому что на следующий ховер он все равно переприменится
+    // don't listen to it, for it will be reapplied at the next hover
   }
 
   if (goog.isDef(opt_value)) {

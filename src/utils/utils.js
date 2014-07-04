@@ -24,23 +24,23 @@ goog.require('goog.json.hybrid');
  */
 anychart.utils.Align = {
   /**
-   * Устанавливает выравнивание по центру.
+   * Center align.
    */
   CENTER: 'center',
   /**
-   * Устанавливает выравнивание по левой стороне.
+   * Left align.
    */
   LEFT: 'left',
   /**
-   * Устанавливает выравнивание по правой стороне.
+   * Right align.
    */
   RIGHT: 'right',
   /**
-   * Устанавливает выравнивание сверху.
+   * Top align.
    */
   TOP: 'top',
   /**
-   * Устанавливает выравнивание снизу.
+   * Bottom align.
    */
   BOTTOM: 'bottom'
 };
@@ -78,19 +78,19 @@ anychart.utils.normalizeAlign = function(align, opt_default) {
  */
 anychart.utils.Orientation = {
   /**
-   * Устанавливает ориентацию по левой стороне.
+   * Left orientation.
    */
   LEFT: 'left',
   /**
-   * Устанавливает ориентацию по правой стороне.
+   * Right orientation.
    */
   RIGHT: 'right',
   /**
-   * Устанавливает ориентацию сверху.
+   * Top orientation.
    */
   TOP: 'top',
   /**
-   * Устанавливает ориентацию снизу.
+   * Bottom orientation.
    */
   BOTTOM: 'bottom'
 };
@@ -308,6 +308,7 @@ anychart.utils.ninePositionsToAnchor = function(position) {
 
 /**
  * Like normalizeNinePositions method but allow to return custom position string value (inside, outside, custom, etc).
+ * Similar to normalizeNinePositions method, but allows to return custom position string value (inside, outside, custom, etc).
  *
  * @param {*} position One of nine positions to normalize.
  * @param {anychart.utils.NinePositions|string=} opt_default Default position value.
@@ -327,7 +328,7 @@ anychart.utils.normalizePosition = function(position, opt_default) {
 
 
 /**
- * Пытается нормализовать anychart.math.Coordinate до acgraph.math.Coordinate.
+ * Tries to normalize anychart.math.Coordinate to acgraph.math.Coordinate.
  * @param {anychart.math.Coordinate} value anychart.math.Coordinate to normalize.
  * @return {acgraph.math.Coordinate} Normalized to acgraph.math.Coordinate value.
  */
@@ -356,22 +357,22 @@ anychart.utils.normalizeMathPosition = function(value) {
  */
 anychart.utils.Sort = {
   /**
-   * Ascending sort.
+   * Ascending sorting.
    */
   ASC: 'asc',
   /**
-   * Descending sort.
+   * Descending sorting.
    */
   DESC: 'desc',
   /**
-   * No sort.
+   * No sorting.
    */
   NONE: 'none'
 };
 
 
 /**
- * Normalizes user input sort to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
+ * Normalizes user input sorting to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
  *
  * @param {string} sort Sort to normalize.
  * @param {anychart.utils.Sort=} opt_default Default value.
@@ -395,18 +396,18 @@ anychart.utils.normalizeSort = function(sort, opt_default) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Получает или устанавливает свойство объекта obj, с учетом переданного способа адресации полей.
- * Поиск поля для чтения или записи производится по порядку элементов в mapping, затем field (mapping может быть пуст).
- * Если поле не найдено, то будет записано поле field.
- * Если используется как сетер, то возвращает предыдущее значение поля (или undefined).
+ * Gets or sets obj property, takes in account fields addresses.
+ * Fields are first looked using mapping order, then -   field order (e.g. mapping is empty).
+ * If field can not be found - field is written.
+ * If used as setter - previous value (or undefined) is returned.
  *
  * NOTE: The number of parameters is the only thing that matters in determining if it is a setter or a getter!
  *
- * @param {!Object} obj Объект, который нужно отобразить.
- * @param {string} field Оригинальное имя поля, которое мы ищем.
- * @param {?Array.<string>} mapping Порядок предпочтения имен полей объекта.
- * @param {*=} opt_setValue Значение, которое нужно установить.
- * @return {*} Текущее, либо предыдущее значение поля.
+ * @param {!Object} obj Object.
+ * @param {string} field Field name.
+ * @param {?Array.<string>} mapping Mapping.
+ * @param {*=} opt_setValue Value to set.
+ * @return {*} Current or previous value.
  */
 anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
   if (mapping) {
@@ -429,7 +430,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
 
 /**
  * Default comparator. Can compare any two values including objects and values of
- * different type, settings a stable ordering.
+ * different type, setting a stable ordering.
  * @param {*} a First value.
  * @param {*} b Second value.
  * @return {number} Comparison result.
@@ -484,7 +485,7 @@ anychart.utils.normalize = function(value, opt_containerSize, opt_invert) {
 
 
 /**
- * Define whenever value is set in percent.
+ * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.
  */
@@ -494,7 +495,7 @@ anychart.utils.isPercent = function(value) {
 
 
 /**
- * Define whenever value is set in percent.
+ * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.
  */
@@ -504,10 +505,10 @@ anychart.utils.isUnit = function(value) {
 
 
 /**
- * Получает координаты якоря на границе.
- * @param {acgraph.math.Rect} bounds Прямоугольник границ.
- * @param {anychart.utils.NinePositions|string} anchor Якорь, координаты которого нужно получить.
- * @return {Object.<string, number>} Координаты якоря в виде [x, y].
+ * Gets anchor coordinates by bounds.
+ * @param {acgraph.math.Rect} bounds Bounds rectangle.
+ * @param {anychart.utils.NinePositions|string} anchor Anchor.
+ * @return {Object.<string, number>} Anchor coordinates as [x, y].
  */
 anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
   var x = bounds.left;
@@ -552,7 +553,7 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
  * Returns the nearest number to the left from value that meets equation ((value - opt_base) mod interval === 0).
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
- * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
  * @return {number} Aligned value.
  */
 anychart.utils.alignLeft = function(value, interval, opt_base) {
@@ -570,7 +571,7 @@ anychart.utils.alignLeft = function(value, interval, opt_base) {
  * Returns the nearest number to the right from value that meets equation ((value - opt_base) mod interval === 0).
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
- * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
  * @return {number} Aligned value.
  */
 anychart.utils.alignRight = function(value, interval, opt_base) {
@@ -587,12 +588,12 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
 
 
 /**
- * Применение оффсета к переданной позиции в зависимости от якоря.
- * @param {acgraph.math.Coordinate} position Розиция к оторой будут применены оффсеты.
- * @param {anychart.utils.NinePositions} anchor Якорь.
- * @param {number} offsetX Оффсет по Х.
- * @param {number} offsetY Оффсет по Y.
- * @return {acgraph.math.Coordinate} Позиция с примененным оффсетом.
+ * Apply offset to the position depending on an anchor оффсета к переданной позиции в зависимости от якоря.
+ * @param {acgraph.math.Coordinate} position Position to be modified.
+ * @param {anychart.utils.NinePositions} anchor Anchor.
+ * @param {number} offsetX Х offset.
+ * @param {number} offsetY Y offset.
+ * @return {acgraph.math.Coordinate} Modified position.
  */
 anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY) {
   switch (anchor) {
@@ -626,7 +627,7 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
 
 
 /**
- * Does a recursive clone of the object.
+ * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
  * @return {*} Clone of the input object.
@@ -646,12 +647,12 @@ anychart.utils.recursiveClone = function(obj) {
 
 
 /**
- * Нормализует значение представленное в виде числа либо процента.
- * Если было число либо процент (строка с числом и знаком %) вернется это значение
- * иначе вернется значение opt_default либо 0.
+ * Normalizes a values represented by a number or percentage.
+ * If value or percentage string is passed - value is returned,
+ * in other cases - opt_default or 0.
  * @param {*} value Value to normalize.
  * @param {(number|string)=} opt_default Default value.
- * @return {(number|string)} Нормализованное значение.
+ * @return {(number|string)} Normalized value.
  */
 anychart.utils.normalizeNumberOrStringPercentValue = function(value, opt_default) {
   var ret = parseFloat(value);
@@ -759,7 +760,7 @@ anychart.utils.color.parseColor = function(str) {
 
 
 /**
- * Define, is passed value fit to the none definition.
+ * Define if passed value fit to the none definition.
  * @param {*} value Value to define.
  * @return {boolean} Is passed value fit to the none definition.
  */
@@ -1058,7 +1059,7 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
 
 
 /**
- * Checks if passed name is a grouper and returns correct property name if it is.
+ * Checks if passed name is a grouper and returns correct property name in case it is.
  * @param {string} nodeName
  * @return {?Array.<string>} Array of [propertyName, itemName] or null.
  * @private

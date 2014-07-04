@@ -44,32 +44,32 @@ anychart.color.blend = function(rgb1, rgb2, factor) {
  * @private
  */
 anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
-  // Если передается сложный объект, то мы должны спросить у него поле color, а иначе
-  // это будут градиенты, имадж заливки - что нам не надо
+  // If a complex object is passed - we ask for a color field
+  // or it's a gradient, an image - not the thing we need
   if (goog.isObject(fillOrStroke)) {
-    // если есть color в объекте - наш случай, забираем и парсим
+    // if there is a color in object  - it's a case, we read it and parse it
     if (fillOrStroke.color) {
       fillOrStroke = fillOrStroke.color;
     } else {
-      // иначе(градиенты и тд) говорим что не смогли распарсить
+      // there is no color - return null to show parsing failure
       return null;
     }
   }
-  // строка либо из поля color, либо цвет, либо hex-like цвет, либо 'none'
+  // string from color field, or color, or hex-like color, or 'none'
   if (goog.isString(fillOrStroke)) {
-    // нужно потому как гуг выкидывает эррор
+    // we need it becaouse goog throws error
     try {
-      // здесь распарсится любые строки вида
+      // here we can parse any strings like
       // rgb(xxx,xxx,xxx), #xxxxxx, #xxx, color_name
       var parsedColorObject = goog.color.parse(fillOrStroke);
       return parsedColorObject.hex;
     } catch (e) {
-      // если не получилось распарсить и был выкинут error значит эта строка 'none'
-      // ретёрним null - как сигнал что не получилось распарсить
+      // if we can't parse and error is thrown that's a 'none' string
+      // return null to show parsing failure
       return null;
     }
   }
-  // если ничего из вышеперечисленного - то непонятно и отдаем null
+  // if none of the above - return null too
   return null;
 };
 
@@ -180,59 +180,59 @@ anychart.color.normalizeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngl
   /** @type {number} */
   var i;
 
-  if (goog.isNull(opt_fillOrColorOrKeys)) { // Если первый параметр null, то считаем что это обнуление фила
+  if (goog.isNull(opt_fillOrColorOrKeys)) { // If the first paraneter is null, we treat this as fill removal
     newFill = 'none';
-  } else if (goog.isString(opt_fillOrColorOrKeys)) { // Разбираем вариант function(color, opt_opacity);
+  } else if (goog.isString(opt_fillOrColorOrKeys)) { // that's function(color, opt_opacity); option
     newFill = anychart.color.parseColor_(opt_fillOrColorOrKeys, false);
-    if (goog.isString(newFill) && goog.isDef(opt_opacityOrAngleOrCx)) { // Если передан простой цвет и задана прозрачность, e.g. fill('red', 0.5)
+    if (goog.isString(newFill) && goog.isDef(opt_opacityOrAngleOrCx)) { // If that's a simple color with an opacity, e.g. fill('red', 0.5)
       opacity = parseFloat(opt_opacityOrAngleOrCx);
       newFill = {
         'color': opt_fillOrColorOrKeys,
         'opacity': isNaN(opacity) ? 1 : goog.math.clamp(opacity, 0, 1)
       };
     }
-  } else if (goog.isArray(opt_fillOrColorOrKeys)) { // создается градиент (либо линейный, либо радиальный)
+  } else if (goog.isArray(opt_fillOrColorOrKeys)) { // creating gradient  (linear or radial)
     keys = goog.array.slice(opt_fillOrColorOrKeys, 0);
-    for (i = keys.length; i--;) { // перебираем ключи и нормализуем их на случай, если они заданы в виде простого цвета
+    for (i = keys.length; i--;) { // iterate keys and normalize them, if color set as a simple color
       key = keys[i];
-      if (goog.isString(key)) // ключ задан как простая строка - надо нормализовать
+      if (goog.isString(key)) // key is a simple string - normailize it
         key = anychart.color.parseKey_(key);
-      if (isNaN(key['offset'])) // проверяет сразу все случаи невалидного смещения, включая неуказание
+      if (isNaN(key['offset'])) // checking all cases on invalid offset, including empty case
         key['offset'] = i / (keys.length - 1);
       keys[i] = /** @type {acgraph.vector.GradientKey} */(key);
     }
     if (goog.isNumber(opt_opacityOrAngleOrCx) && !isNaN(opt_opacityOrAngleOrCx) &&
-        goog.isNumber(opt_modeOrCy) && !isNaN(opt_modeOrCy)) { // это радиальный градиент
+        goog.isNumber(opt_modeOrCy) && !isNaN(opt_modeOrCy)) { // it is a radial gradient
       var cx = opt_opacityOrAngleOrCx || 0;
       var cy = opt_modeOrCy || 0;
       newFill = {
         'keys': keys,
         'cx': cx,
         'cy': cy,
-        'mode': anychart.color.normalizeGradientMode_(opt_opacityOrMode), // Может принимать только прямоугольник
+        'mode': anychart.color.normalizeGradientMode_(opt_opacityOrMode), // accepts only a rectangle
         'fx': isNaN(opt_fx) ? cx : +opt_fx,
         'fy': isNaN(opt_fy) ? cy : +opt_fy,
         'opacity': goog.math.clamp(goog.isDef(opt_opacity) ? opt_opacity : 1, 0, 1)
       };
-    } else { // это линейный градиент
+    } else { // it is a linear gradient
       newFill = {
         'keys': keys,
         'angle': (+opt_opacityOrAngleOrCx) || 0,
-        'mode': anychart.color.normalizeGradientMode_(opt_modeOrCy) || !!opt_modeOrCy, // Может также принимать и boolean
+        'mode': anychart.color.normalizeGradientMode_(opt_modeOrCy) || !!opt_modeOrCy, // also accepts boolean
         'opacity': goog.math.clamp(!isNaN(+opt_opacityOrMode) ? +opt_opacityOrMode : 1, 0, 1)
       };
     }
-  } else if (goog.isObject(opt_fillOrColorOrKeys)) { // заливка задается готовым объектом
+  } else if (goog.isObject(opt_fillOrColorOrKeys)) { // fill is set as an object
     if (opt_fillOrColorOrKeys instanceof acgraph.vector.PatternFill) {
       newFill = opt_fillOrColorOrKeys;
     } else if ('keys' in opt_fillOrColorOrKeys) { // gradient
       keys = goog.array.slice(opt_fillOrColorOrKeys['keys'], 0);
-      for (i = keys.length; i--;) { // перебираем ключи и нормализуем их на случай, если они заданы в виде простого цвета
+      for (i = keys.length; i--;) { // iterate keys and normalize them, if color set as a simple color
         key = keys[i];
         var newKey;
-        if (goog.isString(key)) // ключ задан как простая строка - надо нормализовать
+        if (goog.isString(key)) // key is a simple string - normailize it
           newKey = anychart.color.parseKey_(key);
-        else { // иначе копируем объект как можем
+        else { // or just copy object
           newKey = {
             'offset': key['offset'],
             'color': goog.isString(key['color']) ? key['color'] : 'black'
@@ -240,7 +240,7 @@ anychart.color.normalizeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngl
           if (!isNaN(key['opacity']))
             newKey['opacity'] = goog.math.clamp(key['opacity'], 0, 1);
         }
-        if (isNaN(newKey['offset'])) // проверяет сразу все случаи невалидного смещения, включая неуказание
+        if (isNaN(newKey['offset'])) // checking all cases on invalid offset, including empty case
           newKey['offset'] = i / (keys.length - 1);
         keys[i] = /** @type {acgraph.vector.GradientKey} */(newKey);
       }
@@ -253,7 +253,7 @@ anychart.color.normalizeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngl
           'keys': keys,
           'cx': +cx,
           'cy': +cy,
-          'mode': mode, // Может принимать только прямоугольник
+          'mode': mode, // accepts only a rectangle
           'fx': isNaN(opt_fillOrColorOrKeys['fx']) ? +opt_fillOrColorOrKeys['cx'] : +opt_fillOrColorOrKeys['fx'],
           'fy': isNaN(opt_fillOrColorOrKeys['fy']) ? +opt_fillOrColorOrKeys['cy'] : +opt_fillOrColorOrKeys['fy'],
           'opacity': opacity
@@ -262,7 +262,7 @@ anychart.color.normalizeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngl
         newFill = {
           'keys': keys,
           'angle': +opt_fillOrColorOrKeys['angle'] || 0,
-          'mode': mode || !!opt_fillOrColorOrKeys['mode'], // Может также принимать и boolean
+          'mode': mode || !!opt_fillOrColorOrKeys['mode'], // also accepts boolean
           'opacity': opacity
         };
       }
@@ -288,14 +288,14 @@ anychart.color.normalizeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngl
 
 /**
  * Look at stroke() method for params.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Border fill settings,
+ *    if used as a setter.
+ * @param {number=} opt_thickness Line thickness. Set to 1 if it is not passed.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
  *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
  *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join shape.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
  * @return {acgraph.vector.Stroke} .
  */
@@ -303,13 +303,13 @@ anychart.color.normalizeStroke = function(opt_strokeOrFill, opt_thickness, opt_d
   var tmp;
   /** @type {acgraph.vector.Stroke} */
   var newStroke;
-  if (goog.isNull(opt_strokeOrFill)) { // Если строук задан как null, тогда дальше парсить нечего
+  if (goog.isNull(opt_strokeOrFill)) { // If stroke set as null there is no need to parse more
     newStroke = 'none';
   } else {
-    if (goog.isString(opt_strokeOrFill)) { // если это строка, то может начинаться с толщины ('1 red 0.2')
+    if (goog.isString(opt_strokeOrFill)) { // If it is a string it can start with thickness ('1 red 0.2')
       tmp = goog.string.splitLimit(opt_strokeOrFill, ' ', 1);
       var tmpThickness = parseFloat(tmp[0]);
-      if (!isNaN(tmpThickness)) { // если строка и правда начинается с толщины, то у нее больший приоритет, чем у opt_thickness
+      if (!isNaN(tmpThickness)) { // if string starts with thickness it has priority over opt_thickness
         opt_strokeOrFill = tmp[1];
         opt_thickness = tmpThickness;
       }
@@ -319,25 +319,25 @@ anychart.color.normalizeStroke = function(opt_strokeOrFill, opt_thickness, opt_d
         (setAsComplexStroke && ('thickness' in opt_strokeOrFill)) ?
             opt_strokeOrFill['thickness'] :
             opt_thickness);
-    if (thickness == 0) // Если задана каким-либо способом толщина и она равна нулю
+    if (thickness == 0) // If thickness is set and equals zero
       return 'none';
 
     var hasDash = setAsComplexStroke && ('dash' in opt_strokeOrFill);
     var hasJoin = setAsComplexStroke && ('lineJoin' in opt_strokeOrFill);
     var hasCap = setAsComplexStroke && ('lineCap' in opt_strokeOrFill);
 
-    // Получаем нормализованный филл по всем правилам.
+    // Get normalized fill.
     tmp = anychart.color.normalizeFill(/** @type {(acgraph.vector.Fill|string|null)} */(opt_strokeOrFill));
-    // К сожалению, мы не поддерживаем Pattern заливку для строуков :D
-    // Тайпкаст тут, на самом деле, должен быть двойной, через ColoredFill. Но это многобукоф чистой метадаты, поэтому
-    // сделано так.
+    // Unfortunately we don't support Pattern fill for strokes.
+    // We should have double typecast here, through ColoredFill,
+    //  but we'll go an easy way for now.
     newStroke = (tmp instanceof acgraph.vector.PatternFill) ? 'black' : /** @type {acgraph.vector.Stroke} */(tmp);
 
-    // Если ничего из этого нету, то можно смело использовать просто нормализованный филл в качестве строука,
-    // он совместим. Иначе приходится дописывать в него свойства.
+    // If none of the above, we can use normalized fill as a stroke,
+    // it is compatible. In other case we have to add properties.
     if (!isNaN(thickness) || hasDash || hasJoin || hasCap ||
         goog.isDef(opt_dashpattern) || goog.isDef(opt_lineJoin) || goog.isDef(opt_lineCap)) {
-      if (goog.isString(newStroke)) // Если же есть, а цвет задан строкой, то надо ее апгрейднуть до объекта
+      if (goog.isString(newStroke)) // If it is here and color set as string, we need to upgrade it to object
         newStroke = /** @type {acgraph.vector.Stroke} */({
           'color': newStroke
         });
@@ -400,10 +400,10 @@ anychart.color.serialize = function(color) {
 
 
 /**
- * Приводит режим к прямоугольнику. Если не может (например это null или boolean), возвращает null.
- * @param {null|number|boolean|acgraph.math.Rect|{left:number,top:number,width:number,height:number}|undefined} mode Режим
- *    градиента, который нужно нормализовать.
- * @return {acgraph.math.Rect} Нормализованный прямоугольник градиента (лишних объектов не создается).
+ * Brings mode to a rectangle. If it is not possible (it is null or boolean), returns null.
+ * @param {null|number|boolean|acgraph.math.Rect|{left:number,top:number,width:number,height:number}|undefined} mode Gradient
+ *    mode to normalize.
+ * @return {acgraph.math.Rect} Normalized gradient rectangle (no redundant objects created).
  * @private
  */
 anychart.color.normalizeGradientMode_ = function(mode) {
@@ -418,31 +418,31 @@ anychart.color.normalizeGradientMode_ = function(mode) {
 
 
 /**
- * @param {string} color Цвет в форме 'red' или 'red 0.5'.
- * @param {boolean} forceObject Нужно ли всегда отдавать объект вида acgraph.vector.SolidFill или возвращать строку
- *    в случае простого цвета.
- * @return {string|acgraph.vector.SolidFill} Нормализованный цвет.
+ * @param {string} color Color as 'red' or 'red 0.5'.
+ * @param {boolean} forceObject Whether we need to return  acgraph.vector.SolidFill or return
+ *    string in case of a simple color.
+ * @return {string|acgraph.vector.SolidFill} Normalized color.
  * @private
  */
 anychart.color.parseColor_ = function(color, forceObject) {
-  // TODO (Anton Saukh): возможно дописать сюда trim и переделать на регэкспы
+  // TODO (Anton Saukh): we can add trim and change to regular expressions
   /** @type {Array.<string>} */
   var tmp = color.split(' ', 2);
   /** @type {number} */
   var opacity;
   var result;
-  if (tmp.length > 1) { // случай, когда color - это сложный цвет с прозрачностью, e.g. 'red 0.5'
+  if (tmp.length > 1) { // it's a case when color is a complex string with opacity, e.g. 'red 0.5'
     opacity = parseFloat(tmp[1]);
     result = {
-      'color': tmp[0] // здесь всегда будет чистое первое слово из переданного fill
+      'color': tmp[0] // here we always have a "clear" first word from fill received
     };
     if (!isNaN(opacity))
       result['opacity'] = goog.math.clamp(opacity, 0, 1);
-  } else if (forceObject) { // надо привести к виду объекта даже в случае простого цвета (например, для ключа градиента)
+  } else if (forceObject) { // bring to object even if it is a simple color (e.g. for gradient key)
     result = {
       'color': color
     };
-  } else { // простой цвет
+  } else { // simple color
     result = color;
   }
   return result;
@@ -450,8 +450,8 @@ anychart.color.parseColor_ = function(color, forceObject) {
 
 
 /**
- * @param {string} key Ключ в форме '[offset ]color[ opacity]': 'red', 'red 0.5', '0.5 red' или '0.5 red 0.5'.
- * @return {acgraph.vector.GradientKey} Нормализованный ключ.
+ * @param {string} key Key as '[offset ]color[ opacity]': 'red', 'red 0.5', '0.5 red' or '0.5 red 0.5'.
+ * @return {acgraph.vector.GradientKey} Normalized key.
  * @private
  */
 anychart.color.parseKey_ = function(key) {

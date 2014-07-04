@@ -25,7 +25,7 @@ goog.inherits(anychart.utils.Space, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Signals mask.
  * @type {number}
  */
 anychart.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -64,7 +64,7 @@ anychart.utils.Space.prototype.left_ = 0;
 
 
 /**
- * Resets all offsets by the passed values.
+ * Resets all offsets using values passed.
  * Can accept other Space object or from 0 to 4 values (numbers or percent strings).
  * Space values are applied just as in CSS:
  * 1) set(25, 50, 75, 100):
@@ -148,7 +148,7 @@ anychart.utils.Space.prototype.left = function(opt_value) {
 /**
  * Gets or sets top space. Returns previously set space, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|!anychart.utils.Space)} Value, or itself for chaining.
+ * @return {(number|string|!anychart.utils.Space)} Value or itself for method chaining.
  */
 anychart.utils.Space.prototype.top = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -166,7 +166,7 @@ anychart.utils.Space.prototype.top = function(opt_value) {
 /**
  * Gets or sets right space. Returns previously set space, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|!anychart.utils.Space)} Value, or itself for chaining.
+ * @return {(number|string|!anychart.utils.Space)} Value or itself for chaining.
  */
 anychart.utils.Space.prototype.right = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -184,7 +184,7 @@ anychart.utils.Space.prototype.right = function(opt_value) {
 /**
  * Gets or sets bottom space. Returns previously set space, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|!anychart.utils.Space)} Value, or itself for chaining.
+ * @return {(number|string|!anychart.utils.Space)} Value or itself for chaining.
  */
 anychart.utils.Space.prototype.bottom = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -200,9 +200,9 @@ anychart.utils.Space.prototype.bottom = function(opt_value) {
 
 
 /**
- * Applies margin settings to a rect, creating a new tighten rect.
- * @param {!anychart.math.Rect} boundsRect Rect to apply margin to.
- * @return {!anychart.math.Rect} New rect with applied margin.
+ * Applies margin settings to a rect, creating a new tighten rectangle.
+ * @param {!anychart.math.Rect} boundsRect Rectangle to apply margins to.
+ * @return {!anychart.math.Rect} New rectangle with applied margin.
  */
 anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
   var width = this.getWidthToTighten(boundsRect.width);
@@ -221,9 +221,9 @@ anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
 
 
 /**
- * Applies margin settings to a width. The resulting width is less than the initial.
+ * Applies margin settings to the width. The resulting width is less than the initial.
  * @param {number} initialWidth Width to apply margin to.
- * @return {number} New width tighten by the margin.
+ * @return {number} New width.
  */
 anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
   initialWidth = this.getHeightToTighten(initialWidth);
@@ -236,7 +236,7 @@ anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
 /**
  * Applies margin settings to a height. The resulting height is less than the initial.
  * @param {number} initialHeight Height to apply margin to.
- * @return {number} New height tighten by the margin.
+ * @return {number} New height.
  */
 anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
   initialHeight = this.getHeightToTighten(initialHeight);
@@ -247,9 +247,9 @@ anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
 
 
 /**
- * Applies padding settings to a rect, creating a new widen rect.
- * @param {!anychart.math.Rect} boundsRect Rect to apply margin to.
- * @return {!anychart.math.Rect} New rect with applied margin.
+ * Applies padding settings to a rectangle, creating a new widen rectangle.
+ * @param {!anychart.math.Rect} boundsRect Rectangle to apply margin to.
+ * @return {!anychart.math.Rect} New rectangle.
  */
 anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
   var width = this.getWidthToWiden(boundsRect.width);
@@ -270,7 +270,7 @@ anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
 /**
  * Applies margin settings to a width. The resulting width is bigger than the initial.
  * @param {number} initialWidth Width to apply margin to.
- * @return {number} New width widen by the margin.
+ * @return {number} New width.
  */
 anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
   initialWidth = this.getWidthToWiden(initialWidth);
@@ -283,7 +283,7 @@ anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
 /**
  * Applies margin settings to a height. The resulting height is bigger than the initial.
  * @param {number} initialHeight Height to apply margin to.
- * @return {number} New height widen by the margin.
+ * @return {number} New height.
  */
 anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
   initialHeight = this.getHeightToWiden(initialHeight);

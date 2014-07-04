@@ -4,13 +4,13 @@ goog.provide('anychart.elements.Marker.Type');
 
 
 ///**
-// * Класс, описывающий элемент - маркер.<br/>
-// * Маркер - это самостоятельный элемент визаулизации, которому можно задать тип (предопределенный или свой), размер и
-// * заливку, а также можно спозиционировать широким набором инструментов:
+// * Marker class.<br/>
+// * Marker is an element with a type (predefined or custom), size and
+// * fill, with a advanced positioning options:
 // * <ul>
 // *   <li>{@link anychart.elements.Marker#anchor}</li>
 // *   <li>{@link anychart.elements.Marker#position}</li>
-// *   <li>{@link anychart.elements.Marker#offsetX} и {@link anychart.elements.Marker#offsetY}</li>
+// *   <li>{@link anychart.elements.Marker#offsetX} and {@link anychart.elements.Marker#offsetY}</li>
 // *   <li>{@link anychart.elements.Marker#parentBounds}</li>
 // * </ul>
 // * @example <t>simple-h100</t>
@@ -292,10 +292,10 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // * var marker = new anychart.elements.Marker()
 // *     .position([100, 50])
 // * marker.container(stage).draw();
-// * // обозначим красным точку поционирования лейбла.
+// * // mark positioning point with red
 // * stage.circle(100, 50, 2).stroke('3 red')
-// * @param {anychart.math.Coordinate=} opt_value [{x: 0, y: 0} относительно заанных баундов] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @param {anychart.math.Coordinate=} opt_value [{x: 0, y: 0} in bound set] Value to set.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {anychart.math.Coordinate=} opt_value .
@@ -319,16 +319,16 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // * @return {anychart.utils.NinePositions} Current marker anchor settings.
 // *//**
 // * Setter for marker anchor settings.<br/>
-// * <b>Note:</b> Совмещает точку позиционирования лейбла ({@link anychart.elements.Marker#position}) с указанным якорем.
+// * <b>Note:</b> Merges positioning point ({@link anychart.elements.Marker#position}) with the anchor defined.
 // * @example <t>simple-h100</t>
 // * var marker = new anychart.elements.Marker()
 // *     .position([100, 50])
 // *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
 // * marker.container(stage).draw();
-// * // обозначим красным точку поционирования лейбла.
+// * // mark positioning point with red
 // * stage.circle(100, 50, 2).stroke('3 red')
 // * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {(anychart.utils.NinePositions|string)=} opt_value .
@@ -378,16 +378,15 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *     .draw();
 // * @param {(anychart.elements.Marker.Type|
 // *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
-// *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Функция, задающее произвольно
-// *  нарисованный маркер, в общем виде выглядит как: <code>function(path, x, y, size){
-// *    // path - это acgraph.vector.Path
-// *    // x, y - текущее позиционирование маркера
-// *    // size - размер маркера
-// *    ... //do smth
+// *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom
+// *  marker should look like this: <code>function(path, x, y, size){
+// *    // path - acgraph.vector.Path
+// *    // x, y - marker position
+// *    // size - marker size
+// *    ... //do something
 // *    return path;
 // *  }</code>.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
-// *//**
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // * @ignoreDoc
 // * @param {(anychart.elements.Marker.Type|
 // *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
@@ -432,7 +431,7 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *     .container(stage)
 // *     .draw();
 // * @param {number=} opt_value [10] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {number=} opt_value .
@@ -454,23 +453,23 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 //
 //
 ///**
-// * Возвращает текущий fill.
-// * @return {!acgraph.vector.Fill} Параметры текущей заливки (пустая заливка это всегда 'none').
+// * Returns current fill.
+// * @return {!acgraph.vector.Fill} Current fill settings (empty fill is always 'none').
 // *//**
-// * Устанавливает настройки заливки через объект или одной строкой.<br/>
-// * Принимает объекты типов:
+// * Sets fill settings using an object or a string.<br/>
+// * Accepts these types:
 // * <ul>
 // * <li>{@link acgraph.vector.LinearGradientFill}</li>
 // * <li>{@link acgraph.vector.RadialGradientFill}</li>
 // * <li>{@link acgraph.vector.Fill}</li>
 // * <li>{@link acgraph.vector.ImageFill}</li>
 // * </ul>
-// * Либо цвет в виде строки. Причем, одной строкой можно задать и прозрачность (в виде '<b>Color Opacity</b>',
-// * например 'red .5').
-// * @shortDescription Устанавливает настройки заливки через объект или одной строкой.
+// * Or a color as a string, along with opacity if needed (format is '<b>Color Opacity</b>',
+// * e.g. 'red .5').
+// * @shortDescription Sets fill settings using an object or a string.
 // * @example <c>Solid Fill</c><t>simple-h100</t>
 // * var marker = new anychart.elements.Marker();
-// * // Устанавливаем fill
+// * // Set fill
 // *   marker.fill('red 0.1');
 // * // the same
 // * // marker.fill('#ff0000 0.1');
@@ -486,7 +485,7 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *    .draw();
 // * @example <c>Gradient Fill</c><t>simple-h100</t>
 // * var marker = new anychart.elements.Marker();
-// *   // Устанавливаем fill
+// *   // set fill
 // *   marker.fill({keys:['red .1', 'orange'], mode: true, angle: 45});
 // * marker
 // *   .position([100, 50])
@@ -504,8 +503,8 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *     .size(45)
 // *     .container(stage)
 // *     .draw();
-// * @param {acgraph.vector.Fill} value ['#000'] Заливка в виде одного сложного объекта или строки.
-// * @return {!anychart.elements.Marker} An instance of the {@link anychart.elements.Marker} class for method chaining.
+// * @param {acgraph.vector.Fill} value ['#000'] Fill as an object or a string.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {(!acgraph.vector.Fill)=} opt_value .
@@ -525,13 +524,13 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 //
 //
 ///**
-// * Возаращает текущий stroke.
-// * @return {acgraph.vector.Stroke} Возвращает текущую настройку линии.
+// * Returns current stroke.
+// * @return {acgraph.vector.Stroke} Returns current stroke.
 // *//**
-// * Устанавливает настройки stroke одним параметром.<br/>
-// * Допустимы следующие варианты:
+// * Sets stroke settings.<br/>
+// * The following is acceptable:
 // * <ul>
-// * <li>Строкой в формате '[thickness ]color[ opacity]':
+// * <li>String formatted as '[thickness ]color[ opacity]':
 // * <ol>
 // * <li><b>'color'</b> - {@link http://www.w3schools.com/html/html_colors.asp}.</li>
 // * <li><b>'thickness color'</b> - like a css border, e.g. '3 red' or '3px red'</li>
@@ -539,13 +538,13 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // * <li><b>'thickness color opacity'</b> - as a complex string, e.g. '3px #00ff00 0.5'</li>
 // * </ol>
 // * </li>
-// * <li>Объект {@link acgraph.vector.Stroke}</li>
-// * <li>Массив ключей {@link acgraph.vector.GradientKey}</li>
-// * <li><b>null</b> - сбросит текущие настройки stroke.</li>
+// * <li>{@link acgraph.vector.Stroke} object</li>
+// * <li>{@link acgraph.vector.GradientKey} keys array</li>
+// * <li><b>null</b> - resets current stroke settings.</li>
 // * </ul>
 // * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
-// * @shortDescription Устанавливает настройки stroke одним параметром.
-// * @example <c>Настроки строкой</c><t>simple</t>
+// * @shortDescription Sets stroke settings.
+// * @example <c>Settings as a string</c><t>simple</t>
 // * new anychart.elements.Marker()
 // *   .stroke('red')
 // *   .position([ stage.width()/5, 50]).size(stage.width()/10)
@@ -562,7 +561,7 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *   .stroke('4 #0000FF 0.3')
 // *   .position([ 4*stage.width()/5, 50]).size(stage.width()/10)
 // *   .fill('none').container(stage).draw();
-// * @example <c>Настроки объектом или массивом</c><t>simple</t>
+// * @example <c>Settings as an object or an array</c><t>simple</t>
 // * new anychart.elements.Marker()
 // *   .stroke({color: '#f00', thickness: 2, opacity: 0.9})
 // *   .position([100, 50]).size(45)
@@ -571,8 +570,8 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *   .stroke(['red', 'green', 'blue'])
 // *   .position([200, 50]).size(45)
 // *   .fill('none').container(stage).draw();
-// * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['none'] Стиль заливки в формате '[thickness ]color[ opacity]'.
-// * @return {anychart.elements.Marker} An instance of the {@link anychart.elements.Marker} class for method chaining.
+// * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['none'] Fill style formatted as '[thickness ]color[ opacity]'.
+// * @return {anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {(acgraph.vector.Stroke)=} opt_value .
@@ -664,19 +663,19 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
 // *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
 // * @illustrationDesc
-// * Стрелочками обозначено направление положительно заданных офсетов относительно якоря в котором спозиционирован лейбл.
+// * Arrows denote positive offsets relative to a positioning anchor.
 // * @example <t>simple-h100</t>
 // * var marker = new anychart.elements.Marker()
 // *     .position([100, 50])
-// *     // выставляем оффсеты по 10px.
+// *     // set 10px offsets.
 // *     .offsetX(10)
 // *     .offsetY(10)
 // *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
 // * marker.container(stage).draw();
-// * // обозначим красным точку поционирования лейбла.
+// * // mark positioning point with red
 // * stage.circle(100, 50, 2).stroke('3 red')
 // * @param {(number|string)=} opt_value [0] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {(number|string)=} opt_value .
@@ -709,10 +708,10 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *     .offsetY(10)
 // *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
 // * marker.container(stage).draw();
-// * // обозначим красным точку поционирования лейбла.
+// * // mark positioning point with red
 // * stage.circle(100, 50, 2).stroke('3 red')
 // * @param {(number|string)=} opt_value [0] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {(number|string)=} opt_value .
@@ -732,11 +731,11 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 //
 //
 ///**
-// * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+// * Returns element bounds for positioning calculation.
 // * @return {anychart.math.Rect} Current parent bounds.
 // *//**
-// * Устанавливает баунды отностительно которых идут рассчеты позиционирования элемента.<br/>
-// * Width, height, offsets заданные в проуентах считаются относительно этих заданных баундов.
+// * Sets positioning bounds.<br/>
+// * Width, height, offsets set in percents are set in percents of these bounds.
 // * @illustration <t>simple-h100</t>
 // * var layer = stage.layer();
 // * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
@@ -758,16 +757,16 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // *     .stroke('grey')
 // *     .draw();
 // * @illustrationDesc
-// * Marker находится внутри layer (обозначенного синей рамкой) и показаны два варианта рассчета позиции marker:<br/>
-// *   a. Серым - рассчет внутри баунов родительского кнтейнера.<br/>
-// *   b. Черным - когда в качестве родительских заданы баунды stage.
+// * Marker is placed in a layer (shown with blue border), two alternative positioning options:<br/>
+// *   a. Gray - calculation inside parent container bounds.<br/>
+// *   b. Black - stage bounds are set as parent bounds.
 // * @example <t>listingOnly</t>
 // * new anychart.elements.Marker()
 // *     .container(layer)
 // *     .parentBounds(stageBounds)
 // *     .draw();
 // * @param {anychart.math.Rect=} opt_value [null] Value to set.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // *//**
 // * @ignoreDoc
 // * @param {anychart.math.Rect=} opt_value .
@@ -787,7 +786,7 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 //
 ///**
 // * Render marker.
-// * @return {!anychart.elements.Marker} Экземпляр класса {@link anychart.elements.Marker} для цепочного вызова.
+// * @return {!anychart.elements.Marker} {@link anychart.elements.Marker} instance for method chaining.
 // */
 //anychart.elements.Marker.prototype.draw = function() {
 //  if (this.isConsistent()) return this;

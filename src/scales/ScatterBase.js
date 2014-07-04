@@ -69,7 +69,7 @@ anychart.scales.ScatterBase = function() {
   this.range = 1;
 
   /**
-   * If the scale is consistent. We can't use consistency states mechanic due to the same behaviour for all scales.
+   * If the scale is consistent. We can't use consistency states management due to the same behaviour for all scales.
    * @type {boolean}
    * @protected
    */

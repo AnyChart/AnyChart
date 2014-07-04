@@ -550,7 +550,7 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.fontStyle(this.settingsObj['fontStyle']);
   if ('fontVariant' in this.changedSettings)
     textElement.fontVariant(this.settingsObj['fontVariant']);
-  if ('fontWeight' in this.changedSettings)
+  if (isInitial || 'fontWeight' in this.changedSettings)
     textElement.fontWeight(this.settingsObj['fontWeight']);
   if ('letterSpacing' in this.changedSettings)
     textElement.letterSpacing(this.settingsObj['letterSpacing']);

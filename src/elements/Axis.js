@@ -341,11 +341,11 @@ anychart.elements.Axis.prototype.minorLabelsBounds_ = null;
  *//**
  * Setter for axis name.
  * @param {string=} opt_value Name.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {string=} opt_value Name.
- * @return {string|anychart.elements.Axis} Axis name or itself for chaining.
+ * @return {string|anychart.elements.Axis} Axis name or itself for method chaining.
  */
 anychart.elements.Axis.prototype.name = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -364,11 +364,11 @@ anychart.elements.Axis.prototype.name = function(opt_value) {
  *//**
  * Setter for the title axis.
  * @param {(string|anychart.elements.Title)=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Title)=} opt_value Axis title.
- * @return {string|anychart.elements.Title|anychart.elements.Axis} Axis title or itself for chaining.
+ * @return {string|anychart.elements.Title|anychart.elements.Axis} Axis title or itself for method chaining.
  */
 anychart.elements.Axis.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -416,7 +416,7 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
 
 /**
  * Getter for axis labels.
- * @return {anychart.elements.LabelsFactory} Axis labels of itself for chaining.
+ * @return {anychart.elements.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
  * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
@@ -424,7 +424,7 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
  *//**
  * @ignoreDoc
  * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for chaining.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for method chaining.
  */
 anychart.elements.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -477,11 +477,11 @@ anychart.elements.Axis.prototype.labelsInvalidated_ = function(event) {
  *//**
  * Setter for axis minor labels.
  * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for chaining.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Axis} Axis labels of itself for method chaining.
  */
 anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
@@ -535,11 +535,11 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
  *//**
  * Setter for axis ticks.
  * @param {anychart.elements.Ticks=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.Ticks=} opt_value Axis ticks.
- * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for chaining.
+ * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for method chaining.
  */
 anychart.elements.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
@@ -591,11 +591,11 @@ anychart.elements.Axis.prototype.ticksInvalidated_ = function(event) {
  *//**
  * Setter for minor axis ticks.
  * @param {anychart.elements.Ticks=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.Ticks=} opt_value Axis ticks.
- * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for chaining.
+ * @return {anychart.elements.Ticks|anychart.elements.Axis} Axis ticks or itself for method chaining.
  */
 anychart.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
@@ -645,11 +645,11 @@ anychart.elements.Axis.prototype.minorTicksInvalidated_ = function(event) {
  *//**
  * Setter for axis line stroke.
  * @param {(string|acgraph.vector.Stroke)=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
- * @return {string|acgraph.vector.Stroke|anychart.elements.Axis} Axis line stroke or itself for chaining.
+ * @return {string|acgraph.vector.Stroke|anychart.elements.Axis} Axis line stroke or itself for method chaining.
  */
 anychart.elements.Axis.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -680,7 +680,7 @@ anychart.elements.Axis.prototype.stroke = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(string|anychart.utils.Orientation)=} opt_value Axis orientation.
- * @return {string|anychart.utils.Orientation|anychart.elements.Axis} Axis orientation oe itself for chaining.
+ * @return {string|anychart.utils.Orientation|anychart.elements.Axis} Axis orientation oe itself for method chaining.
  */
 anychart.elements.Axis.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -703,11 +703,11 @@ anychart.elements.Axis.prototype.orientation = function(opt_value) {
  *//**
  * Setter for axis scale.
  * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.Axis} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.Axis} Axis scale or itself for method chaining.
  */
 anychart.elements.Axis.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -736,16 +736,16 @@ anychart.elements.Axis.prototype.scaleInvalidated_ = function(event) {
 
 
 /**
- * Getter сдвиг баундов оси по оси x от края баундов родителя.
+ * Getter for axis X offset.
  * @return {number} Offset by X.
  *//**
- * Setter сдвиг баундов оси по оси x от края баундов родителя.
+ * Setter for axis X offset.
  * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value Value to set.
- * @return {number|anychart.elements.Axis} Offset or itself for chaining.
+ * @return {number|anychart.elements.Axis} Offset or itself for method chaining.
  */
 anychart.elements.Axis.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -761,16 +761,16 @@ anychart.elements.Axis.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Getter сдвиг баундов оси по оси y от края баундов родителя.
+ * Getter for axis Y offset.
  * @return {number} Offset by Y.
  *//**
- * Setter сдвиг баундов оси по оси y от края баундов родителя.
+ * Setter for axis Y offset.
  * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value Value to set.
- * @return {number|anychart.elements.Axis} Offset or itself for chaining.
+ * @return {number|anychart.elements.Axis} Offset or itself for method chaining.
  */
 anychart.elements.Axis.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -790,13 +790,13 @@ anychart.elements.Axis.prototype.offsetY = function(opt_value) {
  * @return {number} Axis length.
  *//**
  * Setter for axis length.<br/>
- * <b>Note:</b> Для горизонтальной ориентации оси длиной будет являться ее ширина, для вертикальной - высота.
- * @param {number=} opt_value Длина оси.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * <b>Note:</b> width and height swap in case of horizontal axis.
+ * @param {number=} opt_value Axis length.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {number=} opt_value Длина оси.
- * @return {number|anychart.elements.Axis} Length or itself for chaining.
+ * @param {number=} opt_value Axis lenght.
+ * @return {number|anychart.elements.Axis} Length or itself for method chaining.
  */
 anychart.elements.Axis.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -817,7 +817,7 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
  *//**
  * Setter for parentBounds.
  * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.math.Rect=} opt_value Bounds for marker.
@@ -826,7 +826,7 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
 anychart.elements.Axis.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
+      this.parentBounds_ = opt_value.clone();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -856,6 +856,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
 
     if (parentBounds) {
       var parentLength;
+
       parentBounds.top = Math.round(parentBounds.top);
       parentBounds.left = Math.round(parentBounds.left);
       parentBounds.width = Math.round(parentBounds.width);
@@ -920,10 +921,10 @@ anychart.elements.Axis.prototype.dropBoundsCache_ = function() {
 
 
 /**
- * Возвращает объект с индесами лейблов, которые нужно нарисовать.
- * @param {anychart.math.Rect=} opt_bounds Родительские баунды.
- * @return {boolean|Object.<string, Array.<boolean>>} Объек,содержащий массивы с индексами дейблов, которые будут нарисованы
- * или булевое значение, означающее что оаерлапа лейблов нет.
+ * Returns an object with indexes of labels to draw.
+ * @param {anychart.math.Rect=} opt_bounds Parent bounds.
+ * @return {boolean|Object.<string, Array.<boolean>>} Object with indexes of labels to draw.
+ * or Boolean when there are no labels.
  * @private
  */
 anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
@@ -939,18 +940,18 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
         var i, j;
 
         /**
-         * Индекс предыдущего нарисованного мажорного лейбла.
+         * Index of previous major label which is displayed.
          * @type {number}
          */
         var prevDrawableLabel = -1;
         /**
-         * Индекс следующего лейбла, который нужно отрисовать и он не будет перекрывать предыдущий нарисованый мажорный лейбл и
-         * самый последний, если он включен.
+         * Index of the next label, which we should display and it doesn't overlap previous major label and the
+         * very last if it is on.
          * @type {number}
          */
         var nextDrawableLabel = -1;
         /**
-         * Индекс предыдущего нарисованного минорного лейбла.
+         * Index of previous minor label which is displayed.
          * @type {number}
          */
         var prevDrawableMinorLabel = -1;
@@ -1086,7 +1087,7 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
 
 
 /**
- * Вычисляет размер (size) оси (Для горизонтальной ориентации - это высота, для вертикальной - ширина)
+ * Calculates the size of an axis (for horizontal - height, for vertical - width)
  * @param {anychart.math.Rect} parentBounds Parent bounds.
  * @param {number} length Axis length.
  * @return {number} Size.
@@ -1223,17 +1224,17 @@ anychart.elements.Axis.prototype.getRemainingBounds = function() {
 
 
 /**
- * Определение знака полупиксельного сдвига относительно позиции элемента. Для того, чтобы элементы отображались четко
- * на экране, используется полупиксельный сдвиг, если элемент не попадает в целые пиксели. Например линия в 1 пиксель
- * толщиной на экране будет занимать по сути 2 пикселя и выглядеть не четко, так как эти два пикселя будут закрашены
- * только на половину, но если ее сдвинуть на 0.5 пикселя, то она займет 1 пиксель и закрасит его весь и будет выглядеть
- * четко. При сдвиге всех тиков в одну сторону позиция последнего тика будет превышать общую длину оси на 1 пиксель.
- * Чтобы этого избежать тики до половины сдвигаем в одну сторону,после половины в другую, знак сдвига как раз и
- * определяет в какую сторону сдвигать элемент.
- * @param {number} index Индекс элемента.
- * @param {number} count Количество всех элементов.
- * @param {number} value Значение полупиксельного сдвига.
- * @return {number} Трансформированное значение полупиксельного сдвига.
+ * Returns half-pixel shift direction. In order to make the display of elements sharp
+ * we use half-pixel shift, when element size/position doesn't calculate into integer number of pixels. 
+ * For example, line of 1px width can occupy two pixels (half of one, and half of another) - it will not look sharp.
+ * But we can move this line 0.5px to left or rigth, it will occupy 1 whole pixel and look sharp.
+ * In case of moving ticks: if all ticks are moved in one direction - the last tick will be visible off,
+ * we avoid this by moving half of the pixels to left, and another half - to right.
+ * This function gives us a sign that defines the shift direction.
+ * @param {number} index Element index.
+ * @param {number} count Number of elements.
+ * @param {number} value Shift value.
+ * @return {number} Transformed shift value.
  * @private
  */
 anychart.elements.Axis.prototype.getPixelShift_ = function(index, count, value) {
@@ -1245,7 +1246,7 @@ anychart.elements.Axis.prototype.getPixelShift_ = function(index, count, value) 
  * Calculate label bounds.
  * @param {number} index Label index.
  * @param {boolean} isMajor Major labels or minor.
- * @param {anychart.math.Rect=} opt_parentBounds Родительские баунды.
+ * @param {anychart.math.Rect=} opt_parentBounds Parent bounds.
  * @return {Array.<number>} Label bounds.
  * @private
  */
@@ -1325,13 +1326,13 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
 
 
 /**
- * Проверка на геометрическое пересечение двух лейблов - first и second. Label - прямоугольник, представленный массивом
- * координат его вершин. Достаточным условием не пересечения двух лейблов считаем, что найдется такая сторона у хотя бы
- * одного лейбла, относительно которой все вершины другого лейбла лежат по одну сторону от нее или лежат на ней.
- * @param {Array.<number>=} opt_first Первый лейбл.
- * @param {Array.<number>=} opt_second Второй лейбл.
- * @return {boolean} Если условие не пересечения не выполнены, то возвращается true, если выполнены (лейблы не
- * пересекаются), то false.
+ * Cheking labels intersection. Label is a rectangle described by an array of its vertices.
+ * We consider that two labels do not intersect, if we find a side of any of two labels
+ * relative to which all vertices of another label lie towards the same direction or lie on this side.
+ * @param {Array.<number>=} opt_first First label.
+ * @param {Array.<number>=} opt_second Second label.
+ * @return {boolean} Returns true if labels intersect, false 
+ * if labels do not intersect.
  * @private
  */
 anychart.elements.Axis.prototype.checkLabelsIntersection_ = function(opt_first, opt_second) {
@@ -1352,16 +1353,16 @@ anychart.elements.Axis.prototype.checkLabelsIntersection_ = function(opt_first, 
 
 
 /**
- * Проверка точек, заданных массивом pointsArr, на то, как они располагаются на плоскости относительно
- * прямой, которая проходит через две точки p1 и p2.
- * @param {number} p1x x координата первой точки отрезка прямой.
- * @param {number} p1y y координата первой точки отрезка прямой.
- * @param {number} p2x x координата второй точки отрезка прямой.
- * @param {number} p2y y координата второй точки отрезка прямой.
- * @param {Array.<number>} pointsArr Массив точек для проверки их расположения относительно
- * прямой p1p2.
- * @return {boolean} Если все точки массива pointsArr лежат на прямой p1p2 или находятся по одну сторону от нее,
- * то возвратится true, в противном случае false.
+ * Check an array of points position in relation to 
+ * a line defined by two points.
+ * @param {number} p1x X coordinate of the first point.
+ * @param {number} p1y Y coordinate of the first point.
+ * @param {number} p2x X coordinate of the second point.
+ * @param {number} p2y Y coordinate of the second point.
+ * @param {Array.<number>} pointsArr Array of points to check against the line
+ * defined by two points.
+ * @return {boolean} If all points from an array lie on the line or lie towards the same direction,
+ * returns true, returns false otherwise.
  * @private
  */
 anychart.elements.Axis.prototype.checkPoints_ = function(p1x, p1y, p2x, p2y, pointsArr) {
@@ -1374,15 +1375,15 @@ anychart.elements.Axis.prototype.checkPoints_ = function(p1x, p1y, p2x, p2y, poi
 
 
 /**
- * Определяем, как точка p3 располагает относительно прямой p1p2 на плоскости.
- * @param {number} p1x x координата первой точки отрезка прямой.
- * @param {number} p1y y координата первой точки отрезка прямой.
- * @param {number} p2x x координата второй точки отрезка прямой.
- * @param {number} p2y y координата второй точки отрезка прямой.
- * @param {number} p3x Координата x точки для которой нужно узнать лежит ли она на прямой, проведенной через первые две точки.
- * @param {number} p3y Координата y точки для которой нужно узнать лежит ли она на прямой, проведенной через первые две точки.
- * @return {number} Возвращает число, если оно равно 0, значит p3 лежит на прямой p1p, в противном случпае вернется
- * число отличное от нуля, знак определяет с какой стороны от прямой p1p2 лежит точка p3.
+ * Check a point position against a line defined by two points.
+ * @param {number} p1x X coordinate of the first point.
+ * @param {number} p1y Y coordinate of the first point.
+ * @param {number} p2x X coordinate of the second point.
+ * @param {number} p2y Y coordinate of the second point.
+ * @param {number} p3x X coordinate of a point to check.
+ * @param {number} p3y X coordinate of a point to check.
+ * @return {number} Returns 0 if a point lies on a line, in other cases a sign of a number
+ * defines a direction.
  * @private
  */
 anychart.elements.Axis.prototype.isPointOnLine_ = function(p1x, p1y, p2x, p2y, p3x, p3y) {
@@ -1392,16 +1393,16 @@ anychart.elements.Axis.prototype.isPointOnLine_ = function(p1x, p1y, p2x, p2y, p
 
 
 /**
- * Getter флаг рисования для первого лейбла оси.
+ * Getter for the first label drawing flag.
  * @return {boolean} Drawing flag.
  *//**
- * Setter флаг рисования для первого лейбла оси.
+ * Setter for the first label drawing flag.
  * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.elements.Axis} Drawing flag or itself for chaining.
+ * @return {boolean|anychart.elements.Axis} Drawing flag or itself for method chaining.
  */
 anychart.elements.Axis.prototype.drawFirstLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1418,16 +1419,16 @@ anychart.elements.Axis.prototype.drawFirstLabel = function(opt_value) {
 
 
 /**
- * Getter флаг рисования для последнего лейбла оси.
+ * Getter for the last label drawing flag.
  * @return {boolean} Drawing flag.
  *//**
- * Setter флаг рисования для последнего лейбла оси.
+ * Setter for the last label drawing flag.
  * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.elements.Axis} Drawing flag or itself for chaining.
+ * @return {boolean|anychart.elements.Axis} Drawing flag or itself for method chaining.
  */
 anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1449,11 +1450,11 @@ anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
  *//**
  * Setter for overlap mode for labels.
  * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value [true] Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value Value to set.
- * @return {anychart.elements.Axis.OverlapMode|string|anychart.elements.Axis} Drawing flag or itself for chaining.
+ * @return {anychart.elements.Axis.OverlapMode|string|anychart.elements.Axis} Drawing flag or itself for method chaining.
  */
 anychart.elements.Axis.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1471,7 +1472,7 @@ anychart.elements.Axis.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * Определяет имеет ли ось горизонтальную ориентацию.
+ * Whether an axis is horizontal.
  * @return {boolean} If the axis is horizontal.
  */
 anychart.elements.Axis.prototype.isHorizontal = function() {
@@ -1482,7 +1483,7 @@ anychart.elements.Axis.prototype.isHorizontal = function() {
 
 /**
  * Axis line drawer for top orientation.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
@@ -1496,7 +1497,7 @@ anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
 
 /**
  * Axis line drawer for right orientation.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display..
  * @private
  */
 anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
@@ -1510,21 +1511,21 @@ anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
 
 /**
  * Axis line drawer for bottom orientation.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
   var bounds = this.getPixelBounds_().toRect();
   var y = bounds.top + pixelShift;
   this.line_
-      .moveTo(bounds.left + pixelShift, y)
-      .lineTo(bounds.left - pixelShift + bounds.width, y);
+      .moveTo(bounds.left + pixelShift, y - 1)
+      .lineTo(bounds.left - pixelShift + bounds.width, y - 1);
 };
 
 
 /**
  * Axis line drawer for left orientation.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawLeftLine_ = function(pixelShift) {
@@ -1575,11 +1576,11 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
-    //todo добавить как станет возможным:
-    //sum -- сумма данных точек относящихся к этой оси (в зависимости от ориентации)
-    //average -- отношение суммы к количеству точек
-    //median -- медиана оси
-    //mode -- мода оси
+    //TODO as soon as it becomes possible:
+    //sum -- the sum data values from series bound to this axis (depends on orientation)
+    //average -- the sum divided by the number of points
+    //median -- axis median
+    //mode -- axis mode
   };
 };
 
@@ -1589,7 +1590,7 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, pixelShift) {
@@ -1621,7 +1622,7 @@ anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, 
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index, pixelShift) {
@@ -1652,7 +1653,7 @@ anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, index, pixelShift) {
@@ -1683,7 +1684,7 @@ anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, inde
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index, pixelShift) {
@@ -1714,7 +1715,7 @@ anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index,
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, index, pixelShift) {
@@ -1745,7 +1746,7 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, index, pixelShift) {
@@ -1775,7 +1776,7 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio, index, pixelShift) {
@@ -1805,7 +1806,7 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
  * @param {number|string} value Scale ratio.
  * @param {number} ratio Scale ratio.
  * @param {number} index Scale label index.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for sharp display.
  * @private
  */
 anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, index, pixelShift) {
