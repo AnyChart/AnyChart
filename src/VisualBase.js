@@ -98,6 +98,7 @@ anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.VisualBase.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.container_ != opt_value) {
+      var containerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
       if (goog.isString(opt_value) || goog.dom.isElement(opt_value)) {
         // Should we use registerDisposable in this case?
         // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
@@ -106,7 +107,12 @@ anychart.VisualBase.prototype.container = function(opt_value) {
       } else {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
       }
-      this.invalidate(anychart.ConsistencyState.CONTAINER, anychart.Signal.NEEDS_REDRAW);
+      var state = anychart.ConsistencyState.CONTAINER;
+      var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
+      if (!goog.math.Rect.equals(containerBounds, newContainerBounds))
+        state |= anychart.ConsistencyState.BOUNDS;
+
+      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

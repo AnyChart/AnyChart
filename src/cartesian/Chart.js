@@ -1349,6 +1349,7 @@ anychart.cartesian.Chart.prototype.registerSeries_ = function(series) {
   series.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
   series.restoreDefaults();
   series.listenSignals(this.seriesInvalidated_, this);
+
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
       anychart.Signal.NEEDS_REDRAW);
 };
@@ -2224,10 +2225,6 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     //bounds of data area
     this.dataBounds_ = boundsWithoutAxes.clone();
 
-    for (i = this.series_.length; i--;) {
-      this.series_[i].pixelBounds(this.dataBounds_);
-    }
-
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.AXES);
     this.invalidate(anychart.ConsistencyState.GRIDS);
@@ -2286,8 +2283,11 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
-    for (i = 0, count = this.series_.length; i < count; i++)
-      this.series_[i].container(this.rootElement);
+    for (i = 0, count = this.series_.length; i < count; i++) {
+      var series = this.series_[i];
+      series.container(this.rootElement);
+      series.pixelBounds(this.dataBounds_);
+    }
 
     this.distributeSeries_();
     this.calcBubbleSizes_();
