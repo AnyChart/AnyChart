@@ -999,6 +999,9 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
 
   var padding = this.padding();
 
+  this.textElement_.width(null);
+  this.textElement_.height(null);
+
   if (autoWidth) {
     width += this.textElement_.getBounds().width;
     this.textWidth_ = width;
