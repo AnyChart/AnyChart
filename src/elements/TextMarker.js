@@ -120,6 +120,27 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.BOUNDS;
 
 
+/**
+ * Normalizes user input align to its enumeration values. Also accepts 'middle' and null. Defaults to opt_default or
+ * 'center'.
+ *
+ * @param {string} align Align to normalize.
+ * @param {anychart.elements.TextMarker.Align=} opt_default Default align.
+ * @return {anychart.elements.TextMarker.Align} Normalized align.
+ */
+anychart.elements.TextMarker.normalizeAlign = function(align, opt_default) {
+  if (goog.isString(align)) {
+    align = align.toLowerCase();
+    if (align == 'middle') return anychart.elements.TextMarker.Align.CENTER;
+    for (var i in anychart.elements.TextMarker.Align) {
+      if (align == anychart.elements.TextMarker.Align[i])
+        return anychart.elements.TextMarker.Align[i];
+    }
+  }
+  return opt_default || anychart.elements.TextMarker.Align.CENTER;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
@@ -186,7 +207,7 @@ anychart.elements.TextMarker.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -207,8 +228,9 @@ anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
  */
 anychart.elements.TextMarker.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.align_ != opt_value) {
-      this.align_ = opt_value;
+    var align = anychart.elements.TextMarker.normalizeAlign(opt_value);
+    if (this.align_ != align) {
+      this.align_ = align;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -226,8 +248,9 @@ anychart.elements.TextMarker.prototype.align = function(opt_value) {
  */
 anychart.elements.TextMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }

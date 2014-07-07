@@ -85,8 +85,9 @@ anychart.elements.LineMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.elements.LineMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -163,7 +164,7 @@ anychart.elements.LineMarker.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.LineMarker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }

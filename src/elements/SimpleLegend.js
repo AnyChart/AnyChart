@@ -826,6 +826,7 @@ anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
 };
 
 
+//todo Need rename. Orientation or Position (blackart)
 /**
  * Getter for legend position setting.
  * @return {anychart.utils.Orientation} Legend position.

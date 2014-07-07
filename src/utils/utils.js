@@ -69,6 +69,46 @@ anychart.utils.normalizeAlign = function(align, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Direction.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Direction enumeration.
+ * @enum {string}
+ */
+anychart.utils.Direction = {
+  /**
+   * Vertical direction.
+   */
+  VERTICAL: 'vertical',
+  /**
+   * Horizontal direction.
+   */
+  HORIZONTAL: 'horizontal'
+};
+
+
+/**
+ * Normalizes user input direction to its enumeration values. Also accepts null. Defaults to opt_default or 'vertical'.
+ *
+ * @param {string} direction Direction to normalize.
+ * @param {anychart.utils.Direction=} opt_default Default direction.
+ * @return {anychart.utils.Direction} Normalized direction.
+ */
+anychart.utils.normalizeDirection = function(direction, opt_default) {
+  if (goog.isString(direction)) {
+    direction = direction.toLowerCase();
+    for (var i in anychart.utils.Direction) {
+      if (direction == anychart.utils.Direction[i])
+        return anychart.utils.Direction[i];
+    }
+  }
+  return opt_default || anychart.utils.Direction.VERTICAL;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Orientation.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,22 +133,6 @@ anychart.utils.Orientation = {
    * Bottom orientation.
    */
   BOTTOM: 'bottom'
-};
-
-
-/**
- * Direction enumeration.
- * @enum {string}
- */
-anychart.utils.Direction = {
-  /**
-   * Vertical direction.
-   */
-  VERTICAL: 'vertical',
-  /**
-   * Horizontal direction.
-   */
-  HORIZONTAL: 'horizontal'
 };
 
 

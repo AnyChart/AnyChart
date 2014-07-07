@@ -243,7 +243,7 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
  */
 anychart.elements.Ticks.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.position_ = opt_value.toLowerCase();
+    this.position_ = anychart.utils.normalizePosition(opt_value);
     this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else
@@ -263,6 +263,7 @@ anychart.elements.Ticks.prototype.orientation = function(opt_value) {
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
       this.drawer_ = null;
+      //todo а при смене ориентации ничего диспачится не должно? (blackart)
     }
     return this;
   } else {
