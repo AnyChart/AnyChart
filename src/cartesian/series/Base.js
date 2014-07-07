@@ -1366,7 +1366,7 @@ anychart.cartesian.series.Base.prototype.labelsInvalidated_ = function(event) {
  * Setter for series color.<br/>
  * Series color. Used as a base in fills, strokes and a legend.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * <b>Note:</b> <u>color</u> methods sets <u>fill</u> and <b>stroke</b> settings, which means it is not wise to pass
  * image fill here - stroke doesn't accept image fill.
  * @shortDescription Setter for series color by one value.
@@ -1540,7 +1540,7 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * Setter for series fill by one value.<br/>
  * Series color. Used as a base in fills, strokes and a legend.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
  * image fill here - stroke doesn't support it.
  * @shortDescription Setter for series color by one value.
@@ -1596,7 +1596,7 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
  * Setter for series fill by one value.<br/>
  * Series color. Used as a base in fills, strokes and a legend.<br/>
  * Read more about setting color at:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
  * image fill here - stroke doesn't support it.
  * @shortDescription Setter for series color by one value.
@@ -1671,7 +1671,7 @@ anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSetting
  *//**
  * Setter for stroke settings.
  * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
@@ -1720,7 +1720,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  *//**
  * Setter for stroke settings.
  * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.

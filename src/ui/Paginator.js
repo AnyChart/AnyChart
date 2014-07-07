@@ -342,7 +342,7 @@ anychart.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
  * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
  *//**
  * @ignoreDoc
- * TODO(AntonKagakin): сделать флаг customDrawers, чтобы при смене layout  кастомном дровере он не заменил его.
+ * TODO(AntonKagakin): create customDrawers flag, to avoid custom layout drawing bug.
  * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Layout value.
  * @return {(anychart.ui.Paginator|anychart.ui.Paginator.Layout)} Current layout or self for chaining.
  */

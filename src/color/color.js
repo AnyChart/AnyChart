@@ -407,7 +407,7 @@ anychart.color.serialize = function(color) {
  * @private
  */
 anychart.color.normalizeGradientMode_ = function(mode) {
-  if (goog.isDefAndNotNull(mode)) { // задан mode
+  if (goog.isDefAndNotNull(mode)) {
     if (mode instanceof acgraph.math.Rect)
       return mode;
     else if (goog.isObject(mode) && !isNaN(mode['left']) && !isNaN(mode['top']) && !isNaN(mode['width']) && !isNaN(mode['height']))

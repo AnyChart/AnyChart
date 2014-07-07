@@ -1709,7 +1709,7 @@ anychart.elements.Legend.prototype.draw = function() {
   this.layer_.clip(/** @type {acgraph.math.Rect} */ (contentBounds));
 
   var pageToDraw = this.paginator().enabled() ? this.paginator().currentPage() - 1 : 0;
-  //TODO(AntonKagakin): вынести contentBounds в this, чтобы сделать метод рисования контента самостоятельным и вызываемым откуда угодно
+  //TODO(AntonKagakin): extract content bounds calculation to prototype method
   this.drawLegendContent_(pageToDraw, contentBounds);
 
   if (manualSuspend) stage.resume();

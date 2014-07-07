@@ -8,21 +8,28 @@ function load() {
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
- // Слева
- var rect = stage.rect(5, 5, 200, 90).fill('none').stroke('1 grey')
- label1 = new anychart.elements.Label()
-     .text('Not adjusted text')
-     .parentBounds(rect.getBounds())
-     .container(stage);
- label1.draw();
- // Справа
- rect = stage.rect(210, 5, 200, 90).fill('none').stroke('1 grey')
- label2 = new anychart.elements.Label()
-     .text('Adjusted text')
-     .adjustFontSize(true)
-     .width('100%')
-     .height('100%')
-     .parentBounds(rect.getBounds())
-     .container(stage).draw();
+    stage.path()
+        .moveTo(stage.width() / 2, 0)
+        .lineTo(stage.width() / 2, stage.height());
+    var bg = new anychart.elements.Label().background();
+    var lbl = new anychart.elements.Label()
+        .parentBounds(new anychart.math.Rect(0, 0, stage.width()/2, stage.height()))
+        .width(stage.width() / 3)
+        .height(stage.height() - 20)
+        .background(bg.fill('yellow'))
+        .text('fill: yellow\nopacity: 1')
+        .padding(10);
+    lbl.background().enabled(true);
+    lbl.container(stage).draw();
+
+    lbl = new anychart.elements.Label()
+        .parentBounds(new anychart.math.Rect(stage.width()/2, 0, stage.width()/2, stage.height()))
+        .width(stage.width() / 3)
+        .height(stage.height() - 20)
+        .background(bg.fill('yellow 0.2'))
+        .text('fill: yellow\nopacity: 0.2')
+        .padding(10);
+    lbl.background().enabled(true);
+    lbl.container(stage).draw();
 
 }

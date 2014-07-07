@@ -343,14 +343,12 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the current chart background.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * chart.background().stroke('2 green');
  * @return {anychart.elements.Background} The current chart background.
  *//**
  * Setter for the chart background.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * var background = new anychart.elements.Background()
  *    .stroke('2 rgb(36,102,177)')
  *    .corners(10)
@@ -414,17 +412,14 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart title.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * chart.title().fontSize(41);
  * @return {anychart.elements.Title} The current chart title.
  *//**
  * Setter for the chart title.
- * @example <c>Simple string</c>
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t><c>Simple string</c>
  * chart.title('Conqueror of Naxxramas');
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t><c>Title instance</c>
  * chart.title( new anychart.elements.Title()
  *      .fontColor('red')
  *      .text('Red title')

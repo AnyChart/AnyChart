@@ -588,10 +588,10 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
 
 
 /**
- * Apply offset to the position depending on an anchor оффсета к переданной позиции в зависимости от якоря.
+ * Apply offset to the position depending on an anchor.
  * @param {acgraph.math.Coordinate} position Position to be modified.
  * @param {anychart.utils.NinePositions} anchor Anchor.
- * @param {number} offsetX Х offset.
+ * @param {number} offsetX X offset.
  * @param {number} offsetY Y offset.
  * @return {acgraph.math.Coordinate} Modified position.
  */

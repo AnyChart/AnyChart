@@ -706,9 +706,9 @@ anychart.elements.Label.prototype.adjustEnabled_ = function() {
  * @return {number} Current value.
  *//**
  * Sets font size setting for adjust text from.<br/>
- * <b>Note:</b> Работает только с включеным adjusting. См {@link anychart.elements.Label#adjustFontSize}.
+ * <b>Note:</b> works only when adjusting is enabled. Look {@link anychart.elements.Label#adjustFontSize}.
  * @param {(number|string)=} opt_value Value to set.
- * @return {anychart.elements.Label} Экземпляр класса {@link anychart.elements.Label} для цепочного вызова.
+ * @return {anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value
@@ -733,7 +733,7 @@ anychart.elements.Label.prototype.minFontSize = function(opt_value) {
  * @return {number} Current value.
  *//**
  * Sets font size setting for adjust text to.<br/>
- * <b>Note:</b> works only when adjusting is enabled. См {@link anychart.elements.Label#adjustFontSize}.
+ * <b>Note:</b> works only when adjusting is enabled. Look {@link anychart.elements.Label#adjustFontSize}.
  * @param {(number|string)=} opt_value Value to set.
  * @return {anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
@@ -806,7 +806,7 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
  * @return {(Array.<boolean, boolean>|anychart.elements.Label)} adjustFontSite setting or self for method chaining.
  */
 anychart.elements.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustByWidth, opt_adjustByHeight) {
-  // if values are set as an array ( [true, true] [true, false] [false, true] [false, false]  )а не набором 2х агументов просто развернем их
+  // if values are set as an array ( [true, true] [true, false] [false, true] [false, false] ) rather than a set of two arguments, simply expand their
   if (goog.isArray(opt_adjustOrAdjustByWidth)) {
     return this.adjustFontSize.apply(this, opt_adjustOrAdjustByWidth);
   }

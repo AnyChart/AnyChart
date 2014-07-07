@@ -1125,7 +1125,6 @@ goog.exportSymbol('anychart.financialChart', anychart.financialChart);
 //  anychart.Chart
 //
 //----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.Chart', anychart.Chart);//in docs/final
 anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/final
 anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/final
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final

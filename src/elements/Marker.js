@@ -703,7 +703,7 @@ anychart.elements.Marker.getMarkerDrawer = function(type) {
 // * @example <t>simple-h100</t>
 // * var marker = new anychart.elements.Marker()
 // *     .position([100, 50])
-// *     // выставляем оффсеты по 10px.
+// *     // set offset to 10px.
 // *     .offsetX(10)
 // *     .offsetY(10)
 // *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);

@@ -1861,7 +1861,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
   var numBarClusters;
   var seenScalesWithColumns;
   var seenScalesWithBars;
-  // spreading column and bar series to the total width of Х categories
+  // spreading column and bar series to the total width of X categories
   for (xId in this.seriesOfXScaleMap_) {
     // no ned to do this if the scale is not ordinal
     if (!this.xScales_[xId].getCategorisation())

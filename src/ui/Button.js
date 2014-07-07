@@ -137,7 +137,7 @@ anychart.ui.Button.prototype.backgroundPath = null;
  * If state is  UNDEFINED (all states are off) - NORMAL is set.
  * If works as getter returns state status (on or off).
  * TODO(AntonKagakin): button is single-state now - this means when set to false it always goes to
- * в NORMAL, and when set to true - overwrites previous value. Possible at some point it should become non single-state.
+ * in NORMAL, and when set to true - overwrites previous value. Possible at some point it should become non single-state.
  *
  * @protected
  * @param {anychart.ui.Button.State} state State to work with.

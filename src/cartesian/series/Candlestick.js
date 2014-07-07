@@ -452,7 +452,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_
     this.hoverFallingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
         anychart.color.normalizeFill.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverFallingFill_;

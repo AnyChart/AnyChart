@@ -64,7 +64,7 @@ anychart.utils.MarkerPalette.prototype.markerAt = function(index, opt_marker) {
 
 /**
  * Getter/setter for markers list of palette.
- * @example
+ * @example <t>simple</t>
  * var palette = new anychart.utils.MarkerPalette();
  * palette.markers(); // ['star4', 'star5', 'star6', ...]
  * palette.markers(['cross', 'diagonalcross']).markers(); // ['cross', 'diagonalcross']

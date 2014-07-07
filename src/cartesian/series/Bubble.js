@@ -457,7 +457,7 @@ anychart.cartesian.series.Bubble.prototype.categoriseData = function(categories)
  *//**
  * Setter for stroke settings.
  * Stroke settings are described are:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.
@@ -498,7 +498,7 @@ anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeO
  *//**
  * Setter for stroke settings.
  * Stroke settings are described at:
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.

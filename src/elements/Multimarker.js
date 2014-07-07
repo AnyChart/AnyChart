@@ -15,7 +15,7 @@ goog.require('goog.events.BrowserEvent');
  * <ul>
  *   <li>{@link anychart.elements.Multimarker#anchor}</li>
  *   <li>{@link anychart.elements.Multimarker#position}</li>
- *   <li>{@link anychart.elements.Multimarker#offsetX} и {@link anychart.elements.Multimarker#offsetY}</li>
+ *   <li>{@link anychart.elements.Multimarker#offsetX} and {@link anychart.elements.Multimarker#offsetY}</li>
  *   <li>{@link anychart.elements.Multimarker#parentBounds}</li>
  * </ul>
  * Also you can access any marker from the set and change it:
@@ -331,9 +331,7 @@ anychart.elements.Multimarker.prototype.positionFormatter = function(opt_value) 
  * @return {string} Current markers's position settings.
  *//**
  * Setter for markers position settings by index.<br/>
- * See example at {@link anychart.elements.Multimarker#position}.<br/>
- * <b>Note:</b> Read how positioning works at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-position}
+ * See example at {@link anychart.elements.Multimarker#position}.
  * @param {number} index Index of marker.
  * @param {string=} opt_value Value to set.
  * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for methd chaining.
@@ -364,9 +362,7 @@ anychart.elements.Multimarker.prototype.positionAt = function(index, opt_value) 
  * Getter for current position settings of all markers.
  * @return {string} Markres position settings.
  *//**
- * Setter for position settings of all markers.<br/>
- * <b>Note:</b> Read more at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-position}.
+ * Setter for position settings of all markers.
  * @example <t>simple</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -434,9 +430,7 @@ anychart.elements.Multimarker.prototype.position = function(opt_value) {
  * @return {(anychart.utils.NinePositions|string)} Current markers's anchor settings.
  *//**
  * Setter for markers's anchor settings by index.<br/>
- * See example at {@link anychart.elements.Multimarker#anchor}.<br/>
- * <b>Note:</b> Read more about position at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-anchor}
+ * See example at {@link anychart.elements.Multimarker#anchor}.
  * @param {number} index Index of marker.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Value to set.
  * @return {anychart.elements.Multimarker} {@link anychart.elements.Multimarker} instance for method chaining.
@@ -467,9 +461,7 @@ anychart.elements.Multimarker.prototype.anchorAt = function(index, opt_value) {
  * Getter for anchor settings of all markers.
  * @return {anychart.utils.NinePositions} Current marker anchor settings.
  *//**
- * Setter for anchor settings of all markers.<br/>
- * <b>Note:</b> Read more about position at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-anchor}
+ * Setter for anchor settings of all markers.
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -589,7 +581,7 @@ anychart.elements.Multimarker.prototype.typeAt = function(index, opt_value) {
  *     .container(stage);
  * // sets custom positions
  * MMarker
- *     .typeAt(0, anychart.elements.Marker.Type.CIRCLE)
+ *     .typeAt(0, 'circle')
  *     .typeAt(3, function(path, x, y, size) {
  *       var point1 = {x: x + 1.7 * size, y: y + 0.6 * size};
  *       var point2 = {x: x, y: y + size / 2};
@@ -732,9 +724,7 @@ anychart.elements.Multimarker.prototype.size = function(opt_value) {
  * @param {number} index Index of marker.
  * @return {number|string} Marker offsetXAt settings.
  *//**
- * Setter for offsetX settings by index.<br/>
- * <b>Note:</b> offsetXAt is describe at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}.<br/>
+ * Setter for offsetX settings by index.
  * See example at {@link anychart.elements.Multimarker#offsetX}.
  * @param {number} index Index of marker.
  * @param {(number|string)=} opt_value Value to set.
@@ -765,9 +755,7 @@ anychart.elements.Multimarker.prototype.offsetXAt = function(index, opt_value) {
  * Getter for current offsetX settings of all markers.
  * @return {number|string} Marker offsetX settings.
  *//**
- * Setter for offsetX settings of all markers.<br/>
- * <b>Note:</b> offsetX is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}
+ * Setter for offsetX settings of all markers.
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -824,9 +812,7 @@ anychart.elements.Multimarker.prototype.offsetX = function(opt_value) {
  * @param {number} index Index of marker.
  * @return {number|string} Marker offsetYAt settings.
  *//**
- * Setter for offsetY settings by index.<br/>
- * <b>Note:</b> offsetYAt is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}.<br/>
+ * Setter for offsetY settings by index.
  * See example at {@link anychart.elements.Multimarker#offsetY}.
  * @param {number} index Index of marker.
  * @param {(number|string)=} opt_value Value to set.
@@ -857,9 +843,7 @@ anychart.elements.Multimarker.prototype.offsetYAt = function(index, opt_value) {
  * Getter for current offsetY settings of all markers.
  * @return {number|string} Markres offsetY settings.
  *//**
- * Setter for offsetY settings of all markers.<br/>
- * <b>Note:</b> offsetY is desribed at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-positioning#m-offsets}
+ * Setter for offsetY settings of all markers.
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -918,7 +902,7 @@ anychart.elements.Multimarker.prototype.offsetY = function(opt_value) {
  *//**
  * Setter for fill settings by index.<br/>
  * <b>Note:</b> fillAt is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}.<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}.<br/>
  * See example at {@link anychart.elements.Multimarker#fill}.
  * @param {number} index Index of marker.
  * @param {(acgraph.vector.Fill|string)=} opt_value Value to set.
@@ -958,7 +942,7 @@ anychart.elements.Multimarker.prototype.fillAt = function(index, opt_fillOrColor
  *//**
  * Setter for fill settings of all markers.<br/>
  * <b>Note:</b> fill is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -1022,7 +1006,7 @@ anychart.elements.Multimarker.prototype.fill = function(opt_fillOrColorOrKeys, o
  *//**
  * Setter for stroke settings by index.<br/>
  * <b>Note:</b> strokeAt is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}.<br/>
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}.<br/>
  * See example at {@link anychart.elements.Multimarker#fill}.
  * @param {number} index Index of marker.
  * @param {(acgraph.vector.Stroke|string)=} opt_value Value to set.
@@ -1063,7 +1047,7 @@ anychart.elements.Multimarker.prototype.strokeAt = function(index, opt_strokeOrF
  *//**
  * Setter for stroke settings of all markers.<br/>
  * <b>Note:</b> stroke is described at
- * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
  * @example <t>simple-h100</t>
  * // create objects for multimarkers
  * var bars = [];
@@ -1476,7 +1460,7 @@ anychart.elements.Multimarker.prototype.measure = function(positionProvider, opt
  *    .size('24')
  *    .container(stage);
  * for (var i=0; i<9; i++) {
- *  // нарисуем 6 звезд, а не 9
+ *  // draw only 6 stars from 9
  *  if (i==6){
  *     MMarker.end();
  *     // first starts will be redrawn with new fill

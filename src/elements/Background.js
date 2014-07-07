@@ -289,7 +289,7 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * new anychart.elements.Background()
  *    .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
  *    .stroke('#000 2').fill({
- *        src: 'http://cdn.anychart.com/resources/rainbow.png',
+ *        src: 'http://static.anychart.com/rainbow.png',
  *        mode: acgraph.vector.ImageFillMode.TILE
  *     }).container(stage).draw();
  * @param {acgraph.vector.Fill} value ['#000 0.5'] Fill as an object or a string.
@@ -317,7 +317,7 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  *  <li>ObjectBoundingBox no angle preservation</li>
  *  <li>UserSpaceOnUse</li>
  * </ul>
- * <h4>Режимы:</h4>
+ * <h4>Modes:</h4>
  * <p><b>ObjectBoundingBox preserving an angle</b><br/>
  * If boolean is passed it says how gradient behaves, specificaly
  * how gradient line angle behaves. If true - it is ObjectBoundingBox
