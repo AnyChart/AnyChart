@@ -238,7 +238,7 @@ anychart.elements.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * @return {anychart.LabelsFactory} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {?=} opt_value Value to set.
+ * @param {(null|boolean)=} opt_value Value to set.
  * @return {anychart.elements.LabelsFactory|boolean|null} .
  */
 anychart.elements.LabelsFactory.prototype.enabled = function(opt_value) {

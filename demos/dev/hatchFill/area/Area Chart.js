@@ -74,7 +74,7 @@ anychart.onDocumentReady(function() {
     ['P20', '184']
   ]);*/
 
- /* series = chart.bar([
+/* series = chart.bar([
     { low: 182, high: 1122},
     { low: 284, high: 1152},
     { low: 255, high: 1139},
@@ -98,9 +98,9 @@ anychart.onDocumentReady(function() {
         4;
   });*/
 
-//  series.setAutoHatchFill(acgraph.vector.HatchFill.HatchFillType.CONFETTI);
-//  series.hatchFill(acgraph.vector.HatchFill.HatchFillType.CONFETTI);
-//  series.hoverHatchFill(acgraph.vector.HatchFill.HatchFillType.PERCENT_50);
+  series.setAutoHatchFill(acgraph.vector.HatchFill.HatchFillType.CONFETTI);
+  series.hatchFill(acgraph.vector.HatchFill.HatchFillType.CONFETTI);
+  series.hoverHatchFill(acgraph.vector.HatchFill.HatchFillType.PERCENT_50);
 //  series.risingHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
 //  series.fallingHatchFill(acgraph.vector.HatchFill.HatchFillType.DASHED_VERTICAL);
 //  series.hoverRisingHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);

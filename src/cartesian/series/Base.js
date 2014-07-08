@@ -1247,7 +1247,25 @@ anychart.cartesian.series.Base.prototype.scaleInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Series data tooltip.
+ * Getter for current series data tooltip.
+ * @return {anychart.elements.Tooltip} Tooltip instance.
+ *//**
+ * Setter for series data tooltip.
+ * @example <t>listingOnly</t>
+ * var tooltipSettings = new anychart.elements.Tooltip();
+ * tooltipSettings
+ *    .background()
+ *      .stroke('#bebebe').fill('#ffffff');
+ * tooltipSettings
+ *    .content()
+ *      .useHtml(true)
+ *      .padding(5);
+ * series.tooltip(labelSettings);
+ * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
+ * <b>Note:</b> Для того, чтобы отключить tooltip необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
  * @return {!(anychart.cartesian.series.Base|anychart.elements.Tooltip)} Tooltip instance or itself for chaining call.
  */
@@ -1289,7 +1307,23 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets or sets series data labels.
+ * Getter for curent series data labels.
+ * @return {anychart.elements.LabelsFactory} Labels instance.
+ *//**
+ * Setter for series data labels.
+ * @example <t>listingOnly</t>
+ * var labelsSettings = new anychart.elements.LabelsFactory();
+ * labelSettings.enabled(true);
+ * labelSettings.position('center');
+ * labelSettings.anchor('center');
+ * labelSettings.fontColor('white');
+ * labelSettings.fontWeight('bold');
+ * series.labels(labelSettings);
+ * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
+ * <b>Note:</b> Для того, чтобы отключить label необходимо передать <b>null</b> или <b>'none'</b>.
+ * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
  * @return {!(anychart.elements.LabelsFactory|anychart.cartesian.series.Base)} Labels instance or itself for chaining call.
  */
@@ -1432,7 +1466,18 @@ anychart.cartesian.series.Base.prototype.setAutoHatchFill = function(value) {
 
 
 /**
- * Set/get hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1457,13 +1502,24 @@ anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrT
 
 
 /**
- * Set/get hover hatch fill.
+ * Getter for current hover hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hover hatch fill settings.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hover hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Base.prototype.hoverHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -1525,7 +1581,7 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
 
 
 /**
- * Getter for the current series color.
+ * Getter for the current series fill color.
  * @return {!acgraph.vector.Fill} Current color.
  *//**
  * Setter for series fill by function.
@@ -1538,7 +1594,6 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * @return {!anychart.cartesian.series.Base}  {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * Setter for series fill by one value.<br/>
- * Series color. Used as a base in fills, strokes and a legend.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
@@ -1553,7 +1608,7 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * @param {number=} opt_opacity Opacity (value from 0 to 1).
  * @param {number=} opt_fx The focus-point x-coordinate.
  * @param {number=} opt_fy The focus-point y-coordinate.
- * @return {!anychart.cartesian.series.Base}  {@link anychart.cartesian.series.Base} instance for method chaining.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
@@ -1594,7 +1649,6 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * Setter for series fill by one value.<br/>
- * Series color. Used as a base in fills, strokes and a legend.<br/>
  * Read more about setting color at:
  * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass

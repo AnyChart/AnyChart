@@ -7,6 +7,10 @@ goog.require('anychart.utils');
 
 
 /**
+ * Define Bubble series type.<br/>
+ * <b>Note:</b> Better for use method {@link anychart.cartesian.Chart#bubble}.
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bubble([[1, 1, 3], [2, 1, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -166,6 +170,17 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function() {
  * @return {(string|number)} Minimum size of the bubble.
  *//**
  * Setter for minimum bubble size.
+ * @example
+ * new anychart.cartesian.series.Bubble([
+ *      [1, 2, 3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
+ *    .minimumSize(20)
+ *    .maximumSize(80)
+ *    .markers(null)
+ *    .container(stage)
+ *    .draw();
  * @param {(string|number)=} opt_value ['10%'] Minimum size of the bubble.
  * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
@@ -190,7 +205,8 @@ anychart.cartesian.series.Bubble.prototype.minimumSize = function(opt_value) {
  * Getter for current maximum bubble size.
  * @return {(string|number)} Maximum size of the bubble.
  *//**
- * Setter for maximum bubble size.
+ * Setter for maximum bubble size.<br/>
+ * See example at {@link anychart.cartesian.series.Bubble#minimumSize}.
  * @param {(string|number)=} opt_value ['95%'] Maximum size of the bubble.
  * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
@@ -215,7 +231,20 @@ anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
  * Getter for current negative value option.
  * @return {boolean} Display negaitve setting .
  *//**
- * Setter for negative value option.
+ * Setter for negative value option.<br/>
+ * <b>Note:</b> Отрицательные значения обрабатываются по модулю, но выделяются заливкой другого цвета.
+ * См {@link anychart.cartesian.series.Bubble#negativeFill}, {@link anychart.cartesian.series.Bubble#negativeStroke}
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bubble([
+ *       [1, 2, 3],
+ *       [2, 2, 2],
+ *       [3, 2, 1],
+ *       [4, 2, -1],
+ *       [5, 2, -2]])
+ *     .displayNegative(true)
+ *     .markers(null)
+ *     .container(stage)
+ *     .draw();
  * @param {boolean=} opt_value Whether to display negative value.
  * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
@@ -553,7 +582,36 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeStroke = function(hov
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for the current series negative values.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series negative values fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -is a color returned by color() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Setter for series negative values fill by one value.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
+ * image fill here - stroke doesn't support it.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Color or gradient.
+ * @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Fill
+ *  mode or CenterY for radial gradient.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Opacity
+ *  or fill mode.
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -580,7 +638,36 @@ anychart.cartesian.series.Bubble.prototype.negativeFill = function(opt_fillOrCol
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for the current series negative values.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series negative values fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -is a color returned by color() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Setter for series negative values fill by one value.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
+ * image fill here - stroke doesn't support it.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Color or gradient.
+ * @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Fill
+ *  mode or CenterY for radial gradient.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Opacity
+ *  or fill mode.
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -626,7 +713,18 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeFill = function(hover
 
 
 /**
- * Set/get negative hatch fill.
+ * Getter for current hatch fill settings for negative values.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hatch fill settings for negative values.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -651,7 +749,18 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patter
 
 
 /**
- * Set/get hover negative hatch fill.
+ * Getter for current hover hatch fill settings for negative values.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hover hatch fill settings for negative values.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
