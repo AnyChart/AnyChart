@@ -614,6 +614,10 @@ anychart.cartesian.series.Base.prototype.getReferenceCoords = function() {
     }
 
     var pix;
+
+    // correct missing checking
+    if (val == null) val = NaN;
+
     switch (this.referenceValueMeanings[i]) {
       case 'x':
         pix = this.applyRatioToBounds(
