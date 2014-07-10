@@ -170,7 +170,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function() {
  * @return {(string|number)} Minimum size of the bubble.
  *//**
  * Setter for minimum bubble size.
- * @example
+ * @example <t>simple</t>
  * new anychart.cartesian.series.Bubble([
  *      [1, 2, 3],
  *      [2, 2, 2],
