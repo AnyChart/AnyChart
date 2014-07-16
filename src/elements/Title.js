@@ -1081,6 +1081,7 @@ anychart.elements.Title.prototype.deserialize = function(config) {
   this.background(config['background']);
   this.textSettings(config);
   this.align(config['align']);
+  this.orientation(config['orientation']);
   this.width(config['width']);
   this.height(config['height']);
   this.text(config['text']);
