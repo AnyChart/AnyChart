@@ -1,19 +1,10 @@
 var chart;
 function load() {
-  chart = new anychart.Chart();
+  chart = new anychart.lineChart();
+  var series = chart.line([1, 2, 3, 4, 5, 6, 7]);
   chart.container('container');
-  chart.title().background().fill('red .5');
-  chart.background().fill('red .5');
-  chart.legend().enabled(true);
+  series.tooltip().enabled(true).textFormatter(function() {
+    return this.x + ': ' + this.value + ' wtf!!' + '\n' + this.seriesName + ': hUI!';
+  });
   chart.draw();
-
-  var title = new anychart.elements.Title();
-  title.text('New Chart title');
-  title.background().fill('blue .5');
-
-  var background = new anychart.elements.Background();
-  background.fill('green .5');
-
-  chart.title(title);
-  chart.background(background);
 }
