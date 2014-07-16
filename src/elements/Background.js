@@ -137,7 +137,7 @@ anychart.elements.Background.CornerType = {
    *   .lineTo(25, 10)
    *   .stroke('3 #666')
    */
-  ROUND_INNER: 'roundInner'
+  ROUND_INNER: 'roundinner'
 };
 
 
