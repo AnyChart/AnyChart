@@ -759,8 +759,8 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
  * Returns an array of two elements <b>[isAdjustByWidth, isAdjustByHeight]</b>.
  * <pre>
  *    [false, false] - do not adjust (adjust is off )
- *    [false, true] - adjust width
- *    [true, false] - adjust height
+ *    [true, false] - adjust width
+ *    [false, true] - adjust height
  *    [true, true] - adjust the first suitable value.
  * </pre>
  * @shortDescription Getter for current adjust font settings.
@@ -828,8 +828,8 @@ anychart.elements.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustBy
     if (!(this.adjustByWidth_ == this.adjustByHeight_ && this.adjustByWidth_ == opt_adjustOrAdjustByWidth)) {
       this.adjustByWidth_ = this.adjustByHeight_ = /** @type {boolean} */ (opt_adjustOrAdjustByWidth);
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-      return this;
     }
+    return this;
   }
   return [this.adjustByWidth_, this.adjustByHeight_];
 };
