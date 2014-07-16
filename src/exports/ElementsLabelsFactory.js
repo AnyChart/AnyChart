@@ -1,6 +1,5 @@
 goog.provide('anychart.exports.ElementsLabelsFactory');
 goog.require('anychart.elements.LabelsFactory');
-goog.require('anychart.elements.LabelsFactory.Label');
 
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -27,26 +26,3 @@ anychart.elements.LabelsFactory.prototype['clear'] = anychart.elements.LabelsFac
 anychart.elements.LabelsFactory.prototype['measure'] = anychart.elements.LabelsFactory.prototype.measure;
 anychart.elements.LabelsFactory.prototype['enabled'] = anychart.elements.LabelsFactory.prototype.enabled;
 anychart.elements.LabelsFactory.prototype['measureWithTransform'] = anychart.elements.LabelsFactory.prototype.measureWithTransform;
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  anychart.elements.LabelsFactory.Label
-//
-//----------------------------------------------------------------------------------------------------------------------
-goog.exportSymbol('anychart.elements.LabelsFactory.Label', anychart.elements.LabelsFactory.Label);
-anychart.elements.LabelsFactory.Label.prototype['background'] = anychart.elements.LabelsFactory.Label.prototype.background;
-anychart.elements.LabelsFactory.Label.prototype['padding'] = anychart.elements.LabelsFactory.Label.prototype.padding;
-anychart.elements.LabelsFactory.Label.prototype['textFormatter'] = anychart.elements.LabelsFactory.Label.prototype.textFormatter;
-anychart.elements.LabelsFactory.Label.prototype['positionFormatter'] = anychart.elements.LabelsFactory.Label.prototype.positionFormatter;
-anychart.elements.LabelsFactory.Label.prototype['position'] = anychart.elements.LabelsFactory.Label.prototype.position;
-anychart.elements.LabelsFactory.Label.prototype['anchor'] = anychart.elements.LabelsFactory.Label.prototype.anchor;
-anychart.elements.LabelsFactory.Label.prototype['offsetX'] = anychart.elements.LabelsFactory.Label.prototype.offsetX;
-anychart.elements.LabelsFactory.Label.prototype['offsetY'] = anychart.elements.LabelsFactory.Label.prototype.offsetY;
-anychart.elements.LabelsFactory.Label.prototype['rotation'] = anychart.elements.LabelsFactory.Label.prototype.rotation;
-anychart.elements.LabelsFactory.Label.prototype['width'] = anychart.elements.LabelsFactory.Label.prototype.width;
-anychart.elements.LabelsFactory.Label.prototype['height'] = anychart.elements.LabelsFactory.Label.prototype.height;
-anychart.elements.LabelsFactory.Label.prototype['enabled'] = anychart.elements.LabelsFactory.Label.prototype.enabled;
-anychart.elements.LabelsFactory.Label.prototype['serialize'] = anychart.elements.LabelsFactory.Label.prototype.serialize;
-anychart.elements.LabelsFactory.Label.prototype['deserialize'] = anychart.elements.LabelsFactory.Label.prototype.deserialize;
-anychart.elements.LabelsFactory.Label.prototype['draw'] = anychart.elements.LabelsFactory.Label.prototype.draw;
-anychart.elements.LabelsFactory.Label.prototype['clear'] = anychart.elements.LabelsFactory.Label.prototype.clear;
-anychart.elements.LabelsFactory.Label.prototype['getIndex'] = anychart.elements.LabelsFactory.Label.prototype.getIndex;

@@ -1701,14 +1701,11 @@ anychart.cartesian.series.Base.prototype.hoverFill = function(opt_fillOrColorOrK
 anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSettings, hover) {
   var iterator = this.getIterator();
   var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      (usePointSettings && iterator.get('fill')) ||
-          this.fill());
+      (usePointSettings && iterator.get('fill')) || this.fill());
   return /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
-              (usePointSettings && iterator.get('hoverFill')) ||
-                  this.hoverFill() ||
-                  normalColor),
+              (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };

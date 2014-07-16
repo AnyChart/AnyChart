@@ -1,7 +1,7 @@
 goog.provide('anychart.cartesian.series.Marker');
 
 goog.require('anychart.cartesian.series.Base');
-goog.require('anychart.elements.Multimarker');
+goog.require('anychart.elements.MarkersFactory');
 
 
 
@@ -15,12 +15,15 @@ goog.require('anychart.elements.Multimarker');
 anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
   /**
-   * @type {anychart.elements.Multimarker}
+   * @type {anychart.elements.MarkersFactory}
    * @private
    */
-  this.marker_ = new anychart.elements.Multimarker();
+  this.marker_ = new anychart.elements.MarkersFactory();
   this.marker_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver_, false, this);
   this.marker_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut_, false, this);
+  this.registerDisposable(this.marker_);
+
+  this.hoverMarker_ = new anychart.elements.MarkersFactory();
   this.registerDisposable(this.marker_);
 
   /**
@@ -256,7 +259,7 @@ anychart.cartesian.series.Marker.prototype.drawSubsequentPoint = function() {
 anychart.cartesian.series.Marker.prototype.remove = function() {
   this.marker_.suspendSignalsDispatching();
   this.marker_.container(null);
-  this.marker_.end();
+  this.marker_.clear();
   this.invalidate(anychart.ConsistencyState.CONTAINER);
   this.marker_.resumeSignalsDispatching(false);
 };
@@ -273,6 +276,7 @@ anychart.cartesian.series.Marker.prototype.createPositionProvider = function(pos
 anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
   this.marker_.suspendSignalsDispatching();
+  this.marker_.clear();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.marker_.zIndex(/** @type {number} */(this.zIndex()));
@@ -284,6 +288,11 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
     this.marker_.stroke(this.getFinalStroke(false, false));
     this.marker_.type(/** @type {anychart.elements.Marker.Type} */(this.type_));
     this.marker_.size(this.size_);
+
+    this.hoverMarker_.fill(this.getFinalFill(false, true));
+    this.hoverMarker_.stroke(this.getFinalStroke(false, true));
+    this.hoverMarker_.type(/** @type {anychart.elements.Marker.Type} */(this.hoverType_));
+    this.hoverMarker_.size(this.hoverSize_);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -295,7 +304,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
     var fill = this.getFinalHatchFill(false, false);
     if (!this.hatchFillElement_ && !anychart.utils.isNone(fill)) {
-      this.hatchFillElement_ = new anychart.elements.Multimarker();
+      this.hatchFillElement_ = new anychart.elements.MarkersFactory();
       this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillElement_.zIndex(/** @type {number} */(this.zIndex() + 1));
       this.hatchFillElement_.pointerEvents('none');
@@ -311,13 +320,13 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
 /** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.marker_.end();
+    this.marker_.draw();
     this.marker_.resumeSignalsDispatching(false);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
     if (this.hatchFillElement_) {
-      this.hatchFillElement_.end();
+      this.hatchFillElement_.draw();
       this.hatchFillElement_.resumeSignalsDispatching(false);
     }
   }
@@ -343,7 +352,7 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) return this;
   this.unhover();
   if (this.getResetIterator().select(index)) {
-    this.drawMarker_(true);
+    this.drawMarker_(true, true);
     this.applyHatchFill(true);
     this.drawLabel(true);
     this.showTooltip(event);
@@ -360,7 +369,7 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
 anychart.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
   if (this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker_(false);
+    this.drawMarker_(false, true);
     this.applyHatchFill(false);
     this.drawLabel(false);
     this.hideTooltip();
@@ -373,29 +382,33 @@ anychart.cartesian.series.Marker.prototype.unhover = function() {
 /**
  * Draws marker for the point.
  * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {boolean=} opt_updateMarker Redraw marker.
  * @private
  */
-anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered) {
-  var pointType = this.getIterator().get(hovered ? 'hoverType' : 'type');
-  var pointSize = this.getIterator().get(hovered ? 'hoverMarkerSize' : 'markerSize');
+anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_updateMarker) {
+  var pointType = this.getIterator().get('type');
+  var pointSize = this.getIterator().get('markerSize');
+  var pointFill = this.getIterator().get('fill');
+  var pointStroke = this.getIterator().get('stroke');
+  var pointHoverType = this.getIterator().get('hoverType');
+  var pointHoverSize = this.getIterator().get('hoverMarkerSize');
+  var pointHoverFill = this.getIterator().get('hoverFill');
+  var pointHoverStroke = this.getIterator().get('hoverStroke');
+  var markersFactory = /** @type {anychart.elements.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
+
+  var settings = {'type': pointType, 'size': pointSize, 'fill': pointFill, 'stroke': pointStroke};
+  var settingsHover = {'type': pointHoverType, 'size': pointHoverSize, 'fill': pointHoverFill, 'stroke': pointHoverStroke};
+
   var index = this.getIterator().getIndex();
 
-  this.marker_.dropCustomSettingsAt(index);
+  var positionProvider = this.createPositionProvider(anychart.utils.NinePositions.CENTER);
 
-  if (goog.isDef(pointType))
-    this.marker_.typeAt(index, /** @type {anychart.elements.Marker.Type} */(pointType));
-  else if (hovered && goog.isDef(this.hoverType()))
-    this.marker_.typeAt(index, /** @type {anychart.elements.Marker.Type} */(this.hoverType()));
+  var marker = this.marker_.add(positionProvider, index);
+  marker.resetSettings();
+  marker.currentMarkersFactory(markersFactory);
+  marker.setSettings(settings, settingsHover);
 
-  if (goog.isDef(pointSize))
-    this.marker_.sizeAt(index, /** @type {number} */(pointSize));
-  else if (hovered && goog.isDef(this.hoverSize()))
-    this.marker_.sizeAt(index, /** @type {number} */(this.hoverSize()));
-
-  this.marker_.fillAt(index, this.getFinalFill(true, hovered));
-  this.marker_.strokeAt(index, this.getFinalStroke(true, hovered));
-
-  this.marker_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
+  if (opt_updateMarker) marker.draw();
 };
 
 
@@ -410,17 +423,24 @@ anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
   var index = iterator.getIndex();
 
   if (this.hatchFillElement_) {
-    this.hatchFillElement_.deserializeAt(index, this.marker_.serializeAt(index));
-    this.hatchFillElement_.fillAt(index, this.getFinalHatchFill(true, hovered));
-    this.hatchFillElement_.strokeAt(index, null);
+    var markersFactory = /** @type {anychart.elements.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
+    var hatchFill = this.hatchFillElement_.add(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
 
-    this.hatchFillElement_.draw(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
+    hatchFill.resetSettings();
+    hatchFill.parentMarkersFactory(markersFactory);
+
+    var fill = this.getFinalHatchFill(true, hovered);
+
+    hatchFill.fill(fill);
+    hatchFill.stroke(null);
+
+    hatchFill.draw();
   }
 };
 
 
 /**
- * @param {anychart.elements.Multimarker.BrowserEvent} event .
+ * @param {anychart.elements.MarkersFactory.BrowserEvent} event .
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {

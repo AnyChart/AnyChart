@@ -49,10 +49,10 @@ anychart.onDocumentReady(function() {
   chart.line(seriesData_1);
 
   //create second series with mapped data
-  chart.line(seriesData_2);
+//  chart.line(seriesData_2);
 
   //create third series with mapped data
-  chart.line(seriesData_3);
+//  chart.line(seriesData_3);
 
   //initiate chart drawing
   chart.draw();

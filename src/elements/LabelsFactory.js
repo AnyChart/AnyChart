@@ -396,9 +396,9 @@ anychart.elements.LabelsFactory.prototype.position = function(opt_value) {
     opt_value = anychart.utils.normalizePosition(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
-      this.changedSettings['position'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['position'] = true;
     return this;
   } else {
     return this.position_;
@@ -416,9 +416,9 @@ anychart.elements.LabelsFactory.prototype.anchor = function(opt_value) {
     opt_value = anychart.utils.normalizeNinePositions(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
-      this.changedSettings['anchor'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['anchor'] = true;
     return this;
   } else {
     return this.anchor_;
@@ -435,9 +435,9 @@ anychart.elements.LabelsFactory.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
-      this.changedSettings['offsetX'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['offsetX'] = true;
     return this;
   } else {
     return this.offsetX_;
@@ -454,9 +454,9 @@ anychart.elements.LabelsFactory.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
-      this.changedSettings['offsetY'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['offsetY'] = true;
     return this;
   } else {
     return this.offsetY_;
@@ -475,9 +475,9 @@ anychart.elements.LabelsFactory.prototype.rotation = function(opt_value) {
     opt_value = +opt_value;
     if (this.rotationAngle_ != opt_value) {
       this.rotationAngle_ = opt_value;
-      this.changedSettings['rotation'] = true;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['rotation'] = true;
     return this;
   } else {
     return this.rotationAngle_;
@@ -490,8 +490,6 @@ anychart.elements.LabelsFactory.prototype.rotation = function(opt_value) {
 //  Width/Height.
 //
 //----------------------------------------------------------------------------------------------------------------------
-
-
 /**
  * LabelsFactory width settings.
  * @param {(number|string|null)=} opt_value Width value to set.
@@ -501,9 +499,9 @@ anychart.elements.LabelsFactory.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
-      this.changedSettings['width'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['width'] = true;
     return this;
   }
   return this.width_;
@@ -519,9 +517,9 @@ anychart.elements.LabelsFactory.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.height_ != opt_value) {
       this.height_ = opt_value;
-      this.changedSettings['height'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    this.changedSettings['height'] = true;
     return this;
   }
   return this.height_;
@@ -695,6 +693,7 @@ anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positio
 
 /**
  * Labels drawing.
+ * @return {anychart.elements.LabelsFactory} Returns itself for chaining.
  */
 anychart.elements.LabelsFactory.prototype.draw = function() {
   if (!this.layer_) this.layer_ = acgraph.layer();
@@ -751,6 +750,7 @@ anychart.elements.LabelsFactory.prototype.draw = function() {
   this.markConsistent(anychart.ConsistencyState.ALL);
 
   if (manualSuspend) stage.resume();
+  return this;
 };
 
 
@@ -1212,7 +1212,8 @@ anychart.elements.LabelsFactory.Label.prototype.SUPPORTED_SIGNALS = anychart.ele
  * Supported consistency states.
  * @type {number}
  */
-anychart.elements.LabelsFactory.Label.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
+anychart.elements.LabelsFactory.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
 /**
@@ -1234,7 +1235,7 @@ anychart.elements.LabelsFactory.Label.prototype.parentLabelsFactory = function(o
   if (goog.isDefAndNotNull(opt_value)) {
     if (this.parentLabelsFactory_ != opt_value) {
       this.parentLabelsFactory_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1273,7 +1274,7 @@ anychart.elements.LabelsFactory.Label.prototype.currentLabelsFactory = function(
   if (goog.isDef(opt_value)) {
     if (this.currentLabelsFactory_ != opt_value) {
       this.currentLabelsFactory_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1317,7 +1318,7 @@ anychart.elements.LabelsFactory.Label.prototype.background = function(opt_value)
  */
 anychart.elements.LabelsFactory.Label.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1351,7 +1352,7 @@ anychart.elements.LabelsFactory.Label.prototype.padding = function(opt_spaceOrTo
  */
 anychart.elements.LabelsFactory.Label.prototype.boundsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
   }
 };
 
@@ -1365,7 +1366,7 @@ anychart.elements.LabelsFactory.Label.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.settingsObj.width !== opt_value) {
       this.settingsObj.width = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -1382,7 +1383,7 @@ anychart.elements.LabelsFactory.Label.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.settingsObj.height !== opt_value) {
       this.settingsObj.height = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -1401,7 +1402,7 @@ anychart.elements.LabelsFactory.Label.prototype.rotation = function(opt_value) {
     opt_value = +opt_value;
     if (this.settingsObj.rotationAngle !== opt_value) {
       this.settingsObj.rotationAngle = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -1420,7 +1421,7 @@ anychart.elements.LabelsFactory.Label.prototype.anchor = function(opt_value) {
     opt_value = anychart.utils.normalizeNinePositions(opt_value);
     if (this.settingsObj.anchor !== opt_value) {
       this.settingsObj.anchor = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -1437,7 +1438,7 @@ anychart.elements.LabelsFactory.Label.prototype.anchor = function(opt_value) {
 anychart.elements.LabelsFactory.Label.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.settingsObj.offsetX = opt_value;
-    this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else {
     return this.settingsObj.offsetX;
@@ -1453,7 +1454,7 @@ anychart.elements.LabelsFactory.Label.prototype.offsetX = function(opt_value) {
 anychart.elements.LabelsFactory.Label.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.settingsObj.offsetY = opt_value;
-    this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else {
     return this.settingsObj.offsetY;
@@ -1471,7 +1472,7 @@ anychart.elements.LabelsFactory.Label.prototype.position = function(opt_value) {
     opt_value = anychart.utils.normalizeNinePositions(opt_value);
     if (this.settingsObj.position != opt_value) {
       this.settingsObj.position = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -1485,7 +1486,7 @@ anychart.elements.LabelsFactory.Label.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.settingsObj.enabledLabel != opt_value) {
       this.settingsObj.enabledLabel = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.ENABLED, anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1503,7 +1504,7 @@ anychart.elements.LabelsFactory.Label.prototype.textFormatter = function(opt_val
   if (goog.isDef(opt_value)) {
     if (this.settingsObj.textFormatter != opt_value) {
       this.settingsObj.textFormatter = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1521,7 +1522,7 @@ anychart.elements.LabelsFactory.Label.prototype.positionFormatter = function(opt
   if (goog.isDef(opt_value)) {
     if (this.settingsObj.positionFormatter != opt_value) {
       this.settingsObj.positionFormatter = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -1539,7 +1540,7 @@ anychart.elements.LabelsFactory.Label.prototype.formatProvider = function(opt_va
   if (goog.isDef(opt_value)) {
     if (this.formatProvider_ != opt_value) {
       this.formatProvider_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1557,7 +1558,7 @@ anychart.elements.LabelsFactory.Label.prototype.positionProvider = function(opt_
   if (goog.isDef(opt_value)) {
     if (this.positionProvider_ != opt_value) {
       this.positionProvider_ = opt_value;
-      this.dispatchSignal(anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -1596,6 +1597,9 @@ anychart.elements.LabelsFactory.Label.prototype.setSettings = function(opt_setti
     this.deserialize(opt_settings1);
   }
   if (goog.isDef(opt_settings2)) this.superSettingsObj = opt_settings2;
+
+  this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ENABLED,
+      anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
   return this;
 };
 
@@ -1612,6 +1616,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
   var notSelfSettings = labelsFactory != parentLabelsFactory;
   if (notSelfSettings)
     settingsChangedStates = labelsFactory.getSettingsChangedStatesObj();
+  if (!this.layer_) this.layer_ = acgraph.layer();
 
   var enabled = notSelfSettings ?
       goog.isDef(this.superSettingsObj['enabled']) ?
@@ -1625,268 +1630,290 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
           this.enabled() :
           parentLabelsFactory.enabled();
 
-  if (!enabled) {
-    if (this.layer_) this.layer_.parent(null);
-    return this;
-  } else if ((!parentLabelsFactory.enabled() || (goog.isDef(this.enabled()) && !this.enabled())) && parentLabelsFactory.getDomElement()) {
-    if (!this.container()) this.container(parentLabelsFactory.getDomElement());
-    if (!this.container().parent()) {
-      this.container().parent(/** @type {acgraph.vector.ILayer} */(parentLabelsFactory.container()));
-      this.container().zIndex(/** @type {number} */(parentLabelsFactory.zIndex()));
+  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
+    if (!enabled) {
+      if (this.layer_) this.layer_.parent(null);
+      this.markConsistent(anychart.ConsistencyState.ALL);
+      return this;
+    } else {
+      if (this.container() && !this.layer_.parent())
+        this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.markConsistent(anychart.ConsistencyState.ENABLED);
     }
   }
 
-  var background = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['background']) ?
-          this.superSettingsObj['background'] :
-              settingsChangedStates && settingsChangedStates['background'] ?
-          labelsFactory.background() :
-          goog.isDef(this.settingsObj.background) ?
-              this.settingsObj.background :
-              parentLabelsFactory.background() :
-      goog.isDef(this.settingsObj.background) ?
-          this.settingsObj.background :
-          parentLabelsFactory.background();
-
-  var padding = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['padding']) ?
-          this.superSettingsObj['padding'] :
-              settingsChangedStates && settingsChangedStates['padding'] ?
-          labelsFactory.padding() :
-          goog.isDef(this.settingsObj.padding) ?
-              this.settingsObj.padding :
-              parentLabelsFactory.padding() :
-      goog.isDef(this.settingsObj.padding) ?
-          this.settingsObj.padding :
-          parentLabelsFactory.padding();
-
-  var widthSettings = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['width']) ?
-          this.superSettingsObj['width'] :
-              settingsChangedStates && settingsChangedStates['width'] ?
-          labelsFactory.width() :
-          goog.isDef(this.settingsObj.width) ?
-              this.settingsObj.width :
-              parentLabelsFactory.width() :
-      goog.isDef(this.settingsObj.width) ?
-          this.settingsObj.width :
-          parentLabelsFactory.width();
-
-  var heightSettings = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['height']) ?
-          this.superSettingsObj['height'] :
-              settingsChangedStates && settingsChangedStates['height'] ?
-          labelsFactory.height() :
-          goog.isDef(this.settingsObj.height) ?
-              this.settingsObj.height :
-              parentLabelsFactory.height() :
-      goog.isDef(this.settingsObj.height) ?
-          this.settingsObj.height :
-          parentLabelsFactory.height();
-
-  var offsetY = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['offsetY']) ?
-          this.superSettingsObj['offsetY'] :
-              settingsChangedStates && settingsChangedStates['offsetY'] ?
-          labelsFactory.offsetY() :
-          goog.isDef(this.settingsObj.offsetY) ?
-              this.settingsObj.offsetY :
-              parentLabelsFactory.offsetY() :
-      goog.isDef(this.settingsObj.offsetY) ?
-          this.settingsObj.offsetY :
-          parentLabelsFactory.offsetY();
-
-  var offsetX = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['offsetX']) ?
-          this.superSettingsObj['offsetX'] :
-              settingsChangedStates && settingsChangedStates['offsetX'] ?
-          labelsFactory.offsetX() :
-          goog.isDef(this.settingsObj.offsetX) ?
-              this.settingsObj.offsetX :
-              parentLabelsFactory.offsetX() :
-      goog.isDef(this.settingsObj.offsetX) ?
-          this.settingsObj.offsetX :
-          parentLabelsFactory.offsetX();
-
-  var anchor = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['anchor']) ?
-          this.superSettingsObj['anchor'] :
-              settingsChangedStates && settingsChangedStates['anchor'] ?
-          labelsFactory.anchor() :
-          goog.isDef(this.settingsObj.anchor) ?
-              this.settingsObj.anchor :
-              parentLabelsFactory.anchor() :
-      goog.isDef(this.settingsObj.anchor) ?
-          this.settingsObj.anchor :
-          parentLabelsFactory.anchor();
-
-  var rotationAngle = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['rotation']) ?
-          this.superSettingsObj['rotation'] :
-              settingsChangedStates && settingsChangedStates['rotation'] ?
-          labelsFactory.rotation() :
-          goog.isDef(this.settingsObj.rotationAngle) ?
-              this.settingsObj.rotationAngle :
-              parentLabelsFactory.rotation() :
-      goog.isDef(this.settingsObj.rotationAngle) ?
-          this.settingsObj.rotationAngle :
-          parentLabelsFactory.rotation();
-
-  var textFormatter = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['textFormatter']) ?
-          this.superSettingsObj['textFormatter'] :
-              settingsChangedStates && settingsChangedStates['textFormatter'] ?
-          labelsFactory.textFormatter() :
-          goog.isDef(this.settingsObj.textFormatter) ?
-              this.settingsObj.textFormatter :
-              parentLabelsFactory.textFormatter() :
-      goog.isDef(this.settingsObj.textFormatter) ?
-          this.settingsObj.textFormatter :
-          parentLabelsFactory.textFormatter();
-
-  var positionFormatter = notSelfSettings ?
-      goog.isDef(this.superSettingsObj['positionFormatter']) ?
-          this.superSettingsObj['positionFormatter'] :
-              settingsChangedStates && settingsChangedStates['positionFormatter'] ?
-          labelsFactory.positionFormatter() :
-          goog.isDef(this.settingsObj.positionFormatter) ?
-              this.settingsObj.positionFormatter :
-              parentLabelsFactory.positionFormatter() :
-      goog.isDef(this.settingsObj.positionFormatter) ?
-          this.settingsObj.positionFormatter :
-          parentLabelsFactory.positionFormatter();
-
-  var text = textFormatter.call(this, this.formatProvider());
-  if (!this.layer_) this.layer_ = acgraph.layer();
-  if (!this.layer_.parent()) {
-    this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
-  this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-
-  if (!this.backgroundElement_) {
-    this.backgroundElement_ = new anychart.elements.Background();
-    this.backgroundElement_.zIndex(0);
-    this.backgroundElement_.container(this.layer_);
-  }
-  this.backgroundElement_.deserialize(background.serialize());
-  this.backgroundElement_.draw();
-
-
-  if (!this.textElement_) {
-    this.textElement_ = acgraph.text();
-    this.textElement_.zIndex(1);
-    this.textElement_.parent(this.layer_);
-    this.textElement_.pointerEvents('none');
-  }
-  //define parent bounds
-  var parentWidth, parentHeight;
-  if (this.parentBounds_) {
-    parentWidth = this.parentBounds_.width;
-    parentHeight = this.parentBounds_.height;
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    if (enabled) {
+      if ((!parentLabelsFactory.enabled() || (goog.isDef(this.enabled()) && !this.enabled())) && parentLabelsFactory.getDomElement()) {
+        if (!this.container()) this.container(parentLabelsFactory.getDomElement());
+        if (!this.container().parent()) {
+          this.container().parent(/** @type {acgraph.vector.ILayer} */(parentLabelsFactory.container()));
+        }
+      }
+      if (this.container())
+        this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    }
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  var isHtml = parentLabelsFactory.useHtml() || labelsFactory.useHtml() || this.useHtml();
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    if (this.container()) this.container().zIndex(/** @type {number} */(parentLabelsFactory.zIndex()));
+    this.layer_.zIndex(/** @type {number} */(this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
 
-  this.textElement_.width(null);
-  this.textElement_.height(null);
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    var background = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['background']) ?
+            this.superSettingsObj['background'] :
+                settingsChangedStates && settingsChangedStates['background'] ?
+            labelsFactory.background() :
+            goog.isDef(this.settingsObj.background) ?
+                this.settingsObj.background :
+                parentLabelsFactory.background() :
+        goog.isDef(this.settingsObj.background) ?
+            this.settingsObj.background :
+            parentLabelsFactory.background();
 
-  if (isHtml) this.textElement_.htmlText(goog.isDef(text) ? text.toString() : null);
-  else this.textElement_.text(goog.isDef(text) ? text.toString() : null);
+    var padding = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['padding']) ?
+            this.superSettingsObj['padding'] :
+                settingsChangedStates && settingsChangedStates['padding'] ?
+            labelsFactory.padding() :
+            goog.isDef(this.settingsObj.padding) ?
+                this.settingsObj.padding :
+                parentLabelsFactory.padding() :
+        goog.isDef(this.settingsObj.padding) ?
+            this.settingsObj.padding :
+            parentLabelsFactory.padding();
 
-  parentLabelsFactory.applyTextSettings(this.textElement_, true);
-  if (notSelfSettings) labelsFactory.applyTextSettings(this.textElement_, false);
-  this.applyTextSettings(this.textElement_, false);
-  if (notSelfSettings) {
-    this.textSettings(this.superSettingsObj);
+    var widthSettings = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['width']) ?
+            this.superSettingsObj['width'] :
+                settingsChangedStates && settingsChangedStates['width'] ?
+            labelsFactory.width() :
+            goog.isDef(this.settingsObj.width) ?
+                this.settingsObj.width :
+                parentLabelsFactory.width() :
+        goog.isDef(this.settingsObj.width) ?
+            this.settingsObj.width :
+            parentLabelsFactory.width();
+
+    var heightSettings = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['height']) ?
+            this.superSettingsObj['height'] :
+                settingsChangedStates && settingsChangedStates['height'] ?
+            labelsFactory.height() :
+            goog.isDef(this.settingsObj.height) ?
+                this.settingsObj.height :
+                parentLabelsFactory.height() :
+        goog.isDef(this.settingsObj.height) ?
+            this.settingsObj.height :
+            parentLabelsFactory.height();
+
+    var offsetY = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['offsetY']) ?
+            this.superSettingsObj['offsetY'] :
+                settingsChangedStates && settingsChangedStates['offsetY'] ?
+            labelsFactory.offsetY() :
+            goog.isDef(this.settingsObj.offsetY) ?
+                this.settingsObj.offsetY :
+                parentLabelsFactory.offsetY() :
+        goog.isDef(this.settingsObj.offsetY) ?
+            this.settingsObj.offsetY :
+            parentLabelsFactory.offsetY();
+
+    var offsetX = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['offsetX']) ?
+            this.superSettingsObj['offsetX'] :
+                settingsChangedStates && settingsChangedStates['offsetX'] ?
+            labelsFactory.offsetX() :
+            goog.isDef(this.settingsObj.offsetX) ?
+                this.settingsObj.offsetX :
+                parentLabelsFactory.offsetX() :
+        goog.isDef(this.settingsObj.offsetX) ?
+            this.settingsObj.offsetX :
+            parentLabelsFactory.offsetX();
+
+    var anchor = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['anchor']) ?
+            this.superSettingsObj['anchor'] :
+                settingsChangedStates && settingsChangedStates['anchor'] ?
+            labelsFactory.anchor() :
+            goog.isDef(this.settingsObj.anchor) ?
+                this.settingsObj.anchor :
+                parentLabelsFactory.anchor() :
+        goog.isDef(this.settingsObj.anchor) ?
+            this.settingsObj.anchor :
+            parentLabelsFactory.anchor();
+
+    var rotationAngle = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['rotation']) ?
+            this.superSettingsObj['rotation'] :
+                settingsChangedStates && settingsChangedStates['rotation'] ?
+            labelsFactory.rotation() :
+            goog.isDef(this.settingsObj.rotationAngle) ?
+                this.settingsObj.rotationAngle :
+                parentLabelsFactory.rotation() :
+        goog.isDef(this.settingsObj.rotationAngle) ?
+            this.settingsObj.rotationAngle :
+            parentLabelsFactory.rotation();
+
+    var textFormatter = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['textFormatter']) ?
+            this.superSettingsObj['textFormatter'] :
+                settingsChangedStates && settingsChangedStates['textFormatter'] ?
+            labelsFactory.textFormatter() :
+            goog.isDef(this.settingsObj.textFormatter) ?
+                this.settingsObj.textFormatter :
+                parentLabelsFactory.textFormatter() :
+        goog.isDef(this.settingsObj.textFormatter) ?
+            this.settingsObj.textFormatter :
+            parentLabelsFactory.textFormatter();
+
+    var positionFormatter = notSelfSettings ?
+        goog.isDef(this.superSettingsObj['positionFormatter']) ?
+            this.superSettingsObj['positionFormatter'] :
+                settingsChangedStates && settingsChangedStates['positionFormatter'] ?
+            labelsFactory.positionFormatter() :
+            goog.isDef(this.settingsObj.positionFormatter) ?
+                this.settingsObj.positionFormatter :
+                parentLabelsFactory.positionFormatter() :
+        goog.isDef(this.settingsObj.positionFormatter) ?
+            this.settingsObj.positionFormatter :
+            parentLabelsFactory.positionFormatter();
+
+    var text = textFormatter.call(this, this.formatProvider());
+
+    this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+    if (!this.backgroundElement_) {
+      this.backgroundElement_ = new anychart.elements.Background();
+      this.backgroundElement_.zIndex(0);
+      this.backgroundElement_.container(this.layer_);
+    }
+    this.backgroundElement_.deserialize(background.serialize());
+    this.backgroundElement_.draw();
+
+
+    if (!this.textElement_) {
+      this.textElement_ = acgraph.text();
+      this.textElement_.zIndex(1);
+      this.textElement_.parent(this.layer_);
+      this.textElement_.pointerEvents('none');
+    }
+    //define parent bounds
+    var parentWidth, parentHeight;
+    if (this.parentBounds_) {
+      parentWidth = this.parentBounds_.width;
+      parentHeight = this.parentBounds_.height;
+    }
+
+    var isHtml = parentLabelsFactory.useHtml() || labelsFactory.useHtml() || this.useHtml();
+
+    this.textElement_.width(null);
+    this.textElement_.height(null);
+
+    if (isHtml) this.textElement_.htmlText(goog.isDef(text) ? text.toString() : null);
+    else this.textElement_.text(goog.isDef(text) ? text.toString() : null);
+
+    parentLabelsFactory.applyTextSettings(this.textElement_, true);
+    if (notSelfSettings) labelsFactory.applyTextSettings(this.textElement_, false);
     this.applyTextSettings(this.textElement_, false);
-  }
-
-  //define is width and height setted from settings
-  var isWidthSet = !goog.isNull(widthSettings);
-  var isHeightSet = !goog.isNull(heightSettings);
-
-  //we should ask text element about bounds only after text format and text settings are applied
-  var textElementBounds = this.textElement_.getBounds();
-
-  /** @type {anychart.math.Rect} */
-  var outerBounds = new anychart.math.Rect(0, 0, 0, 0);
-  //calculate text width and outer width
-  var width, textX, textWidth;
-  if (isWidthSet) {
-    width = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(widthSettings), parentWidth));
-    if (padding) {
-      textX = padding.left();
-      textWidth = padding.tightenWidth(width);
-    } else {
-      textX = 0;
-      textWidth = width;
+    if (notSelfSettings) {
+      this.textSettings(this.superSettingsObj);
+      this.applyTextSettings(this.textElement_, false);
     }
-    outerBounds.width = width;
-  } else {
-    width = textElementBounds.width;
-    if (padding) {
-      textX = padding.left();
-      outerBounds.width = padding.widenWidth(width);
-    } else {
-      textX = 0;
+
+    //define is width and height setted from settings
+    var isWidthSet = !goog.isNull(widthSettings);
+    var isHeightSet = !goog.isNull(heightSettings);
+
+    //we should ask text element about bounds only after text format and text settings are applied
+    var textElementBounds = this.textElement_.getBounds();
+
+    /** @type {anychart.math.Rect} */
+    var outerBounds = new anychart.math.Rect(0, 0, 0, 0);
+    //calculate text width and outer width
+    var width, textX, textWidth;
+    if (isWidthSet) {
+      width = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(widthSettings), parentWidth));
+      if (padding) {
+        textX = padding.left();
+        textWidth = padding.tightenWidth(width);
+      } else {
+        textX = 0;
+        textWidth = width;
+      }
       outerBounds.width = width;
-    }
-  }
-  if (goog.isDef(textWidth)) this.textElement_.width(textWidth);
-
-  //we should ask text element about bounds only after text format and text settings are applied
-  textElementBounds = this.textElement_.getBounds();
-
-  //calculate text height and outer height
-  var height, textY, textHeight;
-  if (isHeightSet) {
-    height = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(heightSettings), parentHeight));
-    if (padding) {
-      textY = padding.top();
-      textHeight = padding.tightenHeight(height);
     } else {
-      textY = 0;
-      textHeight = height;
+      width = textElementBounds.width;
+      if (padding) {
+        textX = padding.left();
+        outerBounds.width = padding.widenWidth(width);
+      } else {
+        textX = 0;
+        outerBounds.width = width;
+      }
     }
-    outerBounds.height = height;
-  } else {
-    height = textElementBounds.height;
-    if (padding) {
-      textY = padding.top();
-      outerBounds.height = padding.widenHeight(height);
-    } else {
-      textY = 0;
+    if (goog.isDef(textWidth)) this.textElement_.width(textWidth);
+
+    //we should ask text element about bounds only after text format and text settings are applied
+    textElementBounds = this.textElement_.getBounds();
+
+    //calculate text height and outer height
+    var height, textY, textHeight;
+    if (isHeightSet) {
+      height = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(heightSettings), parentHeight));
+      if (padding) {
+        textY = padding.top();
+        textHeight = padding.tightenHeight(height);
+      } else {
+        textY = 0;
+        textHeight = height;
+      }
       outerBounds.height = height;
+    } else {
+      height = textElementBounds.height;
+      if (padding) {
+        textY = padding.top();
+        outerBounds.height = padding.widenHeight(height);
+      } else {
+        textY = 0;
+        outerBounds.height = height;
+      }
     }
+
+    if (goog.isDef(textHeight)) this.textElement_.height(textHeight);
+
+    var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(positionFormatter.call(this, this.positionProvider())));
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
+        new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height),
+        /** @type {anychart.utils.NinePositions} */(anchor));
+
+    position.x -= anchorCoordinate.x;
+    position.y -= anchorCoordinate.y;
+
+    offsetX = goog.isDef(offsetX) ? anychart.utils.normalize(/** @type {number|string} */(offsetX), parentWidth) : 0;
+    offsetY = goog.isDef(offsetY) ? anychart.utils.normalize(/** @type {number|string} */(offsetY), parentHeight) : 0;
+
+    anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.utils.NinePositions} */(anchor), offsetX, offsetY);
+
+    textX += position.x;
+    textY += position.y;
+    outerBounds.left = position.x;
+    outerBounds.top = position.y;
+
+    this.textElement_.x(/** @type {number} */(textX)).y(/** @type {number} */(textY));
+
+    this.backgroundElement_.pixelBounds(outerBounds);
+    this.backgroundElement_.draw();
+
+    this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle),
+        anychart.utils.ninePositionsToAnchor(/** @type {anychart.utils.NinePositions} */(anchor)));
+
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
-
-  if (goog.isDef(textHeight)) this.textElement_.height(textHeight);
-
-  var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(positionFormatter.call(this, this.positionProvider())));
-  var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-      new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height),
-      /** @type {anychart.utils.NinePositions} */(anchor));
-
-  position.x -= anchorCoordinate.x;
-  position.y -= anchorCoordinate.y;
-
-  offsetX = goog.isDef(offsetX) ? anychart.utils.normalize(/** @type {number|string} */(offsetX), parentWidth) : 0;
-  offsetY = goog.isDef(offsetY) ? anychart.utils.normalize(/** @type {number|string} */(offsetY), parentHeight) : 0;
-
-  anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.utils.NinePositions} */(anchor), offsetX, offsetY);
-
-  textX += position.x;
-  textY += position.y;
-  outerBounds.left = position.x;
-  outerBounds.top = position.y;
-
-  this.textElement_.x(/** @type {number} */(textX)).y(/** @type {number} */(textY));
-
-  this.backgroundElement_.pixelBounds(outerBounds);
-  this.backgroundElement_.draw();
-
-  this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle),
-      anychart.utils.ninePositionsToAnchor(/** @type {anychart.utils.NinePositions} */(anchor)));
   return this;
 };
 
