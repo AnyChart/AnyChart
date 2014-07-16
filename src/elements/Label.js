@@ -1001,7 +1001,6 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
 
   this.textElement_.width(null);
   this.textElement_.height(null);
-  this.textElement_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
   if (autoWidth) {
     width += this.textElement_.getBounds().width;

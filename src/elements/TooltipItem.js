@@ -659,7 +659,6 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.contentBounds_ = null;
     this.calculateContentBounds_();
     this.boundsWithoutPadding_ = this.padding_ ?
         this.padding_.tightenBounds(/** @type {!anychart.math.Rect} */(this.contentBounds_)) :
