@@ -698,7 +698,7 @@ anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positio
 anychart.elements.LabelsFactory.prototype.draw = function() {
   if (!this.layer_) this.layer_ = acgraph.layer();
 
-  var stage = this.layer_.getStage();
+  var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 

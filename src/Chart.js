@@ -616,7 +616,7 @@ anychart.Chart.prototype.draw = function() {
   if (!this.rootElement) this.rootElement = acgraph.layer();
 
   //suspend stage
-  var stage = this.rootElement.getStage();
+  var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 

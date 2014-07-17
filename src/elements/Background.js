@@ -559,7 +559,7 @@ anychart.elements.Background.prototype.draw = function() {
     this.registerDisposable(this.rect_);
   }
 
-  var stage = this.rect_.getStage();
+  var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
