@@ -688,14 +688,16 @@ anychart.Chart.prototype.draw = function() {
       label.parentBounds(totalBounds);
       label.resumeSignalsDispatching(false);
       label.draw();
-      this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
     }
+    this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )
     if (this.container() && this.container().getStage) {
       //listen resize event
+      this.container().getStage().resize(/** @type {number|string} */(this.bounds().width()),
+          /** @type {number|string} */(this.bounds().height()));
       if (this.autoResize_ && this.bounds().dependsOnContainerSize()) {
         this.container().getStage().listen(
             acgraph.vector.Stage.EventType.STAGE_RESIZE,

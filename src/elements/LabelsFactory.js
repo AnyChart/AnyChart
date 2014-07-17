@@ -1573,6 +1573,7 @@ anychart.elements.LabelsFactory.Label.prototype.positionProvider = function(opt_
 anychart.elements.LabelsFactory.Label.prototype.clear = function() {
   this.resetSettings();
   if (this.layer_) this.layer_.parent(null);
+  this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 
 
@@ -1912,7 +1913,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle),
         anychart.utils.ninePositionsToAnchor(/** @type {anychart.utils.NinePositions} */(anchor)));
 
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS);
   }
   return this;
 };

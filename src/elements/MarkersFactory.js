@@ -1753,6 +1753,7 @@ anychart.elements.MarkersFactory.Marker.prototype.enabled = function(opt_value) 
 anychart.elements.MarkersFactory.Marker.prototype.clear = function() {
   this.resetSettings();
   if (this.markerElement_) this.markerElement_.parent(null);
+  this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 
 
