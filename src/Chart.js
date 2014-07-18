@@ -696,8 +696,8 @@ anychart.Chart.prototype.draw = function() {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )
     if (this.container() && this.container().getStage) {
       //listen resize event
-      this.container().getStage().resize(/** @type {number|string} */(this.bounds().width()),
-          /** @type {number|string} */(this.bounds().height()));
+      stage = this.container().getStage();
+      stage.resize(stage.originalWidth, stage.originalHeight);
       if (this.autoResize_ && this.bounds().dependsOnContainerSize()) {
         this.container().getStage().listen(
             acgraph.vector.Stage.EventType.STAGE_RESIZE,
