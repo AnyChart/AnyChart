@@ -101,6 +101,14 @@ anychart.cartesian.series.Base.prototype.index_;
 
 
 /**
+ * Series clip.
+ * @type {boolean|anychart.math.Rect}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.clip_ = false;
+
+
+/**
  * Series meta map.
  * @type {Object}
  * @private
@@ -408,6 +416,26 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
     return this;
   } else {
     return this.name_;
+  }
+};
+
+
+/**
+ * Sets/gets series clip.
+ * @param {(boolean|anychart.math.Rect)=} opt_value Clip.
+ * @return {anychart.cartesian.series.Base|boolean|anychart.math.Rect} .
+ */
+anychart.cartesian.series.Base.prototype.clip = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isNull(opt_value)) opt_value = false;
+    if (this.clip_ != opt_value) {
+      this.clip_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.clip_;
   }
 };
 
@@ -845,6 +873,13 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
  */
 anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
   this.labels().draw();
+
+  if (this.clip()) {
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var labelDOM = this.labels().getDomElement();
+    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  }
+
   this.labels().resumeSignalsDispatching(false);
   this.hoverLabels().resumeSignalsDispatching(false);
 

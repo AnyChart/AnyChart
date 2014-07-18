@@ -21,6 +21,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.marker_ = new anychart.elements.MarkersFactory();
   this.marker_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver_, false, this);
   this.marker_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut_, false, this);
+  this.marker_.enabled(true);
   this.registerDisposable(this.marker_);
 
   this.hoverMarker_ = new anychart.elements.MarkersFactory();

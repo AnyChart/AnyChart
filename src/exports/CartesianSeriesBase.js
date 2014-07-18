@@ -16,3 +16,4 @@ anychart.cartesian.series.Base.prototype['getResetIterator'] = anychart.cartesia
 anychart.cartesian.series.Base.prototype['xPointPosition'] = anychart.cartesian.series.Base.prototype.xPointPosition;//in docs/
 anychart.cartesian.series.Base.prototype['xScale'] = anychart.cartesian.series.Base.prototype.xScale;//in docs/
 anychart.cartesian.series.Base.prototype['yScale'] = anychart.cartesian.series.Base.prototype.yScale;//in docs/
+anychart.cartesian.series.Base.prototype['clip'] = anychart.cartesian.series.Base.prototype.clip;

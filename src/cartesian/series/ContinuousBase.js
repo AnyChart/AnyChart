@@ -94,9 +94,11 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var bounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
-    for (i = 0; i < len; i++)
-      this.paths[i].clip(bounds);
+    if (this.clip()) {
+      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+      for (i = 0; i < len; i++)
+        this.paths[i].clip(bounds);
+    }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

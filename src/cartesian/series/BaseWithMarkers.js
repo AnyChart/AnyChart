@@ -216,6 +216,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.drawPoint = function() {
 anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = function() {
   this.markers().draw();
 
+  if (this.clip()) {
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var markerDOM = this.markers().getDomElement();
+    if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  }
+
   this.markers().resumeSignalsDispatching(false);
   this.hoverMarkers().resumeSignalsDispatching(false);
 

@@ -76,6 +76,7 @@ anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.s
 //----------------------------------------------------------------------------------------------------------------------
 anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//in docs/
 anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;
+anychart.cartesian.series.Base.prototype['clip'] = anychart.cartesian.series.Base.prototype.clip;
 anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//in docs/
 anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//in docs/
 anychart.cartesian.series.Base.prototype['drawPoint'] = anychart.cartesian.series.Base.prototype.drawPoint;//in docs/

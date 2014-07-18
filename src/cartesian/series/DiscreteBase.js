@@ -84,7 +84,10 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.rootElement.clip(/** @type {!anychart.math.Rect} */(this.pixelBounds()));
+    if (this.clip()) {
+      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+      this.rootElement.clip(/** @type {!anychart.math.Rect} */(bounds));
+    }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

@@ -1348,6 +1348,7 @@ anychart.cartesian.Chart.prototype.registerSeries_ = function(series) {
   series.setAutoColor(this.palette().colorAt(this.series_.length - 1));
   series.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
   series.restoreDefaults();
+  series.clip(true);
   series.listenSignals(this.seriesInvalidated_, this);
 
   this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
