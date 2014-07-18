@@ -1223,10 +1223,8 @@ anychart.elements.Label.prototype.createTextElement_ = function() {
  * @return {anychart.math.Rect} Label content bounds.
  */
 anychart.elements.Label.prototype.getContentBounds = function() {
-  var isInitial = true;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.createTextElement_();
+    var isInitial = this.createTextElement_();
     this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
