@@ -1,0 +1,34 @@
+goog.provide('anychart.exports.ElementsTable');
+goog.require('anychart.elements.Table');
+
+goog.exportSymbol('anychart.elements.Table', anychart.elements.Table);
+anychart.elements.Table.prototype['rowsCount'] = anychart.elements.Table.prototype.rowsCount;
+anychart.elements.Table.prototype['colsCount'] = anychart.elements.Table.prototype.colsCount;
+anychart.elements.Table.prototype['getCell'] = anychart.elements.Table.prototype.getCell;
+anychart.elements.Table.prototype['draw'] = anychart.elements.Table.prototype.draw;
+anychart.elements.Table.prototype['colWidth'] = anychart.elements.Table.prototype.colWidth;
+anychart.elements.Table.prototype['rowHeight'] = anychart.elements.Table.prototype.rowHeight;
+anychart.elements.Table.prototype['cellTextFactory'] = anychart.elements.Table.prototype.cellTextFactory;
+anychart.elements.Table.prototype['cellFill'] = anychart.elements.Table.prototype.cellFill;
+anychart.elements.Table.prototype['cellPadding'] = anychart.elements.Table.prototype.cellPadding;
+anychart.elements.Table.prototype['cellEvenFill'] = anychart.elements.Table.prototype.cellEvenFill;
+anychart.elements.Table.prototype['cellOddFill'] = anychart.elements.Table.prototype.cellOddFill;
+anychart.elements.Table.prototype['cellBorder'] = anychart.elements.Table.prototype.cellBorder;
+anychart.elements.Table.prototype['cellLeftBorder'] = anychart.elements.Table.prototype.cellLeftBorder;
+anychart.elements.Table.prototype['cellRightBorder'] = anychart.elements.Table.prototype.cellRightBorder;
+anychart.elements.Table.prototype['cellTopBorder'] = anychart.elements.Table.prototype.cellTopBorder;
+anychart.elements.Table.prototype['cellBottomBorder'] = anychart.elements.Table.prototype.cellBottomBorder;
+
+anychart.elements.Table.Cell.prototype['rowSpan'] = anychart.elements.Table.Cell.prototype.rowSpan;
+anychart.elements.Table.Cell.prototype['colSpan'] = anychart.elements.Table.Cell.prototype.colSpan;
+anychart.elements.Table.Cell.prototype['content'] = anychart.elements.Table.Cell.prototype.content;
+anychart.elements.Table.Cell.prototype['padding'] = anychart.elements.Table.Cell.prototype.padding;
+anychart.elements.Table.Cell.prototype['fill'] = anychart.elements.Table.Cell.prototype.fill;
+anychart.elements.Table.Cell.prototype['border'] = anychart.elements.Table.Cell.prototype.border;
+anychart.elements.Table.Cell.prototype['leftBorder'] = anychart.elements.Table.Cell.prototype.leftBorder;
+anychart.elements.Table.Cell.prototype['rightBorder'] = anychart.elements.Table.Cell.prototype.rightBorder;
+anychart.elements.Table.Cell.prototype['topBorder'] = anychart.elements.Table.Cell.prototype.topBorder;
+anychart.elements.Table.Cell.prototype['bottomBorder'] = anychart.elements.Table.Cell.prototype.bottomBorder;
+anychart.elements.Table.Cell.prototype['getRow'] = anychart.elements.Table.Cell.prototype.getRow;
+anychart.elements.Table.Cell.prototype['getCol'] = anychart.elements.Table.Cell.prototype.getCol;
+anychart.elements.Table.Cell.prototype['getBounds'] = anychart.elements.Table.Cell.prototype.getBounds;

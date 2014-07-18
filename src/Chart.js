@@ -694,7 +694,7 @@ anychart.Chart.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )
-    if (this.container() && this.container().getStage) {
+    if (this.container() && this.container().getStage()) {
       //listen resize event
       stage = this.container().getStage();
       stage.resize(stage.originalWidth, stage.originalHeight);

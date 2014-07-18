@@ -1,5 +1,6 @@
 goog.provide('anychart.elements.LabelsFactory');
 goog.provide('anychart.elements.LabelsFactory.Label');
+goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Text');
 
 
@@ -603,20 +604,29 @@ anychart.elements.LabelsFactory.prototype.remove = function() {
 
 /**
  * Очищает массив созданных лейблов.
+ * @param {number=} opt_index If set, removes only the label that label.
  * @return {anychart.elements.LabelsFactory} Returns itself for chaining.
  */
-anychart.elements.LabelsFactory.prototype.clear = function() {
+anychart.elements.LabelsFactory.prototype.clear = function(opt_index) {
   if (!this.freeToUseLabelsPool_)
     this.freeToUseLabelsPool_ = [];
 
   if (this.labels_) {
-    goog.array.forEach(this.labels_, function(label) {
-      label.clear();
-      this.freeToUseLabelsPool_.push(label);
-    }, this);
-  }
+    opt_index = +opt_index;
+    if (!isNaN(opt_index) && opt_index in this.labels_) {
+      this.labels_[opt_index].clear();
+      this.freeToUseLabelsPool_.push(this.labels_[opt_index]);
+      delete this.labels_[opt_index];
+    } else {
+      goog.array.forEach(this.labels_, function(label) {
+        label.clear();
+        this.freeToUseLabelsPool_.push(label);
+      }, this);
+      this.labels_.length = 0;
+    }
+  } else
+    this.labels_ = [];
 
-  this.labels_ = [];
   return this;
 };
 

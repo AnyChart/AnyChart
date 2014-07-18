@@ -737,9 +737,9 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
   var iterator;
   var value;
   var scale;
-  if (!this.xScale()) {
-    scale = new anychart.scales.Ordinal();
-    this.xScale(scale);
+  if (!(scale = this.xScale()))
+    this.xScale(scale = new anychart.scales.Ordinal());
+  if (scale.needsAutoCalc()) {
     scale.startAutoCalc();
     iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -749,15 +749,15 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
     }
     scale.finishAutoCalc();
   }
-  if (!this.yScale()) {
-    scale = new anychart.scales.Linear();
-    this.yScale(scale);
+  if (!(scale = this.yScale()))
+    this.yScale(scale = new anychart.scales.Linear());
+  if (scale.needsAutoCalc()) {
     scale.startAutoCalc();
     iterator = this.getResetIterator();
     while (iterator.advance()) {
       value = this.getReferenceScaleValues();
       if (value)
-        scale.extendDataRange.apply(scale, value);
+        scale.extendDataRange.apply(/** @type {anychart.scales.Base} */(scale), value);
     }
     scale.finishAutoCalc();
   }

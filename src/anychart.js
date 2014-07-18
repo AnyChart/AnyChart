@@ -17,6 +17,7 @@ goog.require('anychart.elements.MarkersFactory');
 goog.require('anychart.elements.MarkersFactory.Marker');
 goog.require('anychart.elements.RangeMarker');
 goog.require('anychart.elements.Separator');
+goog.require('anychart.elements.Table');
 goog.require('anychart.elements.TextMarker');
 goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');

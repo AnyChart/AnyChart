@@ -529,6 +529,28 @@ anychart.utils.isUnit = function(value) {
 
 
 /**
+ * Normalizes passed value to a natural value (strictly-positive integer).
+ * If a number-like value passed and if it is greater than 0.5, it is rounded.
+ * If it is not a number or it is less than 1 it defaults to opt_default || 1.
+ * @param {*} value Value to normalize.
+ * @param {number=} opt_default Default value to return.
+ * @param {boolean=} opt_allowZero
+ * @return {number} Naturalized value.
+ */
+anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allowZero) {
+  if (!goog.isNumber(value))
+    value = parseFloat(value);
+  value = Math.round(value);
+  // value > 0 also checks for NaN, because NaN > 0 == false.
+  opt_default = goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1;
+  if (opt_allowZero)
+    return /** @type {number} */(value >= 0 ? value : opt_default);
+  else
+    return /** @type {number} */(value > 0 ? value : opt_default);
+};
+
+
+/**
  * Gets anchor coordinates by bounds.
  * @param {acgraph.math.Rect} bounds Bounds rectangle.
  * @param {anychart.utils.NinePositions|string} anchor Anchor.
