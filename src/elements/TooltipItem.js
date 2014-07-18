@@ -419,7 +419,7 @@ anychart.elements.TooltipItem.prototype.padding = function(opt_value) {
     } else if (goog.isObject(opt_value)) {
       this.padding_.deserialize(opt_value);
     } else if (anychart.utils.isNone(opt_value)) {
-      this.padding_.enabled(false);
+      this.padding_.set(0);
     }
     return this;
   } else {
