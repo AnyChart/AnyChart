@@ -853,6 +853,7 @@ anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
   content.vAlign('top');
   content.padding(5, 10, 5, 10);
   content.background(null);
+  content.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
   content.enabled(true);
 
   var background = /** @type {anychart.elements.Background}*/(this.background());
