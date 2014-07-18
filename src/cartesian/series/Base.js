@@ -48,7 +48,7 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   });
   this.labels().position(anychart.utils.NinePositions.CENTER);
   this.labels().enabled(false);
-  this.hoverLabels().enabled(null);
+  (/** @type {anychart.elements.LabelsFactory} */(this.hoverLabels())).enabled(null);
 
   this.resumeSignalsDispatching(false);
 };
