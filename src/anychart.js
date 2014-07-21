@@ -1,4 +1,5 @@
 goog.provide('anychart');
+goog.require('acgraph');
 goog.require('anychart.data');
 goog.require('anychart.math');
 goog.require('anychart.utils');
