@@ -138,3 +138,10 @@ anychart.scales.Linear.prototype.deserialize = function(value) {
 anychart.scales.linear = function() {
   return new anychart.scales.Linear();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.Linear', anychart.scales.Linear);
+anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
+anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;
+goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);

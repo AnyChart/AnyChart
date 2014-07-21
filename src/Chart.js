@@ -559,7 +559,7 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.elements.Axis) {
+    if (value instanceof anychart.elements.Label) {
       label.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       label.deserialize(value);
@@ -952,3 +952,15 @@ anychart.Chart.DrawEvent = function(chart) {
   this['chart'] = chart;
 };
 goog.inherits(anychart.Chart.DrawEvent, goog.events.Event);
+
+
+//exports
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/final
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/final
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
+anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
+anychart.Chart.prototype['chartLabel'] = anychart.Chart.prototype.chartLabel;
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
+anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
+anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;

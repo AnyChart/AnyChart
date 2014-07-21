@@ -28,6 +28,7 @@ anychart.cartesian.series.RangeColumn = function(data, opt_csvSettings) {
   tooltip.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.RangeColumn, anychart.cartesian.series.WidthBased);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_COLUMN] = anychart.cartesian.series.RangeColumn;
 
 
 /** @inheritDoc */
@@ -86,12 +87,27 @@ anychart.cartesian.series.RangeColumn.prototype.createPositionProvider = functio
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.cartesian.series.RangeColumn.prototype.calculateStatistics = function() {
+  this.statistics('seriesMax', -Infinity);
+  this.statistics('seriesMin', Infinity);
+  this.statistics('seriesSum', 0);
+  this.statistics('seriesAverage', 0);
+  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
+};
+
+
 /**
  * @inheritDoc
  */
 anychart.cartesian.series.RangeColumn.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangecolumn';
+  json['seriesType'] = anychart.cartesian.series.Type.RANGE_COLUMN;
   return json;
 };
 
@@ -102,3 +118,13 @@ anychart.cartesian.series.RangeColumn.prototype.serialize = function() {
 anychart.cartesian.series.RangeColumn.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.RangeColumn', anychart.cartesian.series.RangeColumn);
+anychart.cartesian.series.RangeColumn.prototype['fill'] = anychart.cartesian.series.RangeColumn.prototype.fill;
+anychart.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverFill;
+anychart.cartesian.series.RangeColumn.prototype['stroke'] = anychart.cartesian.series.RangeColumn.prototype.stroke;
+anychart.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.cartesian.series.RangeColumn.prototype.hoverStroke;
+anychart.cartesian.series.RangeColumn.prototype['hatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hatchFill;
+anychart.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverHatchFill;

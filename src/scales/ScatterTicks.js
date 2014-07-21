@@ -477,3 +477,14 @@ anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//exports
+anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;
+anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;
+anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;
+anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;
+anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;
+anychart.scales.ScatterTicks.prototype['mode'] = anychart.scales.ScatterTicks.prototype.mode;
+goog.exportSymbol('anychart.scales.ScatterTicksMode.LINEAR', anychart.scales.ScatterTicksMode.LINEAR);
+goog.exportSymbol('anychart.scales.ScatterTicksMode.LOGARITHMIC', anychart.scales.ScatterTicksMode.LOGARITHMIC);

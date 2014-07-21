@@ -30,6 +30,7 @@ anychart.cartesian.series.Spline = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Spline, anychart.cartesian.series.ContinuousBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.SPLINE] = anychart.cartesian.series.Spline;
 
 
 /** @inheritDoc */
@@ -97,7 +98,7 @@ anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.Spline.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'spline';
+  json['seriesType'] = anychart.cartesian.series.Type.SPLINE;
   return json;
 };
 
@@ -108,3 +109,9 @@ anychart.cartesian.series.Spline.prototype.serialize = function() {
 anychart.cartesian.series.Spline.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Spline', anychart.cartesian.series.Spline);
+anychart.cartesian.series.Spline.prototype['stroke'] = anychart.cartesian.series.Spline.prototype.stroke;
+anychart.cartesian.series.Spline.prototype['hoverStroke'] = anychart.cartesian.series.Spline.prototype.hoverStroke;

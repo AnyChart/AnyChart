@@ -22,6 +22,7 @@ anychart.cartesian.series.StepLine = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.StepLine, anychart.cartesian.series.ContinuousBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.STEP_LINE] = anychart.cartesian.series.StepLine;
 
 
 /**
@@ -97,7 +98,7 @@ anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
  */
 anychart.cartesian.series.StepLine.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'stepline';
+  json['seriesType'] = anychart.cartesian.series.Type.STEP_LINE;
   return json;
 };
 
@@ -108,3 +109,9 @@ anychart.cartesian.series.StepLine.prototype.serialize = function() {
 anychart.cartesian.series.StepLine.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.StepLine', anychart.cartesian.series.StepLine);
+anychart.cartesian.series.StepLine.prototype['stroke'] = anychart.cartesian.series.StepLine.prototype.stroke;
+anychart.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.cartesian.series.StepLine.prototype.hoverStroke;

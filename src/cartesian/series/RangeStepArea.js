@@ -20,6 +20,7 @@ anychart.cartesian.series.RangeStepArea = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.RangeStepArea, anychart.cartesian.series.ContinuousRangeBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_STEP_AREA] = anychart.cartesian.series.RangeStepArea;
 
 
 /** @inheritDoc */
@@ -127,7 +128,7 @@ anychart.cartesian.series.RangeStepArea.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangesteparea';
+  json['seriesType'] = anychart.cartesian.series.Type.RANGE_STEP_AREA;
   return json;
 };
 
@@ -138,3 +139,7 @@ anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
 anychart.cartesian.series.RangeStepArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.RangeStepArea', anychart.cartesian.series.RangeStepArea);

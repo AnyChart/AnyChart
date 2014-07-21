@@ -84,3 +84,6 @@ anychart.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
 
   return result;
 };
+
+//exports
+anychart.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.cartesian.series.AreaBase.prototype.startDrawing;//in docs/

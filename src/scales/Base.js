@@ -385,3 +385,10 @@ anychart.scales.Base.prototype.deserialize = function(value) {
 
   return this;
 };
+
+
+//exports
+anychart.scales.Base.prototype['stackMode'] = anychart.scales.Base.prototype.stackMode;
+anychart.scales.Base.prototype['inverted'] = anychart.scales.Base.prototype.inverted;
+anychart.scales.Base.prototype['startAutoCalc'] = anychart.scales.Base.prototype.startAutoCalc;
+anychart.scales.Base.prototype['finishAutoCalc'] = anychart.scales.Base.prototype.finishAutoCalc;

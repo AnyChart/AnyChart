@@ -96,3 +96,7 @@ anychart.cartesian.series.WidthBased.prototype.restoreDefaults = function() {
 
   return result;
 };
+
+
+//exports
+anychart.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.cartesian.series.WidthBased.prototype.pointWidth;

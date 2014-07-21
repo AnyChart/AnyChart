@@ -226,3 +226,10 @@ anychart.scales.OrdinalTicks.prototype.deserialize = function(value) {
   this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
   return goog.base(this, 'deserialize', value);
 };
+
+
+//exports
+anychart.scales.OrdinalTicks.prototype['interval'] = anychart.scales.OrdinalTicks.prototype.interval;
+anychart.scales.OrdinalTicks.prototype['set'] = anychart.scales.OrdinalTicks.prototype.set;
+anychart.scales.OrdinalTicks.prototype['get'] = anychart.scales.OrdinalTicks.prototype.get;
+anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.prototype.names;

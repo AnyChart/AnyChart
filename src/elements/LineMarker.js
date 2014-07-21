@@ -362,3 +362,14 @@ anychart.elements.LineMarker.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
+
+
+//exports
+goog.exportSymbol('anychart.elements.LineMarker', anychart.elements.LineMarker);
+anychart.elements.LineMarker.prototype['value'] = anychart.elements.LineMarker.prototype.value;
+anychart.elements.LineMarker.prototype['scale'] = anychart.elements.LineMarker.prototype.scale;
+anychart.elements.LineMarker.prototype['parentBounds'] = anychart.elements.LineMarker.prototype.parentBounds;
+anychart.elements.LineMarker.prototype['direction'] = anychart.elements.LineMarker.prototype.direction;
+anychart.elements.LineMarker.prototype['stroke'] = anychart.elements.LineMarker.prototype.stroke;
+anychart.elements.LineMarker.prototype['draw'] = anychart.elements.LineMarker.prototype.draw;
+anychart.elements.LineMarker.prototype['isHorizontal'] = anychart.elements.LineMarker.prototype.isHorizontal;

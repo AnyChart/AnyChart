@@ -1181,3 +1181,28 @@ anychart.ui.Splitter.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//exports
+goog.exportSymbol('anychart.ui.Splitter', anychart.ui.Splitter);
+anychart.ui.Splitter.prototype['layout'] = anychart.ui.Splitter.prototype.layout;
+anychart.ui.Splitter.prototype['position'] = anychart.ui.Splitter.prototype.position;
+anychart.ui.Splitter.prototype['dragAreaLength'] = anychart.ui.Splitter.prototype.dragAreaLength;
+anychart.ui.Splitter.prototype['stroke'] = anychart.ui.Splitter.prototype.stroke;
+anychart.ui.Splitter.prototype['fill'] = anychart.ui.Splitter.prototype.fill;
+anychart.ui.Splitter.prototype['dragPreviewStroke'] = anychart.ui.Splitter.prototype.dragPreviewStroke;
+anychart.ui.Splitter.prototype['dragPreviewFill'] = anychart.ui.Splitter.prototype.dragPreviewFill;
+anychart.ui.Splitter.prototype['dragAreaStroke'] = anychart.ui.Splitter.prototype.dragAreaStroke;
+anychart.ui.Splitter.prototype['dragAreaFill'] = anychart.ui.Splitter.prototype.dragAreaFill;
+anychart.ui.Splitter.prototype['handlePositionChange'] = anychart.ui.Splitter.prototype.handlePositionChange;
+anychart.ui.Splitter.prototype['considerSplitterWidth'] = anychart.ui.Splitter.prototype.considerSplitterWidth;
+anychart.ui.Splitter.prototype['splitterWidth'] = anychart.ui.Splitter.prototype.splitterWidth;
+anychart.ui.Splitter.prototype['leftLimitSize'] = anychart.ui.Splitter.prototype.leftLimitSize;
+anychart.ui.Splitter.prototype['topLimitSize'] = anychart.ui.Splitter.prototype.topLimitSize;
+anychart.ui.Splitter.prototype['rightLimitSize'] = anychart.ui.Splitter.prototype.rightLimitSize;
+anychart.ui.Splitter.prototype['bottomLimitSize'] = anychart.ui.Splitter.prototype.bottomLimitSize;
+anychart.ui.Splitter.prototype['getLeftBounds'] = anychart.ui.Splitter.prototype.getLeftBounds;
+anychart.ui.Splitter.prototype['getTopBounds'] = anychart.ui.Splitter.prototype.getTopBounds;
+anychart.ui.Splitter.prototype['getRightBounds'] = anychart.ui.Splitter.prototype.getRightBounds;
+anychart.ui.Splitter.prototype['getBottomBounds'] = anychart.ui.Splitter.prototype.getBottomBounds;
+anychart.ui.Splitter.prototype['draw'] = anychart.ui.Splitter.prototype.draw;

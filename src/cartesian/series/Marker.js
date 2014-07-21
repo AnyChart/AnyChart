@@ -57,6 +57,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] = anychart.cartesian.series.Marker;
 
 
 /**
@@ -466,7 +467,7 @@ anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
  */
 anychart.cartesian.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'marker';
+  json['seriesType'] = anychart.cartesian.series.Type.MARKER;
 
   if (goog.isFunction(this.type())) {
     if (window.console) {
@@ -516,3 +517,22 @@ anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Marker', anychart.cartesian.series.Marker);
+anychart.cartesian.series.Marker.prototype['stroke'] = anychart.cartesian.series.Marker.prototype.stroke;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverStroke'] = anychart.cartesian.series.Marker.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Marker.prototype['fill'] = anychart.cartesian.series.Marker.prototype.fill;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverFill'] = anychart.cartesian.series.Marker.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Marker.prototype['size'] = anychart.cartesian.series.Marker.prototype.size;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverSize'] = anychart.cartesian.series.Marker.prototype.hoverSize;//in docs/
+anychart.cartesian.series.Marker.prototype['type'] = anychart.cartesian.series.Marker.prototype.type;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverType'] = anychart.cartesian.series.Marker.prototype.hoverType;//in docs/
+anychart.cartesian.series.Marker.prototype['startDrawing'] = anychart.cartesian.series.Marker.prototype.startDrawing;//in docs/
+anychart.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.cartesian.series.Marker.prototype.finalizeDrawing;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverSeries'] = anychart.cartesian.series.Marker.prototype.hoverSeries;//in docs/
+anychart.cartesian.series.Marker.prototype['hoverPoint'] = anychart.cartesian.series.Marker.prototype.hoverPoint;//in docs/
+anychart.cartesian.series.Marker.prototype['unhover'] = anychart.cartesian.series.Marker.prototype.unhover;//in docs/
+anychart.cartesian.series.Marker.prototype['hatchFill'] = anychart.cartesian.series.Marker.prototype.hatchFill;
+anychart.cartesian.series.Marker.prototype['hoverHatchFill'] = anychart.cartesian.series.Marker.prototype.hoverHatchFill;

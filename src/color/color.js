@@ -468,3 +468,9 @@ anychart.color.parseKey_ = function(key) {
     result['offset'] = goog.math.clamp(offset, 0, 1);
   return /** @type {acgraph.vector.GradientKey} */(result);
 };
+
+
+//exports
+goog.exportSymbol('anychart.color.blend', anychart.color.blend);//in docs/final
+goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);//in docs/final
+goog.exportSymbol('anychart.color.darken', anychart.color.darken);//in docs/final

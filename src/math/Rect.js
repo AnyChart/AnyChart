@@ -91,3 +91,6 @@ anychart.math.Rect.deserialize = function(config) {
       +config['height'] || 0);
 };
 //endregion
+
+//exports
+goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);

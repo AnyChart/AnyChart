@@ -365,3 +365,14 @@ anychart.scales.Ordinal.prototype.deserialize = function(value) {
 anychart.scales.ordinal = function() {
   return new anychart.scales.Ordinal();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.Ordinal', anychart.scales.Ordinal);
+anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;
+anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;
+anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;
+anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;
+anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;
+anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;
+goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);

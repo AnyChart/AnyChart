@@ -1,22 +1,37 @@
 goog.provide('anychart.cartesian.series');
-goog.require('anychart.cartesian.series.Area');
-goog.require('anychart.cartesian.series.Bar');
-goog.require('anychart.cartesian.series.Bubble');
-goog.require('anychart.cartesian.series.Candlestick');
-goog.require('anychart.cartesian.series.Column');
-goog.require('anychart.cartesian.series.Line');
-goog.require('anychart.cartesian.series.Marker');
-goog.require('anychart.cartesian.series.OHLC');
-goog.require('anychart.cartesian.series.RangeArea');
-goog.require('anychart.cartesian.series.RangeBar');
-goog.require('anychart.cartesian.series.RangeColumn');
-goog.require('anychart.cartesian.series.RangeSplineArea');
-goog.require('anychart.cartesian.series.RangeStepArea');
-goog.require('anychart.cartesian.series.Spline');
-goog.require('anychart.cartesian.series.SplineArea');
-goog.require('anychart.cartesian.series.StepArea');
-goog.require('anychart.cartesian.series.StepLine');
 /**
  * @namespace
  * @name anychart.cartesian.series
  */
+
+
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.cartesian.series.Type = {
+  AREA: 'area',
+  BAR: 'bar',
+  BUBBLE: 'bubble',
+  CANDLESTICK: 'candlestick',
+  COLUMN: 'column',
+  LINE: 'line',
+  MARKER: 'marker',
+  OHLC: 'ohlc',
+  RANGE_AREA: 'rangearea',
+  RANGE_BAR: 'rangebar',
+  RANGE_COLUMN: 'rangecolumn',
+  RANGE_SPLINE_AREA: 'rangesplinearea',
+  RANGE_STEP_AREA: 'rangesteparea',
+  SPLINE: 'spline',
+  SPLINE_AREA: 'splinearea',
+  STEP_AREA: 'steparea',
+  STEP_LINE: 'stepline'
+};
+
+
+/**
+ *
+ * @type {Object}
+ */
+anychart.cartesian.series.seriesTypesMap = {};

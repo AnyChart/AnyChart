@@ -349,3 +349,17 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
     stage.saveAsPDF(data[0], data[1], data[2]);
   }
 };
+
+
+//exports
+anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//in docs/final
+anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
+anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//in docs/final
+anychart.VisualBase.prototype['listen'] = anychart.VisualBase.prototype.listen;
+anychart.VisualBase.prototype['listenOnce'] = anychart.VisualBase.prototype.listenOnce;
+anychart.VisualBase.prototype['unlisten'] = anychart.VisualBase.prototype.unlisten;
+anychart.VisualBase.prototype['unlistenByKey'] = anychart.VisualBase.prototype.unlistenByKey;
+anychart.VisualBase.prototype['removeAllListeners'] = anychart.VisualBase.prototype.removeAllListeners;
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;

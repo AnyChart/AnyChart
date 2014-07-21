@@ -24,6 +24,7 @@ anychart.cartesian.series.Area = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Area, anychart.cartesian.series.AreaBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.AREA] = anychart.cartesian.series.Area;
 
 
 /** @inheritDoc */
@@ -125,7 +126,7 @@ anychart.cartesian.series.Area.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.Area.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'area';
+  json['seriesType'] = anychart.cartesian.series.Type.AREA;
   return json;
 };
 
@@ -136,3 +137,13 @@ anychart.cartesian.series.Area.prototype.serialize = function() {
 anychart.cartesian.series.Area.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Area', anychart.cartesian.series.Area);//in docs/
+anychart.cartesian.series.Area.prototype['fill'] = anychart.cartesian.series.Area.prototype.fill;//in docs/
+anychart.cartesian.series.Area.prototype['hoverFill'] = anychart.cartesian.series.Area.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Area.prototype['stroke'] = anychart.cartesian.series.Area.prototype.stroke;//in docs/
+anychart.cartesian.series.Area.prototype['hoverStroke'] = anychart.cartesian.series.Area.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Area.prototype['hatchFill'] = anychart.cartesian.series.Area.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Area.prototype['hoverHatchFill'] = anychart.cartesian.series.Area.prototype.hoverHatchFill;//in docs/

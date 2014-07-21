@@ -21,6 +21,7 @@ anychart.cartesian.series.OHLC = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.OHLC, anychart.cartesian.series.WidthBased);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.OHLC] = anychart.cartesian.series.OHLC;
 
 
 /**
@@ -351,12 +352,27 @@ anychart.cartesian.series.OHLC.prototype.getFinalFallingStroke = function(hover)
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.cartesian.series.OHLC.prototype.calculateStatistics = function() {
+  this.statistics('seriesMax', -Infinity);
+  this.statistics('seriesMin', Infinity);
+  this.statistics('seriesSum', 0);
+  this.statistics('seriesAverage', 0);
+  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
+};
+
+
 /**
  * @inheritDoc
  */
 anychart.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'ohlc';
+  json['seriesType'] = anychart.cartesian.series.Type.OHLC;
 
   if (goog.isFunction(this.risingStroke())) {
     if (window.console) {
@@ -418,3 +434,11 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
 
   return result;
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.OHLC', anychart.cartesian.series.OHLC);
+anychart.cartesian.series.OHLC.prototype['risingStroke'] = anychart.cartesian.series.OHLC.prototype.risingStroke;
+anychart.cartesian.series.OHLC.prototype['hoverRisingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverRisingStroke;
+anychart.cartesian.series.OHLC.prototype['fallingStroke'] = anychart.cartesian.series.OHLC.prototype.fallingStroke;
+anychart.cartesian.series.OHLC.prototype['hoverFallingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverFallingStroke;

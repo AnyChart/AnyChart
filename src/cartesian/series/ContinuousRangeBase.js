@@ -324,6 +324,21 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.finalizeHatchFill = func
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.cartesian.series.ContinuousRangeBase.prototype.calculateStatistics = function() {
+  this.statistics('seriesMax', -Infinity);
+  this.statistics('seriesMin', Infinity);
+  this.statistics('seriesSum', 0);
+  this.statistics('seriesAverage', 0);
+  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
+};
+
+
 /**
  * @inheritDoc
  */
@@ -392,3 +407,14 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.restoreDefaults = functi
 
   return result;
 };
+
+
+//exports
+anychart.cartesian.series.ContinuousRangeBase.prototype['fill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.fill;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hoverFill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverFill;
+anychart.cartesian.series.ContinuousRangeBase.prototype['highStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.highStroke;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hoverHighStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke;
+anychart.cartesian.series.ContinuousRangeBase.prototype['lowStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hoverLowStroke'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hatchFill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hatchFill;
+anychart.cartesian.series.ContinuousRangeBase.prototype['hoverHatchFill'] = anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHatchFill;

@@ -189,3 +189,9 @@ anychart.cartesian.series.DiscreteBase.prototype.unhover = function() {
   this.hoverStatus = NaN;
   return this;
 };
+
+
+//exports
+anychart.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.cartesian.series.DiscreteBase.prototype.hoverSeries;
+anychart.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.cartesian.series.DiscreteBase.prototype.hoverPoint;
+anychart.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.cartesian.series.DiscreteBase.prototype.unhover;

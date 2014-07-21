@@ -2003,3 +2003,37 @@ anychart.elements.MarkersFactory.Marker.prototype.deserialize = function(config)
   return goog.base(this, 'deserialize', config);
 };
 
+
+goog.exportSymbol('anychart.elements.MarkersFactory', anychart.elements.MarkersFactory);
+anychart.elements.MarkersFactory.prototype['positionFormatter'] = anychart.elements.MarkersFactory.prototype.positionFormatter;
+anychart.elements.MarkersFactory.prototype['position'] = anychart.elements.MarkersFactory.prototype.position;
+anychart.elements.MarkersFactory.prototype['anchor'] = anychart.elements.MarkersFactory.prototype.anchor;
+anychart.elements.MarkersFactory.prototype['offsetX'] = anychart.elements.MarkersFactory.prototype.offsetX;
+anychart.elements.MarkersFactory.prototype['offsetY'] = anychart.elements.MarkersFactory.prototype.offsetY;
+anychart.elements.MarkersFactory.prototype['type'] = anychart.elements.MarkersFactory.prototype.type;
+anychart.elements.MarkersFactory.prototype['size'] = anychart.elements.MarkersFactory.prototype.size;
+anychart.elements.MarkersFactory.prototype['fill'] = anychart.elements.MarkersFactory.prototype.fill;
+anychart.elements.MarkersFactory.prototype['stroke'] = anychart.elements.MarkersFactory.prototype.stroke;
+anychart.elements.MarkersFactory.prototype['pointerEvents'] = anychart.elements.MarkersFactory.prototype.pointerEvents;
+anychart.elements.MarkersFactory.prototype['serialize'] = anychart.elements.MarkersFactory.prototype.serialize;
+anychart.elements.MarkersFactory.prototype['deserialize'] = anychart.elements.MarkersFactory.prototype.deserialize;
+anychart.elements.MarkersFactory.prototype['add'] = anychart.elements.MarkersFactory.prototype.add;
+anychart.elements.MarkersFactory.prototype['draw'] = anychart.elements.MarkersFactory.prototype.draw;
+anychart.elements.MarkersFactory.prototype['clear'] = anychart.elements.MarkersFactory.prototype.clear;
+anychart.elements.MarkersFactory.prototype['measure'] = anychart.elements.MarkersFactory.prototype.measure;
+anychart.elements.MarkersFactory.prototype['enabled'] = anychart.elements.MarkersFactory.prototype.enabled;
+anychart.elements.MarkersFactory.Marker.prototype['positionFormatter'] = anychart.elements.MarkersFactory.Marker.prototype.positionFormatter;
+anychart.elements.MarkersFactory.Marker.prototype['position'] = anychart.elements.MarkersFactory.Marker.prototype.position;
+anychart.elements.MarkersFactory.Marker.prototype['anchor'] = anychart.elements.MarkersFactory.Marker.prototype.anchor;
+anychart.elements.MarkersFactory.Marker.prototype['offsetX'] = anychart.elements.MarkersFactory.Marker.prototype.offsetX;
+anychart.elements.MarkersFactory.Marker.prototype['offsetY'] = anychart.elements.MarkersFactory.Marker.prototype.offsetY;
+anychart.elements.MarkersFactory.Marker.prototype['type'] = anychart.elements.MarkersFactory.Marker.prototype.type;
+anychart.elements.MarkersFactory.Marker.prototype['size'] = anychart.elements.MarkersFactory.Marker.prototype.size;
+anychart.elements.MarkersFactory.Marker.prototype['fill'] = anychart.elements.MarkersFactory.Marker.prototype.fill;
+anychart.elements.MarkersFactory.Marker.prototype['stroke'] = anychart.elements.MarkersFactory.Marker.prototype.stroke;
+anychart.elements.MarkersFactory.Marker.prototype['enabled'] = anychart.elements.MarkersFactory.Marker.prototype.enabled;
+anychart.elements.MarkersFactory.Marker.prototype['serialize'] = anychart.elements.MarkersFactory.Marker.prototype.serialize;
+anychart.elements.MarkersFactory.Marker.prototype['deserialize'] = anychart.elements.MarkersFactory.Marker.prototype.deserialize;
+anychart.elements.MarkersFactory.Marker.prototype['draw'] = anychart.elements.MarkersFactory.Marker.prototype.draw;
+anychart.elements.MarkersFactory.Marker.prototype['clear'] = anychart.elements.MarkersFactory.Marker.prototype.clear;
+anychart.elements.MarkersFactory.Marker.prototype['getIndex'] = anychart.elements.MarkersFactory.Marker.prototype.getIndex;

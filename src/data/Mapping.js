@@ -160,3 +160,9 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
 anychart.data.Mapping.prototype.getArrayMapping = function() {
   return this.arrayMapping_;
 };
+
+
+//exports
+anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//in docs/final
+anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//in docs/final
+anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//in docs/final

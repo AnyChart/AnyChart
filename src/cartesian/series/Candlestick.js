@@ -15,6 +15,7 @@ anychart.cartesian.series.Candlestick = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 };
 goog.inherits(anychart.cartesian.series.Candlestick, anychart.cartesian.series.OHLC);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.CANDLESTICK] = anychart.cartesian.series.Candlestick;
 
 
 /**
@@ -486,7 +487,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(h
  */
 anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'candlestick';
+  json['seriesType'] = anychart.cartesian.series.Type.CANDLESTICK;
 
   if (goog.isFunction(this.risingFill())) {
     if (window.console) {
@@ -581,3 +582,15 @@ anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Candlestick', anychart.cartesian.series.Candlestick);
+anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesian.series.Candlestick.prototype.risingFill;
+anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;
+anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;
+anychart.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingFill;
+anychart.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.risingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.fallingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;

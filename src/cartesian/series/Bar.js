@@ -24,6 +24,7 @@ anychart.cartesian.series.Bar = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Bar, anychart.cartesian.series.BarBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BAR] = anychart.cartesian.series.Bar;
 
 
 /** @inheritDoc */
@@ -85,7 +86,7 @@ anychart.cartesian.series.Bar.prototype.createPositionProvider = function(positi
  */
 anychart.cartesian.series.Bar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'bar';
+  json['seriesType'] = anychart.cartesian.series.Type.BAR;
   return json;
 };
 
@@ -96,3 +97,13 @@ anychart.cartesian.series.Bar.prototype.serialize = function() {
 anychart.cartesian.series.Bar.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Bar', anychart.cartesian.series.Bar);//in docs/
+anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Bar.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;//in docs/

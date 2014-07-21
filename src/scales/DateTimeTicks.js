@@ -388,3 +388,10 @@ anychart.scales.DateTimeTicks.prototype.deserialize = function(value) {
   this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
   return goog.base(this, 'deserialize', value);
 };
+
+
+//exports
+anychart.scales.DateTimeTicks.prototype['interval'] = anychart.scales.DateTimeTicks.prototype.interval;
+anychart.scales.DateTimeTicks.prototype['count'] = anychart.scales.DateTimeTicks.prototype.count;
+anychart.scales.DateTimeTicks.prototype['set'] = anychart.scales.DateTimeTicks.prototype.set;
+anychart.scales.DateTimeTicks.prototype['get'] = anychart.scales.DateTimeTicks.prototype.get;

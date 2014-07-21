@@ -28,6 +28,7 @@ anychart.cartesian.series.SplineArea = function(data, opt_csvSettings) {
   this.queue_ = new anychart.cartesian.series.SplineDrawer(this.path);
 };
 goog.inherits(anychart.cartesian.series.SplineArea, anychart.cartesian.series.AreaBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.SPLINE_AREA] = anychart.cartesian.series.SplineArea;
 
 
 /** @inheritDoc */
@@ -158,7 +159,7 @@ anychart.cartesian.series.SplineArea.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.SplineArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'splinearea';
+  json['seriesType'] = anychart.cartesian.series.Type.SPLINE_AREA;
   return json;
 };
 
@@ -169,3 +170,14 @@ anychart.cartesian.series.SplineArea.prototype.serialize = function() {
 anychart.cartesian.series.SplineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.SplineArea', anychart.cartesian.series.SplineArea);
+anychart.cartesian.series.SplineArea.prototype['startDrawing'] = anychart.cartesian.series.SplineArea.prototype.startDrawing;
+anychart.cartesian.series.SplineArea.prototype['fill'] = anychart.cartesian.series.SplineArea.prototype.fill;
+anychart.cartesian.series.SplineArea.prototype['hoverFill'] = anychart.cartesian.series.SplineArea.prototype.hoverFill;
+anychart.cartesian.series.SplineArea.prototype['stroke'] = anychart.cartesian.series.SplineArea.prototype.stroke;
+anychart.cartesian.series.SplineArea.prototype['hoverStroke'] = anychart.cartesian.series.SplineArea.prototype.hoverStroke;
+anychart.cartesian.series.SplineArea.prototype['hatchFill'] = anychart.cartesian.series.SplineArea.prototype.hatchFill;
+anychart.cartesian.series.SplineArea.prototype['hoverHatchFill'] = anychart.cartesian.series.SplineArea.prototype.hoverHatchFill;

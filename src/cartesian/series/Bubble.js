@@ -50,6 +50,7 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.labels().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BUBBLE] = anychart.cartesian.series.Bubble;
 
 
 /**
@@ -805,7 +806,7 @@ anychart.cartesian.series.Base.prototype.getFinalNegativeHatchFill = function(ho
  */
 anychart.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'bubble';
+  json['seriesType'] = anychart.cartesian.series.Type.BUBBLE;
   json['minimumSize'] = this.minimumSize();
   json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();
@@ -896,3 +897,22 @@ anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
 
   return result;
 };
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.Bubble', anychart.cartesian.series.Bubble);//in docs/
+anychart.cartesian.series.Bubble.prototype['minimumSize'] = anychart.cartesian.series.Bubble.prototype.minimumSize;
+anychart.cartesian.series.Bubble.prototype['maximumSize'] = anychart.cartesian.series.Bubble.prototype.maximumSize;
+anychart.cartesian.series.Bubble.prototype['displayNegative'] = anychart.cartesian.series.Bubble.prototype.displayNegative;//in docs/
+anychart.cartesian.series.Bubble.prototype['fill'] = anychart.cartesian.series.Bubble.prototype.fill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverFill'] = anychart.cartesian.series.Bubble.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['stroke'] = anychart.cartesian.series.Bubble.prototype.stroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverStroke'] = anychart.cartesian.series.Bubble.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeFill'] = anychart.cartesian.series.Bubble.prototype.negativeFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverNegativeFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeStroke'] = anychart.cartesian.series.Bubble.prototype.negativeStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverNegativeStroke'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hatchFill'] = anychart.cartesian.series.Bubble.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverHatchFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;

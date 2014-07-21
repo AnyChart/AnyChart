@@ -1,37 +1,12 @@
 goog.provide('anychart');
+goog.require('anychart.data');
+goog.require('anychart.math');
+goog.require('anychart.utils');
+goog.require('goog.json.hybrid');
 goog.provide('anychart.globalLock');
 
-goog.require('acgraphexport');
-goog.require('anychart.cartesian');
-goog.require('anychart.data');
-goog.require('anychart.elements.Axis');
-goog.require('anychart.elements.Background');
-goog.require('anychart.elements.Grid');
-goog.require('anychart.elements.Label');
-goog.require('anychart.elements.LabelsFactory');
-goog.require('anychart.elements.LabelsFactory.Label');
-goog.require('anychart.elements.Legend');
-goog.require('anychart.elements.LineMarker');
-goog.require('anychart.elements.Marker');
-goog.require('anychart.elements.MarkersFactory');
-goog.require('anychart.elements.MarkersFactory.Marker');
-goog.require('anychart.elements.RangeMarker');
-goog.require('anychart.elements.Separator');
-goog.require('anychart.elements.Table');
-goog.require('anychart.elements.TextMarker');
-goog.require('anychart.elements.Ticks');
-goog.require('anychart.elements.Title');
-goog.require('anychart.elements.Tooltip');
-goog.require('anychart.math');
-goog.require('anychart.pie');
-goog.require('anychart.ui');
-goog.require('anychart.utils');
-goog.require('anychart.utils.DistinctColorPalette');
-goog.require('anychart.utils.MarkerPalette');
-goog.require('anychart.utils.RangeColorPalette');
-goog.require('goog.json.hybrid');
-
 /**
+ * Core space for all anychart components.
  @namespace
  @name anychart
  */
@@ -44,6 +19,18 @@ goog.require('goog.json.hybrid');
 anychart.VERSION = '';
 
 
+/**
+ * Define, is developers edition.
+ * @define {boolean} Is developers version.
+ */
+anychart.DEVELOP = false;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Global lock
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * If the globalLock is locked.
  * @type {number}
@@ -96,58 +83,28 @@ anychart.globalLock.unlock = function() {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  JSON
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
- * Validates correctness of the json.
- * @param {Object} json JSON object.
- * @return {boolean} Is json valid.
- * @private
+ * @type {Object}
  */
-anychart.isJsonValid_ = function(json) {
-  return true;
-};
-
-
-
-/**
- * Factory for creating class constructors by json config.
- * @constructor
- */
-anychart.ClassFactory = function() {
-};
-goog.addSingletonGetter(anychart.ClassFactory);
+anychart.chartTypesMap = {};
 
 
 /**
- * Returns an instance of the class.
- * @param {Object} json json config.
- * @return {*} Class constructor.
+ * @param {string} type
+ * @return {anychart.Chart}
  */
-anychart.ClassFactory.prototype.getClass = function(json) {
-  if (json['chart'] && json['chart']['type'] == 'pie') return new anychart.pie.Chart();
-  else if (json['chart'] && json['chart']['type'] == 'cartesian') return new anychart.cartesian.Chart();
-  return null;
-};
-
-
-/**
- * Returns an instance of the scale.
- * @param {Object} json json config.
- * @return {anychart.scales.Base} Class constructor.
- */
-anychart.ClassFactory.prototype.getScale = function(json) {
-  var type = json['type'];
-  if (type) {
-    var scale;
-    if (type == 'ordinal') {
-      scale = new anychart.scales.Ordinal();
-    } else if (type == 'linear') {
-      scale = new anychart.scales.Linear();
-    } else if (type == 'datetime') {
-      scale = new anychart.scales.DateTime();
-    }
-    if (scale) return /** @type {anychart.scales.Base}*/(scale.deserialize(json));
+anychart.createChartByType = function(type) {
+  var cls = anychart.chartTypesMap[type];
+  if (cls) {
+    return /** @type {anychart.Chart} */(new cls());
+  } else {
+    throw 'Unknown chart type: ' + type + '\nIt can be contains in other modules, see module list for details.';
   }
-  return null;
 };
 
 
@@ -166,18 +123,16 @@ anychart.fromJson = function(jsonConfig) {
     json = goog.json.hybrid.parse(jsonConfig);
   } else if (goog.isObject(jsonConfig) && !goog.isFunction(jsonConfig)) {
     json = jsonConfig;
-  } else {
-    json = {};
   }
 
-  if (anychart.isJsonValid_(json)) {
-    var cls = anychart.ClassFactory.getInstance().getClass(json);
-    if (cls) {
-      cls.deserialize(json);
-      return cls;
-    }
-    else return null;
-  } else return null;
+  if (!json) throw 'Empty json config';
+
+  var chart = json['chart'];
+  if (!chart) throw 'Config should contains chart node';
+
+
+  var instance = anychart.createChartByType(chart['type']);
+  instance.deserialize(json);
 };
 
 
@@ -372,257 +327,18 @@ anychart.onDocumentReady = function(func, opt_scope) {
   }
 };
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  AnyChart defaults for basic types of charts and series.
-//
-//----------------------------------------------------------------------------------------------------------------------
 
+//exports
+goog.exportSymbol('anychart.VERSION', anychart.VERSION);
+goog.exportSymbol('anychart.version', anychart.VERSION);
+goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);
+goog.exportSymbol('anychart.develop', anychart.DEVELOP);
+goog.exportSymbol('anychart.fromJson', anychart.fromJson);
+goog.exportSymbol('anychart.fromXml', anychart.fromXml);
+goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
+goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
 
-/**
- * Default empty chart.
- * @return {anychart.cartesian.Chart} Empty chart.
- */
-anychart.chart = function() {
-  var chart = new anychart.cartesian.Chart();
 
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
 
-  return chart;
-};
 
 
-/**
- * Default scatter chart.
- * @return {anychart.cartesian.Chart} Scatter chart.
- */
-anychart.scatterChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title').fontWeight('bold');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid()
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.grid()
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  return chart;
-};
-
-
-/**
- * Default pie chart.
- * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @return {anychart.pie.Chart} Default pie chart.
- */
-anychart.pieChart = function(opt_data) {
-  var chart = new anychart.pie.Chart(opt_data);
-
-  chart.title()
-      .text('Pie Chart')
-      .fontWeight('bold');
-
-  chart.labels()
-      .enabled(true);
-
-  chart.legend()
-      .enabled(true)
-      .position('right')
-      .align('left')
-      .itemsLayout('vertical');
-
-  chart.legend().title()
-      .enabled(false);
-
-  chart.legend().titleSeparator()
-      .enabled(false)
-      .margin(3, 0);
-
-  return chart;
-};
-
-
-/**
- * Default line chart.
- * xAxis, yAxis, grids.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
- */
-anychart.lineChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid()
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.grid()
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  return chart;
-};
-
-
-/**
- * Default column chart.
- * xAxis, yAxis, grids.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
- */
-anychart.columnChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title').fontWeight('bold');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid()
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.grid()
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  return chart;
-};
-
-
-/**
- * Default bar chart.
- * xAxis, yAxis, grids.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
- */
-anychart.barChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title').fontWeight('bold');
-
-  chart.xScale().inverted(true);
-
-  chart.xAxis().orientation('left');
-  chart.yAxis().orientation('bottom');
-
-  chart.grid()
-      .direction(anychart.utils.Direction.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .direction(anychart.utils.Direction.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
-
-  chart.grid()
-      .drawFirstLine(true)
-      .drawLastLine(true)
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.HORIZONTAL).scale(/** @type {anychart.scales.Base} */ (chart.xScale()));
-
-  return chart;
-};
-
-
-/**
- * Default area chart.
- * xAxis, yAxis, grids.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
- */
-anychart.areaChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title').fontWeight('bold');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid()
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.grid()
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  return chart;
-};
-
-
-/**
- * Default financial chart.
- * xAxis, yAxis, grids.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
- */
-anychart.financialChart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().text('Chart Title').fontWeight('bold');
-  var scale = new anychart.scales.DateTime();
-
-  chart.xScale(scale);
-
-  var axis = chart.xAxis();
-
-  axis.labels()
-      .textFormatter(function(value) {
-        var date = new Date(value['value']);
-        var options = {year: 'numeric', month: 'short', day: 'numeric'};
-        return date.toLocaleDateString('en-US', options);
-      });
-
-  chart.yAxis();
-
-  chart.grid()
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .direction(anychart.utils.Direction.HORIZONTAL);
-
-  chart.grid()
-      .evenFill('none')
-      .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
-
-  return chart;
-};

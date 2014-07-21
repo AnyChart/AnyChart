@@ -179,3 +179,10 @@ anychart.scales.DateTime.prototype.deserialize = function(value) {
 anychart.scales.dateTime = function() {
   return new anychart.scales.DateTime();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.DateTime', anychart.scales.DateTime);
+anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
+anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
+goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);

@@ -2,6 +2,7 @@ goog.provide('anychart.pie.Chart');
 goog.require('anychart.Chart');
 goog.require('anychart.color');
 goog.require('anychart.elements.LabelsFactory');
+goog.require('anychart.elements.Tooltip');
 goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
@@ -210,12 +211,19 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
 
 
 /**
+ * @type {string}
+ */
+anychart.pie.Chart.CHART_TYPE = 'pie';
+anychart.chartTypesMap[anychart.pie.Chart.CHART_TYPE] = anychart.pie.Chart;
+
+
+/**
  * Supported signals.
  * @type {number}
  */
 anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
     anychart.Chart.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.DATA_CHANGED;
+    anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -224,11 +232,11 @@ anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
  */
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.DATA |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.HOVER |
-        anychart.ConsistencyState.CLICK;
+    anychart.ConsistencyState.DATA |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.LABELS |
+    anychart.ConsistencyState.HOVER |
+    anychart.ConsistencyState.CLICK;
 
 
 /**
@@ -1495,8 +1503,7 @@ anychart.pie.Chart.prototype.serialize = function() {
   var json = {};
 
   var chart = goog.base(this, 'serialize');
-
-  chart['type'] = 'pie';
+  chart['type'] = anychart.pie.Chart.CHART_TYPE;
 
   var fill = this.fill();
   var stroke = this.stroke();
@@ -1661,3 +1668,29 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
   this.event_ = e;
   delete this.propagationStopped_;
 };
+
+
+//exports
+goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);//in docs/final
+anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//in docs/final
+anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;
+
+
+
+anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//in docs/final
+anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//in docs/final
+anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//in docs/final
+anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;//in docs/final
+anychart.pie.Chart.prototype['explode'] = anychart.pie.Chart.prototype.explode;//in docs/final
+anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;//in docs/final
+anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;//in docs/final
+anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/final
+anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/final
+anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/final
+anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//in docs/final
+anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//in docs/final
+anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//in docs/final
+anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//in docs/final
+anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;//in docs/
+anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;
+anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;

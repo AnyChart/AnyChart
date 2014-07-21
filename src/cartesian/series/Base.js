@@ -1,5 +1,6 @@
 goog.provide('anychart.cartesian.series.Base');
 goog.require('anychart.VisualBaseWithBounds');
+goog.require('anychart.cartesian.series');
 goog.require('anychart.color');
 goog.require('anychart.data');
 goog.require('anychart.elements.LabelsFactory');
@@ -61,8 +62,8 @@ goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
  */
 anychart.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.DATA_CHANGED |
-        anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.DATA_CHANGED |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -71,10 +72,10 @@ anychart.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
  */
 anychart.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.HATCH_FILL |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.DATA;
+    anychart.ConsistencyState.HATCH_FILL |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.LABELS |
+    anychart.ConsistencyState.DATA;
 
 
 /**
@@ -1034,14 +1035,14 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
   var sum = this.statistics('sum');
   var average = this.statistics('average');
 
-  if (seriesMax) provider['seriesMax'] = seriesMax;
-  if (seriesMin) provider['seriesMin'] = seriesMin;
-  if (seriesSum) provider['seriesSum'] = seriesSum;
-  if (seriesAverage) provider['seriesAverage'] = seriesAverage;
-  if (max) provider['max'] = max;
-  if (min) provider['min'] = min;
-  if (sum) provider['sum'] = sum;
-  if (average) provider['average'] = average;
+  provider['seriesMax'] = seriesMax;
+  provider['seriesMin'] = seriesMin;
+  provider['seriesSum'] = seriesSum;
+  provider['seriesAverage'] = seriesAverage;
+  provider['max'] = max;
+  provider['min'] = min;
+  provider['sum'] = sum;
+  provider['average'] = average;
 
   var referenceName;
   for (var i in this.referenceValueNames) {
@@ -1428,6 +1429,44 @@ anychart.cartesian.series.Base.prototype.labelsInvalidated_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Calculate series statisctics.
+ */
+anychart.cartesian.series.Base.prototype.calculateStatistics = function() {
+  var seriesMax = -Infinity;
+  var seriesMin = Infinity;
+  var seriesSum = 0;
+  var seriesPointsCount = 0;
+
+  var iterator = this.getResetIterator();
+
+  while (iterator.advance()) {
+    var values = this.getReferenceScaleValues();
+    if (values) {
+      var y = parseFloat(values[0]);
+      if (!isNaN(y)) {
+        seriesMax = Math.max(seriesMax, y);
+        seriesMin = Math.min(seriesMin, y);
+        seriesSum += y;
+      }
+    }
+    seriesPointsCount++;
+  }
+  var seriesAverage = seriesSum / seriesPointsCount;
+
+  this.statistics('seriesMax', seriesMax);
+  this.statistics('seriesMin', seriesMin);
+  this.statistics('seriesSum', seriesSum);
+  this.statistics('seriesAverage', seriesAverage);
+  this.statistics('seriesPointsCount', seriesPointsCount);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Coloring
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1694,7 +1733,7 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
  * image fill here - stroke doesn't support it.
  * @shortDescription Setter for series color by one value.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Color, or gradient.
-* @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
+ * @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Fill
  *  mode or CenterY for radial gradient.
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Opacity
@@ -1852,13 +1891,13 @@ anychart.cartesian.series.Base.prototype.getFinalStroke = function(usePointSetti
   var iterator = this.getIterator();
   var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
       (usePointSettings && iterator.get('stroke')) ||
-          this.stroke());
+      this.stroke());
   return /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Stroke|Function} */(
               (iterator.get('hoverStroke') && usePointSettings) ||
-                  this.hoverStroke() ||
-                  normalColor),
+              this.hoverStroke() ||
+              normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -2112,3 +2151,23 @@ anychart.cartesian.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt
   this.event_ = e;
   delete this.propagationStopped_;
 };
+
+
+//exports
+anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//in docs/
+anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;
+anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//in docs/
+anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//in docs/
+anychart.cartesian.series.Base.prototype['drawPoint'] = anychart.cartesian.series.Base.prototype.drawPoint;//in docs/
+anychart.cartesian.series.Base.prototype['drawMissing'] = anychart.cartesian.series.Base.prototype.drawMissing;//in docs/
+anychart.cartesian.series.Base.prototype['startDrawing'] = anychart.cartesian.series.Base.prototype.startDrawing;//in docs/
+anychart.cartesian.series.Base.prototype['finalizeDrawing'] = anychart.cartesian.series.Base.prototype.finalizeDrawing;//in docs/
+anychart.cartesian.series.Base.prototype['labels'] = anychart.cartesian.series.Base.prototype.labels;//in docs/
+anychart.cartesian.series.Base.prototype['tooltip'] = anychart.cartesian.series.Base.prototype.tooltip;//in docs/
+anychart.cartesian.series.Base.prototype['color'] = anychart.cartesian.series.Base.prototype.color;//in docs/
+anychart.cartesian.series.Base.prototype['getIterator'] = anychart.cartesian.series.Base.prototype.getIterator;//in docs/
+anychart.cartesian.series.Base.prototype['getResetIterator'] = anychart.cartesian.series.Base.prototype.getResetIterator;//in docs/
+anychart.cartesian.series.Base.prototype['xPointPosition'] = anychart.cartesian.series.Base.prototype.xPointPosition;//in docs/
+anychart.cartesian.series.Base.prototype['xScale'] = anychart.cartesian.series.Base.prototype.xScale;//in docs/
+anychart.cartesian.series.Base.prototype['yScale'] = anychart.cartesian.series.Base.prototype.yScale;//in docs/
+anychart.cartesian.series.Base.prototype['clip'] = anychart.cartesian.series.Base.prototype.clip;

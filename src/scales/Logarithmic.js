@@ -47,3 +47,10 @@ anychart.scales.Logarithmic.prototype.calculate = function() {
 anychart.scales.log = function() {
   return new anychart.scales.Logarithmic();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.Logarithmic', anychart.scales.Logarithmic);
+anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;
+anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;
+goog.exportSymbol('anychart.scales.log', anychart.scales.log);
