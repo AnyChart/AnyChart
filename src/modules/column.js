@@ -20,7 +20,7 @@ anychart.columnChart = function(var_args) {
   chart.xAxis();
   chart.yAxis();
 
-  chart.grid()
+  chart.grid(0)
       .direction(anychart.utils.Direction.HORIZONTAL);
 
   chart.minorGrid()
@@ -29,7 +29,7 @@ anychart.columnChart = function(var_args) {
       .stroke('black 0.075')
       .direction(anychart.utils.Direction.HORIZONTAL);
 
-  chart.grid()
+  chart.grid(1)
       .evenFill('none')
       .oddFill('none')
       .direction(anychart.utils.Direction.VERTICAL);

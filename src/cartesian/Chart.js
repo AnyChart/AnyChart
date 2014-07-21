@@ -375,7 +375,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.grids_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var grid = this.grids_[index];
@@ -469,7 +469,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.minorGrids_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var grid = this.minorGrids_[index];
@@ -569,7 +569,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.xAxes_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var axis = this.xAxes_[index];
@@ -656,7 +656,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.yAxes_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var axis = this.yAxes_[index];
@@ -764,7 +764,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.lineAxesMarkers_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var lineMarker = this.lineAxesMarkers_[index];
@@ -842,7 +842,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.rangeAxesMarkers_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var rangeMarker = this.rangeAxesMarkers_[index];
@@ -927,7 +927,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.textAxesMarkers_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var textMarker = this.textAxesMarkers_[index];

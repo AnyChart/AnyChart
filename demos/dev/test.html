@@ -4,7 +4,7 @@
   <script src="../../src/deps.js"></script>
   <meta charset="utf-8">
   <script>
-    goog.require('anychart');
+    goog.require('anychart.modules.anychart');
   </script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
   <style>
@@ -43,11 +43,11 @@
     chart.yAxis();
 
     //create horizontal chart grid
-    chart.grid()
+    chart.grid(0)
         .direction(anychart.utils.Direction.HORIZONTAL);
 
     //create vertical chart grid
-    chart.grid()
+    chart.grid(1)
         .evenFill('none')
         .oddFill('none')
         .direction(anychart.utils.Direction.VERTICAL);

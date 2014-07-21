@@ -12,33 +12,33 @@
 
       var chart = anychart.lineChart();
 
-      var series = chart.spline([
-        ['A1' , -350],
+      var scale = new anychart.scales.Linear();
+//      scale.minimum(20);
+      scale.maximum(1030);
+      chart.yScale(scale);
+      chart.yAxis().overlapMode('nooverlap').minorLabels().enabled(true);
+//      chart.minorGrid()
+//          .scale(chart.yScale())
+//          .stroke('black')
+//          .direction('horizontal');
+      chart.line([
+        ['A1' , 15],
         ['A2' , 50],
-        ['A3' , -191],
+        ['A3' , 101],
         ['A4' , 1001],
         ['A5' , 125]
       ]);
-      series.labels().enabled(true);
-      var scale = new anychart.scales.Linear();
-      scale.minimum(0);
 
-
-
-      chart.yScale(scale);
       chart.container('container');
-
       chart.draw();
 
-
-      series.clip(new acgraph.math.Rect(150, 200, 100, 100));
     }
   </script>
   <style>
     #container {
-      width: 400px;
-      height: 300px;
-      border: 1px solid #000000;
+      width: 1000px;
+      height: 600px;
+      /*border: 1px solid #000000;*/
     }
   </style>
 </head>

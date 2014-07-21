@@ -338,8 +338,3 @@ goog.exportSymbol('anychart.fromJson', anychart.fromJson);
 goog.exportSymbol('anychart.fromXml', anychart.fromXml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
-
-
-
-
-

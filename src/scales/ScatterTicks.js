@@ -377,18 +377,34 @@ anychart.scales.ScatterTicks.prototype.setupLinearAsMinor_ = function(values, or
   this.autoTicks_ = null;
   if (!this.explicit_) {
     var ticks = [];
-    var min, max, lastVal = NaN, j;
+    var min = values[0], max = values[1], lastVal = NaN, j;
+    var count = this.count_ - 1; // it should be valid here
+
+    var interval = this.interval_;
+    if (isNaN(interval)) {
+      var range = max - min;
+      interval = range / count;
+    }
+    interval = Math.max(interval, 1e-7);
+
+    var start = anychart.math.round(anychart.utils.alignRight(originalMin, interval, min));
+    if (start > originalMin) ticks.push(originalMin);
+    for (j = start; j < min; j = anychart.math.round(j + interval, 7)) {
+      if (lastVal != j)
+        ticks.push(j);
+      lastVal = j;
+    }
+
     for (var i = 1; i < values.length; i++) {
       min = values[i - 1];
       max = values[i];
-      var interval = this.interval_;
       if (isNaN(interval)) {
-        var count = this.count_ - 1; // it should be valid here
-        var range = max - min;
+        range = max - min;
         interval = range / count;
       }
       interval = Math.max(interval, 1e-7);
-      var start = anychart.math.round(isNaN(lastVal) ? originalMin : min, 7);
+
+      start = anychart.math.round(min, 7);
       for (j = start; j <= max; j = anychart.math.round(j + interval, 7)) {
         if (lastVal != j)
           ticks.push(j);
@@ -400,6 +416,7 @@ anychart.scales.ScatterTicks.prototype.setupLinearAsMinor_ = function(values, or
         ticks.push(j);
       lastVal = j;
     }
+    if (lastVal < originalMax) ticks.push(originalMax);
     this.autoTicks_ = ticks;
   }
 };

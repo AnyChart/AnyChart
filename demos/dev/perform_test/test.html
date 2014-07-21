@@ -54,10 +54,10 @@
         chart.title().text(seriesName);
         chart.background().fill('gray .5');
         chart.legend().enabled(true);
-        chart.yAxis().orientation('left');
-        chart.xAxis().orientation('bottom');
-        chart.xAxis().orientation('top');
-        chart.yAxis().orientation('right');
+        chart.yAxis(0).orientation('left');
+        chart.xAxis(0).orientation('bottom');
+        chart.xAxis(1).orientation('top');
+        chart.yAxis(1).orientation('right');
 
         if (seriesName == 'bubble') {
           series1.minimumSize(1);

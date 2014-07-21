@@ -214,19 +214,19 @@ function load() {
     [4, 60],
     [5, 20]
   ]).markers(null);
-  chart.yAxis().orientation('left');
-  chart.xAxis().orientation('bottom');
-  chart.xAxis().orientation('top');
-  chart.yAxis().orientation('right');
+  chart.yAxis(0).orientation('left');
+  chart.xAxis(0).orientation('bottom');
+  chart.xAxis(1).orientation('top');
+  chart.yAxis(1).orientation('right');
 
-  chart.lineMarker().direction('horizontal').value(40);
-  chart.lineMarker().direction('vertical').value(2);
+  chart.lineMarker(0).direction('horizontal').value(40);
+  chart.lineMarker(1).direction('vertical').value(2);
 
-  chart.rangeMarker().direction('horizontal').from(60).to(80);
-  chart.rangeMarker().direction('vertical').from(3).to(4);
+  chart.rangeMarker(0).direction('horizontal').from(60).to(80);
+  chart.rangeMarker(1).direction('vertical').from(3).to(4);
 
-  chart.textMarker().orientation('bottom').value(2).text('2').align('near').anchor('rightbottom');
-  chart.textMarker().orientation('left').value(40).text('40').align('near').anchor('leftbottom');
+  chart.textMarker(0).orientation('bottom').value(2).text('2').align('near').anchor('rightbottom');
+  chart.textMarker(1).orientation('left').value(40).text('40').align('near').anchor('leftbottom');
 
   chart.draw();
 

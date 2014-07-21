@@ -2005,7 +2005,7 @@ anychart.elements.Axis.prototype.draw = function() {
         i = 0;
         j = 0;
         var minorTicksArrLen = scaleMinorTicksArr.length;
-        var minorTickVal, minorRatio;
+        var minorTickVal, minorRatio, prevMajorRatio;
 
         while (i < ticksArrLen || j < minorTicksArrLen) {
           tickVal = scaleTicksArr[i];
@@ -2027,10 +2027,11 @@ anychart.elements.Axis.prototype.draw = function() {
             drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
             if (labelsDrawer && drawLabel)
               labelsDrawer.call(this, tickVal, scale.transform(tickVal, .5), i, majorPixelShift);
+            prevMajorRatio = ratio;
             i++;
           } else {
             var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
-            if (minorTicksDrawer && ratio != minorRatio)
+            if (minorTicksDrawer && prevMajorRatio != minorRatio)
               ticksDrawer.call(
                   minorTicks,
                   minorRatio,
@@ -2040,7 +2041,7 @@ anychart.elements.Axis.prototype.draw = function() {
                   minorPixelShift);
 
             drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
-            if (minorLabelsDrawer && drawLabel)
+            if (minorLabelsDrawer && drawLabel && prevMajorRatio != minorRatio)
               minorLabelsDrawer.call(this, minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift);
             j++;
           }
