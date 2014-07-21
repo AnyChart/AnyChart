@@ -297,7 +297,8 @@ anychart.scales.Base.prototype.applyStacking;
  * @return {number} Previously stacked data value. Returns 0, if previous value was NaN.
  */
 anychart.scales.Base.prototype.getPrevVal = function(value) {
-  if (this.stackMode_ != anychart.scales.StackMode.NONE && goog.isNumber(value) && !isNaN(value)) {
+  value = goog.isNull(value) ? NaN : +value;
+  if (this.stackMode_ != anychart.scales.StackMode.NONE && !isNaN(value)) {
     if (value >= 0)
       return this.stackPositive_;
     else
@@ -333,7 +334,8 @@ anychart.scales.Base.prototype.applyModeNone_ = function(value) {
  * @private
  */
 anychart.scales.Base.prototype.applyModeValue_ = function(value) {
-  var isNotMissing = goog.isNumber(value) && !isNaN(value);
+  value = goog.isNull(value) ? NaN : +value;
+  var isNotMissing = !isNaN(value);
   if (isNotMissing) {
     if (/** @type {number} */(value) >= 0) {
       value = this.stackPositive_ += /** @type {number} */(value); // both value and stackVal become a sum of them.
@@ -353,6 +355,7 @@ anychart.scales.Base.prototype.applyModeValue_ = function(value) {
  * @private
  */
 anychart.scales.Base.prototype.applyModePercent_ = function(value) {
+  value = goog.isNull(value) ? NaN : +value;
   var max = /** @type {number} */(value) < 0 ? -this.stackMin_ : this.stackMax_;
   return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, -100, 100));
 };
