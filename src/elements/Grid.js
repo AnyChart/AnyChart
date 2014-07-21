@@ -679,8 +679,17 @@ anychart.elements.Grid.prototype.disposeInternal = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Grid}
+ */
+anychart.elements.grid = function() {
+  return new anychart.elements.Grid();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Grid', anychart.elements.Grid);
+goog.exportSymbol('anychart.elements.grid', anychart.elements.grid);
 anychart.elements.Grid.prototype['minor'] = anychart.elements.Grid.prototype.minor;
 anychart.elements.Grid.prototype['oddFill'] = anychart.elements.Grid.prototype.oddFill;
 anychart.elements.Grid.prototype['evenFill'] = anychart.elements.Grid.prototype.evenFill;

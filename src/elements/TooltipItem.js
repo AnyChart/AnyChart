@@ -928,8 +928,17 @@ anychart.elements.TooltipItem.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.TooltipItem}
+ */
+anychart.elements.tooltipItem = function() {
+  return new anychart.elements.TooltipItem();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.TooltipItem', anychart.elements.TooltipItem);
+goog.exportSymbol('anychart.elements.tooltipItem', anychart.elements.tooltipItem);
 anychart.elements.TooltipItem.prototype['title'] = anychart.elements.TooltipItem.prototype.title;
 anychart.elements.TooltipItem.prototype['separator'] = anychart.elements.TooltipItem.prototype.separator;
 anychart.elements.TooltipItem.prototype['content'] = anychart.elements.TooltipItem.prototype.content;

@@ -1948,8 +1948,17 @@ anychart.elements.Legend.prototype.deserialize = function(config) {
 anychart.elements.Legend.LegendItemProvider;
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Legend}
+ */
+anychart.elements.legend = function() {
+  return new anychart.elements.Legend();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Legend', anychart.elements.Legend);
+goog.exportSymbol('anychart.elements.legend', anychart.elements.legend);
 anychart.elements.Legend.prototype['itemsLayout'] = anychart.elements.Legend.prototype.itemsLayout;
 anychart.elements.Legend.prototype['itemsProvider'] = anychart.elements.Legend.prototype.itemsProvider;
 anychart.elements.Legend.prototype['itemsSpacing'] = anychart.elements.Legend.prototype.itemsSpacing;

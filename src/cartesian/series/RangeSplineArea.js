@@ -136,5 +136,17 @@ anychart.cartesian.series.RangeSplineArea.prototype.deserialize = function(confi
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeSplineArea}
+ */
+anychart.cartesian.series.rangeSplineArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeSplineArea(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.RangeSplineArea', anychart.cartesian.series.RangeSplineArea);
+goog.exportSymbol('anychart.cartesian.series.rangeSplineArea', anychart.cartesian.series.rangeSplineArea);

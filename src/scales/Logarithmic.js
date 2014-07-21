@@ -50,7 +50,6 @@ anychart.scales.log = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.Logarithmic', anychart.scales.Logarithmic);
+goog.exportSymbol('anychart.scales.log', anychart.scales.log);
 anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;
 anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;
-goog.exportSymbol('anychart.scales.log', anychart.scales.log);

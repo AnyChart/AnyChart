@@ -1977,8 +1977,17 @@ anychart.elements.LabelsFactory.Label.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.LabelsFactory}
+ */
+anychart.elements.labelsFactory = function() {
+  return new anychart.elements.LabelsFactory();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.LabelsFactory', anychart.elements.LabelsFactory);
+goog.exportSymbol('anychart.elements.labelsFactory', anychart.elements.labelsFactory);
 anychart.elements.LabelsFactory.prototype['background'] = anychart.elements.LabelsFactory.prototype.background;
 anychart.elements.LabelsFactory.prototype['padding'] = anychart.elements.LabelsFactory.prototype.padding;
 anychart.elements.LabelsFactory.prototype['textFormatter'] = anychart.elements.LabelsFactory.prototype.textFormatter;
@@ -1998,7 +2007,6 @@ anychart.elements.LabelsFactory.prototype['clear'] = anychart.elements.LabelsFac
 anychart.elements.LabelsFactory.prototype['measure'] = anychart.elements.LabelsFactory.prototype.measure;
 anychart.elements.LabelsFactory.prototype['enabled'] = anychart.elements.LabelsFactory.prototype.enabled;
 anychart.elements.LabelsFactory.prototype['measureWithTransform'] = anychart.elements.LabelsFactory.prototype.measureWithTransform;
-goog.exportSymbol('anychart.elements.LabelsFactory.Label', anychart.elements.LabelsFactory.Label);
 anychart.elements.LabelsFactory.Label.prototype['background'] = anychart.elements.LabelsFactory.Label.prototype.background;
 anychart.elements.LabelsFactory.Label.prototype['padding'] = anychart.elements.LabelsFactory.Label.prototype.padding;
 anychart.elements.LabelsFactory.Label.prototype['textFormatter'] = anychart.elements.LabelsFactory.Label.prototype.textFormatter;

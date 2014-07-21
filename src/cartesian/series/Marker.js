@@ -519,8 +519,20 @@ anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Marker}
+ */
+anychart.cartesian.series.marker = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Marker(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.Marker', anychart.cartesian.series.Marker);
+goog.exportSymbol('anychart.cartesian.series.marker', anychart.cartesian.series.marker);
 anychart.cartesian.series.Marker.prototype['stroke'] = anychart.cartesian.series.Marker.prototype.stroke;//in docs/
 anychart.cartesian.series.Marker.prototype['hoverStroke'] = anychart.cartesian.series.Marker.prototype.hoverStroke;//in docs/
 anychart.cartesian.series.Marker.prototype['fill'] = anychart.cartesian.series.Marker.prototype.fill;//in docs/

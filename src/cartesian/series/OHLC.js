@@ -436,8 +436,20 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.OHLC}
+ */
+anychart.cartesian.series.ohlc = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.OHLC(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.OHLC', anychart.cartesian.series.OHLC);
+goog.exportSymbol('anychart.cartesian.series.ohlc', anychart.cartesian.series.ohlc);
 anychart.cartesian.series.OHLC.prototype['risingStroke'] = anychart.cartesian.series.OHLC.prototype.risingStroke;
 anychart.cartesian.series.OHLC.prototype['hoverRisingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverRisingStroke;
 anychart.cartesian.series.OHLC.prototype['fallingStroke'] = anychart.cartesian.series.OHLC.prototype.fallingStroke;

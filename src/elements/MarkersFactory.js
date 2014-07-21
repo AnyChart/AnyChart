@@ -2004,7 +2004,17 @@ anychart.elements.MarkersFactory.Marker.prototype.deserialize = function(config)
 };
 
 
-goog.exportSymbol('anychart.elements.MarkersFactory', anychart.elements.MarkersFactory);
+/**
+ * Constructor function.
+ * @return {!anychart.elements.MarkersFactory}
+ */
+anychart.elements.markersFactory = function() {
+  return new anychart.elements.MarkersFactory();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.markersFactory', anychart.elements.markersFactory);
 anychart.elements.MarkersFactory.prototype['positionFormatter'] = anychart.elements.MarkersFactory.prototype.positionFormatter;
 anychart.elements.MarkersFactory.prototype['position'] = anychart.elements.MarkersFactory.prototype.position;
 anychart.elements.MarkersFactory.prototype['anchor'] = anychart.elements.MarkersFactory.prototype.anchor;

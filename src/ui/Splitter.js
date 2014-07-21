@@ -1183,8 +1183,17 @@ anychart.ui.Splitter.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.ui.Splitter}
+ */
+anychart.ui.splitter = function() {
+  return new anychart.ui.Splitter();
+};
+
+
 //exports
-goog.exportSymbol('anychart.ui.Splitter', anychart.ui.Splitter);
+goog.exportSymbol('anychart.ui.splitter', anychart.ui.splitter);
 anychart.ui.Splitter.prototype['layout'] = anychart.ui.Splitter.prototype.layout;
 anychart.ui.Splitter.prototype['position'] = anychart.ui.Splitter.prototype.position;
 anychart.ui.Splitter.prototype['dragAreaLength'] = anychart.ui.Splitter.prototype.dragAreaLength;

@@ -48,4 +48,3 @@ anychart.areaChart = function(var_args) {
 
 //exports
 goog.exportSymbol('anychart.areaChart', anychart.areaChart);
-

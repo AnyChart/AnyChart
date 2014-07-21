@@ -647,8 +647,18 @@ anychart.elements.Background.prototype.deserialize = function(config) {
   return this;
 };
 
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Background}
+ */
+anychart.elements.background = function() {
+  return new anychart.elements.Background();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Background', anychart.elements.Background);//in docs/final
+goog.exportSymbol('anychart.elements.background', anychart.elements.background);
 anychart.elements.Background.prototype['fill'] = anychart.elements.Background.prototype.fill;//in docs/final
 anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.prototype.stroke;//in docs/final
 anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;//in docs/final

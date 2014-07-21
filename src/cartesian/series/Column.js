@@ -84,11 +84,20 @@ anychart.cartesian.series.Column.prototype.deserialize = function(config) {
 };
 
 
-
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Column}
+ */
+anychart.cartesian.series.column = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Column(data, opt_csvSettings);
+};
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.Column', anychart.cartesian.series.Column);
+goog.exportSymbol('anychart.cartesian.series.column', anychart.cartesian.series.column);
 anychart.cartesian.series.Column.prototype['fill'] = anychart.cartesian.series.Column.prototype.fill;
 anychart.cartesian.series.Column.prototype['hoverFill'] = anychart.cartesian.series.Column.prototype.hoverFill;
 anychart.cartesian.series.Column.prototype['stroke'] = anychart.cartesian.series.Column.prototype.stroke;

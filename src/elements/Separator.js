@@ -616,8 +616,17 @@ anychart.elements.Separator.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Separator}
+ */
+anychart.elements.separator = function() {
+  return new anychart.elements.Separator();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Separator', anychart.elements.Separator);
+goog.exportSymbol('anychart.elements.separator', anychart.elements.separator);
 anychart.elements.Separator.prototype['parentBounds'] = anychart.elements.Separator.prototype.parentBounds;
 anychart.elements.Separator.prototype['width'] = anychart.elements.Separator.prototype.width;
 anychart.elements.Separator.prototype['height'] = anychart.elements.Separator.prototype.height;

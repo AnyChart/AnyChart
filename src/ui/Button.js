@@ -1014,8 +1014,17 @@ anychart.ui.Button.prototype.initStateSettings = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.ui.Button}
+ */
+anychart.ui.button = function() {
+  return new anychart.ui.Button();
+};
+
+
 //exports
-goog.exportSymbol('anychart.ui.Button', anychart.ui.Button);
+goog.exportSymbol('anychart.ui.button', anychart.ui.button);
 anychart.ui.Button.prototype['parentBounds'] = anychart.ui.Button.prototype.parentBounds;
 anychart.ui.Button.prototype['text'] = anychart.ui.Button.prototype.text;
 anychart.ui.Button.prototype['padding'] = anychart.ui.Button.prototype.padding;

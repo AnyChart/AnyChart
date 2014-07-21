@@ -936,8 +936,17 @@ anychart.elements.LegendItem.BrowserEvent.prototype.copyFrom = function(e, opt_t
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.LegendItem}
+ */
+anychart.elements.legendItem = function() {
+  return new anychart.elements.LegendItem();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.LegendItem', anychart.elements.LegendItem);
+goog.exportSymbol('anychart.elements.legendItem', anychart.elements.legendItem);
 anychart.elements.LegendItem.prototype['parentBounds'] = anychart.elements.LegendItem.prototype.parentBounds;
 anychart.elements.LegendItem.prototype['x'] = anychart.elements.LegendItem.prototype.x;
 anychart.elements.LegendItem.prototype['y'] = anychart.elements.LegendItem.prototype.y;

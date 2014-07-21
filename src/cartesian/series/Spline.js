@@ -111,7 +111,19 @@ anychart.cartesian.series.Spline.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Spline}
+ */
+anychart.cartesian.series.spline = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Spline(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.Spline', anychart.cartesian.series.Spline);
+goog.exportSymbol('anychart.cartesian.series.spline', anychart.cartesian.series.spline);
 anychart.cartesian.series.Spline.prototype['stroke'] = anychart.cartesian.series.Spline.prototype.stroke;
 anychart.cartesian.series.Spline.prototype['hoverStroke'] = anychart.cartesian.series.Spline.prototype.hoverStroke;

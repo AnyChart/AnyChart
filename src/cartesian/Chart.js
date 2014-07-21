@@ -2757,9 +2757,9 @@ anychart.cartesian.Chart.prototype.serialize = function() {
 
 /**
  * Default empty chart.
- * @return {anychart.cartesian.Chart} Empty chart.
+ * @return {!anychart.cartesian.Chart} Empty chart.
  */
-anychart.cartesianChart = function() {
+anychart.cartesian.chart = function() {
   var chart = new anychart.cartesian.Chart();
 
   chart.title().enabled(false);
@@ -2772,8 +2772,7 @@ anychart.cartesianChart = function() {
 };
 
 //exports
-goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);
-goog.exportSymbol('anychart.cartesian.Chart', anychart.cartesian.Chart);//in docs/
+goog.exportSymbol('anychart.cartesian.chart', anychart.cartesian.chart);//in docs/
 anychart.cartesian.Chart.prototype['xScale'] = anychart.cartesian.Chart.prototype.xScale;//in docs/
 anychart.cartesian.Chart.prototype['yScale'] = anychart.cartesian.Chart.prototype.yScale;//in docs/
 anychart.cartesian.Chart.prototype['barsPadding'] = anychart.cartesian.Chart.prototype.barsPadding;//in docs/

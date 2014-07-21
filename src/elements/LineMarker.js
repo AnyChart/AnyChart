@@ -364,8 +364,17 @@ anychart.elements.LineMarker.prototype.disposeInternal = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.LineMarker}
+ */
+anychart.elements.lineMarker = function() {
+  return new anychart.elements.LineMarker();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.LineMarker', anychart.elements.LineMarker);
+goog.exportSymbol('anychart.elements.lineMarker', anychart.elements.lineMarker);
 anychart.elements.LineMarker.prototype['value'] = anychart.elements.LineMarker.prototype.value;
 anychart.elements.LineMarker.prototype['scale'] = anychart.elements.LineMarker.prototype.scale;
 anychart.elements.LineMarker.prototype['parentBounds'] = anychart.elements.LineMarker.prototype.parentBounds;

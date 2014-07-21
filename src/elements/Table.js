@@ -1971,7 +1971,17 @@ anychart.elements.Table.Cell.prototype.disposeInternal = function() {
 };
 
 
-goog.exportSymbol('anychart.elements.Table', anychart.elements.Table);
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Table}
+ */
+anychart.elements.table = function() {
+  return new anychart.elements.Table();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.table', anychart.elements.table);
 anychart.elements.Table.prototype['rowsCount'] = anychart.elements.Table.prototype.rowsCount;
 anychart.elements.Table.prototype['colsCount'] = anychart.elements.Table.prototype.colsCount;
 anychart.elements.Table.prototype['getCell'] = anychart.elements.Table.prototype.getCell;

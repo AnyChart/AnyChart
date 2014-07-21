@@ -1334,8 +1334,18 @@ anychart.elements.Label.prototype.disposeInternal = function() {
   //they all disposed with registerDisposable call
 };
 
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Label}
+ */
+anychart.elements.label = function() {
+  return new anychart.elements.Label();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Label', anychart.elements.Label);//in docs/
+goog.exportSymbol('anychart.elements.label', anychart.elements.label);
 anychart.elements.Label.prototype['background'] = anychart.elements.Label.prototype.background;//in docs/
 anychart.elements.Label.prototype['padding'] = anychart.elements.Label.prototype.padding;//in docs/
 anychart.elements.Label.prototype['width'] = anychart.elements.Label.prototype.width;//in docs/

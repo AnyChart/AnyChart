@@ -364,8 +364,17 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.data.Set}
+ */
+anychart.data.set = function() {
+  return new anychart.data.Set();
+};
+
+
 //exports
-goog.exportSymbol('anychart.data.Set', anychart.data.Set);//in docs/final
+goog.exportSymbol('anychart.data.set', anychart.data.set);
 anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/final
 anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/final
 anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/final

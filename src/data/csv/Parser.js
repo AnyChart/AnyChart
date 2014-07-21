@@ -691,8 +691,18 @@ anychart.data.csv.Parser.prototype.disposeInternal = function() {
 //
 //};
 
+
+/**
+ * Constructor function.
+ * @return {!anychart.data.csv.Parser}
+ */
+anychart.data.csv.parser = function() {
+  return new anychart.data.csv.Parser();
+};
+
+
 //exports
-goog.exportSymbol('anychart.data.csv.Parser', anychart.data.csv.Parser);
+goog.exportSymbol('anychart.data.csv.parser', anychart.data.csv.parser);
 anychart.data.csv.Parser.prototype['parse'] = anychart.data.csv.Parser.prototype.parse;
 anychart.data.csv.Parser.prototype['rowsSeparator'] = anychart.data.csv.Parser.prototype.rowsSeparator;
 anychart.data.csv.Parser.prototype['columnsSeparator'] = anychart.data.csv.Parser.prototype.columnsSeparator;

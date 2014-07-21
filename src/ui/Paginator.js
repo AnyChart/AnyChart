@@ -902,8 +902,17 @@ anychart.ui.Paginator.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.ui.Paginator}
+ */
+anychart.ui.paginator = function() {
+  return new anychart.ui.Paginator();
+};
+
+
 //exports
-goog.exportSymbol('anychart.ui.Paginator', anychart.ui.Paginator);
+goog.exportSymbol('anychart.ui.paginator', anychart.ui.paginator);
 anychart.ui.Paginator.prototype['parentBounds'] = anychart.ui.Paginator.prototype.parentBounds;
 anychart.ui.Paginator.prototype['background'] = anychart.ui.Paginator.prototype.background;
 anychart.ui.Paginator.prototype['orientation'] = anychart.ui.Paginator.prototype.orientation;

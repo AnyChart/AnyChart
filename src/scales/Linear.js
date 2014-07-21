@@ -141,7 +141,6 @@ anychart.scales.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.Linear', anychart.scales.Linear);
+goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);
 anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;
-goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);

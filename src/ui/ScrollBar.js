@@ -1359,8 +1359,17 @@ anychart.ui.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
 anychart.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.ui.ScrollBar}
+ */
+anychart.ui.scrollBar = function() {
+  return new anychart.ui.ScrollBar();
+};
+
+
 //exports
-goog.exportSymbol('anychart.ui.ScrollBar', anychart.ui.ScrollBar);
+goog.exportSymbol('anychart.ui.scrollBar', anychart.ui.scrollBar);
 goog.exportSymbol('anychart.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.ui.ScrollBar.SCROLL_PIXEL_STEP);
 goog.exportSymbol('anychart.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.ui.ScrollBar.SCROLL_RATIO_STEP);
 anychart.ui.ScrollBar.prototype['layout'] = anychart.ui.ScrollBar.prototype.layout;

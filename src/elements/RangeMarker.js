@@ -413,8 +413,17 @@ anychart.elements.RangeMarker.prototype.disposeInternal = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.RangeMarker}
+ */
+anychart.elements.rangeMarker = function() {
+  return new anychart.elements.RangeMarker();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.RangeMarker', anychart.elements.RangeMarker);
+goog.exportSymbol('anychart.elements.rangeMarker', anychart.elements.rangeMarker);
 anychart.elements.RangeMarker.prototype['from'] = anychart.elements.RangeMarker.prototype.from;
 anychart.elements.RangeMarker.prototype['to'] = anychart.elements.RangeMarker.prototype.to;
 anychart.elements.RangeMarker.prototype['scale'] = anychart.elements.RangeMarker.prototype.scale;

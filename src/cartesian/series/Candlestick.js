@@ -584,8 +584,20 @@ anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Candlestick}
+ */
+anychart.cartesian.series.candlestick = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.Candlestick', anychart.cartesian.series.Candlestick);
+goog.exportSymbol('anychart.cartesian.series.candlestick', anychart.cartesian.series.candlestick);
 anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesian.series.Candlestick.prototype.risingFill;
 anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;
 anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;

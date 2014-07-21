@@ -899,8 +899,20 @@ anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Bubble}
+ */
+anychart.cartesian.series.bubble = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Bubble(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.Bubble', anychart.cartesian.series.Bubble);//in docs/
+goog.exportSymbol('anychart.cartesian.series.bubble', anychart.cartesian.series.bubble);
 anychart.cartesian.series.Bubble.prototype['minimumSize'] = anychart.cartesian.series.Bubble.prototype.minimumSize;
 anychart.cartesian.series.Bubble.prototype['maximumSize'] = anychart.cartesian.series.Bubble.prototype.maximumSize;
 anychart.cartesian.series.Bubble.prototype['displayNegative'] = anychart.cartesian.series.Bubble.prototype.displayNegative;//in docs/

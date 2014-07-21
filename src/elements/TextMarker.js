@@ -668,8 +668,17 @@ anychart.elements.TextMarker.prototype.disposeInternal = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.TextMarker}
+ */
+anychart.elements.textMarker = function() {
+  return new anychart.elements.TextMarker();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.TextMarker', anychart.elements.TextMarker);
+goog.exportSymbol('anychart.elements.textMarker', anychart.elements.textMarker);
 anychart.elements.TextMarker.prototype['value'] = anychart.elements.TextMarker.prototype.value;
 anychart.elements.TextMarker.prototype['scale'] = anychart.elements.TextMarker.prototype.scale;
 anychart.elements.TextMarker.prototype['parentBounds'] = anychart.elements.TextMarker.prototype.parentBounds;

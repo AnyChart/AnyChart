@@ -1092,8 +1092,17 @@ anychart.elements.Title.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Title}
+ */
+anychart.elements.title = function() {
+  return new anychart.elements.Title();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Title', anychart.elements.Title);//in docs/final
+goog.exportSymbol('anychart.elements.title', anychart.elements.title);
 anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/final
 anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/final
 anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/final

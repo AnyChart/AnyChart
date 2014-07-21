@@ -181,7 +181,16 @@ anychart.utils.DistinctColorPalette.prototype.cloneFrom = function(palette) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.utils.DistinctColorPalette}
+ */
+anychart.utils.distinctColorPalette = function() {
+  return new anychart.utils.DistinctColorPalette();
+};
+
+
 //exports
-goog.exportSymbol('anychart.utils.DistinctColorPalette', anychart.utils.DistinctColorPalette);//in docs/
+goog.exportSymbol('anychart.utils.distinctColorPalette', anychart.utils.distinctColorPalette);
 anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;//in docs/
 anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;//in docs/

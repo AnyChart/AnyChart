@@ -512,8 +512,17 @@ anychart.elements.Tooltip.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Tooltip}
+ */
+anychart.elements.tooltip = function() {
+  return new anychart.elements.Tooltip();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Tooltip', anychart.elements.Tooltip);
+goog.exportSymbol('anychart.elements.tooltip', anychart.elements.tooltip);
 anychart.elements.Tooltip.prototype['titleFormatter'] = anychart.elements.Tooltip.prototype.titleFormatter;
 anychart.elements.Tooltip.prototype['textFormatter'] = anychart.elements.Tooltip.prototype.textFormatter;
 anychart.elements.Tooltip.prototype['allowLeaveScreen'] = anychart.elements.Tooltip.prototype.allowLeaveScreen;

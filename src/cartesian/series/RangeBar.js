@@ -120,8 +120,20 @@ anychart.cartesian.series.RangeBar.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeBar}
+ */
+anychart.cartesian.series.rangeBar = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.RangeBar', anychart.cartesian.series.RangeBar);
+goog.exportSymbol('anychart.cartesian.series.rangeBar', anychart.cartesian.series.rangeBar);
 anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.RangeBar.prototype.fill;
 anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.RangeBar.prototype.hoverFill;
 anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.RangeBar.prototype.stroke;

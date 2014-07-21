@@ -173,7 +173,7 @@ anychart.scales.DateTime.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut  to create DateTime scale.
+ * Shortcut to create DateTime scale.
  * @return {anychart.scales.DateTime} DateTime scale.
  */
 anychart.scales.dateTime = function() {
@@ -182,7 +182,6 @@ anychart.scales.dateTime = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.DateTime', anychart.scales.DateTime);
+goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
-goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);

@@ -2193,8 +2193,17 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Axis}
+ */
+anychart.elements.axis = function() {
+  return new anychart.elements.Axis();
+};
+
+
 //exports
-goog.exportSymbol('anychart.elements.Axis', anychart.elements.Axis);
+goog.exportSymbol('anychart.elements.axis', anychart.elements.axis);
 anychart.elements.Axis.prototype['title'] = anychart.elements.Axis.prototype.title;
 anychart.elements.Axis.prototype['name'] = anychart.elements.Axis.prototype.name;
 anychart.elements.Axis.prototype['labels'] = anychart.elements.Axis.prototype.labels;

@@ -172,8 +172,20 @@ anychart.cartesian.series.SplineArea.prototype.deserialize = function(config) {
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.SplineArea}
+ */
+anychart.cartesian.series.splineArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.SplineArea', anychart.cartesian.series.SplineArea);
+goog.exportSymbol('anychart.cartesian.series.splineArea', anychart.cartesian.series.splineArea);
 anychart.cartesian.series.SplineArea.prototype['startDrawing'] = anychart.cartesian.series.SplineArea.prototype.startDrawing;
 anychart.cartesian.series.SplineArea.prototype['fill'] = anychart.cartesian.series.SplineArea.prototype.fill;
 anychart.cartesian.series.SplineArea.prototype['hoverFill'] = anychart.cartesian.series.SplineArea.prototype.hoverFill;

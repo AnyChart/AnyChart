@@ -92,5 +92,19 @@ anychart.math.Rect.deserialize = function(config) {
 };
 //endregion
 
+
+/**
+ * Constructor function.
+ * @param {number} x X-coordinate.
+ * @param {number} y Y-coordinate.
+ * @param {number} w Width.
+ * @param {number} h Height.
+ * @return {!anychart.math.Rect}
+ */
+anychart.math.rect = function(x, y, w, h) {
+  return new anychart.math.Rect(x, y, w, h);
+};
+
+
 //exports
-goog.exportSymbol('anychart.math.Rect', anychart.math.Rect);
+goog.exportSymbol('anychart.math.rect', anychart.math.rect);

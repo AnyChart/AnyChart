@@ -1670,13 +1670,19 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
 };
 
 
+/**
+ * Constructor function.
+ * @return {!anychart.pie.Chart}
+ */
+anychart.pie.chart = function() {
+  return new anychart.pie.Chart();
+};
+
+
 //exports
-goog.exportSymbol('anychart.pie.Chart', anychart.pie.Chart);//in docs/final
+goog.exportSymbol('anychart.pie.chart', anychart.pie.chart);
 anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//in docs/final
 anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;
-
-
-
 anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//in docs/final
 anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//in docs/final
 anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//in docs/final

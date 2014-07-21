@@ -141,5 +141,17 @@ anychart.cartesian.series.RangeStepArea.prototype.deserialize = function(config)
 };
 
 
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeStepArea}
+ */
+anychart.cartesian.series.rangeStepArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeStepArea(data, opt_csvSettings);
+};
+
+
 //exports
-goog.exportSymbol('anychart.cartesian.series.RangeStepArea', anychart.cartesian.series.RangeStepArea);
+goog.exportSymbol('anychart.cartesian.series.rangeStepArea', anychart.cartesian.series.rangeStepArea);
