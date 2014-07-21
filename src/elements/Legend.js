@@ -97,55 +97,55 @@ anychart.elements.Legend = function() {
   this.zIndex(10);
 
   this.fontFamily('Verdana')
-      .fontSize('10')
-      .fontWeight('normal')
-      .fontColor('rgb(35,35,35)')
+    .fontSize('10')
+    .fontWeight('normal')
+    .fontColor('rgb(35,35,35)')
       // we need LegendItem text could catch mouseover and mouseclick (cause elements.Text turns  pointerEvents off with non-hoverable text)
-      .hoverable(true)
-      .padding(7)
-      .margin(5);
+    .hoverable(true)
+    .padding(7)
+    .margin(5);
 
   var bg = new anychart.elements.Background()
-      .enabled(true)
-      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
+    .enabled(true)
+    .fill(/** @type {acgraph.vector.LinearGradientFill} */({
         'keys': [
           '0 rgb(255,255,255) 1',
           '0.5 rgb(243,243,243) 1',
           '1 rgb(255,255,255) 1'],
         'angle': '90'
       }))
-      .stroke({
+    .stroke({
         'keys': [
           '0 rgb(221,221,221) 1',
           '1 rgb(208,208,208) 1'
         ],
         'angle': '90'
       })
-      .corners(5);
+    .corners(5);
   this.background(/** @type {anychart.elements.Background} */ (bg))
-      .zIndex(0);
+    .zIndex(0);
   //
   this.title()
-      .enabled(true)
-      .zIndex(10)
-      .text('Legend Title')
-      .fontFamily('Verdana')
-      .fontSize('10')
-      .fontWeight('bold')
-      .fontColor('rgb(35,35,35)')
-      .orientation('top')
-      .margin(0, 0, 3, 0)
-      .padding(0);
+    .enabled(true)
+    .zIndex(10)
+    .text('Legend Title')
+    .fontFamily('Verdana')
+    .fontSize('10')
+    .fontWeight('bold')
+    .fontColor('rgb(35,35,35)')
+    .orientation('top')
+    .margin(0, 0, 3, 0)
+    .padding(0);
   this.title().background()
-      .enabled(false)
-      .stroke({
+    .enabled(false)
+    .stroke({
         'keys': [
           '0 #DDDDDD 1',
           '1 #D0D0D0 1'
         ],
         'angle': '90'
       })
-      .fill({
+    .fill({
         'keys': [
           '0 #FFFFFF 1',
           '0.5 #F3F3F3 1',
@@ -155,13 +155,13 @@ anychart.elements.Legend = function() {
       });
 
   this.titleSeparator()
-      .enabled(true)
-      .zIndex(10)
-      .margin(3, 0, 3, 0)
-      .orientation('top')
-      .width('100%')
-      .height(1)
-      .fill({
+    .enabled(true)
+    .zIndex(10)
+    .margin(3, 0, 3, 0)
+    .orientation('top')
+    .width('100%')
+    .height(1)
+    .fill({
         'keys': [
           '0 #333333 0',
           '0.5 #333333 1',
@@ -169,25 +169,25 @@ anychart.elements.Legend = function() {
         ]
       });
   this.paginator()
-      .enabled(false)
-      .zIndex(20)
-      .fontFamily('Verdana')
-      .fontSize('10')
-      .fontWeight('normal')
-      .fontColor('rgb(35,35,35)')
-      .orientation('right')
-      .margin(0)
-      .padding(0);
+    .enabled(false)
+    .zIndex(20)
+    .fontFamily('Verdana')
+    .fontSize('10')
+    .fontWeight('normal')
+    .fontColor('rgb(35,35,35)')
+    .orientation('right')
+    .margin(0)
+    .padding(0);
   this.paginator().background()
-      .enabled(false)
-      .stroke({
+    .enabled(false)
+    .stroke({
         'keys': [
           '0 #DDDDDD 1',
           '1 #D0D0D0 1'
         ],
         'angle': '90'
       })
-      .fill({
+    .fill({
         'keys': [
           '0 #FFFFFF 1',
           '0.5 #F3F3F3 1',
@@ -200,12 +200,6 @@ anychart.elements.Legend = function() {
   tooltip.suspendSignalsDispatching();
   tooltip.isFloating(true);
   tooltip.content().useHtml(true);
-  tooltip.titleFormatter(function() {
-    return this['text'];
-  });
-  tooltip.textFormatter(function() {
-    return this['text'];
-  });
   tooltip.resumeSignalsDispatching(false);
 
   var tooltipTitle = /** @type {anychart.elements.Title} */(tooltip.title());
@@ -732,7 +726,7 @@ anychart.elements.Legend.prototype.moveTooltip = function(event) {
   var index = event['index'];
   var item = event['item'];
   var formatProvider = {
-    'text': item.text(),
+    'value': item.text(),
     'iconType': item.iconType(),
     'iconStroke': item.iconStroke(),
     'iconFill': item.iconFill(),
@@ -933,6 +927,11 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
 anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
   if (this.itemsProvider_ && this.itemsProvider_.length > 0) {
     goog.disposeAll(this.items_);
+    /**
+     * Array of legend item.
+     * @type {Array.<anychart.elements.LegendItem>}
+     * @private
+     */
     this.items_ = [];
     /**
      * Array of legend items metadata. Used for legend item tooltips.
@@ -961,6 +960,8 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       item.container(this.layer_);
       item.enabled(false);
 
+      this.setupMouseEventsListeners_(item);
+
       this.items_.push(item);
       this.legendItemsMeta_.push(provider['meta'] ? provider['meta'] : {});
     }
@@ -970,6 +971,94 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
     this.legendItemsMeta_ = null;
   }
   this.invalidate(anychart.ConsistencyState.BOUNDS);
+};
+
+
+/**
+ * Setup listening of mouse events on legend item.
+ * @param {anychart.elements.LegendItem} item
+ * @private
+ */
+anychart.elements.Legend.prototype.setupMouseEventsListeners_ = function(item) {
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OVER, this.onLegendItemMouseOver_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OUT, this.onLegendItemMouseOut_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_MOVE, this.onLegendItemMouseMove_, false, this);
+  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_CLICK, this.onLegendItemClick_, false, this);
+};
+
+
+/**
+ * Returns index of legend item that dispatched an event.
+ * @param {anychart.elements.LegendItem} item Event.
+ * @private
+ * @return {number} Item index in legend or NaN.
+ */
+anychart.elements.Legend.prototype.getItemIndexInLegend_ = function(item) {
+  return parseInt(goog.object.findKey(this.items_, function(value, key, obj) {
+    return item == value;
+  }), 10);
+};
+
+
+/**
+ * LegendItem click handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemClick_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  this.dispatchEvent(event);
+};
+
+
+/**
+ * LegendItem mouse over handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseOver_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.showTooltip(event);
+  }
+};
+
+
+/**
+ * LegendItem mouse out handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseOut_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.hideTooltip();
+  }
+};
+
+
+/**
+ * LegendItem mouse move handler.
+ * @param {anychart.elements.LegendItem.BrowserEvent} event Event.
+ * @private
+ */
+anychart.elements.Legend.prototype.onLegendItemMouseMove_ = function(event) {
+  var item = /** @type {anychart.elements.LegendItem} */(/** @type {Object} */ (event.target));
+  // save index of legend item and itself to event and dispatch event
+  event['index'] = this.getItemIndexInLegend_(item);
+  event['item'] = item;
+  if (this.dispatchEvent(event)) {
+    this.moveTooltip(event);
+  }
 };
 
 
@@ -1772,44 +1861,6 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(width, he
 
 
 /**
- * Create default paginator.
- * @private
- */
-anychart.elements.Legend.prototype.initDefaultPaginator_ = function() {
-  if (!this.paginator_) {
-    this.paginator()
-        .container(this.rootElement)
-        .zIndex(20)
-        .fontFamily('Verdana')
-        .fontSize('10')
-        .fontWeight('normal')
-        .fontColor('rgb(35,35,35)')
-        .orientation('right')
-        .margin(0)
-        .padding(2);
-    this.paginator().background()
-        .enabled(false)
-        .stroke({
-          'keys': [
-            '0 #DDDDDD 1',
-            '1 #D0D0D0 1'
-          ],
-          'angle' : '90'
-        })
-        .fill({
-          'keys': [
-            '0 #FFFFFF 1',
-            '0.5 #F3F3F3 1',
-            '1 #FFFFFF 1'
-          ],
-          'angle' : '90'
-        });
-    this.invalidate(anychart.ConsistencyState.PAGINATOR | anychart.ConsistencyState.BOUNDS);
-  }
-};
-
-
-/**
  * Clears last drawed page.
  * @private
  */
@@ -1845,13 +1896,13 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
           for (i = 0; i < items.length; i++) {
             item = items[i];
             item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
-                .enabled(true)
-                .resumeSignalsDispatching()
-                .draw();
+              .suspendSignalsDispatching()
+              .parentBounds(contentBounds)
+              .x(x)
+              .y(y)
+              .enabled(true)
+              .resumeSignalsDispatching()
+              .draw();
             x += items[i].getWidth() + this.itemsSpacing_;
           }
           break;
@@ -1859,13 +1910,13 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
           for (i = 0; i < items.length; i++) {
             item = items[i];
             item
-                .suspendSignalsDispatching()
-                .parentBounds(contentBounds)
-                .x(x)
-                .y(y)
-                .enabled(true)
-                .resumeSignalsDispatching(false)
-                .draw();
+              .suspendSignalsDispatching()
+              .parentBounds(contentBounds)
+              .x(x)
+              .y(y)
+              .enabled(true)
+              .resumeSignalsDispatching(false)
+              .draw();
             y += items[i].getHeight() + this.itemsSpacing_;
           }
           break;

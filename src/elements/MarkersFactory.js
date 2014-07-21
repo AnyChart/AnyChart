@@ -162,9 +162,7 @@ anychart.elements.MarkersFactory = function() {
    */
   this.changedSettings = {};
 
-  this.positionFormatter_ = function(positionProvider) {
-    return positionProvider;
-  };
+  this.positionFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   this.zIndex(70);
   this.size(10);
@@ -973,7 +971,8 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
   drawer.call(this, this.measureMarkerElement_, 0, 0, size);
 
   var markerBounds = /** @type {anychart.math.Rect} */(this.measureMarkerElement_.getBounds());
-  var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(this.positionFormatter_.call(this, positionProvider)));
+  var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
+  var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
       anchor);
@@ -1940,7 +1939,9 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
     drawer.call(this, this.markerElement_, 0, 0, size);
     var markerBounds = this.markerElement_.getBounds();
 
-    var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(positionFormatter.call(this, this.positionProvider())));
+    var positionProvider = this.positionProvider();
+    var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
+    var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
         new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
         /** @type {anychart.utils.NinePositions} */(anchor));

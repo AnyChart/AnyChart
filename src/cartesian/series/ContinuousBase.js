@@ -149,7 +149,7 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeDrawing = function() 
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {x: iterator.meta('x'), y: iterator.meta('y')};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
 };
 
 

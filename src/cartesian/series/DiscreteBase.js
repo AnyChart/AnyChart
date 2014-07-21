@@ -54,19 +54,6 @@ anychart.cartesian.series.DiscreteBase.prototype.remove = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.DiscreteBase.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
-};
-
-
-/** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;

@@ -270,7 +270,7 @@ anychart.cartesian.series.Marker.prototype.remove = function() {
 /** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {x: iterator.meta('x'), y: iterator.meta('y')};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
 };
 
 

@@ -36,7 +36,7 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   tooltip.titleFormatter(function() {
     return this['name'];
   });
-  tooltip.textFormatter(function() {
+  tooltip.contentFormatter(function() {
     return this['x'] + ': ' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
@@ -44,9 +44,7 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
 
   this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
-  this.labels().textFormatter(function(provider) {
-    return provider['value'];
-  });
+
   this.labels().position(anychart.utils.NinePositions.CENTER);
   this.labels().enabled(false);
   (/** @type {anychart.elements.LabelsFactory} */(this.hoverLabels())).enabled(null);
@@ -574,7 +572,7 @@ anychart.cartesian.series.Base.prototype.categoriseData = function(categories) {
 
 /**
  * Returns current mapping iterator.
- * @return {!anychart.data.Iterator} Currnet series iterator.
+ * @return {!anychart.data.Iterator} Current series iterator.
  */
 anychart.cartesian.series.Base.prototype.getIterator = function() {
   return this.iterator_ || this.getResetIterator();
@@ -1012,7 +1010,7 @@ anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
 
 
 /**
- * Create column series format provider.
+ * Create base series format provider.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
@@ -1055,12 +1053,21 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
 
 
 /**
- * Create column series format provider.
+ * Create series position provider.
  * @param {anychart.utils.NinePositions|string} position
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
-anychart.cartesian.series.Base.prototype.createPositionProvider = goog.abstractMethod;
+anychart.cartesian.series.Base.prototype.createPositionProvider = function(position) {
+  var iterator = this.getIterator();
+  var shape = iterator.meta('shape');
+  if (shape) {
+    var shapeBounds = shape.getBounds();
+    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
+  } else {
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  }
+};
 
 
 /**

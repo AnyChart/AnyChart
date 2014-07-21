@@ -591,7 +591,7 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
       y += bounds.height;
       break;
   }
-  return {x: x, y: y};
+  return {'x': x, 'y': y};
 };
 
 
@@ -812,6 +812,16 @@ anychart.utils.color.parseColor = function(str) {
  */
 anychart.utils.isNone = function(value) {
   return value === null || (goog.isString(value) && value.toLowerCase() == 'none');
+};
+
+
+/**
+ * Anychart default formatter.
+ * @this {{value: * }}
+ * @return {*}
+ */
+anychart.utils.DEFAULT_FORMATTER = function() {
+  return this['value'];
 };
 
 

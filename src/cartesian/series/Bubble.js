@@ -457,19 +457,6 @@ anychart.cartesian.series.Bubble.prototype.applyHatchFill = function(hover) {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Bubble.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
-};
-
-
-/** @inheritDoc */
 anychart.cartesian.series.Bubble.prototype.categoriseData = function(categories) {
   goog.base(this, 'categoriseData', categories);
   this.invalidate(anychart.ConsistencyState.DATA);

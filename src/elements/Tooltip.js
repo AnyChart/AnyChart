@@ -22,13 +22,13 @@ anychart.elements.Tooltip = function() {
    * @type {Function}
    * @private
    */
-  this.titleFormatter_ = null;
+  this.titleFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
    * @type {Function}
    * @private
    */
-  this.textFormatter_ = null;
+  this.contentFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
    * @type {boolean}
@@ -55,8 +55,6 @@ anychart.elements.Tooltip = function() {
    * @private
    */
   this.positionCache_ = null;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.elements.Tooltip, anychart.Base);
 
@@ -98,15 +96,15 @@ anychart.elements.Tooltip.prototype.titleFormatter = function(opt_value) {
  * @param {Function=} opt_value Function to format content text.
  * @return {Function|anychart.elements.Tooltip} Function to format content text or itself for method chaining.
  */
-anychart.elements.Tooltip.prototype.textFormatter = function(opt_value) {
+anychart.elements.Tooltip.prototype.contentFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.textFormatter_ != opt_value) {
-      this.textFormatter_ = opt_value;
+    if (this.contentFormatter_ != opt_value) {
+      this.contentFormatter_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
-    return this.textFormatter_;
+    return this.contentFormatter_;
   }
 };
 
@@ -353,8 +351,8 @@ anychart.elements.Tooltip.prototype.show = function(textInfo, position) {
   this.textInfoCache_ = textInfo;
   this.positionCache_ = position;
 
-  var titleText = this.titleFormatter_.call(textInfo);
-  var contentText = this.textFormatter_.call(textInfo);
+  var titleText = this.titleFormatter_.call(textInfo, textInfo);
+  var contentText = this.contentFormatter_.call(textInfo, textInfo);
   var realPosition = this.processPosition_(position);
 
   this.item_.suspendSignalsDispatching();
@@ -391,8 +389,8 @@ anychart.elements.Tooltip.prototype.hide = function() {
 anychart.elements.Tooltip.prototype.redraw = function() {
   if (this.item_ && this.item_.visible() && this.item_.enabled()) {
     this.item_.suspendSignalsDispatching();
-    var titleText = this.titleFormatter_.call(this.textInfoCache_);
-    var contentText = this.textFormatter_.call(this.textInfoCache_);
+    var titleText = this.titleFormatter_.call(this.textInfoCache_, this.textInfoCache_);
+    var contentText = this.contentFormatter_.call(this.textInfoCache_, this.textInfoCache_);
     var realPosition = this.processPosition_(this.positionCache_);
 
     this.item_.x(realPosition.x);
@@ -448,19 +446,6 @@ anychart.elements.Tooltip.prototype.disposeInternal = function() {
 };
 
 
-/**
- * Restore title default settings.
- */
-anychart.elements.Tooltip.prototype.restoreDefaults = function() {
-  this.titleFormatter_ = function() {
-    return this['titleText'];
-  };
-  this.textFormatter_ = function() {
-    return this['contentText'];
-  };
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  JSON.
@@ -484,9 +469,9 @@ anychart.elements.Tooltip.prototype.serialize = function() {
     }
   }
 
-  if (goog.isFunction(this.textFormatter_)) {
+  if (goog.isFunction(this.contentFormatter_)) {
     if (window.console) {
-      window.console.log('Warning: We can not serialize textFormatter function, please reset it manually.');
+      window.console.log('Warning: We can not serialize contentFormatter function, please reset it manually.');
     }
   }
   return json;
@@ -501,7 +486,7 @@ anychart.elements.Tooltip.prototype.deserialize = function(config) {
 
   this.maybeCreateTooltipItem_();
   this.item_.deserialize(config);
-  this.textFormatter_ = config['textFormatter'] || this.textFormatter_;
+  this.contentFormatter_ = config['contentFormatter'] || this.contentFormatter_;
   this.titleFormatter_ = config['titleFormatter'] || this.titleFormatter_;
   this.isFloating(config['isFloating']);
   this.allowLeaveScreen(config['allowLeaveScreen']);
@@ -524,7 +509,7 @@ anychart.elements.tooltip = function() {
 //exports
 goog.exportSymbol('anychart.elements.tooltip', anychart.elements.tooltip);
 anychart.elements.Tooltip.prototype['titleFormatter'] = anychart.elements.Tooltip.prototype.titleFormatter;
-anychart.elements.Tooltip.prototype['textFormatter'] = anychart.elements.Tooltip.prototype.textFormatter;
+anychart.elements.Tooltip.prototype['contentFormatter'] = anychart.elements.Tooltip.prototype.contentFormatter;
 anychart.elements.Tooltip.prototype['allowLeaveScreen'] = anychart.elements.Tooltip.prototype.allowLeaveScreen;
 anychart.elements.Tooltip.prototype['isFloating'] = anychart.elements.Tooltip.prototype.isFloating;
 anychart.elements.Tooltip.prototype['title'] = anychart.elements.Tooltip.prototype.title;

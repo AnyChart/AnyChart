@@ -68,19 +68,6 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
 };
 
 
-/** @inheritDoc */
-anychart.cartesian.series.Bar.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
-};
-
-
 /**
  * @inheritDoc
  */

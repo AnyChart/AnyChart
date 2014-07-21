@@ -83,14 +83,14 @@ anychart.elements.LabelsFactory = function() {
    * @type {Function}
    * @private
    */
-  this.textFormatter_ = null;
+  this.textFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
-   * Функция форматирования позиции лейбла, по умолчанию она использует positionProvider для получения позиции.
+   * Функция форматирования позиции лейбла, по умолчанию она использует значение value из контекста для получения позиции.
    * @type {Function}
    * @private
    */
-  this.positionFormatter_ = null;
+  this.positionFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
    * Labels background settings.
@@ -119,13 +119,6 @@ anychart.elements.LabelsFactory = function() {
    * @private
    */
   this.labels_;
-
-  this.textFormatter_ = function(formatProvider) {
-    return formatProvider;
-  };
-  this.positionFormatter_ = function(positionProvider) {
-    return positionProvider;
-  };
 
   this.zIndex(50);
   this.background(null);
@@ -790,7 +783,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
 
   if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
 
-  text = this.textFormatter_.call(this, formatProvider);
+  text = this.textFormatter_.call(formatProvider, formatProvider);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   this.measureTextElement_.text(goog.isDef(text) ? text.toString() : null);
@@ -845,8 +838,8 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   }
 
   if (goog.isDef(textHeight)) this.measureTextElement_.height(textHeight);
-
-  var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(this.positionFormatter_.call(this, positionProvider)));
+  var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
+  var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height),
       /** @type {string} */(anchor));
@@ -1794,7 +1787,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
             this.settingsObj.positionFormatter :
             parentLabelsFactory.positionFormatter();
 
-    var text = textFormatter.call(this, this.formatProvider());
+    var formatProvider = this.formatProvider();
+    var text = textFormatter.call(formatProvider, formatProvider);
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
@@ -1896,8 +1890,9 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     }
 
     if (goog.isDef(textHeight)) this.textElement_.height(textHeight);
-
-    var position = /** @type {acgraph.math.Coordinate} */(goog.object.clone(positionFormatter.call(this, this.positionProvider())));
+    var positionProvider = this.positionProvider();
+    var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
+    var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
         new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height),
         /** @type {anychart.utils.NinePositions} */(anchor));

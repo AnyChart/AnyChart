@@ -19,12 +19,12 @@ function load() {
   ];
 
   var dataWithMissing = [
-    {name: 'point - 1', value: 10},
-    {name: 'point - 2', value: 8},
-    {name: 'point - 3', value: 20},
-    {name: 'point - 4', value: 14},
-    {name: 'point - 5', value: 7},
-    {name: 'missing point'},
+    {name: 'point - 0', value: 10},
+    {name: 'point - 1', value: 8},
+    {name: 'point - 2', value: 20},
+    {name: 'point - 3', value: 14},
+    {name: 'point - 4', value: 7},
+    {name: 'missing point', value: -10},
     {value: 5},
     '17',
     5
@@ -57,10 +57,7 @@ function load() {
         angle: -90
       });
 
-  chart.labels()
-      .enabled(true)
-      .background().fill('green 0.8').enabled(true);
-
+  chart.labels().enabled(true);
   chart.draw();
   var stage = chart.container();
   var trialText = stage.text(0, 0, 'AnyChart Trial Version', {

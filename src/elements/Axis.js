@@ -183,26 +183,6 @@ anychart.elements.Axis.prototype.line_ = null;
 
 
 /**
- * @param {Object} formatProvider
- * @return {string}
- * @private
- */
-anychart.elements.Axis.prototype.labelsTextFormatter_ = function(formatProvider) {
-  return formatProvider['defaultText'];
-};
-
-
-/**
- * @param {Object} formatProvider
- * @return {string}
- * @private
- */
-anychart.elements.Axis.prototype.minorLabelsTextFormatter_ = function(formatProvider) {
-  return formatProvider['defaultText'];
-};
-
-
-/**
  * @type {string}
  * @private
  */
@@ -429,10 +409,6 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
 anychart.elements.Axis.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.LabelsFactory();
-    this.labels_.textFormatter(this.labelsTextFormatter_);
-    this.labels_.positionFormatter(function(positionProvider) {
-      return positionProvider;
-    });
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -487,10 +463,6 @@ anychart.elements.Axis.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.elements.LabelsFactory();
     this.isHorizontal() ? this.minorLabels_.rotation(0) : this.minorLabels_.rotation(-90);
-    this.minorLabels_.textFormatter(this.minorLabelsTextFormatter_);
-    this.minorLabels_.positionFormatter(function(positionProvider) {
-      return positionProvider;
-    });
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
@@ -1146,7 +1118,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     for (i = 0; i < ticksArr.length; i++) {
       var drawLabel = goog.isArray(drawLabels) ? drawLabels[i] : drawLabels;
       if (drawLabel) {
-        bounds = labels.measure(this.getLabelsFormatProvider_(i, ticksArr[i]), {x: 0, y: 0});
+        bounds = labels.measure(this.getLabelsFormatProvider_(i, ticksArr[i]), {'value': {'x': 0, 'y': 0}});
         size = this.isHorizontal() ?
             bounds.height - (bounds.top + bounds.height / 2) :
             bounds.width - (bounds.left + bounds.width / 2);
@@ -1161,7 +1133,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     for (i = 0; i < drawMinorLabels.length; i++) {
       var drawMinorLabel = goog.isArray(drawMinorLabels) ? drawMinorLabels[i] : drawMinorLabels;
       if (drawMinorLabel) {
-        bounds = minorLabels.measure(this.getLabelsFormatProvider_(i, minorTicksArr[i]), {x: 0, y: 0});
+        bounds = minorLabels.measure(this.getLabelsFormatProvider_(i, minorTicksArr[i]), {'value': {'x': 0, 'y': 0}});
         size = this.isHorizontal() ?
             bounds.height - (bounds.top + bounds.height / 2) :
             bounds.width - (bounds.left + bounds.width / 2);
@@ -1279,7 +1251,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   }
 
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var isEnabled = ticks.enabled();
@@ -1318,8 +1290,8 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
       }
       break;
   }
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
 
   return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider);
 };
@@ -1571,8 +1543,8 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
   return {
     'index': index,
     'value': labelValue,
-    'defaultText': labelText,
-    'name': axisName,
+    'name': labelText,
+    'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
@@ -1600,7 +1572,7 @@ anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, 
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
@@ -1610,8 +1582,8 @@ anychart.elements.Axis.prototype.drawTopLabels_ = function(value, ratio, index, 
     y -= ticksLength;
   }
 
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
 
   labels.add(formatProvider, positionProvider);
 };
@@ -1632,7 +1604,7 @@ anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
@@ -1642,8 +1614,8 @@ anychart.elements.Axis.prototype.drawRightLabels_ = function(value, ratio, index
     x += ticksLength;
   }
 
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   labels.add(formatProvider, positionProvider);
 };
 
@@ -1663,7 +1635,7 @@ anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, inde
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
@@ -1673,8 +1645,8 @@ anychart.elements.Axis.prototype.drawBottomLabels_ = function(value, ratio, inde
     y += ticksLength;
   }
 
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   labels.add(formatProvider, positionProvider);
 };
 
@@ -1694,7 +1666,7 @@ anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index,
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var labels = this.labels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = labels.measure(formatProvider, positionProvider);
 
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
@@ -1704,8 +1676,8 @@ anychart.elements.Axis.prototype.drawLeftLabels_ = function(value, ratio, index,
     x -= ticksLength;
   }
 
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   labels.add(formatProvider, positionProvider);
 };
 
@@ -1725,7 +1697,7 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
@@ -1735,8 +1707,8 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
     y -= ticksLength;
   }
 
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   minorLabels.add(formatProvider, positionProvider);
 };
 
@@ -1756,7 +1728,7 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
@@ -1765,8 +1737,8 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     x += ticksLength;
   }
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   minorLabels.add(formatProvider, positionProvider);
 };
 
@@ -1786,7 +1758,7 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
@@ -1795,8 +1767,8 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     y += ticksLength;
   }
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   minorLabels.add(formatProvider, positionProvider);
 };
 
@@ -1816,7 +1788,7 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {x: 0, y: 0};
+  var positionProvider = {'value': {'x': 0, 'y': 0}};
   var labelBounds = minorLabels.measure(formatProvider, positionProvider);
 
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
@@ -1825,8 +1797,8 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
     x -= ticksLength;
   }
-  positionProvider.x = x;
-  positionProvider.y = y;
+  positionProvider['value']['x'] = x;
+  positionProvider['value']['y'] = y;
   minorLabels.add(formatProvider, positionProvider);
 };
 

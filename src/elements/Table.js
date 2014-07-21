@@ -1103,10 +1103,8 @@ anychart.elements.Table.prototype.checkContent_ = function() {
                   label.position() ||
                   label.currentLabelsFactory() && label.currentLabelsFactory().position() ||
                   label.parentLabelsFactory() && label.parentLabelsFactory().position());
-              label.positionProvider(
-                  anychart.utils.getCoordinateByAnchor(
-                      bounds,
-                      position));
+              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+              label.positionProvider(positionProvider);
             } else if (content instanceof anychart.VisualBaseWithBounds) {
               var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
               elementWithBounds.pixelBounds(null);
@@ -1455,7 +1453,7 @@ anychart.elements.Table.prototype.allocCell_ = function(row, col) {
  */
 anychart.elements.Table.prototype.createTextCellContent = function(value) {
   value = value + '';
-  return this.cellTextFactory().add(value, {'x': 0, 'y': 0});
+  return this.cellTextFactory().add({'value': value}, {'value': {'x': 0, 'y': 0}});
 };
 
 

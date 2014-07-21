@@ -134,13 +134,13 @@ anychart.cartesian.series.OHLC.prototype.colorizeShape = function(hover) {
 
 /** @inheritDoc */
 anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
+  var iterator = this.getIterator();
+  var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
+    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('close')};
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('close')}};
   }
 };
 

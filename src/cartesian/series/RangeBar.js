@@ -22,7 +22,7 @@ anychart.cartesian.series.RangeBar = function(data, opt_csvSettings) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
   tooltip.content().useHtml(true);
-  tooltip.textFormatter(function() {
+  tooltip.contentFormatter(function() {
     return this['x'] + '<br>low: ' + this['low'] + '<br>high: ' + this['high'];
   });
   tooltip.resumeSignalsDispatching(false);
@@ -76,13 +76,13 @@ anychart.cartesian.series.RangeBar.prototype.drawSubsequentPoint = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.RangeBar.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
+  var iterator = this.getIterator();
+  var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
+    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('high')};
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
   }
 };
 
