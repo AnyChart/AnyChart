@@ -2392,7 +2392,7 @@ anychart.cartesian.Chart.prototype.drawSeries_ = function() {
 anychart.cartesian.Chart.prototype.invalidateWidthBasedSeries_ = function() {
   for (var i = this.series_.length; i--;) {
     if (this.series_[i] instanceof anychart.cartesian.series.WidthBased)
-      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE);
+      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
   }
 };
 
@@ -2403,7 +2403,7 @@ anychart.cartesian.Chart.prototype.invalidateWidthBasedSeries_ = function() {
  */
 anychart.cartesian.Chart.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE);
+    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
 };
 
 

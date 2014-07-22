@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
   <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
@@ -9,17 +8,21 @@
     goog.require('anychart.modules.anychart');
   </script>
   <script>
-    var chart, yAxis, xAxis, minor, series;
+    var chart, axis, minor;
     anychart.onDocumentLoad(function() {
-      chart = new anychart.cartesian.Chart().container('container');
+      chart = anychart.barChart();
+      chart.container('container');
 
-      var series = chart.column([5, 2, -4, 1, 3]);
-      series.labels().enabled(true).anchor('center').position('center').fontWeight('bold').fontSize(15);
-      series.markers().enabled(true).anchor('center');
+      var data = new anychart.data.Set([
+        ['P1', 14, 24, 34, 42, 50],
+        ['P2', 19, 26, 39, 45, 61],
+        ['P3', 27, 38, 35, 41, 58]
+      ]);
+      var data_1 = data.mapAs({x: [0], value: [1]});
+      var data_2 = data.mapAs({x: [0], value: [2]});
 
-//    yAxis = chart.yAxis();
-//    minor = yAxis.minorLabels().enabled(true);
-      xAxis = chart.xAxis();
+      chart.bar(data_1).hatchFill('diagonalcross');
+      chart.bar(data_2).hatchFill('diagonalbrick');
 
       chart.draw();
     });
@@ -27,15 +30,10 @@
     var width = 400;
     var height = 300;
 
-    function jj(val){
+    function jj(val) {
       width += val * document.getElementById('step').value;
       height += val * document.getElementById('step').value;
 
-      //такое изменение размеров контейнера невалидно и вообще фу таким быть.
-      //document.getElementById('container').style.width = width;
-      //document.getElementById('container').style.height = height;
-
-      //юзай jQuery, будь мужиком, блеать!!!
       $('#container').width(width).height(height);
 
       chart.bounds(chart.bounds().left(), chart.bounds().top(), width, height);
@@ -47,7 +45,7 @@
       height: 300px;
       border: 1px solid #000000;
     }
-    #status{
+    #status {
       display: none;
     }
     body {
