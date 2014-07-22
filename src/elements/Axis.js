@@ -1987,34 +1987,38 @@ anychart.elements.Axis.prototype.draw = function() {
 
           if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
             var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
-            if (ticksDrawer)
-              ticksDrawer.call(
-                  ticks,
-                  ratio,
-                  pixelBounds,
-                  lineBounds,
-                  lineThickness,
-                  majorPixelShift);
-
             drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
-            if (labelsDrawer && drawLabel)
-              labelsDrawer.call(this, tickVal, scale.transform(tickVal, .5), i, majorPixelShift);
+            if (drawLabel) {
+              if (ticksDrawer)
+                ticksDrawer.call(
+                    ticks,
+                    ratio,
+                    pixelBounds,
+                    lineBounds,
+                    lineThickness,
+                    majorPixelShift);
+
+              if (labelsDrawer)
+                labelsDrawer.call(this, tickVal, scale.transform(tickVal, .5), i, majorPixelShift);
+            }
             prevMajorRatio = ratio;
             i++;
           } else {
             var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
-            if (minorTicksDrawer && prevMajorRatio != minorRatio)
-              ticksDrawer.call(
-                  minorTicks,
-                  minorRatio,
-                  pixelBounds,
-                  lineBounds,
-                  lineThickness,
-                  minorPixelShift);
-
             drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
-            if (minorLabelsDrawer && drawLabel && prevMajorRatio != minorRatio)
-              minorLabelsDrawer.call(this, minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift);
+            if (drawLabel) {
+              if (minorTicksDrawer && prevMajorRatio != minorRatio)
+                minorTicksDrawer.call(
+                    minorTicks,
+                    minorRatio,
+                    pixelBounds,
+                    lineBounds,
+                    lineThickness,
+                    minorPixelShift);
+
+              if (minorLabelsDrawer && prevMajorRatio != minorRatio)
+                minorLabelsDrawer.call(this, minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift);
+            }
             j++;
           }
         }
