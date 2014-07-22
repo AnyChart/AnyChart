@@ -366,10 +366,13 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
 
 /**
  * Constructor function.
+ * @param {(Array|string)=} opt_data Data set raw data can be set here.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
  * @return {!anychart.data.Set}
  */
-anychart.data.set = function() {
-  return new anychart.data.Set();
+anychart.data.set = function(opt_data, opt_csvSettings) {
+  return new anychart.data.Set(opt_data, opt_csvSettings);
 };
 
 

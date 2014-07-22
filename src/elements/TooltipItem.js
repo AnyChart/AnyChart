@@ -623,6 +623,11 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+
+  var stage = this.container() ? this.container().getStage() : null;
+  var manualSuspend = stage && !stage.isSuspended();
+  if (manualSuspend) stage.suspend();
+
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
     this.layer_.pointerEvents('none');
@@ -722,6 +727,8 @@ anychart.elements.TooltipItem.prototype.draw = function() {
 
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
+
+  if (manualSuspend) stage.resume();
 
   return this;
 };

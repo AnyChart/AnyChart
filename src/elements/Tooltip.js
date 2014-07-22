@@ -353,13 +353,15 @@ anychart.elements.Tooltip.prototype.show = function(textInfo, position) {
 
   var titleText = this.titleFormatter_.call(textInfo, textInfo);
   var contentText = this.contentFormatter_.call(textInfo, textInfo);
-  var realPosition = this.processPosition_(position);
 
   this.item_.suspendSignalsDispatching();
+  this.item_.content().text(contentText);
+  this.item_.title().text(titleText);
+
+  var realPosition = this.processPosition_(position);
+
   this.item_.x(realPosition.x);
   this.item_.y(realPosition.y);
-  this.item_.title().text(titleText);
-  this.item_.content().text(contentText);
   this.item_.visible(true);
   this.item_.draw();
   this.item_.resumeSignalsDispatching(false);
