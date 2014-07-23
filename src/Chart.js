@@ -893,7 +893,7 @@ anychart.Chart.prototype.restoreDefaults = function() {
 
   var background = /** @type {anychart.elements.Background} */(this.background());
   background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
-  background.stroke('rgb(36,102,177)');
+  background.stroke('none');
 
   this.title('Chart title');
 
