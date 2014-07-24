@@ -2120,7 +2120,7 @@ anychart.elements.Axis.prototype.draw = function() {
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(this.parentBounds_);
-    minorLabelsDrawer = orientation[2];
+    minorLabelsDrawer = orientation[1];
     minorLabels.clear();
     this.markConsistent(anychart.ConsistencyState.MINOR_LABELS);
   }
@@ -2183,7 +2183,7 @@ anychart.elements.Axis.prototype.draw = function() {
           } else {
             var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
             drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
-            drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[i]) || goog.isBoolean(needDrawMinorLabels);
+            drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
 
             if (drawTick && minorTicksDrawer && prevMajorRatio != minorRatio)
               minorTicksDrawer.call(
