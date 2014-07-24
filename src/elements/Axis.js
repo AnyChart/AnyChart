@@ -1242,7 +1242,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
 
   var line = this.line_;
   line.stroke(this.stroke_);
-  var lineThickness = line.stroke().thickness ? parseFloat(line.stroke().thickness) : 1;
+  var lineThickness = line.stroke()['thickness'] ? parseFloat(line.stroke()['thickness']) : 1;
 
   if (title.enabled()) {
     if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -1402,7 +1402,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line_.getBounds();
   var ticks = isMajor ? this.ticks() : this.minorTicks();
   var ticksLength = ticks.length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var labels = isMajor ? this.labels() : this.minorLabels();
 
   var x, y;
@@ -1794,7 +1794,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
   var bounds = this.getPixelBounds_();
   var lineBounds = this.line_.getBounds();
   var ticksLength = this.ticks().length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var labels = this.labels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {x: 0, y: 0}};
@@ -1873,7 +1873,7 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
   var bounds = this.getPixelBounds_();
   var lineBounds = this.line_.getBounds();
   var ticksLength = this.minorTicks().length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': 0, 'y': 0}};
@@ -1904,7 +1904,7 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   var bounds = this.getPixelBounds_();
   var lineBounds = this.line_.getBounds();
   var ticksLength = this.minorTicks_.length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': 0, 'y': 0}};
@@ -1934,7 +1934,7 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   var bounds = this.getPixelBounds_();
   var lineBounds = this.line_.getBounds();
   var ticksLength = this.minorTicks_.length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': 0, 'y': 0}};
@@ -1964,7 +1964,7 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   var bounds = this.getPixelBounds_();
   var lineBounds = this.line_.getBounds();
   var ticksLength = this.minorTicks_.length();
-  var lineThickness = this.line_.stroke().thickness ? this.line_.stroke().thickness : 1;
+  var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
   var minorLabels = this.minorLabels();
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': 0, 'y': 0}};
@@ -2052,7 +2052,7 @@ anychart.elements.Axis.prototype.draw = function() {
     this.line_.clear();
     this.line_.stroke(this.stroke_);
 
-    lineThickness = this.line_.stroke().thickness ? parseFloat(this.line_.stroke().thickness) : 1;
+    lineThickness = this.line_.stroke()['thickness'] ? parseFloat(this.line_.stroke()['thickness']) : 1;
     var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
 
     lineDrawer = orientation[0];
@@ -2132,11 +2132,11 @@ anychart.elements.Axis.prototype.draw = function() {
 
       var scaleTicksArr = scale.ticks().get();
       var ticksArrLen = scaleTicksArr.length;
-      var tickThickness = this.ticks().stroke().thickness ? parseFloat(this.ticks_.stroke().thickness) : 1;
+      var tickThickness = this.ticks().stroke()['thickness'] ? parseFloat(this.ticks_.stroke()['thickness']) : 1;
       var tickVal, ratio, drawLabel, drawTick;
       var pixelBounds = this.getPixelBounds_();
       var lineBounds = this.line_.getBounds();
-      lineThickness = this.line_.stroke().thickness ? parseFloat(this.line_.stroke().thickness) : 1;
+      lineThickness = this.line_.stroke()['thickness'] ? parseFloat(this.line_.stroke()['thickness']) : 1;
 
       if (scale instanceof anychart.scales.ScatterBase) {
         overlappedLabels = this.calcLabels_();
@@ -2150,7 +2150,7 @@ anychart.elements.Axis.prototype.draw = function() {
         }
 
         var scaleMinorTicksArr = scale.minorTicks().get();
-        var minorTickThickness = this.minorTicks_.stroke().thickness ? parseFloat(this.minorTicks_.stroke().thickness) : 1;
+        var minorTickThickness = this.minorTicks_.stroke()['thickness'] ? parseFloat(this.minorTicks_.stroke()['thickness']) : 1;
 
         i = 0;
         j = 0;
