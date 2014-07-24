@@ -661,12 +661,9 @@ anychart.elements.Title.prototype.draw = function() {
       background.draw();
       this.markConsistent(anychart.ConsistencyState.BACKGROUND);
     }
-    // setting text bounds if needed.
-    this.text_.width(this.widthConstricted_ ? this.textWidth_ : null);
-    this.text_.height(this.heightConstricted_ ? this.textHeight_ : null);
     // settings text offset for
-    this.text_.x(/** @type {number} */(this.padding().left()));
-    this.text_.y(/** @type {number} */(this.padding().top()));
+    this.text_.x(anychart.utils.normalize(/** @type {number|string} */(this.padding().left()), this.backgroundWidth_));
+    this.text_.y(anychart.utils.normalize(/** @type {number|string} */(this.padding().top()), this.backgroundHeight_));
 
     needsPositionReset = true;
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -858,54 +855,43 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
     this.applyTextSettings(this.text_, isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
-
-  if (goog.isNull(this.width_)) {
-    this.textWidth_ = NaN;
-  } else {
-    this.backgroundWidth_ = anychart.utils.normalize(this.width_, parentWidth);
-    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
-    this.widthConstricted_ = true;
-  }
-
-  if (goog.isNull(this.height_)) {
-    this.textHeight_ = NaN;
-  } else {
-    this.backgroundHeight_ = anychart.utils.normalize(this.height_, parentHeight);
-    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-    this.heightConstricted_ = true;
-  }
-
   var textBounds;
-  if (this.width_ == null || this.height_ == null) {
-    this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.text_.width(isNaN(this.textWidth_) ? null : this.textWidth_);
-    this.text_.height(isNaN(this.textHeight_) ? null : this.textHeight_);
-    textBounds = this.text_.getBounds();
-  }
+  this.text_.width(null);
+  this.text_.height(null);
+  // need to set transformation to drop text bounds cache
+  this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  textBounds = this.text_.getBounds();
 
-  if (goog.isNull(this.width_)) {
+  if (anychart.utils.isNone(this.width_)) {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
-    if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
-      this.backgroundWidth_ = margin.tightenWidth(parentWidth);
-      this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
-      this.widthConstricted_ = true;
-    } else {
-      this.widthConstricted_ = false;
-    }
+  } else {
+    this.backgroundWidth_ = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
+    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
   }
 
-  if (goog.isNull(this.height_)) {
+  if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
+    this.backgroundWidth_ = margin.tightenWidth(parentWidth);
+    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
+  }
+  this.text_.width(this.textWidth_);
+  // need to set transformation to drop text bounds cache
+  this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  textBounds = this.text_.getBounds();
+
+  if (anychart.utils.isNone(this.height_)) {
     this.textHeight_ = textBounds.height;
     this.backgroundHeight_ = padding.widenHeight(this.textHeight_);
-    if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
-      this.backgroundHeight_ = margin.tightenHeight(parentHeight);
-      this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-      this.heightConstricted_ = true;
-    } else {
-      this.heightConstricted_ = false;
-    }
+  } else {
+    this.backgroundHeight_ = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
   }
+
+  if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
+    this.backgroundHeight_ = margin.tightenHeight(parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
+  }
+  this.text_.height(this.textHeight_);
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
@@ -996,7 +982,16 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
-    this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+    switch (this.orientation_) {
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+        break;
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
+        break;
+    }
   }
 };
 
