@@ -15,6 +15,10 @@ goog.require('anychart.cartesian.series.RangeColumn');
 anychart.columnChart = function(var_args) {
   var chart = new anychart.cartesian.Chart();
 
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart.column(arguments[i]);
+  }
+
   chart.title().text('Chart Title').fontWeight('bold');
 
   chart.xAxis();
