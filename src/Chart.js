@@ -2,6 +2,7 @@ goog.provide('anychart.Chart');
 
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Credits');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
@@ -72,6 +73,12 @@ anychart.Chart = function() {
    */
   this.autoResize_ = true;
 
+  /**
+   * @type {anychart.elements.Credits}
+   * @private
+   */
+  this.credits_ = null;
+
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
@@ -95,7 +102,8 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.LEGEND |
         anychart.ConsistencyState.CHART_LABELS |
         anychart.ConsistencyState.BACKGROUND |
-        anychart.ConsistencyState.TITLE;
+        anychart.ConsistencyState.TITLE |
+        anychart.ConsistencyState.CREDITS;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -585,6 +593,50 @@ anychart.Chart.prototype.onChartLabelSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Credits.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Chart credits settings.
+ * @param {(anychart.elements.Credits|Object|boolean)=} opt_value
+ * @return {!(anychart.Chart|anychart.elements.Credits)} Chart credits or itself for chaining call.
+ */
+anychart.Chart.prototype.credits = function(opt_value) {
+  if (!this.credits_) {
+    this.credits_ = anychart.elements.Credits.getInstance();
+    this.registerDisposable(this.credits_);
+    this.credits_.listenSignals(this.onCreditsSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.Credits) {
+      this.credits_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.credits_.deserialize(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.credits_.enabled(false);
+    } else {
+      this.credits_.enabled(!!opt_value);
+    }
+    return this;
+  } else {
+    return this.credits_;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.Chart.prototype.onCreditsSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.CREDITS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -638,6 +690,16 @@ anychart.Chart.prototype.draw = function() {
 
   totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
   boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
+
+  var credits = this.credits();
+  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
+    credits.suspendSignalsDispatching();
+    if (!credits.container() && credits.enabled())
+      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    credits.resumeSignalsDispatching(false);
+    credits.draw();
+    this.markConsistent(anychart.ConsistencyState.CREDITS);
+  }
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
@@ -769,6 +831,7 @@ anychart.Chart.prototype.autoResize = function(opt_value) {
  * @private
  */
 anychart.Chart.prototype.resizeHandler_ = function(evt) {
+  this.credits().invalidate(anychart.ConsistencyState.POSITION);
   this.invalidate(anychart.ConsistencyState.ALL,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
@@ -859,6 +922,7 @@ anychart.Chart.prototype.deserialize = function(config) {
   this.title(title);
   this.legend(legend);
   this.autoResize(config['autoResize']);
+  this.credits(config['credits']);
 
   this.resumeSignalsDispatching(true);
 
@@ -877,6 +941,7 @@ anychart.Chart.prototype.serialize = function() {
   json['background'] = this.background().serialize();
   json['title'] = this.title().serialize();
   json['legend'] = this.legend().serialize();
+  json['credits'] = this.credits().serialize();
   json['autoResize'] = this.autoResize();
 
   return json;
@@ -961,6 +1026,7 @@ anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/f
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
 anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
 anychart.Chart.prototype['chartLabel'] = anychart.Chart.prototype.chartLabel;
+anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
 anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
 anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;

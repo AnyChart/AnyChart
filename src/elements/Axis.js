@@ -133,9 +133,7 @@ anychart.elements.Axis = function() {
   this.ALL_VISUAL_STATES_ = anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.TITLE |
       anychart.ConsistencyState.LABELS |
-      anychart.ConsistencyState.MINOR_LABELS |
       anychart.ConsistencyState.TICKS |
-      anychart.ConsistencyState.MINOR_TICKS |
       anychart.ConsistencyState.BOUNDS |
       anychart.ConsistencyState.OVERLAP;
 };
@@ -151,9 +149,7 @@ anychart.elements.Axis.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.TITLE |
         anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.MINOR_LABELS |
         anychart.ConsistencyState.TICKS |
-        anychart.ConsistencyState.MINOR_TICKS |
         anychart.ConsistencyState.BOUNDS |
         anychart.ConsistencyState.OVERLAP;
 
@@ -523,7 +519,7 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.MINOR_LABELS;
+    state = anychart.ConsistencyState.LABELS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropBoundsCache_();
@@ -634,7 +630,7 @@ anychart.elements.Axis.prototype.minorTicksInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.MINOR_TICKS;
+    state = anychart.ConsistencyState.TICKS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.invalidate(state, signal);
@@ -2000,9 +1996,7 @@ anychart.elements.Axis.prototype.checkDrawingNeeded = function() {
           anychart.ConsistencyState.CONTAINER |
           anychart.ConsistencyState.TITLE |
           anychart.ConsistencyState.TICKS |
-          anychart.ConsistencyState.MINOR_TICKS |
-          anychart.ConsistencyState.LABELS |
-          anychart.ConsistencyState.MINOR_LABELS
+          anychart.ConsistencyState.LABELS
       );
     }
     return false;
@@ -2097,15 +2091,13 @@ anychart.elements.Axis.prototype.draw = function() {
     ticks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
     ticks.draw();
     ticksDrawer = ticks.getTicksDrawer();
-    this.markConsistent(anychart.ConsistencyState.TICKS);
-  }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MINOR_TICKS)) {
     minorTicks = this.minorTicks();
     minorTicks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
     minorTicks.draw();
     minorTicksDrawer = minorTicks.getTicksDrawer();
-    this.markConsistent(anychart.ConsistencyState.MINOR_TICKS);
+
+    this.markConsistent(anychart.ConsistencyState.TICKS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
@@ -2113,16 +2105,14 @@ anychart.elements.Axis.prototype.draw = function() {
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(this.parentBounds_);
     labels.clear();
-    this.markConsistent(anychart.ConsistencyState.LABELS);
-  }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MINOR_LABELS)) {
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(this.parentBounds_);
     minorLabelsDrawer = orientation[1];
     minorLabels.clear();
-    this.markConsistent(anychart.ConsistencyState.MINOR_LABELS);
+
+    this.markConsistent(anychart.ConsistencyState.LABELS);
   }
 
   if (goog.isDef(ticksDrawer) || goog.isDef(minorTicksDrawer) || goog.isDef(minorLabelsDrawer)) {
