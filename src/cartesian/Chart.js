@@ -159,7 +159,7 @@ anychart.chartTypesMap[anychart.cartesian.Chart.CHART_TYPE] = anychart.cartesian
  * @type {number}
  * @private
  */
-anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_ = 2;
+anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
 
 
 /**
@@ -1817,13 +1817,13 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
 
   for (i = 0, count = this.xAxes_.length; i < count; i++) {
     item = this.xAxes_[i];
-    if (!item.scale())
+    if (item && !item.scale())
       item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
   }
 
   for (i = 0, count = this.yAxes_.length; i < count; i++) {
     item = this.yAxes_[i];
-    if (!item.scale())
+    if (item && !item.scale())
       item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
   }
 
@@ -1837,7 +1837,7 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   for (i = 0, count = directionBasedElements.length; i < count; i++) {
     item = directionBasedElements[i];
 
-    if (!item.scale()) {
+    if (item && !item.scale()) {
       if (item.isHorizontal()) {
         item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
       } else {
@@ -2187,25 +2187,27 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
       for (i = axes.length; i--;) {
         axis = axes[i];
-        if (axis.enabled()) {
+        if (axis && axis.enabled()) {
           axis.suspendSignalsDispatching();
           axis.parentBounds(contentAreaBounds);
-
-          remainingBounds = axis.getRemainingBounds();
           orientation = axis.orientation();
 
           if (orientation == anychart.utils.Orientation.TOP) {
             axis.offsetY(topOffset);
+            remainingBounds = axis.getRemainingBounds();
             topOffset += contentAreaBounds.height - remainingBounds.height;
           } else if (orientation == anychart.utils.Orientation.BOTTOM) {
             axis.offsetY(bottomOffset);
-            bottomOffset += contentAreaBounds.height - remainingBounds.height;
+            remainingBounds = axis.getRemainingBounds();
+            bottomOffset = contentAreaBounds.height - remainingBounds.height;
           } else if (orientation == anychart.utils.Orientation.LEFT) {
             axis.offsetX(leftOffset);
+            remainingBounds = axis.getRemainingBounds();
             leftOffset += contentAreaBounds.width - remainingBounds.width;
           } else if (orientation == anychart.utils.Orientation.RIGHT) {
             axis.offsetX(rightOffset);
-            rightOffset += contentAreaBounds.width - remainingBounds.width;
+            remainingBounds = axis.getRemainingBounds();
+            rightOffset = contentAreaBounds.width - remainingBounds.width;
           }
           axis.resumeSignalsDispatching(false);
         }
@@ -2218,7 +2220,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
       for (i = axes.length; i--;) {
         axis = axes[i];
-        if (axis.enabled()) {
+        if (axis && axis.enabled()) {
           axis.suspendSignalsDispatching();
           var remainingBoundsBeforeSetLength = axis.getRemainingBounds();
           if (axis.isHorizontal()) {
@@ -2240,7 +2242,6 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       attempt++;
     } while (!complete && attempt < anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_);
 
-
     //bounds of data area
     this.dataBounds_ = boundsWithoutAxes.clone();
 
@@ -2255,31 +2256,34 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
     for (i = 0, count = grids.length; i < count; i++) {
       var grid = grids[i];
-      grid.suspendSignalsDispatching();
-      grid.parentBounds(this.dataBounds_);
-      grid.container(this.rootElement);
-      grid.draw();
-      grid.resumeSignalsDispatching(false);
+      if (grid) {
+        grid.suspendSignalsDispatching();
+        grid.parentBounds(this.dataBounds_);
+        grid.container(this.rootElement);
+        grid.draw();
+        grid.resumeSignalsDispatching(false);
+      }
     }
     this.markConsistent(anychart.ConsistencyState.GRIDS);
   }
-
   //draw axes outside of data bounds
   //only inside axes ticks can intersect data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
     for (i = 0, count = axes.length; i < count; i++) {
       axis = axes[i];
-      axis.suspendSignalsDispatching();
-      axis.container(this.rootElement);
-      if (axis.isHorizontal()) {
-        axis.offsetX(leftOffset);
-        axis.length(parseFloat(this.dataBounds_.width));
-      } else {
-        axis.offsetY(topOffset);
-        axis.length(parseFloat(this.dataBounds_.height));
+      if (axis) {
+        axis.suspendSignalsDispatching();
+        axis.container(this.rootElement);
+        if (axis.isHorizontal()) {
+          axis.offsetX(leftOffset);
+          axis.length(parseFloat(this.dataBounds_.width));
+        } else {
+          axis.offsetY(topOffset);
+          axis.length(parseFloat(this.dataBounds_.height));
+        }
+        axis.draw();
+        axis.resumeSignalsDispatching(false);
       }
-      axis.draw();
-      axis.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.AXES);
   }
@@ -2292,11 +2296,13 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
     for (i = 0, count = markers.length; i < count; i++) {
       var axesMarker = markers[i];
-      axesMarker.suspendSignalsDispatching();
-      axesMarker.parentBounds(this.dataBounds_);
-      axesMarker.container(this.rootElement);
-      axesMarker.draw();
-      axesMarker.resumeSignalsDispatching(false);
+      if (axesMarker) {
+        axesMarker.suspendSignalsDispatching();
+        axesMarker.parentBounds(this.dataBounds_);
+        axesMarker.container(this.rootElement);
+        axesMarker.draw();
+        axesMarker.resumeSignalsDispatching(false);
+      }
     }
     this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
   }
