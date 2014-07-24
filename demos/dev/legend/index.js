@@ -1,6 +1,43 @@
 var legend, listener, stage, rb, rect, items;
 
 function load() {
+  /*
+   var stage = acgraph.create(400, 300, 'container');
+   var rects = [
+   stage.rect(10, 10, 200, 140),
+   //    stage.rect(210, 10, 175, 140),
+   //    stage.rect(10, 150, 200, 140),
+   //    stage.rect(210, 150, 175, 140)
+   ];
+   var title = new anychart.elements.Title();
+   title.text('My title for legend')
+   .fontSize(10)
+   .margin(10)
+   .height(40)
+   .width(95)
+   .background().enabled(true).fill('red .1');
+   console.log(title.getContentBounds());
+
+   var orientations = ['top', 'top', 'right', 'bottom'];
+   for (rect in rects) {
+   var legend = new anychart.elements.Legend();
+   legend.itemsProvider([
+   {'text': 'Item 1', iconFill: 'red .3'},
+   {'text': 'Item 2', iconFill: 'red .3'},
+   {'text': 'Item 3', iconFill: 'red .3'}
+   //      {'text': 'Item 4', iconFill: 'red .3'}
+   ]);
+   legend.title(title);
+   legend.title().text(legend.title().text() + orientations[rect]);
+   //console.log(legend.title().getContentBounds());
+   legend.title().orientation(orientations[rect]);
+   if (rect % 2 == 0) {
+   legend.itemsLayout('vertical');
+   }
+   legend.parentBounds(rects[rect].getBounds());
+   legend.container(stage).draw();
+   }
+   */
   items = [
     'Series 1', 'Series 2', 'Series 3', 'Series 4', 'Series 5',
     'Series 6', 'Series 7', 'Series 8', 'Series 9', 'Series 10',

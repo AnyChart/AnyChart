@@ -66,17 +66,17 @@ anychart.ConsistencyState = {
    */
   MARKERS: 0x00002000,
   /**
-   * Minor ticks have changed.
+   * Free to use.
    */
-  MINOR_TICKS: 0x00004000,
+  FREE_STATE: 0x00004000,
   /**
    * Labels have changed.
    */
   LABELS: 0x00008000,
   /**
-   * Minor labels have changed.
+   * Credits have changed.
    */
-  MINOR_LABELS: 0x00010000,
+  CREDITS: 0x00010000,
   /**
    * Separator has changed.
    */

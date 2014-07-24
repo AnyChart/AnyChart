@@ -153,6 +153,15 @@
         "drawLastLabel": {
           "type": "boolean"
         },
+        "staggerMode": {
+          "type": "boolean"
+        },
+        "staggerLines": {
+          "type": "number"
+        },
+        "staggerMaxLines": {
+          "type": "number"
+        },
         "overlapMode": { "$ref": "#/definitions/anychart.elements.Axis.OverlapMode" },
         "labels": { "$ref": "#/definitions/anychart.elements.LabelsFactory" },
         "minorLabels": { "$ref": "#/definitions/anychart.elements.LabelsFactory" },

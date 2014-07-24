@@ -530,7 +530,16 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
   } else {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
-    this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+    switch (this.orientation_) {
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+        break;
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
+        break;
+    }
   }
 };
 

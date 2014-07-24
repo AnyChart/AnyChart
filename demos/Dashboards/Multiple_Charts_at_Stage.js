@@ -54,7 +54,7 @@ anychart.onDocumentReady(function() {
   var areaChart = anychart.areaChart();
   areaChart.title().text('Spline-Area');
   areaChart.bounds('33.3%', 0, '33.3%', '50%');
-  areaChart.spline(dataSet1);
+  areaChart.splineArea(dataSet1);
   setupChartSettings(areaChart);
   areaChart.draw();
 
@@ -72,7 +72,7 @@ anychart.onDocumentReady(function() {
   setupChartSettings(lineChart);
   lineChart.draw();
 
-  var scatterChart = anychart.scatterChart();
+  var scatterChart = anychart.cartesian.chart();
   scatterChart.title().text('Bubble');
   scatterChart.bounds('33.3%', '50%', '33.3%', '50%');
   scatterChart.bubble(dataSet1);

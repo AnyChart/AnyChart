@@ -1,19 +1,17 @@
-var chart;
-function load() {
-  chart = new anychart.Chart();
-  chart.container('container');
-  chart.title().background().fill('red .5');
-  chart.background().fill('red .5');
-  chart.legend().enabled(true);
-  chart.draw();
+anychart.onDocumentLoad(function() {
+  var data = new anychart.data.Set([
+    ['January', 10000],
+    ['February', 12000],
+    ['March', 18000],
+    ['April', 11000],
+    ['May', 9000]
+  ]);
+  chart = anychart.areaChart(data);
+  var series= chart.area(data);
+  series.labels().enabled(true).rotation(90).offsetX(20).textFormatter(function(point){
+    return point.x;
+  });
+  series.tooltip().enabled(true).title().enabled(true).text('Your Tooltip Title');
+  chart.container('container').draw();
 
-  var title = new anychart.elements.Title();
-  title.text('New Chart title');
-  title.background().fill('blue .5');
-
-  var background = new anychart.elements.Background();
-  background.fill('green .5');
-
-  chart.title(title);
-  chart.background(background);
-}
+})

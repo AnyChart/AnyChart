@@ -65,6 +65,23 @@ anychart.math.Rect.prototype.toCoordinateBox = function() {
 
 
 /**
+ * @param {Array.<number>} value .
+ * @return {anychart.math.Rect} .
+ */
+anychart.math.Rect.fromCoordinateBox = function(value) {
+  /** @type {anychart.math.Rect} */
+  var rect = new anychart.math.Rect(0, 0, 0, 0);
+  var bounds = new anychart.math.Rect(value[0], value[1], 0, 0);
+  for (var i = 2, len = value.length; i < len; i += 2) {
+    rect.left = value[i];
+    rect.top = value[i + 1];
+    bounds.boundingRect(rect);
+  }
+  return bounds;
+};
+
+
+/**
  * Serializes the rect.
  * @return {!Object}
  */

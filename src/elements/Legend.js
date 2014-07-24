@@ -1115,292 +1115,6 @@ anychart.elements.Legend.prototype.calculateContentHeight_ = function() {
 
 
 /**
- * Calculate actual bounds.
- * @deprecated Old method to calculate legend bounds. Use calculateBounds_ instead.
- * @private
- */
-anychart.elements.Legend.prototype.calculateLegendBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
-  var stage = container ? container.getStage() : null;
-
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  var parentWidth;
-  var parentHeight;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
-
-  var width, height;
-  var autoWidth, autoHeight;
-
-  // Define if there is autocalculation or not
-  if (parentBounds) {
-    parentWidth = parentBounds.width;
-    parentHeight = parentBounds.height;
-    if (goog.isDefAndNotNull(this.width_)) {
-      width = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
-      autoWidth = false;
-    } else {
-      width = 0;
-      autoWidth = true;
-    }
-    if (goog.isDefAndNotNull(this.height_)) {
-      height = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
-      autoHeight = false;
-    } else {
-      height = 0;
-      autoHeight = true;
-    }
-  } else {
-    if (goog.isNumber(this.width_) && !isNaN(this.width_)) {
-      autoWidth = false;
-      width = this.width_;
-    } else {
-      autoWidth = true;
-      width = 0;
-    }
-    if (goog.isNumber(this.height_) && !isNaN(this.height_)) {
-      autoHeight = false;
-      height = this.height_;
-    } else {
-      autoHeight = true;
-      height = 0;
-    }
-  }
-
-  var padding = this.padding();
-  var margin = this.margin();
-
-  var titleBounds;
-  var title = /** @type {anychart.elements.Title} */(this.title());
-  if (title.enabled()) {
-    title.suspendSignalsDispatching();
-    title.parentBounds(null);
-    title.resumeSignalsDispatching(false);
-    titleBounds = title.getContentBounds();
-  } else titleBounds = null;
-
-  var separatorBounds;
-  var separator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
-  if (separator.enabled()) {
-    separator.suspendSignalsDispatching();
-    separator.parentBounds(null);
-    separator.resumeSignalsDispatching(false);
-    separatorBounds = separator.getContentBounds();
-  } else separatorBounds = null;
-
-  var paginatorBounds;
-  var paginator = /** @type {anychart.ui.Paginator} */(this.paginator());
-  paginator.suspendSignalsDispatching();
-  paginator.parentBounds(null);
-  paginatorBounds = paginator.getPixelBounds();
-  paginator.resumeSignalsDispatching(false);
-
-
-  var contentWidth = this.calculateContentWidth_();
-  var contentHeight = this.calculateContentHeight_();
-  var tightenWidth;
-
-  if (autoWidth) {
-    width += contentWidth;
-
-    if (paginatorBounds) {
-      switch (paginator.orientation()) {
-        case anychart.utils.Orientation.LEFT:
-        case anychart.utils.Orientation.RIGHT:
-          width += paginatorBounds.width;
-          break;
-      }
-    }
-    width = Math.max(width, titleBounds ? titleBounds.width : 0);
-    width = padding.widenWidth(width);
-    tightenWidth = padding.tightenWidth(width);
-  } else {
-    tightenWidth = padding.tightenWidth(width);
-  }
-  var tightenHeight;
-  if (autoHeight) {
-    height += titleBounds ? titleBounds.height : 0;
-    height += separatorBounds ? separatorBounds.height : 0;
-
-    var paginatorHeight = 0;
-    if (paginatorBounds) {
-      switch (paginator.orientation()) {
-        case anychart.utils.Orientation.TOP:
-        case anychart.utils.Orientation.BOTTOM:
-          height += paginatorBounds.height;
-          break;
-        default:
-          paginatorHeight = paginatorBounds.height;
-          break;
-      }
-    }
-    height += Math.max(contentHeight, paginatorHeight);
-    height = padding.widenHeight(height);
-    tightenHeight = padding.tightenHeight(height);
-  } else {
-    tightenHeight = padding.tightenHeight(height);
-  }
-
-  var widthWithMargin = margin.widenWidth(width);
-  var heightWithMargin = margin.widenHeight(height);
-
-  if (parentBounds && parentWidth < widthWithMargin) {
-    width = margin.tightenWidth(parentWidth);
-    tightenWidth = padding.tightenWidth(width);
-    widthWithMargin = margin.widenWidth(width);
-  }
-
-  if (parentBounds && parentHeight < heightWithMargin) {
-    height = margin.tightenHeight(parentHeight);
-    tightenHeight = padding.tightenHeight(height);
-    heightWithMargin = margin.widenHeight(height);
-  }
-
-  var shouldEnablePaginator = false;
-  switch (this.itemsLayout_) {
-    case anychart.elements.Legend.Layout.TABLE:
-    case anychart.elements.Legend.Layout.HORIZONTAL:
-      switch (paginator.orientation()) {
-        case anychart.utils.Orientation.TOP:
-        case anychart.utils.Orientation.BOTTOM:
-          if (contentWidth > width) {
-            shouldEnablePaginator = true;
-          }
-          break;
-        case anychart.utils.Orientation.LEFT:
-        case anychart.utils.Orientation.RIGHT:
-          if (contentWidth > width) {
-            shouldEnablePaginator = true;
-          }
-          break;
-      }
-      break;
-    case anychart.elements.Legend.Layout.VERTICAL:
-      switch (paginator.orientation()) {
-        case anychart.utils.Orientation.TOP:
-        case anychart.utils.Orientation.BOTTOM:
-          if (contentHeight > height) {
-            shouldEnablePaginator = true;
-          }
-          break;
-        case anychart.utils.Orientation.LEFT:
-        case anychart.utils.Orientation.RIGHT:
-          if (contentHeight > height) {
-            shouldEnablePaginator = true;
-          }
-          break;
-      }
-      break;
-  }
-  paginator.suspendSignalsDispatching();
-  paginator.enabled(shouldEnablePaginator);
-  paginator.resumeSignalsDispatching(false);
-
-  if (!shouldEnablePaginator) {
-    if (autoWidth) {
-      if (paginatorBounds) {
-        switch (paginator.orientation()) {
-          case anychart.utils.Orientation.LEFT:
-          case anychart.utils.Orientation.RIGHT:
-            width -= paginatorBounds.width;
-            widthWithMargin -= paginatorBounds.width;
-            tightenWidth -= paginatorBounds.width;
-            break;
-        }
-      }
-    }
-    if (autoHeight) {
-      if (paginatorBounds) {
-        switch (paginator.orientation()) {
-          case anychart.utils.Orientation.TOP:
-          case anychart.utils.Orientation.BOTTOM:
-            height -= paginatorBounds.height;
-            heightWithMargin -= paginatorBounds.height;
-            tightenHeight -= paginatorBounds.height;
-            break;
-        }
-      }
-    }
-  }
-
-  var pageWidth = tightenWidth;
-  var pageHeight = tightenHeight - (titleBounds ? titleBounds.height : 0) - (separatorBounds ? separatorBounds.height : 0);
-
-  if (paginator.enabled()) {
-    switch (paginator.orientation()) {
-      case anychart.utils.Orientation.LEFT:
-      case anychart.utils.Orientation.RIGHT:
-        pageWidth -= (paginatorBounds ? paginatorBounds.width : 0);
-        break;
-      case anychart.utils.Orientation.TOP:
-      case anychart.utils.Orientation.BOTTOM:
-        pageHeight -= (paginatorBounds ? paginatorBounds.height : 0);
-        break;
-    }
-  }
-
-  do {
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-    this.distributeItemsInBounds_(pageWidth, pageHeight);
-    paginator.suspendSignalsDispatching();
-    paginator.parentBounds(null);
-    paginator.resumeSignalsDispatching(false);
-    paginatorBounds = paginator.getPixelBounds();
-    pageWidth = tightenWidth - (paginatorBounds ? paginatorBounds.width : 0);
-  } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
-
-  if (parentBounds) {
-    var left = parentBounds.getLeft();
-    var top = parentBounds.getTop();
-    switch (this.position_) {
-      case anychart.utils.Orientation.LEFT:
-      case anychart.utils.Orientation.RIGHT:
-        switch (this.align_) {
-          case anychart.utils.Align.CENTER:
-            top = top + (parentHeight - heightWithMargin) / 2;
-            break;
-          case anychart.utils.Align.RIGHT:
-          case anychart.utils.Align.BOTTOM:
-            top = parentBounds.getBottom() - heightWithMargin;
-            break;
-        }
-        break;
-      case anychart.utils.Orientation.TOP:
-      case anychart.utils.Orientation.BOTTOM:
-        switch (this.align_) {
-          case anychart.utils.Align.CENTER:
-            left = left + (parentWidth - widthWithMargin) / 2;
-            break;
-          case anychart.utils.Align.RIGHT:
-          case anychart.utils.Align.BOTTOM:
-            left = parentBounds.getRight() - widthWithMargin;
-            break;
-        }
-        break;
-    }
-    switch (this.position_) {
-      case anychart.utils.Orientation.RIGHT:
-        left = parentBounds.getRight() - widthWithMargin;
-        break;
-      case anychart.utils.Orientation.BOTTOM:
-        top = parentBounds.getBottom() - heightWithMargin;
-        break;
-    }
-  } else {
-    left = anychart.utils.normalize(/** @type {string|number} */ (margin.left()), 0);
-    top = anychart.utils.normalize(/** @type {string|number} */ (margin.top()), 0);
-  }
-  this.pixelBounds_ = new anychart.math.Rect(left, top, widthWithMargin, heightWithMargin);
-};
-
-
-/**
  * Calculate legend bounds.
  * @private
  */
@@ -1415,189 +1129,172 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   /** @type {number} */
   var parentHeight;
 
-  if (this.parentBounds_) {
+  if (this.parentBounds_ || goog.isNull(this.parentBounds_)) {
     parentBounds = this.parentBounds_;
   } else if (stage) {
     parentBounds = stage.getBounds();
   } else {
     parentBounds = null;
   }
+  var margin = this.margin();
+  var padding = this.padding();
 
-  var autoWidth, autoHeight;
   var width, height;
 
+  var maxWidth, maxHeight;
   if (parentBounds) {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
     if (goog.isDefAndNotNull(this.width_)) {
       width = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
-      autoWidth = false;
+      if (margin.widenWidth(width) > parentWidth) width = margin.tightenWidth(parentWidth);
+      maxWidth = padding.tightenWidth(width);
     } else {
-      width = 0;
-      autoWidth = true;
+      maxWidth = padding.tightenWidth(margin.tightenWidth(parentWidth));
     }
     if (goog.isDefAndNotNull(this.height_)) {
       height = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
-      autoHeight = false;
+      if (margin.widenHeight(height) > parentHeight) height = margin.tightenHeight(parentHeight);
+      maxHeight = padding.tightenHeight(height);
     } else {
-      height = 0;
-      autoHeight = true;
+      maxHeight = padding.tightenHeight(margin.tightenHeight(parentHeight));
     }
   } else {
     if (goog.isNumber(this.width_) && !isNaN(this.width_)) {
-      autoWidth = false;
-      width = this.width_;
+      maxWidth = padding.tightenWidth(this.width_);
     } else {
-      autoWidth = true;
-      width = 0;
+      maxWidth = Infinity;
     }
     if (goog.isNumber(this.height_) && !isNaN(this.height_)) {
-      autoHeight = false;
-      height = this.height_;
+      maxHeight = padding.tightenHeight(this.height_);
     } else {
-      autoHeight = true;
-      height = 0;
+      maxHeight = Infinity;
     }
   }
 
-  var titleBounds;
-  var title = /** @type {anychart.elements.Title} */(this.title());
-  if (title.enabled()) {
-    title.suspendSignalsDispatching();
-    title.parentBounds(null);
-    title.resumeSignalsDispatching(false);
-    titleBounds = title.getContentBounds();
-  } else titleBounds = null;
-
   var separatorBounds;
-  var separator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
-  if (separator.enabled()) {
-    separator.suspendSignalsDispatching();
-    separator.parentBounds(null);
-    separator.resumeSignalsDispatching(false);
-    separatorBounds = separator.getContentBounds();
-  } else separatorBounds = null;
-
   var paginatorBounds;
+  var titleBounds;
+
+  var separator = /** @type {anychart.elements.Separator} */(this.titleSeparator());
   var paginator = /** @type {anychart.ui.Paginator} */(this.paginator());
+  var title = /** @type {anychart.elements.Title} */(this.title());
+
+  separator.suspendSignalsDispatching();
   paginator.suspendSignalsDispatching();
+  title.suspendSignalsDispatching();
+
+  if (title.enabled()) {
+    title.parentBounds(null);
+    title.width(null);
+    title.height(null);
+    titleBounds = title.getContentBounds();
+  } else
+    titleBounds = null;
+
+  if (separator.enabled()) {
+    separator.parentBounds(null);
+    if (titleBounds)
+      separator.width(titleBounds.width);
+    separatorBounds = separator.getContentBounds();
+  } else
+    separatorBounds = null;
+
   paginator.parentBounds(null);
   paginatorBounds = paginator.getPixelBounds();
 
-  paginator.resumeSignalsDispatching(false);
-
-  var padding = this.padding();
-  var margin = this.margin();
+  var orientation;
 
   var contentWidth = this.calculateContentWidth_();
   var contentHeight = this.calculateContentHeight_();
-  var orientation;
-  var enablePaginator;
 
-  // force disable paginator
-  paginator.suspendSignalsDispatching().enabled(false).resumeSignalsDispatching(false);
-  if (autoWidth) {
-    width += contentWidth;
-
-    if (paginator.enabled()) {
-      orientation = paginator.orientation();
-      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += paginatorBounds.width;
-      else Math.max(width, paginatorBounds.width);
-    }
-
-    if (title.enabled()) {
-      orientation = title.orientation();
-      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += titleBounds.width;
-      else width = Math.max(width, titleBounds.width);
-    }
-
-    if (separator.enabled()) {
-      orientation = separator.orientation();
-      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) width += separatorBounds.width;
-      else Math.max(width, separatorBounds.width);
-    }
-
-    width = margin.widenWidth(padding.widenWidth(width));
-    if (parentWidth &&
-        width > parentWidth &&
-        this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) paginator.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
-  } else {
-    enablePaginator = false;
-    if (paginatorBounds) {
-      orientation = paginator.orientation();
-      if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
-        if (contentWidth + paginatorBounds.width > width) enablePaginator = true;
-      } else {
-        if (contentWidth > width) enablePaginator = true;
-      }
-    }
-    if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) paginator.suspendSignalsDispatching().enabled(enablePaginator).resumeSignalsDispatching(false);
+  if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
+    if (contentWidth > maxWidth) paginator.enabled(true);
+  }
+  if (this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) {
+    if (contentHeight > maxHeight) paginator.enabled(true);
   }
 
-  if (autoHeight) {
-    height += contentHeight;
-    if (paginator.enabled()) {
-      orientation = paginator.orientation();
-      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += paginatorBounds.height;
-      else height = Math.max(height, paginatorBounds.height);
-    }
-    if (title.enabled()) {
-      orientation = title.orientation();
-      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += titleBounds.height;
-      else height = Math.max(height, titleBounds.height);
-    }
-    if (separator.enabled()) {
-      orientation = separator.orientation();
-      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) height += separatorBounds.height;
-      else {
-        separator.suspendSignalsDispatching().width(height).resumeSignalsDispatching(false);
-        separatorBounds = separator.getContentBounds();
-        height = Math.max(height, separatorBounds.height);
-      }
-    }
+  var fullAreaWidth = 0;
+  var fullAreaHeight = 0;
 
-    height = margin.widenHeight(padding.widenHeight(height));
-    if (parentHeight &&
-        height > parentHeight &&
-        this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) {
-      paginator.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
-      if (autoWidth) width += paginatorBounds.width;
+  // calculating area width and height
+  fullAreaWidth += contentWidth;
+  fullAreaHeight += contentHeight;
+
+  if (separator.enabled()) {
+    orientation = separator.orientation();
+    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+      fullAreaWidth += separatorBounds.width;
+      fullAreaHeight = Math.max(fullAreaHeight, separatorBounds.height);
+    } else {
+      fullAreaWidth = Math.max(fullAreaWidth, separatorBounds.width);
+      fullAreaHeight += separatorBounds.height;
     }
-  } else {
-    enablePaginator = false;
-    if (paginatorBounds) {
-      orientation = paginator.orientation();
-      if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) {
-        if (contentHeight + paginatorBounds.height > height) enablePaginator = true;
-      } else {
-        if (contentHeight > height) enablePaginator = true;
-      }
-    }
-    if (this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) paginator.suspendSignalsDispatching().enabled(enablePaginator).resumeSignalsDispatching(false);
   }
 
-  if (parentWidth && width > parentWidth) width = parentWidth;
-  if (parentHeight && height > parentHeight) height = parentHeight;
+  if (paginator.enabled()) {
+    orientation = paginator.orientation();
+    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+      fullAreaWidth += paginatorBounds.width;
+      fullAreaHeight = Math.max(fullAreaHeight, paginatorBounds.height);
+    } else {
+      fullAreaWidth = Math.max(fullAreaWidth, paginatorBounds.width);
+      fullAreaHeight += paginatorBounds.height;
+    }
+  }
 
-  var widthWithoutMargin = margin.tightenWidth(width);
-  var heightWithoutMargin = margin.tightenHeight(height);
+  if (title.enabled()) {
+    orientation = title.orientation();
+    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+      fullAreaWidth += titleBounds.width;
+      fullAreaHeight = Math.max(fullAreaHeight, titleBounds.height);
+    } else {
+      fullAreaWidth = Math.max(fullAreaWidth, titleBounds.width);
+      fullAreaHeight += titleBounds.height;
+    }
+  }
 
-  var widthWithoutPadding = padding.tightenWidth(widthWithoutMargin);
-  var heightWithoutPadding = padding.tightenHeight(heightWithoutMargin);
-
-  var contentAreaWidth = widthWithoutPadding;
-  var contentAreaHeight = heightWithoutPadding;
-
+  var contentAreaWidth = fullAreaWidth > maxWidth ? maxWidth : fullAreaWidth;
+  var contentAreaHeight = fullAreaHeight > maxHeight ? maxHeight : fullAreaHeight;
+  width = margin.widenWidth(padding.widenWidth(contentAreaWidth));
+  height = margin.widenHeight(padding.widenHeight(contentAreaHeight));
+  if (title.enabled()) {
+    var titleWidth = titleBounds.width;
+    var titleHeight = titleBounds.height;
+    orientation = title.orientation();
+    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) {
+      title.width(title.margin().tightenWidth(contentAreaWidth));
+      titleBounds = title.getContentBounds();
+      separator.width(titleBounds.width);
+      separatorBounds = separator.getContentBounds();
+      if (titleBounds.height != titleHeight) {
+        title.height(title.margin().tightenHeight(titleHeight));
+        titleBounds = title.getContentBounds();
+      }
+    } else {
+      title.width(title.margin().tightenWidth(contentAreaHeight));
+      titleBounds = title.getContentBounds();
+      separator.width(titleBounds.height);
+      separatorBounds = separator.getContentBounds();
+      if (titleBounds.width != titleWidth) {
+        title.height(title.margin().tightenHeight(titleWidth));
+        titleBounds = title.getContentBounds();
+      }
+    }
+  }
   if (title.enabled()) {
     orientation = title.orientation();
     if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= titleBounds.height;
     else contentAreaWidth -= titleBounds.width;
   }
+
   if (separator.enabled()) {
     orientation = separator.orientation();
     if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= separatorBounds.height;
     else contentAreaWidth -= separatorBounds.width;
   }
+
   var pageWidth = contentAreaWidth, pageHeight = contentAreaHeight;
   orientation = paginator.orientation();
 
@@ -1609,15 +1306,14 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   do {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
     this.distributeItemsInBounds_(pageWidth, pageHeight);
-    paginator.suspendSignalsDispatching();
     paginator.parentBounds(null);
-    paginator.resumeSignalsDispatching(false);
     paginatorBounds = paginator.getPixelBounds();
     if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) pageHeight = contentAreaHeight - (paginatorBounds ? paginatorBounds.height : 0);
     else pageWidth = contentAreaWidth - (paginatorBounds ? paginatorBounds.width : 0);
   } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
 
   var left, top;
+
   if (parentBounds) {
     left = parentBounds.getLeft();
     top = parentBounds.getTop();
@@ -1661,6 +1357,10 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   }
 
   this.pixelBounds_ = new anychart.math.Rect(left, top, width, height);
+
+  separator.resumeSignalsDispatching(false);
+  paginator.resumeSignalsDispatching(false);
+  title.resumeSignalsDispatching(false);
 };
 
 
