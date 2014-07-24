@@ -2132,7 +2132,7 @@ anychart.elements.Axis.prototype.draw = function() {
 
       var scaleTicksArr = scale.ticks().get();
       var ticksArrLen = scaleTicksArr.length;
-      var tickThickness = this.ticks_.stroke().thickness ? parseFloat(this.ticks_.stroke().thickness) : 1;
+      var tickThickness = this.ticks().stroke().thickness ? parseFloat(this.ticks_.stroke().thickness) : 1;
       var tickVal, ratio, drawLabel, drawTick;
       var pixelBounds = this.getPixelBounds_();
       var lineBounds = this.line_.getBounds();

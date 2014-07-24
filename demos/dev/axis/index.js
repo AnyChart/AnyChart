@@ -97,27 +97,27 @@ function minorTickSet(value) {
 
 var scale;
 function load() {
-  scale = new anychart.scales.Ordinal();
+//  scale = new anychart.scales.Ordinal();
 //  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
-  var values =
-      [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ];
-  scale.values(values);
-  scale.ticks().interval(1);
+//  var values =
+//      [
+//        'January',
+//        'February',
+//        'March',
+//        'April',
+//        'May',
+//        'June',
+//        'July',
+//        'August',
+//        'September',
+//        'October',
+//        'November',
+//        'December'
+//      ];
+//  scale.values(values);
+//  scale.ticks().interval(1);
 
-//  scale = new anychart.scales.Linear();
+  scale = new anychart.scales.Linear();
 //  var ticks = ["0", "25", "50", "75", "100"];
 //  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
 //  scale.ticks().set(ticks);
@@ -134,12 +134,13 @@ function load() {
   axis1.offsetY(250);
   axis1.container('container');
   axis1.orientation('bottom');
-  axis1.length(156);
+  axis1.length(666);
 //  axis1.staggerMaxLines(2);
 //  axis1.overlapMode('nooverlap');
 //  axis1.staggerLines(3);
   axis1.staggerMode(true);
-  axis1.ticks().enabled(true);
+  axis1.ticks().length(25).stroke('2 red');
+  axis1.minorTicks().stroke('2 green').length(15);
   axis1.labels().rotation(0).fontSize(10).enabled(true);
   axis1.minorLabels().rotation(0).enabled(true);
 
@@ -155,7 +156,7 @@ function load() {
 //  var boundsAxis3 = axis3.getPixelBounds_();
 
 //  axis1.offsetX(boundsAxis3.width());
-  axis1.offsetX(200);
+  axis1.offsetX(201);
 //  axis1.length(boundsAxis1.width() - 2 * boundsAxis3.width());
 
 //  axis3.offsetY(boundsAxis1.height());

@@ -138,8 +138,10 @@ anychart.elements.Ticks.Position = {
  */
 anychart.elements.Ticks.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.length_ = opt_value;
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    if (this.length_ != opt_value) {
+      this.length_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
     return this;
   } else
     return this.length_;
@@ -197,8 +199,11 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
  */
 anychart.elements.Ticks.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.stroke_ = opt_value;
-    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    opt_value = anychart.color.normalizeStroke(opt_value);
+    if (this.stroke_ != opt_value) {
+      this.stroke_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   } else
     return this.stroke_;
