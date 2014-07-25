@@ -212,7 +212,6 @@ def __get_optimized_compiler_args():
         # uncomment to have some fun ;)
         #'--compiler_flags=--jscomp_warning=reportUnknownTypes',
     ]
-    __set_pretty_print(compiler_args)
     __set_optimization_level(compiler_args, OptimizationLevel.ADVANCED)
     return compiler_args
 
