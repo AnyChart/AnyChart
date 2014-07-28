@@ -96,7 +96,7 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
         'high': [1 + i * 2 + 1]
       }));
     }
-  } else if (columnsPerSeries == 2) {
+  } else if (columnsPerSeries == 4) {
     for (i = 0; i < seriesCount; i++) {
       res.push(dataSet.mapAs({
         'x': [0],
