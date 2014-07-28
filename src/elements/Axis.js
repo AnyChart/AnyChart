@@ -95,7 +95,7 @@ anychart.elements.Axis = function() {
       .enabled(false)
       .offsetX(0)
       .offsetY(0)
-      .padding(2, 3, 2, 3)
+      .padding(1, 1, 0, 1)
       .fontFamily('Tahoma')
       .fontSize('11')
       .fontColor('rgb(34,34,34)')
@@ -1109,10 +1109,10 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
   if (!goog.isNull(this.staggerLines_)) {
     this.currentStageLines_ = this.staggerLines_;
   } else {
-    var isСonvergence = false;
+    var isConvergence = false;
     i = 1;
-    while (!isСonvergence && i <= ticksArrLen) {
-      isСonvergence = true;
+    while (!isConvergence && i <= ticksArrLen) {
+      isConvergence = true;
 
       for (k = 0; k < i; k++) {
         for (j = k; j < ticksArrLen - i; j = j + i) {
@@ -1120,15 +1120,15 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
           bounds2 = this.getLabelBounds_(j + i, true, opt_bounds);
 
           if (this.checkLabelsIntersection_(bounds1, bounds2)) {
-            isСonvergence = false;
+            isConvergence = false;
             i++;
             break;
           }
         }
-        if (!isСonvergence) break;
+        if (!isConvergence) break;
       }
     }
-    this.staggerAutoLines_ = isСonvergence ? i : ticksArrLen;
+    this.staggerAutoLines_ = isConvergence ? i : ticksArrLen;
 
     if (!goog.isNull(this.staggerMaxLines_) && this.staggerAutoLines_ > this.staggerMaxLines_) {
       this.currentStageLines_ = this.staggerMaxLines_;
