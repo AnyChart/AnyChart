@@ -96,7 +96,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Setter for text appearance settings.<br/>
  * Overrides current text settings by passed settings object.
  * @example <t>listingOnly</t>
- * someTextElement.textSettings({'fontFamily': 'Tahoma', 'color': 'red'});
+ * someTextElement.textSettings({'fontFamily': 'Tahoma', 'fontColor': 'red'});
  * @param {Object=} opt_objectWithSettings Settings object. Complete object looks like this:
  * <code>   {
  *      'fontSize': smth,
