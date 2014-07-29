@@ -433,7 +433,7 @@ def __build_js_doc():
         if is_release:
             docs_out_path = os.path.join(docs_out_path, __get_version())
         else:
-            docs_out_path = os.path.join(docs_out_path, 'master')
+            docs_out_path = os.path.join(docs_out_path, 'develop')
         __create_dir_if_not_exists(docs_out_path)
         shutil.rmtree(docs_out_path)
         os.mkdir(docs_out_path)
@@ -467,7 +467,7 @@ def __build_js_doc():
     if generate_playground_samples:
         print 'GIT: update contrib with samples'
         p = subprocess.Popen(
-            'git checkout master && git pull origin master',
+            'git checkout develop && git pull origin develop',
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             shell=True,
@@ -504,7 +504,7 @@ def __build_js_doc():
     if generate_playground_samples:
         print 'GIT: trying push samples'
         p = subprocess.Popen(
-            "git add -A && git commit -am 'autobuild samples' && git push origin master",
+            "git add -A && git commit -am 'autobuild samples' && git push origin develop",
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             shell=True,

@@ -255,7 +255,7 @@ anychart.elements.Table.CellContent;
 /**
  * Getter and setter for table rows count.
  * @param {number=} opt_value Rows count to set.
- * @return {number|!anychart.elements.Table}
+ * @return {!anychart.elements.Table|number}
  */
 anychart.elements.Table.prototype.rowsCount = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -276,7 +276,7 @@ anychart.elements.Table.prototype.rowsCount = function(opt_value) {
 /**
  * Getter and setter for table cols count.
  * @param {number=} opt_value Cols count to set.
- * @return {number|!anychart.elements.Table}
+ * @return {!anychart.elements.Table|number}
  */
 anychart.elements.Table.prototype.colsCount = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1864,7 +1864,7 @@ anychart.elements.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill,
 /**
  * Getter and setter for cell columns span. Cells that are overlapped by cells with colSpan != 1 are not drawn.
  * @param {number=} opt_value
- * @return {number|!anychart.elements.Table.Cell}
+ * @return {!anychart.elements.Table.Cell|number}
  */
 anychart.elements.Table.Cell.prototype.colSpan = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1883,7 +1883,7 @@ anychart.elements.Table.Cell.prototype.colSpan = function(opt_value) {
 /**
  * Getter and setter for cell rows span. Cells that are overlapped by cells with rowSpan != 1 are not drawn.
  * @param {number=} opt_value
- * @return {number|!anychart.elements.Table.Cell}
+ * @return {!anychart.elements.Table.Cell|number}
  */
 anychart.elements.Table.Cell.prototype.rowSpan = function(opt_value) {
   if (goog.isDef(opt_value)) {
