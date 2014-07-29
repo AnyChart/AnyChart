@@ -1702,10 +1702,11 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
 
 /**
  * Constructor function.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @return {!anychart.pie.Chart}
  */
-anychart.pie.chart = function() {
-  return new anychart.pie.Chart();
+anychart.pie.chart = function(opt_data) {
+  return new anychart.pie.Chart(opt_data);
 };
 
 
