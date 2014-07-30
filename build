@@ -398,39 +398,44 @@ def __build_js_doc():
     generate_playground_samples = ''
     is_release = ''
     log_string = ''
+    js_version = 'local'
 
     if arguments['release']:
         is_release = '1'
         generate_tree = '1'
         generate_playground_samples = '1'
         log_string += '\tRELEASE build\n'
+        js_version = __get_version()
     else:
         if arguments['dry_run']:
             dry_run = '1'
-            log_string += '\tdry-run\n'
+            log_string += '\n\tdry-run'
         if arguments['compile']:
             __build_project(['anychart'])
         if arguments['tree']:
             generate_tree = '1'
-            log_string += '\tgenerate tree of classes\n'
+            log_string += '\n\tgenerate tree of classes'
         if arguments['profile']:
             profiler = '1'
-            log_string += '\tJS profiler on\n'
+            log_string += '\n\tJS profiler on'
         if arguments['examples']:
             generate_playground_samples = '1'
-            log_string += '\tgenerate playground samples\n'
+            log_string += '\n\tgenerate playground samples'
         if arguments['source']:
             custom_src = arguments['source']
+        if arguments['js_version']:
+            js_version = arguments['js_version']
 
     docs_out_path = os.path.join(OUT_PATH, 'docs')
     __create_dir_if_not_exists(OUT_PATH)
     __create_dir_if_not_exists(docs_out_path)
 
-    print 'Build JSDoc with settings:\n' + log_string
+    print 'Build JSDoc with settings:' + log_string
     if not dry_run:
+        print '\tjs version is: ' + js_version
+
         if custom_src:
-            print '\tonly package:' + custom_src + '\n'
-            # clear dir: out/docs/version
+            print '\tonly package: ' + custom_src
         if is_release:
             docs_out_path = os.path.join(docs_out_path, __get_version())
         else:
@@ -460,7 +465,8 @@ def __build_js_doc():
         dry_run,
         '","'.join(tag_list.split('\n')),
         generate_playground_samples,
-        ''.join(__get_exports_sting())
+        ''.join(__get_exports_sting()),
+        js_version
     ]))
     f.close()
 
@@ -628,6 +634,8 @@ def __exec_main_script():
     docs_parser.add_argument('-r', '--release', action='store_true', help='Generate docs with release settings')
     docs_parser.add_argument('-s', '--source', action='store',
                              help='Specify target package, can be specified multiple times', default=False)
+    docs_parser.add_argument('-jv', '--js-version', action='store',
+                             help='Define where take js from local or CDN (for example "develop" or "7.0.0"). By default "local".', default=False)
 
     global arguments
     arguments = vars(parser.parse_args())
