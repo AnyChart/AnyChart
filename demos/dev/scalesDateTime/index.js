@@ -1,7 +1,7 @@
 var scale1, scale2, scale3, scale4, axis1, axis2, axis3, axis4;
 
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   scale1 = new anychart.scales.DateTime();
 //  scale1.minimumGap(0);

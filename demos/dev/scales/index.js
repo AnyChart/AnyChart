@@ -109,7 +109,7 @@ function load1() {
   console.log(scale.ticks().get(), scale.ticks().names());
 
 
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   var data1 = [
     {x: 'p1', value: '1', namae: 'point 1'},

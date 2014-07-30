@@ -2,7 +2,7 @@ var legend, listener, stage, rb, rect, items;
 
 function load() {
   /*
-   var stage = acgraph.create(400, 300, 'container');
+   var stage = acgraph.create('container', 400, 300);
    var rects = [
    stage.rect(10, 10, 200, 140),
    //    stage.rect(210, 10, 175, 140),

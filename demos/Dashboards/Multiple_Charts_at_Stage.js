@@ -42,7 +42,7 @@ anychart.onDocumentReady(function() {
     chart.minorGrid(0).enabled(false);
   };
 
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   var columnChart = anychart.columnChart();
   columnChart.title().text('Column');

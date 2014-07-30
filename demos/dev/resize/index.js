@@ -1,6 +1,6 @@
 var pieChart, cartesianChart;
 anychart.onDocumentReady(function() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   pieChart = new anychart.pie.Chart([
     {x: 'Department Stores', y: 6371664, exploded: true},

@@ -1,7 +1,7 @@
 var split;
 
 anychart.onDocumentReady(function() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   var r1 = stage.rect().fill({
     'keys': ['0 #FCC2D1', '0.5 #FAD7E0', '1 #FAF0F8'],

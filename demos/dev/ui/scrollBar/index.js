@@ -2,7 +2,7 @@ var verticalScroll, horizontalScroll;
 var rect1, rect2, rect3, rect4;
 
 anychart.onDocumentReady(function() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
 
   //Setting a bounds.

@@ -1,6 +1,6 @@
 var label;
 function load() {
-  var stage = acgraph.create('100%' ,'100%', 'container');
+  var stage = acgraph.create('container', '100%' , '100%');
   stage.rect(100, 100, 300, 300).fill('pink');
   label = new anychart.elements.Label();
   label.container(stage);

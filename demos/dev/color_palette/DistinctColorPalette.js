@@ -3,7 +3,7 @@ function load() {
   index;
   count = 12;
 
-  stage = acgraph.create('100%', '100%', 'container');
+  stage = acgraph.create('container', '100%', '100%');
   palette = new anychart.utils.DistinctColorPalette();
   palette.listen('invalidated', function() {
     stage.removeChildren();
