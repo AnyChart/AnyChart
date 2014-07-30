@@ -19,9 +19,9 @@ anychart.utils.TooltipsContainer = function() {
   var ah = goog.dom.getWindow().screen.availHeight;
 
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher('9')) {
-    this.stage_ = acgraph.create(1, 1, this.root_);
+    this.stage_ = acgraph.create(this.root_, 1, 1);
   } else {
-    this.stage_ = acgraph.create(aw, ah, this.root_);
+    this.stage_ = acgraph.create(this.root_, aw, ah);
   }
   this.children_ = [];
   this.stage_.domElement()['style']['cssText'] = 'position:fixed; left:0; top:0; opacity:1; pointer-events: none';

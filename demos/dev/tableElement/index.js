@@ -9,7 +9,7 @@ function load() {
   table = new anychart.elements.Table(rows + 2, 5);
 
   table.height(rows * rowHeight).width(600);
-  var stage = acgraph.create(620, rows * rowHeight + 20, 'container');
+  var stage = acgraph.create('container', 620, rows * rowHeight + 20);
   table.container(stage);
   table.colWidth(0, 30);
 
@@ -110,5 +110,5 @@ function load1() {
   table.cellFill('none');
   table.getCell(0, 0).content('CELL 1').rightBorder('3 blue');
   table.getCell(0, 1).content('CELL 2').border('3 black');
-  table.container(acgraph.create(420, 220, 'container')).draw();
+  table.container(acgraph.create('container', 420, 220)).draw();
 };

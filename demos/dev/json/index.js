@@ -4,8 +4,8 @@ var area, bar, bubble, candlestick, column, line, markers, ohlc, rangeArea, rang
 
 
 function load() {
-  stage = acgraph.create('100%', '100%', 'container');
-  stage2 = acgraph.create('100%', '100%', 'container2');
+  stage = acgraph.create('container', '100%', '100%');
+  stage2 = acgraph.create('container2', '100%', '100%');
 
   var data1 = [];
   var data2 = [];

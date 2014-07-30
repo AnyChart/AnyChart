@@ -1,5 +1,5 @@
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   var data = [
     'missing',//1

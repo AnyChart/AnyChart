@@ -1,6 +1,6 @@
 var areaChart, data1, area;
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
   data1 = [];
   var data2 = [];
   var d1 = [], d2 = [];

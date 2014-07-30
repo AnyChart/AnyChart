@@ -1,6 +1,6 @@
 var areaChart, barChart;
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
   var data1 = [];
   var data2 = [];
   var d1 = [], d2 = [];

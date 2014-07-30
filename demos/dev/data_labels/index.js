@@ -1,7 +1,7 @@
 var chart1, chart2, chart3;
 
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
 
   chart1 = new anychart.cartesian.Chart();
   chart1.container(stage);
