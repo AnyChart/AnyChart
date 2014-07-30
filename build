@@ -271,6 +271,7 @@ def __build_project_sources(modules):
 
 def __build_project(modules):
     output_file = os.path.join(OUT_PATH, '_'.join(modules) + '.min.js')
+    print output_file
     print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s" % (', '.join(modules), output_file, __get_version(True), str(arguments['develop']))
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
@@ -410,6 +411,7 @@ def __build_js_doc():
             dry_run = '1'
             log_string += '\n\tdry-run'
         if arguments['compile']:
+            arguments['develop'] = False
             __build_project(['anychart'])
         if arguments['tree']:
             generate_tree = '1'
@@ -541,6 +543,9 @@ def __get_exports_sting(target=SRC_PATH):
                     found = True
 
     return result
+
+def __print_exports(target=SRC_PATH):
+    print '\n'.join(__get_exports_sting(target))
 #=======================================================================================================================
 #                            Logging.
 #=======================================================================================================================
@@ -620,6 +625,9 @@ def __exec_main_script():
     # create the parser for the "contrib" command
     subparsers.add_parser('autofix', help='Try to autofix linter warnings and errors')
 
+    # create the parser for the "exports" command
+    subparsers.add_parser('exports', help='Print exports list in console')
+
     # create the parser for the "contrib" command
     docs_parser = subparsers.add_parser('docs', help='Generate project documentation')
     docs_parser.add_argument('-c', '--compile', action='store_true', help='Compile project before docs generation')
@@ -653,6 +661,8 @@ def __exec_main_script():
         __autofix_project()
     elif command == 'docs':
         __build_js_doc()
+    elif command == 'exports':
+        __print_exports()
 
     __print_warnings_list()
 
