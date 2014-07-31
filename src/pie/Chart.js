@@ -7,6 +7,7 @@ goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
 goog.require('anychart.utils.Sort');
+goog.require('anychart.utils.TypedLayer');
 
 
 
@@ -218,9 +219,7 @@ anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.DATA |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.HOVER |
-    anychart.ConsistencyState.CLICK;
+    anychart.ConsistencyState.LABELS;
 
 
 /**
@@ -309,16 +308,7 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
  * @return {!anychart.data.Iterator} Current pie view iterator.
  */
 anychart.pie.Chart.prototype.getIterator = function() {
-  return this.iterator_ || this.getResetIterator();
-};
-
-
-/**
- * Returns new iterator for the current view.
- * @return {!anychart.data.Iterator} New iterator.
- */
-anychart.pie.Chart.prototype.getResetIterator = function() {
-  return this.iterator_ = this.view_.getIterator();
+  return this.iterator_ || (this.iterator_ = this.view_.getIterator());
 };
 
 
@@ -894,15 +884,13 @@ anychart.pie.Chart.prototype.explode = function(opt_value) {
 /**
  * Explodes slice at index.
  * @param {number} index Pie slice index that should be exploded or not.
- * @param {boolean} explode Whether to explode.
+ * @param {boolean=} opt_explode Whether to explode.
  * @return {anychart.pie.Chart} .
  */
-anychart.pie.Chart.prototype.explodeSlice = function(index, explode) {
-  var iterator = this.view_.getIterator();
-  if (iterator.select(index)) {
-    iterator.meta('exploded', !!explode);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS,
-        anychart.Signal.NEEDS_REDRAW);
+anychart.pie.Chart.prototype.explodeSlice = function(index, opt_explode) {
+  var iterator = this.getIterator();
+  if (iterator.select(index) && !this.isMissing_(iterator.get('value'))) {
+    this.clickSlice(goog.isDef(opt_explode) ? opt_explode : true);
   }
   return this;
 };
@@ -968,80 +956,70 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 
 
 /**
- * Gets the final normalized fill color.
- * @param {number} pieSliceIndex Index of a pie slice.
- * @param {boolean=} opt_hover Whether a pie sliceis hovered or not.
- * @param {acgraph.vector.Fill=} opt_fill Normal state fill.
- * @return {!acgraph.vector.Fill} Normalized fill.
- * @private
+ * Method that gets final fill color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {boolean} hover If the fill should be a hover fill.
+ * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
+ * @protected
  */
-anychart.pie.Chart.prototype.getFillColor_ = function(pieSliceIndex, opt_hover, opt_fill) {
-  var scope, fill;
-
-  scope = {
-    'index': pieSliceIndex
-  };
-
-  if (goog.isFunction(this.fill_)) {
-    scope['sourceColor'] = this.palette_.colorAt(pieSliceIndex) || 'black';
-    fill = this.fill_.call(scope);
-  } else if (goog.isDef(this.fill_)) {
-    fill = this.fill_;
-  }
-
-  fill = anychart.color.normalizeFill(fill);
-
-  if (goog.isDefAndNotNull(opt_hover) && opt_hover === true) {
-    if (goog.isDef(opt_fill)) fill = anychart.color.normalizeFill(opt_fill);
-    scope['sourceColor'] = fill;
-    if (goog.isFunction(this.hoverFill_)) {
-      fill = this.hoverFill_.call(scope);
-    } else if (goog.isDefAndNotNull(this.hoverFill_)) {
-      fill = this.hoverFill_;
-    }
-    return anychart.color.normalizeFill(fill);
-  } else {
-    return fill;
-  }
+anychart.pie.Chart.prototype.getFillColor = function(usePointSettings, hover) {
+  var iterator = this.getIterator();
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
+      (usePointSettings && iterator.get('fill')) || this.fill());
+  return /** @type {!acgraph.vector.Fill} */(hover ?
+      this.normalizeColor(
+          /** @type {acgraph.vector.Fill|Function} */(
+              (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
+          normalColor) :
+      this.normalizeColor(normalColor));
 };
 
 
 /**
- * Gets the final normalized stroke color.
- * @param {number} pieSliceIndex Index of a pie slice.
- * @param {boolean=} opt_hover Whether a pie slice is hovered or not.
- * @param {acgraph.vector.Stroke=} opt_stroke Normal state stroke.
- * @return {!acgraph.vector.Stroke} Normalized stroke.
- * @private
+ * Method that gets final stroke color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {boolean} hover If the stroke should be a hover stroke.
+ * @return {!acgraph.vector.Stroke} Final hover stroke for the current slice.
+ * @protected
  */
-anychart.pie.Chart.prototype.getStrokeColor_ = function(pieSliceIndex, opt_hover, opt_stroke) {
-  var scope, stroke;
+anychart.pie.Chart.prototype.getStrokeColor = function(usePointSettings, hover) {
+  var iterator = this.getIterator();
 
-  scope = {
-    'index': pieSliceIndex
-  };
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
+      (usePointSettings && iterator.get('stroke')) ||
+      this.stroke());
+  return /** @type {!acgraph.vector.Stroke} */(hover ?
+      this.normalizeColor(
+          /** @type {acgraph.vector.Stroke|Function} */(
+              (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
+          normalColor) :
+      this.normalizeColor(normalColor));
+};
 
-  if (goog.isFunction(this.stroke_)) {
-    scope['sourceColor'] = this.palette_.colorAt(pieSliceIndex) || 'black';
-    stroke = this.stroke_.call(scope);
-  } else if (goog.isDefAndNotNull(this.stroke_)) {
-    stroke = this.stroke_;
-  } else stroke = 'none';
 
-  stroke = anychart.color.normalizeStroke(stroke);
-
-  if (goog.isDefAndNotNull(opt_hover) && opt_hover === true) {
-    if (goog.isDef(opt_stroke)) stroke = anychart.color.normalizeStroke(opt_stroke);
-    scope['sourceColor'] = stroke;
-    if (goog.isFunction(this.hoverStroke_)) {
-      stroke = this.hoverStroke_.call(scope);
-    } else if (goog.isDefAndNotNull(this.hoverStroke_)) {
-      stroke = this.hoverStroke_;
-    }
-    return anychart.color.normalizeStroke(stroke);
-  } else {
-    return stroke;
-  }
+/**
+ * Gets final normalized fill or stroke color.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
+ * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
+ * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
+ * @protected
+ */
+anychart.pie.Chart.prototype.normalizeColor = function(color, var_args) {
+  var fill;
+  var index = this.getIterator().getIndex();
+  if (goog.isFunction(color)) {
+    var sourceColor = arguments.length > 1 ?
+        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
+        this.palette().colorAt(index);
+    var scope = {
+      'index': index,
+      'sourceColor': sourceColor,
+      'iterator': this.getIterator()
+    };
+    fill = color.call(scope);
+  } else
+    fill = color;
+  return fill;
 };
 
 
@@ -1059,7 +1037,8 @@ anychart.pie.Chart.prototype.remove = function() {
  */
 anychart.pie.Chart.prototype.drawContent = function(bounds) {
   var iterator = this.getIterator();
-  var fill, stroke, exploded;
+  var exploded;
+  var value;
 
   if (iterator.getRowsCount() >= 10) {
     if (window.console) {
@@ -1071,95 +1050,65 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     this.palette_.count(iterator.getRowsCount());
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
-    //TODO(AntonKagakin): убрать обработку hover`а точек и цикла draw
-    if (this.hovered_) {
-      var pieSlice = this.hovered_[0];
-      var pieSliceIndex = this.hovered_[1];
-      var isHovered = this.hovered_[2];
-      iterator.select(pieSliceIndex);
-
-      var fillColor = isHovered ? iterator.get('hoverFill') : iterator.get('fill');
-      var strokeColor = isHovered ? iterator.get('hoverStroke') : iterator.get('stroke');
-
-      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, /** @type {acgraph.vector.Fill} */ (iterator.get('fill')));
-      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, /** @type {acgraph.vector.Stroke} */ (iterator.get('stroke')));
-
-      pieSlice.fill(fill);
-      pieSlice.stroke(stroke);
-    }
-    this.markConsistent(anychart.ConsistencyState.HOVER);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CLICK)) {
-    this.markConsistent(anychart.ConsistencyState.CLICK);
-    if (this.clicked_) {
-      pieSliceIndex = this.clicked_[0];
-      iterator.select(pieSliceIndex);
-      iterator.meta('exploded', !iterator.meta('exploded'));
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
-    }
-  }
-
-
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.dataLayer_) {
-      this.dataLayer_.removeChildren();
-    } else {
-      this.dataLayer_ = acgraph.layer().parent(this.rootElement);
-    }
-
-    var value;
+  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+    var missingPoints = 0; // count of missing points
+    var min = Number.MAX_VALUE;
+    var max = -Number.MAX_VALUE;
+    var sum = 0;
 
     iterator.reset();
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
-      var missingPoints = 0; // count of missing points
-      var min = Number.MAX_VALUE;
-      var max = -Number.MAX_VALUE;
-      var sum = 0;
-      while (iterator.advance()) {
-        value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-        // if missing
-        if (this.isMissing_(value)) {
-          missingPoints++;
-          continue;
-        }
-        value = +value;
-        min = Math.min(value, min);
-        max = Math.max(value, max);
-        sum += value;
+    while (iterator.advance()) {
+      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+      // if missing
+      if (this.isMissing_(value)) {
+        missingPoints++;
+        continue;
       }
+      value = +value;
+      min = Math.min(value, min);
+      max = Math.max(value, max);
+      sum += value;
+    }
 
-      var count = iterator.getRowsCount() - missingPoints; // do not count missing points
-      var avg;
-      if (count == 0) min = max = sum = avg = undefined;
-      else avg = sum / count;
-      this.statistic_['count'] = count;
-      this.statistic_['min'] = min;
-      this.statistic_['max'] = max;
-      this.statistic_['sum'] = sum;
-      this.statistic_['average'] = avg;
+    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+    var avg;
+    if (count == 0) min = max = sum = avg = undefined;
+    else avg = sum / count;
+    this.statistic_['count'] = count;
+    this.statistic_['min'] = min;
+    this.statistic_['max'] = max;
+    this.statistic_['sum'] = sum;
+    this.statistic_['average'] = avg;
 
-      iterator.reset();
-      this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.DATA);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    if (this.dataLayer_) {
+      this.dataLayer_.clear();
+    } else {
+      this.dataLayer_ = new anychart.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.dataLayer_.parent(this.rootElement);
     }
 
     var start = /** @type {number} */ (this.startAngle_);
     var sweep = 0;
 
+    iterator.reset();
     while (iterator.advance()) {
       value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
       if (this.isMissing_(value)) continue;
       value = +value;
       sweep = value / this.statistic_['sum'] * 360;
-
-      fill = /** @type {acgraph.vector.Fill} */ (iterator.get('fill')) || this.getFillColor_(iterator.getIndex());
-      stroke = /** @type {acgraph.vector.Stroke} */ (iterator.get('stroke')) || this.getStrokeColor_(iterator.getIndex());
 
       iterator.meta('start', start).meta('sweep', sweep);
       if (!goog.isDef(exploded = iterator.meta('exploded'))) {
@@ -1167,7 +1116,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
         iterator.meta('exploded', exploded);
       }
 
-      this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, /** @type {boolean} */ (exploded), this.explodeValue_, null);
+      this.drawSlice_();
       start += sweep;
     }
 
@@ -1186,14 +1135,11 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
         var formatProvider = this.createFormatProvider();
         var positionProvider = this.createPositionProvider();
         // index for positionProvider function, cause label set it as an argument
-        this.labels_.add(formatProvider, positionProvider);
+        this.labels_.add(formatProvider, positionProvider, iterator.getIndex());
       }
       this.labels_.draw();
     }
     this.markConsistent(anychart.ConsistencyState.LABELS);
-  }
-  if (this.hovered_) {
-    this.getIterator().select(this.hovered_[1]);
   }
 };
 
@@ -1212,51 +1158,63 @@ anychart.pie.Chart.prototype.isMissing_ = function(value) {
 
 /**
  * Internal function for drawinga slice by arguments.
- * @param {number} index Index of a row in the view.
- * @param {number} start Start angle.
- * @param {number} sweep Sweep angle.
- * @param {number} cx The X coordinate of center point.
- * @param {number} cy The Y coordinate of center point.
- * @param {number} radius Outer radius.
- * @param {number} innerRadius Inner radius.
- * @param {acgraph.vector.Fill?} fill Fill setting.
- * @param {acgraph.vector.Stroke?} stroke Stroke setting.
- * @param {boolean=} opt_exploded Is point exploded.
- * @param {number=} opt_explode Explode value.
- * @param {acgraph.vector.Path=} opt_path If set, draws to that path.
+ * @param {boolean=} opt_update Whether to update current slice.
  * @return {boolean} True if point is drawn.
  * @private
  */
-anychart.pie.Chart.prototype.drawPoint_ = function(index, start, sweep, cx, cy, radius, innerRadius, fill, stroke, opt_exploded, opt_explode, opt_path) {
+anychart.pie.Chart.prototype.drawSlice_ = function(opt_update) {
+  var iterator = this.getIterator();
+
+  var index = /** @type {number} */ (iterator.getIndex());
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+
+  var exploded = !!iterator.meta('exploded');
+
   if (sweep == 0) return false;
-  if (opt_path) {
-    var pie = opt_path;
-    pie.clear();
+  var slice;
+  if (opt_update) {
+    slice = /** @type {acgraph.vector.Path} */ (iterator.meta('slice'));
+    slice.clear();
   } else {
-    pie = this.dataLayer_.path();
+    slice = this.dataLayer_.genNextChild();
+    iterator.meta('slice', slice);
   }
 
-  if (opt_exploded) {
+  if (exploded) {
     var angle = start + sweep / 2;
     var cos = Math.cos(angle * Math.PI / 180);
     var sin = Math.sin(angle * Math.PI / 180);
-    var ex = opt_explode * cos;
-    var ey = opt_explode * sin;
-    pie = acgraph.vector.primitives.donut(pie, cx + ex, cy + ey, radius, innerRadius, start, sweep);
+    var ex = this.explodeValue_ * cos;
+    var ey = this.explodeValue_ * sin;
+    slice = acgraph.vector.primitives.donut(slice, this.cx_ + ex, this.cy_ + ey, this.radiusValue_, this.innerRadiusValue_, start, sweep);
   } else {
-    pie = acgraph.vector.primitives.donut(pie, cx, cy, radius, innerRadius, start, sweep);
+    slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, start, sweep);
   }
-  if (opt_path) return true;
 
-  pie['__index'] = index;
-  pie.fill(fill);
-  pie.stroke(stroke);
+  slice['__index'] = index;
+  this.colorizeSlice(false);
 
-  acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
-  acgraph.events.listen(pie, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
-  acgraph.events.listen(pie, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
+  acgraph.events.listen(slice, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
+  acgraph.events.listen(slice, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
+  acgraph.events.listen(slice, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
 
   return true;
+};
+
+
+/**
+ * Colorizes shape in accordance to current slice colorization settings.
+ * Shape is get from current meta 'shape'.
+ * @param {boolean} hover If the slice is hovered.
+ * @protected
+ */
+anychart.pie.Chart.prototype.colorizeSlice = function(hover) {
+  var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
+  if (goog.isDef(slice)) {
+    slice.stroke(this.getStrokeColor(true, hover));
+    slice.fill(this.getFillColor(true, hover));
+  }
 };
 
 
@@ -1297,22 +1255,84 @@ anychart.pie.Chart.prototype.paletteInvalidated_ = function(event) {
 
 
 /**
+ * Slice hover status. NaN - not hovered, non-negative number - pie slice with this index hovered.
+ * @type {number}
+ * @protected
+ */
+anychart.pie.Chart.prototype.hoverStatus = NaN;
+
+
+/**
+ * Hovers pie slice by its index.
+ * @param {number} index Index of the slice to hover.
+ * @param {acgraph.events.Event=} opt_event Event that initiate Slice hovering.
+ * @protected
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ */
+anychart.pie.Chart.prototype.hoverSlice = function(index, opt_event) {
+  if (this.hoverStatus == index) return this;
+  this.unhover();
+  if (this.getIterator().reset().select(index)) {
+    this.colorizeSlice(true);
+    this.showTooltip(opt_event);
+  }
+  this.hoverStatus = index;
+  return this;
+};
+
+
+/**
+ * Removes hover from the pie slice.
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ */
+anychart.pie.Chart.prototype.unhover = function() {
+  if (isNaN(this.hoverStatus)) return this;
+  if (this.getIterator().reset().select(this.hoverStatus)) {
+    this.colorizeSlice(false);
+    this.hideTooltip();
+  }
+  this.hoverStatus = NaN;
+  return this;
+};
+
+
+/**
+ * Explode or implode pie slice.
+ * @protected
+ * @param {boolean=} opt_explode Explode value to set.
+ */
+anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
+  var iterator = this.getIterator();
+  if (goog.isDef(opt_explode)) {
+    iterator.meta('exploded', !!opt_explode);
+  } else {
+    var exploded = iterator.meta('exploded');
+    iterator.meta('exploded', !exploded);
+  }
+  this.drawSlice_(true);
+  var sliceLabel;
+  if (sliceLabel = this.labels().getLabel(iterator.getIndex())) {
+    sliceLabel.positionProvider(this.createPositionProvider()).draw();
+  }
+};
+
+
+/**
  * Mouse over internal handler.
  * @param {acgraph.events.Event} event Event object.
  * @private
  */
 anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
   if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
-    var pie = event.target;
-    var index = pie['__index'];
+    if (event && event.target) {
+      if (goog.isDef(event.target['__index']))
+        this.hoverSlice(event.target['__index'], event);
+      else
+        this.unhover();
+    } else
+      this.unhover();
 
-    this.hovered_ = [pie, index, true];
-
-    acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    if (this.getIterator().select(index)) {
-      this.showTooltip(event);
-    }
-    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    acgraph.events.listen(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
   }
 };
 
@@ -1324,16 +1344,8 @@ anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
  */
 anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
   if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
-    var pie = event.target;
-    var index = pie['__index'];
-
-    this.hovered_ = [pie, index, false];
-
-    acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    if (this.getIterator().select(index)) {
-      this.hideTooltip();
-    }
-    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    this.unhover();
+    acgraph.events.unlisten(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
   }
 };
 
@@ -1345,11 +1357,11 @@ anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
  */
 anychart.pie.Chart.prototype.mouseClickHandler_ = function(event) {
   if (this.dispatchEvent(new anychart.pie.Chart.BrowserEvent(this, event))) {
-    var pie = event.target;
-    var index = pie['__index'];
-
-    this.clicked_ = [index];
-    this.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
+    if (event && event.target) {
+      if (goog.isDef(event.target['__index'])) {
+        this.clickSlice();
+      }
+    }
   }
 };
 
@@ -1370,16 +1382,16 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
    * @type {!Array.<anychart.elements.Legend.LegendItemProvider>}
    */
   var data = [];
-  var iterator = this.view_.getIterator();
+  var iterator = this.getIterator().reset();
 
   while (iterator.advance()) {
     var index = iterator.getIndex();
     data.push({
       'index': index,
       'text': iterator.get('name') || 'Point - ' + index,
-      'iconType': 'circle',
+      'iconType': anychart.elements.LegendItem.IconType.CIRCLE,
       'iconStroke': 'none',
-      'iconFill': this.getFillColor_(index),
+      'iconFill': this.getFillColor(true, false),
       'iconMarker': null
     });
   }
@@ -1467,7 +1479,6 @@ anychart.pie.Chart.prototype.hideTooltip = function() {
  */
 anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
-  var index = this.hovered_[1];
   var formatProvider = this.createFormatProvider();
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
@@ -1613,19 +1624,19 @@ anychart.pie.Chart.BrowserEvent = function(target, opt_e) {
     this.copyFrom(opt_e, target);
 
   /**
-   * Point index.
+   * Slice index.
    * @type {number}
    */
-  this['pointIndex'] = opt_e && opt_e.target && opt_e.target['__index'];
-  if (isNaN(this['pointIndex']))
-    this['pointIndex'] = -1;
+  this['sliceIndex'] = opt_e && opt_e.target && opt_e.target['__index'];
+  if (isNaN(this['sliceIndex']))
+    this['sliceIndex'] = -1;
 
   /**
-   * Series data iterator ready for the point capturing.
+   * Pie chart data iterator ready for the slice capturing.
    * @type {!anychart.data.Iterator}
    */
   this['iterator'] = target.data().getIterator();
-  this['iterator'].select(this['pointIndex']) || this['iterator'].reset();
+  this['iterator'].select(this['sliceIndex']) || this['iterator'].reset();
 
   /**
    * Series.
