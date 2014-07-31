@@ -6,7 +6,7 @@ goog.require('anychart.utils.Padding');
 
 
 /**
- * Класс представляет из себя кнопку. Если был задан текст - создаст текст на кнопке.
+ * Button class. Button with text, if text is set.
  * @constructor
  * @extends {anychart.elements.Text}
  */
@@ -14,50 +14,50 @@ anychart.ui.Button = function() {
   goog.base(this);
 
   /**
-   * Width of the button.
+   * Width of a button.
    * @type {(string|number)?}
    * @private
    */
   this.width_ = null;
 
   /**
-   * Height of the button.
+   * Height of a button.
    * @type {(string|number)?}
    * @private
    */
   this.height_ = null;
 
   /**
-   * Bounds of button parent element.
+   * Bounds of a button parent element.
    * @type {anychart.math.Rect}
    * @private
    */
   this.parentBounds_ = null;
 
   /**
-   * Start state of the button.
+   * Start state of a button.
    * @type {anychart.ui.Button.State}
    * @private
    */
   this.state_ = anychart.ui.Button.State.NORMAL;
 
   /**
-   * Is events handling on button.
+   * Is there events handling on a button.
    * @type {boolean}
    * @private
    */
   this.eventHandling_ = false;
 
   /**
-   * Is button checked.
+   * Is a button checked.
    * @type {boolean}
    * @private
    */
   this.checkedInternal_ = false;
 
   /**
-   * Is button pushing.
-   * На кнопку нажали мышкой, но не отпустили.
+   * Is a button pushed.
+   * Button clicked, but mouse is not released.
    * @type {boolean}
    * @private
    */
@@ -88,8 +88,7 @@ anychart.ui.Button.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * State of button.
- * @protected
+ * State of a button.
  * @enum {number}
  */
 anychart.ui.Button.State = {
@@ -117,7 +116,7 @@ anychart.ui.Button.prototype.supportedStates_ =
 
 
 /**
- * Text element containing button text if present.
+ * Text element containing a button text.
  * @protected
  * @type {acgraph.vector.Text}
  */
@@ -133,21 +132,21 @@ anychart.ui.Button.prototype.backgroundPath = null;
 
 
 /**
- * Метод для работы с состояниями.
- * В режиме сеттера включает/выключает состояние state.
- * Если состояние стало UNDEFINED (сняли все состояния) то выставляется NORMAL.
- * В режиме геттера возвращает - включено или нет состояние.
- * TODO(AntonKagakin): так как сейчас кнопка single-state - то выставляя состояние false - оно в любом случае перейдёт
- * в NORMAL, а выставляя true перезапишет прошлое. Потом надо будет переделать не на single-state видимо.
+ * States management method.
+ * If works as a setter - turns state on and off.
+ * If state is  UNDEFINED (all states are off) - NORMAL is set.
+ * If works as getter returns state status (on or off).
+ * TODO(AntonKagakin): button is single-state now - this means when set to false it always goes to
+ * in NORMAL, and when set to true - overwrites previous value. Possible at some point it should become non single-state.
  *
  * @protected
  * @param {anychart.ui.Button.State} state State to work with.
  * @param {boolean=} opt_enable Whether to enable or disable state.
- * @return {(anychart.ui.Button|boolean)} Is button in that state or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is a button in this state or self for method chaining.
  */
 anychart.ui.Button.prototype.state = function(state, opt_enable) {
   if (goog.isDef(opt_enable)) {
-    // Если сеттер проверяем поддреживает ли элемент это состояние
+    // If it is a setter - check of an element supports this state
     if (this.supportedStates(state) && opt_enable != this.state(state)) {
       this.state_ = /** @type {anychart.ui.Button.State} */ (opt_enable ? state : this.state_ & ~state);
       if (this.state_ == anychart.ui.Button.State.UNDEFINED) this.state_ = anychart.ui.Button.State.NORMAL;
@@ -160,7 +159,7 @@ anychart.ui.Button.prototype.state = function(state, opt_enable) {
 
 
 /**
- * Getter for supported state.
+ * Getter for a supported state.
  * @param {anychart.ui.Button.State} state State to work with.
  * @return {(anychart.ui.Button|boolean)} Is state supported.
  *//**
@@ -170,20 +169,20 @@ anychart.ui.Button.prototype.state = function(state, opt_enable) {
  * @return {!anychart.ui.Button} An instance of the {@link anychart.ui.Button} class for method chaining.
  *//**
  * @ignoreDoc
- * Метод для определения состояний поддерживаемых кнопкой.
- * В режиме сеттера говорит кнопке какое состояние (state) будет поддреживаться(opt_enable=true) или нет (opt_enable=false).
+ * Method to check supported states.
+ * As a setter tells a button which state is supported (opt_enable=true) or not supported (opt_enable=false).
  * @param {anychart.ui.Button.State} state State to work with.
  * @param {boolean=} opt_enable Enable or disable support of the state.
- * @return {(anychart.ui.Button|boolean)} Is state supported or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state supported or self for method chaining.
  */
 anychart.ui.Button.prototype.supportedStates = function(state, opt_enable) {
   if (goog.isDef(opt_enable)) {
-    // Если сеттер
+    // If a setter
     if (!opt_enable && this.state(state)) {
-      // Если мы убираем поддержку состояния и кнопка в этом состоянии - нужно его снять.
+      // If we are removing state support and button is in this state now - we need to remove it first.
       this.state(state, false);
     }
-    // устанавливаем или снимаем поддержку состояния state
+    // set or remove state support
     this.supportedStates_ = opt_enable ?
         this.supportedStates_ | state : this.supportedStates_ & ~state;
 
@@ -204,7 +203,7 @@ anychart.ui.Button.prototype.supportedStates = function(state, opt_enable) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_enable Value to set.
- * @return {(anychart.ui.Button|boolean)} Is state enabled or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.ui.Button.prototype.normal = function(opt_enable) {
   return this.state(anychart.ui.Button.State.NORMAL, opt_enable);
@@ -221,7 +220,7 @@ anychart.ui.Button.prototype.normal = function(opt_enable) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_enable Value to set.
- * @return {(anychart.ui.Button|boolean)} Is state enabled or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.ui.Button.prototype.hover = function(opt_enable) {
   return this.state(anychart.ui.Button.State.HOVER, opt_enable);
@@ -238,7 +237,7 @@ anychart.ui.Button.prototype.hover = function(opt_enable) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_enable Value to set.
- * @return {(anychart.ui.Button|boolean)} Is state enabled or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.ui.Button.prototype.pushed = function(opt_enable) {
   return this.state(anychart.ui.Button.State.PUSHED, opt_enable);
@@ -255,7 +254,7 @@ anychart.ui.Button.prototype.pushed = function(opt_enable) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_enable Value to set.
- * @return {(anychart.ui.Button|boolean)} Is state enabled or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.ui.Button.prototype.checked = function(opt_enable) {
   return this.state(anychart.ui.Button.State.CHECKED, opt_enable);
@@ -272,7 +271,7 @@ anychart.ui.Button.prototype.checked = function(opt_enable) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_enable Value to set.
- * @return {(anychart.ui.Button|boolean)} Is state enabled or self for chaining.
+ * @return {(anychart.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.ui.Button.prototype.disabled = function(opt_enable) {
   if (goog.isDef(opt_enable)) {
@@ -289,7 +288,7 @@ anychart.ui.Button.prototype.disabled = function(opt_enable) {
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.ui.Button|anychart.utils.Margin)} Padding or self for chaining.
+ * @return {!(anychart.ui.Button|anychart.utils.Margin)} Padding or self for method chaining.
  */
 anychart.ui.Button.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -325,7 +324,7 @@ anychart.ui.Button.prototype.boundsInvalidated_ = function(event) {
 /**
  * Button text value.
  * @param {string=} opt_value Value to set.
- * @return {(anychart.ui.Button|string)} Text value or self for chaining.
+ * @return {(anychart.ui.Button|string)} Text value or self for method chaining.
  */
 anychart.ui.Button.prototype.text = function(opt_value) {
   return /** @type {!anychart.ui.Button|string} */(this.textSettings('text', opt_value));
@@ -355,7 +354,7 @@ anychart.ui.Button.prototype.applyTextSettings = function(textElement, isInitial
  *//**
  * @ignoreDoc
  * @param {anychart.math.Coordinate=} opt_value Button position.
- * @return {(anychart.math.Coordinate|anychart.ui.Button)} Button position or self for chaining.
+ * @return {(anychart.math.Coordinate|anychart.ui.Button)} Button position or self for method chaining.
  */
 anychart.ui.Button.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -372,7 +371,7 @@ anychart.ui.Button.prototype.position = function(opt_value) {
 /**
  * Bounds of button parent element. Need to calculate percent-values of width, height.
  * @param {anychart.math.Rect=} opt_value Parent bounds.
- * @return {(anychart.math.Rect|anychart.ui.Button)} Bounds of parent element or self for chaining.
+ * @return {(anychart.math.Rect|anychart.ui.Button)} Bounds of parent element or self for method chaining.
  */
 anychart.ui.Button.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -390,7 +389,7 @@ anychart.ui.Button.prototype.parentBounds = function(opt_value) {
 /**
  * Button width.
  * @param {(number|string)=} opt_value Width value.
- * @return {(number|string|anychart.ui.Button)} Width of button or self for chaining.
+ * @return {(number|string|anychart.ui.Button)} Width of button or self for method chaining.
  */
 anychart.ui.Button.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -408,7 +407,7 @@ anychart.ui.Button.prototype.width = function(opt_value) {
 /**
  * Button height.
  * @param {(number|string)=} opt_value Height value.
- * @return {(number|string|anychart.ui.Button)} Height of button or self for chaining.
+ * @return {(number|string|anychart.ui.Button)} Height of button or self for method chaining.
  */
 anychart.ui.Button.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -424,11 +423,11 @@ anychart.ui.Button.prototype.height = function(opt_value) {
 
 
 /**
- * Метод для рисования текста.
- * Чтобы переопределить логику рисования текста для всех состояний, нужно переопределить этот метод.
- * Внимание!
- * Нужно самостоятельно мэнэджить первое ли это рисование (создать textElement и backgroundPath), а также
- * состояния APPEARANCE, PIXEL_BOUNDS
+ * Text drawing method.
+ * To change text display for all states you need to override this method.
+ * NOTE:
+ * when overriding you need to manage if this is a first time drawing (create textElement and backgroundPath),
+ * as well as APPEARANCE and PIXEL_BOUNDS states.
  * @param {Object} textSettings Text settings.
  * @protected
  */
@@ -462,13 +461,13 @@ anychart.ui.Button.prototype.drawText = function(textSettings) {
 
 
 /**
- * Метод для рисования бекграунда.
- * Чтобы переопределить логику рисования бекграунда для всех состояний, нужно переопределить этот метод.
- * Внимание!
- * Нужно самостоятельно мэнэджить состояние BACKGROUND_APPEARANCE
+ * Background drawing method.
+ * To change background display you need to override this method.
+ * NOTE:
+ * when overriding you need to manage BACKGROUND_APPEARANCE state
  * @protected
- * @param {acgraph.vector.Fill} fill Настройки заливки стейта который рисует бекграунд.
- * @param {acgraph.vector.Stroke} stroke Настройки линии стейта который рисует бекграунд.
+ * @param {acgraph.vector.Fill} fill Fill setting for a background drawing state.
+ * @param {acgraph.vector.Stroke} stroke Line setting for a background drawing state.
  */
 anychart.ui.Button.prototype.drawBackground = function(fill, stroke) {
   if (!this.backgroundPath) {
@@ -499,10 +498,10 @@ anychart.ui.Button.prototype.drawBackground = function(fill, stroke) {
 
 
 /**
- * Метод определяющий рисование кнопки.
- * Чтобы переопределить логику рисования КНОПКИ для всех состояний, нужно переопределить этот метод.
+ * Button drawing method.
+ * To change button drawing for all states you need to override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта.
+ * @param {*} settings State settings object.
  */
 anychart.ui.Button.prototype.drawInternal = function(settings) {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -524,10 +523,10 @@ anychart.ui.Button.prototype.drawInternal = function(settings) {
 
 
 /**
- * Метод рисования стейта NORMAL.
- * Чтобы переопределить рисование только этого стейта, переопределите этот метод.
+ * NORMAL state drawing method.
+ * To change NORMAL state display - override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта NORMAL.
+ * @param {*} settings NORMAL state settings object.
  */
 anychart.ui.Button.prototype.drawNormal = function(settings) {
   this.drawInternal(settings);
@@ -535,10 +534,10 @@ anychart.ui.Button.prototype.drawNormal = function(settings) {
 
 
 /**
- * Метод рисования стейта HOVER.
- * Чтобы переопределить рисование только этого стейта, переопределите этот метод.
+ * HOVER state display.
+ * To change HOVER state display - override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта HOVER.
+ * @param {*} settings HOVER state settings object.
  */
 anychart.ui.Button.prototype.drawHover = function(settings) {
   this.drawInternal(settings);
@@ -546,10 +545,10 @@ anychart.ui.Button.prototype.drawHover = function(settings) {
 
 
 /**
- * Метод рисования стейта PUSHED.
- * Чтобы переопределить рисование только этого стейта, переопределите этот метод.
+ * PUSHED state display.
+ * To change PUSHED state display - override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта PUSHED.
+ * @param {*} settings PUSHED state settings object.
  */
 anychart.ui.Button.prototype.drawPushed = function(settings) {
   this.drawInternal(settings);
@@ -557,10 +556,10 @@ anychart.ui.Button.prototype.drawPushed = function(settings) {
 
 
 /**
- * Метод рисования стейта CHECKED.
- * Чтобы переопределить рисование только этого стейта, переопределите этот метод.
+ * CHECKED state display.
+ * To change CHECKED state display - override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта CHECKED.
+ * @param {*} settings CHECKED state settings object.
  */
 anychart.ui.Button.prototype.drawChecked = function(settings) {
   this.drawInternal(settings);
@@ -568,10 +567,10 @@ anychart.ui.Button.prototype.drawChecked = function(settings) {
 
 
 /**
- * Метод рисования стейта DISABLED.
- * Чтобы переопределить рисование только этого стейта, переопределите этот метод.
+ * DISABLED state display.
+ * To change DISABLED state display - override this method.
  * @protected
- * @param {*} settings Объект с настройками стейта DISABLED.
+ * @param {*} settings DISABLED state settings object.
  */
 anychart.ui.Button.prototype.drawDisabled = function(settings) {
   this.drawInternal(settings);
@@ -625,30 +624,30 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
 
   /** @type {number} */
   var width;
-  if (isWidthSet) { // ширина кнопки задана число или процент
-    if (anychart.utils.isPercent(this.width_) && !goog.isDef(parentWidth)) { // если ширина процент, но нет родительской ширины
-      if (hasText) { // если есть текст - то аджастить по тексту
+  if (isWidthSet) { // button width or percent
+    if (anychart.utils.isPercent(this.width_) && !goog.isDef(parentWidth)) { // if width set in percents, but no parent width is availble
+      if (hasText) { // if there is text - adjust
         width = textWidth;
-      } else { // иначе ширина будет 0
+      } else { // or set width to 0
         width = 0;
       }
-    } else { // иначе считаемся нормально от родительской ширины
+    } else { // in other case - calculating using parent width
       width = anychart.utils.normalize(/** @type {number|string} */ (this.width_), parentWidth);
     }
     if (hasText) this.textX = anychart.utils.normalize(/** @type {number|string} */ (padding.left()), width);
-  } else { // если ширина не задана - то она либо равна ширине текста либо 0 если нет текста
-    if (hasText) {// если есть текст - то аджастить по тексту
+  } else { // if width is not set  - it is either the same as text width, or 0
+    if (hasText) {// if there is text - adjust
       width = textWidth;
-    } else { // иначе ширина будет 0
+    } else { // or set to 0
       width = 0;
     }
     if (hasText) this.textX = anychart.utils.normalize(/** @type {number|string} */ (padding.left()), width);
-    // раз ширина не задана - значит паддингом расширяем её
+    // if width is not set - use padding
     width = padding.widenWidth(width);
   }
 
   if (parentBounds && parentWidth < width) {
-    // если ширина вылезла за пределы родительской ширины, делаем ширину равной родительской
+    // if width becomes bigger than parent width - make it equal to parent width
     width = parentWidth;
   }
 
@@ -656,37 +655,37 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
   var height;
   if (isHeightSet) {
     if (anychart.utils.isPercent(this.height_) && !goog.isDef(parentHeight)) {
-      if (hasText) { // если есть текст - то аджастить по тексту
+      if (hasText) { // if there is text - adjust
         height = textHeight;
-      } else { // иначе высота будет 0
+      } else { // or set to 0
         height = 0;
       }
-    } else { // иначе считаемся нормально от родительской высоты
+    } else { // in other case - calculating using parent height
       height = anychart.utils.normalize(/** @type {number|string} */ (this.height_), parentHeight);
     }
     if (hasText) this.textY = anychart.utils.normalize(/** @type {number|string} */ (padding.top()), height);
-  } else { // если высота не задана - то она либо равна высоте текста либо 0 если нет текста
-    if (hasText) { // если есть текст - то аджастить по тексту
+  } else { // if height is not set  - it is either the same as text height, or 0
+    if (hasText) { // if there is text - adjust
       height = textHeight;
-    } else { // иначе высота будет 0
+    } else { // or set to 0
       height = 0;
     }
     if (hasText) this.textY = anychart.utils.normalize(/** @type {number|string} */ (padding.top()), height);
-    // раз высота не задана - значит паддингом расширяем её
+    // if height is not set - use padding
     height = padding.widenHeight(height);
   }
 
   if (parentBounds && parentHeight < height) {
-    // если высота вылезла за пределы родительской высоты, делаем высоту равной родительской
+    // if width becomes bigger than parent height - make it equal to parent height
     height = parentHeight;
   }
 
-  // рассчитываем позицию если она была задана.
+  // calcualte position if it is set
   var position = anychart.utils.normalizeMathPosition(this.position_);
   position.x = parentWidth ? anychart.utils.normalize(position.x, parentWidth) : 0;
   position.y = parentHeight ? anychart.utils.normalize(position.y, parentHeight) : 0;
 
-  // размеры для рисования бэкграунда
+  // background display bounds
   this.buttonBounds = new anychart.math.Rect(position.x, position.y, width, height);
 };
 
@@ -777,7 +776,7 @@ anychart.ui.Button.prototype.enableEventHandling_ = function(enable) {
 
 
 /**
- * Handler for dbl click.
+ * Handler for double click.
  * @param {acgraph.events.Event} event Event.
  */
 anychart.ui.Button.prototype.handleMouseDblClick = function(event) {
@@ -884,7 +883,7 @@ anychart.ui.Button.prototype.restoreDefaults = function() {
 /**
  * Sets listener fired when button clicked.
  * @param {function(anychart.ui.Button)=} opt_value Listener.
- * @return {*|anychart.ui.Button} Current listener of self for chaining.
+ * @return {*|anychart.ui.Button} Current listener of self for method chaining.
  */
 anychart.ui.Button.prototype.setOnClickListener = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -904,7 +903,7 @@ anychart.ui.Button.prototype.setOnClickListener = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {Object=} opt_value State settings.
- * @return {Object|anychart.ui.Button} State settings or self for chaining.
+ * @return {Object|anychart.ui.Button} State settings or self for method chaining.
  */
 anychart.ui.Button.prototype.stateSettings = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1013,3 +1012,29 @@ anychart.ui.Button.prototype.initStateSettings = function() {
     }
   };
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.ui.Button}
+ */
+anychart.ui.button = function() {
+  return new anychart.ui.Button();
+};
+
+
+//exports
+goog.exportSymbol('anychart.ui.button', anychart.ui.button);
+anychart.ui.Button.prototype['parentBounds'] = anychart.ui.Button.prototype.parentBounds;
+anychart.ui.Button.prototype['text'] = anychart.ui.Button.prototype.text;
+anychart.ui.Button.prototype['padding'] = anychart.ui.Button.prototype.padding;
+anychart.ui.Button.prototype['position'] = anychart.ui.Button.prototype.position;
+anychart.ui.Button.prototype['width'] = anychart.ui.Button.prototype.width;
+anychart.ui.Button.prototype['height'] = anychart.ui.Button.prototype.height;
+anychart.ui.Button.prototype['draw'] = anychart.ui.Button.prototype.draw;
+anychart.ui.Button.prototype['setOnClickListener'] = anychart.ui.Button.prototype.setOnClickListener;
+anychart.ui.Button.prototype['normal'] = anychart.ui.Button.prototype.normal;
+anychart.ui.Button.prototype['hover'] = anychart.ui.Button.prototype.hover;
+anychart.ui.Button.prototype['pushed'] = anychart.ui.Button.prototype.pushed;
+anychart.ui.Button.prototype['checked'] = anychart.ui.Button.prototype.checked;
+anychart.ui.Button.prototype['disabled'] = anychart.ui.Button.prototype.disabled;

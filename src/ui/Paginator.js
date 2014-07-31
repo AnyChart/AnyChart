@@ -342,7 +342,7 @@ anychart.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
  * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
  *//**
  * @ignoreDoc
- * TODO(AntonKagakin): сделать флаг customDrawers, чтобы при смене layout  кастомном дровере он не заменил его.
+ * TODO(AntonKagakin): create customDrawers flag, to avoid custom layout drawing bug.
  * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Layout value.
  * @return {(anychart.ui.Paginator|anychart.ui.Paginator.Layout)} Current layout or self for chaining.
  */
@@ -598,7 +598,8 @@ anychart.ui.Paginator.prototype.measureMaxDimensions_ = function() {
       break;
     }
   }
-  if (reCache || !this.boundsCache_[this.pageCount_]) {
+  var cacheIndex = this.pageCount_ + this.layout_.substr(0, 1);
+  if (reCache || !this.boundsCache_[cacheIndex]) {
     var measureText = acgraph.text();
     var stngs = this.changedSettings;
     this.applyTextSettings(measureText, true);
@@ -619,9 +620,9 @@ anychart.ui.Paginator.prototype.measureMaxDimensions_ = function() {
       maxWidth = Math.max(buttonSize, bounds.width);
       maxHeight = buttonSize * 2 + this.spacing_ * 2 + bounds.height;
     }
-    return (this.boundsCache_[this.pageCount_] = [maxWidth, maxHeight]);
+    return (this.boundsCache_[cacheIndex] = [maxWidth, maxHeight]);
   }
-  return this.boundsCache_[this.pageCount_];
+  return this.boundsCache_[cacheIndex];
 };
 
 
@@ -899,3 +900,25 @@ anychart.ui.Paginator.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.ui.Paginator}
+ */
+anychart.ui.paginator = function() {
+  return new anychart.ui.Paginator();
+};
+
+
+//exports
+goog.exportSymbol('anychart.ui.paginator', anychart.ui.paginator);
+anychart.ui.Paginator.prototype['parentBounds'] = anychart.ui.Paginator.prototype.parentBounds;
+anychart.ui.Paginator.prototype['background'] = anychart.ui.Paginator.prototype.background;
+anychart.ui.Paginator.prototype['orientation'] = anychart.ui.Paginator.prototype.orientation;
+anychart.ui.Paginator.prototype['padding'] = anychart.ui.Paginator.prototype.padding;
+anychart.ui.Paginator.prototype['margin'] = anychart.ui.Paginator.prototype.margin;
+anychart.ui.Paginator.prototype['layout'] = anychart.ui.Paginator.prototype.layout;
+anychart.ui.Paginator.prototype['pageCount'] = anychart.ui.Paginator.prototype.pageCount;
+anychart.ui.Paginator.prototype['currentPage'] = anychart.ui.Paginator.prototype.currentPage;
+anychart.ui.Paginator.prototype['draw'] = anychart.ui.Paginator.prototype.draw;

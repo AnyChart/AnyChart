@@ -1,6 +1,6 @@
 var areaChart, barChart;
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
   var data1 = [];
   var data2 = [];
   var d1 = [], d2 = [];
@@ -42,12 +42,13 @@ function load() {
       series2.markers().type('triangledown').enabled(true).fill({color: series2.color(), opacity: 0.5});
     }
 
+    chart.title().text(seriesName);
     chart.background().fill('gray .5');
     chart.legend().enabled(true);
-    chart.yAxis().orientation('left');
-    chart.xAxis().orientation('bottom');
-    chart.xAxis().orientation('top');
-    chart.yAxis().orientation('right');
+    chart.yAxis(0).orientation('left');
+    chart.xAxis(0).orientation('bottom');
+    chart.xAxis(1).orientation('top');
+    chart.yAxis(1).orientation('right');
 
     if (seriesName == 'bubble') {
       series1.minimumSize(1);

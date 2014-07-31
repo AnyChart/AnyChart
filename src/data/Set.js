@@ -362,3 +362,23 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
   //TODO(Anton Saukh): please avoid curses in the code!
   throw new Error('Asking rowMapping from a Set! What a shame...');
 };
+
+
+/**
+ * Constructor function.
+ * @param {(Array|string)=} opt_data Data set raw data can be set here.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.data.Set}
+ */
+anychart.data.set = function(opt_data, opt_csvSettings) {
+  return new anychart.data.Set(opt_data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.data.set', anychart.data.set);
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/final
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/final
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/final
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/final

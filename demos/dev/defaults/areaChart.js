@@ -29,7 +29,6 @@ anychart.onDocumentReady(function() {
   chart = anychart.areaChart()
       .container('container');
 
-  chart.splineArea(s1);
-  chart.stepArea(s2);
+
   chart.draw();
 });

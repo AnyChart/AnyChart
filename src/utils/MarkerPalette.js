@@ -20,7 +20,7 @@ anychart.utils.MarkerPalette = function() {
    */
   this.markers_ = [];
 
-  // Initialize default marker palette from all marker types that framework knows.
+  // Initialize default marker palette using all marker types framework supports.
   for (var key in anychart.elements.Marker.Type) {
     this.markers_.push(anychart.elements.Marker.Type[key]);
   }
@@ -64,13 +64,13 @@ anychart.utils.MarkerPalette.prototype.markerAt = function(index, opt_marker) {
 
 /**
  * Getter/setter for markers list of palette.
- * @example
+ * @example <t>simple</t>
  * var palette = new anychart.utils.MarkerPalette();
  * palette.markers(); // ['star4', 'star5', 'star6', ...]
  * palette.markers(['cross', 'diagonalcross']).markers(); // ['cross', 'diagonalcross']
  * palette.markers('diamond', 'circle', 'square').markers(); // ['diamond', 'circle', 'square']
  * @param {(Array.<string>)=} opt_markers
- * @return {Array.<string>|anychart.utils.MarkerPalette} Markers list or self for chaining.
+ * @return {Array.<string>|anychart.utils.MarkerPalette} Markers list or self for method chaining.
  */
 anychart.utils.MarkerPalette.prototype.markers = function(opt_markers) {
   if (goog.isDef(opt_markers)) {
@@ -109,3 +109,20 @@ anychart.utils.MarkerPalette.prototype.deserialize = function(config) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.utils.MarkerPalette}
+ */
+anychart.utils.markerPalette = function() {
+  return new anychart.utils.MarkerPalette();
+};
+
+
+//exports
+goog.exportSymbol('anychart.utils.markerPalette', anychart.utils.markerPalette);
+anychart.utils.MarkerPalette.prototype['markerAt'] = anychart.utils.MarkerPalette.prototype.markerAt;
+anychart.utils.MarkerPalette.prototype['markers'] = anychart.utils.MarkerPalette.prototype.markers;
+anychart.utils.MarkerPalette.prototype['serialize'] = anychart.utils.MarkerPalette.prototype.serialize;
+anychart.utils.MarkerPalette.prototype['deserialize'] = anychart.utils.MarkerPalette.prototype.deserialize;

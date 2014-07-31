@@ -1,7 +1,7 @@
 var tooltip, stage;
 
 function load() {
-  stage = acgraph.create('100%', '100%', 'container');
+  stage = acgraph.create('container', '100%', '100%');
 
   tooltip = new anychart.elements.Tooltip();
   tooltip.hideDelay(0);

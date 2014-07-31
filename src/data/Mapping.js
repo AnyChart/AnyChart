@@ -151,3 +151,18 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    */
   this.indexProps_ = opt_indexProps || ['x'];
 };
+
+
+/**
+ * Getter for array mapping.
+ * @return {!Object.<Array.<number>>} Array mapping.
+ */
+anychart.data.Mapping.prototype.getArrayMapping = function() {
+  return this.arrayMapping_;
+};
+
+
+//exports
+anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//in docs/final
+anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//in docs/final
+anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//in docs/final

@@ -2,6 +2,7 @@ goog.provide('anychart.elements.TextMarker');
 goog.require('anychart.color');
 goog.require('anychart.elements.Text');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -88,7 +89,7 @@ goog.inherits(anychart.elements.TextMarker, anychart.elements.Text);
 //  Enums.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Определяет положение маркера относительно оси
+ * Sets marker position relative to an axis
  * @enum {string}
  */
 anychart.elements.TextMarker.Align = {
@@ -119,11 +120,32 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.BOUNDS;
 
 
+/**
+ * Normalizes user input align to its enumeration values. Also accepts 'middle' and null. Defaults to opt_default or
+ * 'center'.
+ *
+ * @param {string} align Align to normalize.
+ * @param {anychart.elements.TextMarker.Align=} opt_default Default align.
+ * @return {anychart.elements.TextMarker.Align} Normalized align.
+ */
+anychart.elements.TextMarker.normalizeAlign = function(align, opt_default) {
+  if (goog.isString(align)) {
+    align = align.toLowerCase();
+    if (align == 'middle') return anychart.elements.TextMarker.Align.CENTER;
+    for (var i in anychart.elements.TextMarker.Align) {
+      if (align == anychart.elements.TextMarker.Align[i])
+        return anychart.elements.TextMarker.Align[i];
+    }
+  }
+  return opt_default || anychart.elements.TextMarker.Align.CENTER;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
+ * Getter for the axis scale.
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
@@ -132,7 +154,7 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.TextMarker} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.TextMarker} Axis scale or itself for method chaining.
  */
 anychart.elements.TextMarker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -185,7 +207,7 @@ anychart.elements.TextMarker.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -200,14 +222,15 @@ anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set align.
+ * Get/Set align.
  * @param {anychart.elements.TextMarker.Align=} opt_value TextMarker align.
  * @return {anychart.elements.TextMarker.Align|anychart.elements.TextMarker} Align or this.
  */
 anychart.elements.TextMarker.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.align_ != opt_value) {
-      this.align_ = opt_value;
+    var align = anychart.elements.TextMarker.normalizeAlign(opt_value);
+    if (this.align_ != align) {
+      this.align_ = align;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -225,8 +248,9 @@ anychart.elements.TextMarker.prototype.align = function(opt_value) {
  */
 anychart.elements.TextMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -240,7 +264,7 @@ anychart.elements.TextMarker.prototype.direction = function(opt_value) {
 /**
  * Get/set text marker anchor settings.
  * @param {(anychart.utils.NinePositions|string)=} opt_value Text marker anchor settings.
- * @return {anychart.elements.TextMarker|anychart.utils.NinePositions} Text marker anchor settings or itself for chaining call.
+ * @return {anychart.elements.TextMarker|anychart.utils.NinePositions} Text marker anchor settings or itself for method chaining.
  */
 anychart.elements.TextMarker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -261,9 +285,9 @@ anychart.elements.TextMarker.prototype.anchor = function(opt_value) {
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set text marker settings.
+ * Get/Set text marker settings.
  * @param {(string)=} opt_value TextMarker text settings.
- * @return {string|anychart.elements.TextMarker} TextMarker line settings or TextMarker instance for chaining.
+ * @return {string|anychart.elements.TextMarker} TextMarker line settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.text = function(opt_value) {
   return /** @type {anychart.elements.TextMarker|string} */(this.textSettings('text', opt_value));
@@ -273,7 +297,7 @@ anychart.elements.TextMarker.prototype.text = function(opt_value) {
 /**
  * Get/set value.
  * @param {number=} opt_newValue TextMarker value settings.
- * @return {number|anychart.elements.TextMarker} TextMarker value settings or LineMarker instance for chaining.
+ * @return {number|anychart.elements.TextMarker} TextMarker value settings or LineMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.value = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -292,7 +316,7 @@ anychart.elements.TextMarker.prototype.value = function(opt_newValue) {
 /**
  * Get/set offset x.
  * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for chaining.
+ * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.offsetX = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -311,7 +335,7 @@ anychart.elements.TextMarker.prototype.offsetX = function(opt_newValue) {
 /**
  * Get/set offset y.
  * @param {(number|string)=} opt_newValue TextMarker value settings.
- * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for chaining.
+ * @return {number|string|anychart.elements.TextMarker} TextMarker value settings or TextMarker instance for method chaining.
  */
 anychart.elements.TextMarker.prototype.offsetY = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -391,7 +415,7 @@ anychart.elements.TextMarker.prototype.applyTextSettings = function(textElement,
 
 
 /**
- * Определяет расположения маркера
+ * Defines marker direction
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.TextMarker.prototype.isHorizontal = function() {
@@ -416,8 +440,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-    var ratio = scale.transform(this.value_, isOrdinal ? 0.5 : 0);
+    var ratio = goog.math.clamp(scale.transform(this.value_, 0.5), 0, 1);
     if (isNaN(ratio)) return;
 
     var shift = -.5;
@@ -482,7 +505,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 
 
 /**
- * Рассчитывает позицию текста по заданныи параметрам direction и align.
+ * Calculates text position using direction and align.
  * @param {number} ratio Scale ratio.
  * @param {number} shift Pixel shift.
  * @return {acgraph.math.Coordinate} text position.
@@ -643,3 +666,32 @@ anychart.elements.TextMarker.prototype.disposeInternal = function() {
   this.markerElement_ = null;
   goog.base(this, 'disposeInternal');
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.TextMarker}
+ */
+anychart.elements.textMarker = function() {
+  return new anychart.elements.TextMarker();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.textMarker', anychart.elements.textMarker);
+anychart.elements.TextMarker.prototype['value'] = anychart.elements.TextMarker.prototype.value;
+anychart.elements.TextMarker.prototype['scale'] = anychart.elements.TextMarker.prototype.scale;
+anychart.elements.TextMarker.prototype['parentBounds'] = anychart.elements.TextMarker.prototype.parentBounds;
+anychart.elements.TextMarker.prototype['anchor'] = anychart.elements.TextMarker.prototype.anchor;
+anychart.elements.TextMarker.prototype['align'] = anychart.elements.TextMarker.prototype.align;
+anychart.elements.TextMarker.prototype['direction'] = anychart.elements.TextMarker.prototype.direction;
+anychart.elements.TextMarker.prototype['offsetX'] = anychart.elements.TextMarker.prototype.offsetX;
+anychart.elements.TextMarker.prototype['offsetY'] = anychart.elements.TextMarker.prototype.offsetY;
+anychart.elements.TextMarker.prototype['text'] = anychart.elements.TextMarker.prototype.text;
+anychart.elements.TextMarker.prototype['height'] = anychart.elements.TextMarker.prototype.height;
+anychart.elements.TextMarker.prototype['width'] = anychart.elements.TextMarker.prototype.width;
+anychart.elements.TextMarker.prototype['draw'] = anychart.elements.TextMarker.prototype.draw;
+anychart.elements.TextMarker.prototype['isHorizontal'] = anychart.elements.TextMarker.prototype.isHorizontal;
+goog.exportSymbol('anychart.elements.TextMarker.Align.CENTER', anychart.elements.TextMarker.Align.CENTER);
+goog.exportSymbol('anychart.elements.TextMarker.Align.NEAR', anychart.elements.TextMarker.Align.NEAR);
+goog.exportSymbol('anychart.elements.TextMarker.Align.FAR', anychart.elements.TextMarker.Align.FAR);

@@ -93,7 +93,10 @@ anychart.cartesian.series.WidthBased.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 
   this.markers(null);
-  this.hoverMarkers(null);
 
   return result;
 };
+
+
+//exports
+anychart.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.cartesian.series.WidthBased.prototype.pointWidth;

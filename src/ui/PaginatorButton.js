@@ -12,7 +12,7 @@ anychart.ui.PaginatorButton = function() {
   goog.base(this);
 
   /**
-   * Drawer for te button background.
+   * Drawer for the button background.
    * @type {function(acgraph.vector.Path, anychart.math.Rect)}
    * @private
    */
@@ -24,7 +24,7 @@ goog.inherits(anychart.ui.PaginatorButton, anychart.ui.Button);
 
 
 /**
- * Getter for button drawer.
+ * Getter for a button drawer.
  * @return {function(acgraph.vector.Path, anychart.math.Rect)} Current drawer function.
  *//**
  * Setter for button drawer.
@@ -33,7 +33,7 @@ goog.inherits(anychart.ui.PaginatorButton, anychart.ui.Button);
  *//**
  * @ignoreDoc
  * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
- * @return {(anychart.ui.PaginatorButton|function(acgraph.vector.Path, anychart.math.Rect))} Current drawer function or elf for chaining.
+ * @return {(anychart.ui.PaginatorButton|function(acgraph.vector.Path, anychart.math.Rect))} Current drawer function or self for chaining.
  */
 anychart.ui.PaginatorButton.prototype.buttonDrawer = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -48,14 +48,14 @@ anychart.ui.PaginatorButton.prototype.buttonDrawer = function(opt_value) {
 
 
 /**
- * Перегружена, чтобы не рисовать текст.
+ * Overloaded to avoid drawing text.
  * @inheritDoc
  */
 anychart.ui.PaginatorButton.prototype.drawText = goog.nullFunction;
 
 
 /**
- * Перегружена, чтобы была возможность подменить стандартную рисовку кнопки.
+ * Overloaded to have an option of button display customization.
  * @inheritDoc
  */
 anychart.ui.PaginatorButton.prototype.drawBackground = function(fill, stroke) {

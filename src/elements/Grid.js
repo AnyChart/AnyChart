@@ -15,12 +15,6 @@ anychart.elements.Grid = function() {
   goog.base(this);
 
   /**
-   * @type {boolean}
-   * @private
-   */
-  this.invert_;
-
-  /**
    * @type {anychart.utils.TypedLayer}
    * @private
    */
@@ -112,33 +106,15 @@ anychart.elements.Grid.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.elements.Grid.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
       this.invalidate(anychart.ConsistencyState.POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
     return this.direction_;
-  }
-};
-
-
-/**
- * Get/set grid invert.
- * @param {boolean=} opt_value Grid invert.
- * @return {boolean|anychart.elements.Grid} Invert settings or this.
- */
-anychart.elements.Grid.prototype.invert = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.invert_ != opt_value) {
-      this.invert_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.invert_;
   }
 };
 
@@ -152,11 +128,11 @@ anychart.elements.Grid.prototype.invert = function(opt_value) {
  *//**
  * Setter for axis scale.
  * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.elements.Grid} An instance of the {@link anychart.elements.Grid} class for method chaining.
+ * @return {!anychart.elements.Grid} {@link anychart.elements.Grid} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.Grid} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.Grid} Axis scale or itself for method chaining.
  */
 anychart.elements.Grid.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -201,7 +177,7 @@ anychart.elements.Grid.prototype.scaleInvalidated_ = function(event) {
  *//**
  * Setter for parentBounds.
  * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Grid} An instance of the {@link anychart.elements.Grid} class for method chaining.
+ * @return {!anychart.elements.Grid} {@link anychart.elements.Grid} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.math.Rect=} opt_value Bounds for marker.
@@ -210,7 +186,10 @@ anychart.elements.Grid.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      if (opt_value) {
+        this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
+      }
+
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -227,7 +206,7 @@ anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
 /**
  * Get/set grid odd fill settings.
  * @param {string|acgraph.vector.Fill=} opt_value Grid odd fill settings.
- * @return {string|acgraph.vector.Fill|anychart.elements.Grid} Grid odd fill settings or Grid instance for chaining.
+ * @return {string|acgraph.vector.Fill|anychart.elements.Grid} Grid odd fill settings or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.oddFill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -245,7 +224,7 @@ anychart.elements.Grid.prototype.oddFill = function(opt_value) {
 /**
  * Get/set grid even fill settings.
  * @param {string|acgraph.vector.Fill=} opt_value Grid even fill settings.
- * @return {string|acgraph.vector.Fill|anychart.elements.Grid} Grid even fill settings or Grid instance for chaining.
+ * @return {string|acgraph.vector.Fill|anychart.elements.Grid} Grid even fill settings or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.evenFill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -263,7 +242,7 @@ anychart.elements.Grid.prototype.evenFill = function(opt_value) {
 /**
  * Get/set grid stroke line.
  * @param {string|acgraph.vector.Stroke=} opt_value Grid stroke line settings.
- * @return {string|acgraph.vector.Stroke|anychart.elements.Grid} Grid stroke line settings or Grid instance for chaining.
+ * @return {string|acgraph.vector.Stroke|anychart.elements.Grid} Grid stroke line settings or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -280,8 +259,8 @@ anychart.elements.Grid.prototype.stroke = function(opt_value) {
 
 /**
  * Whether to draw the first line.
- * @param {boolean=} opt_value Whenever grid should draw first line.
- * @return {boolean|anychart.elements.Grid} Whenever grid should draw first line or Grid instance for chaining.
+ * @param {boolean=} opt_value Whether grid should draw first line.
+ * @return {boolean|anychart.elements.Grid} Whether grid should draw first line or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.drawFirstLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -299,8 +278,8 @@ anychart.elements.Grid.prototype.drawFirstLine = function(opt_value) {
 
 /**
  * Whether to draw the last line.
- * @param {boolean=} opt_value Whenever grid should draw last line.
- * @return {boolean|anychart.elements.Grid} Whenever grid should draw first line or Grid instance for chaining.
+ * @param {boolean=} opt_value Whether grid should draw last line.
+ * @return {boolean|anychart.elements.Grid} Whether grid should draw first line or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.drawLastLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -317,9 +296,9 @@ anychart.elements.Grid.prototype.drawLastLine = function(opt_value) {
 
 
 /**
- * Определяет минорный это грид или нет.
+ * Whether it is a minor grid or not.
  * @param {boolean=} opt_value Minor or not.
- * @return {boolean|anychart.elements.Grid} Is minor grid or Grid instance for chaining..
+ * @return {boolean|anychart.elements.Grid} Is minor grid or Grid instance for method chaining.
  */
 anychart.elements.Grid.prototype.minor = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -349,14 +328,8 @@ anychart.elements.Grid.prototype.minor = function(opt_value) {
 anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
   var parentBounds = this.parentBounds();
   /** @type {number}*/
-  var y;
-  if (this.invert()) {
-    y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-    ratio == 1 ? y -= shift : y += shift;
-  } else {
-    y = Math.round(parentBounds.getTop() + ratio * parentBounds.height);
-    ratio == 0 ? y -= shift : y += shift;
-  }
+  var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
+  ratio == 1 ? y -= shift : y += shift;
   this.lineElement_.moveTo(parentBounds.getLeft(), y);
   this.lineElement_.lineTo(parentBounds.getRight(), y);
 };
@@ -371,21 +344,15 @@ anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
 anychart.elements.Grid.prototype.drawLineVertical = function(ratio, shift) {
   var parentBounds = this.parentBounds();
   /** @type {number}*/
-  var x;
-  if (this.invert()) {
-    x = Math.round(parentBounds.getRight() - ratio * parentBounds.width);
-    ratio == 0 ? x += shift : x -= shift;
-  } else {
-    x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-  }
+  var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
+  ratio == 1 ? x += shift : x -= shift;
   this.lineElement_.moveTo(x, parentBounds.getBottom());
   this.lineElement_.lineTo(x, parentBounds.getTop());
 };
 
 
 /**
- * Определяет расположения маркера
+ * Whether marker is horizontal
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.Grid.prototype.isHorizontal = function() {
@@ -395,7 +362,7 @@ anychart.elements.Grid.prototype.isHorizontal = function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Interlacing drawing.
+//  Interlaced drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -411,15 +378,9 @@ anychart.elements.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevR
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds();
     var y1, y2, checkIndex;
-    if (this.invert()) {
-      y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
-      y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
-      checkIndex = 1;
-    } else {
-      y1 = Math.round(parentBounds.getTop() + prevRatio * parentBounds.height);
-      y2 = Math.round(parentBounds.getTop() + ratio * parentBounds.height);
-      checkIndex = 0;
-    }
+    y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
+    y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
+    checkIndex = 1;
     ratio == checkIndex ? y2 -= shift : y2 += shift;
     prevRatio == checkIndex ? y1 -= shift : y1 += shift;
 
@@ -447,15 +408,9 @@ anychart.elements.Grid.prototype.drawInterlaceVertical = function(ratio, prevRat
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds();
     var x1, x2, checkIndex;
-    if (!this.invert()) {
-      x1 = Math.round(parentBounds.getRight() - prevRatio * parentBounds.width);
-      x2 = Math.round(parentBounds.getRight() - ratio * parentBounds.width);
-      checkIndex = 0;
-    } else {
-      x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
-      x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-      checkIndex = 1;
-    }
+    x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
+    x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
+    checkIndex = 1;
     ratio == checkIndex ? x2 += shift : x2 -= shift;
     prevRatio == checkIndex ? x1 += shift : x1 -= shift;
 
@@ -593,7 +548,6 @@ anychart.elements.Grid.prototype.restoreDefaults = function() {
   this.zIndex(10);
   this.suspendSignalsDispatching();
   this.direction(anychart.utils.Direction.HORIZONTAL);
-  this.invert(false);
   this.minor(false);
   this.oddFill('#FFFFFF 1');
   this.evenFill('#F5F5F5 1');
@@ -723,3 +677,26 @@ anychart.elements.Grid.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Grid}
+ */
+anychart.elements.grid = function() {
+  return new anychart.elements.Grid();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.grid', anychart.elements.grid);
+anychart.elements.Grid.prototype['minor'] = anychart.elements.Grid.prototype.minor;
+anychart.elements.Grid.prototype['oddFill'] = anychart.elements.Grid.prototype.oddFill;
+anychart.elements.Grid.prototype['evenFill'] = anychart.elements.Grid.prototype.evenFill;
+anychart.elements.Grid.prototype['direction'] = anychart.elements.Grid.prototype.direction;
+anychart.elements.Grid.prototype['scale'] = anychart.elements.Grid.prototype.scale;
+anychart.elements.Grid.prototype['parentBounds'] = anychart.elements.Grid.prototype.parentBounds;
+anychart.elements.Grid.prototype['stroke'] = anychart.elements.Grid.prototype.stroke;
+anychart.elements.Grid.prototype['drawFirstLine'] = anychart.elements.Grid.prototype.drawFirstLine;
+anychart.elements.Grid.prototype['drawLastLine'] = anychart.elements.Grid.prototype.drawLastLine;
+anychart.elements.Grid.prototype['draw'] = anychart.elements.Grid.prototype.draw;

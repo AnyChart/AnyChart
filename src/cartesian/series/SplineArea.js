@@ -15,7 +15,7 @@ goog.require('anychart.cartesian.series.SplineDrawer');
 anychart.cartesian.series.SplineArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value', 'value'];
   this.referenceValueMeanings = ['x', 'z', 'y'];
   this.referenceValuesSupportStack = true;
@@ -28,6 +28,7 @@ anychart.cartesian.series.SplineArea = function(data, opt_csvSettings) {
   this.queue_ = new anychart.cartesian.series.SplineDrawer(this.path);
 };
 goog.inherits(anychart.cartesian.series.SplineArea, anychart.cartesian.series.AreaBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.SPLINE_AREA] = anychart.cartesian.series.SplineArea;
 
 
 /** @inheritDoc */
@@ -158,7 +159,7 @@ anychart.cartesian.series.SplineArea.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.SplineArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'splinearea';
+  json['seriesType'] = anychart.cartesian.series.Type.SPLINE_AREA;
   return json;
 };
 
@@ -169,3 +170,26 @@ anychart.cartesian.series.SplineArea.prototype.serialize = function() {
 anychart.cartesian.series.SplineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.SplineArea}
+ */
+anychart.cartesian.series.splineArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.SplineArea(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.splineArea', anychart.cartesian.series.splineArea);
+anychart.cartesian.series.SplineArea.prototype['startDrawing'] = anychart.cartesian.series.SplineArea.prototype.startDrawing;
+anychart.cartesian.series.SplineArea.prototype['fill'] = anychart.cartesian.series.SplineArea.prototype.fill;
+anychart.cartesian.series.SplineArea.prototype['hoverFill'] = anychart.cartesian.series.SplineArea.prototype.hoverFill;
+anychart.cartesian.series.SplineArea.prototype['stroke'] = anychart.cartesian.series.SplineArea.prototype.stroke;
+anychart.cartesian.series.SplineArea.prototype['hoverStroke'] = anychart.cartesian.series.SplineArea.prototype.hoverStroke;
+anychart.cartesian.series.SplineArea.prototype['hatchFill'] = anychart.cartesian.series.SplineArea.prototype.hatchFill;
+anychart.cartesian.series.SplineArea.prototype['hoverHatchFill'] = anychart.cartesian.series.SplineArea.prototype.hoverHatchFill;

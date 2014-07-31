@@ -16,17 +16,17 @@ goog.require('goog.userAgent');
  *
  * How it works:
  * 1) Generate random UID (Is used to name a div).
- * 2) Create a style for normal div and for printing (media="print" is in use).
- * 3) Create a div placed into an absolute position far out of the screen.
+ * 2) Create a style for a normal div and for the printing process (media="print" is in use).
+ * 3) Create a div placed into an absolute position out of the screen.
  * 4) Create an iframe inside the previous div.
  * 5) Add iframe.onload event. Triggers after new 'src' is set to iframe.
  * 6) iframe.onload calls 'window.print()'. Special style with media="print" allows to print only our div.
- * 7) Check all base64 support.
+ * 7) Check base64 support.
  * 8) Get a string value of stage's SVG.
  * 9) Send a server request with SVG string data attached.
  * 10) Get a response with base64 encoded result to be applied as iframe's src.
  * 11) After src is set, iframe.onload is triggers. TODO Check for all browsers.
- * 12) If some pervert kills a body content with body.innerHtml='', all printing structures will be re-created on print() call.
+ * 12) If someone kills a body content with body.innerHtml='', all printing structures will be re-created on print() call.
  *
  * @constructor
  * @extends {goog.Disposable}
@@ -80,7 +80,7 @@ anychart.utils.PrintHelper.prototype.printDiv_ = null;
 
 
 /**
- * Serializer. Used to take a string value of stage's SVG.
+ * Serializer. Used to take a string value of stage SVG.
  *
  * @type {XMLSerializer}
  * @private
@@ -138,7 +138,7 @@ anychart.utils.PrintHelper.prototype.addDefaultStyle_ = function() {
 
   this.defaultStyleNode_.appendChild(goog.dom.getDocument().createTextNode(styles));
 
-  //We don't need a DOM helper here. It does the same.
+  //We don't need DOM helper here. It does the same.
   goog.dom.getDocument().getElementsByTagName('head')[0].appendChild(this.defaultStyleNode_);
 };
 
@@ -158,7 +158,7 @@ anychart.utils.PrintHelper.prototype.addPrintStyle_ = function() {
 
   this.printStyleNode_.appendChild(goog.dom.getDocument().createTextNode(styles));
 
-  //We don't need a DOM helper here. It does the same.
+  //We don't need DOM helper here. It does the same.
   goog.dom.getDocument().getElementsByTagName('head')[0].appendChild(this.printStyleNode_);
 
 };
@@ -193,8 +193,8 @@ anychart.utils.PrintHelper.prototype.load_ = function(svgText) {
 
         } else if (result) {
 
-//          ths.iframe_.setAttribute('width', response['width']);
-//          ths.iframe_.setAttribute('height', response['height']);
+          //          ths.iframe_.setAttribute('width', response['width']);
+          //          ths.iframe_.setAttribute('height', response['height']);
 
           ths.iframe_.setAttribute('width', '800px');
           ths.iframe_.setAttribute('height', '1110px');
@@ -208,51 +208,51 @@ anychart.utils.PrintHelper.prototype.load_ = function(svgText) {
       data.toString()
   );
 
-//  $.ajax({
-//    type: 'POST',
-//    url: 'http://176.9.224.4/pdf',
-//    data: {
-//      'data': svgText,
-//      'productName': 'acdvf',
-//      'dataType': 'svg',
-//      'responseType': 'base64'
-//    },
-//    success: function(response) {
-//      var result = response['result'];
-//      var error = response['error'];
-//      if (error) {
-//        console.log(error);
-//      } else if (result) {
-//        console.log(result);
-//        ths.iframe_.setAttribute('width', response['width']);
-//        ths.iframe_.setAttribute('height', response['height']);
-//        ths.iframe_.setAttribute('src', 'data:application/pdf;base64,' + response['result']);
-//      }
-//    },
-//    dataType: 'json'
-//  });
+  //  $.ajax({
+  //    type: 'POST',
+  //    url: 'http://176.9.224.4/pdf',
+  //    data: {
+  //      'data': svgText,
+  //      'productName': 'acdvf',
+  //      'dataType': 'svg',
+  //      'responseType': 'base64'
+  //    },
+  //    success: function(response) {
+  //      var result = response['result'];
+  //      var error = response['error'];
+  //      if (error) {
+  //        console.log(error);
+  //      } else if (result) {
+  //        console.log(result);
+  //        ths.iframe_.setAttribute('width', response['width']);
+  //        ths.iframe_.setAttribute('height', response['height']);
+  //        ths.iframe_.setAttribute('src', 'data:application/pdf;base64,' + response['result']);
+  //      }
+  //    },
+  //    dataType: 'json'
+  //  });
 
-//  var dataUrl = 'http://176.9.224.4/pdf';
+  //  var dataUrl = 'http://176.9.224.4/pdf';
 
-//  var ths = this;
-//  console.log(JSON.stringify());
+  //  var ths = this;
+  //  console.log(JSON.stringify());
 
-//  goog.net.XhrIo.send(dataUrl, function(e) { //Callback
-//    var xhr = e.target;
-//    var obj = xhr.getResponseJson();
+  //  goog.net.XhrIo.send(dataUrl, function(e) { //Callback
+  //    var xhr = e.target;
+  //    var obj = xhr.getResponseJson();
 
-//  }, 'POST', JSON.stringify({
-//    'data': svgText,
-//    'productName': 'acdvf',
-//    'dataType': 'svg',
-//    'responseType': 'base64'
-//  }));
+  //  }, 'POST', JSON.stringify({
+  //    'data': svgText,
+  //    'productName': 'acdvf',
+  //    'dataType': 'svg',
+  //    'responseType': 'base64'
+  //  }));
 };
 
 
 /**
  * Checks if browser supports base64.
- * NOTE: IE7 and below doesn't support base64.
+ * NOTE: IE7 and versions below doesn't support base64.
  * @return {boolean} - 'True' if browser supports base64.
  * @private
  */
@@ -266,7 +266,7 @@ anychart.utils.PrintHelper.prototype.base64Support_ = function() {
  * NOTE: IE8 works with resources up to 32k size (no longer than 32768 characters).
  *
  * @param {string} svgString - SVG string value.
- * @return {boolean} - 'False' if browser can't process too long base64-encoded string.
+ * @return {boolean} - 'False' if browser can't process long base64-encoded string.
  * @private
  */
 anychart.utils.PrintHelper.prototype.longBase64Support_ = function(svgString) {
@@ -277,8 +277,8 @@ anychart.utils.PrintHelper.prototype.longBase64Support_ = function(svgString) {
 
 /**
  * Prints.
- * @param {acgraph.vector.Stage} stage - Stage to be printed. TODO param can be changed on API rework.
- * TODO add export server URL on API rework.
+ * @param {acgraph.vector.Stage} stage - Stage to be printed. TODO param can be changed when refactoring API.
+ * TODO add export server URL when refactoring API.
  */
 anychart.utils.PrintHelper.prototype.print = function(stage) {
   if (!this.base64Support_()) {
@@ -294,6 +294,7 @@ anychart.utils.PrintHelper.prototype.print = function(stage) {
     goog.global['console']['error']('IE8 is detected. Your browser does not support base64-encoded strings longer than 32768 characters. ' +
         'Printing process can\'t be completed.');
     //TODO Should we add some recommendations? Kind of 'Make a chart smaller' or 'http://www.google.com/chrome'.
+    //Idea: make chart smaller automatically :)
     return;
   }
 

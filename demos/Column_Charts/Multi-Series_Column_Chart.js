@@ -32,9 +32,8 @@ anychart.onDocumentReady(function() {
   var setupSeriesLabels = function(series) {
     var seriesLabels = series.labels();
     seriesLabels.enabled(true);
-    seriesLabels.position('rightcenter');
-    seriesLabels.anchor('leftcenter');
-    seriesLabels.offsetX(10);
+    seriesLabels.position('top');
+    seriesLabels.anchor('bottom');
     seriesLabels.fontWeight('bold');
   };
 

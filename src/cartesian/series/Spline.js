@@ -15,7 +15,7 @@ goog.require('anychart.cartesian.series.SplineDrawer');
 anychart.cartesian.series.Spline = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
@@ -30,6 +30,7 @@ anychart.cartesian.series.Spline = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Spline, anychart.cartesian.series.ContinuousBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.SPLINE] = anychart.cartesian.series.Spline;
 
 
 /** @inheritDoc */
@@ -97,7 +98,7 @@ anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.Spline.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'spline';
+  json['seriesType'] = anychart.cartesian.series.Type.SPLINE;
   return json;
 };
 
@@ -108,3 +109,21 @@ anychart.cartesian.series.Spline.prototype.serialize = function() {
 anychart.cartesian.series.Spline.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Spline}
+ */
+anychart.cartesian.series.spline = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Spline(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.spline', anychart.cartesian.series.spline);
+anychart.cartesian.series.Spline.prototype['stroke'] = anychart.cartesian.series.Spline.prototype.stroke;
+anychart.cartesian.series.Spline.prototype['hoverStroke'] = anychart.cartesian.series.Spline.prototype.hoverStroke;

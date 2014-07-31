@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.BarBase');
 
 
 /**
+ * Define Bar series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#bar} or {@link anychart.Chart#barChart}.
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bar([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -14,12 +18,13 @@ goog.require('anychart.cartesian.series.BarBase');
 anychart.cartesian.series.Bar = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value', 'value'];
   this.referenceValueMeanings = ['x', 'z', 'y'];
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Bar, anychart.cartesian.series.BarBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BAR] = anychart.cartesian.series.Bar;
 
 
 /** @inheritDoc */
@@ -63,25 +68,12 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
 };
 
 
-/** @inheritDoc */
-anychart.cartesian.series.Bar.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
-};
-
-
 /**
  * @inheritDoc
  */
 anychart.cartesian.series.Bar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'bar';
+  json['seriesType'] = anychart.cartesian.series.Type.BAR;
   return json;
 };
 
@@ -92,3 +84,25 @@ anychart.cartesian.series.Bar.prototype.serialize = function() {
 anychart.cartesian.series.Bar.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Bar}
+ */
+anychart.cartesian.series.bar = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Bar(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);
+anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Bar.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;//in docs/

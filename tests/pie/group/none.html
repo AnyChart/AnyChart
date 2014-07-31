@@ -1,0 +1,44 @@
+<html>
+<head>
+    <script src="../../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = new anychart.pie.Chart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+        chart.data([
+            {name: 'Zyuganov', value: 10},
+            {name: 'Prokhorov', value: 8},
+            {name: 'Putin', value: 20},
+            {name: 'Medvedev', value: 14},
+            {name: 'Zhirinovsky', value:7}
+        ]);
+        chart.group(function(value){
+            return (value <= 10);
+        });
+        chart.group(null);
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>

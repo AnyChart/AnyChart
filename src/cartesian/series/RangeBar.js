@@ -14,7 +14,7 @@ goog.require('anychart.cartesian.series.BarBase');
 anychart.cartesian.series.RangeBar = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
@@ -22,12 +22,13 @@ anychart.cartesian.series.RangeBar = function(data, opt_csvSettings) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
   tooltip.content().useHtml(true);
-  tooltip.textFormatter(function() {
+  tooltip.contentFormatter(function() {
     return this['x'] + '<br>low: ' + this['low'] + '<br>high: ' + this['high'];
   });
   tooltip.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.RangeBar, anychart.cartesian.series.BarBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_BAR] = anychart.cartesian.series.RangeBar;
 
 
 /** @inheritDoc */
@@ -75,13 +76,13 @@ anychart.cartesian.series.RangeBar.prototype.drawSubsequentPoint = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.RangeBar.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
+  var iterator = this.getIterator();
+  var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
+    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('high')};
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
   }
 };
 
@@ -91,8 +92,23 @@ anychart.cartesian.series.RangeBar.prototype.createPositionProvider = function(p
  */
 anychart.cartesian.series.RangeBar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangebar';
+  json['seriesType'] = anychart.cartesian.series.Type.RANGE_BAR;
   return json;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.cartesian.series.RangeBar.prototype.calculateStatistics = function() {
+  this.statistics('seriesMax', -Infinity);
+  this.statistics('seriesMin', Infinity);
+  this.statistics('seriesSum', 0);
+  this.statistics('seriesAverage', 0);
+  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
 };
 
 
@@ -102,3 +118,25 @@ anychart.cartesian.series.RangeBar.prototype.serialize = function() {
 anychart.cartesian.series.RangeBar.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeBar}
+ */
+anychart.cartesian.series.rangeBar = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeBar(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.rangeBar', anychart.cartesian.series.rangeBar);
+anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.RangeBar.prototype.fill;
+anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.RangeBar.prototype.hoverFill;
+anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.RangeBar.prototype.stroke;
+anychart.cartesian.series.RangeBar.prototype['hoverStroke'] = anychart.cartesian.series.RangeBar.prototype.hoverStroke;
+anychart.cartesian.series.RangeBar.prototype['hatchFill'] = anychart.cartesian.series.RangeBar.prototype.hatchFill;
+anychart.cartesian.series.RangeBar.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeBar.prototype.hoverHatchFill;

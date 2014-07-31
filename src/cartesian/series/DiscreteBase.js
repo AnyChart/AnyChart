@@ -15,9 +15,7 @@ goog.require('anychart.cartesian.series.BaseWithMarkers');
 anychart.cartesian.series.DiscreteBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
   this.markers().position(anychart.utils.NinePositions.TOP);
-  this.hoverMarkers().position(anychart.utils.NinePositions.TOP);
   this.labels().position(anychart.utils.NinePositions.TOP);
-  this.hoverLabels().position(anychart.utils.NinePositions.TOP);
 };
 goog.inherits(anychart.cartesian.series.DiscreteBase, anychart.cartesian.series.BaseWithMarkers);
 
@@ -38,7 +36,7 @@ anychart.cartesian.series.DiscreteBase.prototype.hatchFillRootElement = null;
 
 /**
  * Discrete-pointed series are based on a typed layer, that constructs children by this initializer.
- * @return {!acgraph.vector.IElement} Returns a new instance of element.
+ * @return {!acgraph.vector.IElement} Returns new instance of an element.
  * @protected
  */
 anychart.cartesian.series.DiscreteBase.prototype.rootTypedLayerInitializer = function() {
@@ -47,24 +45,11 @@ anychart.cartesian.series.DiscreteBase.prototype.rootTypedLayerInitializer = fun
 
 
 /**
- * Remove all element content from container.
+ * Remove all element content from a container.
  */
 anychart.cartesian.series.DiscreteBase.prototype.remove = function() {
   if (this.rootElement)
     this.rootElement.remove();
-};
-
-
-/** @inheritDoc */
-anychart.cartesian.series.DiscreteBase.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
 };
 
 
@@ -86,7 +71,10 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.rootElement.clip(/** @type {!anychart.math.Rect} */(this.pixelBounds()));
+    if (this.clip()) {
+      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+      this.rootElement.clip(/** @type {!anychart.math.Rect} */(bounds));
+    }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -188,3 +176,9 @@ anychart.cartesian.series.DiscreteBase.prototype.unhover = function() {
   this.hoverStatus = NaN;
   return this;
 };
+
+
+//exports
+anychart.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.cartesian.series.DiscreteBase.prototype.hoverSeries;
+anychart.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.cartesian.series.DiscreteBase.prototype.hoverPoint;
+anychart.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.cartesian.series.DiscreteBase.prototype.unhover;

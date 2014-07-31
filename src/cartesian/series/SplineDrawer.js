@@ -3,8 +3,8 @@ goog.provide('anychart.cartesian.series.SplineDrawer');
 
 
 /**
- * Очередь, рисующая сплайны. Вы ей в конструкторе отдаете путь, потом кормите последовательно точки.
- * Как только ей хватает точек для рисования очередного сплайна она его рисует.
+ * Queue too draw splines. Pass a path in a constuctor and then feed it with a sequence of points.
+ * As soon as it has enough points to draw a spline - it draws it.
  * @param {!acgraph.vector.Path} mainPath .
  * @param {boolean=} opt_rtl If the drawing goes right-to-left (occurs on inverted X scale).
  * @constructor
@@ -17,7 +17,7 @@ anychart.cartesian.series.SplineDrawer = function(mainPath, opt_rtl) {
   this.path_ = mainPath;
 
   /**
-   * Состояние очереди.
+   * Queue state.
    * 0 - no items,
    * 1 - one item,
    * 2 - ready to draw first segment,
@@ -74,7 +74,7 @@ anychart.cartesian.series.SplineDrawer.prototype.rtl = function(opt_rtl) {
 
 
 /**
- * Processes next spine point.
+ * Processes next spline point.
  * @param {number} x .
  * @param {number} y .
  */

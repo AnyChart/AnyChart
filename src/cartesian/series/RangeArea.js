@@ -14,12 +14,13 @@ goog.require('anychart.cartesian.series.ContinuousRangeBase');
 anychart.cartesian.series.RangeArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.RangeArea, anychart.cartesian.series.ContinuousRangeBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_AREA] = anychart.cartesian.series.RangeArea;
 
 
 /** @inheritDoc */
@@ -102,7 +103,7 @@ anychart.cartesian.series.RangeArea.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.RangeArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangearea';
+  json['seriesType'] = anychart.cartesian.series.Type.RANGE_AREA;
   return json;
 };
 
@@ -113,3 +114,27 @@ anychart.cartesian.series.RangeArea.prototype.serialize = function() {
 anychart.cartesian.series.RangeArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeArea}
+ */
+anychart.cartesian.series.rangeArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeArea(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.rangeArea', anychart.cartesian.series.rangeArea);
+anychart.cartesian.series.RangeArea.prototype['fill'] = anychart.cartesian.series.RangeArea.prototype.fill;
+anychart.cartesian.series.RangeArea.prototype['hoverFill'] = anychart.cartesian.series.RangeArea.prototype.hoverFill;
+anychart.cartesian.series.RangeArea.prototype['highStroke'] = anychart.cartesian.series.RangeArea.prototype.highStroke;
+anychart.cartesian.series.RangeArea.prototype['hoverHighStroke'] = anychart.cartesian.series.RangeArea.prototype.hoverHighStroke;
+anychart.cartesian.series.RangeArea.prototype['lowStroke'] = anychart.cartesian.series.RangeArea.prototype.lowStroke;
+anychart.cartesian.series.RangeArea.prototype['hoverLowStroke'] = anychart.cartesian.series.RangeArea.prototype.hoverLowStroke;
+anychart.cartesian.series.RangeArea.prototype['hatchFill'] = anychart.cartesian.series.RangeArea.prototype.hatchFill;
+anychart.cartesian.series.RangeArea.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeArea.prototype.hoverHatchFill;

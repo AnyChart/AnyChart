@@ -4,8 +4,9 @@
   <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../../../src/deps.js"></script>
   <meta charset="utf-8">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
   <script>
-    goog.require('anychart');
+    goog.require('anychart.modules.anychart');
     goog.require('anychart.elements.Axis');
   </script>
   <script src="index.js"></script>
@@ -13,7 +14,7 @@
 
 
 <body onload="load()">
-<div id="container" style="position: absolute; left: 0; top: 0; border: 0 solid; width: 638px; height: 601px; float: left;"></div>
+<div id="container" style="position: absolute; left: 0; top: 0; border: 0 solid; width: 938px; height: 601px; float: left;"></div>
 
 <div style="position: absolute; left: 1170px; top: 0; border: 1px solid; ">
   Enable axis: <input type="checkbox" onchange="setAxis(this.checked);" id="setAxis"/><br>
@@ -26,7 +27,17 @@
   Enable first label: <input type="checkbox" onchange="setFirstLabel(this.checked);" id="setFirstLabel"/><br>
   Enable last label: <input type="checkbox" onchange="setLastLabel(this.checked);" id="setLastLabel"/><br>
   <br>
-  Scale length: <input type="text" onchange="scaleLength(this.value);" id="length"/><br>
+  Stagger lines: <input type="text" onchange="setStaggerLines(this.value);" id="setStaggerLines"/><br>
+  Stagger max lines: <input type="text" onchange="setStaggerMaxLines(this.value);" id="setStaggerMaxLines"/><br>
+  Stagger mode: <input type="checkbox" onchange="setStaggerMode(this.checked);" id="setStaggerMode"/><br>
+  Overlap (on/off): <input type="checkbox" onchange="setOverlapMode(this.checked);" id="setOverlapMode"/><br>
+  <br>
+  <!--Scale length: <input type="text" onchange="scaleLength(this.value);" id="length"/><br>-->
+
+  Scale length: <input type="range" min="1" max="700" id="length" oninput="scaleLength(this.value);" value="400">
+  <span style="display: inline-block; width: 50px" id="scaleLength"></span><br>
+  Labels rotation: <input type="range" step="1" min="0" max="360" id="rotation" oninput="rotation(this.value);" value="0">
+  <span style="display: inline-block; width: 50px" id="rotationAngle"></span><br>
   Tick length: <input type="text" onchange="tickLength(this.value);" id="tickLength"/><br>
   Minor tick length: <input type="text" onchange="minorTickLength(this.value);" id="minorTickLength"/><br>
   <!--Ticks set: <input type="text" onchange="tickSet(this.value);" id="ticksSet"/><br>-->

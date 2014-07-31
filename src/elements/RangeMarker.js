@@ -2,6 +2,7 @@ goog.provide('anychart.elements.RangeMarker');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -91,10 +92,10 @@ anychart.elements.RangeMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
@@ -107,7 +108,7 @@ anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
+ * Getter for the axis scale.
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
@@ -116,7 +117,7 @@ anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.RangeMarker} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.RangeMarker} Axis scale or itself for method chaining.
  */
 anychart.elements.RangeMarker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -186,7 +187,7 @@ anychart.elements.RangeMarker.prototype.parentBounds = function(opt_value) {
 /**
  * Get/set range marker fill.
  * @param {string|acgraph.vector.Fill=} opt_value RangeMarker line settings.
- * @return {string|acgraph.vector.Fill|anychart.elements.RangeMarker} RangeMarker line settings or RangeMarker instance for chaining.
+ * @return {string|acgraph.vector.Fill|anychart.elements.RangeMarker} RangeMarker line settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.fill = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -202,9 +203,9 @@ anychart.elements.RangeMarker.prototype.fill = function(opt_value) {
 
 
 /**
- * Get/set начальное значение маркера.
+ * Get/set starting marker value.
  * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for chaining.
+ * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.from = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -221,9 +222,9 @@ anychart.elements.RangeMarker.prototype.from = function(opt_newValue) {
 
 
 /**
- * Get/set конечное значение маркера.
+ * Get/set ending marker value.
  * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for chaining.
+ * @return {number|anychart.elements.RangeMarker} RangeMarker value settings or RangeMarker instance for method chaining.
  */
 anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -240,7 +241,7 @@ anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
 
 
 /**
- * Определяет расположения маркера
+ * Defines marker direction
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.RangeMarker.prototype.isHorizontal = function() {
@@ -277,16 +278,14 @@ anychart.elements.RangeMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-
     var minValue = this.from_, maxValue = this.to_;
     if (this.from_ > this.to_) {
       minValue = this.from_;
       maxValue = this.to_;
     }
-
-    var ratioMinValue = this.scale().transform(minValue, isOrdinal ? 0 : 0);
-    var ratioMaxValue = this.scale().transform(maxValue, isOrdinal ? 1 : 0);
+    // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
+    var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
+    var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
 
     if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return;
 
@@ -412,3 +411,24 @@ anychart.elements.RangeMarker.prototype.disposeInternal = function() {
   delete this.fill_;
   goog.base(this, 'disposeInternal');
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.RangeMarker}
+ */
+anychart.elements.rangeMarker = function() {
+  return new anychart.elements.RangeMarker();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.rangeMarker', anychart.elements.rangeMarker);
+anychart.elements.RangeMarker.prototype['from'] = anychart.elements.RangeMarker.prototype.from;
+anychart.elements.RangeMarker.prototype['to'] = anychart.elements.RangeMarker.prototype.to;
+anychart.elements.RangeMarker.prototype['scale'] = anychart.elements.RangeMarker.prototype.scale;
+anychart.elements.RangeMarker.prototype['parentBounds'] = anychart.elements.RangeMarker.prototype.parentBounds;
+anychart.elements.RangeMarker.prototype['direction'] = anychart.elements.RangeMarker.prototype.direction;
+anychart.elements.RangeMarker.prototype['fill'] = anychart.elements.RangeMarker.prototype.fill;
+anychart.elements.RangeMarker.prototype['draw'] = anychart.elements.RangeMarker.prototype.draw;
+anychart.elements.RangeMarker.prototype['isHorizontal'] = anychart.elements.RangeMarker.prototype.isHorizontal;

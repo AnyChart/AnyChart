@@ -27,19 +27,16 @@
             console.log('chart draw');
         });
         chart.line([5,2,2,1,'6', 0]);
-        var y = chart.yAxis().title();
-        y.text('Value')
+        chart.yAxis().title()
+                .text('Value')
                 .fontSize(20)
                 .fontFamily('verdana');
-        y.align('center');
         chart.xAxis()
                 .title()
                 .text('Some category')
-                .fontSize(20)
                 .fontColor('red')
                 .fontFamily('verdana');
 
-        chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
         chart.draw();
     });

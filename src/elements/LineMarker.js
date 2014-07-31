@@ -2,6 +2,7 @@ goog.provide('anychart.elements.LineMarker');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -84,8 +85,9 @@ anychart.elements.LineMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.elements.LineMarker.prototype.direction = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.direction_ != opt_value) {
-      this.direction_ = opt_value;
+    var direction = anychart.utils.normalizeDirection(opt_value);
+    if (this.direction_ != direction) {
+      this.direction_ = direction;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -100,16 +102,16 @@ anychart.elements.LineMarker.prototype.direction = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
+ * Getter for the axis scale.
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
  * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.elements.LineMarker} An instance of the {@link anychart.elements.LineMarker} class for method chaining.
+ * @return {!anychart.elements.LineMarker} {@link anychart.elements.LineMarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.elements.LineMarker} Axis scale or itself for chaining.
+ * @return {anychart.scales.Base|anychart.elements.LineMarker} Axis scale or itself for method chaining.
  */
 anychart.elements.LineMarker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -153,7 +155,7 @@ anychart.elements.LineMarker.prototype.scaleInvalidated_ = function(event) {
  *//**
  * Setter for parentBounds.
  * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.LineMarker} An instance of the {@link anychart.elements.LineMarker} class for method chaining.
+ * @return {!anychart.elements.LineMarker} {@link anychart.elements.LineMarker} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {acgraph.math.Rect=} opt_value Bounds for marker.
@@ -162,7 +164,7 @@ anychart.elements.LineMarker.prototype.scaleInvalidated_ = function(event) {
 anychart.elements.LineMarker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
+      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -179,7 +181,7 @@ anychart.elements.LineMarker.prototype.parentBounds = function(opt_value) {
 /**
  * Get/set line marker stroke.
  * @param {string|acgraph.vector.Stroke=} opt_value LineMarker line settings.
- * @return {string|acgraph.vector.Stroke|anychart.elements.LineMarker} LineMarker line settings or LineMarker instance for chaining.
+ * @return {string|acgraph.vector.Stroke|anychart.elements.LineMarker} LineMarker line settings or LineMarker instance for method chaining.
  */
 anychart.elements.LineMarker.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -197,7 +199,7 @@ anychart.elements.LineMarker.prototype.stroke = function(opt_value) {
 /**
  * Get/set value.
  * @param {number=} opt_newValue LineMarker value settings.
- * @return {number|anychart.elements.LineMarker} LineMarker value settings or LineMarker instance for chaining.
+ * @return {number|anychart.elements.LineMarker} LineMarker value settings or LineMarker instance for method chaining.
  */
 anychart.elements.LineMarker.prototype.value = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
@@ -214,7 +216,7 @@ anychart.elements.LineMarker.prototype.value = function(opt_newValue) {
 
 
 /**
- * Определяет расположения маркера
+ * Whether marker is horizontal
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.LineMarker.prototype.isHorizontal = function() {
@@ -251,8 +253,7 @@ anychart.elements.LineMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var isOrdinal = scale instanceof anychart.scales.Ordinal;
-    var ratio = scale.transform(this.value_, isOrdinal ? 0.5 : 0);
+    var ratio = goog.math.clamp(scale.transform(this.value_, 0.5), 0, 1);
     if (isNaN(ratio)) return;
 
     var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
@@ -361,3 +362,23 @@ anychart.elements.LineMarker.prototype.disposeInternal = function() {
   delete this.stroke_;
   goog.base(this, 'disposeInternal');
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.LineMarker}
+ */
+anychart.elements.lineMarker = function() {
+  return new anychart.elements.LineMarker();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.lineMarker', anychart.elements.lineMarker);
+anychart.elements.LineMarker.prototype['value'] = anychart.elements.LineMarker.prototype.value;
+anychart.elements.LineMarker.prototype['scale'] = anychart.elements.LineMarker.prototype.scale;
+anychart.elements.LineMarker.prototype['parentBounds'] = anychart.elements.LineMarker.prototype.parentBounds;
+anychart.elements.LineMarker.prototype['direction'] = anychart.elements.LineMarker.prototype.direction;
+anychart.elements.LineMarker.prototype['stroke'] = anychart.elements.LineMarker.prototype.stroke;
+anychart.elements.LineMarker.prototype['draw'] = anychart.elements.LineMarker.prototype.draw;
+anychart.elements.LineMarker.prototype['isHorizontal'] = anychart.elements.LineMarker.prototype.isHorizontal;

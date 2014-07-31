@@ -45,7 +45,7 @@ anychart.VisualBase.prototype.enabled_ = true;
 
 
 /**
- * Double signals dispatching for enables state signals special treatment.
+ * Double signals dispatching for enabled state signals special treatment.
  * @type {boolean}
  * @private
  */
@@ -72,13 +72,13 @@ anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for the element's current container.
+ * Getter for the element current container.
  * @return {acgraph.vector.ILayer} The current container.
  *//**
  * Setter for the element container.<br/>
- * Each element appends all it's content to this container.<br/>
+ * Each element appends all its content to this container.<br/>
  * The order of adding is not defined, but usually it will be the order in which elements are drawn for the first time.
- * So if you need to specify the order use {@link anychart.VisualBase#zIndex}.
+ * If you need to specify the order use {@link anychart.VisualBase#zIndex}.
  * @example <t>listingOnly</t>
  * // string
  *  element.container('containerIdentifier');
@@ -98,6 +98,7 @@ anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.VisualBase.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.container_ != opt_value) {
+      var containerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
       if (goog.isString(opt_value) || goog.dom.isElement(opt_value)) {
         // Should we use registerDisposable in this case?
         // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
@@ -106,7 +107,12 @@ anychart.VisualBase.prototype.container = function(opt_value) {
       } else {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
       }
-      this.invalidate(anychart.ConsistencyState.CONTAINER, anychart.Signal.NEEDS_REDRAW);
+      var state = anychart.ConsistencyState.CONTAINER;
+      var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
+      if (!goog.math.Rect.equals(containerBounds, newContainerBounds))
+        state |= anychart.ConsistencyState.BOUNDS;
+
+      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -343,3 +349,17 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
     stage.saveAsPDF(data[0], data[1], data[2]);
   }
 };
+
+
+//exports
+anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//in docs/final
+anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
+anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//in docs/final
+anychart.VisualBase.prototype['listen'] = anychart.VisualBase.prototype.listen;
+anychart.VisualBase.prototype['listenOnce'] = anychart.VisualBase.prototype.listenOnce;
+anychart.VisualBase.prototype['unlisten'] = anychart.VisualBase.prototype.unlisten;
+anychart.VisualBase.prototype['unlistenByKey'] = anychart.VisualBase.prototype.unlistenByKey;
+anychart.VisualBase.prototype['removeAllListeners'] = anychart.VisualBase.prototype.removeAllListeners;
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;

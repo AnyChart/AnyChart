@@ -28,15 +28,10 @@
         });
         chart.bar([5,2,2,1]);
         chart.xAxis()
-                .orientation('bottom')
-                .scale(chart.yScale())
-                .title('X-Axis');
+                .scale(chart.yScale());
         chart.yAxis()
-                .orientation('left')
-                .scale(chart.xScale())
-                .title('Y-Axis');
+                .scale(chart.xScale());
 
-        chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
         chart.container('container');
         chart.draw();
     });

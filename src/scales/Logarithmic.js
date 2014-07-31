@@ -18,7 +18,8 @@ goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
-  return (anychart.math.log(/** @type {number} */(value)) - anychart.math.log(this.min)) / this.range;
+  var result = (anychart.math.log(/** @type {number} */(value)) - anychart.math.log(this.min)) / this.range;
+  return this.isInverted ? 1 - result : result;
 };
 
 
@@ -36,13 +37,27 @@ anychart.scales.Logarithmic.prototype.calculate = function() {
 };
 
 
+/** @inheritDoc */
+anychart.scales.Logarithmic.prototype.createTicks = function() {
+  var ticks = goog.base(this, 'createTicks');
+  ticks.mode('log');
+  return ticks;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create logarithmic scale.
+ * Shortcut to create a logarithmic scale.
  * @return {anychart.scales.Logarithmic} Logarithmic scale.
  */
 anychart.scales.log = function() {
   return new anychart.scales.Logarithmic();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.log', anychart.scales.log);
+anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;
+anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;

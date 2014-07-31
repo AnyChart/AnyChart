@@ -7,6 +7,10 @@ goog.require('anychart.utils');
 
 
 /**
+ * Define Bubble series type.<br/>
+ * <b>Note:</b> Better for use method {@link anychart.cartesian.Chart#bubble}.
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bubble([[1, 1, 3], [2, 1, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -37,17 +41,16 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
    */
   this.displayNegative_ = false;
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value', 'size'];
   this.referenceValueMeanings = ['x', 'y', 'n'];
   this.referenceValuesSupportStack = false;
 
   this.markers().position(anychart.utils.NinePositions.CENTER);
-  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
   this.labels().position(anychart.utils.NinePositions.CENTER);
-  this.hoverLabels().position(anychart.utils.NinePositions.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BUBBLE] = anychart.cartesian.series.Bubble;
 
 
 /**
@@ -164,16 +167,27 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function() {
 
 
 /**
- * Getter for currnet minimum bubble size.
+ * Getter for current minimum bubble size.
  * @return {(string|number)} Minimum size of the bubble.
  *//**
  * Setter for minimum bubble size.
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bubble([
+ *      [1, 2, 3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
+ *    .minimumSize(20)
+ *    .maximumSize(80)
+ *    .markers(null)
+ *    .container(stage)
+ *    .draw();
  * @param {(string|number)=} opt_value ['10%'] Minimum size of the bubble.
- * @return {!anychart.cartesian.series.Bubble}  An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value Minimum size of the bubble.
- * @return {(string|number|anychart.cartesian.series.Bubble)} Minimum size of the bubble or self for chaining.
+ * @return {(string|number|anychart.cartesian.series.Bubble)} Minimum size of the bubble or self for method chaining.
  */
 anychart.cartesian.series.Bubble.prototype.minimumSize = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -189,16 +203,17 @@ anychart.cartesian.series.Bubble.prototype.minimumSize = function(opt_value) {
 
 
 /**
- * Getter for currnet maximum bubble size.
+ * Getter for current maximum bubble size.
  * @return {(string|number)} Maximum size of the bubble.
  *//**
- * Setter for maximum bubble size.
+ * Setter for maximum bubble size.<br/>
+ * See example at {@link anychart.cartesian.series.Bubble#minimumSize}.
  * @param {(string|number)=} opt_value ['95%'] Maximum size of the bubble.
- * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value maximum size of the bubble.
- * @return {(string|number|anychart.cartesian.series.Bubble)} maximum size of the bubble or self for chaining.
+ * @return {(string|number|anychart.cartesian.series.Bubble)} maximum size of the bubble or self for method chaining.
  */
 anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -217,13 +232,26 @@ anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
  * Getter for current negative value option.
  * @return {boolean} Display negaitve setting .
  *//**
- * Setter for negative value option.
+ * Setter for negative value option.<br/>
+ * <b>Note:</b> Отрицательные значения обрабатываются по модулю, но выделяются заливкой другого цвета.
+ * См {@link anychart.cartesian.series.Bubble#negativeFill}, {@link anychart.cartesian.series.Bubble#negativeStroke}
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Bubble([
+ *       [1, 2, 3],
+ *       [2, 2, 2],
+ *       [3, 2, 1],
+ *       [4, 2, -1],
+ *       [5, 2, -2]])
+ *     .displayNegative(true)
+ *     .markers(null)
+ *     .container(stage)
+ *     .draw();
  * @param {boolean=} opt_value Whether to display negative value.
- * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Whether to display negative value.
- * @return {(boolean|anychart.cartesian.series.Bubble)} Display negaitve setting or self for chaining.
+ * @return {(boolean|anychart.cartesian.series.Bubble)} Display negaitve setting or self for method chaining.
  */
 anychart.cartesian.series.Bubble.prototype.displayNegative = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -429,19 +457,6 @@ anychart.cartesian.series.Bubble.prototype.applyHatchFill = function(hover) {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Bubble.prototype.createPositionProvider = function(position) {
-  var shape = this.getIterator().meta('shape');
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    return anychart.utils.getCoordinateByAnchor(shapeBounds, position);
-  } else {
-    var iterator = this.getIterator();
-    return {x: iterator.meta('x'), y: iterator.meta('y')};
-  }
-};
-
-
-/** @inheritDoc */
 anychart.cartesian.series.Bubble.prototype.categoriseData = function(categories) {
   goog.base(this, 'categoriseData', categories);
   this.invalidate(anychart.ConsistencyState.DATA);
@@ -458,24 +473,24 @@ anychart.cartesian.series.Bubble.prototype.categoriseData = function(categories)
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Stroke settings are described are:
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -499,24 +514,24 @@ anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeO
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for stroke settings.
- * О том как задавать настройки, можно почитать тут:
- * {@link http://docs.anychart.com/v1.0/reference-articles/elements-fill}<br/>
+ * Stroke settings are described at:
+ * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}<br/>
  * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {!anychart.cartesian.series.Bubble} An instance of the {@link anychart.cartesian.series.Bubble} class for method chaining.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.cartesian.series.Bubble} {@link anychart.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness [1] Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
+ *    or fill settings.
+ * @param {number=} opt_thickness [1] Stroke thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
@@ -525,7 +540,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke = function(opt_st
     this.hoverNegativeStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
         anychart.color.normalizeStroke.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverNegativeStroke_;
@@ -533,7 +548,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke = function(opt_st
 
 
 /**
- * Метод, получающий финальное значение цвета линии для текущей точки с учетом всех fallback.
+ * Method that gets final negative stroke, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
@@ -555,7 +570,36 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeStroke = function(hov
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Getter for the current series negative values.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series negative values fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -is a color returned by color() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Setter for series negative values fill by one value.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
+ * image fill here - stroke doesn't support it.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Color or gradient.
+ * @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Fill
+ *  mode or CenterY for radial gradient.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Opacity
+ *  or fill mode.
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -582,7 +626,36 @@ anychart.cartesian.series.Bubble.prototype.negativeFill = function(opt_fillOrCol
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Getter for the current series negative values.
+ * @return {!acgraph.vector.Fill} Current color.
+ *//**
+ * Setter for series negative values fill by function.
+ * @param {function():acgraph.vector.Fill=} opt_fillFunction [function() {
+ *  return this.sourceColor;
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -is a color returned by color() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Setter for series negative values fill by one value.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/Reference_Articles/elements-fill}<br/>
+ * <b>Note:</b> <u>color</u> methid sets <u>fill</u> and <b>stroke</b>, which means it is not wise to pass
+ * image fill here - stroke doesn't support it.
+ * @shortDescription Setter for series color by one value.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys Color or gradient.
+ * @param {number=} opt_opacityOrAngleOrCx Opacity, or gradient angle, or CenterX for radial gradient.
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy Fill
+ *  mode or CenterY for radial gradient.
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode Opacity
+ *  or fill mode.
+ * @param {number=} opt_opacity Opacity (value from 0 to 1).
+ * @param {number=} opt_fx The focus-point x-coordinate.
+ * @param {number=} opt_fy The focus-point y-coordinate.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -598,7 +671,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeFill = function(opt_fill
     this.hoverNegativeFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
         anychart.color.normalizeFill.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverNegativeFill_;
@@ -606,7 +679,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeFill = function(opt_fill
 
 
 /**
- * Метод, получающий финальное значение цвета заливки для растущей текущей точки с учетом всех fallback.
+ * Method to get final negative fill, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
@@ -628,7 +701,18 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeFill = function(hover
 
 
 /**
- * Set/get negative hatch fill.
+ * Getter for current hatch fill settings for negative values.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hatch fill settings for negative values.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -653,7 +737,18 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patter
 
 
 /**
- * Set/get hover negative hatch fill.
+ * Getter for current hover hatch fill settings for negative values.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hover hatch fill settings for negative values.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -673,7 +768,7 @@ anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_p
 
 
 /**
- * Метод, получающий финальное значение negative hatch fill для текущей точки с учетом всех fallback.
+ * Method to get final negative hatch fill with all fallbacks taken into account.
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final negative hatch fill for the current row.
  */
@@ -698,14 +793,14 @@ anychart.cartesian.series.Base.prototype.getFinalNegativeHatchFill = function(ho
  */
 anychart.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'bubble';
+  json['seriesType'] = anychart.cartesian.series.Type.BUBBLE;
   json['minimumSize'] = this.minimumSize();
   json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();
 
   if (goog.isFunction(this.negativeFill())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize negativeFill function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize negativeFill function, please reset it manually.');
     }
   } else {
     json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
@@ -713,7 +808,7 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverNegativeFill())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverNegativeFill function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverNegativeFill function, please reset it manually.');
     }
   } else {
     json['hoverNegativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeFill()));
@@ -721,7 +816,7 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
 
   if (goog.isFunction(this.negativeStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize negativeStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize negativeStroke function, please reset it manually.');
     }
   } else {
     json['negativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.negativeStroke()));
@@ -729,7 +824,7 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverNegativeStroke())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverNegativeStroke function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverNegativeStroke function, please reset it manually.');
     }
   } else {
     json['hoverNegativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverNegativeStroke()));
@@ -737,7 +832,7 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
 
   if (goog.isFunction(this.negativeHatchFill())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize negativeHatchFill function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize negativeHatchFill function, please reset it manually.');
     }
   } else {
     json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
@@ -745,7 +840,7 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
 
   if (goog.isFunction(this.hoverNegativeHatchFill())) {
     if (window.console) {
-      window.console.log('Warning: We cant serialize hoverNegativeHatchFill function, you should reset it manually.');
+      window.console.log('Warning: We can not serialize hoverNegativeHatchFill function, please reset it manually.');
     }
   } else {
     json['hoverNegativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeHatchFill()));
@@ -789,3 +884,34 @@ anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
 
   return result;
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Bubble}
+ */
+anychart.cartesian.series.bubble = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Bubble(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.bubble', anychart.cartesian.series.bubble);
+anychart.cartesian.series.Bubble.prototype['minimumSize'] = anychart.cartesian.series.Bubble.prototype.minimumSize;
+anychart.cartesian.series.Bubble.prototype['maximumSize'] = anychart.cartesian.series.Bubble.prototype.maximumSize;
+anychart.cartesian.series.Bubble.prototype['displayNegative'] = anychart.cartesian.series.Bubble.prototype.displayNegative;//in docs/
+anychart.cartesian.series.Bubble.prototype['fill'] = anychart.cartesian.series.Bubble.prototype.fill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverFill'] = anychart.cartesian.series.Bubble.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['stroke'] = anychart.cartesian.series.Bubble.prototype.stroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverStroke'] = anychart.cartesian.series.Bubble.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeFill'] = anychart.cartesian.series.Bubble.prototype.negativeFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverNegativeFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeStroke'] = anychart.cartesian.series.Bubble.prototype.negativeStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverNegativeStroke'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke;//in docs/
+anychart.cartesian.series.Bubble.prototype['hatchFill'] = anychart.cartesian.series.Bubble.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['hoverHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverHatchFill;//in docs/
+anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;

@@ -1,7 +1,7 @@
 goog.provide('anychart.cartesian.series.BaseWithMarkers');
 
 goog.require('anychart.cartesian.series.Base');
-goog.require('anychart.elements.Multimarker');
+goog.require('anychart.elements.MarkersFactory');
 
 
 
@@ -16,15 +16,13 @@ goog.require('anychart.elements.Multimarker');
 anychart.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  this.realMarkers_ = new anychart.elements.Multimarker();
-  this.realMarkers_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
-  this.realMarkers_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
-  this.realMarkers_.listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
-  this.realMarkers_.listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
-  this.registerDisposable(this.realMarkers_);
-
+  this.markers().listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
+  this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
+  this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
+  this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().position(anychart.utils.NinePositions.CENTER);
-  this.hoverMarkers().position(anychart.utils.NinePositions.CENTER);
+  this.registerDisposable(this.markers());
+  this.registerDisposable(this.hoverMarkers());
 };
 goog.inherits(anychart.cartesian.series.BaseWithMarkers, anychart.cartesian.series.Base);
 
@@ -39,21 +37,14 @@ anychart.cartesian.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES
 
 
 /**
- * @type {anychart.elements.Multimarker}
- * @private
- */
-anychart.cartesian.series.BaseWithMarkers.prototype.realMarkers_ = null;
-
-
-/**
- * @type {anychart.elements.Multimarker}
+ * @type {anychart.elements.MarkersFactory}
  * @private
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.markers_ = null;
 
 
 /**
- * @type {anychart.elements.Multimarker}
+ * @type {anychart.elements.MarkersFactory}
  * @private
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers_ = null;
@@ -96,33 +87,33 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * Getter for series data markers.
  * @example <t>listingOnly</t>
  * series.markers().size(10);
- * @return {!anychart.elements.Multimarker} Markers instance.
+ * @return {!anychart.elements.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers.<br/>
- * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
  * @example <t>listingOnly</t>
  * series.markers(null);
  * @example <t>listingOnly</t>
- * var myMarkers = new anychart.elements.Multimarker()
+ * var myMarkers = new anychart.elements.MarkersFactory()
  *       .size(10)
  *       .type('star5')
  * series.markers(myMarkers);
- * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
+ * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!(anychart.elements.MarkersFactory|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value) {
   if (!this.markers_) {
-    this.markers_ = new anychart.elements.Multimarker();
+    this.markers_ = new anychart.elements.MarkersFactory();
     this.registerDisposable(this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.elements.Multimarker) {
+    if (opt_value instanceof anychart.elements.MarkersFactory) {
       var data = opt_value.serialize();
       this.markers_.deserialize(data);
     } else if (goog.isObject(opt_value)) {
@@ -140,33 +131,33 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * Getter for series data markers on hover.
  * @example <t>listingOnly</t>
  * series.hoverMarkers().size(20);
- * @return {!anychart.elements.Multimarker} Markers instance.
+ * @return {!anychart.elements.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers on hover.<br/>
- * <b>Note:</b> Что бы отключить маркеры, надо передать <b>'none'</b> или <b>null</b>.
+ * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
  * @example <t>listingOnly</t>
  * series.hoverMarkers(null);
  * @example <t>listingOnly</t>
- * var myMarkers = new anychart.elements.Multimarker()
+ * var myMarkers = new anychart.elements.MarkersFactory()
  *       .size(10)
  *       .type('star5')
  * series.hoverMarkers(myMarkers);
- * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!anychart.cartesian.series.BaseWithMarkers} An instance of the {@link anychart.cartesian.series.BaseWithMarkers} class for method chaining.
+ * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Multimarker|Object|string|null)=} opt_value Series data markers settings.
- * @return {!(anychart.elements.Multimarker|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
+ * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @return {!(anychart.elements.MarkersFactory|anychart.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_value) {
   if (!this.hoverMarkers_) {
-    this.hoverMarkers_ = new anychart.elements.Multimarker();
+    this.hoverMarkers_ = new anychart.elements.MarkersFactory();
     this.registerDisposable(this.hoverMarkers_);
-    // мы его не слушаем, потому что на следующий ховер он все равно переприменится
+    // don't listen to it, for it will be reapplied at the next hover
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.elements.Multimarker) {
+    if (opt_value instanceof anychart.elements.MarkersFactory) {
       this.hoverMarkers_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.hoverMarkers_.deserialize(opt_value);
@@ -194,12 +185,21 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markersInvalidated_ = functi
 /** @inheritDoc */
 anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
-  this.markers().suspendSignalsDispatching();
-  this.hoverMarkers().suspendSignalsDispatching();
-  this.realMarkers_.suspendSignalsDispatching();
-  this.realMarkers_.deserialize(this.markers_.serialize(true));
-  this.realMarkers_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  this.realMarkers_.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  var markers = this.markers();
+  var hoverMarkers = this.hoverMarkers();
+
+  markers.suspendSignalsDispatching();
+  hoverMarkers.suspendSignalsDispatching();
+
+  var fillColor = this.getMarkerColor();
+  var strokeColor = /** @type {acgraph.vector.Stroke} */(anychart.color.darken(fillColor));
+
+  markers.setAutoFill(fillColor);
+  markers.setAutoStroke(strokeColor);
+  markers.setAutoType(this.autoMarkerType);
+
+  markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 
 
@@ -214,16 +214,19 @@ anychart.cartesian.series.BaseWithMarkers.prototype.drawPoint = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = function() {
-  this.realMarkers_.end();
+  this.markers().draw();
+
+  if (this.clip()) {
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var markerDOM = this.markers().getDomElement();
+    if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  }
+
   this.markers().resumeSignalsDispatching(false);
   this.hoverMarkers().resumeSignalsDispatching(false);
-  this.realMarkers_.resumeSignalsDispatching(false);
 
-  this.realMarkers_.markConsistent(anychart.ConsistencyState.ALL);
-  if (this.markers_)
-    this.markers_.markConsistent(anychart.ConsistencyState.ALL);
-  if (this.hoverMarkers_)
-    this.hoverMarkers_.markConsistent(anychart.ConsistencyState.ALL);
+  this.markers().markConsistent(anychart.ConsistencyState.ALL);
+  this.hoverMarkers().markConsistent(anychart.ConsistencyState.ALL);
 
   goog.base(this, 'finalizeDrawing');
 };
@@ -235,16 +238,47 @@ anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = function()
  * @protected
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(hovered) {
-  var pointMarker = this.getIterator().get(hovered ? 'hoverMarker' : 'marker');
+  var pointMarker = this.getIterator().get('marker');
+  var hoverPointMarker = this.getIterator().get('hoverMarker');
   var index = this.getIterator().getIndex();
-  var markers = /** @type {anychart.elements.Multimarker} */(hovered ? this.hoverMarkers() : this.markers());
-  if (goog.isDef(pointMarker))
-    markers.deserializeAt(index, /** @type {Object} */(pointMarker));
-  this.realMarkers_.dropCustomSettingsAt(index);
-  this.realMarkers_.deserializeAt(index, markers.serializeAt(index, !hovered));
-  this.realMarkers_.draw(
-      this.createPositionProvider(/** @type {anychart.utils.NinePositions} */(this.realMarkers_.positionAt(index))),
-      index);
+  var markersFactory = /** @type {anychart.elements.MarkersFactory} */(hovered ? this.hoverMarkers() : this.markers());
+
+  var marker = this.markers().getMarker(index);
+
+  var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
+  var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+
+  var isDraw = hovered ?
+      goog.isNull(markerHoverEnabledState) ?
+          goog.isNull(this.hoverMarkers().enabled()) ?
+              goog.isNull(markerEnabledState) ?
+                  this.markers().enabled() :
+                  markerEnabledState :
+              this.hoverMarkers().enabled() :
+          markerHoverEnabledState :
+      goog.isNull(markerEnabledState) ?
+          this.markers().enabled() :
+          markerEnabledState;
+
+  if (isDraw) {
+    var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+    var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+
+    var positionProvider = this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(position));
+    if (marker) {
+      marker.positionProvider(positionProvider);
+    } else {
+      marker = this.markers().add(positionProvider, index);
+    }
+
+    marker.resetSettings();
+    marker.currentMarkersFactory(markersFactory);
+    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hoverPointMarker));
+    marker.draw();
+  } else if (marker) {
+    marker.clear();
+  }
 };
 
 
@@ -285,25 +319,24 @@ anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerColor = function() 
 anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 
-  var fillColor = this.getMarkerColor();
-  var strokeColor = /** @type {acgraph.vector.Stroke} */(anychart.color.darken(fillColor));
-
-  var markers = /** @type {anychart.elements.Multimarker} */(this.markers());
+  var markers = /** @type {anychart.elements.MarkersFactory} */(this.markers());
   markers.suspendSignalsDispatching();
   markers.enabled(true);
   markers.size(4);
-  markers.fill(fillColor);
-  markers.stroke(strokeColor);
-  markers.type(this.autoMarkerType);
   markers.resumeSignalsDispatching(false);
 
-  var hoverMarkers = (/** @type {anychart.elements.Multimarker} */(this.hoverMarkers()));
+  var hoverMarkers = (/** @type {anychart.elements.MarkersFactory} */(this.hoverMarkers()));
   hoverMarkers.suspendSignalsDispatching();
-  hoverMarkers.fill(fillColor);
-  hoverMarkers.stroke(strokeColor);
   hoverMarkers.size(6);
-  hoverMarkers.type(this.autoMarkerType);
   hoverMarkers.resumeSignalsDispatching(false);
 
   return result;
 };
+
+
+//exports
+anychart.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing;//in docs/
+anychart.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.cartesian.series.BaseWithMarkers.prototype.drawPoint;//in docs/
+anychart.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//in docs/
+anychart.cartesian.series.BaseWithMarkers.prototype['markers'] = anychart.cartesian.series.BaseWithMarkers.prototype.markers;//in docs/
+anychart.cartesian.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers;//in docs/

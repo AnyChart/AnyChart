@@ -24,23 +24,23 @@ goog.require('goog.json.hybrid');
  */
 anychart.utils.Align = {
   /**
-   * Устанавливает выравнивание по центру.
+   * Center align.
    */
   CENTER: 'center',
   /**
-   * Устанавливает выравнивание по левой стороне.
+   * Left align.
    */
   LEFT: 'left',
   /**
-   * Устанавливает выравнивание по правой стороне.
+   * Right align.
    */
   RIGHT: 'right',
   /**
-   * Устанавливает выравнивание сверху.
+   * Top align.
    */
   TOP: 'top',
   /**
-   * Устанавливает выравнивание снизу.
+   * Bottom align.
    */
   BOTTOM: 'bottom'
 };
@@ -69,33 +69,9 @@ anychart.utils.normalizeAlign = function(align, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Orientation.
+//  Direction.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Orientation enumeration.
- * @enum {string}
- */
-anychart.utils.Orientation = {
-  /**
-   * Устанавливает ориентацию по левой стороне.
-   */
-  LEFT: 'left',
-  /**
-   * Устанавливает ориентацию по правой стороне.
-   */
-  RIGHT: 'right',
-  /**
-   * Устанавливает ориентацию сверху.
-   */
-  TOP: 'top',
-  /**
-   * Устанавливает ориентацию снизу.
-   */
-  BOTTOM: 'bottom'
-};
-
-
 /**
  * Direction enumeration.
  * @enum {string}
@@ -109,6 +85,54 @@ anychart.utils.Direction = {
    * Horizontal direction.
    */
   HORIZONTAL: 'horizontal'
+};
+
+
+/**
+ * Normalizes user input direction to its enumeration values. Also accepts null. Defaults to opt_default or 'vertical'.
+ *
+ * @param {string} direction Direction to normalize.
+ * @param {anychart.utils.Direction=} opt_default Default direction.
+ * @return {anychart.utils.Direction} Normalized direction.
+ */
+anychart.utils.normalizeDirection = function(direction, opt_default) {
+  if (goog.isString(direction)) {
+    direction = direction.toLowerCase();
+    for (var i in anychart.utils.Direction) {
+      if (direction == anychart.utils.Direction[i])
+        return anychart.utils.Direction[i];
+    }
+  }
+  return opt_default || anychart.utils.Direction.VERTICAL;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Orientation.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Orientation enumeration.
+ * @enum {string}
+ */
+anychart.utils.Orientation = {
+  /**
+   * Left orientation.
+   */
+  LEFT: 'left',
+  /**
+   * Right orientation.
+   */
+  RIGHT: 'right',
+  /**
+   * Top orientation.
+   */
+  TOP: 'top',
+  /**
+   * Bottom orientation.
+   */
+  BOTTOM: 'bottom'
 };
 
 
@@ -128,6 +152,46 @@ anychart.utils.normalizeOrientation = function(orientation, opt_default) {
     }
   }
   return opt_default || anychart.utils.Orientation.TOP;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Layout.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Layout enumeration.
+ * @enum {string}
+ */
+anychart.utils.Layout = {
+  /**
+   * Vertical layout.
+   */
+  VERTICAL: 'vertical',
+  /**
+   * Horizontal layout.
+   */
+  HORIZONTAL: 'horizontal'
+};
+
+
+/**
+ * Normalizes user input layout to its enumeration values. Also accepts null. Defaults to opt_default or 'vertical'.
+ *
+ * @param {string} layout - Layout to normalize.
+ * @param {anychart.utils.Layout=} opt_default Orientation to normalize.
+ * @return {anychart.utils.Layout} Normalized orientation.
+ */
+anychart.utils.normalizeLayout = function(layout, opt_default) {
+  if (goog.isString(layout)) {
+    layout = layout.toLowerCase();
+    for (var i in anychart.utils.Layout) {
+      if (layout == anychart.utils.Layout[i])
+        return anychart.utils.Layout[i];
+    }
+  }
+  return opt_default || anychart.utils.Layout.VERTICAL;
 };
 
 
@@ -226,7 +290,49 @@ anychart.utils.normalizeNinePositions = function(position, opt_default) {
 
 
 /**
+ * Костыль. Соотносит позицию из anychart.utils.NinePositions к acgraph.vector.Anchor.
+ * @param {anychart.utils.NinePositions} position Позиция из енума anychart.utils.NinePositions.
+ * @return {acgraph.vector.Anchor} Позиция из енума acgraph.vector.Anchor.
+ */
+anychart.utils.ninePositionsToAnchor = function(position) {
+  var resultPos = acgraph.vector.Anchor.CENTER;
+  switch (position) {
+    case anychart.utils.NinePositions.LEFT_TOP:
+      resultPos = acgraph.vector.Anchor.LEFT_TOP;
+      break;
+    case anychart.utils.NinePositions.TOP:
+      resultPos = acgraph.vector.Anchor.LEFT_CENTER;
+      break;
+    case anychart.utils.NinePositions.RIGHT_TOP:
+      resultPos = acgraph.vector.Anchor.RIGHT_TOP;
+      break;
+    case anychart.utils.NinePositions.LEFT_CENTER:
+      resultPos = acgraph.vector.Anchor.LEFT_CENTER;
+      break;
+    case anychart.utils.NinePositions.CENTER:
+      resultPos = acgraph.vector.Anchor.CENTER;
+      break;
+    case anychart.utils.NinePositions.RIGHT_CENTER:
+      resultPos = acgraph.vector.Anchor.RIGHT_CENTER;
+      break;
+    case anychart.utils.NinePositions.LEFT_BOTTOM:
+      resultPos = acgraph.vector.Anchor.LEFT_BOTTOM;
+      break;
+    case anychart.utils.NinePositions.BOTTOM:
+      resultPos = acgraph.vector.Anchor.CENTER_BOTTOM;
+      break;
+    case anychart.utils.NinePositions.RIGHT_BOTTOM:
+      resultPos = acgraph.vector.Anchor.RIGHT_BOTTOM;
+      break;
+  }
+
+  return resultPos;
+};
+
+
+/**
  * Like normalizeNinePositions method but allow to return custom position string value (inside, outside, custom, etc).
+ * Similar to normalizeNinePositions method, but allows to return custom position string value (inside, outside, custom, etc).
  *
  * @param {*} position One of nine positions to normalize.
  * @param {anychart.utils.NinePositions|string=} opt_default Default position value.
@@ -246,7 +352,7 @@ anychart.utils.normalizePosition = function(position, opt_default) {
 
 
 /**
- * Пытается нормализовать anychart.math.Coordinate до acgraph.math.Coordinate.
+ * Tries to normalize anychart.math.Coordinate to acgraph.math.Coordinate.
  * @param {anychart.math.Coordinate} value anychart.math.Coordinate to normalize.
  * @return {acgraph.math.Coordinate} Normalized to acgraph.math.Coordinate value.
  */
@@ -275,22 +381,22 @@ anychart.utils.normalizeMathPosition = function(value) {
  */
 anychart.utils.Sort = {
   /**
-   * Ascending sort.
+   * Ascending sorting.
    */
   ASC: 'asc',
   /**
-   * Descending sort.
+   * Descending sorting.
    */
   DESC: 'desc',
   /**
-   * No sort.
+   * No sorting.
    */
   NONE: 'none'
 };
 
 
 /**
- * Normalizes user input sort to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
+ * Normalizes user input sorting to its enumeration values. Also accepts null. Defaults to opt_default or 'none'.
  *
  * @param {string} sort Sort to normalize.
  * @param {anychart.utils.Sort=} opt_default Default value.
@@ -314,18 +420,18 @@ anychart.utils.normalizeSort = function(sort, opt_default) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Получает или устанавливает свойство объекта obj, с учетом переданного способа адресации полей.
- * Поиск поля для чтения или записи производится по порядку элементов в mapping, затем field (mapping может быть пуст).
- * Если поле не найдено, то будет записано поле field.
- * Если используется как сетер, то возвращает предыдущее значение поля (или undefined).
+ * Gets or sets obj property, takes in account fields addresses.
+ * Fields are first looked using mapping order, then -   field order (e.g. mapping is empty).
+ * If field can not be found - field is written.
+ * If used as setter - previous value (or undefined) is returned.
  *
  * NOTE: The number of parameters is the only thing that matters in determining if it is a setter or a getter!
  *
- * @param {!Object} obj Объект, который нужно отобразить.
- * @param {string} field Оригинальное имя поля, которое мы ищем.
- * @param {?Array.<string>} mapping Порядок предпочтения имен полей объекта.
- * @param {*=} opt_setValue Значение, которое нужно установить.
- * @return {*} Текущее, либо предыдущее значение поля.
+ * @param {!Object} obj Object.
+ * @param {string} field Field name.
+ * @param {?Array.<string>} mapping Mapping.
+ * @param {*=} opt_setValue Value to set.
+ * @return {*} Current or previous value.
  */
 anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
   if (mapping) {
@@ -348,7 +454,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
 
 /**
  * Default comparator. Can compare any two values including objects and values of
- * different type, settings a stable ordering.
+ * different type, setting a stable ordering.
  * @param {*} a First value.
  * @param {*} b Second value.
  * @return {number} Comparison result.
@@ -403,7 +509,7 @@ anychart.utils.normalize = function(value, opt_containerSize, opt_invert) {
 
 
 /**
- * Define whenever value is set in percent.
+ * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.
  */
@@ -413,7 +519,7 @@ anychart.utils.isPercent = function(value) {
 
 
 /**
- * Define whenever value is set in percent.
+ * Define whether value is set in percent.
  * @param {*} value Value to define.
  * @return {boolean} Is value set in percent.
  */
@@ -423,10 +529,32 @@ anychart.utils.isUnit = function(value) {
 
 
 /**
- * Получает координаты якоря на границе.
- * @param {acgraph.math.Rect} bounds Прямоугольник границ.
- * @param {anychart.utils.NinePositions|string} anchor Якорь, координаты которого нужно получить.
- * @return {Object.<string, number>} Координаты якоря в виде [x, y].
+ * Normalizes passed value to a natural value (strictly-positive integer).
+ * If a number-like value passed and if it is greater than 0.5, it is rounded.
+ * If it is not a number or it is less than 1 it defaults to opt_default || 1.
+ * @param {*} value Value to normalize.
+ * @param {number=} opt_default Default value to return.
+ * @param {boolean=} opt_allowZero
+ * @return {number} Naturalized value.
+ */
+anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allowZero) {
+  if (!goog.isNumber(value))
+    value = parseFloat(value);
+  value = Math.round(value);
+  // value > 0 also checks for NaN, because NaN > 0 == false.
+  opt_default = goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1;
+  if (opt_allowZero)
+    return /** @type {number} */(value >= 0 ? value : opt_default);
+  else
+    return /** @type {number} */(value > 0 ? value : opt_default);
+};
+
+
+/**
+ * Gets anchor coordinates by bounds.
+ * @param {acgraph.math.Rect} bounds Bounds rectangle.
+ * @param {anychart.utils.NinePositions|string} anchor Anchor.
+ * @return {Object.<string, number>} Anchor coordinates as [x, y].
  */
 anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
   var x = bounds.left;
@@ -463,7 +591,7 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
       y += bounds.height;
       break;
   }
-  return {x: x, y: y};
+  return {'x': x, 'y': y};
 };
 
 
@@ -471,7 +599,7 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
  * Returns the nearest number to the left from value that meets equation ((value - opt_base) mod interval === 0).
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
- * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
  * @return {number} Aligned value.
  */
 anychart.utils.alignLeft = function(value, interval, opt_base) {
@@ -489,7 +617,7 @@ anychart.utils.alignLeft = function(value, interval, opt_base) {
  * Returns the nearest number to the right from value that meets equation ((value - opt_base) mod interval === 0).
  * @param {number} value Value to align.
  * @param {number} interval Value to align by.
- * @param {number=} opt_base Optional base value to calc from. Defaults to 0.
+ * @param {number=} opt_base Optional base value to calculate from. Defaults to 0.
  * @return {number} Aligned value.
  */
 anychart.utils.alignRight = function(value, interval, opt_base) {
@@ -506,12 +634,12 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
 
 
 /**
- * Применение оффсета к переданной позиции в зависимости от якоря.
- * @param {acgraph.math.Coordinate} position Розиция к оторой будут применены оффсеты.
- * @param {anychart.utils.NinePositions} anchor Якорь.
- * @param {number} offsetX Оффсет по Х.
- * @param {number} offsetY Оффсет по Y.
- * @return {acgraph.math.Coordinate} Позиция с примененным оффсетом.
+ * Apply offset to the position depending on an anchor.
+ * @param {acgraph.math.Coordinate} position Position to be modified.
+ * @param {anychart.utils.NinePositions} anchor Anchor.
+ * @param {number} offsetX X offset.
+ * @param {number} offsetY Y offset.
+ * @return {acgraph.math.Coordinate} Modified position.
  */
 anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY) {
   switch (anchor) {
@@ -545,7 +673,7 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
 
 
 /**
- * Does a recursive clone of the object.
+ * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
  * @return {*} Clone of the input object.
@@ -565,12 +693,12 @@ anychart.utils.recursiveClone = function(obj) {
 
 
 /**
- * Нормализует значение представленное в виде числа либо процента.
- * Если было число либо процент (строка с числом и знаком %) вернется это значение
- * иначе вернется значение opt_default либо 0.
+ * Normalizes a values represented by a number or percentage.
+ * If value or percentage string is passed - value is returned,
+ * in other cases - opt_default or 0.
  * @param {*} value Value to normalize.
  * @param {(number|string)=} opt_default Default value.
- * @return {(number|string)} Нормализованное значение.
+ * @return {(number|string)} Normalized value.
  */
 anychart.utils.normalizeNumberOrStringPercentValue = function(value, opt_default) {
   var ret = parseFloat(value);
@@ -678,12 +806,22 @@ anychart.utils.color.parseColor = function(str) {
 
 
 /**
- * Define, is passed value fit to the none definition.
+ * Define if passed value fit to the none definition.
  * @param {*} value Value to define.
  * @return {boolean} Is passed value fit to the none definition.
  */
 anychart.utils.isNone = function(value) {
   return value === null || (goog.isString(value) && value.toLowerCase() == 'none');
+};
+
+
+/**
+ * Anychart default formatter.
+ * @this {{value: * }}
+ * @return {*}
+ */
+anychart.utils.DEFAULT_FORMATTER = function() {
+  return this['value'];
 };
 
 
@@ -922,7 +1060,7 @@ anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#_(),. -]*$/;
 anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
   if (goog.isNull(json)) return null;
   var root = doc.createElement(rootNodeName);
-  if (goog.isString(json)) {
+  if (goog.isString(json) || goog.isNumber(json)) {
     root.appendChild(doc.createCDATASection(String(json)));
   } else {
     var j;
@@ -977,7 +1115,7 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
 
 
 /**
- * Checks if passed name is a grouper and returns correct property name if it is.
+ * Checks if passed name is a grouper and returns correct property name in case it is.
  * @param {string} nodeName
  * @return {?Array.<string>} Array of [propertyName, itemName] or null.
  * @private
@@ -993,3 +1131,33 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
   }
   return null;
 };
+
+
+//exports
+goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);//in docs/
+goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);//in docs/
+goog.exportSymbol('anychart.utils.Align.RIGHT', anychart.utils.Align.RIGHT);//in docs/
+goog.exportSymbol('anychart.utils.Align.TOP', anychart.utils.Align.TOP);//in docs/
+goog.exportSymbol('anychart.utils.Align.BOTTOM', anychart.utils.Align.BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.LEFT', anychart.utils.Orientation.LEFT);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.RIGHT', anychart.utils.Orientation.RIGHT);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.TOP', anychart.utils.Orientation.TOP);//in docs/
+goog.exportSymbol('anychart.utils.Orientation.BOTTOM', anychart.utils.Orientation.BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_TOP', anychart.utils.NinePositions.LEFT_TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.TOP', anychart.utils.NinePositions.TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_TOP', anychart.utils.NinePositions.RIGHT_TOP);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_CENTER', anychart.utils.NinePositions.LEFT_CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.CENTER', anychart.utils.NinePositions.CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_CENTER', anychart.utils.NinePositions.RIGHT_CENTER);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.LEFT_BOTTOM', anychart.utils.NinePositions.LEFT_BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.BOTTOM', anychart.utils.NinePositions.BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.NinePositions.RIGHT_BOTTOM', anychart.utils.NinePositions.RIGHT_BOTTOM);//in docs/
+goog.exportSymbol('anychart.utils.Direction.HORIZONTAL', anychart.utils.Direction.HORIZONTAL);//in docs/
+goog.exportSymbol('anychart.utils.Direction.VERTICAL', anychart.utils.Direction.VERTICAL);//in docs/
+goog.exportSymbol('anychart.utils.Layout.HORIZONTAL', anychart.utils.Layout.HORIZONTAL);
+goog.exportSymbol('anychart.utils.Layout.VERTICAL', anychart.utils.Layout.VERTICAL);
+goog.exportSymbol('anychart.utils.Sort.NONE', anychart.utils.Sort.NONE);//in docs/
+goog.exportSymbol('anychart.utils.Sort.ASC', anychart.utils.Sort.ASC);//in docs/
+goog.exportSymbol('anychart.utils.Sort.DESC', anychart.utils.Sort.DESC);//in docs/
+goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
+goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);

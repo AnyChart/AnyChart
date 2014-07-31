@@ -14,7 +14,7 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 anychart.cartesian.series.StepLine = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields of a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
@@ -22,6 +22,7 @@ anychart.cartesian.series.StepLine = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.StepLine, anychart.cartesian.series.ContinuousBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.STEP_LINE] = anychart.cartesian.series.StepLine;
 
 
 /**
@@ -97,7 +98,7 @@ anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
  */
 anychart.cartesian.series.StepLine.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'stepline';
+  json['seriesType'] = anychart.cartesian.series.Type.STEP_LINE;
   return json;
 };
 
@@ -108,3 +109,21 @@ anychart.cartesian.series.StepLine.prototype.serialize = function() {
 anychart.cartesian.series.StepLine.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.StepLine}
+ */
+anychart.cartesian.series.stepLine = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.StepLine(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.stepLine', anychart.cartesian.series.stepLine);
+anychart.cartesian.series.StepLine.prototype['stroke'] = anychart.cartesian.series.StepLine.prototype.stroke;
+anychart.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.cartesian.series.StepLine.prototype.hoverStroke;

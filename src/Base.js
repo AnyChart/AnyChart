@@ -5,143 +5,143 @@ goog.require('goog.events.EventTarget');
 
 
 /**
- * Список возможных флагов целостности в текущем состоянии элемента.
+ * The list of elements consistency states.
  * @enum {number}
  */
 anychart.ConsistencyState = {
   /**
-   * Означает, что поменялось значение свойства enabled()
+   * enabled() has changed.
    */
   ENABLED: 0x00000001,
   /**
-   * Означает, что поменялся контейнер.
+   * Container has changed.
    */
   CONTAINER: 0x00000002,
   /**
-   * Означает, что поменялся Z индекс.
+   * Z index has changed.
    */
   Z_INDEX: 0x00000004,
   /**
-   * Означает, что изменились визуальные настройки (например, fill или stroke).
+   * Visual settings have changed (fill, stroke, etc.).
    */
   APPEARANCE: 0x00000008,
   /**
-   * Означает, что изменились размеры элемента
+   * Size has changed.
    */
   BOUNDS: 0x00000010,
   /**
-   * Означает, что изменился фон элемента.
+   * Background has changed.
    */
   BACKGROUND: 0x00000020,
   /**
-   * Означает, что изменились данные.
+   * Data has changed.
    */
   DATA: 0x00000040,
   /**
-   * Означает, что именился заголовок.
+   * Title has changed.
    */
   TITLE: 0x00000080,
   /**
-   * Изменились оси.
+   * Axes has changed.
    */
   AXES: 0x00000100,
   /**
-   * Изменлась палитра.
+   * Palette has changed.
    */
   PALETTE: 0x00000200,
   /**
-   * Изменились шкалы.
+   * Scales have changed.
    */
   SCALES: 0x00000400,
   /**
-   * Серии изменились.
+   * Series have changed.
    */
   SERIES: 0x00000800,
   /**
-   * Тики изменились.
+   * Ticks have changed.
    */
   TICKS: 0x00001000,
   /**
-   * Маркеры изменились.
+   * Markers have changed.
    */
   MARKERS: 0x00002000,
   /**
-   * Минорные тики изменились.
+   * Free to use.
    */
-  MINOR_TICKS: 0x00004000,
+  FREE_STATE: 0x00004000,
   /**
-   * Лэйблы изменились.
+   * Labels have changed.
    */
   LABELS: 0x00008000,
   /**
-   * Минорные лейблы изменились.
+   * Credits have changed.
    */
-  MINOR_LABELS: 0x00010000,
+  CREDITS: 0x00010000,
   /**
-   * Сепаратор изменился.
+   * Separator has changed.
    */
   SEPARATOR: 0x00020000,
   /**
-   * Пагинатор изменился.
+   * Paginator has changed.
    */
   PAGINATOR: 0x00040000,
   /**
-   * Легенда изменилась.
+   * Legend has changed.
    */
   LEGEND: 0x00080000,
   /**
-   * Оверлап изменился.
+   * Overlap has changed.
    */
   OVERLAP: 0x00100000,
   /**
-   * Видимость изменилась.
+   * Visibility has changed.
    */
   VISIBILITY: 0x00200000,
   /**
-   * Позиция изменилась.
+   * Position has changed.
    */
   POSITION: 0x00400000,
   /**
-   * Клик.
+   * Click.
    */
   CLICK: 0x00800000,
   /**
-   * Ховер.
+   * Hover.
    */
   HOVER: 0x01000000,
   /**
-   * Маркеры оси изменились.
+   * Axes markers have changed.
    */
   AXES_MARKERS: 0x02000000,
   /**
-   * Гриды изменились.
+   * Grids have changed.
    */
   GRIDS: 0x04000000,
   /**
-   * Состав хэндлеров событий изменился.
+   * Handlers set has changed.
    */
   HANDLERS: 0x08000000,
   /**
-   * Лейблы чарта (появились из-за того, что pie уже занял стейт LABELS)
+   * Chart labels have changed (weird naming due to the fact that we use LABELS state for pie chart)
    */
   CHART_LABELS: 0x10000000,
   /**
-   * Палитра маркеров изменилась.
+   * Marker palette has changed.
    */
   MARKER_PALETTE: 0x20000000,
   /**
-   *
+   * Hatch fill has changed
    */
   HATCH_FILL: 0x40000000,
   /**
-   * Комбинация всех состояний.
+   * Combination of all states.
    */
   ALL: 0xFFFFFFFF
 };
 
 
 /**
- * Список возможных сигналов.
+ * List of all possible signals.
  * @enum {number}
  */
 anychart.Signal = {
@@ -182,9 +182,9 @@ anychart.Signal = {
 
 
 /**
- * Класс, реализующий функциональность по работе элемента с состояниями целостности.
- * Изменять состояния целостности можно методами invalidate() и markConsistent().
- * Проверять наличие - методами isConsistent() и hasInvalidationState().
+ * Class implementins all the work with consistency states.
+ * invalidate() and markConsistent() are used to change states.
+ * isConsistent() and hasInvalidationState() are used to check states.
  * @constructor
  * @name anychart.Base
  * @extends {goog.events.EventTarget}
@@ -196,28 +196,28 @@ goog.inherits(anychart.Base, goog.events.EventTarget);
 
 
 /**
- * Строка с событием, которое отправляется классом Invalidatable.
+ * String with event sent by Invalidatable class.
  * @const {string}
  */
 anychart.Base.SIGNAL = 'signal';
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Supported signals mask.
  * @type {number}
  */
 anychart.Base.prototype.SUPPORTED_SIGNALS = 0;
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет обрабатывать этот объект.
+ * Supported consistency states mask.
  * @type {number}
  */
 anychart.Base.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
 
 
 /**
- * Текущее состояние целостности элемента. Если оно равно нулю - элемент согласован.
+ * Current consistency state. Equals zero when element is consistent.
  * @type {number}
  * @private
  */
@@ -225,8 +225,8 @@ anychart.Base.prototype.consistency_ = 0;
 
 
 /**
- * If NaN - no dispatching suspending is active.
- * If a number - contains the cumulative signal for all suspended states that were to be dispatched during the suspend.
+ * If NaN - no dispatching suspend is active.
+ * If a number - contains the cumulative signal for all suspended states that had to be dispatched during the suspend.
  * @type {number}
  * @protected
  */
@@ -261,11 +261,10 @@ anychart.Base.prototype.listenSignals = function(listener, opt_scope) {
 
 
 /**
- * Устанавливает элементу переданную комбинацию состояний рассинхронизации {@link anychart.ConsistencyState}.
- * @param {anychart.ConsistencyState|number} state Состояние, которые нужно установить (или комбинация состояний).
- * @param {(anychart.Signal|number)=} opt_signal Сигнал или комбинация, которые нужно отправить слушателям, если
- *    состояния были установлены.
- * @return {number} Композиция состояний связности, которые реально изменились.
+ * Sets consistency state to an element {@link anychart.ConsistencyState}.
+ * @param {anychart.ConsistencyState|number} state State(s) to be set.
+ * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if states have been set.
+ * @return {number} Actually modified consistensy states.
  */
 anychart.Base.prototype.invalidate = function(state, opt_signal) {
   state &= this.SUPPORTED_CONSISTENCY_STATES;
@@ -278,8 +277,8 @@ anychart.Base.prototype.invalidate = function(state, opt_signal) {
 
 
 /**
- * Очищает у элемента переданное состояние рассинхронизации.
- * @param {anychart.ConsistencyState|number} state Состояние, которое нужно очистить (или комбинация состояний).
+ * Clears consistency state.
+ * @param {anychart.ConsistencyState|number} state State(s) to be cleared.
  */
 anychart.Base.prototype.markConsistent = function(state) {
   this.consistency_ &= ~state;
@@ -287,8 +286,8 @@ anychart.Base.prototype.markConsistent = function(state) {
 
 
 /**
- * Проверяет, имеет ли элемент хоть какое-нибудь состояние рассинхронизации.
- * @return {boolean} Имеет ли элемент переданное состояние рассинхронизации.
+ * Checks if an element has any consistency state set.
+ * @return {boolean} True if it has it.
  */
 anychart.Base.prototype.isConsistent = function() {
   return !this.consistency_;
@@ -296,9 +295,9 @@ anychart.Base.prototype.isConsistent = function() {
 
 
 /**
- * Проверяет, имеет ли элемент переданное состояние рассинхронизации (или хотя бы одно из комбинации).
- * @param {anychart.ConsistencyState|number} state Состояние, которое нужно проверить (или комбинация).
- * @return {boolean} Имеет ли элемент переданное состояние рассинхронизации.
+ * Checks of an element has a consistency state(s).
+ * @param {anychart.ConsistencyState|number} state State(s) to be checked.
+ * @return {boolean} True if it has it.
  */
 anychart.Base.prototype.hasInvalidationState = function(state) {
   return !!(this.consistency_ & state);
@@ -306,11 +305,11 @@ anychart.Base.prototype.hasInvalidationState = function(state) {
 
 
 /**
- * Отправляет подписчикам событие инвалидации объекта.
+ * Sends invalidation event to listeners.
  *
- * NOTE: ОТПРАВИТЬСЯ МОГУТ ТОЛЬКО ТЕ СИГНАЛЫ, КОТОРЫЕ ЕСТЬ В МАСКЕ SUPPORTED_SIGNALS!
+ * NOTE: YOU CAN ONLY SEND SIGNALS FROM SUPPORTED_SIGNALS MASK!
  *
- * @param {anychart.Signal|number} state Установленные состояния инвалидации.
+ * @param {anychart.Signal|number} state Invalidation state(s).
  */
 anychart.Base.prototype.dispatchSignal = function(state) {
   state &= this.SUPPORTED_SIGNALS;
@@ -333,7 +332,7 @@ anychart.Base.prototype.dispatchSignal = function(state) {
 
 
 /**
- * Suspends invalidation events dispatching. The dispatching can be then resumed with or without cumulative dispatching
+ * Suspends dispatching of invalidation events. The dispatching can be resumed with or without cumulative dispatching
  * of all affected states.
  * @return {!anychart.Base} Itself for chaining.
  */
@@ -373,8 +372,8 @@ anychart.Base.prototype.serialize = function() {
 
 /**
  * Deserializes element from JSON.
- * @param {Object} config Config of the element.
- * @return {anychart.Base} return itself for chaining.
+ * @param {Object} config Config of an element.
+ * @return {anychart.Base} Returns itself for chaining.
  */
 anychart.Base.prototype.deserialize = function(config) {
   return this;
@@ -382,7 +381,7 @@ anychart.Base.prototype.deserialize = function(config) {
 
 
 /**
- * Dispatches external event with a timeout to detach it from other code execution frame.
+ * Dispatches external event with a timeout to detach it from the other code execution frame.
  * @param {goog.events.EventLike} event Event object.
  */
 anychart.Base.prototype.dispatchDetachedEvent = function(event) {
@@ -391,7 +390,7 @@ anychart.Base.prototype.dispatchDetachedEvent = function(event) {
 
 
 /**
- * Suspends dispatching for all passed arguments. Any argument can be an array also.
+ * Suspends dispatching for all passed arguments. Any argument can also be an array.
  * @param {...(anychart.Base|Array.<anychart.Base>)} var_args
  */
 anychart.Base.suspendSignalsDispatching = function(var_args) {
@@ -406,7 +405,7 @@ anychart.Base.suspendSignalsDispatching = function(var_args) {
 
 
 /**
- * Suspends dispatching for all passed arguments. Any argument can be an array also.
+ * Suspends dispatching for all passed arguments. Any argument can also be an array.
  * @param {...(anychart.Base|Array.<anychart.Base>)} var_args
  */
 anychart.Base.resumeSignalsDispatchingTrue = function(var_args) {
@@ -421,7 +420,7 @@ anychart.Base.resumeSignalsDispatchingTrue = function(var_args) {
 
 
 /**
- * Suspends dispatching for all passed arguments. Any argument can be an array also.
+ * Suspends dispatching for all passed arguments. Any argument can also be an array.
  * @param {...(anychart.Base|Array.<anychart.Base>)} var_args
  */
 anychart.Base.resumeSignalsDispatchingFalse = function(var_args) {
@@ -439,7 +438,7 @@ anychart.Base.resumeSignalsDispatchingFalse = function(var_args) {
 /**
  * Special event for changes in dirty states.
  * @param {anychart.Base} target Event target.
- * @param {number} invalidatedStates Changes effectively happen with the target.
+ * @param {number} invalidatedStates Changes effectively happened with the target.
  * @constructor
  * @extends {goog.events.Event}
  */
@@ -456,10 +455,22 @@ goog.inherits(anychart.SignalEvent, goog.events.Event);
 
 
 /**
- * Проверяет, имеет ли элемент переданное состояние рассинхронизации (или хотя бы одно из комбинации).
- * @param {anychart.Signal|number} state Состояние, которое нужно проверить (или комбинация).
- * @return {boolean} Имеет ли элемент переданное состояние рассинхронизации.
+ * Checks if an element has consistency state that was sent.
+ * @param {anychart.Signal|number} state State(s) to be checked.
+ * @return {boolean} True if element has it.
  */
 anychart.SignalEvent.prototype.hasSignal = function(state) {
   return !!(this.signals & state);
 };
+
+
+//exports
+anychart.Base.prototype['listen'] = anychart.Base.prototype.listen;
+goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);
+anychart.SignalEvent.prototype['hasSignal'] = anychart.SignalEvent.prototype.hasSignal;
+goog.exportSymbol('anychart.Signal', anychart.Signal);
+goog.exportSymbol('anychart.Signal.NEEDS_REDRAW', anychart.Signal.NEEDS_REDRAW);
+goog.exportSymbol('anychart.Signal.NEEDS_REAPPLICATION', anychart.Signal.NEEDS_REAPPLICATION);
+goog.exportSymbol('anychart.Signal.NEEDS_RECALCULATION', anychart.Signal.NEEDS_RECALCULATION);
+goog.exportSymbol('anychart.Signal.BOUNDS_CHANGED', anychart.Signal.BOUNDS_CHANGED);
+goog.exportSymbol('anychart.Signal.DATA_CHANGED', anychart.Signal.DATA_CHANGED);

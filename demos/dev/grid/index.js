@@ -28,17 +28,17 @@ function load() {
     [21, 40],
   ]).markers(null);
 
-  chart.yAxis().orientation('left');
-  chart.xAxis().orientation('top');
-  chart.xAxis().orientation('bottom');
-  chart.yAxis().orientation('right');
+  chart.yAxis(0).orientation('left');
+  chart.xAxis(0).orientation('top');
+  chart.xAxis(1).orientation('bottom');
+  chart.yAxis(1).orientation('right');
 
-  chart.grid()
+  chart.grid(0)
       .direction('horizontal')
       .invert(false)
       .minor(true);
 
-  chart.grid()
+  chart.grid(1)
       .direction('vertical')
       .invert(false)
       .oddFill('lightgray 0.1')

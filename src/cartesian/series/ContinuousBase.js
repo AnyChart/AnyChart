@@ -69,7 +69,7 @@ anychart.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
       this.drawMarker(false);
       this.drawLabel(false);
     }
-    // if connectMissing == true, то firstPointDrawn уже не станет false в процессе рисования.
+    // if connectMissing == true, firstPointDrawn will never be false when drawing.
     this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;
   }
 };
@@ -94,9 +94,11 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var bounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
-    for (i = 0; i < len; i++)
-      this.paths[i].clip(bounds);
+    if (this.clip()) {
+      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+      for (i = 0; i < len; i++)
+        this.paths[i].clip(bounds);
+    }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -147,7 +149,7 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeDrawing = function() 
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {x: iterator.meta('x'), y: iterator.meta('y')};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
 };
 
 
@@ -170,7 +172,7 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeHatchFill = goog.null
  * If set to true, the series will not be interrupted on missing points.
  * Defaults to false. Markers will not be drawn for missing points in both cases.
  * @param {boolean=} opt_value The value to be set.
- * @return {!anychart.cartesian.series.Base|boolean} The setting, or itself for chaining.
+ * @return {!anychart.cartesian.series.Base|boolean} The setting, or itself for method chaining.
  */
 anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -297,7 +299,7 @@ anychart.cartesian.series.ContinuousBase.prototype.deserialize = function(config
 anychart.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() {
   var res = goog.base(this, 'restoreDefaults');
 
-  var labels = /** @type {anychart.elements.Multilabel} */(this.labels());
+  var labels = /** @type {anychart.elements.LabelsFactory} */(this.labels());
   labels.suspendSignalsDispatching();
   labels.enabled(false);
   labels.anchor('bottom');
@@ -305,3 +307,12 @@ anychart.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() 
 
   return res;
 };
+
+
+//exports
+anychart.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.cartesian.series.ContinuousBase.prototype.startDrawing;
+anychart.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.cartesian.series.ContinuousBase.prototype.drawMissing;
+anychart.cartesian.series.ContinuousBase.prototype['hoverSeries'] = anychart.cartesian.series.ContinuousBase.prototype.hoverSeries;
+anychart.cartesian.series.ContinuousBase.prototype['hoverPoint'] = anychart.cartesian.series.ContinuousBase.prototype.hoverPoint;
+anychart.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.cartesian.series.ContinuousBase.prototype.unhover;
+anychart.cartesian.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints;

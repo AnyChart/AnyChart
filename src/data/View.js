@@ -432,10 +432,44 @@ anychart.data.View.prototype.transitionMeta = function(on) {
 anychart.data.View.prototype.serialize = function() {
   var arr = [];
   var iterator = this.getIterator();
-
+  var index;
+  var row;
+  var arrayMapping;
+  var key;
+  var rowObject;
+  var i;
   while (iterator.advance()) {
-    arr.push(this.row(iterator.getIndex()));
+    index = iterator.getIndex();
+    row = this.row(index);
+    // if row represented by array - convert it to object with help of array mapping.
+    if (goog.isArray(row)) {
+      // get array mapping for the row
+      arrayMapping = this.getRowMapping(index).getArrayMapping();
+      rowObject = {};
+      for (key in arrayMapping) {
+        for (i = 0; i < arrayMapping[key].length; i++) {
+          if (arrayMapping[key][i] in row) {
+            rowObject[key] = row[arrayMapping[key][i]];
+            break;
+          }
+        }
+      }
+    } else {
+      rowObject = row;
+    }
+    arr.push(rowObject);
   }
 
   return arr;
 };
+
+
+//exports
+anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/final
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/final
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/final
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/final
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/final
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/final
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/final

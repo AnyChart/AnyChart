@@ -5,7 +5,7 @@ goog.require('anychart.utils.Space');
 
 
 /**
- * Stores margin info for 4 sides. Can accept numbers and strings as side margin.
+ * Stores margin info for 4 sides. Can accept numbers and strings as a margin.
  * For initializing values meaning see anychart.utils.Margin#set() method.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.

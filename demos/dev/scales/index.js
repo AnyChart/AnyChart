@@ -91,11 +91,14 @@ function load1() {
 
   scale = new anychart.scales.Ordinal();
   scale.values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+  scale.names(['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
   console.log(scale.ticks().get(), scale.ticks().names());
+  scale.names(null);
   scale.ticks().interval(2);
   console.log(scale.ticks().get(), scale.ticks().names());
   scale.ticks().interval(3);
   console.log(scale.ticks().get(), scale.ticks().names());
+  scale.ticks().names(['xyn1', 'xyn2']);
   scale.ticks().set([0, 3, 6, 9]);
   console.log(scale.ticks().get(), scale.ticks().names());
   scale.ticks().set([1, 3, 6, 9]);
@@ -106,7 +109,37 @@ function load1() {
   console.log(scale.ticks().get(), scale.ticks().names());
 
 
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
+
+  var data1 = [
+    {x: 'p1', value: '1', namae: 'point 1'},
+    {x: 'p2', value: '5', name: 'point 2'},
+    {x: 'p3', value: '2', name: 'point 3'},
+    {x: 'p4', value: '4', name: 'point 4'},
+    {x: 'p5', value: '3', name: 'point 5'}
+  ];
+  var data2 = [
+    {x: 'p1', value: '1', name: 'point a'},
+    {x: 'p3', value: '2', name: 'point b'},
+    {x: 'p6', value: '4', name: 'point c'},
+    {x: 'p8', value: '3', name: 'point d'}
+  ];
+  var chart = new anychart.cartesian.Chart();
+  chart.container(stage);
+  chart.bounds(250, 100, 500, 400);
+  chart.line(data1);
+  chart.line(data2);
+  chart.xAxis();
+  chart.draw();
+  console.log(chart.xScale().names());
+  chart.xScale().names('name');
+  console.log(chart.xScale().names());
+  chart.xScale().names(['the1', 'the2']);
+  console.log(chart.xScale().names());
+  chart.xScale().names('comma1', 'comma2', undefined);
+  console.log(chart.xScale().names());
+  chart.xScale().names('c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8');
+  console.log(chart.xScale().names());
 
   var scale1 = new anychart.scales.Logarithmic();
   scale1.ticks().mode('linear');

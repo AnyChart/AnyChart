@@ -34,7 +34,7 @@ goog.inherits(anychart.scales.DateTime, anychart.scales.ScatterBase);
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.DateTime.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
@@ -53,7 +53,7 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
 /**
  * Gets or sets a set of scale minor ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
@@ -173,9 +173,15 @@ anychart.scales.DateTime.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create date/time scale.
+ * Shortcut to create DateTime scale.
  * @return {anychart.scales.DateTime} DateTime scale.
  */
 anychart.scales.dateTime = function() {
   return new anychart.scales.DateTime();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
+anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
+anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;

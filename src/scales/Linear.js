@@ -7,7 +7,7 @@ goog.require('anychart.scales.ScatterTicks');
 
 /**
  * Represents simple linear scale that transforms values from domain [a, b] to domain [0, 1].
- * Note, that a can be greater than b. The only condition for the scale is that a != b.
+ * Note that a can be greater than b. The only condition for the scale is that a != b.
  * @constructor
  * @extends {anychart.scales.ScatterBase}
  */
@@ -36,13 +36,11 @@ goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
-    this.ticksObj = new anychart.scales.ScatterTicks(this);
-    this.registerDisposable(this.ticksObj);
-    this.ticksObj.listenSignals(this.ticksInvalidated_, this);
+    this.ticksObj = this.createTicks();
   }
   if (goog.isDef(opt_value)) {
     this.ticksObj.set(opt_value);
@@ -55,13 +53,11 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
 /**
  * Gets or sets a set of scale minor ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for chaining.
+ * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
-    this.minorTicksObj = new anychart.scales.ScatterTicks(this);
-    this.registerDisposable(this.minorTicksObj);
-    this.minorTicksObj.listenSignals(this.ticksInvalidated_, this);
+    this.minorTicksObj = this.createTicks();
   }
   if (goog.isDef(opt_value)) {
     this.minorTicksObj.set(opt_value);
@@ -104,6 +100,19 @@ anychart.scales.Linear.prototype.ticksInvalidated_ = function(event) {
 };
 
 
+/**
+ * Create scale ticks.
+ * @return {!anychart.scales.ScatterTicks}
+ * @protected
+ */
+anychart.scales.Linear.prototype.createTicks = function() {
+  var ticks = new anychart.scales.ScatterTicks(this);
+  this.registerDisposable(ticks);
+  ticks.listenSignals(this.ticksInvalidated_, this);
+  return ticks;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,9 +141,15 @@ anychart.scales.Linear.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create linear scale.
+ * Shortcut to create a linear scale.
  * @return {anychart.scales.Linear} Linear scale.
  */
 anychart.scales.linear = function() {
   return new anychart.scales.Linear();
 };
+
+
+//exports
+goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);
+anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
+anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;

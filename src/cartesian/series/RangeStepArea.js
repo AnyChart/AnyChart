@@ -14,12 +14,13 @@ goog.require('anychart.cartesian.series.ContinuousRangeBase');
 anychart.cartesian.series.RangeStepArea = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference points for a series
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.RangeStepArea, anychart.cartesian.series.ContinuousRangeBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_STEP_AREA] = anychart.cartesian.series.RangeStepArea;
 
 
 /** @inheritDoc */
@@ -127,7 +128,7 @@ anychart.cartesian.series.RangeStepArea.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'rangesteparea';
+  json['seriesType'] = anychart.cartesian.series.Type.RANGE_STEP_AREA;
   return json;
 };
 
@@ -138,3 +139,19 @@ anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
 anychart.cartesian.series.RangeStepArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.RangeStepArea}
+ */
+anychart.cartesian.series.rangeStepArea = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.RangeStepArea(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.rangeStepArea', anychart.cartesian.series.rangeStepArea);

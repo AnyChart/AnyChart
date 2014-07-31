@@ -1,7 +1,44 @@
-var legend, listener, stage, rb, rect;
+var legend, listener, stage, rb, rect, items;
 
 function load() {
-  var items = [
+  /*
+   var stage = acgraph.create('container', 400, 300);
+   var rects = [
+   stage.rect(10, 10, 200, 140),
+   //    stage.rect(210, 10, 175, 140),
+   //    stage.rect(10, 150, 200, 140),
+   //    stage.rect(210, 150, 175, 140)
+   ];
+   var title = new anychart.elements.Title();
+   title.text('My title for legend')
+   .fontSize(10)
+   .margin(10)
+   .height(40)
+   .width(95)
+   .background().enabled(true).fill('red .1');
+   console.log(title.getContentBounds());
+
+   var orientations = ['top', 'top', 'right', 'bottom'];
+   for (rect in rects) {
+   var legend = new anychart.elements.Legend();
+   legend.itemsProvider([
+   {'text': 'Item 1', iconFill: 'red .3'},
+   {'text': 'Item 2', iconFill: 'red .3'},
+   {'text': 'Item 3', iconFill: 'red .3'}
+   //      {'text': 'Item 4', iconFill: 'red .3'}
+   ]);
+   legend.title(title);
+   legend.title().text(legend.title().text() + orientations[rect]);
+   //console.log(legend.title().getContentBounds());
+   legend.title().orientation(orientations[rect]);
+   if (rect % 2 == 0) {
+   legend.itemsLayout('vertical');
+   }
+   legend.parentBounds(rects[rect].getBounds());
+   legend.container(stage).draw();
+   }
+   */
+  items = [
     'Series 1', 'Series 2', 'Series 3', 'Series 4', 'Series 5',
     'Series 6', 'Series 7', 'Series 8', 'Series 9', 'Series 10',
     'Series 11', 'Series 12', 'Series 13', 'Series 14', 'Series 15',
@@ -11,23 +48,26 @@ function load() {
 
   legend = new anychart.elements.Legend();
   legend.container('container');
-  legend.parentBounds(new anychart.math.Rect(50, 50, 900, 500));
-  legend.width(300);
+  //legend.width(500);
   legend.itemsProvider([
-    1,
-    {index: 1, iconColor: 'red', text: 'Series 2'},
-    {index: 2, iconColor: 'red', text: 'Series 3'},
-    {index: 3, text: 'Series 4'},
-    {index: 4, text: 'Series 5'},
-    {name: 'chidori', iconColor: 'black'},
-    {index: 7},
-    {index: 8}
+    {text: 'line', iconType: 'column', iconStroke: 'pink', iconFill: 'red'},
+    {text: 'spline', iconType: 'spline', iconStroke: 'black', iconFill: 'none', iconMarker: 'circle'},
+    {text: 'ohlc', iconType: 'ohlc', iconStroke: 'black'},
+    {text: 'candlestick', iconType: 'candlestick', iconStroke: 'pink', iconFill: 'pink'},
+    {text: 'chidori', iconFill: 'black', meta: {
+      'name': 'Anton Kagakin',
+      'profession': 'developer',
+      'employer': 'anychart.com'
+    }}
   ]);
-  // another example of itemsProvider
-  //legend.itemsProvider(items);
-  //legend.itemsProvider('legend items');
-  //legend.itemsProvider([undefined, {}, null, 'qwer']);
-  //legend.itemsProvider([1, 2, 3, 4, 5]);
+  legend.tooltip().textFormatter(function() {
+    var meta = this['meta'];
+    if (this['text'] == 'chidori') {
+      return this['text'] + ' a.k.a ' + meta['name'] + '<br>' + meta['profession'] + ' @ ' + meta['employer'];
+    } else {
+      return this['text'];
+    }
+  });
   legend.draw();
 
   stage = legend.container().getStage();
@@ -40,6 +80,9 @@ function load() {
     rect.setBounds(rb);
   };
   legend.listen('signal', listener, false);
+  legend.listen('legendItemClick', function(event) {
+    alert('the world is mine!');
+  }, false);
 
 
   rb = legend.getRemainingBounds();

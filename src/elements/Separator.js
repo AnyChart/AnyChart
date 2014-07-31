@@ -8,7 +8,7 @@ goog.require('anychart.utils.Margin');
 
 
 /**
- * Class is responsible for separator element.
+ * Class for a separator element.
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -64,14 +64,14 @@ anychart.elements.Separator = function() {
   this.margin_;
 
   /**
-   * Separator`s left position.
+   * Separator left position.
    * @type {number}
    * @private
    */
   this.actualLeft_ = NaN;
 
   /**
-   * Separator`s top position.
+   * Separator top position.
    * @type {number}
    * @private
    */
@@ -125,7 +125,7 @@ anychart.elements.Separator.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Устанавливает/Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Gets/Sets bounds to calculate position.
  * @param {anychart.math.Rect=} opt_value .
  * @return {!anychart.elements.Separator|anychart.math.Rect} .
  */
@@ -291,7 +291,7 @@ anychart.elements.Separator.prototype.stroke = function(opt_strokeOrFill, opt_th
  *//**
  * @ignoreDoc
  * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
- * @return {(function(acgraph.vector.Path, anychart.math.Rect)|anychart.elements.Separator)} Drawer function or self for chaining.
+ * @return {(function(acgraph.vector.Path, anychart.math.Rect)|anychart.elements.Separator)} Drawer function or self for method chaining.
  */
 anychart.elements.Separator.prototype.drawer = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -307,7 +307,7 @@ anychart.elements.Separator.prototype.drawer = function(opt_value) {
 
 /**
  * Draw separator.
- * @return {!anychart.elements.Separator} Экземпляр класса {@link anychart.elements.Separator} для цепочного вызова.
+ * @return {!anychart.elements.Separator} {@link anychart.elements.Separator} instance for method chaining.
  */
 anychart.elements.Separator.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
@@ -530,7 +530,16 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
   } else {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
-    this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+    switch (this.orientation_) {
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+        break;
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
+        break;
+    }
   }
 };
 
@@ -614,3 +623,26 @@ anychart.elements.Separator.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Separator}
+ */
+anychart.elements.separator = function() {
+  return new anychart.elements.Separator();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.separator', anychart.elements.separator);
+anychart.elements.Separator.prototype['parentBounds'] = anychart.elements.Separator.prototype.parentBounds;
+anychart.elements.Separator.prototype['width'] = anychart.elements.Separator.prototype.width;
+anychart.elements.Separator.prototype['height'] = anychart.elements.Separator.prototype.height;
+anychart.elements.Separator.prototype['margin'] = anychart.elements.Separator.prototype.margin;
+anychart.elements.Separator.prototype['orientation'] = anychart.elements.Separator.prototype.orientation;
+anychart.elements.Separator.prototype['fill'] = anychart.elements.Separator.prototype.fill;
+anychart.elements.Separator.prototype['stroke'] = anychart.elements.Separator.prototype.stroke;
+anychart.elements.Separator.prototype['drawer'] = anychart.elements.Separator.prototype.drawer;
+anychart.elements.Separator.prototype['draw'] = anychart.elements.Separator.prototype.draw;
+anychart.elements.Separator.prototype['getRemainingBounds'] = anychart.elements.Separator.prototype.getRemainingBounds;

@@ -256,7 +256,7 @@ anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
  *     .fontColor('gray')
  *     .draw();
  * @illustrationDesc
- * Title is inside a layer (marked with a blue framt), two title positioning options are shown:<br/>
+ * Title is inside a layer (marked with a blue frame), two title positioning options are shown:<br/>
  *   a. Gray - within the parent container.<br/>
  *   b. Black - when the stage bounds act as parent.
  * @example <t>listingOnly</t>
@@ -430,7 +430,7 @@ anychart.elements.Title.prototype.height = function(opt_value) {
  * @return {anychart.utils.Margin} The current title margin.
  *//**
  * Setter for the title margin in pixels using one value.<br/>
- * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Value to set.
+ * @param {(string|number|anychart.utils.Space)=} opt_allValues Value to set.
  * @return {anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  *//**
  * Setter for the title margin in pixels using several numbers.<br/>
@@ -552,7 +552,7 @@ anychart.elements.Title.prototype.align = function(opt_value) {
 
 /**
  * Getter for the title orientation.
- * @return {anychart.utils.Orientation} The orientation or the title for chaining.
+ * @return {anychart.utils.Orientation} The orientation or the title for method chaining.
  *//**
  * Setter for the title orientation.
  * @example <t>simple</t>
@@ -608,7 +608,7 @@ anychart.elements.Title.prototype.draw = function() {
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  // Checking APPEARANCE state. It excludes text width and height inconsistency, that will be checked later.
+  // Checking APPEARANCE state. It excludes text width and height inconsistency that will be checked later.
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     // Applying text settings if needed.
     this.applyTextSettings(this.text_, isInitial);
@@ -637,7 +637,7 @@ anychart.elements.Title.prototype.draw = function() {
     this.invalidate(anychart.ConsistencyState.CONTAINER);
     needsPositionReset = true;
   } else if (!hasBackground && this.layer_) {
-    // Else we should render only the text element, so if there is a layer, than we should remove the background
+    // Else we should render only the text element, so if there is a layer then we should remove the background
     // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
     // container later in this method
     if (background.container() == this.layer_)
@@ -661,12 +661,9 @@ anychart.elements.Title.prototype.draw = function() {
       background.draw();
       this.markConsistent(anychart.ConsistencyState.BACKGROUND);
     }
-    // setting text bounds if needed.
-    this.text_.width(this.widthConstricted_ ? this.textWidth_ : null);
-    this.text_.height(this.heightConstricted_ ? this.textHeight_ : null);
     // settings text offset for
-    this.text_.x(/** @type {number} */(this.padding().left()));
-    this.text_.y(/** @type {number} */(this.padding().top()));
+    this.text_.x(anychart.utils.normalize(/** @type {number|string} */(this.padding().left()), this.backgroundWidth_));
+    this.text_.y(anychart.utils.normalize(/** @type {number|string} */(this.padding().top()), this.backgroundHeight_));
 
     needsPositionReset = true;
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -724,7 +721,7 @@ anychart.elements.Title.prototype.remove = function() {
  *     .text('First title')
  *     .container(stage)
  *     .draw();
- * // Placing the second title over the remainging part - under the first title.
+ * // Placing the second title over the remaining part - under the first title.
  * new anychart.elements.Title()
  *     .text('Second title')
  *     .container(stage)
@@ -858,54 +855,43 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
     this.applyTextSettings(this.text_, isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
-
-  if (goog.isNull(this.width_)) {
-    this.textWidth_ = NaN;
-  } else {
-    this.backgroundWidth_ = anychart.utils.normalize(this.width_, parentWidth);
-    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
-    this.widthConstricted_ = true;
-  }
-
-  if (goog.isNull(this.height_)) {
-    this.textHeight_ = NaN;
-  } else {
-    this.backgroundHeight_ = anychart.utils.normalize(this.height_, parentHeight);
-    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-    this.heightConstricted_ = true;
-  }
-
   var textBounds;
-  if (this.width_ == null || this.height_ == null) {
-    this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.text_.width(isNaN(this.textWidth_) ? null : this.textWidth_);
-    this.text_.height(isNaN(this.textHeight_) ? null : this.textHeight_);
-    textBounds = this.text_.getBounds();
-  }
+  this.text_.width(null);
+  this.text_.height(null);
+  // need to set transformation to drop text bounds cache
+  this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  textBounds = this.text_.getBounds();
 
-  if (goog.isNull(this.width_)) {
+  if (anychart.utils.isNone(this.width_)) {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
-    if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
-      this.backgroundWidth_ = margin.tightenWidth(parentWidth);
-      this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
-      this.widthConstricted_ = true;
-    } else {
-      this.widthConstricted_ = false;
-    }
+  } else {
+    this.backgroundWidth_ = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
+    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
   }
 
-  if (goog.isNull(this.height_)) {
+  if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
+    this.backgroundWidth_ = margin.tightenWidth(parentWidth);
+    this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
+  }
+  this.text_.width(this.textWidth_);
+  // need to set transformation to drop text bounds cache
+  this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  textBounds = this.text_.getBounds();
+
+  if (anychart.utils.isNone(this.height_)) {
     this.textHeight_ = textBounds.height;
     this.backgroundHeight_ = padding.widenHeight(this.textHeight_);
-    if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
-      this.backgroundHeight_ = margin.tightenHeight(parentHeight);
-      this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-      this.heightConstricted_ = true;
-    } else {
-      this.heightConstricted_ = false;
-    }
+  } else {
+    this.backgroundHeight_ = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
   }
+
+  if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
+    this.backgroundHeight_ = margin.tightenHeight(parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
+  }
+  this.text_.height(this.textHeight_);
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
@@ -996,7 +982,16 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
-    this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+    switch (this.orientation_) {
+      case anychart.utils.Orientation.TOP:
+      case anychart.utils.Orientation.BOTTOM:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+        break;
+      case anychart.utils.Orientation.LEFT:
+      case anychart.utils.Orientation.RIGHT:
+        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
+        break;
+    }
   }
 };
 
@@ -1081,6 +1076,7 @@ anychart.elements.Title.prototype.deserialize = function(config) {
   this.background(config['background']);
   this.textSettings(config);
   this.align(config['align']);
+  this.orientation(config['orientation']);
   this.width(config['width']);
   this.height(config['height']);
   this.text(config['text']);
@@ -1089,3 +1085,27 @@ anychart.elements.Title.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.elements.Title}
+ */
+anychart.elements.title = function() {
+  return new anychart.elements.Title();
+};
+
+
+//exports
+goog.exportSymbol('anychart.elements.title', anychart.elements.title);
+anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/final
+anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/final
+anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/final
+anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;//in docs/final
+anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;//in docs/final
+anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;//in docs/final
+anychart.elements.Title.prototype['padding'] = anychart.elements.Title.prototype.padding;//in docs/final
+anychart.elements.Title.prototype['align'] = anychart.elements.Title.prototype.align;//in docs/final
+anychart.elements.Title.prototype['orientation'] = anychart.elements.Title.prototype.orientation;//in docs/final
+anychart.elements.Title.prototype['draw'] = anychart.elements.Title.prototype.draw;//in docs/final
+anychart.elements.Title.prototype['getRemainingBounds'] = anychart.elements.Title.prototype.getRemainingBounds;//in docs/final

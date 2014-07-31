@@ -1,6 +1,6 @@
-var areaChart, data1;
+var areaChart, data1, area;
 function load() {
-  var stage = acgraph.create('100%', '100%', 'container');
+  var stage = acgraph.create('container', '100%', '100%');
   data1 = [];
   var data2 = [];
   var d1 = [], d2 = [];
@@ -14,22 +14,22 @@ function load() {
         Math.round(Math.random() * 1000) + 10
       ]);
     }
-    if (t2 = (Math.random() > 0.2)) {
-      d2.push(i);
-      data2.push([
-        i,
-        Math.round(Math.random() * 1000) + 10
-      ]);
-    }
     vals.push(i);
   }
   data1 = new anychart.data.Set(data1);
 
   areaChart = new anychart.cartesian.Chart();
+  areaChart.xScale(new anychart.scales.Linear());
   areaChart.container(stage);
   areaChart.bounds(0, 0, 1000, 300);
 
-  var area = areaChart.area(data1);
+  area = areaChart.line(data1);
+  area.labels().anchor('bottom').position('top').enabled(true);
+  area.labels().background().enabled(true).fill('blue');
+
+  area.hoverLabels().fontColor('green');
+  area.hoverLabels().background().enabled(true).fill('red');
+
 //  area.listen('click', function() { console.log(arguments); });
   areaChart.barsPadding(0.1);
   areaChart.xAxis();

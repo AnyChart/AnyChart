@@ -96,7 +96,7 @@ anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Setter for text appearance settings.<br/>
  * Overrides current text settings by passed settings object.
  * @example <t>listingOnly</t>
- * someTextElement.textSettings({'fontFamily': 'Tahoma', 'color': 'red'});
+ * someTextElement.textSettings({'fontFamily': 'Tahoma', 'fontColor': 'red'});
  * @param {Object=} opt_objectWithSettings Settings object. Complete object looks like this:
  * <code>   {
  *      'fontSize': smth,
@@ -550,7 +550,7 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.fontStyle(this.settingsObj['fontStyle']);
   if ('fontVariant' in this.changedSettings)
     textElement.fontVariant(this.settingsObj['fontVariant']);
-  if ('fontWeight' in this.changedSettings)
+  if (isInitial || 'fontWeight' in this.changedSettings)
     textElement.fontWeight(this.settingsObj['fontWeight']);
   if ('letterSpacing' in this.changedSettings)
     textElement.letterSpacing(this.settingsObj['letterSpacing']);
@@ -599,3 +599,26 @@ anychart.elements.Text.prototype.serialize = function() {
 
   return json;
 };
+
+
+//exports
+anychart.elements.Text.prototype['fontSize'] = anychart.elements.Text.prototype.fontSize;//in docs/final
+anychart.elements.Text.prototype['fontFamily'] = anychart.elements.Text.prototype.fontFamily;//in docs/final
+anychart.elements.Text.prototype['fontColor'] = anychart.elements.Text.prototype.fontColor;//in docs/final
+anychart.elements.Text.prototype['fontOpacity'] = anychart.elements.Text.prototype.fontOpacity;//in docs/final
+anychart.elements.Text.prototype['fontDecoration'] = anychart.elements.Text.prototype.fontDecoration;//in docs/final
+anychart.elements.Text.prototype['fontStyle'] = anychart.elements.Text.prototype.fontStyle;//in docs/final
+anychart.elements.Text.prototype['fontVariant'] = anychart.elements.Text.prototype.fontVariant;//in docs/final
+anychart.elements.Text.prototype['fontWeight'] = anychart.elements.Text.prototype.fontWeight;//in docs/final
+anychart.elements.Text.prototype['letterSpacing'] = anychart.elements.Text.prototype.letterSpacing;//in docs/final
+anychart.elements.Text.prototype['textDirection'] = anychart.elements.Text.prototype.textDirection;//in docs/final
+anychart.elements.Text.prototype['lineHeight'] = anychart.elements.Text.prototype.lineHeight;//in docs/final
+anychart.elements.Text.prototype['textIndent'] = anychart.elements.Text.prototype.textIndent;//in docs/final
+anychart.elements.Text.prototype['vAlign'] = anychart.elements.Text.prototype.vAlign;//in docs/final
+anychart.elements.Text.prototype['hAlign'] = anychart.elements.Text.prototype.hAlign;//in docs/final
+anychart.elements.Text.prototype['textWrap'] = anychart.elements.Text.prototype.textWrap;//in docs/final
+anychart.elements.Text.prototype['textOverflow'] = anychart.elements.Text.prototype.textOverflow;//in docs/final
+anychart.elements.Text.prototype['selectable'] = anychart.elements.Text.prototype.selectable;//in docs/final
+anychart.elements.Text.prototype['hoverable'] = anychart.elements.Text.prototype.hoverable;//in docs/final
+anychart.elements.Text.prototype['useHtml'] = anychart.elements.Text.prototype.useHtml;//in docs/final
+anychart.elements.Text.prototype['textSettings'] = anychart.elements.Text.prototype.textSettings;//in docs/final

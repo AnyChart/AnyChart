@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script src="../../out/anychart.min.js"></script>
+    <style>
+        #container {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #000000;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="status"></div>
+</body>
+<script>
+    anychart.onDocumentLoad(function() {
+        var chart = anychart.lineChart();
+        chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
+            document.getElementById('status').innerHTML = 'chart draw';
+            console.log('chart draw');
+        });
+
+        chart.line([
+            ['A1' , 3],
+            ['A2' , 50],
+            ['A3' , 101],
+            ['A4' , 1001],
+            ['A5' , 125]
+
+        ]);
+
+        var scale = new anychart.scales.Logarithmic();
+        scale.minimum(3);
+        chart.yScale(scale);
+
+        chart.minorGrid()
+                .scale(chart.yScale())
+                .stroke('black')
+                .direction('horizontal');
+
+        chart.container('container');
+        chart.draw();
+    });
+</script>
+</html>
+

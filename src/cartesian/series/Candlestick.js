@@ -15,6 +15,7 @@ anychart.cartesian.series.Candlestick = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 };
 goog.inherits(anychart.cartesian.series.Candlestick, anychart.cartesian.series.OHLC);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.CANDLESTICK] = anychart.cartesian.series.Candlestick;
 
 
 /**
@@ -255,7 +256,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(
 
 
 /**
- * Метод, получающий финальное значение rising hatch fill для текущей точки с учетом всех fallback.
+ * Method to get final rising hatch fill, with all fallbacks taken into account.
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final rising hatch fill for the current row.
  */
@@ -317,7 +318,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function
 
 
 /**
- * Метод, получающий финальное значение falling hatch fill для текущей точки с учетом всех fallback.
+ * Method to get final falling hatch fill, with all fallbacks taken into account.
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final falling hatch fill for the current row.
  */
@@ -337,7 +338,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = funct
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -364,7 +365,7 @@ anychart.cartesian.series.Candlestick.prototype.risingFill = function(opt_fillOr
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -379,7 +380,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingFill = function(opt_f
     this.hoverRisingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
         anychart.color.normalizeFill.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverRisingFill_;
@@ -387,7 +388,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingFill = function(opt_f
 
 
 /**
- * Метод, получающий финальное значение цвета заливки для растущей текущей точки с учетом всех fallback.
+ * Method to get final stroke, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
@@ -409,7 +410,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingFill = function(ho
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -436,7 +437,7 @@ anychart.cartesian.series.Candlestick.prototype.fallingFill = function(opt_fillO
 
 
 /**
- * Общий филл, но! Может принять еще функцию первым параметром.
+ * Common fill. Note: it can accept function as a first parameter.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -452,7 +453,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_
     this.hoverFallingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
         anychart.color.normalizeFill.apply(null, arguments);
-    // Ничего не выставляем, потому что и так все ок?
+    // TODO: We don't set anything cause everything is fine?
     return this;
   }
   return this.hoverFallingFill_;
@@ -460,7 +461,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_
 
 
 /**
- * Метод, получающий финальное значение цвета заливки для растущей текущей точки с учетом всех fallback.
+ * Method to get final rising point stroke, with all fallbacks taken into account.
  * @param {boolean} hover If the stroke should be a hover stroke.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
@@ -486,7 +487,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(h
  */
 anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'candlestick';
+  json['seriesType'] = anychart.cartesian.series.Type.CANDLESTICK;
 
   if (goog.isFunction(this.risingFill())) {
     if (window.console) {
@@ -581,3 +582,27 @@ anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
 
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Candlestick}
+ */
+anychart.cartesian.series.candlestick = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Candlestick(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.candlestick', anychart.cartesian.series.candlestick);
+anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesian.series.Candlestick.prototype.risingFill;
+anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;
+anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;
+anychart.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingFill;
+anychart.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.risingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.fallingHatchFill;
+anychart.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;

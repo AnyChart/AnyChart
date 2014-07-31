@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.AreaBase');
 
 
 /**
+ * Define Area series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#area} or {@link anychart.Chart#areaChart}.
+ * @example <t>simple</t>
+ * new anychart.cartesian.series.Area([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -14,12 +18,13 @@ goog.require('anychart.cartesian.series.AreaBase');
 anychart.cartesian.series.Area = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value', 'value'];
   this.referenceValueMeanings = ['x', 'z', 'y'];
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Area, anychart.cartesian.series.AreaBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.AREA] = anychart.cartesian.series.Area;
 
 
 /** @inheritDoc */
@@ -121,7 +126,7 @@ anychart.cartesian.series.Area.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.Area.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'area';
+  json['seriesType'] = anychart.cartesian.series.Type.AREA;
   return json;
 };
 
@@ -132,3 +137,25 @@ anychart.cartesian.series.Area.prototype.serialize = function() {
 anychart.cartesian.series.Area.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Area}
+ */
+anychart.cartesian.series.area = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Area(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.area', anychart.cartesian.series.area);
+anychart.cartesian.series.Area.prototype['fill'] = anychart.cartesian.series.Area.prototype.fill;//in docs/
+anychart.cartesian.series.Area.prototype['hoverFill'] = anychart.cartesian.series.Area.prototype.hoverFill;//in docs/
+anychart.cartesian.series.Area.prototype['stroke'] = anychart.cartesian.series.Area.prototype.stroke;//in docs/
+anychart.cartesian.series.Area.prototype['hoverStroke'] = anychart.cartesian.series.Area.prototype.hoverStroke;//in docs/
+anychart.cartesian.series.Area.prototype['hatchFill'] = anychart.cartesian.series.Area.prototype.hatchFill;//in docs/
+anychart.cartesian.series.Area.prototype['hoverHatchFill'] = anychart.cartesian.series.Area.prototype.hoverHatchFill;//in docs/

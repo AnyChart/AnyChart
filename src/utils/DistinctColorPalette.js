@@ -6,7 +6,7 @@ goog.require('goog.array');
 
 
 /**
- * Класс, определяющий палитру цветов.
+ * Color palette class.
  * @example <t>simple-h100</t>
  * var palette = new anychart.utils.DistinctColorPalette()
  *     .colors(['red', 'yellow', 'brown', 'green']);
@@ -34,7 +34,7 @@ goog.inherits(anychart.utils.DistinctColorPalette, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Signals mask.
  * @type {number}
  */
 anychart.utils.DistinctColorPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -179,3 +179,18 @@ anychart.utils.DistinctColorPalette.prototype.cloneFrom = function(palette) {
   }
   return this;
 };
+
+
+/**
+ * Constructor function.
+ * @return {!anychart.utils.DistinctColorPalette}
+ */
+anychart.utils.distinctColorPalette = function() {
+  return new anychart.utils.DistinctColorPalette();
+};
+
+
+//exports
+goog.exportSymbol('anychart.utils.distinctColorPalette', anychart.utils.distinctColorPalette);
+anychart.utils.DistinctColorPalette.prototype['colorAt'] = anychart.utils.DistinctColorPalette.prototype.colorAt;//in docs/
+anychart.utils.DistinctColorPalette.prototype['colors'] = anychart.utils.DistinctColorPalette.prototype.colors;//in docs/

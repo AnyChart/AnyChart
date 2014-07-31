@@ -69,7 +69,7 @@ anychart.scales.ScatterBase = function() {
   this.range = 1;
 
   /**
-   * If the scale is consistent. We can't use consistency states mechanic due to the same behaviour for all scales.
+   * If the scale is consistent. We can't use consistency states management due to the same behaviour for all scales.
    * @type {boolean}
    * @protected
    */
@@ -317,3 +317,14 @@ anychart.scales.ScatterBase.prototype.deserialize = function(value) {
   this.resumeSignalsDispatching(true);
   return this;
 };
+
+
+//exports
+anychart.scales.ScatterBase.prototype['transform'] = anychart.scales.ScatterBase.prototype.transform;
+anychart.scales.ScatterBase.prototype['inverseTransform'] = anychart.scales.ScatterBase.prototype.inverseTransform;
+anychart.scales.ScatterBase.prototype['minimum'] = anychart.scales.ScatterBase.prototype.minimum;
+anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.prototype.maximum;
+anychart.scales.ScatterBase.prototype['minimumGap'] = anychart.scales.ScatterBase.prototype.minimumGap;
+anychart.scales.ScatterBase.prototype['maximumGap'] = anychart.scales.ScatterBase.prototype.maximumGap;
+anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;
+anychart.scales.ScatterBase.prototype['stackMode'] = anychart.scales.ScatterBase.prototype.stackMode;

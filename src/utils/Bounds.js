@@ -22,7 +22,7 @@ anychart.utils.RectObj;
 /**
  * Stores information about visual location of an object. Can be defined with an object, a math.Rect or as a set of
  * numbers.
- * Note: 'right' and 'bottom' have more priority than 'width' and 'height'.
+ * Note: 'right' and 'bottom' have priority over 'width' and 'height'.
  * @param {(number|string|anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_xOrRect X-coordinate or
  *    the rect as object.
  * @param {(number|string)=} opt_y Y-coordinate.
@@ -40,7 +40,7 @@ goog.inherits(anychart.utils.Bounds, anychart.Base);
 
 
 /**
- * Маска состояний рассинхронизации, которые умеет отправлять этот объект.
+ * Signals mask.
  * @type {number}
  */
 anychart.utils.Bounds.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
@@ -161,13 +161,13 @@ anychart.utils.Bounds.prototype.toRect = function(opt_containerWidth, opt_contai
 
 /**
  * Resets all values of the object by passed values.
- * Note: 'right' and 'bottom' have more priority than 'width' and 'height'.
+ * Note: 'right' and 'bottom' have priority over 'width' and 'height'.
  * @param {(number|string|anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds|null)=} opt_xOrRect X-coordinate or
  *    the rect as object.
  * @param {(number|string|null)=} opt_y Y-coordinate.
  * @param {(number|string|null)=} opt_width Width.
  * @param {(number|string|null)=} opt_height Height.
- * @return {!anychart.utils.Bounds} Returns itself for chaining.
+ * @return {!anychart.utils.Bounds} Returns itself for method chaining.
  */
 anychart.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_width, opt_height) {
   var left, top, right, bottom, width, height;
@@ -212,7 +212,7 @@ anychart.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_width, op
 /**
  * Gets or sets left edge position. Returns previously set position, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for chaining.
+ * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for method chaining.
  */
 anychart.utils.Bounds.prototype.left = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -284,7 +284,7 @@ anychart.utils.Bounds.prototype.bottom = function(opt_value) {
 /**
  * Gets or sets width value. Returns previously set position, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for chaining.
+ * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for method chaining.
  */
 anychart.utils.Bounds.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -302,7 +302,7 @@ anychart.utils.Bounds.prototype.width = function(opt_value) {
 /**
  * Gets or sets height value. Returns previously set position, not the derived pixel value.
  * @param {(number|string|null)=} opt_value Value to set.
- * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for chaining.
+ * @return {(number|string|null|anychart.utils.Bounds)} Value, or itself for method chaining.
  */
 anychart.utils.Bounds.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {

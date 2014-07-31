@@ -1,7 +1,8 @@
 goog.provide('anychart.pie.Chart');
 goog.require('anychart.Chart');
 goog.require('anychart.color');
-goog.require('anychart.elements.Multilabel');
+goog.require('anychart.elements.LabelsFactory');
+goog.require('anychart.elements.Tooltip');
 goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
@@ -11,8 +12,6 @@ goog.require('anychart.utils.Sort');
 
 /**
  * Pie (Donut) Chart Class.<br/>
- * Learn more about this type of charts at:
- * {@link http://demos.anychart.dev/articles/Pie-Donut.html}.<br/>
  * Pie is interactive, you can customize click and hover behavior.
  * @example
  *  var data = [20, 7, 10, 14];
@@ -27,7 +26,7 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Filter function that should accept a field value and return true if the row
-   *    should be included into the resulting view as a and false otherwise..
+   *    should be included into the resulting view as and false otherwise.
    * @type {(function(*):boolean)?}
    * @private
    */
@@ -70,7 +69,7 @@ anychart.pie.Chart = function(opt_data) {
   this.sort_ = anychart.utils.Sort.NONE;
 
   /**
-   * @type {anychart.elements.Multilabel}
+   * @type {anychart.elements.LabelsFactory}
    * @private
    */
   this.labels_ = null;
@@ -104,34 +103,13 @@ anychart.pie.Chart = function(opt_data) {
    */
   this.parentViewToDispose_ = null;
 
-  /**
-   * Position provider for the labels position formatter.
-   * @type {function(number):Object}
-   * @private
-   */
-  this.positionProvider_ = goog.bind(function(index) {
-    var iterator = this.data().getIterator();
-    iterator.select(index);
-    var start = /** @type {number} */ (iterator.meta('start'));
-    var sweep = /** @type {number} */ (iterator.meta('sweep'));
-    var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
-    var angle = (start + sweep / 2) * Math.PI / 180;
-
-    var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
-
-    var x = this.cx_ + dR * Math.cos(angle);
-    var y = this.cy_ + dR * Math.sin(angle);
-
-    return {'x': x, 'y': y};
-  }, this);
-
 
   /**
-   * Format provider for the the labels text formatter.
+   * Object with information about pie. (min value, max value, sum of values, average value, count of slices)
    * @type {Object}
    * @private
    */
-  this.formatProvider_ = {};
+  this.statistic_ = {};
 
   /**
    * Default fill function.
@@ -173,6 +151,11 @@ anychart.pie.Chart = function(opt_data) {
     return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
   };
 
+  /**
+   * @type {!anychart.data.Iterator}
+   */
+  this.iterator_;
+
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
   tooltip.isFloating(true);
@@ -180,7 +163,7 @@ anychart.pie.Chart = function(opt_data) {
   tooltip.titleFormatter(function() {
     return this['name'];
   });
-  tooltip.textFormatter(function() {
+  tooltip.contentFormatter(function() {
     return this['name'] + '<br>' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
@@ -191,6 +174,20 @@ anychart.pie.Chart = function(opt_data) {
       .fontSize(13);
   this.data(opt_data);
   this.legend().enabled(true);
+
+  // Add handler to listen legend item click for legend and explode slice.
+  this.legend().listen(anychart.events.EventType.LEGEND_ITEM_CLICK, function(event) {
+    // function that explodes pie slice by index of the clicked legend item
+
+    var index = event['index'];
+    var pieChart = /** @type {anychart.pie.Chart} */ (this);
+    var iterator = pieChart.data().getIterator();
+    if (iterator.select(index)) {
+      var isExploded = !!iterator.meta('exploded');
+      pieChart.explodeSlice(index, !isExploded);
+    }
+  }, false, this);
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -198,12 +195,19 @@ goog.inherits(anychart.pie.Chart, anychart.Chart);
 
 
 /**
- * Supported consistency states.
+ * @type {string}
+ */
+anychart.pie.Chart.CHART_TYPE = 'pie';
+anychart.chartTypesMap[anychart.pie.Chart.CHART_TYPE] = anychart.pie.Chart;
+
+
+/**
+ * Supported signals.
  * @type {number}
  */
 anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
     anychart.Chart.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.DATA_CHANGED;
+    anychart.Signal.DATA_CHANGED;
 
 
 /**
@@ -212,11 +216,11 @@ anychart.pie.Chart.prototype.SUPPORTED_SIGNALS =
  */
 anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.DATA |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.HOVER |
-        anychart.ConsistencyState.CLICK;
+    anychart.ConsistencyState.DATA |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.LABELS |
+    anychart.ConsistencyState.HOVER |
+    anychart.ConsistencyState.CLICK;
 
 
 /**
@@ -260,7 +264,7 @@ anychart.pie.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * Returns current chart data.
- * @return {anychart.data.View} Current view or self for chaining.
+ * @return {anychart.data.View} Current view or self for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
@@ -301,9 +305,27 @@ anychart.pie.Chart.prototype.data = function(opt_value) {
 
 
 /**
+ * Returns current view iterator.
+ * @return {!anychart.data.Iterator} Current pie view iterator.
+ */
+anychart.pie.Chart.prototype.getIterator = function() {
+  return this.iterator_ || this.getResetIterator();
+};
+
+
+/**
+ * Returns new iterator for the current view.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.pie.Chart.prototype.getResetIterator = function() {
+  return this.iterator_ = this.view_.getIterator();
+};
+
+
+/**
  * Method that prepares the final view of data.
  * @param {(anychart.data.View)} data Data.
- * @return {anychart.data.View} Prepared view.
+ * @return {anychart.data.View} Ready to use view.
  * @private
  */
 anychart.pie.Chart.prototype.prepareData_ = function(data) {
@@ -583,11 +605,11 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *  chart3.labels()
  *     .fontSize(10)
  *     .fontColor('white');
- * @return {anychart.elements.Multilabel} An instance of {@link anychart.elements.Multilabel} class for method chaining.
+ * @return {anychart.elements.LabelsFactory} An instance of {@link anychart.elements.LabelsFactory} class for method chaining.
  *//**
  * Setter for the pie labels.<br/>
- * <b>Note:</b> positioing is done using {@link anychart.elements.Multilabel#positionFormatter} method
- * and text is formatted using {@link anychart.elements.Multilabel#textFormatter} method.
+ * <b>Note:</b> positioing is done using {@link anychart.elements.LabelsFactory#positionFormatter} method
+ * and text is formatted using {@link anychart.elements.LabelsFactory#textFormatter} method.
  * @example
  *  var data = [
  *    {name: 'Point 1', value: 10},
@@ -596,33 +618,33 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
  *    {name: 'Point 4', value: 14}
  *  ];
  *  chart = new anychart.pie.Chart(data);
- *  var labels = new anychart.elements.Multilabel();
- *  labels.textFormatter(function(formatProvider, index){
- *        var lblText = formatProvider(index, 'name');
- *        lblText += ': ' + formatProvider(index, 'value');
+ *  var labels = new anychart.elements.LabelsFactory();
+ *  labels.textFormatter(function(){
+ *        var lblText = this['name'];
+ *        lblText += ': ' + this['value'];
  *        return lblText;
  *      })
- *      .positionFormatter(function(positionProvider, index){
- *        return positionProvider(index);
+ *      .positionFormatter(function(){
+ *        return this['value'];
  *      })
  *      .fontSize(10)
  *      .fontColor('white');
  *  chart.labels(labels);
- * @param {anychart.elements.Multilabel=} opt_value [] Multilabel instance.
+ * @param {anychart.elements.LabelsFactory=} opt_value [] LabelsFactory instance.
  * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.elements.Multilabel=} opt_value .
- * @return {(anychart.elements.Multilabel|anychart.pie.Chart)} .
+ * @param {anychart.elements.LabelsFactory=} opt_value .
+ * @return {(anychart.elements.LabelsFactory|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.elements.Multilabel();
-    this.labels_.textFormatter(function(formatProvider, index) {
-      return (formatProvider['value'] * 100 / formatProvider['sum']).toFixed(1) + '%';
+    this.labels_ = new anychart.elements.LabelsFactory();
+    this.labels_.textFormatter(function() {
+      return (this['value'] * 100 / this['sum']).toFixed(1) + '%';
     });
-    this.labels_.positionFormatter(function(positionProvider, index) {
-      return positionProvider(index);
+    this.labels_.positionFormatter(function() {
+      return this['value'];
     });
 
     this.labels_.listenSignals(this.labelsInvalidated_, this);
@@ -630,7 +652,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
-  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.Multilabel || goog.isNull(opt_value))) {
+  if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.LabelsFactory || goog.isNull(opt_value))) {
     this.labels_.deserialize(opt_value ? opt_value.serialize() : {});
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -641,11 +663,11 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 /**
  * Setter/getter for points grouping function.
- * Если передается функция - задаёт её фильтрующей функцией для группировки точки.
- * Если передаётся срока 'none' или null то отключает группировку.
- * Если ничего не передается возвращает последнее установленное значение фильтрующей функции либо null.
+ * If function is passed - sets it as a filter for grouping.
+ * If 'none' string or null is passed - turns grouping off.
+ * If nothing is passed - returns the last values set by grouping functionor null.
  * @param {(string|null|function(*):boolean)=} opt_value Filtering function or disabling value (null, 'none').
- * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for chaining.
+ * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
  */
 anychart.pie.Chart.prototype.group = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -715,7 +737,7 @@ anychart.pie.Chart.prototype.radius = function(opt_value) {
  *  chart2.innerRadius(function(outerRadius){
  *    return parseFloat(outerRadius)/2;
  *  });
- * @param {(string|number|function(number):number)=} opt_value [0] he value of the inner radius in pixels, percents or
+ * @param {(string|number|function(number):number)=} opt_value [0] The value of the inner radius in pixels, percents or
  * function. In general the function should look like this:
  * <code>function(outerRadius){
  *   ...
@@ -1036,7 +1058,7 @@ anychart.pie.Chart.prototype.remove = function() {
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
 anychart.pie.Chart.prototype.drawContent = function(bounds) {
-  var iterator = this.view_.getIterator();
+  var iterator = this.getIterator();
   var fill, stroke, exploded;
 
   if (iterator.getRowsCount() >= 10) {
@@ -1050,6 +1072,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
+    //TODO(AntonKagakin): убрать обработку hover`а точек и цикла draw
     if (this.hovered_) {
       var pieSlice = this.hovered_[0];
       var pieSliceIndex = this.hovered_[1];
@@ -1059,8 +1082,8 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       var fillColor = isHovered ? iterator.get('hoverFill') : iterator.get('fill');
       var strokeColor = isHovered ? iterator.get('hoverStroke') : iterator.get('stroke');
 
-      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, iterator.get('fill'));
-      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, iterator.get('stroke'));
+      fill = fillColor || this.getFillColor_(iterator.getIndex(), isHovered, /** @type {acgraph.vector.Fill} */ (iterator.get('fill')));
+      stroke = strokeColor || this.getStrokeColor_(iterator.getIndex(), isHovered, /** @type {acgraph.vector.Stroke} */ (iterator.get('stroke')));
 
       pieSlice.fill(fill);
       pieSlice.stroke(stroke);
@@ -1078,11 +1101,10 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     }
   }
 
-  iterator.reset();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1093,23 +1115,35 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     }
 
     var value;
+
+    iterator.reset();
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+      var missingPoints = 0; // count of missing points
       var min = Number.MAX_VALUE;
       var max = -Number.MAX_VALUE;
       var sum = 0;
       while (iterator.advance()) {
-        value = parseFloat(iterator.get('value'));
+        value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+        // if missing
+        if (this.isMissing_(value)) {
+          missingPoints++;
+          continue;
+        }
+        value = +value;
         min = Math.min(value, min);
         max = Math.max(value, max);
         sum += value;
       }
 
-      var count = iterator.getRowsCount();
-      this.formatProvider_['count'] = count;
-      this.formatProvider_['min'] = min;
-      this.formatProvider_['max'] = max;
-      this.formatProvider_['sum'] = sum;
-      this.formatProvider_['average'] = (sum / count);
+      var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+      var avg;
+      if (count == 0) min = max = sum = avg = undefined;
+      else avg = sum / count;
+      this.statistic_['count'] = count;
+      this.statistic_['min'] = min;
+      this.statistic_['max'] = max;
+      this.statistic_['sum'] = sum;
+      this.statistic_['average'] = avg;
 
       iterator.reset();
       this.markConsistent(anychart.ConsistencyState.DATA);
@@ -1119,12 +1153,13 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     var sweep = 0;
 
     while (iterator.advance()) {
-      value = parseFloat(iterator.get('value'));
+      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+      if (this.isMissing_(value)) continue;
+      value = +value;
+      sweep = value / this.statistic_['sum'] * 360;
 
-      sweep = value / this.formatProvider_['sum'] * 360;
-
-      fill = iterator.get('fill') || this.getFillColor_(iterator.getIndex());
-      stroke = iterator.get('stroke') || this.getStrokeColor_(iterator.getIndex());
+      fill = /** @type {acgraph.vector.Fill} */ (iterator.get('fill')) || this.getFillColor_(iterator.getIndex());
+      stroke = /** @type {acgraph.vector.Stroke} */ (iterator.get('stroke')) || this.getStrokeColor_(iterator.getIndex());
 
       iterator.meta('start', start).meta('sweep', sweep);
       if (!goog.isDef(exploded = iterator.meta('exploded'))) {
@@ -1132,25 +1167,46 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
         iterator.meta('exploded', exploded);
       }
 
-      this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, exploded, this.explodeValue_, null);
+      this.drawPoint_(iterator.getIndex(), start, sweep, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, fill, stroke, /** @type {boolean} */ (exploded), this.explodeValue_, null);
       start += sweep;
     }
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
+
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     if (this.labels_) {
       iterator.reset();
 
       if (!this.labels_.container()) this.labels_.container(this.rootElement);
+      this.labels_.clear();
       while (iterator.advance()) {
-        this.createFormatProvider(iterator.getIndex());
-        this.labels_.draw(this.formatProvider_, this.positionProvider_);
+        if (this.isMissing_(iterator.get('value'))) continue;
+        var formatProvider = this.createFormatProvider();
+        var positionProvider = this.createPositionProvider();
+        // index for positionProvider function, cause label set it as an argument
+        this.labels_.add(formatProvider, positionProvider);
       }
-      this.labels_.end();
+      this.labels_.draw();
     }
     this.markConsistent(anychart.ConsistencyState.LABELS);
   }
+  if (this.hovered_) {
+    this.getIterator().select(this.hovered_[1]);
+  }
+};
+
+
+/**
+ * Checks that value represents missing point.
+ * @param {*} value
+ * @return {boolean} Is value represents missing value.
+ * @private
+ */
+anychart.pie.Chart.prototype.isMissing_ = function(value) {
+  value = goog.isNull(value) ? NaN : +value;
+  return !(goog.isNumber(value) && !isNaN(value) && (value > 0));
 };
 
 
@@ -1253,7 +1309,7 @@ anychart.pie.Chart.prototype.mouseOverHandler_ = function(event) {
     this.hovered_ = [pie, index, true];
 
     acgraph.events.listen(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    if (this.data().getIterator().select(index)) {
+    if (this.getIterator().select(index)) {
       this.showTooltip(event);
     }
     this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
@@ -1274,7 +1330,7 @@ anychart.pie.Chart.prototype.mouseOutHandler_ = function(event) {
     this.hovered_ = [pie, index, false];
 
     acgraph.events.unlisten(pie, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    if (this.data().getIterator().select(index)) {
+    if (this.getIterator().select(index)) {
       this.hideTooltip();
     }
     this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
@@ -1310,19 +1366,24 @@ anychart.pie.Chart.prototype.mouseDblClickHandler_ = function(event) {
 
 /** @inheritDoc */
 anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
+  /**
+   * @type {!Array.<anychart.elements.Legend.LegendItemProvider>}
+   */
   var data = [];
   var iterator = this.view_.getIterator();
-  iterator.reset();
 
   while (iterator.advance()) {
     var index = iterator.getIndex();
     data.push({
       'index': index,
-      'text': iterator.get('name') || iterator.get('x').toString() || 'Point - ' + index,
-      'iconColor': this.getFillColor_(index, false, iterator.get('fill'))
+      'text': iterator.get('name') || 'Point - ' + index,
+      'iconType': 'circle',
+      'iconStroke': 'none',
+      'iconFill': this.getFillColor_(index),
+      'iconMarker': null
     });
   }
-  return new anychart.utils.LegendItemsProvider(data);
+  return data;
 };
 
 
@@ -1334,7 +1395,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
 /**
  * Pie chart tooltip.
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
- * @return {!(anychart.pie.Chart|anychart.elements.Tooltip)} Tooltip instance or self for chaining call.
+ * @return {!(anychart.pie.Chart|anychart.elements.Tooltip)} Tooltip instance or self for method chaining.
  */
 anychart.pie.Chart.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
@@ -1402,55 +1463,66 @@ anychart.pie.Chart.prototype.hideTooltip = function() {
 
 /**
  * @protected
- * @param {goog.events.BrowserEvent=} opt_event that initiate tooltip to show.
+ * @param {goog.events.BrowserEvent=} opt_event initiates tooltip show.
  */
 anychart.pie.Chart.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   var index = this.hovered_[1];
+  var formatProvider = this.createFormatProvider();
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
-        this.createFormatProvider(index),
+        formatProvider,
         new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
   } else {
     tooltip.show(
-        this.createFormatProvider(index),
+        formatProvider,
         new acgraph.math.Coordinate(0, 0));
   }
 };
 
 
 /**
- * Create column series format provider.
- * @param {number} index Slice index.
+ * Create pie label format provider.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
-anychart.pie.Chart.prototype.createFormatProvider = function(index) {
-  var iterator = this.data().getIterator();
-  // no need to store this information always in this.formatProvider_
-  if (goog.isDef(this.formatProvider_['gropedPoint'])) {
-    delete this.formatProvider_['groupedPoint'];
-    delete this.formatProvider_['names'];
-    delete this.formatProvider_['values'];
+anychart.pie.Chart.prototype.createFormatProvider = function() {
+  var iterator = this.getIterator();
+  // no need to store this information always in this.statistic_
+  var formatProvider = {};
+
+  formatProvider['index'] = iterator.getIndex();
+  formatProvider['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + iterator.getIndex();
+  formatProvider['x'] = iterator.get('x');
+  formatProvider['value'] = iterator.get('value');
+  if (iterator.meta('groupedPoint') == true) {
+    formatProvider['name'] = 'Grouped Point';
+    formatProvider['groupedPoint'] = true;
+    formatProvider['names'] = iterator.meta('names');
+    formatProvider['values'] = iterator.meta('values');
   }
-  if (iterator.select(index)) {
-    this.formatProvider_['index'] = index;
-    this.formatProvider_['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + index;
-    this.formatProvider_['x'] = iterator.get('x');
-    this.formatProvider_['value'] = iterator.get('value');
-    if (iterator.meta('groupedPoint') == true) {
-      this.formatProvider_['name'] = 'Grouped Point';
-      this.formatProvider_['groupedPoint'] = true;
-      this.formatProvider_['names'] = iterator.meta('names');
-      this.formatProvider_['values'] = iterator.meta('values');
-    }
-  } else {
-    this.formatProvider_['index'] = -1;
-    this.formatProvider_['name'] = 'undefined';
-    this.formatProvider_['x'] = 'undefined';
-    this.formatProvider_['value'] = 'undefined';
-  }
-  return this.formatProvider_;
+  goog.object.extend(formatProvider, this.statistic_);
+  return formatProvider;
+};
+
+
+/**
+ * Create column series format provider.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.pie.Chart.prototype.createPositionProvider = function() {
+  var iterator = this.getIterator();
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
+  var angle = (start + sweep / 2) * Math.PI / 180;
+
+  var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
+
+  var x = this.cx_ + dR * Math.cos(angle);
+  var y = this.cy_ + dR * Math.sin(angle);
+  return {'value': {'x': x, 'y': y}};
 };
 
 
@@ -1461,8 +1533,7 @@ anychart.pie.Chart.prototype.serialize = function() {
   var json = {};
 
   var chart = goog.base(this, 'serialize');
-
-  chart['type'] = 'pie';
+  chart['type'] = anychart.pie.Chart.CHART_TYPE;
 
   var fill = this.fill();
   var stroke = this.stroke();
@@ -1504,7 +1575,6 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   var stroke = chart['stroke'];
   var hoverFill = chart['hoverFill'];
   var hoverStroke = chart['hoverStroke'];
-
   var labels = chart['labels'];
 
   this.suspendSignalsDispatching();
@@ -1521,13 +1591,7 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.stroke(stroke);
   this.hoverFill(hoverFill);
   this.hoverStroke(hoverStroke);
-
-  //if (labels) {
-  //  var multiLabels = this.labels();
-  //  multiLabels.textFormatter(/** @type {Function} */ (this.labels().textFormatter()));
-  //  multiLabels.positionFormatter(/** @type {Function} */ (this.labels().positionFormatter()));
-  //  multiLabels.deserialize(labels);
-  //}
+  this.labels(labels);
 
   this.resumeSignalsDispatching(false);
 
@@ -1634,3 +1698,36 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
   this.event_ = e;
   delete this.propagationStopped_;
 };
+
+
+/**
+ * Constructor function.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
+ * @return {!anychart.pie.Chart}
+ */
+anychart.pie.chart = function(opt_data) {
+  return new anychart.pie.Chart(opt_data);
+};
+
+
+//exports
+goog.exportSymbol('anychart.pie.chart', anychart.pie.chart);
+anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//in docs/final
+anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;
+anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//in docs/final
+anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//in docs/final
+anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//in docs/final
+anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;//in docs/final
+anychart.pie.Chart.prototype['explode'] = anychart.pie.Chart.prototype.explode;//in docs/final
+anychart.pie.Chart.prototype['sort'] = anychart.pie.Chart.prototype.sort;//in docs/final
+anychart.pie.Chart.prototype['getCenterPoint'] = anychart.pie.Chart.prototype.getCenterPoint;//in docs/final
+anychart.pie.Chart.prototype['getPixelRadius'] = anychart.pie.Chart.prototype.getPixelRadius;//in docs/final
+anychart.pie.Chart.prototype['getPixelInnerRadius'] = anychart.pie.Chart.prototype.getPixelInnerRadius;//in docs/final
+anychart.pie.Chart.prototype['palette'] = anychart.pie.Chart.prototype.palette;//in docs/final
+anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//in docs/final
+anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//in docs/final
+anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//in docs/final
+anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//in docs/final
+anychart.pie.Chart.prototype['serialize'] = anychart.pie.Chart.prototype.serialize;//in docs/
+anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;
+anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;

@@ -14,7 +14,7 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 anychart.cartesian.series.Line = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 
-  // Определяем значения опорных полей серии.
+  // Define reference fields for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
@@ -22,6 +22,7 @@ anychart.cartesian.series.Line = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Line, anychart.cartesian.series.ContinuousBase);
+anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.LINE] = anychart.cartesian.series.Line;
 
 
 /** @inheritDoc */
@@ -73,7 +74,7 @@ anychart.cartesian.series.Line.prototype.strokeInternal = (function() {
  */
 anychart.cartesian.series.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = 'line';
+  json['seriesType'] = anychart.cartesian.series.Type.LINE;
   return json;
 };
 
@@ -84,3 +85,21 @@ anychart.cartesian.series.Line.prototype.serialize = function() {
 anychart.cartesian.series.Line.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
+
+
+/**
+ * Constructor function.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {!anychart.cartesian.series.Line}
+ */
+anychart.cartesian.series.line = function(data, opt_csvSettings) {
+  return new anychart.cartesian.series.Line(data, opt_csvSettings);
+};
+
+
+//exports
+goog.exportSymbol('anychart.cartesian.series.line', anychart.cartesian.series.line);
+anychart.cartesian.series.Line.prototype['stroke'] = anychart.cartesian.series.Line.prototype.stroke;
+anychart.cartesian.series.Line.prototype['hoverStroke'] = anychart.cartesian.series.Line.prototype.hoverStroke;

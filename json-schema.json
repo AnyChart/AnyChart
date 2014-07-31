@@ -153,9 +153,18 @@
         "drawLastLabel": {
           "type": "boolean"
         },
+        "staggerMode": {
+          "type": "boolean"
+        },
+        "staggerLines": {
+          "type": "number"
+        },
+        "staggerMaxLines": {
+          "type": "number"
+        },
         "overlapMode": { "$ref": "#/definitions/anychart.elements.Axis.OverlapMode" },
-        "labels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
-        "minorLabels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
+        "labels": { "$ref": "#/definitions/anychart.elements.LabelsFactory" },
+        "minorLabels": { "$ref": "#/definitions/anychart.elements.LabelsFactory" },
         "ticks": { "$ref": "#/definitions/anychart.elements.Ticks" },
         "minorTicks": { "$ref": "#/definitions/anychart.elements.Ticks" },
         "title": { "$ref": "#/definitions/anychart.elements.Title" }
@@ -297,7 +306,7 @@
     "anychart.elements.Marker.Type": {
       "enum": [ "star4", "star5", "star6", "star7", "star10", "triangleup", "triangledown", "cross", "diamond", "diagonalcross", "circle", "square" ]
     },
-    "anychart.elements.Multilabel": {
+    "anychart.elements.LabelsFactory": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Text" }
@@ -307,11 +316,18 @@
           "type": "number"
         },
         "anchor": { "$ref": "#/definitions/anychart.utils.NinePositions" },
+        "position": { "$ref": "#/definitions/anychart.utils.NinePositions" },
         "offsetX": {
           "type": "number"
         },
         "offsetY": {
           "type": "number"
+        },
+        "width": {
+          "type": [ "string" , "number" , "null" ]
+        },
+        "height": {
+          "type": [ "string" , "number" , "null" ]
         },
         "padding": { "$ref": "#/definitions/anychart.utils.Space" },
         "background": { "$ref": "#/definitions/anychart.elements.Background" }

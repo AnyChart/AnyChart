@@ -2,12 +2,12 @@ goog.provide('anychart.Chart');
 
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
+goog.require('anychart.elements.Credits');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
 goog.require('anychart.events.EventType');
 goog.require('anychart.utils');
-goog.require('anychart.utils.LegendItemsProvider');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
 goog.require('anychart.utils.PrintHelper');
@@ -73,6 +73,12 @@ anychart.Chart = function() {
    */
   this.autoResize_ = true;
 
+  /**
+   * @type {anychart.elements.Credits}
+   * @private
+   */
+  this.credits_ = null;
+
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
@@ -88,7 +94,7 @@ anychart.Chart.prototype.SUPPORTED_SIGNALS = anychart.VisualBaseWithBounds.proto
 
 
 /**
- * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND  to BaseWithBounds states.
+ * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND to BaseWithBounds states.
  * @type {number}
  */
 anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
@@ -96,7 +102,8 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.LEGEND |
         anychart.ConsistencyState.CHART_LABELS |
         anychart.ConsistencyState.BACKGROUND |
-        anychart.ConsistencyState.TITLE;
+        anychart.ConsistencyState.TITLE |
+        anychart.ConsistencyState.CREDITS;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -344,14 +351,12 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the current chart background.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * chart.background().stroke('2 green');
  * @return {anychart.elements.Background} The current chart background.
  *//**
  * Setter for the chart background.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * var background = new anychart.elements.Background()
  *    .stroke('2 rgb(36,102,177)')
  *    .corners(10)
@@ -415,17 +420,14 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart title.
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t>
  * chart.title().fontSize(41);
  * @return {anychart.elements.Title} The current chart title.
  *//**
  * Setter for the chart title.
- * @example <c>Simple string</c>
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t><c>Simple string</c>
  * chart.title('Conqueror of Naxxramas');
- * @example
- * chart = new anychart.Chart();
+ * @example <t>listingOnly</t><c>Title instance</c>
  * chart.title( new anychart.elements.Title()
  *      .fontColor('red')
  *      .text('Red title')
@@ -477,7 +479,7 @@ anychart.Chart.prototype.onTitleSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals – state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -530,7 +532,7 @@ anychart.Chart.prototype.onLegendSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // Если ни одного сингнала нет, то state == 0 и ничего не произойдет.
+  // If there are no signals – state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -565,7 +567,7 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.elements.Axis) {
+    if (value instanceof anychart.elements.Label) {
       label.deserialize(value.serialize());
     } else if (goog.isObject(value)) {
       label.deserialize(value);
@@ -586,6 +588,50 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
  */
 anychart.Chart.prototype.onChartLabelSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Credits.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Chart credits settings.
+ * @param {(anychart.elements.Credits|Object|boolean)=} opt_value
+ * @return {!(anychart.Chart|anychart.elements.Credits)} Chart credits or itself for chaining call.
+ */
+anychart.Chart.prototype.credits = function(opt_value) {
+  if (!this.credits_) {
+    this.credits_ = anychart.elements.Credits.getInstance();
+    this.registerDisposable(this.credits_);
+    this.credits_.listenSignals(this.onCreditsSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.Credits) {
+      this.credits_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.credits_.deserialize(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.credits_.enabled(false);
+    } else {
+      this.credits_.enabled(!!opt_value);
+    }
+    return this;
+  } else {
+    return this.credits_;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.Chart.prototype.onCreditsSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.CREDITS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -622,7 +668,7 @@ anychart.Chart.prototype.draw = function() {
   if (!this.rootElement) this.rootElement = acgraph.layer();
 
   //suspend stage
-  var stage = this.rootElement.getStage();
+  var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
@@ -644,6 +690,16 @@ anychart.Chart.prototype.draw = function() {
 
   totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
   boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
+
+  var credits = this.credits();
+  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
+    credits.suspendSignalsDispatching();
+    if (!credits.container() && credits.enabled())
+      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    credits.resumeSignalsDispatching(false);
+    credits.draw();
+    this.markConsistent(anychart.ConsistencyState.CREDITS);
+  }
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
@@ -694,14 +750,16 @@ anychart.Chart.prototype.draw = function() {
       label.parentBounds(totalBounds);
       label.resumeSignalsDispatching(false);
       label.draw();
-      this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
     }
+    this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )
-    if (this.container() && this.container().getStage) {
+    if (this.container() && this.container().getStage()) {
       //listen resize event
+      stage = this.container().getStage();
+      stage.resize(stage.originalWidth, stage.originalHeight);
       if (this.autoResize_ && this.bounds().dependsOnContainerSize()) {
         this.container().getStage().listen(
             acgraph.vector.Stage.EventType.STAGE_RESIZE,
@@ -725,9 +783,9 @@ anychart.Chart.prototype.draw = function() {
 
   if (manualSuspend) stage.resume();
 
-  //todo(Anton Saukh): rework this shit!
+  //todo(Anton Saukh): refactor this mess!
   this.listenSignals(this.invalidateHandler_, this);
-  //end shit
+  //end mess
 
   this.resumeSignalsDispatching(false);
 
@@ -773,6 +831,7 @@ anychart.Chart.prototype.autoResize = function(opt_value) {
  * @private
  */
 anychart.Chart.prototype.resizeHandler_ = function(evt) {
+  this.credits().invalidate(anychart.ConsistencyState.POSITION);
   this.invalidate(anychart.ConsistencyState.ALL,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
@@ -795,20 +854,14 @@ anychart.Chart.prototype.remove = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Create legend items provider specific for chart type.
+ * Create legend items provider specific to chart type.
  * @protected
- * @return {!anychart.utils.LegendItemsProvider} Legend items provider.
+ * @return {!Array.<anychart.elements.Legend.LegendItemProvider>} Legend items provider.
  */
-anychart.Chart.prototype.createLegendItemsProvider = function() {
-  return new anychart.utils.LegendItemsProvider([
-    'chart legend item',
-    'chart legend item',
-    'chart legend item'
-  ]);
-};
+anychart.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 
 
-//todo(Anton Saukh): rework this shit!
+//todo(Anton Saukh): refactor this mess!
 /**
  * Internal invalidation event handler, redraw chart on all invalidate events.
  * @param {anychart.SignalEvent} event Event object.
@@ -817,7 +870,7 @@ anychart.Chart.prototype.createLegendItemsProvider = function() {
 anychart.Chart.prototype.invalidateHandler_ = function(event) {
   anychart.globalLock.onUnlock(this.draw, this);
 };
-//end shit
+//end mess
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -825,10 +878,10 @@ anychart.Chart.prototype.invalidateHandler_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Return chart configuration as JSON object or string.
- * Note for doc writers!: Гугловый компилятор считает что у Object есть метод toJSON который должен принимать строку и возвращать *.
- * Для того, чтобы он на нас не ругался, приходится писать не правильные параметры.
- * Во внешних доках параметр должен быть boolean, а возвращаемый тип Object|string.
- * Другого способа обойти эту особенность компилятора пока не придумали.
+ * Note for documentation writers!: Google compiler thinks that "Object" has "toJSON" method that must accept string and return *.
+ * To avoid this we have to put in the "wrong" params.
+ * In external documentation parameter must be boolean, and method must return Object|string.
+ * For the moment we have no way around this "nice feature" of the compiler.
  * @param {string=} opt_stringify Return as JSON as string.
  * @return {*} Chart JSON.
  */
@@ -869,6 +922,7 @@ anychart.Chart.prototype.deserialize = function(config) {
   this.title(title);
   this.legend(legend);
   this.autoResize(config['autoResize']);
+  this.credits(config['credits']);
 
   this.resumeSignalsDispatching(true);
 
@@ -887,6 +941,7 @@ anychart.Chart.prototype.serialize = function() {
   json['background'] = this.background().serialize();
   json['title'] = this.title().serialize();
   json['legend'] = this.legend().serialize();
+  json['credits'] = this.credits().serialize();
   json['autoResize'] = this.autoResize();
 
   return json;
@@ -903,7 +958,7 @@ anychart.Chart.prototype.restoreDefaults = function() {
 
   var background = /** @type {anychart.elements.Background} */(this.background());
   background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
-  background.stroke('rgb(36,102,177)');
+  background.stroke('none');
 
   this.title('Chart title');
 
@@ -962,3 +1017,16 @@ anychart.Chart.DrawEvent = function(chart) {
   this['chart'] = chart;
 };
 goog.inherits(anychart.Chart.DrawEvent, goog.events.Event);
+
+
+//exports
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/final
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/final
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
+anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
+anychart.Chart.prototype['chartLabel'] = anychart.Chart.prototype.chartLabel;
+anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
+anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
+anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;
