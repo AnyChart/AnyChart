@@ -199,7 +199,7 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
  */
 anychart.elements.Ticks.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
+    opt_value = acgraph.vector.normalizeStroke(opt_value);
     if (this.stroke_ != opt_value) {
       this.stroke_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);

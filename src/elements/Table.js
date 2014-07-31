@@ -181,7 +181,7 @@ anychart.elements.Table = function(opt_rowsCount, opt_colsCount) {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.cellBorder_ = anychart.color.normalizeStroke('1 black');
+  this.cellBorder_ = acgraph.vector.normalizeStroke('1 black');
 
   /**
    * Default cell top border.
@@ -447,7 +447,7 @@ anychart.elements.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt
       this.cellEvenFill_ = undefined;
       shouldInvalidate = true;
     }
-    var fill = anychart.color.normalizeFill.apply(null, arguments);
+    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.cellFill_) {
       this.cellFill_ = fill;
       shouldInvalidate = true;
@@ -480,7 +480,7 @@ anychart.elements.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, 
       this.cellOddFill_ = undefined;
       shouldInvalidate = true;
     } else {
-      var fill = anychart.color.normalizeFill.apply(null, arguments);
+      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
       if (fill != this.cellOddFill_) {
         this.cellOddFill_ = fill;
         shouldInvalidate = true;
@@ -514,7 +514,7 @@ anychart.elements.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys,
       this.cellEvenFill_ = undefined;
       shouldInvalidate = true;
     } else {
-      var fill = anychart.color.normalizeFill.apply(null, arguments);
+      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
       if (fill != this.cellEvenFill_) {
         this.cellEvenFill_ = fill;
         shouldInvalidate = true;
@@ -544,7 +544,7 @@ anychart.elements.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys,
  */
 anychart.elements.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.cellBorder_) {
       this.cellBorder_ = stroke;
       this.shouldRedrawBorders = true;
@@ -581,7 +581,7 @@ anychart.elements.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, op
         shouldInvalidate = true;
       }
     } else {
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.cellLeftBorder_) {
         this.cellLeftBorder_ = stroke;
         shouldInvalidate = true;
@@ -622,7 +622,7 @@ anychart.elements.Table.prototype.cellRightBorder = function(opt_strokeOrFill, o
         shouldInvalidate = true;
       }
     } else {
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.cellRightBorder_) {
         this.cellRightBorder_ = stroke;
         shouldInvalidate = true;
@@ -663,7 +663,7 @@ anychart.elements.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt
         shouldInvalidate = true;
       }
     } else {
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.cellTopBorder_) {
         this.cellTopBorder_ = stroke;
         shouldInvalidate = true;
@@ -704,7 +704,7 @@ anychart.elements.Table.prototype.cellBottomBorder = function(opt_strokeOrFill, 
         shouldInvalidate = true;
       }
     } else {
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.cellBottomBorder_) {
         this.cellBottomBorder_ = stroke;
         shouldInvalidate = true;
@@ -1637,7 +1637,7 @@ anychart.elements.Table.Cell.prototype.fill = function(opt_fillOrColorOrKeys, op
         shouldInvalidate = true;
       }
     } else {
-      var fill = anychart.color.normalizeFill.apply(null, arguments);
+      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
       if (fill != this.settings_.fill) {
         this.settings_.fill = fill;
@@ -1685,7 +1685,7 @@ anychart.elements.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_t
       }
     } else {
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.settings_.border) {
         this.settings_.border = stroke;
         shouldInvalidate = true;
@@ -1725,7 +1725,7 @@ anychart.elements.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, o
       }
     } else {
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.settings_.leftBorder) {
         this.settings_.leftBorder = stroke;
         shouldInvalidate = true;
@@ -1765,7 +1765,7 @@ anychart.elements.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, 
       }
     } else {
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.settings_.rightBorder) {
         this.settings_.rightBorder = stroke;
         shouldInvalidate = true;
@@ -1805,7 +1805,7 @@ anychart.elements.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, op
       }
     } else {
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.settings_.topBorder) {
         this.settings_.topBorder = stroke;
         shouldInvalidate = true;
@@ -1845,7 +1845,7 @@ anychart.elements.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill,
       }
     } else {
       if (!this.settings_) this.settings_ = /** @type {anychart.elements.Table.Cell.SettingsObj} */({});
-      var stroke = anychart.color.normalizeStroke.apply(null, arguments);
+      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
       if (stroke != this.settings_.bottomBorder) {
         this.settings_.bottomBorder = stroke;
         shouldInvalidate = true;

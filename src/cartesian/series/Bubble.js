@@ -498,7 +498,7 @@ anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeO
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.negativeStroke_) {
       this.negativeStroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -539,7 +539,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke = function(opt_st
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverNegativeStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
@@ -614,7 +614,7 @@ anychart.cartesian.series.Bubble.prototype.negativeFill = function(opt_fillOrCol
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.negativeFill_) {
       this.negativeFill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -670,7 +670,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeFill = function(opt_fill
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverNegativeFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
@@ -724,7 +724,7 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patter
   if (goog.isDef(opt_patternFillOrType)) {
     var hatchFill = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.negativeHatchFill_) {
       this.negativeHatchFill_ = hatchFill;
@@ -760,7 +760,7 @@ anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_p
   if (goog.isDef(opt_patternFillOrType)) {
     this.hoverNegativeHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
     return this;
   }
   return this.hoverNegativeHatchFill_;

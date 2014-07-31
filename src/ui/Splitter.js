@@ -175,7 +175,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = anychart.color.normalizeStroke('#acbece');
+  this.stroke_ = acgraph.vector.normalizeStroke('#acbece');
 
 
   /**
@@ -183,7 +183,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = anychart.color.normalizeFill(/** @type {acgraph.vector.LinearGradientFill} */({
+  this.fill_ = acgraph.vector.normalizeFill(/** @type {acgraph.vector.LinearGradientFill} */({
     'keys': ['0 #9ccae3', '0.5 #a9dbf6', '1 #e3f4fc'],
     'angle': -90,
     'opacity': 1
@@ -195,7 +195,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.dragPreviewFill_ = anychart.color.normalizeFill('#ccd7e1 0.3');
+  this.dragPreviewFill_ = acgraph.vector.normalizeFill('#ccd7e1 0.3');
 
 
   /**
@@ -203,7 +203,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.dragPreviewStroke_ = anychart.color.normalizeStroke(null);
+  this.dragPreviewStroke_ = acgraph.vector.normalizeStroke(null);
 
 
   /**
@@ -211,7 +211,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.dragAreaFill_ = anychart.color.normalizeFill('#fff 0');
+  this.dragAreaFill_ = acgraph.vector.normalizeFill('#fff 0');
 
 
   /**
@@ -219,7 +219,7 @@ anychart.ui.Splitter = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.dragAreaStroke_ = anychart.color.normalizeStroke(null);
+  this.dragAreaStroke_ = acgraph.vector.normalizeStroke(null);
 
 
   /**
@@ -344,7 +344,7 @@ anychart.ui.Splitter.prototype.dragAreaLength = function(opt_value) {
  */
 anychart.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.stroke_, val)) {
       this.stroke_ = val;
       //Invalidates a position because changed line thickness affects a changes in drag area and line's positioning.
@@ -370,7 +370,7 @@ anychart.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thickness
  */
 anychart.ui.Splitter.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.fill_, val)) {
       this.fill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -393,7 +393,7 @@ anychart.ui.Splitter.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacit
  */
 anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.dragPreviewStroke_, val)) {
       this.dragPreviewStroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -417,7 +417,7 @@ anychart.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFill, op
  */
 anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.dragPreviewFill_, val)) {
       this.dragPreviewFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -440,7 +440,7 @@ anychart.ui.Splitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys,
  */
 anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.dragAreaStroke_, val)) {
       this.dragAreaStroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -464,7 +464,7 @@ anychart.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, opt_t
  */
 anychart.ui.Splitter.prototype.dragAreaFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.dragAreaFill_, val)) {
       this.dragAreaFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);

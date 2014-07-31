@@ -52,7 +52,7 @@ anychart.elements.Background = function(opt_cornerType, var_args) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = anychart.color.normalizeFill('#000 0.5');
+  this.fill_ = acgraph.vector.normalizeFill('#000 0.5');
 
   /**
    * Stroke settings.
@@ -427,7 +427,7 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  */
 anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.fill_, val)) {
       this.fill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -534,7 +534,7 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  */
 anychart.elements.Background.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(val, this.stroke_)) {
       this.stroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);

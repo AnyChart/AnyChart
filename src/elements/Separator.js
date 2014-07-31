@@ -246,7 +246,7 @@ anychart.elements.Separator.prototype.orientation = function(opt_value) {
  */
 anychart.elements.Separator.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(val, this.fill_)) {
       this.fill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -269,7 +269,7 @@ anychart.elements.Separator.prototype.fill = function(opt_fillOrColorOrKeys, opt
  */
 anychart.elements.Separator.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(val, this.stroke_)) {
       this.stroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);

@@ -87,7 +87,7 @@ anychart.ui.ScrollBar = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.bgFill_ = anychart.color.normalizeFill('#e0e0e0');
+  this.bgFill_ = acgraph.vector.normalizeFill('#e0e0e0');
 
 
   /**
@@ -95,7 +95,7 @@ anychart.ui.ScrollBar = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.bgStroke_ = anychart.color.normalizeStroke('#d5d5d5');
+  this.bgStroke_ = acgraph.vector.normalizeStroke('#d5d5d5');
 
 
   /**
@@ -103,7 +103,7 @@ anychart.ui.ScrollBar = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.sliderFill_ = anychart.color.normalizeFill('#d5d5d5');
+  this.sliderFill_ = acgraph.vector.normalizeFill('#d5d5d5');
 
 
   /**
@@ -111,7 +111,7 @@ anychart.ui.ScrollBar = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.sliderStroke_ = anychart.color.normalizeStroke('#656565');
+  this.sliderStroke_ = acgraph.vector.normalizeStroke('#656565');
 
 
   /**
@@ -237,7 +237,7 @@ anychart.ui.ScrollBar.prototype.layout = function(opt_value) {
  */
 anychart.ui.ScrollBar.prototype.backgroundStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.bgStroke_, val)) {
       this.bgStroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -261,7 +261,7 @@ anychart.ui.ScrollBar.prototype.backgroundStroke = function(opt_strokeOrFill, op
  */
 anychart.ui.ScrollBar.prototype.backgroundFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.bgFill_, val)) {
       this.bgFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -284,7 +284,7 @@ anychart.ui.ScrollBar.prototype.backgroundFill = function(opt_fillOrColorOrKeys,
  */
 anychart.ui.ScrollBar.prototype.sliderStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = anychart.color.normalizeStroke.apply(null, arguments);
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.sliderStroke_, val)) {
       this.sliderStroke_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -308,7 +308,7 @@ anychart.ui.ScrollBar.prototype.sliderStroke = function(opt_strokeOrFill, opt_th
  */
 anychart.ui.ScrollBar.prototype.sliderFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = anychart.color.normalizeFill.apply(null, arguments);
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.sliderFill_, val)) {
       this.sliderFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);

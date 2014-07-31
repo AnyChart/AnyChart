@@ -223,7 +223,7 @@ anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_p
   if (goog.isDef(opt_patternFillOrType)) {
     var hatchFill = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.risingHatchFill_) {
       this.risingHatchFill_ = hatchFill;
@@ -248,7 +248,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(
   if (goog.isDef(opt_patternFillOrType)) {
     this.hoverRisingHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
     return this;
   }
   return this.hoverRisingHatchFill_;
@@ -285,7 +285,7 @@ anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_
   if (goog.isDef(opt_patternFillOrType)) {
     var hatchFill = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.fallingHatchFill_) {
       this.fallingHatchFill_ = hatchFill;
@@ -310,7 +310,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function
   if (goog.isDef(opt_patternFillOrType)) {
     this.hoverFallingHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
     return this;
   }
   return this.hoverFallingHatchFill_;
@@ -353,7 +353,7 @@ anychart.cartesian.series.Candlestick.prototype.risingFill = function(opt_fillOr
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.risingFill_) {
       this.risingFill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -379,7 +379,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingFill = function(opt_f
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverRisingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
@@ -425,7 +425,7 @@ anychart.cartesian.series.Candlestick.prototype.fallingFill = function(opt_fillO
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fallingFill_) {
       this.fallingFill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -452,7 +452,7 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverFallingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }

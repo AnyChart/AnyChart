@@ -1512,7 +1512,7 @@ anychart.cartesian.series.Base.prototype.calculateStatistics = function() {
  */
 anychart.cartesian.series.Base.prototype.color = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = goog.isNull(opt_fillOrColorOrKeys) ? null : anychart.color.normalizeFill.apply(null, arguments);
+    var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.color_ != color) {
       this.color_ = color;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1546,7 +1546,7 @@ anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
  * @param {?acgraph.vector.HatchFill.HatchFillType} value Auto hatch fill type distributed by the chart.
  */
 anychart.cartesian.series.Base.prototype.setAutoHatchFill = function(value) {
-  this.autoHatchFill_ = /** @type {acgraph.vector.HatchFill} */(anychart.color.normalizeHatchFill(value));
+  this.autoHatchFill_ = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
 };
 
 
@@ -1574,7 +1574,7 @@ anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrT
   if (goog.isDef(opt_patternFillOrType)) {
     var hatchFill = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
@@ -1610,7 +1610,7 @@ anychart.cartesian.series.Base.prototype.hoverHatchFill = function(opt_patternFi
   if (goog.isDef(opt_patternFillOrType)) {
     this.hoverHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
         opt_patternFillOrType :
-        anychart.color.normalizeHatchFill.apply(null, arguments);
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
     return this;
   }
   return this.hoverHatchFill_;
@@ -1651,16 +1651,16 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
     var sourceHatchFill = arguments.length > 1 ?
         this.normalizeHatchFill.apply(this, goog.array.slice(arguments, 1)) :
         this.autoHatchFill_ ||
-        anychart.color.normalizeHatchFill(anychart.cartesian.series.Base.DEFAULT_HATCH_FILL_TYPE);
+        acgraph.vector.normalizeHatchFill(anychart.cartesian.series.Base.DEFAULT_HATCH_FILL_TYPE);
 
     var scope = {
       'index': this.getIterator().getIndex(),
       'sourceHatchFill': sourceHatchFill,
       'iterator': this.getIterator()
     };
-    fill = anychart.color.normalizeHatchFill(hatchFill.call(scope));
+    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
   } else
-    fill = anychart.color.normalizeHatchFill(hatchFill);
+    fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;
 };
 
@@ -1709,7 +1709,7 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1764,7 +1764,7 @@ anychart.cartesian.series.Base.prototype.hoverFill = function(opt_fillOrColorOrK
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
-        anychart.color.normalizeFill.apply(null, arguments);
+        acgraph.vector.normalizeFill.apply(null, arguments);
     // TODO: we don't set anything cause everything is fine?
     return this;
   }
@@ -1830,7 +1830,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.strokeInternal) {
       this.strokeInternal = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1879,7 +1879,7 @@ anychart.cartesian.series.Base.prototype.hoverStroke = function(opt_strokeOrFill
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: we don't set anything cause there is nothing to do?
     return this;
   }

@@ -105,7 +105,7 @@ anychart.utils.DistinctColorPalette.prototype.colorAt = function(index, opt_colo
 anychart.utils.DistinctColorPalette.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.colors_ = goog.array.map(opt_value, function(element) {
-      return anychart.color.normalizeFill(element);
+      return acgraph.vector.normalizeFill(element);
     });
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;

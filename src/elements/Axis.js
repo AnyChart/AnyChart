@@ -652,7 +652,7 @@ anychart.elements.Axis.prototype.minorTicksInvalidated_ = function(event) {
  */
 anychart.elements.Axis.prototype.stroke = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.color.normalizeStroke(opt_value);
+    opt_value = acgraph.vector.normalizeStroke(opt_value);
     if (this.stroke_ != opt_value) {
       var thicknessOld = goog.isObject(this.stroke_) ? this.stroke_['thickness'] || 1 : 1;
       var thicknessNew = goog.isObject(opt_value) ? opt_value['thickness'] || 1 : 1;

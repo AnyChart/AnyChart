@@ -755,7 +755,7 @@ anychart.elements.MarkersFactory.prototype.offsetY = function(opt_value) {
  */
 anychart.elements.MarkersFactory.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = anychart.color.normalizeFill.apply(null, arguments);
+    var color = acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.fill_ != color) {
       this.fill_ = color;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -829,7 +829,7 @@ anychart.elements.MarkersFactory.prototype.setAutoFill = function(value) {
  */
 anychart.elements.MarkersFactory.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var color = anychart.color.normalizeStroke.apply(null, arguments);
+    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.stroke_ != color) {
       this.stroke_ = color;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1693,7 +1693,7 @@ anychart.elements.MarkersFactory.Marker.prototype.offsetY = function(opt_value) 
  */
 anychart.elements.MarkersFactory.Marker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = anychart.color.normalizeFill.apply(null, arguments);
+    var color = acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.settingsObj.fill_ != color) {
       this.settingsObj.fill_ = color;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1720,7 +1720,7 @@ anychart.elements.MarkersFactory.Marker.prototype.fill = function(opt_fillOrColo
  */
 anychart.elements.MarkersFactory.Marker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var color = anychart.color.normalizeStroke.apply(null, arguments);
+    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.settingsObj.stroke_ != color) {
       this.settingsObj.stroke_ = color;
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ENABLED, anychart.Signal.NEEDS_REDRAW);

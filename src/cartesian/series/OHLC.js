@@ -180,7 +180,7 @@ anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFil
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.risingStroke_) {
       this.risingStroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -221,7 +221,7 @@ anychart.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_stroke
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverRisingStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
@@ -281,7 +281,7 @@ anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFi
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.fallingStroke_) {
       this.fallingStroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -322,7 +322,7 @@ anychart.cartesian.series.OHLC.prototype.hoverFallingStroke = function(opt_strok
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverFallingStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }

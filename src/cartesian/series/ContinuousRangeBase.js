@@ -141,7 +141,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.highStroke = function(op
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.highStroke_) {
       this.highStroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -182,7 +182,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = functi
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverHighStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
@@ -242,7 +242,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke = function(opt
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.lowStroke_) {
       this.lowStroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -283,7 +283,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = functio
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverLowStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
-        anychart.color.normalizeStroke.apply(null, arguments);
+        acgraph.vector.normalizeStroke.apply(null, arguments);
     // TODO: We don't set anything cause everything is fine?
     return this;
   }
