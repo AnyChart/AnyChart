@@ -662,6 +662,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
   var axis = this.yAxes_[index];
   if (!axis) {
     axis = new anychart.elements.Axis();
+    axis.staggerMode(false);
     axis.orientation(anychart.utils.Orientation.LEFT);
     axis.title().text('Y-Axis');
     this.yAxes_[index] = axis;

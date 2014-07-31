@@ -40,9 +40,7 @@ goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
  */
 anychart.scales.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
-    this.ticksObj = new anychart.scales.ScatterTicks(this);
-    this.registerDisposable(this.ticksObj);
-    this.ticksObj.listenSignals(this.ticksInvalidated_, this);
+    this.ticksObj = this.createTicks();
   }
   if (goog.isDef(opt_value)) {
     this.ticksObj.set(opt_value);
@@ -59,9 +57,7 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
  */
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
-    this.minorTicksObj = new anychart.scales.ScatterTicks(this);
-    this.registerDisposable(this.minorTicksObj);
-    this.minorTicksObj.listenSignals(this.ticksInvalidated_, this);
+    this.minorTicksObj = this.createTicks();
   }
   if (goog.isDef(opt_value)) {
     this.minorTicksObj.set(opt_value);
@@ -101,6 +97,19 @@ anychart.scales.Linear.prototype.ticksInvalidated_ = function(event) {
     this.consistent = false;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
+};
+
+
+/**
+ * Create scale ticks.
+ * @return {!anychart.scales.ScatterTicks}
+ * @protected
+ */
+anychart.scales.Linear.prototype.createTicks = function() {
+  var ticks = new anychart.scales.ScatterTicks(this);
+  this.registerDisposable(ticks);
+  ticks.listenSignals(this.ticksInvalidated_, this);
+  return ticks;
 };
 
 

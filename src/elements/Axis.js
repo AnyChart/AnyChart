@@ -64,7 +64,7 @@ anychart.elements.Axis = function() {
       .offsetX(0)
       .offsetY(0)
       .anchor(anychart.utils.NinePositions.CENTER)
-      .padding(2, 3, 2, 3)
+      .padding(1, 2, 1, 2)
       .fontFamily('Tahoma')
       .fontSize('11')
       .fontColor('rgb(34,34,34)')
@@ -122,6 +122,7 @@ anychart.elements.Axis = function() {
 
   this.overlapMode(anychart.elements.Axis.OverlapMode.OVERLAP);
   this.stroke({'color': '#474747', 'lineJoin': 'round', 'lineCap': 'square'});
+  this.staggerMaxLines(2);
 
   this.resumeSignalsDispatching(true);
 

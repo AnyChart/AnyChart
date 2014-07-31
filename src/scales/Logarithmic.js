@@ -37,6 +37,14 @@ anychart.scales.Logarithmic.prototype.calculate = function() {
 };
 
 
+/** @inheritDoc */
+anychart.scales.Logarithmic.prototype.createTicks = function() {
+  var ticks = goog.base(this, 'createTicks');
+  ticks.mode('log');
+  return ticks;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
