@@ -438,7 +438,7 @@ anychart.ui.Button.prototype.drawText = function(textSettings) {
   if (isInitial) {
     this.textElement = acgraph.text();
     this.registerDisposable(this.textElement);
-    this.textElement.pointerEvents('none');
+    this.textElement.disablePointerEvents(true);
   }
 
   this.applyTextSettings(/** @type {!acgraph.vector.Text} */ (this.textElement), isInitial);

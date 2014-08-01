@@ -309,7 +309,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
       this.hatchFillElement_ = new anychart.elements.MarkersFactory();
       this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillElement_.zIndex(/** @type {number} */(this.zIndex() + 1));
-      this.hatchFillElement_.pointerEvents('none');
+      this.hatchFillElement_.disablePointerEvents(true);
     }
 
     if (this.hatchFillElement_) {

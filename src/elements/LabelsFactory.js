@@ -1805,7 +1805,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
       this.textElement_ = acgraph.text();
       this.textElement_.zIndex(1);
       this.textElement_.parent(this.layer_);
-      this.textElement_.pointerEvents('none');
+      this.textElement_.disablePointerEvents(true);
     }
     //define parent bounds
     var parentWidth, parentHeight;

@@ -853,17 +853,17 @@ anychart.elements.MarkersFactory.prototype.setAutoStroke = function(value) {
 
 /**
  * Specifies under what circumstances a given graphics element can be the target element for a pointer event.
- * @param {?string=} opt_pointerEvents Pointer events property value.
- * @return {anychart.elements.MarkersFactory|string} If opt_pointerEvents defined then returns Element object for chaining else
+ * @param {boolean=} opt_value Pointer events property value.
+ * @return {anychart.elements.MarkersFactory|boolean} If opt_value defined then returns Element object for chaining else
  * pointer events property value.
  */
-anychart.elements.MarkersFactory.prototype.pointerEvents = function(opt_pointerEvents) {
-  if (goog.isDef(opt_pointerEvents)) {
-    this.pointerEvents_ = opt_pointerEvents;
+anychart.elements.MarkersFactory.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.disablePointerEvents_ = opt_value;
     this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
-  return this.pointerEvents_;
+  return this.disablePointerEvents_;
 };
 
 
@@ -1092,7 +1092,7 @@ anychart.elements.MarkersFactory.prototype.add = function(positionProvider, opt_
  */
 anychart.elements.MarkersFactory.prototype.draw = function() {
   if (!this.layer_) this.layer_ = acgraph.layer();
-  this.layer_.pointerEvents(/** @type {string} */(this.pointerEvents()));
+  this.layer_.disablePointerEvents(/** @type {boolean} */(this.disablePointerEvents()));
 
   var stage = this.layer_.getStage();
   var manualSuspend = stage && !stage.isSuspended();
@@ -2025,7 +2025,7 @@ anychart.elements.MarkersFactory.prototype['type'] = anychart.elements.MarkersFa
 anychart.elements.MarkersFactory.prototype['size'] = anychart.elements.MarkersFactory.prototype.size;
 anychart.elements.MarkersFactory.prototype['fill'] = anychart.elements.MarkersFactory.prototype.fill;
 anychart.elements.MarkersFactory.prototype['stroke'] = anychart.elements.MarkersFactory.prototype.stroke;
-anychart.elements.MarkersFactory.prototype['pointerEvents'] = anychart.elements.MarkersFactory.prototype.pointerEvents;
+anychart.elements.MarkersFactory.prototype['disablePointerEvents'] = anychart.elements.MarkersFactory.prototype.disablePointerEvents;
 anychart.elements.MarkersFactory.prototype['serialize'] = anychart.elements.MarkersFactory.prototype.serialize;
 anychart.elements.MarkersFactory.prototype['deserialize'] = anychart.elements.MarkersFactory.prototype.deserialize;
 anychart.elements.MarkersFactory.prototype['add'] = anychart.elements.MarkersFactory.prototype.add;

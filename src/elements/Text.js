@@ -36,7 +36,7 @@ anychart.elements.Text = function() {
     'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
     'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
     'selectable': false,
-    'hoverable': false,
+    'disablePointerEvents': true,
     'useHtml': false
   };
 
@@ -57,7 +57,7 @@ anychart.elements.Text = function() {
     'fontColor': true,
     'fontOpacity': true,
     'selectable': true,
-    'hoverable': true
+    'disablePointerEvents': true
   };
 };
 goog.inherits(anychart.elements.Text, anychart.VisualBase);
@@ -500,8 +500,8 @@ anychart.elements.Text.prototype.selectable = function(opt_value) {
  * @param {boolean=} opt_value .
  * @return {!anychart.elements.Text|boolean} .
  */
-anychart.elements.Text.prototype.hoverable = function(opt_value) {
-  return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('hoverable', opt_value));
+anychart.elements.Text.prototype.disablePointerEvents = function(opt_value) {
+  return /** @type {!anychart.elements.Text|boolean} */(this.textSettings('disablePointerEvents', opt_value));
 };
 
 
@@ -566,8 +566,8 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.textOverflow(this.settingsObj['textOverflow']);
   if (isInitial || 'selectable' in this.changedSettings)
     textElement.selectable(this.settingsObj['selectable']);
-  if (isInitial || 'hoverable' in this.changedSettings)
-    textElement.pointerEvents(this.settingsObj['hoverable'] ? '' : 'none');
+  if (isInitial || 'disablePointerEvents' in this.changedSettings)
+    textElement.disablePointerEvents(!!this.settingsObj['disablePointerEvents']);
 };
 
 
@@ -594,7 +594,7 @@ anychart.elements.Text.prototype.serialize = function() {
   json['textWrap'] = this.textWrap();
   json['textOverflow'] = this.textOverflow();
   json['selectable'] = this.selectable();
-  json['hoverable'] = this.hoverable();
+  json['disablePointerEvents'] = this.disablePointerEvents();
   json['useHtml'] = this.useHtml();
 
   return json;
@@ -619,6 +619,6 @@ anychart.elements.Text.prototype['hAlign'] = anychart.elements.Text.prototype.hA
 anychart.elements.Text.prototype['textWrap'] = anychart.elements.Text.prototype.textWrap;//in docs/final
 anychart.elements.Text.prototype['textOverflow'] = anychart.elements.Text.prototype.textOverflow;//in docs/final
 anychart.elements.Text.prototype['selectable'] = anychart.elements.Text.prototype.selectable;//in docs/final
-anychart.elements.Text.prototype['hoverable'] = anychart.elements.Text.prototype.hoverable;//in docs/final
+anychart.elements.Text.prototype['disablePointerEvents'] = anychart.elements.Text.prototype.disablePointerEvents;//in docs/final
 anychart.elements.Text.prototype['useHtml'] = anychart.elements.Text.prototype.useHtml;//in docs/final
 anychart.elements.Text.prototype['textSettings'] = anychart.elements.Text.prototype.textSettings;//in docs/final

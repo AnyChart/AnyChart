@@ -122,7 +122,7 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
       this.hatchFillPath = acgraph.path();
       this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillPath.zIndex(/** @type {number} */(this.zIndex() + 1));
-      this.hatchFillPath.pointerEvents('none');
+      this.hatchFillPath.disablePointerEvents(true);
     }
   }
 

@@ -97,7 +97,7 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
 
       this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillRootElement.zIndex(/** @type {number} */(this.zIndex() + 1));
-      this.hatchFillRootElement.pointerEvents('none');
+      this.hatchFillRootElement.disablePointerEvents(true);
     }
 
     if (this.hatchFillRootElement)

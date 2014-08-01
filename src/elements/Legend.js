@@ -100,8 +100,9 @@ anychart.elements.Legend = function() {
     .fontSize('10')
     .fontWeight('normal')
     .fontColor('rgb(35,35,35)')
-      // we need LegendItem text could catch mouseover and mouseclick (cause elements.Text turns  pointerEvents off with non-hoverable text)
-    .hoverable(true)
+      // we need LegendItem text could catch mouseover and mouseclick
+      // (cause elements.Text turns disablePointerEvents() on with non-hoverable text)
+    .disablePointerEvents(false)
     .padding(7)
     .margin(5);
 

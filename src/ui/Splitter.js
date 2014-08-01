@@ -1039,7 +1039,7 @@ anychart.ui.Splitter.prototype.getDragPreview_ = function() {
 anychart.ui.Splitter.prototype.getCenterLine_ = function() {
   if (!this.centerLine_) {
     this.centerLine_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect()
-        .pointerEvents('none')
+        .disablePointerEvents(true)
         .fill(this.fill_)
         .stroke(this.stroke_));
 
