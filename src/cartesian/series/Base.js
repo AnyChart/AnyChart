@@ -1191,7 +1191,7 @@ anychart.cartesian.series.Base.prototype.unhover = goog.abstractMethod;
 
 /**
  * Temporarily works only for acgraph.vector.Element.
- * @param {acgraph.vector.IElement} element .
+ * @param {acgraph.vector.Element} element .
  * @param {boolean=} opt_seriesGlobal .
  * @protected
  */

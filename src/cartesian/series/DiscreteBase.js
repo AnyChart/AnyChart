@@ -36,7 +36,7 @@ anychart.cartesian.series.DiscreteBase.prototype.hatchFillRootElement = null;
 
 /**
  * Discrete-pointed series are based on a typed layer, that constructs children by this initializer.
- * @return {!acgraph.vector.IElement} Returns new instance of an element.
+ * @return {!acgraph.vector.Element} Returns new instance of an element.
  * @protected
  */
 anychart.cartesian.series.DiscreteBase.prototype.rootTypedLayerInitializer = function() {

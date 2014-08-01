@@ -4,26 +4,25 @@ goog.require('acgraph.vector.Layer');
 
 
 /**
- * @param {function():!acgraph.vector.IElement} constructChild .
- * @param {function(!acgraph.vector.IElement)=} opt_cleanChild .
+ * @param {function():!acgraph.vector.Element} constructChild .
+ * @param {function(!acgraph.vector.Element)=} opt_cleanChild .
  * @param {!acgraph.vector.Layer=} opt_layer .
  * @param {*=} opt_context .
  * @constructor
- * @implements {acgraph.vector.IElement}
  * @extends {acgraph.vector.Layer}
  */
 anychart.utils.TypedLayer = function(constructChild, opt_cleanChild, opt_layer, opt_context) {
   goog.base(this);
 
   /**
-   * @return {!acgraph.vector.IElement} .
+   * @return {!acgraph.vector.Element} .
    * @private
    * @this {*}
    */
   this.constructChild_ = constructChild;
 
   /**
-   * @param {!acgraph.vector.IElement} element .
+   * @param {!acgraph.vector.Element} element .
    * @private
    * @this {*}
    */
@@ -54,7 +53,7 @@ anychart.utils.TypedLayer.prototype.clear = function() {
 
 
 /**
- * @return {!acgraph.vector.IElement} .
+ * @return {!acgraph.vector.Element} .
  */
 anychart.utils.TypedLayer.prototype.genNextChild = function() {
   var child = this.childrenPool_.pop();

@@ -1190,8 +1190,8 @@ anychart.ui.ScrollBar.prototype.draw = function() {
     if (manualSuspend) stage.suspend();
 
     if (!this.getBase_().numChildren()) {
-      this.base_.addChild(/** @type {!acgraph.vector.IElement} */ (this.getBg_()));
-      this.base_.addChild(/** @type {!acgraph.vector.IElement} */ (this.getSlider_()));
+      this.base_.addChild(/** @type {!acgraph.vector.Element} */ (this.getBg_()));
+      this.base_.addChild(/** @type {!acgraph.vector.Element} */ (this.getSlider_()));
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {

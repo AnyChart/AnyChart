@@ -1064,9 +1064,9 @@ anychart.ui.Splitter.prototype.draw = function() {
     //Ensure DOM structure is created.
     if (!this.getBase_().numChildren()) {
       this.getBase_()
-          .addChild(/** @type {!acgraph.vector.IElement} */ (this.getDragPreview_()))
-          .addChild(/** @type {!acgraph.vector.IElement} */ (this.getDragArea_()))
-          .addChild(/** @type {!acgraph.vector.IElement} */ (this.getCenterLine_()));
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getDragPreview_()))
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getDragArea_()))
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getCenterLine_()));
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
