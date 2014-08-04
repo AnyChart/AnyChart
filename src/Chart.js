@@ -603,7 +603,7 @@ anychart.Chart.prototype.onChartLabelSignal_ = function(event) {
  */
 anychart.Chart.prototype.credits = function(opt_value) {
   if (!this.credits_) {
-    this.credits_ = anychart.elements.Credits.getInstance();
+    this.credits_ = new anychart.elements.Credits();
     this.registerDisposable(this.credits_);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
   }
@@ -696,6 +696,7 @@ anychart.Chart.prototype.draw = function() {
     credits.suspendSignalsDispatching();
     if (!credits.container() && credits.enabled())
       credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    credits.parentBounds(/** @type {anychart.math.Rect} */ (this.pixelBounds()));
     credits.resumeSignalsDispatching(false);
     credits.draw();
     this.markConsistent(anychart.ConsistencyState.CREDITS);

@@ -35,12 +35,6 @@ anychart.elements.Credits = function() {
    */
   this.logoSrc_ = 'http://static.anychart.com/logo_grey.png';
 
-  /**
-   * @type {Element}
-   * @private
-   */
-  this.creditsCss_ = null;
-
 
   /**
    * @type {Element}
@@ -49,7 +43,6 @@ anychart.elements.Credits = function() {
   this.domElement_ = null;
 };
 goog.inherits(anychart.elements.Credits, anychart.VisualBase);
-goog.addSingletonGetter(anychart.elements.Credits);
 
 
 /** @inheritDoc */
@@ -146,6 +139,30 @@ anychart.elements.Credits.prototype.logoSrc = function(opt_value) {
 
 
 /**
+ * Getter for credits parent element bounds.
+ * @return {anychart.math.Rect} Parent element bounds.
+ *//**
+ * Setter for credits parent element bounds.
+ * @param {anychart.math.Rect=} opt_value Value to set.
+ * @return {!anychart.elements.Credits} An instance of the {@link anychart.elements.Credits} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {anychart.math.Rect=} opt_value Parent element bounds to set.
+ * @return {(anychart.math.Rect|!anychart.elements.Credits)} Parent element bounds or self for method chaining.
+ */
+anychart.elements.Credits.prototype.parentBounds = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.parentBounds_ != opt_value) {
+      this.parentBounds_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.parentBounds_;
+};
+
+
+/**
  * Draw credits.
  * @return {anychart.elements.Credits} Return itself for chaining call.
  */
@@ -154,7 +171,21 @@ anychart.elements.Credits.prototype.draw = function() {
     return this;
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
-  var containerElement = /** @type {Element} */(container.getStage().container());
+  var stage = container ? container.getStage() : null;
+  var parentBounds;
+  if (this.parentBounds_) {
+    parentBounds = this.parentBounds_;
+  } else if (stage) {
+    parentBounds = stage.getBounds();
+  } else {
+    parentBounds = new anychart.math.Rect(0, 0, 0, 0);
+  }
+
+  var containerElement;
+  if (stage)
+    containerElement = /** @type {Element} */(stage.container());
+  else
+    containerElement = null;
 
   if (!this.domElement_) {
     this.domElement_ = goog.dom.createDom(
@@ -163,12 +194,13 @@ anychart.elements.Credits.prototype.draw = function() {
         );
   }
 
-  if (!this.creditsCss_) {
-    this.creditsCss_ = this.createCssElement_();
+  if (!anychart.elements.Credits.creditsCss_) {
+    anychart.elements.Credits.creditsCss_ = this.createCssElement_();
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    goog.dom.appendChild(containerElement, this.domElement_);
+    if (containerElement)
+      goog.dom.appendChild(containerElement, this.domElement_);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -183,13 +215,12 @@ anychart.elements.Credits.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
-    var box = goog.style.getBorderBoxSize(containerElement);
     var creditSize = goog.style.getBorderBoxSize(this.domElement_);
 
     goog.style.setPosition(
         this.domElement_,
-        box.width - creditSize.width - 10, //fixed offsets
-        box.height - creditSize.height - 6
+        parentBounds.left + parentBounds.width - creditSize.width - 10, //fixed offsets
+        parentBounds.top + parentBounds.height - creditSize.height - 6
     );
     this.markConsistent(anychart.ConsistencyState.POSITION);
   }
@@ -211,6 +242,15 @@ anychart.elements.Credits.prototype.getHTMLString_ = function() {
   return '<img class="' + anychart.elements.Credits.CssClass.LOGO + '" src="' + this.logoSrc_ + '">' +
       '<span class="' + anychart.elements.Credits.CssClass.TEXT + '">' + this.text_ + '</span>';
 };
+
+
+/**
+ * Style node created in dom.
+ * Need to prevent creating of multiple style nodes.
+ * @type {Element}
+ * @private
+ */
+anychart.elements.Credits.creditsCss_ = null;
 
 
 /**
@@ -252,9 +292,9 @@ anychart.elements.Credits.prototype.createCssElement_ = function() {
   else
     goog.dom.appendChild(css, goog.dom.createTextNode(styles));
 
-  goog.dom.appendChild(
+  goog.dom.insertChildAt(
       goog.dom.getElementsByTagNameAndClass('head')[0],
-      css
+      css, 0
   );
   return css;
 };
