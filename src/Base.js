@@ -466,6 +466,10 @@ anychart.SignalEvent.prototype.hasSignal = function(state) {
 
 //exports
 anychart.Base.prototype['listen'] = anychart.Base.prototype.listen;
+anychart.Base.prototype['listenOnce'] = anychart.Base.prototype.listenOnce;
+anychart.Base.prototype['unlisten'] = anychart.Base.prototype.unlisten;
+anychart.Base.prototype['unlistenByKey'] = anychart.Base.prototype.unlistenByKey;
+anychart.Base.prototype['removeAllListeners'] = anychart.Base.prototype.removeAllListeners;
 goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);
 anychart.SignalEvent.prototype['hasSignal'] = anychart.SignalEvent.prototype.hasSignal;
 goog.exportSymbol('anychart.Signal', anychart.Signal);

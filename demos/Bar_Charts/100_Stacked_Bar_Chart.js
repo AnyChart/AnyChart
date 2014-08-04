@@ -1,6 +1,6 @@
 anychart.onDocumentReady(function() {
   //create data set on our data
-  var dataSet = new anychart.data.Set([
+  var dataSet = anychart.data.set([
     ['P1', 297, 243, 235, 223],
     ['P2', 184, 255, 156, 249],
     ['P3', 136, 199, 177, 276],

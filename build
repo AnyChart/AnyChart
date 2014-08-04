@@ -466,7 +466,7 @@ def __build_js_doc():
         dry_run,
         '","'.join(tag_list.split('\n')),
         generate_playground_samples,
-        ''.join(__get_exports_sting()),
+        ''.join(__get_exports_sting()) + __get_graphics_export_string(),
         js_version
     ]))
     f.close()
@@ -498,6 +498,7 @@ def __build_js_doc():
     t = time.time()
     subprocess.call([os.path.join(API_REFERENCE_ENGINE_PATH, 'jsdoc'),
                      SRC_PATH,
+                     GRAPHICS_SRC_PATH,
                      '-r',
                      '-t',
                      os.path.join(API_REFERENCE_ENGINE_PATH, 'templates', 'main'),
@@ -543,6 +544,16 @@ def __get_exports_sting(target=SRC_PATH):
                     found = True
 
     return result
+
+def __get_graphics_export_string():
+    export_file_path = os.path.join(GRAPHICS_SRC_PATH, 'export.js')
+    export_file = open(export_file_path, 'r')
+    text = export_file.read()
+    export_file.close()
+
+    text = ''.join(text.split('\n'))
+    return text.strip()
+
 
 def __print_exports(target=SRC_PATH):
     print '\n'.join(__get_exports_sting(target))

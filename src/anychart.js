@@ -8,8 +8,8 @@ goog.provide('anychart.globalLock');
 
 /**
  * Core space for all anychart components.
- @namespace
- @name anychart
+ * @namespace
+ * @name anychart
  */
 
 
@@ -25,6 +25,19 @@ anychart.VERSION = '';
  * @define {boolean} Is developers version.
  */
 anychart.DEVELOP = false;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Graphics engine
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Drawing core namespace.
+ * @namespace
+ * @name anychart.graphics
+ */
+anychart.graphics = window['acgraph'];
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -331,9 +344,8 @@ anychart.onDocumentReady = function(func, opt_scope) {
 
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);
-goog.exportSymbol('anychart.version', anychart.VERSION);
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);
-goog.exportSymbol('anychart.develop', anychart.DEVELOP);
+goog.exportSymbol('anychart.graphics', anychart.graphics);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);
 goog.exportSymbol('anychart.fromXml', anychart.fromXml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
