@@ -88,7 +88,7 @@ def __sync_contrib():
         print 'Install closure linter'
         commands = [] if platform.system() == 'Windows' else ['sudo']
         commands.append('easy_install')
-        commands.append('http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz')
+        commands.append('https://closure-linter.googlecode.com/files/closure_linter-2.3.9.tar.gz')
         try:
             subprocess.call(commands)
         except StandardError:
