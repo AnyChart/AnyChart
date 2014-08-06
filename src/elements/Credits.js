@@ -15,7 +15,7 @@ anychart.elements.Credits = function() {
    * @type {string}
    * @private
    */
-  this.text_ = 'AnyChart.com';
+  this.text_ = 'AnyChart Trial Version';
 
   /**
    * @type {string}
@@ -167,6 +167,8 @@ anychart.elements.Credits.prototype.parentBounds = function(opt_value) {
  * @return {anychart.elements.Credits} Return itself for chaining call.
  */
 anychart.elements.Credits.prototype.draw = function() {
+  var valid = anychart.isValidKey();
+  if (!valid && !this.enabled()) this.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -206,11 +208,11 @@ anychart.elements.Credits.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     goog.dom.setProperties(this.domElement_, {
-      'href': this.url_,
-      'title': this.alt_,
+      'href': valid ? this.url_ : 'http://anychart.com',
+      'title': valid ? this.alt_ : 'AnyChart.com',
       'target': '_blank'
     });
-    this.domElement_.innerHTML = this.getHTMLString_();
+    this.domElement_.innerHTML = this.getHTMLString_(valid);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -235,12 +237,13 @@ anychart.elements.Credits.prototype.draw = function() {
 
 
 /**
+ * @param {boolean} valid Is license key valid.
  * @return {string}
  * @private
  */
-anychart.elements.Credits.prototype.getHTMLString_ = function() {
-  return '<img class="' + anychart.elements.Credits.CssClass.LOGO + '" src="' + this.logoSrc_ + '">' +
-      '<span class="' + anychart.elements.Credits.CssClass.TEXT + '">' + this.text_ + '</span>';
+anychart.elements.Credits.prototype.getHTMLString_ = function(valid) {
+  return '<img class="' + anychart.elements.Credits.CssClass.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo_grey.png') + '">' +
+      '<span class="' + anychart.elements.Credits.CssClass.TEXT + '">' + (valid ? this.text_ : 'AnyChart Trial Version') + '</span>';
 };
 
 
@@ -264,7 +267,7 @@ anychart.elements.Credits.prototype.createCssElement_ = function() {
 
   styles += '.' + anychart.elements.Credits.CssClass.CREDITS + '{' +
       'position:absolute;' +
-      'width:76px;' +
+      'width:110px;' +
       'height:10px;' +
       '}';
 

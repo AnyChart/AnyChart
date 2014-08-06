@@ -1133,6 +1133,80 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
 };
 
 
+/**
+ * CRC table.
+ * @type {Array}
+ * @private
+ */
+anychart.utils.crcTable_ = null;
+
+
+/**
+ * Creates crc32 table.
+ * @return {Array} crc table.
+ * @private
+ */
+anychart.utils.createCRCTable_ = function() {
+  var c;
+  var crcTable = [];
+  for (var n = 0; n < 256; n++) {
+    c = n;
+    for (var k = 0; k < 8; k++) {
+      c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+    }
+    crcTable[n] = c;
+  }
+  return crcTable;
+};
+
+
+/**
+ * Takes argument and returns it crc32 checksum.
+ * @param {string} str Input string.
+ * @return {string} crc32b.
+ */
+anychart.utils.crc32 = function(str) {
+  if (!anychart.utils.crcTable_) anychart.utils.crcTable_ = anychart.utils.createCRCTable_();
+  var crc = 0 ^ (-1), i = 0;
+  while (i < str.length)
+    crc = (crc >>> 8) ^ anychart.utils.crcTable_[(crc ^ str.charCodeAt(i++)) & 0xFF];
+  return ((crc ^ (-1)) >>> 0).toString(16);
+};
+
+
+/**
+ * Crypted salt
+ * @type {Array.<number>}
+ * @private
+ */
+anychart.utils.crc32Salt_ = [45, 113, 99, 117, 108, 106, 110, 124, 109, 118, 35, 120, 99, 111, 91, 123, 85];
+
+
+/**
+ * Decrypted salt.
+ * @type {?string}
+ * @private
+ */
+anychart.utils.decryptedSalt_ = null;
+
+
+/**
+ * Decrypt salt.
+ * @return {string} Decrypted salt.
+ */
+anychart.utils.getSalt = function() {
+  if (anychart.utils.decryptedSalt_) return anychart.utils.decryptedSalt_;
+  var l = anychart.utils.crc32Salt_.length;
+  var mod = l % 2 == 0 ? l / 2 : (l + 1 / 2);
+  return anychart.utils.decryptedSalt_ = anychart.utils.crc32Salt_.map(function(v, i) {
+    var sign = i % 2 ? -1 : 1;
+    return v + sign * (i % mod);
+  }).map(function(v) {
+    return String.fromCharCode(v);
+  }).join('');
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.Align.CENTER', anychart.utils.Align.CENTER);//in docs/
 goog.exportSymbol('anychart.utils.Align.LEFT', anychart.utils.Align.LEFT);//in docs/

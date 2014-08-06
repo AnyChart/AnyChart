@@ -342,6 +342,40 @@ anychart.onDocumentReady = function(func, opt_scope) {
 };
 
 
+/**
+ * License key.
+ * @type {?string}
+ * @private
+ */
+anychart.licenseKey_ = null;
+
+
+/**
+ * License key.
+ * @param {string=} opt_value
+ * @return {?string}
+ */
+anychart.licenseKey = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.licenseKey_ = opt_value;
+  }
+  return anychart.licenseKey_;
+};
+
+
+/**
+ * Method to get hash from string.
+ * @return {boolean} Is key valid.
+ */
+anychart.isValidKey = function() {
+  if (!goog.isDefAndNotNull(anychart.licenseKey_) || !goog.isString(anychart.licenseKey_)) return false;
+  var lio = anychart.licenseKey_.lastIndexOf('-');
+  var value = anychart.licenseKey_.substr(0, lio);
+  var hashToCheck = anychart.licenseKey_.substr(lio + 1);
+  return (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt()));
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);
@@ -350,3 +384,4 @@ goog.exportSymbol('anychart.fromJson', anychart.fromJson);
 goog.exportSymbol('anychart.fromXml', anychart.fromXml);
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
+goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);
