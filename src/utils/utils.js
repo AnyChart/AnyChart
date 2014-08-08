@@ -1042,6 +1042,16 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
 
 
 /**
+ * Wrapper for safe console usage on develop version of anychart component.
+ * @param {*} msg - Warning message.
+ */
+anychart.utils.consoleWarn = function(msg) {
+  //TODO (A.Kudryavtsev): Add another console notifications if needed (log(), error(), info() ... ).
+  if (anychart.DEVELOP && goog.global['console']) goog.global['console']['warn'](msg);
+};
+
+
+/**
  * RegExp of what we allow to be serialized as an xml attribute.
  * @type {RegExp}
  * @private

@@ -21,10 +21,10 @@ anychart.VERSION = '';
 
 
 /**
- * Define, is developers edition.
+ * Define, if is developers edition.
  * @define {boolean} Is developers version.
  */
-anychart.DEVELOP = false;
+anychart.DEVELOP = true;
 
 
 //----------------------------------------------------------------------------------------------------------------------
