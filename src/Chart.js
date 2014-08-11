@@ -548,13 +548,13 @@ anychart.Chart.prototype.onLegendSignal_ = function(event) {
  * @param {anychart.elements.Label=} opt_value Chart label instance.
  * @return {!(anychart.elements.Label|anychart.Chart)} Chart label instance or itself for chaining call.
  */
-anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
+anychart.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   var index, value;
   if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
     index = +opt_indexOrValue;
     value = opt_value;
   } else {
-    index = this.chartLabels_.length;
+    index = 0;
     value = opt_indexOrValue;
   }
   var label = this.chartLabels_[index];
@@ -563,7 +563,7 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
     label.text('Chart label');
     this.chartLabels_[index] = label;
     this.registerDisposable(label);
-    label.listenSignals(this.onChartLabelSignal_, this);
+    label.listenSignals(this.onLabelSignal_, this);
   }
 
   if (goog.isDef(value)) {
@@ -586,7 +586,7 @@ anychart.Chart.prototype.chartLabel = function(opt_indexOrValue, opt_value) {
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.Chart.prototype.onChartLabelSignal_ = function(event) {
+anychart.Chart.prototype.onLabelSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -1026,7 +1026,7 @@ anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//i
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
 anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
-anychart.Chart.prototype['chartLabel'] = anychart.Chart.prototype.chartLabel;
+anychart.Chart.prototype['label'] = anychart.Chart.prototype.label;
 anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
 anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
