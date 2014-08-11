@@ -240,6 +240,17 @@ def __get_default_compiler_args():
 #           Build project
 #=======================================================================================================================
 @sync_required
+def __compile_project_each():
+    global arguments
+    arguments['sources'] = False
+    arguments['develop'] = False
+    modules = __get_modules_list()
+    for module in modules:
+        arguments['modules'] = [str(module)]
+        print arguments
+        __compile_project()
+
+@sync_required
 def __compile_project():
     t = time.time()
     global arguments
@@ -624,6 +635,9 @@ def __exec_main_script():
     compile_parser.add_argument('-d', '--develop', action='store_true',
                                 help='Include developers tools into build.')
 
+    # create the parser for the "compile_each" command
+    subparsers.add_parser('compile_each', help='Compile each project available module')
+
     # create the parser for the "contrib" command
     subparsers.add_parser('contrib', help='Synchronize project dependencies')
 
@@ -664,6 +678,8 @@ def __exec_main_script():
         __sync_contrib()
     elif command == 'compile':
         __compile_project()
+    elif command == 'compile_each':
+        __compile_project_each()
     elif command == 'deps':
         __build_deps()
     elif command == 'lint':
