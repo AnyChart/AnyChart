@@ -26,7 +26,7 @@ goog.require('anychart.utils.Padding');
  * @illustrationDesc
  * Title occupies the whole part of a container (depending on the orientation by the width or the height).
  * @example <c>Self-sufficient title.</c><t>simple-h100</t>
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('My custom Title')
  *     .fontSize(27)
  *     .height('100')
@@ -230,8 +230,8 @@ anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
  * Sets bound for positioning.
  * @illustration <t>simple</t>
  * var layer = stage.layer();
- * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
- * var layerBounds = new anychart.math.Rect(0, 0, stage.width() / 3, stage.height() / 3);
+ * var stageBounds = anychart.math.rect(0, 0, stage.width(), stage.height());
+ * var layerBounds = anychart.math.rect(0, 0, stage.width() / 3, stage.height() / 3);
  * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
  *      .stroke('2 red');
  * layer.text(2, 2, 'stageBounds');
@@ -240,14 +240,14 @@ anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
  *      .stroke('2 blue');
  * layer2.text(2, -20, 'layerBounds');
  * layer2.translate(0, stage.height() / 4);
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Title\n(stageBounds)')
  *     .container(layer2)
  *     .fontSize(14)
  *     .hAlign('center')
  *     .parentBounds(stageBounds)
  *     .draw();
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Title\n(layerBounds)')
  *     .fontSize(14)
  *     .hAlign('center')
@@ -260,7 +260,7 @@ anychart.elements.Title.prototype.align_ = anychart.utils.Align.CENTER;
  *   a. Gray - within the parent container.<br/>
  *   b. Black - when the stage bounds act as parent.
  * @example <t>listingOnly</t>
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Title text')
  *     .container(layer2)
  *     .parentBounds(stageBounds)
@@ -291,7 +291,7 @@ anychart.elements.Title.prototype.parentBounds = function(opt_value) {
  *//**
  * Sets the text content for the title.
  * @example <t>simple-h100</t>
- * var title = new anychart.elements.Title();
+ * var title = anychart.elements.title();
  * title.text('My custom Text');
  * title.container(stage)
  *      .draw();
@@ -310,7 +310,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
 /**
  * Getter for the title background.
  * @example <t>simple-h100</t>
- * var title = new anychart.elements.Title();
+ * var title = anychart.elements.title();
  * title.text('\' Simple text \'')
  *      .background()
  *          .stroke('1 rgb(36,102,177) 0.4')
@@ -321,7 +321,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
  *//**
  * Setter for the title background.
  * @example <t>simple-h100</t>
- * var myTitleBackground = new anychart.elements.Background()
+ * var myTitleBackground = anychart.elements.background()
  *         .stroke('1 rgb(36,102,177) 0.4')
  *         .corners(2)
  *         .fill({
@@ -332,7 +332,7 @@ anychart.elements.Title.prototype.text = function(opt_value) {
  *           ],
  *           angle: -90
  *         });
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Title text')
  *     .padding(5)
  *     .background( myTitleBackground )
@@ -519,12 +519,12 @@ anychart.elements.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
  * Setter for the title align.
  * @example <t>simple-h100</t>
  * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Left align')
  *     .align('left')
  *     .container(stage)
  *     .draw();
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Right align')
  *     .align('right')
  *     .container(stage)
@@ -555,14 +555,14 @@ anychart.elements.Title.prototype.align = function(opt_value) {
  * @return {anychart.utils.Orientation} The orientation or the title for method chaining.
  *//**
  * Setter for the title orientation.
- * @example <t>simple</t>
+ * @example
  * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Left title orientation')
  *     .orientation('left')
  *     .container(stage)
  *     .draw();
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Right title orientation')
  *     .orientation('right')
  *     .container(stage)
@@ -717,12 +717,12 @@ anychart.elements.Title.prototype.remove = function() {
  * Returns the remaining (after title placement) part of the container.
  * @example <t>simple-h100</t>
  * // Placing the first title on the top of the Stage.
- * var title1 = new anychart.elements.Title()
+ * var title1 = anychart.elements.title()
  *     .text('First title')
  *     .container(stage)
  *     .draw();
  * // Placing the second title over the remaining part - under the first title.
- * new anychart.elements.Title()
+ * anychart.elements.title()
  *     .text('Second title')
  *     .container(stage)
  *     .parentBounds(title1.getRemainingBounds())

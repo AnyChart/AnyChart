@@ -21,7 +21,7 @@ goog.require('goog.events.BrowserEvent');
  * </ul>
  * Also you can access any marker from the set and change it:
  * @example <t>simple-h100</t>
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star5')
  *     .size(27)
  *     .fill('blue')
@@ -312,8 +312,8 @@ anychart.elements.MarkersFactory.prototype.enabled = function(opt_value) {
  * <b>positionProvider</b> - object with information about current (by index) marker position,
  *  this object must contain <b>x</b> and <b>y</b> field (with no offsets taken in account).<br/>
  * <b>index</b> - current marker index.
- * @example <t>simple</t>
- * var marker = new anychart.elements.MarkersFactory()
+ * @example
+ * var marker = anychart.elements.markersFactory()
  *     .container(stage)
  *     .size(25)
  *     .positionFormatter(function(positionProvider, index) {
@@ -345,7 +345,7 @@ anychart.elements.MarkersFactory.prototype.positionFormatter = function(opt_valu
  * @return {string} Markers position settings.
  *//**
  * Setter for position settings of all markers.
- * @example <t>simple</t>
+ * @example
  * // create objects for markers factory
  * var bars = [];
  * bars.push(
@@ -355,7 +355,7 @@ anychart.elements.MarkersFactory.prototype.positionFormatter = function(opt_valu
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .position('center')
  *     .container(stage);
@@ -420,7 +420,7 @@ anychart.elements.MarkersFactory.prototype.position = function(opt_value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('blue')
  *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM)
@@ -478,7 +478,7 @@ anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .container(stage);
  * // sets custom positions
@@ -549,7 +549,7 @@ anychart.elements.MarkersFactory.prototype.setAutoType = function(value) {
  * @return {number} Markeres size settings.
  *//**
  * Setter for size settings of all markers.
- * @example <t>simple</t>
+ * @example
  * // create objects for markers factory
  * var bars = [];
  * bars.push(
@@ -559,7 +559,7 @@ anychart.elements.MarkersFactory.prototype.setAutoType = function(value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .size(15)
  *     .container(stage);
  * // sets custom positions
@@ -611,7 +611,7 @@ anychart.elements.MarkersFactory.prototype.size = function(opt_value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('blue')
  *     .offsetX(15)
@@ -666,7 +666,7 @@ anychart.elements.MarkersFactory.prototype.offsetX = function(opt_value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('blue')
  *     .offsetY(15)
@@ -723,7 +723,7 @@ anychart.elements.MarkersFactory.prototype.offsetY = function(opt_value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('green')
  *     .size('14')
@@ -794,7 +794,7 @@ anychart.elements.MarkersFactory.prototype.setAutoFill = function(value) {
  *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
  * );
  * // sets global settings
- * var MMarker = new anychart.elements.MarkersFactory()
+ * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('none')
  *     .stroke('4px green .5')

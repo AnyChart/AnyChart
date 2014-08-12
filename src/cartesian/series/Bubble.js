@@ -9,8 +9,8 @@ goog.require('anychart.utils');
 /**
  * Define Bubble series type.<br/>
  * <b>Note:</b> Better for use method {@link anychart.cartesian.Chart#bubble}.
- * @example <t>simple</t>
- * new anychart.cartesian.series.Bubble([[1, 1, 3], [2, 1, 1]]).container(stage).draw();
+ * @example
+ * anychart.cartesian.series.bubble([[1, 1, 3], [2, 1, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -171,8 +171,8 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function() {
  * @return {(string|number)} Minimum size of the bubble.
  *//**
  * Setter for minimum bubble size.
- * @example <t>simple</t>
- * new anychart.cartesian.series.Bubble([
+ * @example
+ * anychart.cartesian.series.bubble([
  *      [1, 2, 3],
  *      [2, 2, 2],
  *      [3, 2, 1],
@@ -235,8 +235,8 @@ anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
  * Setter for negative value option.<br/>
  * <b>Note:</b> Отрицательные значения обрабатываются по модулю, но выделяются заливкой другого цвета.
  * См {@link anychart.cartesian.series.Bubble#negativeFill}, {@link anychart.cartesian.series.Bubble#negativeStroke}
- * @example <t>simple</t>
- * new anychart.cartesian.series.Bubble([
+ * @example
+ * anychart.cartesian.series.bubble([
  *       [1, 2, 3],
  *       [2, 2, 2],
  *       [3, 2, 1],

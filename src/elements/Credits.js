@@ -5,6 +5,10 @@ goog.require('goog.dom');
 
 
 /**
+ * Define class Credits.<br/>
+ * <b>Note:</b> Use method {@link anychart.elements.credits} to create instance of this class.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -67,7 +71,21 @@ anychart.elements.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Sets or gets credits text value.
+ * Getter for credits text value.
+ * @return {string} Current credits text.
+ *//**
+ * Setter for credits text value.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
+ * @example
+ * anychart.licenseKey('AnyChart-95048498-10629dd6');
+ * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits().text('Changed credits');
+ * chart.container(stage).draw();
+ * @param {string=} opt_value Text value.
+ * @return {anychart.elements.Credits} {@link anychart.elements.Credits} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Text value.
  * @return {anychart.elements.Credits|string} Credits text or itself for chaining call.
  */
@@ -85,7 +103,21 @@ anychart.elements.Credits.prototype.text = function(opt_value) {
 
 
 /**
- * Sets or gets credits url.
+ * Getter for credits url.
+ * @return {string} Current credits url.
+ *//**
+ * Setter for credits url.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
+ * @example
+ * anychart.licenseKey('AnyChart-95048498-10629dd6');
+ * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits().url('http://www.anychart.com/buy/');
+ * chart.container(stage).draw();
+ * @param {string=} opt_value Url value.
+ * @return {anychart.elements.Credits} {@link anychart.elements.Credits} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Url value.
  * @return {anychart.elements.Credits|string} Credits url or itself for chaining call.
  */
@@ -103,7 +135,21 @@ anychart.elements.Credits.prototype.url = function(opt_value) {
 
 
 /**
- * Sets or gets credits alt.
+ * Getter for credits alt.
+ * @return {string} Current credits alternative text.
+ *//**
+ * Setter for credits alt.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
+ * @example
+ * anychart.licenseKey('AnyChart-95048498-10629dd6');
+ * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits().alt('Custom alternative text.');
+ * chart.container(stage).draw();
+ * @param {string=} opt_value Title value.
+ * @return {anychart.elements.Credits} {@link anychart.elements.Credits} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Title value.
  * @return {anychart.elements.Credits|string} Credits alt or itself for chaining call.
  */
@@ -121,7 +167,21 @@ anychart.elements.Credits.prototype.alt = function(opt_value) {
 
 
 /**
- * Sets or gets credits logo src value.
+ * Getter for credits logo src value.
+ * @return {string} Current credits logo source.
+ *//**
+ * Setter for credits logo src value.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
+ * @example
+ * anychart.licenseKey('AnyChart-95048498-10629dd6');
+ * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits().logoSrc(null);
+ * chart.container(stage).draw();
+ * @param {string=} opt_value Logo source value.
+ * @return {anychart.elements.Credits} {@link anychart.elements.Credits} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {string=} opt_value Logo src value.
  * @return {anychart.elements.Credits|string} Credits logo src or itself for chaining call.
  */
@@ -345,7 +405,16 @@ anychart.elements.Credits.prototype.disposeInternal = function() {
 
 
 /**
- * Create credits instance.
+ * Create instance of {@link anychart.elements.Credits}.<br/>
+ * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
+ * <a href="http://www.anychart.com/buy/">Buy page</a>.
+ * @example
+ * anychart.licenseKey('AnyChart-95048498-10629dd6');
+ * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits(
+ *     anychart.elements.credits().text('Custom credits')
+ * );
+ * chart.container(stage).draw();
  * @return {anychart.elements.Credits}
  */
 anychart.elements.credits = function() {
@@ -354,8 +423,8 @@ anychart.elements.credits = function() {
 
 
 //exports
-goog.exportSymbol('anychart.elements.credits', anychart.elements.credits);
-anychart.elements.Credits.prototype['text'] = anychart.elements.Credits.prototype.text;
-anychart.elements.Credits.prototype['url'] = anychart.elements.Credits.prototype.url;
-anychart.elements.Credits.prototype['alt'] = anychart.elements.Credits.prototype.alt;
-anychart.elements.Credits.prototype['logoSrc'] = anychart.elements.Credits.prototype.logoSrc;
+goog.exportSymbol('anychart.elements.credits', anychart.elements.credits);//doc|ex|need-tr
+anychart.elements.Credits.prototype['text'] = anychart.elements.Credits.prototype.text;//doc|ex
+anychart.elements.Credits.prototype['url'] = anychart.elements.Credits.prototype.url;//doc|ex
+anychart.elements.Credits.prototype['alt'] = anychart.elements.Credits.prototype.alt;//doc|ex
+anychart.elements.Credits.prototype['logoSrc'] = anychart.elements.Credits.prototype.logoSrc;//doc|ex

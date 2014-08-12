@@ -7,8 +7,8 @@ goog.require('anychart.cartesian.series.AreaBase');
 /**
  * Define Area series type.<br/>
  * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#area} or {@link anychart.Chart#areaChart}.
- * @example <t>simple</t>
- * new anychart.cartesian.series.Area([1, 4, 7, 1]).container(stage).draw();
+ * @example
+ * anychart.cartesian.series.area([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

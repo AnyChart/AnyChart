@@ -1299,7 +1299,7 @@ anychart.cartesian.series.Base.prototype.scaleInvalidated_ = function(event) {
  *//**
  * Setter for series data tooltip.
  * @example <t>listingOnly</t>
- * var tooltipSettings = new anychart.elements.Tooltip();
+ * var tooltipSettings = anychart.elements.tooltip();
  * tooltipSettings
  *    .background()
  *      .stroke('#bebebe').fill('#ffffff');
@@ -1359,7 +1359,7 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
  *//**
  * Setter for series data labels.
  * @example <t>listingOnly</t>
- * var labelsSettings = new anychart.elements.LabelsFactory();
+ * var labelsSettings = anychart.elements.labelsFactory();
  * labelSettings.enabled(true);
  * labelSettings.position('center');
  * labelSettings.anchor('center');

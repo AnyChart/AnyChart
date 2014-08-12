@@ -86,8 +86,10 @@ anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
  *  var domElement = document.getElementById('containerIdentifier');
  *  element.container(domElement);
  * // Framework-element
- *  var fwElement = new anychart.elements.Title();
+ *  var fwElement = anychart.elements.title();
  *  element.container( fwElement.container() );
+ * @example <t>lineChart</t>
+ * chart.line([4, 2, 8]);
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value The value to set.
  * @return {anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
@@ -312,7 +314,18 @@ anychart.VisualBase.prototype.getExportData = function() {
 
 
 /**
- * Save visual base stage as png file.
+ * Сохраняет текущее визуальное состояние в PNG file.
+ * @example <t>lineChart</t>
+ * chart.line([4, 2, 12]);
+ * chart.top(50);
+ * var button = new anychart.ui.button();
+ * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
+ * .text('Save image')
+ * .padding(10)
+ * .setOnClickListener(function(){
+ *      chart.saveAsPNG();
+ *  })
+ * .container(stage).draw();
  */
 anychart.VisualBase.prototype.saveAsPNG = function() {
   var data = this.getExportData();
@@ -326,7 +339,18 @@ anychart.VisualBase.prototype.saveAsPNG = function() {
 
 
 /**
- * Save visual base stage as jpg file.
+ * Сохраняет текущее визуальное состояние в JPEG file.
+ * @example <t>lineChart</t>
+ * chart.line([4, 2, 12]);
+ * chart.top(50);
+ * var button = new anychart.ui.button();
+ * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
+ * .text('Save image')
+ * .padding(10)
+ * .setOnClickListener(function(){
+ *      chart.saveAsJPG();
+ *  })
+ * .container(stage).draw();
  */
 anychart.VisualBase.prototype.saveAsJPG = function() {
   var data = this.getExportData();
@@ -339,7 +363,18 @@ anychart.VisualBase.prototype.saveAsJPG = function() {
 
 
 /**
- * Save visual base stage as pdf file.
+ * Сохраняет текущее визуальное состояние в PDF file.
+ * @example <t>lineChart</t>
+ * chart.line([4, 2, 12]);
+ * chart.top(50);
+ * var button = new anychart.ui.button();
+ * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
+ * .text('Save image')
+ * .padding(10)
+ * .setOnClickListener(function(){
+ *      chart.saveAsPDF();
+ *  })
+ * .container(stage).draw();
  */
 anychart.VisualBase.prototype.saveAsPDF = function() {
   var data = this.getExportData();
@@ -352,9 +387,9 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
 
 
 //exports
-anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//in docs/final
+anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//doc|ex
 anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
 anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//in docs/final
-anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;
-anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;
-anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;//doc|ex|need-tr
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;//doc|ex|need-tr
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;//doc|ex|need-tr

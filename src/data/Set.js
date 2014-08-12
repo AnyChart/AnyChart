@@ -33,28 +33,28 @@ goog.require('goog.array');
  *  ]
  * @example <c>Sample 2. Sample data.</c><t>listingOnly</t>
  * // An array with numbers, strings and functions:
- *  new anychart.data.Set([
+ *  anychart.data.set([
  *    20,
  *    7,
  *    '10',
  *    function(smth){ return smth*10; }
  *    ]);
  * // An array of arrays:
- *  new anychart.data.Set([
+ *  anychart.data.set([
  *    [1, 22, 13],
  *    [13, 22, 23],
  *    [17, 22, 33],
  *    [21, 22, 43]
  *  ]);
  * // An array of objects.
- *  new anychart.data.Set([
+ *  anychart.data.set([
  *    {name: 'Point 1', value: 10},
  *    {name: 'Point 2', value: 7},
  *    {name: 'Point 3', value: 20},
  *    {name: 'Point 4', value: 14}
  *  ]);
  * // A multi-typed array:
- *  new anychart.data.Set([
+ *  anychart.data.set([
  *    {value: 10, name: 'Point 1'},
  *    {value: 7, name: 'Point 2'},
  *    [20, 'Point 3'],

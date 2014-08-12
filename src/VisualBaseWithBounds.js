@@ -53,14 +53,14 @@ anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {!anychart.utils.Bounds} Current bounds of the element.
  *//**
  * Sets bounds of the element using one parameter.<br/>
- * @example <t>listingOnly</t>
- * element.bounds( new anychart.math.Rect(0, 0, 100, 100) );
+ * @example <t>lineChart</t>
+ * chart.bounds( anychart.math.rect(10, 10, 100, 100) );
  * @param {(anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_value Bounds of element.
  * @return {!anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
  * Setter for the element bounds settings.
- * @example <t>listingOnly</t>
- * element.bounds(0, 100, '50%', '400px');
+ * @example <t>lineChart</t>
+ * chart.bounds(0, 50, '50%', '200px');
  * @param {(number|string)=} opt_x X-coordinate.
  * @param {(number|string)=} opt_y Y-coordinate.
  * @param {(number|string)=} opt_width Width.
@@ -92,10 +92,9 @@ anychart.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_y, 
  * Getter for element left bound settings.
  * @return {number|string|undefined} Current element's left bound settings.
  *//**
- * Sets element left.<br/>
- * @example <t>listingOnly</t>
- * element.left(100);
- * element.left('50%');
+ * Sets element left.
+ * @example <t>lineChart</t>
+ * chart.left('20%');
  * @param {(number|string|null)=} opt_value Left bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -116,10 +115,9 @@ anychart.VisualBaseWithBounds.prototype.left = function(opt_value) {
  * Getter for element right bound settings.
  * @return {number|string|undefined} Current element's right bound settings.
  *//**
- * Sets element right.<br/>
- * @example <t>listingOnly</t>
- * element.right(700);
- * element.right('80%');
+ * Sets element right.
+ * @example <t>lineChart</t>
+ * chart.right('20%');
  * @param {(number|string|null)=} opt_value Right bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -140,10 +138,9 @@ anychart.VisualBaseWithBounds.prototype.right = function(opt_value) {
  * Getter for element top bound settings.
  * @return {number|string|undefined} Current element's top bound settings.
  *//**
- * Sets element top.<br/>
- * @example <t>listingOnly</t>
- * element.top(100);
- * element.top('50%');
+ * Sets element top.
+ * @example <t>lineChart</t>
+ * chart.top('20%');
  * @param {(number|string|null)=} opt_value Top bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -164,10 +161,9 @@ anychart.VisualBaseWithBounds.prototype.top = function(opt_value) {
  * Getter for element bottom bound settings.
  * @return {number|string|undefined} Current element's bottom bound settings.
  *//**
- * Sets element bottom.<br/>
- * @example <t>listingOnly</t>
- * element.bottom(700);
- * element.bottom('80%');
+ * Sets element bottom.
+ * @example <t>lineChart</t>
+ * chart.bottom('20%');
  * @param {(number|string|null)=} opt_value Bottom bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -188,10 +184,9 @@ anychart.VisualBaseWithBounds.prototype.bottom = function(opt_value) {
  * Getter for element width settings.
  * @return {number|string|undefined} Current element's width settings.
  *//**
- * Sets element width.<br/>
- * @example <t>listingOnly</t>
- * element.width(500);
- * element.width('80%');
+ * Sets element width.
+ * @example <t>lineChart</t>
+ * chart.width('80%');
  * @param {(number|string|null)=} opt_value Width settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -212,10 +207,9 @@ anychart.VisualBaseWithBounds.prototype.width = function(opt_value) {
  * Getter for element height settings.
  * @return {number|string|undefined} Current element's height settings.
  *//**
- * Sets element height.<br/>
- * @example <t>listingOnly</t>
- * element.height(500);
- * element.height('80%');
+ * Sets element height.
+ * @example <t>lineChart</t>
+ * chart.height('80%');
  * @param {(number|string|null)=} opt_value Height settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
  *//**
@@ -250,7 +244,7 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
  * element.bounds(0, 10, '50%', '57%');
  * element.pixelBounds(400, 100); // returns Rect with size: 200x57
  * @example <c>Using setter</c><t>listingOnly</t>
- * var rect = new anychart.math.Rect( 0, 0, 100, 100);
+ * var rect = anychart.math.rect( 0, 0, 100, 100);
  * element.pixelBounds(rect);
  * element.pixelBounds(); // returns the value of variable rect.
  * element.pixelBounds(400, 100); // returns the value of variable rect.
@@ -261,8 +255,8 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
  * Sets exact pixel bounds of the element.<br/>
  * <b>Note:</b> If you pass <b>null</b> then previous value is reset
  * and bounds are autocalculated.
- * @example <t>listingOnly</t>
- * element.pixelBounds( new anychart.math.Rect( 0, 0, 100, 100) );
+ * @example <t>lineChart</t>
+ * chart.pixelBounds( anychart.math.rect( 0, 0, 100, 100) );
  * @param {(!anychart.math.Rect|null)=} opt_value Value to set.
  * @return {!anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
@@ -335,11 +329,11 @@ anychart.VisualBaseWithBounds.prototype.deserialize = function(config) {
 
 
 //exports
-anychart.VisualBaseWithBounds.prototype['bounds'] = anychart.VisualBaseWithBounds.prototype.bounds;//in docs/final
-anychart.VisualBaseWithBounds.prototype['top'] = anychart.VisualBaseWithBounds.prototype.top;//in docs/
-anychart.VisualBaseWithBounds.prototype['right'] = anychart.VisualBaseWithBounds.prototype.right;//in docs/
-anychart.VisualBaseWithBounds.prototype['bottom'] = anychart.VisualBaseWithBounds.prototype.bottom;//in docs/
-anychart.VisualBaseWithBounds.prototype['left'] = anychart.VisualBaseWithBounds.prototype.left;//in docs/
-anychart.VisualBaseWithBounds.prototype['width'] = anychart.VisualBaseWithBounds.prototype.width;//in docs/
-anychart.VisualBaseWithBounds.prototype['height'] = anychart.VisualBaseWithBounds.prototype.height;//in docs/
-anychart.VisualBaseWithBounds.prototype['pixelBounds'] = anychart.VisualBaseWithBounds.prototype.pixelBounds;//in docs/final
+anychart.VisualBaseWithBounds.prototype['bounds'] = anychart.VisualBaseWithBounds.prototype.bounds;//doc|ex
+anychart.VisualBaseWithBounds.prototype['top'] = anychart.VisualBaseWithBounds.prototype.top;//doc|ex
+anychart.VisualBaseWithBounds.prototype['right'] = anychart.VisualBaseWithBounds.prototype.right;//doc|ex
+anychart.VisualBaseWithBounds.prototype['bottom'] = anychart.VisualBaseWithBounds.prototype.bottom;//doc|ex
+anychart.VisualBaseWithBounds.prototype['left'] = anychart.VisualBaseWithBounds.prototype.left;//doc|ex
+anychart.VisualBaseWithBounds.prototype['width'] = anychart.VisualBaseWithBounds.prototype.width;//doc|ex
+anychart.VisualBaseWithBounds.prototype['height'] = anychart.VisualBaseWithBounds.prototype.height;//doc|ex
+anychart.VisualBaseWithBounds.prototype['pixelBounds'] = anychart.VisualBaseWithBounds.prototype.pixelBounds;//doc|ex

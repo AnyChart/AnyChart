@@ -20,7 +20,7 @@ goog.require('anychart.utils.Padding');
  *   <li>{@link anychart.elements.Label#parentBounds}</li>
  * </ul>
  * @example <c>Creating an autonomous label.</c><t>simple-h100</t>
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .text('My custom Label')
  *     .fontSize(27)
  *     .background(null)
@@ -169,7 +169,7 @@ anychart.elements.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * Sets text content for a label.
  * @example <t>simple-h100</t>
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *      .text('My custom label Text')
  *      .container(stage)
  *      .background(null)
@@ -198,11 +198,11 @@ anychart.elements.Label.prototype.text = function(opt_value) {
  *//**
  * Setter for Label background settings.
  * @example <t>simple-h100</t>
- * var bg = new anychart.elements.Background();
+ * var bg = anychart.elements.background();
  * bg.fill(['rgb(255,250,250)', 'rgb(205,250,250)', 'rgb(255,250,250)']);
  * bg.stroke('1 lightgrey');
  * bg.cornerType('round').corners(10);
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *      .text('Label backgruond sample')
  *      .fontSize(12)
  *      .background(bg)
@@ -321,7 +321,7 @@ anychart.elements.Label.prototype.boundsInvalidated_ = function(event) {
  * Setter for label width.<br/>
  * <b>Note:</b> if <b>null</b> is passed, width is calculated automatically.
  * @example <t>simple-h100</t>
- * label = new anychart.elements.Label()
+ * label = anychart.elements.label()
  *      .width(200);
  * // mark the area occupied by the label with a blue frame
  * label.background().enabled(true).fill('none').stroke('1 #00F');
@@ -353,7 +353,7 @@ anychart.elements.Label.prototype.width = function(opt_value) {
  * Setter for label height.<br/>
  * <b>Note:</b> if <b>null</b> is passed, height is calculated automatically.
  * @example <t>simple-h100</t>
- * label = new anychart.elements.Label()
+ * label = anychart.elements.label()
  *      .height(90);
  * // mark the area occupied by the label with a blue frame
  * label.background().enabled(true).fill('none').stroke('1 #00F');
@@ -386,8 +386,8 @@ anychart.elements.Label.prototype.height = function(opt_value) {
  * If width, height or offsets are set in percents - these are percents of these bounds.
  * @illustration <t>simple-h100</t>
  * var layer = stage.layer();
- * var stageBounds = new anychart.math.Rect(0, 0, stage.width(), stage.height());
- * var layerBounds = new anychart.math.Rect(100, 20, stage.width() / 3, stage.height() / 3);
+ * var stageBounds =  anychart.math.rect(0, 0, stage.width(), stage.height());
+ * var layerBounds =  anychart.math.rect(100, 20, stage.width() / 3, stage.height() / 3);
  * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
  *      .stroke('2 red');
  * layer.text(2*stage.width()/3, 2, 'stageBounds');
@@ -395,12 +395,12 @@ anychart.elements.Label.prototype.height = function(opt_value) {
  * layer2.rect(layerBounds.left, layerBounds.top, layerBounds.width, layerBounds.height)
  *      .stroke('2 blue');
  * layer2.text(layerBounds.left, layerBounds.top+layerBounds.height, 'layerBounds');
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .container(layer2)
  *     .parentBounds(stageBounds)
  *     .background(null)
  *     .draw();
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .container(layer2)
  *     .background(null)
  *     .parentBounds(layerBounds)
@@ -411,7 +411,7 @@ anychart.elements.Label.prototype.height = function(opt_value) {
  *   a. Gray - inside parent container bounds.<br/>
  *   b. Black - when stage acts as a parent.
  * @example <t>listingOnly</t>
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .container(layer)
  *     .parentBounds(stageBounds)
  *     .background(null)
@@ -468,7 +468,7 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * @example <t>simple-h100</t>
  * // to the left
  * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = new anychart.elements.Label()
+ * var label = anychart.elements.label()
  *     .padding(5)
  *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
  *     .parentBounds(parentBounds.getBounds())
@@ -478,7 +478,7 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * stage.circle(105, 75, 2).stroke('3 red');
  * // to the right
  * parentBounds = stage.rect(120, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * label = new anychart.elements.Label()
+ * label = anychart.elements.label()
  *     .padding(5)
  *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
  *     .parentBounds(parentBounds.getBounds())
@@ -590,7 +590,7 @@ anychart.elements.Label.prototype.anchor = function(opt_value) {
  * Arrows show offsets direction.
  * @example <t>simple-h100</t>
  * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = new anychart.elements.Label()
+ * var label = anychart.elements.label()
  *     .padding(5)
  *     .parentBounds(parentBounds.getBounds())
  *     .offsetX(10)
@@ -625,7 +625,7 @@ anychart.elements.Label.prototype.offsetX = function(opt_value) {
  * See illustration in {@link anychart.elements.Label#offsetX}.
  * @example <t>simple-h100</t>
  * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = new anychart.elements.Label()
+ * var label = anychart.elements.label()
  *     .padding(5)
  *     .parentBounds(parentBounds.getBounds())
  *     .offsetX(10)
@@ -661,7 +661,7 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
  * @illustration <t>simple-h100</t>
  * var rect = stage.rect(5, 5, 90, 90).stroke('1 blue');
  * var rectBounds = rect.getBounds();
- * var label = new anychart.elements.Label();
+ * var label = anychart.elements.label();
  * label.position(anychart.utils.NinePositions.CENTER);
  * label.parentBounds(rectBounds);
  * label.container(stage).draw();
@@ -782,13 +782,13 @@ anychart.elements.Label.prototype.maxFontSize = function(opt_value) {
  * // to the right
  * var rect;
  * rect = stage.rect(5, 5, 190, 90).fill('none').stroke('1 grey');
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .text('Not adjusted text')
  *     .parentBounds(rect.getBounds())
  *     .container(stage).draw();
  * // to the right
  * rect = stage.rect(205, 5, 190, 90).fill('none').stroke('1 grey');
- * new anychart.elements.Label()
+ * anychart.elements.label()
  *     .text('Adjusted text')
  *     .adjustFontSize(true, false)
  *     .width('100%')

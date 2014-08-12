@@ -67,13 +67,13 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
  *//**
  * Setter for marker type settings.
  * @example <c>By Enum value.</c>
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *    .type('star4')
  *    .hoverType('star6');
  * @example <c>By custom function.</c>
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *    .type(function(path, x, y, size) {
@@ -124,13 +124,13 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *//**
  * Setter for hovered marker type settings.
  * @example <c>By Enum value.</c>
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *    .type('star4')
  *    .hoverType('star6');
  * @example <c>By custom function.</c>
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *    .size(20)
@@ -181,7 +181,7 @@ anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
  *//**
  * Setter for marker size.
  * @example
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *     .size(14);
@@ -211,7 +211,7 @@ anychart.cartesian.series.Marker.prototype.size = function(opt_value) {
  *//**
  * Setter for hovered marker size.
  * @example
- * chart = new anychart.cartesian.Chart();
+ * chart = anychart.cartesian.chart();
  * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
  * markerSeries
  *     .size(10)

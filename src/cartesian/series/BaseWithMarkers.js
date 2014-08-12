@@ -94,7 +94,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * @example <t>listingOnly</t>
  * series.markers(null);
  * @example <t>listingOnly</t>
- * var myMarkers = new anychart.elements.MarkersFactory()
+ * var myMarkers = anychart.elements.markersFactory()
  *       .size(10)
  *       .type('star5')
  * series.markers(myMarkers);
@@ -138,7 +138,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * @example <t>listingOnly</t>
  * series.hoverMarkers(null);
  * @example <t>listingOnly</t>
- * var myMarkers = new anychart.elements.MarkersFactory()
+ * var myMarkers = anychart.elements.markersFactory()
  *       .size(10)
  *       .type('star5')
  * series.hoverMarkers(myMarkers);

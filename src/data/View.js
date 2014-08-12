@@ -155,8 +155,8 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
  * Creates a derived view that ensures sorting by a passed field.
  * @example <t>listingOnly</t>
  *  // Sorting by string length:
- *  view.filter('pointName', function(value1, value2){
- *    return value1.toString().length() - value2.toString().length();
+ *  view.sort('name', function(value1, value2){
+ *    return value1 > value2;
  *  });
  * @param {string} fieldName A field name to make sort by.
  * @param {function(*, *):number=} opt_comparator A sorting function that should accept two field values and return
@@ -194,7 +194,7 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
  *    [1, 3, 5],
  *    [5, 3, 1]
  *  ]
- * mainView.concat(new anychart.data.Set([
+ * mainView.concat(anychart.data.set([
  *     {x: 2, y: 5},
  *     {x: 3, y: 7},
  *     function(){ return {x: 4, y: 7}}
@@ -316,7 +316,7 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
  * Returns a new iterator for the current view.
  * @example <t>listingOnly</t>
  * // Create a new data Set:
- * var dataSet = new anychart.data.Set([1,2,3]);
+ * var dataSet = anychart.data.set([1,2,3]);
  * // Default mapping and getting an iterator:
  * var iterator = dataSet.mapAs().getIterator();
  * @return {!anychart.data.Iterator} New iterator.

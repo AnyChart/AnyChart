@@ -14,8 +14,8 @@ goog.require('goog.array');
  * Background has a fill, a border and corner shape settings.<br/>
  * <b>Note:</b> Always specify display bounds if you use Background separately.
  * @example <t>simple-h100</t>
- * new anychart.elements.Background()
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ * anychart.elements.background()
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .container(stage).draw();
  * @param {anychart.elements.Background.CornerType=} opt_cornerType [anychart.elements.Background.CornerType.ROUND] Type
  *  of the background corners.
@@ -188,18 +188,18 @@ anychart.elements.Background.normalizeCornerType = function(type, opt_default) {
  *//** topLeft, topRight, bottomRight, bottomLeft
  * Setter for corner's radius by one value.
  * @example <c>One for all.</c><t>simple-h100</t>
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .cornerType(anychart.elements.Background.CornerType.CUT)
  *   .corners(10) // same .corners('10px')
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @example <c>One for all.</c><t>simple-h100</t>
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .cornerType(anychart.elements.Background.CornerType.CUT)
  *   .corners([5, 7, 12, 7])
  *    // same .corners('5 7 12 7')
  *    // same .corners('5px 7px 12px 7px')
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @param {(number|string|Array.<number>)=} opt_value ['0px'] Value to set.<br/><b>Note:</b> If array has less than 4 elements
  *  (or string provide less than 4 values), the first value is set for all four corners.
@@ -207,10 +207,10 @@ anychart.elements.Background.normalizeCornerType = function(type, opt_default) {
  *//**
  * Setter for corner radius by each value.
  * @example <t>simple-h100</t>
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .cornerType(anychart.elements.Background.CornerType.CUT)
  *   .corners(15, 7, 12, 7)
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @param {(number|string)=} opt_topLeft Top left corner value.
  * @param {(number|string)=} opt_topRight Top right corner value.
@@ -247,11 +247,11 @@ anychart.elements.Background.prototype.corners = function(opt_value) {
  *//**
  * Setter for corner type.
  * @example <t>simple-h100</t>
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .cornerType(anychart.elements.Background.CornerType.ROUND_INNER)
  *   .corners(10)
  *   .stroke('#000 2')
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds(anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .fill('none').container(stage).draw();
  * @param {anychart.elements.Background.CornerType=} opt_value [{@link anychart.elements.Background.CornerType}.ROUND] Value to set.
  * @return {!anychart.elements.Background} {@link anychart.elements.Background} instance for method chaining.
@@ -289,7 +289,7 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * e.g. 'red .5'.
  * @shortDescription Sets fill settings using an object or a string.
  * @example <c>Solid Fill</c><t>simple-h100</t>
- * var bg = new anychart.elements.Background();
+ * var bg = anychart.elements.background();
  * // Set fill
  *   bg.fill('red 0.1');
  * // the same
@@ -300,18 +300,18 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * // bg.fill('#ff0000 0.1');
  * // then draw
  * bg.container(stage)
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height()-20) )
  *   .draw();
  * @example <c>Gradient Fill</c><t>simple-h100</t>
- * var bg = new anychart.elements.Background();
+ * var bg = anychart.elements.background();
  * // Set fill
  *   bg.fill({keys:['red .1', 'orange'], mode: true, angle: 45});
  * bg.container(stage)
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height()-20) )
  *   .draw();
  * @example <c>Image Fill</c><t>simple-h100</t>
- * new anychart.elements.Background()
- *    .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height() - 20) )
+ * anychart.elements.background()
+ *    .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *    .stroke('#000 2').fill({
  *        src: 'http://static.anychart.com/rainbow.png',
  *        mode: acgraph.vector.ImageFillMode.TILE
@@ -324,11 +324,11 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * means: <b>fill</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>simple-h100</t>
- * var bg = new anychart.elements.Background();
+ * var bg = anychart.elements.background();
  * // Set fill
  *   bg.fill('red', 0.1);
  * bg.container(stage)
- *   .bounds( new anychart.math.Rect(10, 10, stage.width()-20, stage.height()-20) )
+ *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height()-20) )
  *   .draw();
  * @param {string} color Fill as a string.
  * @param {number=} opt_opacity Fill opacity.
@@ -360,32 +360,32 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  * @shortDescription Linear gradient fill.
  * @illustration <t>simple</t>
  * stage.text(0*stage.width()/6+3, 0, 'a');
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .fill(['0.2 black', 'white'], 45)
- *   .bounds( new anychart.math.Rect(0*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
+ *   .bounds( anychart.math.rect(0*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
  * stage.text(1*stage.width()/6-5, 0, 'b');
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .fill(['0.2 black', 'white'], 45, true)
- *   .bounds( new anychart.math.Rect(1*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
+ *   .bounds( anychart.math.rect(1*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
  * stage.text(2*stage.width()/6+3, 0, 'c');
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .fill(['red', 'blue'], 45, {left: 10, top: 20, width: 100, height: 100})
- *   .bounds( new anychart.math.Rect(2*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
+ *   .bounds( anychart.math.rect(2*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
- * new anychart.elements.Background()
- *   .fill(['red', 'blue'], 45, new anychart.math.Rect(10, 20, 100, 100))
- *   .bounds( new anychart.math.Rect(3*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
+ * anychart.elements.background()
+ *   .fill(['red', 'blue'], 45, anychart.math.rect(10, 20, 100, 100))
+ *   .bounds( anychart.math.rect(3*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
  * stage.text(4*stage.width()/6+3, 0, 'd');
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .fill(['red 0.1', 'orange', 'red 0.1'])
- *   .bounds( new anychart.math.Rect(4*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
+ *   .bounds( anychart.math.rect(4*stage.width()/6+3, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .fill(['red', {offset: 0.3, color: 'orange'}, 'red 0.1'])
- *   .bounds( new anychart.math.Rect(5*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
+ *   .bounds( anychart.math.rect(5*stage.width()/6-5, 13, stage.width()/7-6, stage.height()-20) )
  *   .container(stage).draw();
  * @illustrationDesc
  *  a) ObjectBoundingBox no angle preservation.<br/>
@@ -400,11 +400,11 @@ anychart.elements.Background.prototype.cornerType = function(opt_value) {
  *//**
  * Radial gradient fill.
  * @example <t>simple-h100</t>
- * var bg = new anychart.elements.Background();
+ * var bg = anychart.elements.background();
  * // set fill
  *   bg.fill(['black', 'white'], .5, .5, null, .9, 0.3, 0.81)
  * bg.container(stage)
- *   .bounds( new anychart.math.Rect(10, 10, 90, 90) )
+ *   .bounds( anychart.math.rect(10, 10, 90, 90) )
  *   .draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
@@ -460,34 +460,34 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  * </ul>
  * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
  * @shortDescription Sets stroke settings using one parameter.
- * @example <c>String</c><t>simple</t>
- * new anychart.elements.Background()
- *   .bounds( new anychart.math.Rect(stage.width()/2-8, 5, 16, stage.height()-10) )
+ * @example <c>String</c>
+ * anychart.elements.background()
+ *   .bounds( anychart.math.rect(stage.width()/2-8, 5, 16, stage.height()-10) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke('red')
- *   .bounds( new anychart.math.Rect(30, 0.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
+ *   .bounds( anychart.math.rect(30, 0.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke('4px ORANGE')
- *   .bounds( new anychart.math.Rect(30, 1.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
+ *   .bounds( anychart.math.rect(30, 1.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke('#0f0 0.7')
- *   .bounds( new anychart.math.Rect(30, 2.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
+ *   .bounds( anychart.math.rect(30, 2.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke('4 #0000FF 0.3')
- *   .bounds( new anychart.math.Rect(30, 3.4*stage.height()/4, stage.width()-60, stage.height()/4 - 35) )
+ *   .bounds( anychart.math.rect(30, 3.4*stage.height()/4, stage.width()-60, stage.height()/4 - 35) )
  *   .fill('none').container(stage).draw();
- * @example <c>Object or array</c><t>simple</t>
- * new anychart.elements.Background()
+ * @example <c>Object or array</c>
+ * anychart.elements.background()
  *   .stroke({color: '#f00', thickness: 2, opacity: 0.9})
- *   .bounds( new anychart.math.Rect(30, 0.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
+ *   .bounds( anychart.math.rect(30, 0.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke(['red', 'green', 'blue'])
- *   .bounds( new anychart.math.Rect(30, 1.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
+ *   .bounds( anychart.math.rect(30, 1.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
  *   .fill('none').container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['#000'] Fill formatted as '[thickness ]color[ opacity]'.
  * @return {anychart.elements.Background} {@link anychart.elements.Background} class for method chaining.
@@ -497,22 +497,22 @@ anychart.elements.Background.prototype.fill = function(opt_fillOrColorOrKeys, op
  * object properties have priority. E.g. setting <b>shape.stroke('10 red', 5);</b> (or <b>shape.stroke({color: 'red',
  * thickness: 10}, 5);</b> will result in a red stroke with thickness 10px.
  * @shortDescription Sets stroke settings.
- * @example <t>simple</t>
- * new anychart.elements.Background()
+ * @example
+ * anychart.elements.background()
  *   .stroke('red .5', 4)
- *   .bounds( new anychart.math.Rect(30, 0.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
+ *   .bounds( anychart.math.rect(30, 0.4*stage.height()/4, stage.width()-60, stage.height()/4 - 30) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke('5 orange .5', 1)
- *   .bounds( new anychart.math.Rect(30, 1.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4) )
+ *   .bounds( anychart.math.rect(30, 1.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke(['red', 'green', 'blue'], 5, '5 2')
- *   .bounds( new anychart.math.Rect(30, 2.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4) )
+ *   .bounds( anychart.math.rect(30, 2.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4) )
  *   .fill('none').container(stage).draw();
- * new anychart.elements.Background()
+ * anychart.elements.background()
  *   .stroke({color: '#00B'}, 10, '', acgraph.vector.StrokeLineJoin.ROUND, acgraph.vector.StrokeLineCap.SQUARE)
- *   .bounds( new anychart.math.Rect(30, 3.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4 -5) )
+ *   .bounds( anychart.math.rect(30, 3.2*stage.height()/4, stage.width()-60, 0.6*stage.height()/4 -5) )
  *   .fill('none').container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string)} value Fill settings.
  * @param {number=} opt_thickness Line thickness. Defaults to 1 of not set.

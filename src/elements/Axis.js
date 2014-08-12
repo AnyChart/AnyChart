@@ -1609,7 +1609,27 @@ anychart.elements.Axis.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * Stagger mode.
+ * Getter for stagger mode state.
+ * @return {boolean} Current stagger mode state.
+ *//**
+ * Setter for stagger mode state.
+ * @example <t>lineChart</t>
+ * var data = [
+ *     ['January', 1],
+ *     ['Febrary', 2],
+ *     ['March', 4],
+ *     ['April', 3],
+ *     ['May', 2],
+ *     ['June', 4],
+ *     ['Jule', 5],
+ *     ['August', 1]
+ * ];
+ * chart.xAxis().staggerMode(true);
+ * chart.line(data);
+ * @param {boolean=} opt_value [true] On/off stagger mode.
+ * @return {anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {boolean=} opt_value On/off.
  * @return {boolean|anychart.elements.Axis} .
  */
@@ -1628,7 +1648,28 @@ anychart.elements.Axis.prototype.staggerMode = function(opt_value) {
 
 
 /**
- * Stagger lines.
+ * Getter for stagger lines.
+ * @return {?number} Current stagger line settings.
+ *//**
+ * Setter for stagger lines.<br/>
+ * <b>Note:</b> pass <b>null</b> to enable autocalculation.
+ * @example <t>lineChart</t>
+ * var data = [
+ *     ['January', 1],
+ *     ['Febrary', 2],
+ *     ['March', 4],
+ *     ['April', 3],
+ *     ['May', 2],
+ *     ['June', 4],
+ *     ['Jule', 5],
+ *     ['August', 1]
+ * ];
+ * chart.xAxis().staggerLines(4);
+ * chart.line(data);
+ * @param {(number|null)=} opt_value [null] Count of stager lines.
+ * @return {anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|null)=} opt_value On/off.
  * @return {null|number|anychart.elements.Axis} .
  */
@@ -1647,7 +1688,45 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
 
 
 /**
- * Stagger max lines.
+ * Getter for maximum stagger lines.
+ * @return {?number} Current stagger line settings.
+ *//**
+ * Setter for maximum stagger lines in autocalculation mode (if {@link anychart.elements.Axis#staggerLines} passed null).<br/>
+ * @example
+ * var leftChart = anychart.cartesian.chart();
+ * var data = [
+ *     ['January', 1],
+ *     ['Febrary', 2],
+ *     ['March', 4],
+ *     ['April', 3],
+ *     ['May', 2],
+ *     ['June', 4],
+ *     ['Jule', 5],
+ *     ['August', 1]
+ * ];
+ * leftChart.xAxis().staggerLines(4);
+ * leftChart.line(data);
+ * leftChart.bounds(anychart.math.rect(0,0,'49%','100%'));
+ * leftChart.container(stage).draw();
+ * var rightChart = anychart.cartesian.chart();
+ * var data = [
+ *     ['January', 1],
+ *     ['Febrary', 2],
+ *     ['March', 4],
+ *     ['April', 3],
+ *     ['May', 2],
+ *     ['June', 4],
+ *     ['Jule', 5],
+ *     ['August', 1]
+ * ];
+ * rightChart.xAxis().staggerMaxLines(2);
+ * rightChart.line(data);
+ * rightChart.bounds(anychart.math.rect('51%',0,'50%','100%'));
+ * rightChart.container(stage).draw();
+ * @param {(number|null)=} opt_value [2] Ограничивает наибольшее количество линий, которое может потребоваться при рисоании лейблов. Если для корректной отрисовки лейблов потребуется меньшее число линий, то будет использовано меньшее число, но не больше заданого.
+ * @return {anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|null)=} opt_value .
  * @return {null|number|anychart.elements.Axis} .
  */
@@ -2354,9 +2433,9 @@ anychart.elements.axis = function() {
 
 //exports
 goog.exportSymbol('anychart.elements.axis', anychart.elements.axis);
-anychart.elements.Axis.prototype['staggerMode'] = anychart.elements.Axis.prototype.staggerMode;
-anychart.elements.Axis.prototype['staggerLines'] = anychart.elements.Axis.prototype.staggerLines;
-anychart.elements.Axis.prototype['staggerMaxLines'] = anychart.elements.Axis.prototype.staggerMaxLines;
+anychart.elements.Axis.prototype['staggerMode'] = anychart.elements.Axis.prototype.staggerMode;//doc|ex
+anychart.elements.Axis.prototype['staggerLines'] = anychart.elements.Axis.prototype.staggerLines;//doc|ex
+anychart.elements.Axis.prototype['staggerMaxLines'] = anychart.elements.Axis.prototype.staggerMaxLines;//doc|ex|need-tr
 anychart.elements.Axis.prototype['title'] = anychart.elements.Axis.prototype.title;
 anychart.elements.Axis.prototype['name'] = anychart.elements.Axis.prototype.name;
 anychart.elements.Axis.prototype['labels'] = anychart.elements.Axis.prototype.labels;

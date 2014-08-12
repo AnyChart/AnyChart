@@ -7,8 +7,8 @@ goog.require('anychart.cartesian.series.BarBase');
 /**
  * Define Bar series type.<br/>
  * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#bar} or {@link anychart.Chart#barChart}.
- * @example <t>simple</t>
- * new anychart.cartesian.series.Bar([1, 4, 7, 1]).container(stage).draw();
+ * @example
+ * anychart.cartesian.series.bar([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

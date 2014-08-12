@@ -150,7 +150,10 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * // all margins 15px
  * chart.margin('15px');
  * // top and bottom 5px ,right and left 15px
- * chart.margin( new anychart.utils.Space(5,15) );
+ * chart.margin(anychart.utils.space(5,15) );
+ * @example <t>lineChart</t>
+ * chart.margin(35);
+ * chart.line([6, 2, 12]);
  * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
@@ -162,6 +165,9 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * chart.margin(10, '15px', 5);
  * // 3) top 10px, right 15px, bottom 5px, left 12px
  * chart.margin(10, '15px', '5px', 12);
+ * @example <t>lineChart</t>
+ * chart.margin(10, '15px', '5px', 12);
+ * chart.spline([6, 2, 12]);
  * @param {(string|number)=} opt_value1 Top or top-bottom space.
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
@@ -282,7 +288,10 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * // all paddings 15px
  * chart.padding('15px');
  * // top and bottom 5px ,right and left 15px
- * chart.padding( new anychart.utils.Space(5,15) );
+ * chart.padding(anychart.utils.space(5,15));
+ * @example <t>lineChart</t>
+ * chart.padding(20);
+ * chart.line([6, 2, 12]);
  * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  *//**
@@ -294,6 +303,9 @@ anychart.Chart.prototype.marginInvalidated_ = function(event) {
  * chart.padding(10, '15px', 5);
  * // 3) top 10px, right 15px, bottom 5px, left 12px
  * chart.padding(10, '15px', '5px', 12);
+ * @example <t>lineChart</t>
+ * chart.padding(10, '15px', '5px', 12);
+ * chart.spline([6, 2, 12]);
  * @param {(string|number)=} opt_value1 Top or top-bottom space.
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
@@ -351,19 +363,17 @@ anychart.Chart.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the current chart background.
- * @example <t>listingOnly</t>
- * chart.background().stroke('2 green');
  * @return {anychart.elements.Background} The current chart background.
  *//**
  * Setter for the chart background.
- * @example <t>listingOnly</t>
- * var background = new anychart.elements.Background()
+ * @example <t>lineChart</t>
+ * var background = anychart.elements.background()
  *    .stroke('2 rgb(36,102,177)')
  *    .corners(10)
  *    .fill({
  *           keys: [
  *             "rgb(255,255,255) 1",
- *             "rgb(233,233,233) 1",
+ *             "rgb(233,133,233) 1",
  *             "rgb(255,255,255) 1"
  *           ],
  *           angle: -90
@@ -420,17 +430,15 @@ anychart.Chart.prototype.backgroundInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart title.
- * @example <t>listingOnly</t>
- * chart.title().fontSize(41);
  * @return {anychart.elements.Title} The current chart title.
  *//**
  * Setter for the chart title.
- * @example <t>listingOnly</t><c>Simple string</c>
- * chart.title('Conqueror of Naxxramas');
- * @example <t>listingOnly</t><c>Title instance</c>
- * chart.title( new anychart.elements.Title()
+ * @example <c>Simple string</c><t>lineChart</t>
+ * chart.title().text('Conqueror of Naxxramas');
+ * @example <c>Title instance</c><t>lineChart</t>
+ * chart.title(anychart.elements.title()
  *      .fontColor('red')
- *      .text('Red title')
+ *      .text('Red Chart title')
  * );
  * @param {(string|anychart.elements.Title)=} opt_value Chart title text or title instance for copy settings from.
  * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
@@ -490,7 +498,24 @@ anychart.Chart.prototype.onTitleSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart legend.
+ * Getter for current chart legend.
+ * @return {anychart.elements.Legend} An instance of {@link anychart.elements.Legend} for method chaining.
+ *//**
+ * Setter for chart legend setting.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.line([7, 10, 2, 0]);
+ * chart.legend(
+ *     anychart.elements.legend()
+ *         .position('right')
+ *         .title(null)
+ *         .itemsLayout('vertical')
+ *         .align('left')
+ * );
+ * @param {(null|string|Object|anychart.elements.Legend)=} opt_value Legend settings.
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(null|string|Object|anychart.elements.Legend)=} opt_value Legend settings.
  * @return {!(anychart.Chart|anychart.elements.Legend)} Chart legend instance of itself for chaining call.
  */
@@ -597,7 +622,18 @@ anychart.Chart.prototype.onLabelSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart credits settings.
+ * Getter for current chart credits settings.
+ * @return {anychart.elements.Credits} An instance of {@link anychart.elements.Credits} class for method chaining.
+ *//**
+ * Setter for chart credits settings.
+ * @example <t>lineChart</t>
+ * chart.credits(
+ *   anychart.elements.credits().text('Click me!')
+ * );
+ * @param {(anychart.elements.Credits|Object|boolean)=} opt_value
+ * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Credits|Object|boolean)=} opt_value
  * @return {!(anychart.Chart|anychart.elements.Credits)} Chart credits or itself for chaining call.
  */
@@ -1021,13 +1057,13 @@ goog.inherits(anychart.Chart.DrawEvent, goog.events.Event);
 
 
 //exports
-anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//in docs/final
-anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//in docs/final
-anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//in docs/final
-anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//in docs/final
-anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;
+anychart.Chart.prototype['title'] = anychart.Chart.prototype.title;//doc|ex
+anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//doc|ex
+anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//doc|ex
+anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//doc|ex
+anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;//doc|ex
 anychart.Chart.prototype['label'] = anychart.Chart.prototype.label;
-anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;
-anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//in docs/final
-anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;
-anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;
+anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;//doc|ex
+anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//doc
+anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;//|need-ex
+anychart.Chart.prototype['toXml'] = anychart.Chart.prototype.toXml;//|need-ex
