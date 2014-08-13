@@ -117,7 +117,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.createPositionProvider =
  *//**
  * Setter for stroke settings.<br/>
  * Read more about stroke here:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.
@@ -158,7 +158,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.highStroke = function(op
  *//**
  * Setter for stroke settings.<br/>
  * Read more about stroke:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.
@@ -218,7 +218,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke = fun
  *//**
  * Setter for stroke settings.<br/>
  * Read more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.
@@ -259,7 +259,7 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.lowStroke = function(opt
  *//**
  * Setter for stroke settings.<br/>
  * Read more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @shortDescription Setter for stroke settings.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
  *    or fill settings.

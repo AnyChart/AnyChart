@@ -449,7 +449,7 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
  *//**
  * Setter for the pie slices fill in the normal state.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example
  *  var data = [10, 1, 7, 10];
  *  var chart = anychart.pieChart(data);
@@ -491,7 +491,7 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
  *//**
  * Setter for the pie slices stroke in the normal state.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
  *  var data = [10, 1, 7, 10];
  *  var chart = anychart.pie.chart(data);
@@ -530,7 +530,7 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
  *//**
  * Setter for the pie slices fill in the hover state.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example
  *  var data = [10, 1, 7, 10];
  *  var chart = anychart.pie.chart(data);
@@ -569,7 +569,7 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
  *//**
  * Setter for the pie slices stroke in the hover state.<br/>
  * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
  *  var data = [10, 1, 7, 10];
  *  var chart = anychart.pieChart(data);

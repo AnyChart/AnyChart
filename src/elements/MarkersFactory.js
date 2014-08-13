@@ -712,7 +712,7 @@ anychart.elements.MarkersFactory.prototype.offsetY = function(opt_value) {
  *//**
  * Setter for fill settings of all markers.<br/>
  * <b>Note:</b> fill is described at
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
  * // create objects for markers factory
  * var bars = [];
@@ -783,7 +783,7 @@ anychart.elements.MarkersFactory.prototype.setAutoFill = function(value) {
  *//**
  * Setter for stroke settings of all markers.<br/>
  * <b>Note:</b> stroke is described at
- * {@link http://docs.anychart.com/__VERSION__/Elements_Fill}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example <t>simple-h100</t>
  * // create objects for markers factory
  * var bars = [];
