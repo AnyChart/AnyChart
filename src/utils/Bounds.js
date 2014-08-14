@@ -104,52 +104,52 @@ anychart.utils.Bounds.prototype.toRect = function(opt_containerWidth, opt_contai
   var left, top, width, height;
 
   if (!goog.isNull(this.left_)) {
-    left = anychart.utils.normalize(this.left_, opt_containerWidth);
+    left = anychart.utils.normalizeSize(this.left_, opt_containerWidth);
     if (!goog.isNull(this.right_)) {
-      width = anychart.utils.normalize(this.right_, opt_containerWidth, true) - left;
+      width = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true) - left;
     } else if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalize(this.width_, opt_containerWidth);
+      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
     } else {
       width = (+opt_containerWidth - left) || 0;
     }
   } else if (!goog.isNull(this.right_)) {
     if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalize(this.width_, opt_containerWidth);
-      left = anychart.utils.normalize(this.right_, opt_containerWidth, true) - width;
+      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
+      left = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true) - width;
     } else {
       left = 0;
-      width = anychart.utils.normalize(this.right_, opt_containerWidth, true);
+      width = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true);
     }
   } else {
     left = 0;
     if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalize(this.width_, opt_containerWidth);
+      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
     } else {
       width = +opt_containerWidth || 0;
     }
   }
 
   if (!goog.isNull(this.top_)) {
-    top = anychart.utils.normalize(this.top_, opt_containerHeight);
+    top = anychart.utils.normalizeSize(this.top_, opt_containerHeight);
     if (!goog.isNull(this.bottom_)) {
-      height = anychart.utils.normalize(this.bottom_, opt_containerHeight, true) - top;
+      height = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true) - top;
     } else if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalize(this.height_, opt_containerHeight);
+      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
     } else {
       height = (+opt_containerHeight - top) || 0;
     }
   } else if (!goog.isNull(this.bottom_)) {
     if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalize(this.height_, opt_containerHeight);
-      top = anychart.utils.normalize(this.bottom_, opt_containerHeight, true) - height;
+      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
+      top = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true) - height;
     } else {
       top = 0;
-      height = anychart.utils.normalize(this.bottom_, opt_containerHeight, true);
+      height = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true);
     }
   } else {
     top = 0;
     if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalize(this.height_, opt_containerHeight);
+      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
     } else {
       height = +opt_containerHeight || 0;
     }

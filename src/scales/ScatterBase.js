@@ -173,7 +173,7 @@ anychart.scales.ScatterBase.prototype.maximumGap = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
   this.suspendSignalsDispatching();
-  if (opt_stackMode == anychart.scales.StackMode.PERCENT) {
+  if (opt_stackMode == anychart.enums.ScaleStackMode.PERCENT) {
     this.minimumGap(0);
     this.maximumGap(0);
   }

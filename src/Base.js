@@ -1,5 +1,6 @@
 goog.provide('anychart.Base');
 
+goog.require('anychart.enums');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
@@ -196,13 +197,6 @@ goog.inherits(anychart.Base, goog.events.EventTarget);
 
 
 /**
- * String with event sent by Invalidatable class.
- * @const {string}
- */
-anychart.Base.SIGNAL = 'signal';
-
-
-/**
  * Supported signals mask.
  * @type {number}
  */
@@ -242,11 +236,7 @@ anychart.Base.prototype.suspensionLevel = 0;
 
 
 /**
- * Adds an event listener. A listener can only be added once to an
- * object and if it is added again the key for the listener is
- * returned. Note that if the existing listener is a one-off listener
- * (registered via listenOnce), it will no longer be a one-off
- * listener after a call to listen().
+ * Adds a signal events listener.
  *
  * @param {function(this:SCOPE, anychart.SignalEvent):(boolean|undefined)} listener Callback
  *     method.
@@ -256,7 +246,22 @@ anychart.Base.prototype.suspensionLevel = 0;
  * @template SCOPE
  */
 anychart.Base.prototype.listenSignals = function(listener, opt_scope) {
-  return this.listen(anychart.Base.SIGNAL, listener, false, opt_scope);
+  return this.listen(anychart.enums.EventType.SIGNAL, listener, false, opt_scope);
+};
+
+
+/**
+ * Removes a signal events listener.
+ *
+ * @param {function(this:SCOPE, anychart.SignalEvent):(boolean|undefined)} listener Callback
+ *     method.
+ * @param {SCOPE=} opt_scope Object in whose scope to call the
+ *     listener.
+ * @return {boolean} Whether any listener was removed.
+ * @template SCOPE
+ */
+anychart.Base.prototype.unlistenSignals = function(listener, opt_scope) {
+  return this.unlisten(anychart.enums.EventType.SIGNAL, listener, false, opt_scope);
 };
 
 
@@ -315,18 +320,9 @@ anychart.Base.prototype.dispatchSignal = function(state) {
   state &= this.SUPPORTED_SIGNALS;
   if (!state) return;
   if (isNaN(this.suspendedDispatching)) {
-    //if (this.hasListener(anychart.Base.SIGNAL, false)) {
-    //  var signal = [];
-    //  for (var i in anychart.Signal) {
-    //    if (!!(anychart.Signal[i] & state))
-    //      signal.push(i);
-    //  }
-    //  goog.global['console']['log']('dispatching invalidation', signal.join(' | '), 'at\n', this, '\n');
-    //}
     this.dispatchEvent(new anychart.SignalEvent(this, state));
   } else {
     this.suspendedDispatching |= state;
-    //goog.global['console']['log']('dispatching suspended in', this);
   }
 };
 
@@ -443,7 +439,7 @@ anychart.Base.resumeSignalsDispatchingFalse = function(var_args) {
  * @extends {goog.events.Event}
  */
 anychart.SignalEvent = function(target, invalidatedStates) {
-  goog.base(this, anychart.Base.SIGNAL, target);
+  goog.base(this, anychart.enums.EventType.SIGNAL, target);
 
   /**
    * Aspects of the object that were hasSignal.
@@ -457,10 +453,55 @@ goog.inherits(anychart.SignalEvent, goog.events.Event);
 /**
  * Checks if an element has consistency state that was sent.
  * @param {anychart.Signal|number} state State(s) to be checked.
- * @return {boolean} True if element has it.
+ * @return {boolean} True if element has it (one of it).
  */
 anychart.SignalEvent.prototype.hasSignal = function(state) {
   return !!(this.signals & state);
+};
+
+
+/**
+ * If target needs redraw.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetNeedsRedraw = function() {
+  return this.hasSignal(anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * If target signalled bounds change.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetBoundsChanged = function() {
+  return this.hasSignal(anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * If target signalled data change.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetDataChanged = function() {
+  return this.hasSignal(anychart.Signal.DATA_CHANGED);
+};
+
+
+/**
+ * If target needs to be reapplied.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetNeedsReapplication = function() {
+  return this.hasSignal(anychart.Signal.NEEDS_REAPPLICATION);
+};
+
+
+/**
+ * If target needs to be recalculated.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
+  return this.hasSignal(anychart.Signal.NEEDS_RECALCULATION);
 };
 
 
@@ -471,10 +512,8 @@ anychart.Base.prototype['unlisten'] = anychart.Base.prototype.unlisten;
 anychart.Base.prototype['unlistenByKey'] = anychart.Base.prototype.unlistenByKey;
 anychart.Base.prototype['removeAllListeners'] = anychart.Base.prototype.removeAllListeners;
 goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);
-anychart.SignalEvent.prototype['hasSignal'] = anychart.SignalEvent.prototype.hasSignal;
-goog.exportSymbol('anychart.Signal', anychart.Signal);
-goog.exportSymbol('anychart.Signal.NEEDS_REDRAW', anychart.Signal.NEEDS_REDRAW);
-goog.exportSymbol('anychart.Signal.NEEDS_REAPPLICATION', anychart.Signal.NEEDS_REAPPLICATION);
-goog.exportSymbol('anychart.Signal.NEEDS_RECALCULATION', anychart.Signal.NEEDS_RECALCULATION);
-goog.exportSymbol('anychart.Signal.BOUNDS_CHANGED', anychart.Signal.BOUNDS_CHANGED);
-goog.exportSymbol('anychart.Signal.DATA_CHANGED', anychart.Signal.DATA_CHANGED);
+anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;
+anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;
+anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.prototype.targetDataChanged;
+anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;
+anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;

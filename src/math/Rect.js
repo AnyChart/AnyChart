@@ -1,6 +1,5 @@
 goog.provide('anychart.math.Rect');
-
-goog.require('acgraph.math.Rect');
+goog.require('acgraph');
 
 
 

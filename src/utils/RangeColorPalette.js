@@ -1,6 +1,6 @@
 goog.provide('anychart.utils.RangeColorPalette');
 goog.require('anychart.Base');
-goog.require('anychart.utils.color');
+goog.require('anychart.color');
 goog.require('goog.array');
 goog.require('goog.color');
 
@@ -183,7 +183,7 @@ anychart.utils.RangeColorPalette.prototype.processColorRange_ = function() {
     for (var i = 0; i < colors.length; i++) {
       var colorItem = colors[i];
       if (goog.isString(colorItem)) {
-        color = anychart.utils.color.parseColor(colorItem);
+        color = anychart.color.parseColor(colorItem);
         gradientKeys.push(
             {
               'color': color ? color.hex : '#000000',
@@ -191,7 +191,7 @@ anychart.utils.RangeColorPalette.prototype.processColorRange_ = function() {
             }
         );
       } else {
-        color = anychart.utils.color.parseColor(colorItem.color);
+        color = anychart.color.parseColor(colorItem.color);
         gradientKeys.push(
             {
               'color': color ? color.hex : '#000000',

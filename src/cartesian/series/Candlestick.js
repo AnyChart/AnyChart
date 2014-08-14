@@ -1,5 +1,5 @@
 goog.provide('anychart.cartesian.series.Candlestick');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.OHLC');
 
 

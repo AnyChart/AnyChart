@@ -1,6 +1,8 @@
 goog.provide('anychart.ui.Button');
+goog.require('acgraph');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Text');
+goog.require('anychart.math');
 goog.require('anychart.utils.Padding');
 
 
@@ -632,16 +634,16 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
         width = 0;
       }
     } else { // in other case - calculating using parent width
-      width = anychart.utils.normalize(/** @type {number|string} */ (this.width_), parentWidth);
+      width = anychart.utils.normalizeSize(/** @type {number|string} */ (this.width_), parentWidth);
     }
-    if (hasText) this.textX = anychart.utils.normalize(/** @type {number|string} */ (padding.left()), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), width);
   } else { // if width is not set  - it is either the same as text width, or 0
     if (hasText) {// if there is text - adjust
       width = textWidth;
     } else { // or set to 0
       width = 0;
     }
-    if (hasText) this.textX = anychart.utils.normalize(/** @type {number|string} */ (padding.left()), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), width);
     // if width is not set - use padding
     width = padding.widenWidth(width);
   }
@@ -661,16 +663,16 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
         height = 0;
       }
     } else { // in other case - calculating using parent height
-      height = anychart.utils.normalize(/** @type {number|string} */ (this.height_), parentHeight);
+      height = anychart.utils.normalizeSize(/** @type {number|string} */ (this.height_), parentHeight);
     }
-    if (hasText) this.textY = anychart.utils.normalize(/** @type {number|string} */ (padding.top()), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), height);
   } else { // if height is not set  - it is either the same as text height, or 0
     if (hasText) { // if there is text - adjust
       height = textHeight;
     } else { // or set to 0
       height = 0;
     }
-    if (hasText) this.textY = anychart.utils.normalize(/** @type {number|string} */ (padding.top()), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), height);
     // if height is not set - use padding
     height = padding.widenHeight(height);
   }
@@ -681,9 +683,9 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
   }
 
   // calcualte position if it is set
-  var position = anychart.utils.normalizeMathPosition(this.position_);
-  position.x = parentWidth ? anychart.utils.normalize(position.x, parentWidth) : 0;
-  position.y = parentHeight ? anychart.utils.normalize(position.y, parentHeight) : 0;
+  var position = anychart.math.normalizeCoordinate(this.position_);
+  position.x = parentWidth ? anychart.utils.normalizeSize(position.x, parentWidth) : 0;
+  position.y = parentHeight ? anychart.utils.normalizeSize(position.y, parentHeight) : 0;
 
   // background display bounds
   this.buttonBounds = new anychart.math.Rect(position.x, position.y, width, height);

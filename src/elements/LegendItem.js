@@ -1,7 +1,7 @@
 goog.provide('anychart.elements.LegendItem');
-goog.require('anychart.elements.Marker');
+goog.require('acgraph');
 goog.require('anychart.elements.Text');
-goog.require('anychart.events.EventType');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('goog.events.BrowserEvent');
@@ -37,12 +37,12 @@ anychart.elements.LegendItem = function() {
   acgraph.events.listen(this.layer_, acgraph.events.EventType.DBLCLICK, this.mouseDoubleClickHandler_, false, this);
 
   /**
-   * @type {(anychart.elements.LegendItem.IconType|string|function(acgraph.vector.Path, number))}
+   * @type {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))}
    */
   this.iconType_;
   this.x(0);
   this.y(0);
-  this.iconType(anychart.elements.LegendItem.IconType.SQUARE);
+  this.iconType(anychart.enums.LegendItemIconType.SQUARE);
   this.iconFill('black');
   this.iconStroke('none');
   this.iconMarker(null);
@@ -70,43 +70,14 @@ anychart.elements.LegendItem.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Predefined icons type.
- * @enum {string}
- */
-anychart.elements.LegendItem.IconType = {
-  AREA: 'area',
-  BAR: 'bar',
-  BUBBLE: 'bubble',
-  CANDLESTICK: 'candlestick',
-  COLUMN: 'column',
-  LINE: 'line',
-  MARKER: 'marker',
-  OHLC: 'ohlc',
-  RANGE_AREA: 'rangearea',
-  RANGE_BAR: 'rangebar',
-  RANGE_COLUMN: 'rangecolumn',
-  RANGE_SPLINE_AREA: 'rangesplinearea',
-  RANGE_STEP_AREA: 'rangesteparea',
-  SPLINE: 'spline',
-  SPLINE_AREA: 'splinearea',
-  STEP_LINE: 'stepline',
-  STEP_AREA: 'steparea',
-  CIRCLE: 'circle',
-  SQUARE: 'square'
-};
-
-
-/**
  * Method to get icon drawer
- * @this {anychart.elements.LegendItem}
- * @param {(anychart.elements.LegendItem.IconType|string)=} opt_iconType Type of an icon.
- * @return {function(acgraph.vector.Path, number)} Drawer function.
+ * @param {(anychart.enums.LegendItemIconType|string)=} opt_iconType Type of an icon.
+ * @return {function(this: anychart.elements.LegendItem, acgraph.vector.Path, number)} Drawer function.
  */
-anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
+anychart.elements.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
   var drawer;
-  var ths = this;
   switch (opt_iconType) {
-    case anychart.elements.LegendItem.IconType.STEP_AREA:
+    case anychart.enums.LegendItemIconType.STEP_AREA:
       drawer = function(path, size) {
         path.clear();
 
@@ -121,7 +92,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.AREA:
+    case anychart.enums.LegendItemIconType.AREA:
       drawer = function(path, size) {
         path.clear();
 
@@ -136,9 +107,9 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.RANGE_STEP_AREA:
-    case anychart.elements.LegendItem.IconType.RANGE_SPLINE_AREA:
-    case anychart.elements.LegendItem.IconType.RANGE_AREA:
+    case anychart.enums.LegendItemIconType.RANGE_STEP_AREA:
+    case anychart.enums.LegendItemIconType.RANGE_SPLINE_AREA:
+    case anychart.enums.LegendItemIconType.RANGE_AREA:
       drawer = function(path, size) {
         path.clear();
 
@@ -152,7 +123,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.SPLINE_AREA:
+    case anychart.enums.LegendItemIconType.SPLINE_AREA:
       drawer = function(path, size) {
         path.clear();
         var r = size / 2;
@@ -167,7 +138,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.RANGE_BAR:
+    case anychart.enums.LegendItemIconType.RANGE_BAR:
       drawer = function(path, size) {
         path.clear();
 
@@ -188,7 +159,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
             .close();
       };
       break;
-    case anychart.elements.LegendItem.IconType.RANGE_COLUMN:
+    case anychart.enums.LegendItemIconType.RANGE_COLUMN:
       drawer = function(path, size) {
         path.clear();
 
@@ -213,7 +184,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.BAR:
+    case anychart.enums.LegendItemIconType.BAR:
       drawer = function(path, size) {
         path.clear();
 
@@ -234,7 +205,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
             .close();
       };
       break;
-    case anychart.elements.LegendItem.IconType.COLUMN:
+    case anychart.enums.LegendItemIconType.COLUMN:
       drawer = function(path, size) {
         path.clear();
 
@@ -256,7 +227,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.STEP_LINE:
+    case anychart.enums.LegendItemIconType.STEP_LINE:
       drawer = function(path, size) {
         path.clear();
 
@@ -267,20 +238,20 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
             .moveTo(0, 0)
             .close();
 
-        if (ths.iconMarker_) {
-          if (!ths.marker_) {
-            ths.marker_ = path.parent().path();
-            ths.registerDisposable(ths.marker_);
-          } else ths.marker_.clear();
-          ths.marker_.fill(ths.iconFill_);
-          ths.marker_.stroke(ths.iconStroke_);
-          var markerDrawer = anychart.elements.Marker.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(ths)).iconMarker_);
-          markerDrawer.call(ths, ths.marker_, size / 2, size / 2, size / 6);
+        if (this.iconMarker_) {
+          if (!this.marker_) {
+            this.marker_ = path.parent().path();
+            this.registerDisposable(this.marker_);
+          } else this.marker_.clear();
+          this.marker_.fill(this.iconFill_);
+          this.marker_.stroke(this.iconStroke_);
+          var markerDrawer = anychart.enums.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(this)).iconMarker_);
+          markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
         }
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.LINE:
+    case anychart.enums.LegendItemIconType.LINE:
       drawer = function(path, size) {
         path.clear();
 
@@ -288,20 +259,20 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
             .lineTo(size, 0.5 * size)
             .close();
 
-        if (ths.iconMarker_) {
-          if (!ths.marker_) {
-            ths.marker_ = path.parent().path();
-            ths.registerDisposable(ths.marker_);
-          } else ths.marker_.clear();
-          ths.marker_.fill(ths.iconFill_);
-          ths.marker_.stroke(ths.iconStroke_);
-          var markerDrawer = anychart.elements.Marker.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(ths)).iconMarker_);
-          markerDrawer.call(ths, ths.marker_, size / 2, size / 2, size / 6);
+        if (this.iconMarker_) {
+          if (!this.marker_) {
+            this.marker_ = path.parent().path();
+            this.registerDisposable(this.marker_);
+          } else this.marker_.clear();
+          this.marker_.fill(this.iconFill_);
+          this.marker_.stroke(this.iconStroke_);
+          var markerDrawer = anychart.enums.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(this)).iconMarker_);
+          markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
         }
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.SPLINE:
+    case anychart.enums.LegendItemIconType.SPLINE:
       drawer = function(path, size) {
         path.clear();
         var r = size / 2;
@@ -310,22 +281,22 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
             .moveTo(0, 0)
             .close();
 
-        if (ths.iconMarker_) {
-          if (!ths.marker_) {
-            ths.marker_ = path.parent().path();
-            ths.registerDisposable(ths.marker_);
-          } else ths.marker_.clear();
-          ths.marker_.fill(ths.iconFill_);
-          ths.marker_.stroke(ths.iconStroke_);
-          var markerDrawer = anychart.elements.Marker.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(ths)).iconMarker_);
-          markerDrawer.call(ths, ths.marker_, size / 2, size / 2, size / 6);
+        if (this.iconMarker_) {
+          if (!this.marker_) {
+            this.marker_ = path.parent().path();
+            this.registerDisposable(this.marker_);
+          } else this.marker_.clear();
+          this.marker_.fill(this.iconFill_);
+          this.marker_.stroke(this.iconStroke_);
+          var markerDrawer = anychart.enums.getMarkerDrawer((/** @type {anychart.elements.LegendItem} */(this)).iconMarker_);
+          markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
         }
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.MARKER:
-    case anychart.elements.LegendItem.IconType.BUBBLE:
-    case anychart.elements.LegendItem.IconType.CIRCLE:
+    case anychart.enums.LegendItemIconType.MARKER:
+    case anychart.enums.LegendItemIconType.BUBBLE:
+    case anychart.enums.LegendItemIconType.CIRCLE:
       drawer = function(path, size) {
         path.clear();
         var r = size / 2;
@@ -334,7 +305,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.CANDLESTICK:
+    case anychart.enums.LegendItemIconType.CANDLESTICK:
       drawer = function(path, size) {
         path.clear();
 
@@ -349,7 +320,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.OHLC:
+    case anychart.enums.LegendItemIconType.OHLC:
       drawer = function(path, size) {
         path.clear();
 
@@ -363,7 +334,7 @@ anychart.elements.LegendItem.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.elements.LegendItem.IconType.SQUARE:
+    case anychart.enums.LegendItemIconType.SQUARE:
     default:
       //default drawer is a square
       drawer = function(path, size) {
@@ -660,11 +631,11 @@ anychart.elements.LegendItem.prototype.calculateBounds_ = function() {
   this.iconSize_ = textBounds.height;
   var width = this.iconSize_ + this.iconTextSpacing_ + textBounds.width;
   var height = textBounds.height;
-  var x = parentWidth ? anychart.utils.normalize(this.x_, parentWidth) : 0;
-  var y = parentHeight ? anychart.utils.normalize(this.y_, parentHeight) : 0;
+  var x = parentWidth ? anychart.utils.normalizeSize(this.x_, parentWidth) : 0;
+  var y = parentHeight ? anychart.utils.normalizeSize(this.y_, parentHeight) : 0;
 
-  var textWidth = anychart.utils.normalize(this.maxWidth_, parentWidth) - this.iconSize_ - this.iconTextSpacing_;
-  var textHeight = anychart.utils.normalize(this.maxHeight_, parentWidth);
+  var textWidth = anychart.utils.normalizeSize(this.maxWidth_, parentWidth) - this.iconSize_ - this.iconTextSpacing_;
+  var textHeight = anychart.utils.normalizeSize(this.maxHeight_, parentWidth);
 
   this.textElement_.width(textWidth);
   this.textElement_.height(textHeight);
@@ -775,7 +746,7 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
   var drawer = goog.isString(this.iconType_) ?
-      anychart.elements.LegendItem.getIconDrawer.call(this, this.iconType_) :
+      this.getIconDrawer(this.iconType_) :
       this.iconType_;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -886,19 +857,19 @@ anychart.elements.LegendItem.BrowserEvent.prototype.copyFrom = function(e, opt_t
   var type = e.type;
   switch (type) {
     case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.events.EventType.LEGEND_ITEM_MOUSE_OUT;
+      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT;
       break;
     case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.events.EventType.LEGEND_ITEM_MOUSE_OVER;
+      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER;
       break;
     case acgraph.events.EventType.MOUSEMOVE:
-      type = anychart.events.EventType.LEGEND_ITEM_MOUSE_MOVE;
+      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE;
       break;
     case acgraph.events.EventType.CLICK:
-      type = anychart.events.EventType.LEGEND_ITEM_CLICK;
+      type = anychart.enums.EventType.LEGEND_ITEM_CLICK;
       break;
     case acgraph.events.EventType.DBLCLICK:
-      type = anychart.events.EventType.LEGEND_ITEM_DOUBLE_CLICK;
+      type = anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK;
       break;
   }
   this.type = type;

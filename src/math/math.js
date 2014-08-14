@@ -1,5 +1,4 @@
 goog.provide('anychart.math');
-goog.provide('anychart.math.Coordinate');
 
 
 
@@ -30,6 +29,25 @@ anychart.math.CoordinateObject;
  * )} anychart.math.Coordinate
  */
 anychart.math.Coordinate;
+
+
+/**
+ * Tries to normalize anychart.math.Coordinate to acgraph.math.Coordinate.
+ * @param {anychart.math.Coordinate} value anychart.math.Coordinate to normalize.
+ * @return {acgraph.math.Coordinate} Normalized to acgraph.math.Coordinate value.
+ */
+anychart.math.normalizeCoordinate = function(value) {
+  if (value instanceof acgraph.math.Coordinate) {
+    return /** @type {acgraph.math.Coordinate} */(value);
+  } else {
+    if (goog.isArray(value)) {
+      return new acgraph.math.Coordinate(value[0], value[1]);
+    } else if (goog.isObject(value)) {
+      return new acgraph.math.Coordinate(value['x'], value['y']);
+    }
+  }
+  return new acgraph.math.Coordinate(0, 0);
+};
 
 
 /**

@@ -50,7 +50,7 @@ goog.inherits(anychart.data.OrdinalView, anychart.data.View);
  * @private
  */
 anychart.data.OrdinalView.prototype.comparator_ = function(a, b) {
-  return anychart.utils.compare(a.value, b.value);
+  return anychart.utils.compareAsc(a.value, b.value);
 };
 
 

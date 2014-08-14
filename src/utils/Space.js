@@ -207,10 +207,10 @@ anychart.utils.Space.prototype.bottom = function(opt_value) {
 anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
   var width = this.getWidthToTighten(boundsRect.width);
   var height = this.getHeightToTighten(boundsRect.height);
-  var left = anychart.utils.normalize(this.left_, width);
-  var right = anychart.utils.normalize(this.right_, width);
-  var top = anychart.utils.normalize(this.top_, height);
-  var bottom = anychart.utils.normalize(this.bottom_, height);
+  var left = anychart.utils.normalizeSize(this.left_, width);
+  var right = anychart.utils.normalizeSize(this.right_, width);
+  var top = anychart.utils.normalizeSize(this.top_, height);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, height);
   return new anychart.math.Rect(
       boundsRect.left + left,
       boundsRect.top + top,
@@ -227,8 +227,8 @@ anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
  */
 anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
   initialWidth = this.getHeightToTighten(initialWidth);
-  var left = anychart.utils.normalize(this.left_, initialWidth);
-  var right = anychart.utils.normalize(this.right_, initialWidth);
+  var left = anychart.utils.normalizeSize(this.left_, initialWidth);
+  var right = anychart.utils.normalizeSize(this.right_, initialWidth);
   return initialWidth - left - right;
 };
 
@@ -240,8 +240,8 @@ anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
  */
 anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
   initialHeight = this.getHeightToTighten(initialHeight);
-  var top = anychart.utils.normalize(this.top_, initialHeight);
-  var bottom = anychart.utils.normalize(this.bottom_, initialHeight);
+  var top = anychart.utils.normalizeSize(this.top_, initialHeight);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, initialHeight);
   return initialHeight - top - bottom;
 };
 
@@ -254,10 +254,10 @@ anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
 anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
   var width = this.getWidthToWiden(boundsRect.width);
   var height = this.getHeightToWiden(boundsRect.height);
-  var left = anychart.utils.normalize(this.left_, width);
-  var right = anychart.utils.normalize(this.right_, width);
-  var top = anychart.utils.normalize(this.top_, height);
-  var bottom = anychart.utils.normalize(this.bottom_, height);
+  var left = anychart.utils.normalizeSize(this.left_, width);
+  var right = anychart.utils.normalizeSize(this.right_, width);
+  var top = anychart.utils.normalizeSize(this.top_, height);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, height);
   return new anychart.math.Rect(
       boundsRect.left - left,
       boundsRect.top - top,
@@ -274,8 +274,8 @@ anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
  */
 anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
   initialWidth = this.getWidthToWiden(initialWidth);
-  var left = anychart.utils.normalize(this.left_, initialWidth);
-  var right = anychart.utils.normalize(this.right_, initialWidth);
+  var left = anychart.utils.normalizeSize(this.left_, initialWidth);
+  var right = anychart.utils.normalizeSize(this.right_, initialWidth);
   return initialWidth + left + right;
 };
 
@@ -287,8 +287,8 @@ anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
  */
 anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
   initialHeight = this.getHeightToWiden(initialHeight);
-  var top = anychart.utils.normalize(this.top_, initialHeight);
-  var bottom = anychart.utils.normalize(this.bottom_, initialHeight);
+  var top = anychart.utils.normalizeSize(this.top_, initialHeight);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, initialHeight);
   return initialHeight + top + bottom;
 };
 

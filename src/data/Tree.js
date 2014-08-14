@@ -2,8 +2,8 @@ goog.provide('anychart.data.Tree');
 
 goog.require('anychart.Base');
 goog.require('anychart.data.Traverser');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
-
 goog.require('goog.array');
 goog.require('goog.object');
 
@@ -12,7 +12,7 @@ goog.require('goog.object');
 /**
  * Tree data implementation.
  * @param {Array.<Object>=} opt_data - Raw data.
- * @param {anychart.data.Tree.FillMethod=} opt_fillMethod - Fill method.
+ * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @constructor
  * @extends {anychart.Base}
  */
@@ -73,67 +73,6 @@ anychart.data.Tree.IndexKeyValue;
  * @type {number}
  */
 anychart.data.Tree.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
-
-
-/**
- * Data fill method.
- * @enum {string}
- */
-anychart.data.Tree.FillMethod = {
-  /**
-   * Using this method means that the original data will be treated as an array of objects with a hierarchical tree
-   * structure.
-   *
-   * Sample:
-   * [code]
-   *  var rawData = [
-   *    {
-   *      _Object_,
-   *      children: [ ... ]
-   *    },
-   *
-   *    ...,
-   *
-   *    {
-   *      _Object_,
-   *      children: [
-   *        {
-   *          _Object_,
-   *          children: [ ... ]
-   *        },
-   *        ...
-   *      ]
-   *    }
-   *  ];
-   * [/code]
-   */
-  TREE_STRUCTURE: 'tree_structure',
-
-  /**
-   * Using this method means that the original data will be treated as a linear array of objects each of which
-   * can be given its own ID and the ID of the parent.
-   *
-   * Sample:
-   * [code]
-   *  var rawData = [
-   *    {
-   *      id: _opt_value_,
-   *      parent: _opt_value_,
-   *      someData: _some_data_
-   *    },
-   *
-   *    ...,
-   *
-   *    {
-   *      id: _opt_value_,
-   *      parent: _opt_value_,
-   *      someData: _some_data_
-   *    }
-   *  ];
-   * [/code]
-   */
-  PARENT_POINTER: 'parent_pointer'
-};
 
 
 /** @inheritDoc */
@@ -280,20 +219,32 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
 /**
  * Adds a data.
  * @param {Array.<Object>} data - Raw data.
- * @param {anychart.data.Tree.FillMethod=} opt_fillMethod - Fill method.
+ * @param {(anychart.enums.TreeFillingMethod|string)=} opt_fillingMethod - Filling method.
  * @return {anychart.data.Tree} - Itself for method chaining.
  */
-anychart.data.Tree.prototype.addData = function(data, opt_fillMethod) {
-  opt_fillMethod = opt_fillMethod || anychart.data.Tree.FillMethod.TREE_STRUCTURE;
+anychart.data.Tree.prototype.addData = function(data, opt_fillingMethod) {
+  opt_fillingMethod = (String(opt_fillingMethod)).toLowerCase();
 
   this.suspendSignalsDispatching();
 
-  switch (opt_fillMethod) {
-    case anychart.data.Tree.FillMethod.PARENT_POINTER:
+  switch (opt_fillingMethod) {
+    case 'astable':
+    case 'table':
+    case 'parentid':
+    case 'linear':
+    case 'plain':
+    case 'db':
+    case 'database':
+    case 'id':
+    case 'parentpointer':
+    case 'pointer':
       this.fillAsParentPointer_(data);
       break;
 
-    case anychart.data.Tree.FillMethod.TREE_STRUCTURE:
+    case 'astree':
+    case 'tree':
+    case 'structure':
+    case 'structural':
     default:
       this.fillAsTree_(data);
       break;
@@ -317,7 +268,7 @@ anychart.data.Tree.prototype.addData = function(data, opt_fillMethod) {
  * @private
  */
 anychart.data.Tree.prototype.comparisonFunction_ = function(item1, item2) {
-  return anychart.utils.compare(item1.key, item2.key);
+  return anychart.utils.compareAsc(item1.key, item2.key);
 };
 
 
@@ -499,7 +450,7 @@ anychart.data.Tree.prototype.search = function(soughtField, valueOrEvaluator, op
         if (!compareResult) result.push(this.traverserToArrayCache_[i]);
       }
     } else {
-      var comparator = /** @type {Function} */ (opt_comparisonFnOrEvaluatorContext || anychart.utils.compare);
+      var comparator = /** @type {Function} */ (opt_comparisonFnOrEvaluatorContext || anychart.utils.compareAsc);
       for (i = 0; i < this.traverserToArrayCache_.length; i++) {
         if (!comparator(this.traverserToArrayCache_[i].get(soughtField), valueOrEvaluator)) result.push(this.traverserToArrayCache_[i]);
       }
@@ -1074,7 +1025,7 @@ anychart.data.Tree.DataItem.prototype.treeInternal_ = function(newTree) {
 /**
  * Constructor function
  * @param {Array.<Object>=} opt_data - Raw data.
- * @param {anychart.data.Tree.FillMethod=} opt_fillMethod - Fill method.
+ * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @return {!anychart.data.Tree}
  */
 anychart.data.tree = function(opt_data, opt_fillMethod) {
@@ -1084,8 +1035,6 @@ anychart.data.tree = function(opt_data, opt_fillMethod) {
 
 //exports
 goog.exportSymbol('anychart.data.tree', anychart.data.tree);
-goog.exportSymbol('anychart.data.Tree.FillMethod.TREE_STRUCTURE', anychart.data.Tree.FillMethod.TREE_STRUCTURE);
-goog.exportSymbol('anychart.data.Tree.FillMethod.PARENT_POINTER', anychart.data.Tree.FillMethod.PARENT_POINTER);
 anychart.data.Tree.prototype['getTraverser'] = anychart.data.Tree.prototype.getTraverser;
 anychart.data.Tree.prototype['addData'] = anychart.data.Tree.prototype.addData;
 anychart.data.Tree.prototype['createIndexOn'] = anychart.data.Tree.prototype.createIndexOn;

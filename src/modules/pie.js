@@ -21,9 +21,9 @@ anychart.pieChart = function(opt_data) {
 
   chart.legend()
       .enabled(true)
-      .position('right')
-      .align('left')
-      .itemsLayout('vertical');
+      .position(anychart.enums.Position.RIGHT_CENTER)
+      .align(anychart.enums.Align.LEFT)
+      .itemsLayout(anychart.enums.Layout.HORIZONTAL);
 
   chart.legend().title()
       .enabled(false);

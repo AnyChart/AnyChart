@@ -23,8 +23,9 @@ goog.inherits(anychart.data.csv.Parser, goog.Disposable);
 /**
  * Parser states enumeration.
  * @enum {number}
+ * @private
  */
-anychart.data.csv.Parser.ParserState = {
+anychart.data.csv.Parser.ParserState_ = {
   STATE_GENERAL: 0,
   STATE_VALUE: 1,
   STATE_ESCAPING: 2,
@@ -420,7 +421,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
   this.currColsSepPos_ = -1;
 
   //state
-  var state = anychart.data.csv.Parser.ParserState.STATE_GENERAL;
+  var state = anychart.data.csv.Parser.ParserState_.STATE_GENERAL;
 
   //contains a current substring witch we work with
   var str = '';
@@ -434,7 +435,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
   while (++i < this.contentLen_) {
     var currChar = this.content_.charAt(i);
     switch (state) {
-      case anychart.data.csv.Parser.ParserState.STATE_GENERAL:// beginning of the cell
+      case anychart.data.csv.Parser.ParserState_.STATE_GENERAL:// beginning of the cell
         if (currChar == '\"') { // found a quote
           if (++i < this.contentLen_) // check if the next symbol exists. In the same time we move the current symbol pointer on next symbol
             nextChar = this.content_.charAt(i);
@@ -445,9 +446,9 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           this.currPos_ = i; //any row will begin with this symbol anyway
           if (nextChar == '\"') { // we if it is a beginning of markup or just a quotes
             // if it's just a quotes - we set state to STATE_VALUE
-            state = anychart.data.csv.Parser.ParserState.STATE_VALUE;
+            state = anychart.data.csv.Parser.ParserState_.STATE_VALUE;
           } else {// else we set a STATE_ESCAPING - state and roll the pointer back
-            state = anychart.data.csv.Parser.ParserState.STATE_ESCAPING;
+            state = anychart.data.csv.Parser.ParserState_.STATE_ESCAPING;
             i--;
           }
           break;
@@ -477,10 +478,10 @@ anychart.data.csv.Parser.prototype.next_ = function() {
 
         if (!this.ignoreTrailingSpaces_ || (currChar != ' ' && currChar != '\t')) {// if the spaces are the part of data or we didn't find a space
           this.currPos_ = i;
-          state = anychart.data.csv.Parser.ParserState.STATE_VALUE;
+          state = anychart.data.csv.Parser.ParserState_.STATE_VALUE;
         }
         break;
-      case anychart.data.csv.Parser.ParserState.STATE_VALUE: // within the data of cell
+      case anychart.data.csv.Parser.ParserState_.STATE_VALUE: // within the data of cell
         if (this.checkColSep_(currChar)) {
           len = i - this.currPos_ - this.colsSepLen_;
 
@@ -499,7 +500,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           this.currRowsSepPos_ = -1;
           this.currPos_ = i + 1;
           spacesLen = 0;
-          state = anychart.data.csv.Parser.ParserState.STATE_GENERAL;
+          state = anychart.data.csv.Parser.ParserState_.STATE_GENERAL;
           break;
         }
 
@@ -507,7 +508,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           len = i - this.currPos_ - this.rowsSepLen_;
           if (!currFieldIndex && len <= 0) { // we made a mistake thinking that the beginning of a multi-symbol separator is the beginning of data. Well, we start from beginning
             str = '';
-            state = anychart.data.csv.Parser.ParserState.STATE_GENERAL;
+            state = anychart.data.csv.Parser.ParserState_.STATE_GENERAL;
             this.currColsSepPos_ = -1;
             this.currRowsSepPos_ = -1;
             this.currPos_ = i + 1;
@@ -534,7 +535,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
         else
           spacesLen = 0;
         break;
-      case anychart.data.csv.Parser.ParserState.STATE_ESCAPING: // we are within the screening and swallow everything except the quotes
+      case anychart.data.csv.Parser.ParserState_.STATE_ESCAPING: // we are within the screening and swallow everything except the quotes
         if (currChar == '\"') { // the quote is found
           if (++i < this.contentLen_) // check if the next symbol presents and in the same time move a current symbol's pointer on the next symbol
             nextChar = this.content_.charAt(i);
@@ -552,7 +553,7 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           } else {// else set state to STATE_LOOKING_FOR_SEPARATOR, put the data into a cell and roll the pointer's value back
             this.currColsSepPos_ = -1;
             this.currRowsSepPos_ = -1;
-            state = anychart.data.csv.Parser.ParserState.STATE_LOOKING_FOR_SEPARATOR;
+            state = anychart.data.csv.Parser.ParserState_.STATE_LOOKING_FOR_SEPARATOR;
             str += this.content_.substr(this.currPos_, i - this.currPos_ - 1);
             this.processItem_(currFieldIndex++, str ? str : null);
             str = '';
@@ -561,14 +562,14 @@ anychart.data.csv.Parser.prototype.next_ = function() {
           break;
         }
         break;
-      case anychart.data.csv.Parser.ParserState.STATE_LOOKING_FOR_SEPARATOR: // looking for an end of the cell ignoring any other symbols
+      case anychart.data.csv.Parser.ParserState_.STATE_LOOKING_FOR_SEPARATOR: // looking for an end of the cell ignoring any other symbols
         if (this.checkColSep_(currChar)) {
           str = '';
           this.currColsSepPos_ = -1;
           this.currRowsSepPos_ = -1;
           this.currPos_ = i + 1;
           spacesLen = 0;
-          state = anychart.data.csv.Parser.ParserState.STATE_GENERAL;
+          state = anychart.data.csv.Parser.ParserState_.STATE_GENERAL;
           break;
         }
 
@@ -583,8 +584,8 @@ anychart.data.csv.Parser.prototype.next_ = function() {
   len = this.contentLen_ - this.currPos_;
   // at the end of the data, we found no line separator (generator was impolite),
   // therefore, if we still have something to be appended to the end of last cell, then we write in it all that we have
-  if ((state == anychart.data.csv.Parser.ParserState.STATE_ESCAPING ||
-      state == anychart.data.csv.Parser.ParserState.STATE_VALUE) && len) {
+  if ((state == anychart.data.csv.Parser.ParserState_.STATE_ESCAPING ||
+      state == anychart.data.csv.Parser.ParserState_.STATE_VALUE) && len) {
     str += this.content_.substr(this.currPos_, len);
     if (this.ignoreTrailingSpaces_)
       str = anychart.utils.rtrim(this.content_.substr(this.currPos_, len));

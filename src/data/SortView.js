@@ -1,6 +1,6 @@
 goog.provide('anychart.data.SortView');
-
 goog.require('anychart.data.View');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.array');
 
@@ -10,12 +10,13 @@ goog.require('goog.array');
  * Sorting view.
  * @param {!anychart.data.IView} parentView Parent view. The last view is a mapping.
  * @param {string} fieldName Field name to make sort by.
- * @param {function(*, *):number=} opt_comparator Sorting function that should accept two field values and return
- *    numeric result of the comparison.
+ * @param {(anychart.enums.Sort|function(*, *):number)=} opt_comparatorOrSort Sorting function that should accept two
+ *    field values and return numeric result of the comparison or string value of anychart.enums.Sort enumeration
+ *    except NONE.
  * @constructor
  * @extends {anychart.data.View}
  */
-anychart.data.SortView = function(parentView, fieldName, opt_comparator) {
+anychart.data.SortView = function(parentView, fieldName, opt_comparatorOrSort) {
   goog.base(this, parentView);
 
   /**
@@ -25,7 +26,11 @@ anychart.data.SortView = function(parentView, fieldName, opt_comparator) {
    */
   this.fieldName_ = fieldName;
 
-  var comparator = opt_comparator || anychart.utils.compare;
+  var comparator = goog.isFunction(opt_comparatorOrSort) ?
+      opt_comparatorOrSort :
+      (anychart.enums.normalizeSort(opt_comparatorOrSort, anychart.enums.Sort.ASC) == anychart.enums.Sort.DESC ?
+          anychart.utils.compareDesc :
+          anychart.utils.compareAsc);
 
   /**
    * Comparison function.

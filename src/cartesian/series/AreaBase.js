@@ -1,5 +1,5 @@
 goog.provide('anychart.cartesian.series.AreaBase');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.ContinuousBase');
 
 

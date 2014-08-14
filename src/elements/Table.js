@@ -1,9 +1,10 @@
 goog.provide('anychart.elements.Table');
 goog.provide('anychart.elements.Table.Cell');
-
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
 goog.require('anychart.elements.LabelsFactory');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Padding');
 
@@ -371,8 +372,8 @@ anychart.elements.Table.prototype.getCell = function(row, col) {
 anychart.elements.Table.prototype.cellTextFactory = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.elements.LabelsFactory();
-    this.labelsFactory_.anchor(anychart.utils.NinePositions.CENTER);
-    this.labelsFactory_.position(anychart.utils.NinePositions.CENTER);
+    this.labelsFactory_.anchor(anychart.enums.Anchor.CENTER);
+    this.labelsFactory_.position(anychart.enums.Position.CENTER);
     this.registerDisposable(this.labelsFactory_);
   }
   if (goog.isDef(opt_value)) {
@@ -837,7 +838,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     var autoSizesCount = 0;
     var tableSize = this.pixelBounds().width;
     for (i = 0, len = this.colsCount_; i < len; i++) {
-      size = anychart.utils.normalize(this.colWidthSettings_[i], tableSize);
+      size = anychart.utils.normalizeSize(this.colWidthSettings_[i], tableSize);
       if (isNaN(size)) {
         autoSizesCount++;
       } else {
@@ -869,7 +870,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     autoSizesCount = 0;
     tableSize = this.pixelBounds().height;
     for (i = 0, len = this.rowsCount_; i < len; i++) {
-      size = anychart.utils.normalize(this.rowHeightSettings_[i], tableSize);
+      size = anychart.utils.normalizeSize(this.rowHeightSettings_[i], tableSize);
       if (isNaN(size)) {
         autoSizesCount++;
       } else {
@@ -1971,10 +1972,12 @@ anychart.elements.Table.Cell.prototype.disposeInternal = function() {
 
 /**
  * Constructor function.
+ * @param {number=} opt_rowsCount Number of rows in the table.
+ * @param {number=} opt_colsCount Number of columns in the table.
  * @return {!anychart.elements.Table}
  */
-anychart.elements.table = function() {
-  return new anychart.elements.Table();
+anychart.elements.table = function(opt_rowsCount, opt_colsCount) {
+  return new anychart.elements.Table(opt_rowsCount, opt_colsCount);
 };
 
 

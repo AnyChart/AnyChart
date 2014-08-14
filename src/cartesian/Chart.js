@@ -10,6 +10,7 @@ goog.require('anychart.elements.Grid');
 goog.require('anychart.elements.LineMarker');
 goog.require('anychart.elements.RangeMarker');
 goog.require('anychart.elements.TextMarker');
+goog.require('anychart.enums');
 goog.require('anychart.scales');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.MarkerPalette');
@@ -130,7 +131,7 @@ anychart.cartesian.Chart = function() {
 
   // Add handler to listen legend item click for legend and enable/disable series.
   var legend = /** @type {anychart.elements.Legend} */ (this.legend());
-  legend.listen(anychart.events.EventType.LEGEND_ITEM_CLICK, function(event) {
+  legend.listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
     // function that enables or disables series by index of clicked legend item
 
     var cartesianChart = /** @type {anychart.cartesian.Chart} */ (this);
@@ -309,11 +310,11 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid()
- *     .direction(anychart.utils.Direction.HORIZONTAL);
+ *     .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid()
  *     .oddFill('none')
  *     .evenFill('none')
- *     .direction(anychart.utils.Direction.VERTICAL);
+ *     .layout(anychart.enums.Layout.VERTICAL);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.elements.Grid} Axis instance by index.
@@ -323,7 +324,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * var myGrid = anychart.elements.grid()
- *    .direction(anychart.utils.Direction.HORIZONTAL);
+ *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid(myGrid);
  * chart.container(stage).draw();
  * @param {(anychart.elements.Grid|Object)=} opt_value Chart grid settings to set.
@@ -334,11 +335,11 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid(0)
- *     .direction(anychart.utils.Direction.HORIZONTAL);
+ *     .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid(1)
  *     .oddFill('none')
  *     .evenFill('red 0.1')
- *     .direction(anychart.utils.Direction.VERTICAL);
+ *     .layout(anychart.enums.Layout.VERTICAL);
  * chart.container(stage).draw();
  * chart.grid(1, null);
  * chart.container(stage).draw();
@@ -391,15 +392,15 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid()
- *     .direction(anychart.utils.Direction.HORIZONTAL);
+ *     .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid()
  *     .oddFill('none')
  *     .evenFill('none')
- *     .direction(anychart.utils.Direction.VERTICAL);
+ *     .layout(anychart.enums.Layout.VERTICAL);
  * chart.minorGrid()
  *    .oddFill('none')
  *    .evenFill('none')
- *    .direction(anychart.utils.Direction.HORIZONTAL);
+ *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Chart minor grid index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.elements.Grid} Axis instance by index.
@@ -409,11 +410,11 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * var myGrid = anychart.elements.grid()
- *    .direction(anychart.utils.Direction.HORIZONTAL);
+ *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid(myGrid);
  * myGrid.oddFill('none')
  *    .evenFill('none')
- *    .direction(anychart.utils.Direction.HORIZONTAL).minor(true);
+ *    .layout(anychart.enums.Layout.HORIZONTAL).minor(true);
  * chart.minorGrid(myGrid)
  * chart.container(stage).draw();
  * @param {(anychart.elements.Grid|Object)=} opt_value Chart minor grid settings to set.
@@ -424,15 +425,15 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * var chart = anychart.cartesian.chart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid(0)
- *     .direction(anychart.utils.Direction.HORIZONTAL);
+ *     .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.minorGrid(0)
  *     .oddFill('none')
  *     .evenFill('red')
- *     .direction(anychart.utils.Direction.VERTICAL);
+ *     .layout(anychart.enums.Layout.VERTICAL);
  * chart.minorGrid(1)
  *    .oddFill('none')
  *    .evenFill('none')
- *    .direction(anychart.utils.Direction.HORIZONTAL);
+ *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.container(stage).draw();
  * chart.minorGrid(0, null);
  * chart.container(stage).draw();
@@ -550,7 +551,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
   var axis = this.xAxes_[index];
   if (!axis) {
     axis = new anychart.elements.Axis();
-    axis.orientation(anychart.utils.Orientation.BOTTOM);
+    axis.orientation(anychart.enums.Orientation.BOTTOM);
     axis.title().text('X-Axis');
     this.xAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -629,7 +630,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
   if (!axis) {
     axis = new anychart.elements.Axis();
     axis.staggerMode(false);
-    axis.orientation(anychart.utils.Orientation.LEFT);
+    axis.orientation(anychart.enums.Orientation.LEFT);
     axis.title().text('Y-Axis');
     this.yAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -688,7 +689,7 @@ anychart.cartesian.Chart.prototype.onAxisSignal_ = function(event) {
  * var lineMarker = anychart.elements.lineMarker()
  *     .value(5.5)
  *     .stroke('2 red')
- *     .direction('horizontal');
+ *     .layout('horizontal');
  * chart.lineMarker(lineMarker);
  * @param {(anychart.elements.LineMarker|Object)=} opt_value Chart line marker settings to set.
  * @return {!anychart.cartesian.Chart} {@link anychart.cartesian.Chart} instance for method chaining.
@@ -820,8 +821,8 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
  * var txtMarker = anychart.elements.textMarker()
  *     .text('Marker')
  *     .value(3.3)
- *     .align(anychart.elements.TextMarker.Align.NEAR)
- *     .anchor(anychart.utils.NinePositions.LEFT_BOTTOM);
+ *     .align(anychart.enums.TextMarkerAlign.NEAR)
+ *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
  * chart.textMarker(txtMarker);
  * chart.lineMarker().value(3.3);
  * @param {(anychart.elements.TextMarker|Object)=} opt_value Chart text marker settings to set.
@@ -1304,13 +1305,13 @@ anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, op
     instance.index(this.series_.length - 1);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(this.series_.length - 1)));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    throw 'Unknown series type: ' + type + '\nIt can be contains in other modules, see module list for details.';
+    throw 'Unknown series type: ' + type + '\nIt can be contained in other modules, see modules list for details.';
   }
 
   return instance;
@@ -1497,7 +1498,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
       scale = this.yScales_[id];
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc(); // starting autocalc for stacked scales too.
-        if (scale.stackMode() != anychart.scales.StackMode.VALUE)
+        if (scale.stackMode() != anychart.enums.ScaleStackMode.VALUE)
           yScalesToCalc.push(scale);
       }
     }
@@ -1528,7 +1529,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
     for (i = 0; i < yScalesToCalc.length; i++) {
       scale = yScalesToCalc[i];
       series = this.seriesOfYScaleMap_[goog.getUid(scale)];
-      if (scale.stackMode() == anychart.scales.StackMode.PERCENT) {
+      if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
         var hasPositive = false;
         var hasNegative = false;
         for (j = 0; j < series.length; j++) {
@@ -1707,7 +1708,7 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
     scale = series.yScale();
 
     id = goog.getUid(scale);
-    if (scale.stackMode() == anychart.scales.StackMode.VALUE) {
+    if (scale.stackMode() == anychart.enums.ScaleStackMode.VALUE) {
       if (id in seriesOfStackedScaleMap)
         seriesOfStackedScaleMap[id].push(series);
       else
@@ -1754,15 +1755,15 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
       item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
   }
 
-  var directionBasedElements = goog.array.concat(
+  var layoutBasedElements = goog.array.concat(
       this.lineAxesMarkers_,
       this.rangeAxesMarkers_,
       this.textAxesMarkers_,
       this.grids_,
       this.minorGrids_);
 
-  for (i = 0, count = directionBasedElements.length; i < count; i++) {
-    item = directionBasedElements[i];
+  for (i = 0, count = layoutBasedElements.length; i < count; i++) {
+    item = layoutBasedElements[i];
 
     if (item && !item.scale()) {
       if (item.isHorizontal()) {
@@ -1828,7 +1829,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
       scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
       id = goog.getUid(scale);
       if (aSeries instanceof anychart.cartesian.series.BarBase) {
-        if (scale.stackMode() == anychart.scales.StackMode.NONE) {
+        if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           numBarClusters++;
         } else {
           if (!(id in seenScalesWithBars)) {
@@ -1837,7 +1838,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
           }
         }
       } else if (aSeries instanceof anychart.cartesian.series.WidthBased) {
-        if (scale.stackMode() == anychart.scales.StackMode.NONE) {
+        if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           numColumnClusters++;
         } else {
           if (!(id in seenScalesWithColumns)) {
@@ -1856,7 +1857,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
         wSeries = /** @type {anychart.cartesian.series.WidthBased} */(series[i]);
         if (wSeries instanceof anychart.cartesian.series.WidthBased && !(wSeries instanceof anychart.cartesian.series.BarBase)) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
-          if (scale.stackMode() == anychart.scales.StackMode.NONE) {
+          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoBarWidth(barWidthRatio);
             currPosition += barWidthRatio * (1 + this.barsPadding_);
@@ -1884,7 +1885,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
         wSeries = /** @type {anychart.cartesian.series.Bar} */(series[i]);
         if (wSeries instanceof anychart.cartesian.series.BarBase) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
-          if (scale.stackMode() == anychart.scales.StackMode.NONE) {
+          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoBarWidth(barWidthRatio);
             currPosition += barWidthRatio * (1 + this.barsPadding_);
@@ -1975,7 +1976,7 @@ anychart.cartesian.Chart.prototype.palette = function(opt_value) {
 
 /**
  * Chart markers palette settings.
- * @param {(Array.<anychart.elements.Marker.Type>|Object|anychart.utils.MarkerPalette)=} opt_value Chart marker palette settings to set.
+ * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.utils.MarkerPalette)=} opt_value Chart marker palette settings to set.
  * @return {anychart.utils.MarkerPalette|anychart.cartesian.Chart} Return current chart markers palette or itself for chaining call.
  */
 anychart.cartesian.Chart.prototype.markerPalette = function(opt_value) {
@@ -2092,7 +2093,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.elements.Marker.Type} */(this.markerPalette().markerAt(i)));
+      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.SERIES);
@@ -2125,19 +2126,19 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
           axis.parentBounds(contentAreaBounds);
           orientation = axis.orientation();
 
-          if (orientation == anychart.utils.Orientation.TOP) {
+          if (orientation == anychart.enums.Orientation.TOP) {
             axis.offsetY(topOffset);
             remainingBounds = axis.getRemainingBounds();
             topOffset += contentAreaBounds.height - remainingBounds.height;
-          } else if (orientation == anychart.utils.Orientation.BOTTOM) {
+          } else if (orientation == anychart.enums.Orientation.BOTTOM) {
             axis.offsetY(bottomOffset);
             remainingBounds = axis.getRemainingBounds();
             bottomOffset = contentAreaBounds.height - remainingBounds.height;
-          } else if (orientation == anychart.utils.Orientation.LEFT) {
+          } else if (orientation == anychart.enums.Orientation.LEFT) {
             axis.offsetX(leftOffset);
             remainingBounds = axis.getRemainingBounds();
             leftOffset += contentAreaBounds.width - remainingBounds.width;
-          } else if (orientation == anychart.utils.Orientation.RIGHT) {
+          } else if (orientation == anychart.enums.Orientation.RIGHT) {
             axis.offsetX(rightOffset);
             remainingBounds = axis.getRemainingBounds();
             rightOffset = contentAreaBounds.width - remainingBounds.width;

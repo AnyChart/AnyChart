@@ -1,12 +1,13 @@
 goog.provide('anychart.pie.Chart');
+goog.require('acgraph');
 goog.require('anychart.Chart');
 goog.require('anychart.color');
 goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.elements.Tooltip');
+goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.RangeColorPalette');
-goog.require('anychart.utils.Sort');
 goog.require('anychart.utils.TypedLayer');
 
 
@@ -29,7 +30,7 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * Filter function that should accept a field value and return true if the row
    *    should be included into the resulting view as and false otherwise.
-   * @type {(function(*):boolean)?}
+   * @type {(null|function(*):boolean)}
    * @private
    */
   this.groupedPointFilter_ = null;
@@ -65,10 +66,10 @@ anychart.pie.Chart = function(opt_data) {
   /**
    * The sort type for the pie points.
    * Grouped point included into sort.
-   * @type {anychart.utils.Sort}
+   * @type {anychart.enums.Sort}
    * @private
    */
-  this.sort_ = anychart.utils.Sort.NONE;
+  this.sort_ = anychart.enums.Sort.NONE;
 
   /**
    * @type {anychart.elements.LabelsFactory}
@@ -192,7 +193,7 @@ anychart.pie.Chart = function(opt_data) {
   this.legend().enabled(true);
 
   // Add handler to listen legend item click for legend and explode slice.
-  this.legend().listen(anychart.events.EventType.LEGEND_ITEM_CLICK, function(event) {
+  this.legend().listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
     // function that explodes pie slice by index of the clicked legend item
 
     var index = event['index'];
@@ -742,7 +743,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 /**
  * Gets the last values set by grouping function or null.
- * @return {function(*):boolean|null} Current grouping function.
+ * @return {(null|function(*):boolean)} Current grouping function.
  *//**
  * Setter for points grouping function.<br/>
  * Группирует точки по условию заданному в фильтрующей функции и добавляет итоговую точку в конец.
@@ -974,7 +975,8 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
  */
 anychart.pie.Chart.prototype.explode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.explode_ = anychart.utils.normalizeNumberOrStringPercentValue(opt_value, 15);
+    // TODO(Anton Saukh): Это инлайн бывшего метода normalizeNumberOrStringPercentValue - с этим надо что-то сделать.
+    this.explode_ = isNaN(parseFloat(opt_value)) ? 15 : opt_value;
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
@@ -1004,7 +1006,7 @@ anychart.pie.Chart.prototype.explodeSlice = function(index, opt_explode) {
 
 /**
  * Getter for the current sort setting.
- * @return {anychart.utils.Sort} Sort setting.
+ * @return {anychart.enums.Sort} Sort setting.
  *//**
  * Setter for the sort setting.<br/>
  * Ascending, Descending and No sorting is supported.
@@ -1017,18 +1019,18 @@ anychart.pie.Chart.prototype.explodeSlice = function(index, opt_explode) {
  *  anychart.pie.chart(data)
  *      .container(stage)
  *      .bounds('50%',0,'50%', '100%')
- *      .sort(anychart.utils.Sort.DESC)
+ *      .sort(anychart.enums.Sort.DESC)
  *      .draw();
- * @param {(anychart.utils.Sort|string)=} opt_value [{@link anychart.utils.Sort}.NONE] Value of the sort setting.
+ * @param {(anychart.enums.Sort|string)=} opt_value [{@link anychart.enums.Sort}.NONE] Value of the sort setting.
  * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.Sort|string)=} opt_value .
- * @return {(anychart.utils.Sort|anychart.pie.Chart)} .
+ * @param {(anychart.enums.Sort|string)=} opt_value .
+ * @return {(anychart.enums.Sort|anychart.pie.Chart)} .
  */
 anychart.pie.Chart.prototype.sort = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeSort(opt_value);
+    opt_value = anychart.enums.normalizeSort(opt_value);
     if (this.sort_ != opt_value) {
       this.sort_ = opt_value;
       this.data(this.parentView_);
@@ -1048,13 +1050,13 @@ anychart.pie.Chart.prototype.sort = function(opt_value) {
 anychart.pie.Chart.prototype.calculate_ = function(bounds) {
   var minWidthHeight = Math.min(bounds.width, bounds.height);
 
-  this.radiusValue_ = anychart.utils.normalize(this.radius_, minWidthHeight);
+  this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight);
 
   this.innerRadiusValue_ = goog.isFunction(this.innerRadius_) ?
       this.innerRadius_(this.radiusValue_) :
-      anychart.utils.normalize(this.innerRadius_, this.radiusValue_);
+      anychart.utils.normalizeSize(this.innerRadius_, this.radiusValue_);
 
-  this.explodeValue_ = anychart.utils.normalize(this.explode_, minWidthHeight);
+  this.explodeValue_ = anychart.utils.normalizeSize(this.explode_, minWidthHeight);
 
   this.cx_ = bounds.left + bounds.width / 2;
   this.cy_ = bounds.top + bounds.height / 2;
@@ -1584,7 +1586,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     data.push({
       'index': index,
       'text': iterator.get('name') || 'Point - ' + index,
-      'iconType': anychart.elements.LegendItem.IconType.CIRCLE,
+      'iconType': anychart.enums.LegendItemIconType.CIRCLE,
       'iconStroke': 'none',
       'iconFill': this.getFillColor(true, false),
       'iconMarker': null
@@ -1875,16 +1877,16 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
   var type = e.type;
   switch (type) {
     case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.events.EventType.POINT_MOUSE_OUT;
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
       break;
     case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.events.EventType.POINT_MOUSE_OVER;
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
       break;
     case acgraph.events.EventType.CLICK:
-      type = anychart.events.EventType.POINT_CLICK;
+      type = anychart.enums.EventType.POINT_CLICK;
       break;
     case acgraph.events.EventType.DBLCLICK:
-      type = anychart.events.EventType.POINT_DOUBLE_CLICK;
+      type = anychart.enums.EventType.POINT_DOUBLE_CLICK;
       break;
   }
   this.type = type;

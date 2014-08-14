@@ -1,6 +1,5 @@
 goog.provide('anychart.VisualBase');
-
-goog.require('acgraphexport');
+goog.require('acgraph');
 goog.require('anychart.Base');
 goog.require('goog.dom');
 goog.require('goog.json.hybrid');

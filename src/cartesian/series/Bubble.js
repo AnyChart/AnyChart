@@ -1,5 +1,5 @@
 goog.provide('anychart.cartesian.series.Bubble');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.DiscreteBase');
 goog.require('anychart.color');
 goog.require('anychart.utils');
@@ -46,8 +46,8 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'y', 'n'];
   this.referenceValuesSupportStack = false;
 
-  this.markers().position(anychart.utils.NinePositions.CENTER);
-  this.labels().position(anychart.utils.NinePositions.CENTER);
+  this.markers().position(anychart.enums.Position.CENTER);
+  this.labels().position(anychart.enums.Position.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BUBBLE] = anychart.cartesian.series.Bubble;
@@ -287,14 +287,14 @@ anychart.cartesian.series.Bubble.prototype.startDrawing = function() {
    * @type {!number}
    * @private
    */
-  this.minimumSizeValue_ = anychart.utils.normalize(this.minimumSizeSetting_, categoryWidth);
+  this.minimumSizeValue_ = anychart.utils.normalizeSize(this.minimumSizeSetting_, categoryWidth);
 
   /**
    * Calculated maximum size value. For inner use.
    * @type {!number}
    * @private
    */
-  this.maximumSizeValue_ = anychart.utils.normalize(this.maximumSizeSetting_, categoryWidth);
+  this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, categoryWidth);
 
   this.calculateSizeScale();
 };

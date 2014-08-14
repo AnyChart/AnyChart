@@ -1,6 +1,8 @@
 goog.provide('anychart.elements.TextMarker');
+goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.elements.Text');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
@@ -33,19 +35,19 @@ anychart.elements.TextMarker = function() {
   this.parentBounds_ = null;
 
   /**
-   * @type {anychart.utils.Direction}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.direction_;
+  this.layout_;
 
   /**
-   * @type {anychart.elements.TextMarker.Align}
+   * @type {anychart.enums.TextMarkerAlign}
    * @private
    */
   this.align_;
 
   /**
-   * @type {anychart.utils.NinePositions}
+   * @type {anychart.enums.Anchor}
    * @private
    */
   this.anchor_;
@@ -86,20 +88,6 @@ goog.inherits(anychart.elements.TextMarker, anychart.elements.Text);
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Enums.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Sets marker position relative to an axis
- * @enum {string}
- */
-anychart.elements.TextMarker.Align = {
-  NEAR: 'near',
-  CENTER: 'center',
-  FAR: 'far'
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
 //  States and signals.
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -118,27 +106,6 @@ anychart.elements.TextMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.BOUNDS;
-
-
-/**
- * Normalizes user input align to its enumeration values. Also accepts 'middle' and null. Defaults to opt_default or
- * 'center'.
- *
- * @param {string} align Align to normalize.
- * @param {anychart.elements.TextMarker.Align=} opt_default Default align.
- * @return {anychart.elements.TextMarker.Align} Normalized align.
- */
-anychart.elements.TextMarker.normalizeAlign = function(align, opt_default) {
-  if (goog.isString(align)) {
-    align = align.toLowerCase();
-    if (align == 'middle') return anychart.elements.TextMarker.Align.CENTER;
-    for (var i in anychart.elements.TextMarker.Align) {
-      if (align == anychart.elements.TextMarker.Align[i])
-        return anychart.elements.TextMarker.Align[i];
-    }
-  }
-  return opt_default || anychart.elements.TextMarker.Align.CENTER;
-};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -223,12 +190,12 @@ anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/Set align.
- * @param {anychart.elements.TextMarker.Align=} opt_value TextMarker align.
- * @return {anychart.elements.TextMarker.Align|anychart.elements.TextMarker} Align or this.
+ * @param {anychart.enums.TextMarkerAlign=} opt_value TextMarker align.
+ * @return {anychart.enums.TextMarkerAlign|anychart.elements.TextMarker} Align or this.
  */
 anychart.elements.TextMarker.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var align = anychart.elements.TextMarker.normalizeAlign(opt_value);
+    var align = anychart.enums.normalizeTextMarkerAlign(opt_value);
     if (this.align_ != align) {
       this.align_ = align;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -242,33 +209,33 @@ anychart.elements.TextMarker.prototype.align = function(opt_value) {
 
 
 /**
- * Get/set direction.
- * @param {anychart.utils.Direction=} opt_value TextMarker direction.
- * @return {anychart.utils.Direction|anychart.elements.TextMarker} Direction or this.
+ * Get/set layout.
+ * @param {anychart.enums.Layout=} opt_value TextMarker layout.
+ * @return {anychart.enums.Layout|anychart.elements.TextMarker} Layout or this.
  */
-anychart.elements.TextMarker.prototype.direction = function(opt_value) {
+anychart.elements.TextMarker.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var direction = anychart.utils.normalizeDirection(opt_value);
-    if (this.direction_ != direction) {
-      this.direction_ = direction;
+    var layout = anychart.enums.normalizeLayout(opt_value);
+    if (this.layout_ != layout) {
+      this.layout_ = layout;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.direction_;
+    return this.layout_;
   }
 };
 
 
 /**
  * Get/set text marker anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Text marker anchor settings.
- * @return {anychart.elements.TextMarker|anychart.utils.NinePositions} Text marker anchor settings or itself for method chaining.
+ * @param {(anychart.enums.Anchor|string)=} opt_value Text marker anchor settings.
+ * @return {anychart.elements.TextMarker|anychart.enums.Anchor} Text marker anchor settings or itself for method chaining.
  */
 anychart.elements.TextMarker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -415,11 +382,11 @@ anychart.elements.TextMarker.prototype.applyTextSettings = function(textElement,
 
 
 /**
- * Defines marker direction
+ * Defines marker layout
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.TextMarker.prototype.isHorizontal = function() {
-  return this.direction_ == anychart.utils.Direction.HORIZONTAL;
+  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -446,7 +413,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
     var shift = -.5;
 
     var parentBounds = /** @type {acgraph.math.Rect} */(this.parentBounds());
-    var anchor = /** @type {anychart.utils.NinePositions} */(this.anchor());
+    var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
 
     var textElement = this.markerElement();
     textElement.width(null);
@@ -458,14 +425,14 @@ anychart.elements.TextMarker.prototype.draw = function() {
     var textElementBounds = textElement.getBounds();
 
     var width = isWidthSet ?
-        Math.ceil(anychart.utils.normalize(/** @type {number|string} */(this.width()), parentBounds.width)) :
+        Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.width()), parentBounds.width)) :
         textElementBounds.width;
     if (isWidthSet) textElement.width(width);
 
     textElementBounds = textElement.getBounds();
 
     var height = isHeightSet ?
-        Math.ceil(anychart.utils.normalize(/** @type {number|string} */(this.height()), parentBounds.height)) :
+        Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.height()), parentBounds.height)) :
         textElementBounds.height;
     if (isHeightSet) textElement.height(height);
 
@@ -477,8 +444,8 @@ anychart.elements.TextMarker.prototype.draw = function() {
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
 
-    var offsetX = anychart.utils.normalize(/** @type {number|string} */(this.offsetX()), width);
-    var offsetY = anychart.utils.normalize(/** @type {number|string} */(this.offsetY()), height);
+    var offsetX = anychart.utils.normalizeSize(/** @type {number|string} */(this.offsetX()), width);
+    var offsetY = anychart.utils.normalizeSize(/** @type {number|string} */(this.offsetY()), height);
 
     anychart.utils.applyOffsetByAnchor(position, anchor, offsetX, offsetY);
     this.applyTextSettings(textElement, true);
@@ -505,7 +472,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 
 
 /**
- * Calculates text position using direction and align.
+ * Calculates text position using layout and align.
  * @param {number} ratio Scale ratio.
  * @param {number} shift Pixel shift.
  * @return {acgraph.math.Coordinate} text position.
@@ -514,47 +481,25 @@ anychart.elements.TextMarker.prototype.draw = function() {
 anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift) {
   var x, y;
   var parentBounds = this.parentBounds();
-  switch (this.direction_) {
+  switch (this.layout_) {
     default:
-    case anychart.utils.Direction.HORIZONTAL:
+    case anychart.enums.Layout.HORIZONTAL:
       y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
       ratio == 1 ? y -= shift : y += shift;
-      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
+      if (this.align_ == anychart.enums.TextMarkerAlign.NEAR) {
         x = parentBounds.getLeft();
-      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
+      } else if (this.align_ == anychart.enums.TextMarkerAlign.CENTER) {
         x = parentBounds.getLeft() + parentBounds.width / 2;
       } else {
         x = parentBounds.getRight();
       }
       break;
-      //    case anychart.utils.Direction.HORIZONTAL:
-      //      x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
-      //      ratio == 1 ? x += shift : x -= shift;
-      //      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
-      //        y = parentBounds.getTop();
-      //      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
-      //        y = parentBounds.getTop() + parentBounds.height / 2;
-      //      } else {
-      //        y = parentBounds.getBottom();
-      //      }
-      //      break;
-      //    case anychart.utils.Orientation.RIGHT:
-      //      y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
-      //      ratio == 1 ? y -= shift : y += shift;
-      //      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
-      //        x = parentBounds.getRight();
-      //      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
-      //        x = parentBounds.getLeft() + parentBounds.width / 2;
-      //      } else {
-      //        x = parentBounds.getLeft();
-      //      }
-      //      break;
-    case anychart.utils.Direction.VERTICAL:
+    case anychart.enums.Layout.VERTICAL:
       x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
       ratio == 1 ? x += shift : x -= shift;
-      if (this.align_ == anychart.elements.TextMarker.Align.NEAR) {
+      if (this.align_ == anychart.enums.TextMarkerAlign.NEAR) {
         y = parentBounds.getBottom();
-      } else if (this.align_ == anychart.elements.TextMarker.Align.CENTER) {
+      } else if (this.align_ == anychart.enums.TextMarkerAlign.CENTER) {
         y = parentBounds.getTop() + parentBounds.height / 2;
       } else {
         y = parentBounds.getTop();
@@ -571,9 +516,9 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
 anychart.elements.TextMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
   this.zIndex(27);
-  this.direction(anychart.utils.Direction.HORIZONTAL);
-  this.align(anychart.elements.TextMarker.Align.CENTER);
-  this.anchor(anychart.utils.NinePositions.CENTER);
+  this.layout(anychart.enums.Layout.HORIZONTAL);
+  this.align(anychart.enums.TextMarkerAlign.CENTER);
+  this.anchor(anychart.enums.Anchor.CENTER);
   this.value(0);
   this.text('Text marker');
   this.offsetX(0);
@@ -606,7 +551,7 @@ anychart.elements.TextMarker.prototype.remove = function() {
  */
 anychart.elements.TextMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['direction'] = this.direction();
+  data['layout'] = this.layout();
   data['align'] = this.align();
   data['anchor'] = this.anchor();
   data['value'] = this.value();
@@ -625,7 +570,7 @@ anychart.elements.TextMarker.prototype.deserialize = function(value) {
 
   goog.base(this, 'deserialize', value);
 
-  this.direction(value['direction']);
+  this.layout(value['layout']);
   this.align(value['align']);
   this.anchor(value['anchor']);
   this.value(value['value']);
@@ -684,7 +629,7 @@ anychart.elements.TextMarker.prototype['scale'] = anychart.elements.TextMarker.p
 anychart.elements.TextMarker.prototype['parentBounds'] = anychart.elements.TextMarker.prototype.parentBounds;
 anychart.elements.TextMarker.prototype['anchor'] = anychart.elements.TextMarker.prototype.anchor;
 anychart.elements.TextMarker.prototype['align'] = anychart.elements.TextMarker.prototype.align;
-anychart.elements.TextMarker.prototype['direction'] = anychart.elements.TextMarker.prototype.direction;
+anychart.elements.TextMarker.prototype['layout'] = anychart.elements.TextMarker.prototype.layout;
 anychart.elements.TextMarker.prototype['offsetX'] = anychart.elements.TextMarker.prototype.offsetX;
 anychart.elements.TextMarker.prototype['offsetY'] = anychart.elements.TextMarker.prototype.offsetY;
 anychart.elements.TextMarker.prototype['text'] = anychart.elements.TextMarker.prototype.text;
@@ -692,6 +637,3 @@ anychart.elements.TextMarker.prototype['height'] = anychart.elements.TextMarker.
 anychart.elements.TextMarker.prototype['width'] = anychart.elements.TextMarker.prototype.width;
 anychart.elements.TextMarker.prototype['draw'] = anychart.elements.TextMarker.prototype.draw;
 anychart.elements.TextMarker.prototype['isHorizontal'] = anychart.elements.TextMarker.prototype.isHorizontal;
-goog.exportSymbol('anychart.elements.TextMarker.Align.CENTER', anychart.elements.TextMarker.Align.CENTER);
-goog.exportSymbol('anychart.elements.TextMarker.Align.NEAR', anychart.elements.TextMarker.Align.NEAR);
-goog.exportSymbol('anychart.elements.TextMarker.Align.FAR', anychart.elements.TextMarker.Align.FAR);

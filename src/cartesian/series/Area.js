@@ -47,7 +47,7 @@ anychart.cartesian.series.Area.prototype.drawFirstPoint = function() {
     this.strokePath
         .moveTo(x, y);
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack = [x, zero, zeroMissing];
@@ -74,7 +74,7 @@ anychart.cartesian.series.Area.prototype.drawSubsequentPoint = function() {
     this.path.lineTo(x, y);
     this.strokePath.lineTo(x, y);
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack.push(x, zero, zeroMissing);

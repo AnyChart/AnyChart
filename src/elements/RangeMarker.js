@@ -1,6 +1,8 @@
 goog.provide('anychart.elements.RangeMarker');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
@@ -33,10 +35,10 @@ anychart.elements.RangeMarker = function() {
   this.parentBounds_ = null;
 
   /**
-   * @type {anychart.utils.Direction}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.direction_;
+  this.layout_;
 
   /**
    * @type {number}
@@ -83,23 +85,23 @@ anychart.elements.RangeMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Direction.
+//  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set direction.
- * @param {anychart.utils.Direction=} opt_value RangeMarker direction.
- * @return {anychart.utils.Direction|anychart.elements.RangeMarker} Direction or this.
+ * Get/set layout.
+ * @param {anychart.enums.Layout=} opt_value RangeMarker layout.
+ * @return {anychart.enums.Layout|anychart.elements.RangeMarker} Layout or this.
  */
-anychart.elements.RangeMarker.prototype.direction = function(opt_value) {
+anychart.elements.RangeMarker.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var direction = anychart.utils.normalizeDirection(opt_value);
-    if (this.direction_ != direction) {
-      this.direction_ = direction;
+    var layout = anychart.enums.normalizeLayout(opt_value);
+    if (this.layout_ != layout) {
+      this.layout_ = layout;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.direction_;
+    return this.layout_;
   }
 };
 
@@ -241,11 +243,11 @@ anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
 
 
 /**
- * Defines marker direction
+ * Defines marker layout
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.RangeMarker.prototype.isHorizontal = function() {
-  return this.direction_ == anychart.utils.Direction.HORIZONTAL;
+  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -295,7 +297,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
     var bounds = this.parentBounds();
     this.markerElement().clear();
 
-    if (this.direction_ == anychart.utils.Direction.HORIZONTAL) {
+    if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
       var y_max = Math.round(bounds.getTop() + bounds.height - bounds.height * ratioMaxValue);
       var y_min = Math.round(bounds.getTop() + bounds.height - bounds.height * ratioMinValue);
       var x_start = bounds.getLeft();
@@ -309,7 +311,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
           .lineTo(x_end, y_min)
           .lineTo(x_start, y_min)
           .close();
-    } else if (this.direction_ == anychart.utils.Direction.VERTICAL) {
+    } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
       var y_start = bounds.getBottom();
       var y_end = bounds.getBottom() - bounds.height;
       var x_min = bounds.getLeft() + (bounds.width * ratioMinValue);
@@ -335,7 +337,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
 anychart.elements.RangeMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
   this.zIndex(25);
-  this.direction(anychart.utils.Direction.HORIZONTAL);
+  this.layout(anychart.enums.Layout.HORIZONTAL);
   this.from(0);
   this.to(0);
   this.fill('black 0.3');
@@ -364,7 +366,7 @@ anychart.elements.RangeMarker.prototype.serialize = function() {
   data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
   data['from'] = this.from();
   data['to'] = this.to();
-  data['direction'] = this.direction();
+  data['layout'] = this.layout();
   return data;
 };
 
@@ -378,7 +380,7 @@ anychart.elements.RangeMarker.prototype.deserialize = function(value) {
   this.fill(value['fill']);
   this.from(value['from']);
   this.to(value['to']);
-  this.direction(value['direction']);
+  this.layout(value['layout']);
 
   this.resumeSignalsDispatching(true);
 
@@ -428,7 +430,7 @@ anychart.elements.RangeMarker.prototype['from'] = anychart.elements.RangeMarker.
 anychart.elements.RangeMarker.prototype['to'] = anychart.elements.RangeMarker.prototype.to;
 anychart.elements.RangeMarker.prototype['scale'] = anychart.elements.RangeMarker.prototype.scale;
 anychart.elements.RangeMarker.prototype['parentBounds'] = anychart.elements.RangeMarker.prototype.parentBounds;
-anychart.elements.RangeMarker.prototype['direction'] = anychart.elements.RangeMarker.prototype.direction;
+anychart.elements.RangeMarker.prototype['layout'] = anychart.elements.RangeMarker.prototype.layout;
 anychart.elements.RangeMarker.prototype['fill'] = anychart.elements.RangeMarker.prototype.fill;
 anychart.elements.RangeMarker.prototype['draw'] = anychart.elements.RangeMarker.prototype.draw;
 anychart.elements.RangeMarker.prototype['isHorizontal'] = anychart.elements.RangeMarker.prototype.isHorizontal;

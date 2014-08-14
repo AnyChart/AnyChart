@@ -1,6 +1,5 @@
 goog.provide('anychart.elements.Text');
-
-goog.require('acgraphexport');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 
 

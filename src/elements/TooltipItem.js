@@ -1,9 +1,11 @@
 goog.provide('anychart.elements.TooltipItem');
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Title');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Padding');
@@ -69,7 +71,7 @@ anychart.elements.TooltipItem = function() {
 
   /**
    * Tooltip anchor settings.
-   * @type {anychart.utils.NinePositions}
+   * @type {anychart.enums.Anchor}
    * @private
    */
   this.anchor_;
@@ -528,12 +530,12 @@ anychart.elements.TooltipItem.prototype.offsetY = function(opt_value) {
 
 /**
  * Gets or sets Tooltip item anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Tooltip item anchor settings.
- * @return {anychart.elements.TooltipItem|anychart.utils.NinePositions} Tooltip item anchor settings or itself for method chaining.
+ * @param {(anychart.enums.Anchor|string)=} opt_value Tooltip item anchor settings.
+ * @return {anychart.elements.TooltipItem|anychart.enums.Anchor} Tooltip item anchor settings or itself for method chaining.
  */
 anychart.elements.TooltipItem.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.position_ = null;
@@ -825,7 +827,7 @@ anychart.elements.TooltipItem.prototype.getContentBounds = function() {
  */
 anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
   this.zIndex(100);
-  this.anchor(anychart.utils.NinePositions.BOTTOM);
+  this.anchor(anychart.enums.Anchor.CENTER_BOTTOM);
   this.offsetX(5);
   this.offsetY(5);
   this.hideDelay(0);
@@ -836,15 +838,15 @@ anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
   title.fontSize(10);
   title.fontWeight('bold');
   title.fontColor('rgb(35,35,35)');
-  title.hAlign('center');
-  title.vAlign('top');
+  title.hAlign(acgraph.vector.Text.HAlign.CENTER);
+  title.vAlign(acgraph.vector.Text.VAlign.TOP);
   title.margin(0);
   title.padding(5, 10, 5, 10);
   title.background(null);
   title.enabled(false);
 
   var separator = /** @type {anychart.elements.Separator} */(this.separator());
-  separator.orientation('top');
+  separator.orientation(anychart.enums.Orientation.TOP);
   separator.width('100%');
   separator.height(1);
   separator.margin(0, 5, 0, 5);
@@ -856,8 +858,8 @@ anychart.elements.TooltipItem.prototype.restoreDefaults = function() {
   content.fontSize(10);
   content.fontWeight('bold');
   content.fontColor('rgb(35,35,35)');
-  content.hAlign('center');
-  content.vAlign('top');
+  content.hAlign(acgraph.vector.Text.HAlign.CENTER);
+  content.vAlign(acgraph.vector.Text.VAlign.TOP);
   content.padding(5, 10, 5, 10);
   content.background(null);
   content.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);

@@ -33,7 +33,7 @@ anychart.data.ScatterView.prototype.buildMask = function() {
   while (iterator.advance()) {
     var value = iterator.get(this.fieldName_);
     if (goog.isDef(value)) {
-      var index = goog.array.binarySearch(values, value, anychart.utils.compare);
+      var index = goog.array.binarySearch(values, value, anychart.utils.compareAsc);
       if (index < 0) {
         goog.array.insertAt(values, value, ~index);
         goog.array.insertAt(mask, iterator.getIndex(), ~index);

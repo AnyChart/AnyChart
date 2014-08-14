@@ -30,18 +30,18 @@ anychart.areaChart = function(var_args) {
   chart.yAxis();
 
   chart.grid(0)
-      .direction(anychart.utils.Direction.HORIZONTAL);
+      .layout(anychart.enums.Layout.HORIZONTAL);
 
   chart.minorGrid()
       .evenFill('none')
       .oddFill('none')
       .stroke('black 0.075')
-      .direction(anychart.utils.Direction.HORIZONTAL);
+      .layout(anychart.enums.Layout.HORIZONTAL);
 
   chart.grid(1)
       .evenFill('none')
       .oddFill('none')
-      .direction(anychart.utils.Direction.VERTICAL);
+      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };

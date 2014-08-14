@@ -1,12 +1,11 @@
 goog.provide('anychart.Chart');
-
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Credits');
 goog.require('anychart.elements.Label');
 goog.require('anychart.elements.Legend');
 goog.require('anychart.elements.Title');
-goog.require('anychart.events.EventType');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
@@ -1004,7 +1003,7 @@ anychart.Chart.prototype.restoreDefaults = function() {
   legend.itemsLayout('horizontal');
   legend.position('bottom');
   legend.margin(0, 0, 0, 10);
-  legend.align('center');
+  legend.align(anychart.enums.Align.CENTER);
   legend.fontSize(11);
   legend.fontFamily('Tahoma');
   legend.fontColor('rgb(34,34,34)');
@@ -1046,7 +1045,7 @@ anychart.Chart.prototype.print = function(opt_stage) {
  * @extends {goog.events.Event}
  */
 anychart.Chart.DrawEvent = function(chart) {
-  goog.base(this, anychart.events.EventType.CHART_DRAW, chart);
+  goog.base(this, anychart.enums.EventType.CHART_DRAW, chart);
 
   /**
    * @type {anychart.Chart}

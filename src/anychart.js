@@ -1,10 +1,10 @@
 goog.provide('anychart');
+goog.provide('anychart.globalLock');
 goog.require('acgraph');
 goog.require('anychart.data');
 goog.require('anychart.math');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
-goog.provide('anychart.globalLock');
 
 /**
  * Core space for all anychart components.

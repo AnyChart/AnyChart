@@ -1,4 +1,5 @@
 goog.provide('anychart.ui.PaginatorButton');
+goog.require('acgraph');
 goog.require('anychart.ui.Button');
 
 

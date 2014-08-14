@@ -1,11 +1,12 @@
 goog.provide('anychart.cartesian.series.Base');
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.cartesian.series');
 goog.require('anychart.color');
 goog.require('anychart.data');
 goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.elements.Tooltip');
-goog.require('anychart.events.EventType');
+goog.require('anychart.enums');
 
 
 
@@ -45,7 +46,7 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
 
-  this.labels().position(anychart.utils.NinePositions.CENTER);
+  this.labels().position(anychart.enums.Position.CENTER);
   this.labels().enabled(false);
   (/** @type {anychart.elements.LabelsFactory} */(this.hoverLabels())).enabled(null);
 
@@ -306,7 +307,7 @@ anychart.cartesian.series.Base.prototype.hoverHatchFill_ = (function() {
 
 
 /**
- * @type {anychart.elements.Marker.Type}
+ * @type {anychart.enums.MarkerType}
  * @protected
  */
 anychart.cartesian.series.Base.prototype.autoMarkerType;
@@ -629,7 +630,7 @@ anychart.cartesian.series.Base.prototype.getReferenceCoords = function() {
   var xScale = /** @type {anychart.scales.Base} */(this.xScale());
   var iterator = this.getIterator();
   var fail = false;
-  var stacked = yScale.stackMode() != anychart.scales.StackMode.NONE;
+  var stacked = yScale.stackMode() != anychart.enums.ScaleStackMode.NONE;
   for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
     var val = iterator.get(this.referenceValueNames[i]);
 
@@ -829,7 +830,7 @@ anychart.cartesian.series.Base.prototype.drawPoint = function() {
  */
 anychart.cartesian.series.Base.prototype.drawMissing = function() {
   this.firstPointDrawn = false;
-  if (this.yScale().stackMode() != anychart.scales.StackMode.NONE && this.referenceValuesSupportStack) {
+  if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE && this.referenceValuesSupportStack) {
     for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
       if (this.referenceValueMeanings[i] == 'y')
         this.yScale().applyStacking(NaN);
@@ -939,7 +940,7 @@ anychart.cartesian.series.Base.prototype.drawLabel = function(hovered) {
             labelPosition :
             this.labels().position();
 
-    var positionProvider = this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(position));
+    var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.createFormatProvider();
     if (label) {
       label.formatProvider(formatProvider);
@@ -1054,7 +1055,7 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
 
 /**
  * Create series position provider.
- * @param {anychart.utils.NinePositions|string} position
+ * @param {string} position Understands anychart.enums.Position and some additional values.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
@@ -1229,9 +1230,9 @@ anychart.cartesian.series.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.xScale_ != opt_value) {
       if (this.xScale_)
-        this.xScale_.unlisten(anychart.Base.SIGNAL, this.scaleInvalidated_, false, this);
+        this.xScale_.unlistenSignals(this.scaleInvalidated_, this);
       this.xScale_ = opt_value;
-      this.xScale_.listen(anychart.Base.SIGNAL, this.scaleInvalidated_, false, this);
+      this.xScale_.listenSignals(this.scaleInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     }
@@ -1258,9 +1259,9 @@ anychart.cartesian.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.yScale_ != opt_value) {
       if (this.yScale_)
-        this.yScale_.unlisten(anychart.Base.SIGNAL, this.scaleInvalidated_, false, this);
+        this.yScale_.unlistenSignals(this.scaleInvalidated_, this);
       this.yScale_ = opt_value;
-      this.yScale_.listen(anychart.Base.SIGNAL, this.scaleInvalidated_, false, this);
+      this.yScale_.listenSignals(this.scaleInvalidated_, this);
       this.invalidate(anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     }
@@ -1534,7 +1535,7 @@ anychart.cartesian.series.Base.prototype.setAutoColor = function(value) {
 
 /**
  * Sets series marker type that parent chart have set for it.
- * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the chart.
+ * @param {anychart.enums.MarkerType} value Auto marker type distributed by the chart.
  */
 anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
   this.autoMarkerType = value;
@@ -2113,16 +2114,16 @@ anychart.cartesian.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt
   var type = e.type;
   switch (type) {
     case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.events.EventType.POINT_MOUSE_OUT;
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
       break;
     case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.events.EventType.POINT_MOUSE_OVER;
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
       break;
     case acgraph.events.EventType.CLICK:
-      type = anychart.events.EventType.POINT_CLICK;
+      type = anychart.enums.EventType.POINT_CLICK;
       break;
     case acgraph.events.EventType.DBLCLICK:
-      type = anychart.events.EventType.POINT_DOUBLE_CLICK;
+      type = anychart.enums.EventType.POINT_DOUBLE_CLICK;
       break;
   }
   this.type = type;

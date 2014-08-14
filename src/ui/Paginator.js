@@ -1,7 +1,9 @@
 goog.provide('anychart.ui.Paginator');
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Text');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.ui.PaginatorButton');
 goog.require('anychart.utils.Margin');
@@ -69,7 +71,7 @@ anychart.ui.Paginator = function() {
 
   /**
    * Layout of the items in the paginator.
-   * @type {anychart.ui.Paginator.Layout}
+   * @type {anychart.enums.Layout}
    * @private
    */
   this.layout_;
@@ -160,34 +162,6 @@ anychart.ui.Paginator.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Enum representing layout of the paginator.
- * @enum {string}
- */
-anychart.ui.Paginator.Layout = {
-  HORIZONTAL: 'horizontal',
-  VERTICAL: 'vertical'
-};
-
-
-/**
- * Normalizes string value to Layout enum.
- * @param {string} layout Layout to be normalized.
- * @param {anychart.ui.Paginator.Layout=} opt_default Default value to be used.
- * @return {anychart.ui.Paginator.Layout} Normalized layout.
- */
-anychart.ui.Paginator.normalizeLayout = function(layout, opt_default) {
-  if (goog.isString(layout)) {
-    layout = layout.toLowerCase();
-    for (var i in anychart.ui.Paginator.Layout) {
-      if (layout == anychart.ui.Paginator.Layout[i])
-        return anychart.ui.Paginator.Layout[i];
-    }
-  }
-  return opt_default || anychart.ui.Paginator.Layout.HORIZONTAL;
-};
-
-
-/**
  * Bounds of paginator parent element. Need to calculate percent-values of width, height.
  * @param {anychart.math.Rect=} opt_value Parent bounds.
  * @return {(anychart.math.Rect|anychart.ui.Paginator)} Bounds of parent element or self for chaining.
@@ -207,12 +181,12 @@ anychart.ui.Paginator.prototype.parentBounds = function(opt_value) {
 
 /**
  * Orientation of the paginator.
- * @param {(anychart.utils.Orientation|string)=} opt_value .
- * @return {!anychart.ui.Paginator|anychart.utils.Orientation} .
+ * @param {(anychart.enums.Orientation|string)=} opt_value .
+ * @return {!anychart.ui.Paginator|anychart.enums.Orientation} .
  */
 anychart.ui.Paginator.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeOrientation(opt_value);
+    opt_value = anychart.enums.normalizeOrientation(opt_value);
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -335,23 +309,23 @@ anychart.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
 
 /**
  * Getter for paginator layout.
- * @return {anychart.ui.Paginator.Layout} Current layout or self for chaining.
+ * @return {anychart.enums.Layout} Current layout or self for chaining.
  *//**
  * Setter for paginator layout.
- * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Value to set.
+ * @param {(string|anychart.enums.Layout)=} opt_value Value to set.
  * @return {!anychart.ui.Paginator} An instance of the {@link anychart.ui.Paginator} class for method chaining.
  *//**
  * @ignoreDoc
  * TODO(AntonKagakin): create customDrawers flag, to avoid custom layout drawing bug.
- * @param {(string|anychart.ui.Paginator.Layout)=} opt_value Layout value.
- * @return {(anychart.ui.Paginator|anychart.ui.Paginator.Layout)} Current layout or self for chaining.
+ * @param {(string|anychart.enums.Layout)=} opt_value Layout value.
+ * @return {(anychart.ui.Paginator|anychart.enums.Layout)} Current layout or self for chaining.
  */
 anychart.ui.Paginator.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.ui.Paginator.normalizeLayout(opt_value);
+    opt_value = anychart.enums.normalizeLayout(opt_value);
     if (this.layout_ != opt_value) {
       this.layout_ = opt_value;
-      if (this.layout_ == anychart.ui.Paginator.Layout.HORIZONTAL) {
+      if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
         this.previousButton_.buttonDrawer(anychart.ui.Paginator.LEFT_ARROW_DRAWER_);
         this.nextButton_.buttonDrawer(anychart.ui.Paginator.RIGHT_ARROW_DRAWER_);
       } else {
@@ -499,8 +473,8 @@ anychart.ui.Paginator.prototype.draw = function() {
     var nextButtonX;
     var nextButtonY;
 
-    var padTop = anychart.utils.normalize(/** @type {number|string} */ (this.padding().top()), this.backgroundHeight_);
-    var padLeft = anychart.utils.normalize(/** @type {number|string} */ (this.padding().left()), this.backgroundWidth_);
+    var padTop = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().top()), this.backgroundHeight_);
+    var padLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().left()), this.backgroundWidth_);
 
     var availWidth = this.padding().tightenWidth(this.backgroundWidth_);
     var availHeight = this.padding().tightenHeight(this.backgroundHeight_);
@@ -509,12 +483,12 @@ anychart.ui.Paginator.prototype.draw = function() {
     textX = this.actualLeft_ + padLeft + (availWidth - textBounds.width) / 2;
 
     switch (this.layout_) {
-      case anychart.ui.Paginator.Layout.HORIZONTAL:
+      case anychart.enums.Layout.HORIZONTAL:
         prevButtonY = nextButtonY = textY;
         prevButtonX = textX - this.spacing_ - buttonSize;
         nextButtonX = textX + textBounds.width + this.spacing_;
         break;
-      case anychart.ui.Paginator.Layout.VERTICAL:
+      case anychart.enums.Layout.VERTICAL:
         prevButtonY = textY - this.spacing_ - buttonSize;
         nextButtonY = textY + textBounds.height + this.spacing_;
         prevButtonX = nextButtonX = textX + (textBounds.width - buttonSize) / 2;
@@ -613,7 +587,7 @@ anychart.ui.Paginator.prototype.measureMaxDimensions_ = function() {
     var maxWidth;
     var maxHeight;
 
-    if (this.layout_ == anychart.ui.Paginator.Layout.HORIZONTAL) {
+    if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
       maxWidth = buttonSize * 2 + this.spacing_ * 2 + bounds.width;
       maxHeight = bounds.height;
     } else {
@@ -673,24 +647,24 @@ anychart.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
-  var leftMargin = parentBounds ? anychart.utils.normalize(/** @type {number} */(margin.left()), this.backgroundWidth_) : 0;
-  var topMargin = parentBounds ? anychart.utils.normalize(/** @type {number} */(margin.top()), this.backgroundHeight_) : 0;
+  var leftMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number} */(margin.left()), this.backgroundWidth_) : 0;
+  var topMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number} */(margin.top()), this.backgroundHeight_) : 0;
 
   if (parentBounds) {
     switch (this.orientation_) {
-      case anychart.utils.Orientation.TOP:
+      case anychart.enums.Orientation.TOP:
         this.actualLeft_ = parentBounds.getLeft() + (parentWidth - widthWithMargin) / 2 + leftMargin;
         this.actualTop_ = parentBounds.getTop() + topMargin;
         break;
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.RIGHT:
         this.actualLeft_ = parentBounds.getRight() - widthWithMargin + leftMargin;
         this.actualTop_ = parentBounds.getTop() + (parentHeight - heightWithMargin) / 2 + topMargin;
         break;
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.BOTTOM:
         this.actualLeft_ = parentBounds.getLeft() + (parentWidth - widthWithMargin) / 2 + leftMargin;
         this.actualTop_ = parentBounds.getBottom() - heightWithMargin + topMargin;
         break;
-      case anychart.utils.Orientation.LEFT:
+      case anychart.enums.Orientation.LEFT:
         this.actualLeft_ = parentBounds.getLeft() + leftMargin;
         this.actualTop_ = parentBounds.getTop() + (parentHeight - heightWithMargin) / 2 + topMargin;
         break;
@@ -743,17 +717,17 @@ anychart.ui.Paginator.prototype.getRemainingBounds = function() {
   if (!this.enabled()) return parentBounds;
 
   switch (this.orientation_) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       parentBounds.width -= this.pixelBounds_.width;
       break;
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       parentBounds.left += this.pixelBounds_.width;
       parentBounds.width -= this.pixelBounds_.width;
       break;

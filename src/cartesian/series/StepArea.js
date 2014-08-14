@@ -60,7 +60,7 @@ anychart.cartesian.series.StepArea.prototype.drawFirstPoint = function() {
     this.prevX_ = x;
     this.prevY_ = y;
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack = [x, zero, zeroMissing];
@@ -97,7 +97,7 @@ anychart.cartesian.series.StepArea.prototype.drawSubsequentPoint = function() {
     this.prevX_ = x;
     this.prevY_ = y;
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack.push(x, zero, zeroMissing);

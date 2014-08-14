@@ -1,16 +1,6 @@
 goog.provide('anychart.scales.Base');
-
 goog.require('anychart.Base');
-
-
-/**
- * @enum {string}
- */
-anychart.scales.StackMode = {
-  NONE: 'none',
-  VALUE: 'value',
-  PERCENT: 'percent'
-};
+goog.require('anychart.enums');
 
 
 
@@ -214,10 +204,10 @@ anychart.scales.Base.prototype.stackMissing_ = false;
 
 /**
  * Stacking mode.
- * @type {anychart.scales.StackMode}
+ * @type {anychart.enums.ScaleStackMode}
  * @private
  */
-anychart.scales.Base.prototype.stackMode_ = anychart.scales.StackMode.NONE;
+anychart.scales.Base.prototype.stackMode_ = anychart.enums.ScaleStackMode.NONE;
 
 
 /**
@@ -230,21 +220,21 @@ anychart.scales.Base.prototype.canBeStacked = false;
 
 /**
  * Accepts 'none', 'value', 'percent'.
- * @param {anychart.scales.StackMode=} opt_stackMode Stack mode if used as a setter.
- * @return {anychart.scales.Base|anychart.scales.StackMode} StackMode or itself for method chaining.
+ * @param {anychart.enums.ScaleStackMode=} opt_stackMode Stack mode if used as a setter.
+ * @return {anychart.scales.Base|anychart.enums.ScaleStackMode} StackMode or itself for method chaining.
  */
 anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
   if (goog.isDef(opt_stackMode)) {
-    var str = ('' + opt_stackMode).toLowerCase();
+    var str = anychart.enums.normalizeScaleStackMode(opt_stackMode);
     var res, fn;
-    if (this.canBeStacked && str == /** @type {string} */(anychart.scales.StackMode.PERCENT)) {
-      res = anychart.scales.StackMode.PERCENT;
+    if (this.canBeStacked && str == anychart.enums.ScaleStackMode.PERCENT) {
+      res = anychart.enums.ScaleStackMode.PERCENT;
       fn = this.applyModePercent_;
-    } else if (this.canBeStacked && str == /** @type {string} */(anychart.scales.StackMode.VALUE)) {
-      res = anychart.scales.StackMode.VALUE;
+    } else if (this.canBeStacked && str == anychart.enums.ScaleStackMode.VALUE) {
+      res = anychart.enums.ScaleStackMode.VALUE;
       fn = this.applyModeValue_;
     } else {
-      res = anychart.scales.StackMode.NONE;
+      res = anychart.enums.ScaleStackMode.NONE;
       fn = this.applyModeNone_;
     }
     if (this.stackMode_ != res) {
@@ -298,7 +288,7 @@ anychart.scales.Base.prototype.applyStacking;
  */
 anychart.scales.Base.prototype.getPrevVal = function(value) {
   value = goog.isNull(value) ? NaN : +value;
-  if (this.stackMode_ != anychart.scales.StackMode.NONE && !isNaN(value)) {
+  if (this.stackMode_ != anychart.enums.ScaleStackMode.NONE && !isNaN(value)) {
     if (value >= 0)
       return this.stackPositive_;
     else

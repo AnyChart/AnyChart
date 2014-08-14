@@ -1,6 +1,8 @@
 goog.provide('anychart.elements.Separator');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Margin');
@@ -93,7 +95,7 @@ anychart.elements.Separator = function() {
 
   /**
    * Separator orientation.
-   * @type {anychart.utils.Orientation}
+   * @type {anychart.enums.Orientation}
    * @private
    */
   this.orientation_;
@@ -216,12 +218,12 @@ anychart.elements.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBo
 
 /**
  * Orientation of the separator.
- * @param {(anychart.utils.Orientation|string)=} opt_value .
- * @return {!anychart.elements.Separator|anychart.utils.Orientation} .
+ * @param {(anychart.enums.Orientation|string)=} opt_value .
+ * @return {!anychart.elements.Separator|anychart.enums.Orientation} .
  */
 anychart.elements.Separator.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeOrientation(opt_value);
+    opt_value = anychart.enums.normalizeOrientation(opt_value);
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
@@ -401,17 +403,17 @@ anychart.elements.Separator.prototype.getRemainingBounds = function() {
   if (!this.enabled()) return parentBounds;
 
   switch (this.orientation_) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       parentBounds.width -= this.pixelBounds_.width;
       break;
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       parentBounds.left += this.pixelBounds_.width;
       parentBounds.width -= this.pixelBounds_.width;
       break;
@@ -442,8 +444,8 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
 
   var parentWidth, parentHeight;
   if (parentBounds) {
-    if (this.orientation_ == anychart.utils.Orientation.TOP ||
-        this.orientation_ == anychart.utils.Orientation.BOTTOM) {
+    if (this.orientation_ == anychart.enums.Orientation.TOP ||
+        this.orientation_ == anychart.enums.Orientation.BOTTOM) {
       parentWidth = parentBounds.width;
       parentHeight = parentBounds.height;
     } else {
@@ -457,12 +459,12 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
   var width = anychart.utils.isNone(this.width_) ? '100%' : this.width_;
   var height = anychart.utils.isNone(this.height_) ? '100%' : this.height_;
 
-  var separatorWidth = anychart.utils.normalize(/** @type {number} */ (width), parentWidth);
+  var separatorWidth = anychart.utils.normalizeSize(/** @type {number} */ (width), parentWidth);
   if (parentBounds && parentWidth < margin.widenWidth(separatorWidth)) {
     separatorWidth = margin.tightenWidth(parentWidth);
   }
 
-  var separatorHeight = anychart.utils.normalize(/** @type {number} */ (height), parentHeight);
+  var separatorHeight = anychart.utils.normalizeSize(/** @type {number} */ (height), parentHeight);
   if (parentBounds && parentHeight < margin.widenHeight(separatorHeight)) {
     separatorHeight = margin.tightenHeight(parentHeight);
   }
@@ -470,12 +472,12 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
   var widthWithMargin = margin.widenWidth(separatorWidth);
   var heightWithMargin = margin.widenHeight(separatorHeight);
 
-  var leftMargin = anychart.utils.normalize(/** @type {number} */ (margin.left()), parentWidth);
-  var topMargin = anychart.utils.normalize(/** @type {number} */ (margin.top()), parentHeight);
+  var leftMargin = anychart.utils.normalizeSize(/** @type {number} */ (margin.left()), parentWidth);
+  var topMargin = anychart.utils.normalizeSize(/** @type {number} */ (margin.top()), parentHeight);
 
   if (parentBounds) {
     switch (this.orientation_) {
-      case anychart.utils.Orientation.TOP:
+      case anychart.enums.Orientation.TOP:
         this.actualLeft_ = parentBounds.getLeft() + leftMargin;
         this.actualTop_ = parentBounds.getTop() + topMargin;
         this.separatorWidth_ = separatorWidth;
@@ -488,7 +490,7 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
             heightWithMargin);
         break;
 
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.BOTTOM:
         this.actualLeft_ = parentBounds.getLeft() + leftMargin;
         this.actualTop_ = parentBounds.getBottom() - heightWithMargin + topMargin;
         this.separatorWidth_ = separatorWidth;
@@ -501,7 +503,7 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
             heightWithMargin);
         break;
 
-      case anychart.utils.Orientation.LEFT:
+      case anychart.enums.Orientation.LEFT:
         this.actualLeft_ = parentBounds.getLeft() + topMargin;
         this.actualTop_ = parentBounds.getBottom() - leftMargin - separatorWidth;
         this.separatorWidth_ = separatorHeight;
@@ -514,7 +516,7 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
             widthWithMargin);
         break;
 
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.RIGHT:
         this.actualLeft_ = parentBounds.getRight() - topMargin - separatorHeight;
         this.actualTop_ = parentBounds.getTop() + leftMargin;
         this.separatorWidth_ = separatorHeight;
@@ -531,12 +533,12 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
     switch (this.orientation_) {
-      case anychart.utils.Orientation.TOP:
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.TOP:
+      case anychart.enums.Orientation.BOTTOM:
         this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
         break;
-      case anychart.utils.Orientation.LEFT:
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.LEFT:
+      case anychart.enums.Orientation.RIGHT:
         this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
         break;
     }
@@ -565,7 +567,7 @@ anychart.elements.Separator.prototype.restoreDefaults = function() {
   this.zIndex(60)
       .enabled(true)
       .margin(0, 3, 3, 3)
-      .orientation(anychart.utils.Orientation.TOP)
+      .orientation(anychart.enums.Orientation.TOP)
       .width('100%')
       .height(1)
       .fill({

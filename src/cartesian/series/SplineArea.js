@@ -61,7 +61,7 @@ anychart.cartesian.series.SplineArea.prototype.drawFirstPoint = function() {
         .moveTo(x, y);
     this.queue_.processPoint(x, y);
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack = [x, zero, zeroMissing];
@@ -88,7 +88,7 @@ anychart.cartesian.series.SplineArea.prototype.drawSubsequentPoint = function() 
 
     this.queue_.processPoint(x, y);
 
-    if (this.yScale().stackMode() == anychart.scales.StackMode.NONE)
+    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
     else
       this.zeroesStack.push(x, zero, zeroMissing);

@@ -1,7 +1,8 @@
 goog.provide('anychart.cartesian.series.Marker');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.Base');
 goog.require('anychart.elements.MarkersFactory');
+goog.require('anychart.enums');
 
 
 
@@ -28,7 +29,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.registerDisposable(this.marker_);
 
   /**
-   * @type {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
+   * @type {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
   this.type_;
@@ -40,7 +41,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.size_ = 10;
 
   /**
-   * @type {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
+   * @type {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
   this.hoverType_;
@@ -62,7 +63,7 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
 
 /**
  * Getter for current marker type settings.
- * @return {string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ * @return {string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
  *  Markers type settings.
  *//**
  * Setter for marker type settings.
@@ -86,9 +87,9 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
  *          .close();
  *      return path;
  *    });
- * @param {(string|anychart.elements.Marker.Type|
+ * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Function for a custom
+ *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
  *  marker should look like this: <code>function(path, x, y, size){
  *    // path - acgraph.vector.Path
  *    // x, y - marker position
@@ -99,9 +100,9 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
  * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|
+ * @param {(string|anychart.enums.MarkerType|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.cartesian.series.Marker|anychart.elements.Marker.Type|string|
+ * @return {!anychart.cartesian.series.Marker|anychart.enums.MarkerType|string|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
@@ -119,7 +120,7 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
 
 /**
  * Getter for current hovered marker type settings.
- * @return {string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ * @return {string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
  *  Markers type settings.
  *//**
  * Setter for hovered marker type settings.
@@ -145,9 +146,9 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *          .close();
  *      return path;
  *    });
- * @param {(string|anychart.elements.Marker.Type|
+ * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.STAR5] Type or custom drawer. Function for a custom
+ *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
  *  marker should look like this: <code>function(path, x, y, size){
  *    // path - acgraph.vector.Path
  *    // x, y - marker position
@@ -158,9 +159,9 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.elements.Marker.Type|
+ * @param {(string|anychart.enums.MarkerType|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.cartesian.series.Marker|anychart.elements.Marker.Type|string|
+ * @return {!anychart.cartesian.series.Marker|anychart.enums.MarkerType|string|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path} .
  */
 anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
@@ -288,12 +289,12 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.marker_.fill(this.getFinalFill(false, false));
     this.marker_.stroke(this.getFinalStroke(false, false));
-    this.marker_.type(/** @type {anychart.elements.Marker.Type} */(this.type_));
+    this.marker_.type(/** @type {anychart.enums.MarkerType} */(this.type_));
     this.marker_.size(this.size_);
 
     this.hoverMarker_.fill(this.getFinalFill(false, true));
     this.hoverMarker_.stroke(this.getFinalStroke(false, true));
-    this.hoverMarker_.type(/** @type {anychart.elements.Marker.Type} */(this.hoverType_));
+    this.hoverMarker_.type(/** @type {anychart.enums.MarkerType} */(this.hoverType_));
     this.hoverMarker_.size(this.hoverSize_);
   }
 
@@ -403,7 +404,7 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_u
 
   var index = this.getIterator().getIndex();
 
-  var positionProvider = this.createPositionProvider(anychart.utils.NinePositions.CENTER);
+  var positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
 
   var marker = this.marker_.add(positionProvider, index);
   marker.resetSettings();
@@ -426,7 +427,7 @@ anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
 
   if (this.hatchFillElement_) {
     var markersFactory = /** @type {anychart.elements.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
-    var hatchFill = this.hatchFillElement_.add(this.createPositionProvider(anychart.utils.NinePositions.CENTER), index);
+    var hatchFill = this.hatchFillElement_.add(this.createPositionProvider(anychart.enums.Position.CENTER), index);
 
     hatchFill.resetSettings();
     hatchFill.parentMarkersFactory(markersFactory);
@@ -495,7 +496,7 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 anychart.cartesian.series.Marker.prototype.restoreDefaults = function() {
   var res = goog.base(this, 'restoreDefaults');
 
-  var type = this.autoMarkerType || anychart.elements.Marker.Type.STAR5;
+  var type = this.autoMarkerType || anychart.enums.MarkerType.STAR5;
 
   this.type_ = type;
   this.hoverType_ = type;

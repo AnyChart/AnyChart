@@ -1,6 +1,8 @@
 goog.provide('anychart.elements.Grid');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('anychart.utils.TypedLayer');
 
@@ -100,21 +102,21 @@ anychart.elements.Grid.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set grid direction.
- * @param {anychart.utils.Direction=} opt_value Grid direction.
- * @return {anychart.utils.Direction|anychart.elements.Grid} Direction or this.
+ * Get/set grid layout.
+ * @param {anychart.enums.Layout=} opt_value Grid layout.
+ * @return {anychart.enums.Layout|anychart.elements.Grid} Layout or this.
  */
-anychart.elements.Grid.prototype.direction = function(opt_value) {
+anychart.elements.Grid.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var direction = anychart.utils.normalizeDirection(opt_value);
-    if (this.direction_ != direction) {
-      this.direction_ = direction;
+    var layout = anychart.enums.normalizeLayout(opt_value);
+    if (this.layout_ != layout) {
+      this.layout_ = layout;
       this.invalidate(anychart.ConsistencyState.POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.direction_;
+    return this.layout_;
   }
 };
 
@@ -356,7 +358,7 @@ anychart.elements.Grid.prototype.drawLineVertical = function(ratio, shift) {
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.Grid.prototype.isHorizontal = function() {
-  return this.direction_ == anychart.utils.Direction.HORIZONTAL;
+  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -454,7 +456,7 @@ anychart.elements.Grid.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var direction;
+    var layout;
     var fill;
     /** @type {anychart.utils.TypedLayer} */
     var layer;
@@ -465,17 +467,17 @@ anychart.elements.Grid.prototype.draw = function() {
     var ticksArray = ticks.get();
 
     if (this.isHorizontal()) {
-      direction = [this.drawLineHorizontal, this.drawInterlaceHorizontal];
+      layout = [this.drawLineHorizontal, this.drawInterlaceHorizontal];
     } else {
-      direction = [this.drawLineVertical, this.drawInterlaceVertical];
+      layout = [this.drawLineVertical, this.drawInterlaceVertical];
     }
 
     this.evenFillElement().clear();
     this.oddFillElement().clear();
     this.lineElement().clear();
 
-    var drawInterlace = direction[1];
-    var drawLine = direction[0];
+    var drawInterlace = layout[1];
+    var drawLine = layout[0];
 
     var pixelShift = -this.lineElement().strokeThickness() % 2 / 2;
 
@@ -547,7 +549,7 @@ anychart.elements.Grid.prototype.draw = function() {
 anychart.elements.Grid.prototype.restoreDefaults = function() {
   this.zIndex(10);
   this.suspendSignalsDispatching();
-  this.direction(anychart.utils.Direction.HORIZONTAL);
+  this.layout(anychart.enums.Layout.HORIZONTAL);
   this.minor(false);
   this.oddFill('#FFFFFF 1');
   this.evenFill('#F5F5F5 1');
@@ -637,7 +639,7 @@ anychart.elements.Grid.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
   data['parentBounds'] = this.parentBounds();
   data['stroke'] = this.stroke();
-  data['direction'] = this.direction();
+  data['layout'] = this.layout();
   data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
   data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
   data['drawFirstLine'] = this.drawFirstLine();
@@ -656,7 +658,7 @@ anychart.elements.Grid.prototype.deserialize = function(value) {
 
   if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['direction'])) this.direction(value['direction']);
+  if (goog.isDef(value['layout'])) this.layout(value['layout']);
   if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
   if (goog.isDef(value['evenFill'])) this.evenFill(value['evenFill']);
   if (goog.isDef(value['drawFirstLine'])) this.drawFirstLine(value['drawFirstLine']);
@@ -693,7 +695,8 @@ goog.exportSymbol('anychart.elements.grid', anychart.elements.grid);
 anychart.elements.Grid.prototype['minor'] = anychart.elements.Grid.prototype.minor;
 anychart.elements.Grid.prototype['oddFill'] = anychart.elements.Grid.prototype.oddFill;
 anychart.elements.Grid.prototype['evenFill'] = anychart.elements.Grid.prototype.evenFill;
-anychart.elements.Grid.prototype['direction'] = anychart.elements.Grid.prototype.direction;
+anychart.elements.Grid.prototype['layout'] = anychart.elements.Grid.prototype.layout;
+anychart.elements.Grid.prototype['isHorizontal'] = anychart.elements.Grid.prototype.isHorizontal;
 anychart.elements.Grid.prototype['scale'] = anychart.elements.Grid.prototype.scale;
 anychart.elements.Grid.prototype['parentBounds'] = anychart.elements.Grid.prototype.parentBounds;
 anychart.elements.Grid.prototype['stroke'] = anychart.elements.Grid.prototype.stroke;

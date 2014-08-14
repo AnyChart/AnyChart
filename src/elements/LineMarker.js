@@ -1,6 +1,8 @@
 goog.provide('anychart.elements.LineMarker');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
@@ -32,10 +34,10 @@ anychart.elements.LineMarker = function() {
   this.parentBounds_ = null;
 
   /**
-   * @type {anychart.utils.Direction}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.direction_;
+  this.layout_;
 
   /**
    * @type {number}
@@ -79,21 +81,21 @@ anychart.elements.LineMarker.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Direction.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set line marker direction.
- * @param {anychart.utils.Direction=} opt_value LineMarker direction.
- * @return {anychart.utils.Direction|anychart.elements.LineMarker} Direction or this.
+ * Get/set line marker layout.
+ * @param {anychart.enums.Layout=} opt_value LineMarker layout.
+ * @return {anychart.enums.Layout|anychart.elements.LineMarker} Layout or this.
  */
-anychart.elements.LineMarker.prototype.direction = function(opt_value) {
+anychart.elements.LineMarker.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var direction = anychart.utils.normalizeDirection(opt_value);
-    if (this.direction_ != direction) {
-      this.direction_ = direction;
+    var layout = anychart.enums.normalizeLayout(opt_value);
+    if (this.layout_ != layout) {
+      this.layout_ = layout;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.direction_;
+    return this.layout_;
   }
 };
 
@@ -220,7 +222,7 @@ anychart.elements.LineMarker.prototype.value = function(opt_newValue) {
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.LineMarker.prototype.isHorizontal = function() {
-  return this.direction_ == anychart.utils.Direction.HORIZONTAL;
+  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -260,12 +262,12 @@ anychart.elements.LineMarker.prototype.draw = function() {
     var bounds = this.parentBounds();
     this.markerElement().clear();
 
-    if (this.direction_ == anychart.utils.Direction.HORIZONTAL) {
+    if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
       var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
       ratio == 1 ? y -= shift : y += shift;
       this.markerElement().moveTo(bounds.getLeft(), y);
       this.markerElement().lineTo(bounds.getRight(), y);
-    } else if (this.direction_ == anychart.utils.Direction.VERTICAL) {
+    } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
       var x = Math.round(bounds.getLeft() + ratio * bounds.width);
       ratio == 1 ? x += shift : x -= shift;
       this.markerElement().moveTo(x, bounds.getTop());
@@ -282,7 +284,7 @@ anychart.elements.LineMarker.prototype.draw = function() {
 anychart.elements.LineMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
   this.zIndex(26);
-  this.direction(anychart.utils.Direction.HORIZONTAL);
+  this.layout(anychart.enums.Layout.HORIZONTAL);
   this.value(0);
   this.stroke({
     'color': '#DC0A0A',
@@ -316,7 +318,7 @@ anychart.elements.LineMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
   data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
   data['value'] = this.value();
-  data['direction'] = this.direction();
+  data['layout'] = this.layout();
   return data;
 };
 
@@ -329,7 +331,7 @@ anychart.elements.LineMarker.prototype.deserialize = function(value) {
 
   this.stroke(value['stroke']);
   this.value(value['value']);
-  this.direction(value['direction']);
+  this.layout(value['layout']);
 
   this.resumeSignalsDispatching(true);
 
@@ -378,7 +380,7 @@ goog.exportSymbol('anychart.elements.lineMarker', anychart.elements.lineMarker);
 anychart.elements.LineMarker.prototype['value'] = anychart.elements.LineMarker.prototype.value;
 anychart.elements.LineMarker.prototype['scale'] = anychart.elements.LineMarker.prototype.scale;
 anychart.elements.LineMarker.prototype['parentBounds'] = anychart.elements.LineMarker.prototype.parentBounds;
-anychart.elements.LineMarker.prototype['direction'] = anychart.elements.LineMarker.prototype.direction;
+anychart.elements.LineMarker.prototype['layout'] = anychart.elements.LineMarker.prototype.layout;
 anychart.elements.LineMarker.prototype['stroke'] = anychart.elements.LineMarker.prototype.stroke;
 anychart.elements.LineMarker.prototype['draw'] = anychart.elements.LineMarker.prototype.draw;
 anychart.elements.LineMarker.prototype['isHorizontal'] = anychart.elements.LineMarker.prototype.isHorizontal;

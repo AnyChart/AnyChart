@@ -1,15 +1,10 @@
 goog.provide('anychart.ui.Splitter');
-
-goog.require('acgraph.events');
-goog.require('acgraph.math.Rect');
-goog.require('acgraph.vector.Cursor');
-goog.require('acgraph.vector.Layer');
-
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.utils');
-
 goog.require('goog.math');
 
 
@@ -26,10 +21,10 @@ anychart.ui.Splitter = function() {
 
   /**
    * Layout.
-   * @type {anychart.utils.Layout}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_ = anychart.utils.Layout.VERTICAL;
+  this.layout_ = anychart.enums.Layout.VERTICAL;
 
 
   /**
@@ -254,12 +249,12 @@ anychart.ui.Splitter.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Getter/setter for layout.
  * NOTE: Doesn't modify actual bounds.
  *
- * @param {(anychart.utils.Layout|string)=} opt_value - Value to be set.
- * @return {(anychart.utils.Layout|anychart.ui.Splitter)} - Current layout or itself for method chaining.
+ * @param {(anychart.enums.Layout|string)=} opt_value - Value to be set.
+ * @return {(anychart.enums.Layout|anychart.ui.Splitter)} - Current layout or itself for method chaining.
  */
 anychart.ui.Splitter.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeLayout(opt_value);
+    opt_value = anychart.enums.normalizeLayout(opt_value);
     if (opt_value != this.layout_) {
       this.layout_ = opt_value;
       this.position(this.position_); //Used to dispatch event.
@@ -297,7 +292,7 @@ anychart.ui.Splitter.prototype.position = function(opt_value) {
     if (!isNaN(pos)) {
       if (this.pixelBoundsCache_) { //TODO (A.Kudryavtsev): Move after this.invalidate() ?
         this.position_ = pos; //Here we must do it before handler call.
-        if (this.handlePositionChange_) this.dispatchEvent(anychart.events.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
+        if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
       }
       this.position_ = pos;
       this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
@@ -1124,7 +1119,7 @@ anychart.ui.Splitter.prototype.draw = function() {
  */
 anychart.ui.Splitter.prototype.isVertical_ = function() {
   //Is horizontal if layout is directly set as 'horizontal'. Is vertical in all of other cases.
-  return !(this.layout_.toLowerCase() == anychart.utils.Layout.HORIZONTAL);
+  return !(this.layout_.toLowerCase() == anychart.enums.Layout.HORIZONTAL);
 };
 
 

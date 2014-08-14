@@ -13,8 +13,8 @@ goog.require('anychart.cartesian.series.WidthBased');
  */
 anychart.cartesian.series.BarBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
-  this.markers().position(anychart.utils.NinePositions.RIGHT_CENTER);
-  this.labels().position(anychart.utils.NinePositions.RIGHT_CENTER);
+  this.markers().position(anychart.enums.Position.RIGHT_CENTER);
+  this.labels().position(anychart.enums.Position.RIGHT_CENTER);
 };
 goog.inherits(anychart.cartesian.series.BarBase, anychart.cartesian.series.WidthBased);
 
@@ -24,7 +24,7 @@ anychart.cartesian.series.BarBase.prototype.getPointWidth = function() {
   // todo(Anton Saukh): fix for linear scale case.
   var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
       this.pixelBounds().height;
-  return anychart.utils.normalize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
+  return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
 };
 
 

@@ -1,7 +1,8 @@
 goog.provide('anychart.elements.Background');
-
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('goog.array');
 
@@ -17,7 +18,7 @@ goog.require('goog.array');
  * anychart.elements.background()
  *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .container(stage).draw();
- * @param {anychart.elements.Background.CornerType=} opt_cornerType [anychart.elements.Background.CornerType.ROUND] Type
+ * @param {anychart.enums.BackgroundCornersType=} opt_cornerType [anychart.enums.BackgroundCornersType.ROUND] Type
  *  of the background corners.
  * @param {...(number|string)} var_args Radii set, much like {@link anychart.elements.Background#corners} but
  *  without an array.
@@ -36,10 +37,10 @@ anychart.elements.Background = function(opt_cornerType, var_args) {
   this.rect_ = null;
 
   /**
-   * @type {anychart.elements.Background.CornerType|string}
+   * @type {anychart.enums.BackgroundCornersType|string}
    * @private
    */
-  this.cornerType_ = opt_cornerType || anychart.elements.Background.CornerType.ROUND;
+  this.cornerType_ = opt_cornerType || anychart.enums.BackgroundCornersType.ROUND;
 
   /**
    * @type {!Array}
@@ -69,79 +70,6 @@ goog.inherits(anychart.elements.Background, anychart.VisualBaseWithBounds);
 
 
 /**
- * Types of the corner.
- * @enum {string}
- */
-anychart.elements.Background.CornerType = {
-  /**
-   * @illustration
-   * stage.width(200).height(30);
-   * stage.text(35, 10, 'Square corners').fontSize(12);
-   * stage.path()
-   *   .moveTo(5, 25)
-   *   .lineTo(5, 10)
-   *   .lineTo(20, 10)
-   *   .stroke('3 #F00')
-   * stage.path()
-   *   .moveTo(5,30)
-   *   .lineTo(5,25)
-   *   .moveTo(20, 10)
-   *   .lineTo(25, 10)
-   *   .stroke('3 #666')
-   */
-  NONE: 'none',
-  /**
-   * @illustration
-   * stage.width(200).height(30);
-   * stage.text(35, 10, 'Round corners')
-   * stage.path()
-   *   .moveTo(5, 25)
-   *   .arcToByEndPoint(20, 10, 15, 15, false, true)
-   *   .stroke('3 #F00')
-   *  stage.path()
-   *   .moveTo(5,30)
-   *   .lineTo(5,25)
-   *   .moveTo(20, 10)
-   *   .lineTo(25, 10)
-   *   .stroke('3 #666')
-   */
-  ROUND: 'round',
-  /**
-   * @illustration
-   * stage.width(200).height(30);
-   * stage.text(35, 10, 'Cut corners')
-   * stage.path()
-   *   .moveTo(5, 25)
-   *   .lineTo(20, 10)
-   *   .stroke('3 #F00')
-   *  stage.path()
-   *   .moveTo(5,30)
-   *   .lineTo(5,25)
-   *   .moveTo(20, 10)
-   *   .lineTo(25, 10)
-   *   .stroke('3 #666')
-   */
-  CUT: 'cut',
-  /**
-   * @illustration
-   * stage.width(200).height(30);
-   * stage.text(35, 10, 'Round-inner corners')
-   * stage.path()
-   *   .moveTo(5, 25)
-   *   .arcToByEndPoint(20, 10, 15, 15, false, false)
-   *   .stroke('3 #F00')
-   *  stage.path()
-   *   .moveTo(5,30)
-   *   .lineTo(5,25)
-   *   .moveTo(20, 10)
-   *   .lineTo(25, 10)
-   *   .stroke('3 #666')
-   */
-  ROUND_INNER: 'roundinner'
-};
-
-
-/**
  * Supported signals.
  * @type {number}
  */
@@ -167,18 +95,18 @@ anychart.elements.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Normalizes user input corners type to its enumeration values. Also accepts null. Defaults to opt_default or 'round'.
  *
  * @param {string} type Type to normalize.
- * @param {anychart.elements.Background.CornerType=} opt_default Default type.
- * @return {anychart.elements.Background.CornerType} Normalized type.
+ * @param {anychart.enums.BackgroundCornersType=} opt_default Default type.
+ * @return {anychart.enums.BackgroundCornersType} Normalized type.
  */
 anychart.elements.Background.normalizeCornerType = function(type, opt_default) {
   if (goog.isString(type)) {
     type = type.toLowerCase();
-    for (var i in anychart.elements.Background.CornerType) {
-      if (type == anychart.elements.Background.CornerType[i])
-        return anychart.elements.Background.CornerType[i];
+    for (var i in anychart.enums.BackgroundCornersType) {
+      if (type == anychart.enums.BackgroundCornersType[i])
+        return anychart.enums.BackgroundCornersType[i];
     }
   }
-  return opt_default || anychart.elements.Background.CornerType.NONE;
+  return opt_default || anychart.enums.BackgroundCornersType.NONE;
 };
 
 
@@ -189,13 +117,13 @@ anychart.elements.Background.normalizeCornerType = function(type, opt_default) {
  * Setter for corner's radius by one value.
  * @example <c>One for all.</c><t>simple-h100</t>
  * anychart.elements.background()
- *   .cornerType(anychart.elements.Background.CornerType.CUT)
+ *   .cornerType(anychart.enums.BackgroundCornersType.CUT)
  *   .corners(10) // same .corners('10px')
  *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @example <c>One for all.</c><t>simple-h100</t>
  * anychart.elements.background()
- *   .cornerType(anychart.elements.Background.CornerType.CUT)
+ *   .cornerType(anychart.enums.BackgroundCornersType.CUT)
  *   .corners([5, 7, 12, 7])
  *    // same .corners('5 7 12 7')
  *    // same .corners('5px 7px 12px 7px')
@@ -208,7 +136,7 @@ anychart.elements.Background.normalizeCornerType = function(type, opt_default) {
  * Setter for corner radius by each value.
  * @example <t>simple-h100</t>
  * anychart.elements.background()
- *   .cornerType(anychart.elements.Background.CornerType.CUT)
+ *   .cornerType(anychart.enums.BackgroundCornersType.CUT)
  *   .corners(15, 7, 12, 7)
  *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .stroke('#000 2').fill('none').container(stage).draw();
@@ -243,22 +171,22 @@ anychart.elements.Background.prototype.corners = function(opt_value) {
 
 /**
  * Getter for current corner type.
- * @return {anychart.elements.Background.CornerType} Corners type.
+ * @return {anychart.enums.BackgroundCornersType} Corners type.
  *//**
  * Setter for corner type.
  * @example <t>simple-h100</t>
  * anychart.elements.background()
- *   .cornerType(anychart.elements.Background.CornerType.ROUND_INNER)
+ *   .cornerType(anychart.enums.BackgroundCornersType.ROUND_INNER)
  *   .corners(10)
  *   .stroke('#000 2')
  *   .bounds(anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
  *   .fill('none').container(stage).draw();
- * @param {anychart.elements.Background.CornerType=} opt_value [{@link anychart.elements.Background.CornerType}.ROUND] Value to set.
+ * @param {anychart.enums.BackgroundCornersType=} opt_value [{@link anychart.enums.BackgroundCornersType}.ROUND] Value to set.
  * @return {!anychart.elements.Background} {@link anychart.elements.Background} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Background.CornerType|string)=} opt_value Corner type.
- * @return {anychart.elements.Background.CornerType|string|anychart.elements.Background} Corners type or self for method chaining.
+ * @param {(anychart.enums.BackgroundCornersType|string)=} opt_value Corner type.
+ * @return {anychart.enums.BackgroundCornersType|string|anychart.elements.Background} Corners type or self for method chaining.
  */
 anychart.elements.Background.prototype.cornerType = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -580,13 +508,13 @@ anychart.elements.Background.prototype.draw = function() {
     this.rect_.fill(this.fill_);
     this.rect_.stroke(this.stroke_);
     switch (this.cornerType_) {
-      case anychart.elements.Background.CornerType.ROUND:
+      case anychart.enums.BackgroundCornersType.ROUND:
         this.rect_.round.apply(this.rect_, this.corners_);
         break;
-      case anychart.elements.Background.CornerType.CUT:
+      case anychart.enums.BackgroundCornersType.CUT:
         this.rect_.cut.apply(this.rect_, this.corners_);
         break;
-      case anychart.elements.Background.CornerType.ROUND_INNER:
+      case anychart.enums.BackgroundCornersType.ROUND_INNER:
         this.rect_.roundInner.apply(this.rect_, this.corners_);
         break;
       default:
@@ -664,7 +592,3 @@ anychart.elements.Background.prototype['stroke'] = anychart.elements.Background.
 anychart.elements.Background.prototype['cornerType'] = anychart.elements.Background.prototype.cornerType;//in docs/final
 anychart.elements.Background.prototype['corners'] = anychart.elements.Background.prototype.corners;//in docs/final
 anychart.elements.Background.prototype['draw'] = anychart.elements.Background.prototype.draw;//in docs/final
-goog.exportSymbol('anychart.elements.Background.CornerType.NONE', anychart.elements.Background.CornerType.NONE);//in docs/final
-goog.exportSymbol('anychart.elements.Background.CornerType.ROUND', anychart.elements.Background.CornerType.ROUND);//in docs/final
-goog.exportSymbol('anychart.elements.Background.CornerType.CUT', anychart.elements.Background.CornerType.CUT);//in docs/final
-goog.exportSymbol('anychart.elements.Background.CornerType.ROUND_INNER', anychart.elements.Background.CornerType.ROUND_INNER);//in docs/final

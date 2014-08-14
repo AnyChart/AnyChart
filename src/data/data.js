@@ -9,6 +9,7 @@ goog.require('anychart.data.Set');
 goog.require('anychart.data.SortView');
 goog.require('anychart.data.Tree');
 goog.require('anychart.data.csv.Parser');
+goog.require('anychart.enums');
 
 /**
  Classes for handling data structures/sources<br/>
@@ -26,23 +27,12 @@ goog.require('anychart.data.csv.Parser');
 
 
 /**
- * Modes enum for anychart.data.mapAsTable() function.
- * @enum {string}
- */
-anychart.data.MapAsTableMode = {
-  VALUE: 'value',
-  RANGE: 'range',
-  OHLC: 'ohlc'
-};
-
-
-/**
  * Maps passed data as an array of mappings. Data is expected to be a table, e.g. an array of arrays of values.
  * The function treats the table as a source for several series of points, that have the same X value.
  * Each row of the table is treated as a bunch of points, one for each series. Column number 0 is treated as an X value.
  * Other columns (number per series depends on the opt_mode) are treated as data values.
  * @param {Array.<Array.<*>>} data Source data table.
- * @param {(anychart.data.MapAsTableMode|string)=} opt_mode Mapping mode. VALUE means, that each series
+ * @param {(anychart.enums.MapAsTableMode|string)=} opt_mode Mapping mode. VALUE means, that each series
  *    is represented by one column in the table + shared X column (own Y values), RANGE means two columns per series
  *    + shared X column (high and low values) and OHLC means four columns per series + shared X (open, high, low, close).
  * @param {number=} opt_seriesCount Explicit number of series to make mapping for. If not set, auto-determination by
@@ -55,10 +45,10 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
   if (goog.isDef(opt_mode)) {
     opt_mode = String(opt_mode).toLowerCase();
     switch (opt_mode) {
-      case anychart.data.MapAsTableMode.RANGE:
+      case anychart.enums.MapAsTableMode.RANGE:
         columnsPerSeries = 2;
         break;
-      case anychart.data.MapAsTableMode.OHLC:
+      case anychart.enums.MapAsTableMode.OHLC:
         columnsPerSeries = 4;
         break;
       default:
@@ -113,7 +103,4 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
 
 
 //exports
-goog.exportSymbol('anychart.data.MapAsTableMode.VALUE', anychart.data.MapAsTableMode.VALUE);
-goog.exportSymbol('anychart.data.MapAsTableMode.RANGE', anychart.data.MapAsTableMode.RANGE);
-goog.exportSymbol('anychart.data.MapAsTableMode.OHLC', anychart.data.MapAsTableMode.OHLC);
 goog.exportSymbol('anychart.data.mapAsTable', anychart.data.mapAsTable);

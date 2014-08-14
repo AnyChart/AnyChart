@@ -1,5 +1,5 @@
 goog.provide('anychart.cartesian.series.DiscreteBase');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.BaseWithMarkers');
 
 
@@ -14,8 +14,8 @@ goog.require('anychart.cartesian.series.BaseWithMarkers');
  */
 anychart.cartesian.series.DiscreteBase = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
-  this.markers().position(anychart.utils.NinePositions.TOP);
-  this.labels().position(anychart.utils.NinePositions.TOP);
+  this.markers().position(anychart.enums.Position.CENTER_TOP);
+  this.labels().position(anychart.enums.Position.CENTER_TOP);
 };
 goog.inherits(anychart.cartesian.series.DiscreteBase, anychart.cartesian.series.BaseWithMarkers);
 

@@ -1,7 +1,8 @@
 goog.provide('anychart.elements.Ticks');
-
+goog.require('acgraph');
 goog.require('anychart.Base');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Bounds');
 
@@ -32,14 +33,14 @@ anychart.elements.Ticks = function() {
 
   /**
    * Ticks position.
-   * @type {anychart.elements.Ticks.Position|string}
+   * @type {anychart.enums.TicksPosition}
    * @private
    */
   this.position_;
 
   /**
    * Ticks enabled.
-   * @type {anychart.utils.Orientation}
+   * @type {anychart.enums.Orientation}
    * @private
    */
   this.orientation_;
@@ -69,27 +70,6 @@ anychart.elements.Ticks.prototype.SUPPORTED_SIGNALS = anychart.VisualBase.protot
  * @type {number}
  */
 anychart.elements.Ticks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES; // ENABLED CONTAINER Z_INDEX
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Enums.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Ticks position (inside ot outside).
- * @enum {string}
- */
-anychart.elements.Ticks.Position = {
-  /**
-   * Inside a chart, no matter where an axis is.
-   */
-  INSIDE: 'inside',
-  /**
-   * Outside of a chart, no matter where an axis is.
-   */
-  OUTSIDE: 'outside'
-};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,7 +192,7 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
 
 /**
  * Getter for the current ticks position.
- * @return {(anychart.elements.Ticks.Position|string)} Current position.
+ * @return {(anychart.enums.TicksPosition|string)} Current position.
  *//**
  * Setter for ticks position.<br/>
  * You can set ticks inside of a chart area or outside its position.
@@ -238,17 +218,17 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
  * stage.text(stage.width()/5, 2, 'outside position');
  * stage.text(3*stage.width()/5, 92, 'Chart Area');
  * stage.rect(0, 55, stage.width(), 95).fill('orange 0.1').stroke('0 0')
- * @param {(anychart.elements.Ticks.Position|string)=} opt_value [{@link anychart.elements.Ticks.Position}.OUTSIDE]
+ * @param {(anychart.enums.TicksPosition|string)=} opt_value [{@link anychart.enums.TicksPosition}.OUTSIDE]
  *  Value to set.
  * @return {anychart.elements.Ticks} An instance of the {@link anychart.elements.Ticks} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Ticks.Position|string)=} opt_value .
- * @return {(anychart.elements.Ticks.Position|string|!anychart.elements.Ticks)} .
+ * @param {(anychart.enums.TicksPosition|string)=} opt_value .
+ * @return {(anychart.enums.TicksPosition|string|!anychart.elements.Ticks)} .
  */
 anychart.elements.Ticks.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.position_ = anychart.utils.normalizePosition(opt_value);
+    this.position_ = anychart.enums.normalizeTicksPosition(opt_value);
     this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else
@@ -259,12 +239,12 @@ anychart.elements.Ticks.prototype.position = function(opt_value) {
 /**
  * Internal use.
  * Change orientation and set drawer to null.
- * @param {(string|anychart.utils.Orientation)=} opt_value Orientation.
- * @return {anychart.elements.Ticks|anychart.utils.Orientation} Orientation or self for chaining.
+ * @param {(string|anychart.enums.Orientation)=} opt_value Orientation.
+ * @return {anychart.elements.Ticks|anychart.enums.Orientation} Orientation or self for chaining.
  */
 anychart.elements.Ticks.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeOrientation(opt_value);
+    opt_value = anychart.enums.normalizeOrientation(opt_value);
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
       this.drawer_ = null;
@@ -281,8 +261,8 @@ anychart.elements.Ticks.prototype.orientation = function(opt_value) {
  * Restore labels default settings.
  */
 anychart.elements.Ticks.prototype.restoreDefaults = function() {
-  this.orientation(anychart.utils.Orientation.TOP);
-  this.position(anychart.elements.Ticks.Position.OUTSIDE);
+  this.orientation(anychart.enums.Orientation.TOP);
+  this.position(anychart.enums.TicksPosition.OUTSIDE);
   this.length(5);
   this.stroke('black');
 
@@ -328,16 +308,16 @@ anychart.elements.Ticks.prototype.draw = function() {
 anychart.elements.Ticks.prototype.getTicksDrawer = function() {
   if (!this.drawer_) {
     switch (this.orientation_) {
-      case anychart.utils.Orientation.TOP:
+      case anychart.enums.Orientation.TOP:
         this.drawer_ = this.drawTopTick_;
         break;
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.RIGHT:
         this.drawer_ = this.drawRightTick_;
         break;
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.BOTTOM:
         this.drawer_ = this.drawBottomTick_;
         break;
-      case anychart.utils.Orientation.LEFT:
+      case anychart.enums.Orientation.LEFT:
         this.drawer_ = this.drawLeftTick_;
         break;
     }
@@ -366,7 +346,7 @@ anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBou
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
 
-  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (this.position_ == anychart.enums.TicksPosition.OUTSIDE) {
     y -= lineThickness / 2;
     dy = /** @type {number} */(-this.length_);
   } else {
@@ -399,7 +379,7 @@ anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineB
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
 
-  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (this.position_ == anychart.enums.TicksPosition.OUTSIDE) {
     x += lineThickness / 2;
     dx = /** @type {number} */(this.length_);
   } else {
@@ -432,7 +412,7 @@ anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, line
   if (ratio == 1) x += pixelShift;
   else x -= pixelShift;
 
-  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (this.position_ == anychart.enums.TicksPosition.OUTSIDE) {
     y += lineThickness / 2;
     dy = /** @type {number} */(this.length_);
   } else {
@@ -465,7 +445,7 @@ anychart.elements.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineBo
   if (ratio == 1) y -= pixelShift;
   else y += pixelShift;
 
-  if (this.position_ == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (this.position_ == anychart.enums.TicksPosition.OUTSIDE) {
     x -= lineThickness / 2;
     dx = /** @type {number} */(-this.length_);
   } else {
@@ -510,5 +490,3 @@ anychart.elements.Ticks.prototype.deserialize = function(value) {
 anychart.elements.Ticks.prototype['length'] = anychart.elements.Ticks.prototype.length;//in docs/
 anychart.elements.Ticks.prototype['stroke'] = anychart.elements.Ticks.prototype.stroke;//in docs/
 anychart.elements.Ticks.prototype['position'] = anychart.elements.Ticks.prototype.position;//in docs/
-goog.exportSymbol('anychart.elements.Ticks.Position.INSIDE', anychart.elements.Ticks.Position.INSIDE);//in docs/
-goog.exportSymbol('anychart.elements.Ticks.Position.OUTSIDE', anychart.elements.Ticks.Position.OUTSIDE);//in docs/

@@ -1,11 +1,11 @@
 goog.provide('anychart.elements.Axis');
-
-goog.require('acgraph.vector.Path');
+goog.require('acgraph');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
 goog.require('anychart.elements.LabelsFactory');
 goog.require('anychart.elements.Ticks');
 goog.require('anychart.elements.Title');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
 goog.require('anychart.scales.ScatterBase');
@@ -63,7 +63,7 @@ anychart.elements.Axis = function() {
       .enabled(true)
       .offsetX(0)
       .offsetY(0)
-      .anchor(anychart.utils.NinePositions.CENTER)
+      .anchor(anychart.enums.Anchor.CENTER)
       .padding(1, 2, 1, 2)
       .fontFamily('Tahoma')
       .fontSize('11')
@@ -120,7 +120,7 @@ anychart.elements.Axis = function() {
       .stroke({'color': '#3C3C3C', 'lineJoin': 'round', 'lineCap': 'butt'})
       .resumeSignalsDispatching(false);
 
-  this.overlapMode(anychart.elements.Axis.OverlapMode.OVERLAP);
+  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
   this.stroke({'color': '#474747', 'lineJoin': 'round', 'lineCap': 'square'});
   this.staggerMaxLines(2);
 
@@ -160,16 +160,6 @@ anychart.elements.Axis.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.elements.Axis.prototype.SUPPORTED_SIGNALS = anychart.VisualBase.prototype.SUPPORTED_SIGNALS;
-
-
-/**
- * Overlap mods.
- * @enum {string}
- */
-anychart.elements.Axis.OverlapMode = {
-  NO_OVERLAP: 'nooverlap',
-  OVERLAP: 'overlap'
-};
 
 
 /**
@@ -229,10 +219,10 @@ anychart.elements.Axis.prototype.stroke_ = 'none';
 
 
 /**
- * @type {string|anychart.utils.Orientation}
+ * @type {string|anychart.enums.Orientation}
  * @private
  */
-anychart.elements.Axis.prototype.orientation_ = anychart.utils.Orientation.TOP;
+anychart.elements.Axis.prototype.orientation_ = anychart.enums.Orientation.TOP;
 
 
 /**
@@ -243,10 +233,10 @@ anychart.elements.Axis.prototype.scale_ = null;
 
 
 /**
- * @type {anychart.elements.Axis.OverlapMode|string}
+ * @type {anychart.enums.LabelsOverlapMode}
  * @private
  */
-anychart.elements.Axis.prototype.overlapMode_ = anychart.elements.Axis.OverlapMode.OVERLAP;
+anychart.elements.Axis.prototype.overlapMode_ = anychart.enums.LabelsOverlapMode.NO_OVERLAP;
 
 
 /**
@@ -543,7 +533,7 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
 anychart.elements.Axis.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.elements.Ticks();
-    this.ticks_.listen(anychart.Base.SIGNAL, this.ticksInvalidated_, false, this);
+    this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
 
@@ -599,7 +589,7 @@ anychart.elements.Axis.prototype.ticksInvalidated_ = function(event) {
 anychart.elements.Axis.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.elements.Ticks();
-    this.minorTicks_.listen(anychart.Base.SIGNAL, this.minorTicksInvalidated_, false, this);
+    this.minorTicks_.listenSignals(this.minorTicksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
   }
 
@@ -671,19 +661,19 @@ anychart.elements.Axis.prototype.stroke = function(opt_value) {
 
 /**
  * Getter for axis orientation.
- * @return {string|anychart.utils.Orientation} Axis orientation.
+ * @return {string|anychart.enums.Orientation} Axis orientation.
  *//**
  * Setter for axis orientation.
- * @param {(string|anychart.utils.Orientation)=} opt_value Value to set.
+ * @param {(string|anychart.enums.Orientation)=} opt_value Value to set.
  * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.utils.Orientation)=} opt_value Axis orientation.
- * @return {string|anychart.utils.Orientation|anychart.elements.Axis} Axis orientation oe itself for method chaining.
+ * @param {(string|anychart.enums.Orientation)=} opt_value Axis orientation.
+ * @return {string|anychart.enums.Orientation|anychart.elements.Axis} Axis orientation oe itself for method chaining.
  */
 anychart.elements.Axis.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var orientation = anychart.utils.normalizeOrientation(opt_value);
+    var orientation = anychart.enums.normalizeOrientation(opt_value);
     if (this.orientation_ != orientation) {
       this.orientation_ = orientation;
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -857,7 +847,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
       parentBounds.width = Math.round(parentBounds.width);
       parentBounds.height = Math.round(parentBounds.height);
 
-      if (this.orientation_ == anychart.utils.Orientation.TOP || this.orientation_ == anychart.utils.Orientation.BOTTOM) {
+      if (this.orientation_ == anychart.enums.Orientation.TOP || this.orientation_ == anychart.enums.Orientation.BOTTOM) {
         parentLength = parentBounds.width;
       } else {
         parentLength = parentBounds.height;
@@ -869,25 +859,25 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
 
       var width, height;
       switch (this.orientation()) {
-        case anychart.utils.Orientation.TOP:
+        case anychart.enums.Orientation.TOP:
           y = parentBounds.top + this.offsetY_;
           x = parentBounds.left + this.offsetX_;
           height = size;
           width = length;
           break;
-        case anychart.utils.Orientation.RIGHT:
+        case anychart.enums.Orientation.RIGHT:
           y = parentBounds.top + this.offsetY_;
           x = parentBounds.left + (parentBounds.width - size) - this.offsetX_;
           width = size;
           height = length;
           break;
-        case anychart.utils.Orientation.BOTTOM:
+        case anychart.enums.Orientation.BOTTOM:
           y = parentBounds.top + (parentBounds.height - size) - this.offsetY_;
           x = parentBounds.left + this.offsetX_;
           height = size;
           width = length;
           break;
-        case anychart.utils.Orientation.LEFT:
+        case anychart.enums.Orientation.LEFT:
           y = parentBounds.top + this.offsetY_;
           x = parentBounds.left + this.offsetX_;
           width = size;
@@ -925,9 +915,9 @@ anychart.elements.Axis.prototype.dropBoundsCache_ = function() {
  */
 anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
   if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.OVERLAP)) {
-    if (this.overlapMode_ == anychart.elements.Axis.OverlapMode.NO_OVERLAP) {
+    if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
-    } else if (this.overlapMode_ == anychart.elements.Axis.OverlapMode.OVERLAP) {
+    } else {
       var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
       var labels = [];
       var minorLabels = [];
@@ -1141,7 +1131,7 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
   var limitedLineNumber = (!goog.isNull(this.staggerLines_) ||
       !goog.isNull(this.staggerMaxLines_) && this.staggerAutoLines_ > this.staggerMaxLines_);
 
-  if (limitedLineNumber && this.overlapMode() == anychart.elements.Axis.OverlapMode.OVERLAP) {
+  if (limitedLineNumber && this.overlapMode() == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
     states = [];
     for (j = 0; j < this.currentStageLines_; j++) {
       var prevDrawableLabel = -1;
@@ -1250,11 +1240,11 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     title.resumeSignalsDispatching(false);
   }
 
-  if (ticks.enabled() && ticks.position() == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (ticks.enabled() && ticks.position() == anychart.enums.TicksPosition.OUTSIDE) {
     ticksLength = ticks.length();
   }
 
-  if (minorTicks.enabled() && minorTicks.position() == anychart.elements.Ticks.Position.OUTSIDE) {
+  if (minorTicks.enabled() && minorTicks.position() == anychart.enums.TicksPosition.OUTSIDE) {
     minorTicksLength = minorTicks.length();
   }
 
@@ -1339,17 +1329,17 @@ anychart.elements.Axis.prototype.getRemainingBounds = function() {
     var axisBounds = this.getPixelBounds_();
 
     switch (this.orientation()) {
-      case anychart.utils.Orientation.TOP:
+      case anychart.enums.Orientation.TOP:
         remainingBounds.height -= axisBounds.height();
         remainingBounds.top += axisBounds.height() + this.offsetY();
         break;
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.RIGHT:
         remainingBounds.width -= axisBounds.width() + this.offsetX();
         break;
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.BOTTOM:
         remainingBounds.height -= axisBounds.height() + this.offsetY();
         break;
-      case anychart.utils.Orientation.LEFT:
+      case anychart.enums.Orientation.LEFT:
         remainingBounds.width -= axisBounds.width();
         remainingBounds.left += axisBounds.width() + this.offsetX();
         break;
@@ -1423,34 +1413,34 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   var position = ticks.position();
 
   switch (this.orientation_) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       x = Math.round(bounds.left + ratio * bounds.width);
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
-      if (position == anychart.elements.Ticks.Position.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
         y -= ticksLength;
       }
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
-      if (position == anychart.elements.Ticks.Position.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
         x += ticksLength;
       }
       break;
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       x = Math.round(bounds.left + ratio * bounds.width);
       y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
-      if (position == anychart.elements.Ticks.Position.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
         y += ticksLength;
       }
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
-      if (position == anychart.elements.Ticks.Position.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
         x -= ticksLength;
       }
       break;
@@ -1583,19 +1573,19 @@ anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
 
 /**
  * Getter for overlap mode for labels.
- * @return {anychart.elements.Axis.OverlapMode|string} OverlapMode flag.
+ * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
  *//**
  * Setter for overlap mode for labels.
- * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value [true] Value to set.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [true] Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Axis.OverlapMode|string)=} opt_value Value to set.
- * @return {anychart.elements.Axis.OverlapMode|string|anychart.elements.Axis} Drawing flag or itself for method chaining.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
+ * @return {anychart.enums.LabelsOverlapMode|string|anychart.elements.Axis} Drawing flag or itself for method chaining.
  */
 anychart.elements.Axis.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var overlap = opt_value.toLowerCase();
+    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
     if (this.overlapMode_ != overlap) {
       this.overlapMode_ = overlap;
       var state = anychart.ConsistencyState.ALL &
@@ -1749,8 +1739,8 @@ anychart.elements.Axis.prototype.staggerMaxLines = function(opt_value) {
  * @return {boolean} If the axis is horizontal.
  */
 anychart.elements.Axis.prototype.isHorizontal = function() {
-  return this.orientation_ == anychart.utils.Orientation.TOP ||
-      this.orientation_ == anychart.utils.Orientation.BOTTOM;
+  return this.orientation_ == anychart.enums.Orientation.TOP ||
+      this.orientation_ == anychart.enums.Orientation.BOTTOM;
 };
 
 
@@ -1896,35 +1886,35 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
 
   var x, y;
   switch (orientation) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2 - staggerSize;
 
-      if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
         y -= ticksLength;
       }
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2 + staggerSize;
       y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-      if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
         x += ticksLength;
       }
       break;
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
       y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2 + staggerSize;
 
-      if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
         y += ticksLength;
       }
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2 - staggerSize;
       y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-      if (this.ticks_.position() == anychart.elements.Ticks.Position.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
         x -= ticksLength;
       }
       break;
@@ -1958,7 +1948,7 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
 
-  if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
     y -= ticksLength;
   }
 
@@ -1989,7 +1979,7 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-  if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
     x += ticksLength;
   }
   positionProvider['value']['x'] = x;
@@ -2019,7 +2009,7 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
-  if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
     y += ticksLength;
   }
   positionProvider['value']['x'] = x;
@@ -2049,7 +2039,7 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-  if (this.minorTicks().position() == anychart.elements.Ticks.Position.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
     x -= ticksLength;
   }
   positionProvider['value']['x'] = x;
@@ -2098,16 +2088,16 @@ anychart.elements.Axis.prototype.draw = function() {
   var lineThickness;
 
   switch (this.orientation_) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       orientation = [this.drawTopLine_, this.drawTopMinorLabels_];
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       orientation = [this.drawRightLine_, this.drawRightMinorLabels_];
       break;
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       orientation = [this.drawBottomLine_, this.drawBottomMinorLabels_];
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       orientation = [this.drawLeftLine_, this.drawLeftMinorLabels_];
       break;
   }
@@ -2168,12 +2158,12 @@ anychart.elements.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TICKS)) {
     ticks = this.ticks();
-    ticks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
+    ticks.orientation(/** @type {anychart.enums.Orientation} */ (this.orientation()));
     ticks.draw();
     ticksDrawer = ticks.getTicksDrawer();
 
     minorTicks = this.minorTicks();
-    minorTicks.orientation(/** @type {anychart.utils.Orientation} */ (this.orientation()));
+    minorTicks.orientation(/** @type {anychart.enums.Orientation} */ (this.orientation()));
     minorTicks.draw();
     minorTicksDrawer = minorTicks.getTicksDrawer();
 

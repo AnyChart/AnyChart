@@ -1,9 +1,11 @@
 goog.provide('anychart.elements.Legend');
+goog.require('acgraph');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.LegendItem');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Text');
 goog.require('anychart.elements.Title');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.ui.Paginator');
 goog.require('anychart.utils');
@@ -24,17 +26,17 @@ anychart.elements.Legend = function() {
 
   /**
    * Position of the legend.
-   * @type {anychart.utils.Orientation}
+   * @type {anychart.enums.Orientation}
    * @private
    */
-  this.position_ = anychart.utils.Orientation.BOTTOM;
+  this.position_ = anychart.enums.Orientation.BOTTOM;
 
   /**
    * Align of the legend.
-   * @type {anychart.utils.Align}
+   * @type {anychart.enums.Align}
    * @private
    */
-  this.align_ = anychart.utils.Align.CENTER;
+  this.align_ = anychart.enums.Align.CENTER;
 
   /**
    * Spacing between items.
@@ -73,10 +75,10 @@ anychart.elements.Legend = function() {
 
   /**
    * Default layout of legend.
-   * @type {anychart.elements.Legend.Layout}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.itemsLayout_ = anychart.elements.Legend.Layout.HORIZONTAL;
+  this.itemsLayout_ = anychart.enums.Layout.HORIZONTAL;
 
   /**
    * Wrapped legend items.
@@ -234,53 +236,13 @@ anychart.elements.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Legend layout enum.
- * @enum {string}
- */
-anychart.elements.Legend.Layout = {
-  /**
-   * Horizontal allocation of items.
-   */
-  HORIZONTAL: 'horizontal',
-
-  /**
-   * Vertical allocation of items.
-   */
-  VERTICAL: 'vertical',
-
-  /**
-   * Table allocation.
-   */
-  TABLE: 'table'
-};
-
-
-/**
- * Normalizes string value to Layout enum.
- * @param {string} layout Layout to be normalized.
- * @param {anychart.elements.Legend.Layout=} opt_default Default value to be used.
- * @return {anychart.elements.Legend.Layout} Normalized layout.
- */
-anychart.elements.Legend.normalizeItemsLayout = function(layout, opt_default) {
-  if (goog.isString(layout)) {
-    layout = layout.toLowerCase();
-    for (var i in anychart.elements.Legend.Layout) {
-      if (layout == anychart.elements.Legend.Layout[i] && anychart.elements.Legend.Layout[i] != 'table')
-        return anychart.elements.Legend.Layout[i];
-    }
-  }
-  return opt_default || anychart.elements.Legend.Layout.HORIZONTAL;
-};
-
-
-/**
  * Sets items layout.
  * @param {string=} opt_value Layout type for legend items.
- * @return {(anychart.elements.Legend.Layout|anychart.elements.Legend)} Items layout or self for method chaining.
+ * @return {(anychart.enums.Layout|anychart.elements.Legend)} Items layout or self for method chaining.
  */
 anychart.elements.Legend.prototype.itemsLayout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.elements.Legend.normalizeItemsLayout(opt_value, this.itemsLayout_);
+    opt_value = anychart.enums.normalizeLayout(opt_value, this.itemsLayout_);
     if (this.itemsLayout_ != opt_value) {
       this.itemsLayout_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -824,19 +786,19 @@ anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
 //todo Need rename. Orientation or Position (blackart)
 /**
  * Getter for legend position setting.
- * @return {anychart.utils.Orientation} Legend position.
+ * @return {anychart.enums.Orientation} Legend position.
  *//**
  * Setter for legend position setting.
- * @param {(anychart.utils.Orientation|string)=} opt_value Legend position.
+ * @param {(anychart.enums.Orientation|string)=} opt_value Legend position.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.Orientation|string)=} opt_value Legend position.
- * @return {(anychart.utils.Orientation|anychart.elements.Legend)} Legend position or self for method chaining.
+ * @param {(anychart.enums.Orientation|string)=} opt_value Legend position.
+ * @return {(anychart.enums.Orientation|anychart.elements.Legend)} Legend position or self for method chaining.
  */
 anychart.elements.Legend.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeOrientation(opt_value);
+    opt_value = anychart.enums.normalizeOrientation(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -851,19 +813,19 @@ anychart.elements.Legend.prototype.position = function(opt_value) {
 
 /**
  * Getter for legend align setting.
- * @return {anychart.utils.Align} Legend align.
+ * @return {anychart.enums.Align} Legend align.
  *//**
  * Setter for legend align setting.
- * @param {(anychart.utils.Align|string)=} opt_value Value to set.
+ * @param {(anychart.enums.Align|string)=} opt_value Value to set.
  * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.Align|string)=} opt_value Legend align.
- * @return {(anychart.utils.Align|anychart.elements.Legend)} Legend align or self for chaining.
+ * @param {(anychart.enums.Align|string)=} opt_value Legend align.
+ * @return {(anychart.enums.Align|anychart.elements.Legend)} Legend align or self for chaining.
  */
 anychart.elements.Legend.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeAlign(opt_value);
+    opt_value = anychart.enums.normalizeAlign(opt_value);
     if (this.align_ != opt_value) {
       this.align_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -900,18 +862,18 @@ anychart.elements.Legend.prototype.getRemainingBounds = function() {
   if (!this.enabled()) return parentBounds;
 
   switch (this.position_) {
-    case anychart.utils.Orientation.TOP:
+    case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.RIGHT:
+    case anychart.enums.Orientation.RIGHT:
       parentBounds.width -= this.pixelBounds_.width;
       break;
     default:
-    case anychart.utils.Orientation.BOTTOM:
+    case anychart.enums.Orientation.BOTTOM:
       parentBounds.height -= this.pixelBounds_.height;
       break;
-    case anychart.utils.Orientation.LEFT:
+    case anychart.enums.Orientation.LEFT:
       parentBounds.left += this.pixelBounds_.width;
       parentBounds.width -= this.pixelBounds_.width;
       break;
@@ -947,7 +909,7 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       provider = this.itemsProvider_[i];
       item = new anychart.elements.LegendItem();
 
-      item.iconType(provider['iconType'] ? provider['iconType'] : anychart.elements.LegendItem.IconType.SQUARE);
+      item.iconType(provider['iconType'] ? provider['iconType'] : anychart.enums.LegendItemIconType.SQUARE);
       item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
       item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
       item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : 'none');
@@ -981,10 +943,10 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
  * @private
  */
 anychart.elements.Legend.prototype.setupMouseEventsListeners_ = function(item) {
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OVER, this.onLegendItemMouseOver_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_OUT, this.onLegendItemMouseOut_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_MOUSE_MOVE, this.onLegendItemMouseMove_, false, this);
-  acgraph.events.listen(item, anychart.events.EventType.LEGEND_ITEM_CLICK, this.onLegendItemClick_, false, this);
+  acgraph.events.listen(item, anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER, this.onLegendItemMouseOver_, false, this);
+  acgraph.events.listen(item, anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT, this.onLegendItemMouseOut_, false, this);
+  acgraph.events.listen(item, anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE, this.onLegendItemMouseMove_, false, this);
+  acgraph.events.listen(item, anychart.enums.EventType.LEGEND_ITEM_CLICK, this.onLegendItemClick_, false, this);
 };
 
 
@@ -1081,7 +1043,7 @@ anychart.elements.Legend.prototype.calculateContentWidth_ = function() {
   }
   fullWidth -= this.itemsSpacing_;
 
-  if (this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) {
+  if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
     return maxWidth;
   } else {
     return fullWidth;
@@ -1107,7 +1069,7 @@ anychart.elements.Legend.prototype.calculateContentHeight_ = function() {
   }
   fullHeight -= this.itemsSpacing_;
 
-  if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
+  if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
     return maxHeight;
   } else {
     return fullHeight;
@@ -1147,14 +1109,14 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
     if (goog.isDefAndNotNull(this.width_)) {
-      width = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
+      width = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
       if (margin.widenWidth(width) > parentWidth) width = margin.tightenWidth(parentWidth);
       maxWidth = padding.tightenWidth(width);
     } else {
       maxWidth = padding.tightenWidth(margin.tightenWidth(parentWidth));
     }
     if (goog.isDefAndNotNull(this.height_)) {
-      height = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
+      height = anychart.utils.normalizeSize(/** @type {number|string} */(this.height_), parentHeight);
       if (margin.widenHeight(height) > parentHeight) height = margin.tightenHeight(parentHeight);
       maxHeight = padding.tightenHeight(height);
     } else {
@@ -1209,10 +1171,10 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   var contentWidth = this.calculateContentWidth_();
   var contentHeight = this.calculateContentHeight_();
 
-  if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
+  if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
     if (contentWidth > maxWidth) paginator.enabled(true);
   }
-  if (this.itemsLayout_ == anychart.elements.Legend.Layout.VERTICAL) {
+  if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
     if (contentHeight > maxHeight) paginator.enabled(true);
   }
 
@@ -1225,7 +1187,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
 
   if (separator.enabled()) {
     orientation = separator.orientation();
-    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+    if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
       fullAreaWidth += separatorBounds.width;
       fullAreaHeight = Math.max(fullAreaHeight, separatorBounds.height);
     } else {
@@ -1236,7 +1198,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
 
   if (paginator.enabled()) {
     orientation = paginator.orientation();
-    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+    if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
       fullAreaWidth += paginatorBounds.width;
       fullAreaHeight = Math.max(fullAreaHeight, paginatorBounds.height);
     } else {
@@ -1247,7 +1209,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
 
   if (title.enabled()) {
     orientation = title.orientation();
-    if (orientation == anychart.utils.Orientation.LEFT || orientation == anychart.utils.Orientation.RIGHT) {
+    if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
       fullAreaWidth += titleBounds.width;
       fullAreaHeight = Math.max(fullAreaHeight, titleBounds.height);
     } else {
@@ -1264,7 +1226,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
     var titleWidth = titleBounds.width;
     var titleHeight = titleBounds.height;
     orientation = title.orientation();
-    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) {
+    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) {
       title.width(title.margin().tightenWidth(contentAreaWidth));
       titleBounds = title.getContentBounds();
       separator.width(titleBounds.width);
@@ -1286,13 +1248,13 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   }
   if (title.enabled()) {
     orientation = title.orientation();
-    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= titleBounds.height;
+    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) contentAreaHeight -= titleBounds.height;
     else contentAreaWidth -= titleBounds.width;
   }
 
   if (separator.enabled()) {
     orientation = separator.orientation();
-    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) contentAreaHeight -= separatorBounds.height;
+    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) contentAreaHeight -= separatorBounds.height;
     else contentAreaWidth -= separatorBounds.width;
   }
 
@@ -1300,7 +1262,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   orientation = paginator.orientation();
 
   if (paginator.enabled()) {
-    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) pageHeight = contentAreaHeight - paginatorBounds.height;
+    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) pageHeight = contentAreaHeight - paginatorBounds.height;
     else pageWidth = contentAreaWidth - paginatorBounds.width;
   }
 
@@ -1309,7 +1271,7 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
     this.distributeItemsInBounds_(pageWidth, pageHeight);
     paginator.parentBounds(null);
     paginatorBounds = paginator.getPixelBounds();
-    if (orientation == anychart.utils.Orientation.TOP || orientation == anychart.utils.Orientation.BOTTOM) pageHeight = contentAreaHeight - (paginatorBounds ? paginatorBounds.height : 0);
+    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) pageHeight = contentAreaHeight - (paginatorBounds ? paginatorBounds.height : 0);
     else pageWidth = contentAreaWidth - (paginatorBounds ? paginatorBounds.width : 0);
   } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
 
@@ -1319,42 +1281,42 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
     left = parentBounds.getLeft();
     top = parentBounds.getTop();
     switch (this.position_) {
-      case anychart.utils.Orientation.LEFT:
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.LEFT:
+      case anychart.enums.Orientation.RIGHT:
         switch (this.align_) {
-          case anychart.utils.Align.CENTER:
+          case anychart.enums.Align.CENTER:
             top = top + (parentHeight - height) / 2;
             break;
-          case anychart.utils.Align.RIGHT:
-          case anychart.utils.Align.BOTTOM:
+          case anychart.enums.Align.RIGHT:
+          case anychart.enums.Align.BOTTOM:
             top = parentBounds.getBottom() - height;
             break;
         }
         break;
-      case anychart.utils.Orientation.TOP:
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.TOP:
+      case anychart.enums.Orientation.BOTTOM:
         switch (this.align_) {
-          case anychart.utils.Align.CENTER:
+          case anychart.enums.Align.CENTER:
             left = left + (parentWidth - width) / 2;
             break;
-          case anychart.utils.Align.RIGHT:
-          case anychart.utils.Align.BOTTOM:
+          case anychart.enums.Align.RIGHT:
+          case anychart.enums.Align.BOTTOM:
             left = parentBounds.getRight() - width;
             break;
         }
         break;
     }
     switch (this.position_) {
-      case anychart.utils.Orientation.RIGHT:
+      case anychart.enums.Orientation.RIGHT:
         left = parentBounds.getRight() - width;
         break;
-      case anychart.utils.Orientation.BOTTOM:
+      case anychart.enums.Orientation.BOTTOM:
         top = parentBounds.getBottom() - height;
         break;
     }
   } else {
-    left = anychart.utils.normalize(/** @type {string|number} */ (margin.left()), 0);
-    top = anychart.utils.normalize(/** @type {string|number} */ (margin.top()), 0);
+    left = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.left()), 0);
+    top = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.top()), 0);
   }
 
   this.pixelBounds_ = new anychart.math.Rect(left, top, width, height);
@@ -1527,7 +1489,7 @@ anychart.elements.Legend.prototype.distributeItemsInBounds_ = function(width, he
   if (this.items_) {
     this.distributedItems_[page] = [];
     this.distributedItems_[page][0] = this.items_[0];
-    if (this.itemsLayout_ == anychart.elements.Legend.Layout.HORIZONTAL) {
+    if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
       w = this.items_[0].getWidth();
       for (i = 1, len = this.items_.length; i < len; i++) {
         if (w + this.itemsSpacing_ + this.items_[i].getWidth() > width) {
@@ -1593,7 +1555,7 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
     var item;
     if (items) {
       switch (this.itemsLayout_) {
-        case anychart.elements.Legend.Layout.HORIZONTAL:
+        case anychart.enums.Layout.HORIZONTAL:
           for (i = 0; i < items.length; i++) {
             item = items[i];
             item
@@ -1607,7 +1569,7 @@ anychart.elements.Legend.prototype.drawLegendContent_ = function(pageNumber, con
             x += items[i].getWidth() + this.itemsSpacing_;
           }
           break;
-        case anychart.elements.Legend.Layout.VERTICAL:
+        case anychart.enums.Layout.VERTICAL:
           for (i = 0; i < items.length; i++) {
             item = items[i];
             item

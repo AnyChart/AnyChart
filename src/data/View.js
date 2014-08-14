@@ -2,6 +2,7 @@ goog.provide('anychart.data.View');
 
 goog.require('anychart.Base');
 goog.require('anychart.data.Iterator');
+goog.require('anychart.enums');
 
 
 
@@ -25,7 +26,7 @@ anychart.data.View = function(parentView) {
    */
   this.parentView = parentView;
 
-  parentView.listen(anychart.Base.SIGNAL, this.parentViewChangedHandler, false, this);
+  parentView.listen(anychart.enums.EventType.SIGNAL, this.parentViewChangedHandler, false, this);
 
   this.invalidate(anychart.ConsistencyState.DATA);
 };
@@ -159,12 +160,13 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
  *    return value1 > value2;
  *  });
  * @param {string} fieldName A field name to make sort by.
- * @param {function(*, *):number=} opt_comparator A sorting function that should accept two field values and return
- *  numeric result of the comparison.
+ * @param {(anychart.enums.Sort|function(*, *):number)=} opt_comparatorOrOrder A sorting function that should accept two
+ *    field values and return numeric result of the comparison or string value of anychart.enums.Sort enumeration
+ *    except NONE. Defaults to anychart.enums.Sort.ASC.
  * @return {!anychart.data.View} The new derived view.
  */
-anychart.data.View.prototype.sort = function(fieldName, opt_comparator) {
-  var result = new anychart.data.SortView(this, fieldName, opt_comparator);
+anychart.data.View.prototype.sort = function(fieldName, opt_comparatorOrOrder) {
+  var result = new anychart.data.SortView(this, fieldName, opt_comparatorOrOrder);
   this.registerDisposable(result);
   return result;
 };

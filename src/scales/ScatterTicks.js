@@ -1,23 +1,6 @@
 goog.provide('anychart.scales.ScatterTicks');
-goog.provide('anychart.scales.ScatterTicksMode');
-
 goog.require('anychart.Base');
-
-
-/**
- * Scatter ticks mode enum.
- * @enum {string}
- */
-anychart.scales.ScatterTicksMode = {
-  /**
-   * Scatter ticks go with linear interval, e.g. [1, 2, 3, 4, 5]
-   */
-  LINEAR: 'linear',
-  /**
-   * Scatter ticks go with log-linear interval, e.g. [0.1, 1, 10, 100, 1000]
-   */
-  LOGARITHMIC: 'logarithmic'
-};
+goog.require('anychart.enums');
 
 
 
@@ -89,10 +72,10 @@ anychart.scales.ScatterTicks.prototype.base_ = 0;
 
 /**
  * Ticks mode.
- * @type {anychart.scales.ScatterTicksMode|string}
+ * @type {anychart.enums.ScatterTicksMode|string}
  * @private
  */
-anychart.scales.ScatterTicks.prototype.mode_ = anychart.scales.ScatterTicksMode.LINEAR;
+anychart.scales.ScatterTicks.prototype.mode_ = anychart.enums.ScatterTicksMode.LINEAR;
 
 
 /**
@@ -193,16 +176,16 @@ anychart.scales.ScatterTicks.prototype.get = function() {
 
 /**
  * Scatter ticks mode. Linear or logarithmic.
- * @param {(anychart.scales.ScatterTicksMode|string)=} opt_value Value to set.
- * @return {anychart.scales.ScatterTicksMode|anychart.scales.ScatterTicks} Value or itself.
+ * @param {(anychart.enums.ScatterTicksMode|string)=} opt_value Value to set.
+ * @return {anychart.enums.ScatterTicksMode|anychart.scales.ScatterTicks} Value or itself.
  */
 anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = ('' + opt_value).toLowerCase();
-    if (opt_value == 'log' || opt_value == anychart.scales.ScatterTicksMode.LOGARITHMIC)
-      opt_value = anychart.scales.ScatterTicksMode.LOGARITHMIC;
+    if (opt_value == 'log' || opt_value == anychart.enums.ScatterTicksMode.LOGARITHMIC)
+      opt_value = anychart.enums.ScatterTicksMode.LOGARITHMIC;
     else
-      opt_value = anychart.scales.ScatterTicksMode.LINEAR;
+      opt_value = anychart.enums.ScatterTicksMode.LINEAR;
     if (this.mode_ != opt_value) {
       this.autoTicks_ = null;
       this.mode_ = opt_value;
@@ -211,7 +194,7 @@ anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
     }
     return this;
   }
-  return /** @type {anychart.scales.ScatterTicksMode} */(this.mode_);
+  return /** @type {anychart.enums.ScatterTicksMode} */(this.mode_);
 };
 
 
@@ -225,7 +208,7 @@ anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
  * @return {!Array} Array of two values: [newMin, newMax].
  */
 anychart.scales.ScatterTicks.prototype.setup = function(min, max, opt_canModifyMin, opt_canModifyMax) {
-  if (this.mode_ == anychart.scales.ScatterTicksMode.LOGARITHMIC)
+  if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC)
     return this.setupLogarithmic_(min, max, opt_canModifyMin, opt_canModifyMax);
   else
     return this.setupLinear_(min, max, opt_canModifyMin, opt_canModifyMax);
@@ -245,7 +228,7 @@ anychart.scales.ScatterTicks.prototype.setup = function(min, max, opt_canModifyM
 anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_originalMin, opt_originalMax) {
   if (!goog.isDef(opt_originalMin)) opt_originalMin = values[0];
   if (!goog.isDef(opt_originalMax)) opt_originalMax = values[values.length - 1];
-  if (this.mode_ == anychart.scales.ScatterTicksMode.LOGARITHMIC)
+  if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC)
     this.setupLogarithmicAsMinor_(values, opt_originalMin, opt_originalMax);
   else
     this.setupLinearAsMinor_(values, opt_originalMin, opt_originalMax);
@@ -503,5 +486,3 @@ anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.pr
 anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;
 anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;
 anychart.scales.ScatterTicks.prototype['mode'] = anychart.scales.ScatterTicks.prototype.mode;
-goog.exportSymbol('anychart.scales.ScatterTicksMode.LINEAR', anychart.scales.ScatterTicksMode.LINEAR);
-goog.exportSymbol('anychart.scales.ScatterTicksMode.LOGARITHMIC', anychart.scales.ScatterTicksMode.LOGARITHMIC);

@@ -1,7 +1,9 @@
 goog.provide('anychart.elements.LabelsFactory');
+goog.require('acgraph');
 goog.provide('anychart.elements.LabelsFactory.Label');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Text');
+goog.require('anychart.enums');
 
 
 
@@ -45,14 +47,14 @@ anychart.elements.LabelsFactory = function() {
 
   /**
    * Labels position settings.
-   * @type {anychart.utils.NinePositions|string}
+   * @type {string}
    * @private
    */
   this.position_;
 
   /**
    * Labels anchor settings.
-   * @type {anychart.utils.NinePositions}
+   * @type {anychart.enums.Anchor}
    * @private
    */
   this.anchor_;
@@ -122,7 +124,7 @@ anychart.elements.LabelsFactory = function() {
 
   this.zIndex(50);
   this.background(null);
-  this.anchor(anychart.utils.NinePositions.CENTER);
+  this.anchor(anychart.enums.Anchor.CENTER);
   this.padding(5, 10, 5, 10);
   this.rotation(0);
   this.width(null);
@@ -381,13 +383,14 @@ anychart.elements.LabelsFactory.prototype.positionFormatter = function(opt_value
 
 
 /**
- * Gets or sets labels position settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Labels position settings.
- * @return {anychart.elements.LabelsFactory|anychart.utils.NinePositions|string} Labels position settings or itself for chaining call.
+ * Gets or sets labels position settings. These settings are processed by the factory handler (for example a series,
+ * or an axis) and can have different meanings from handler to handler. Try using anychart.enums.Position values.
+ * @param {string=} opt_value Labels position settings.
+ * @return {anychart.elements.LabelsFactory|string} Labels position settings or itself for chaining call.
  */
 anychart.elements.LabelsFactory.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value);
+    opt_value = String(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -402,12 +405,12 @@ anychart.elements.LabelsFactory.prototype.position = function(opt_value) {
 
 /**
  * Gets or sets labels anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Labels anchor settings.
- * @return {anychart.elements.LabelsFactory|anychart.utils.NinePositions} Labels anchor settings or itself for chaining call.
+ * @param {(anychart.enums.Anchor|string)=} opt_value Labels anchor settings.
+ * @return {anychart.elements.LabelsFactory|anychart.enums.Anchor} Labels anchor settings or itself for chaining call.
  */
 anychart.elements.LabelsFactory.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -814,7 +817,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   //calculate text width and outer width
   var width;
   if (isWidthSet) {
-    width = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(widthSettings), parentWidth));
+    width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(widthSettings), parentWidth));
     textWidth = padding.tightenWidth(width);
     outerBounds.width = width;
   } else {
@@ -829,7 +832,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   //calculate text height and outer height
   var height;
   if (isHeightSet) {
-    height = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(heightSettings), parentHeight));
+    height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(heightSettings), parentHeight));
     textHeight = padding.tightenHeight(height);
     outerBounds.height = height;
   } else {
@@ -847,10 +850,10 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   position.x -= anchorCoordinate.x;
   position.y -= anchorCoordinate.y;
 
-  offsetX = goog.isDef(offsetX) ? anychart.utils.normalize(offsetX, parentWidth) : 0;
-  offsetY = goog.isDef(offsetY) ? anychart.utils.normalize(offsetY, parentHeight) : 0;
+  offsetX = goog.isDef(offsetX) ? anychart.utils.normalizeSize(offsetX, parentWidth) : 0;
+  offsetY = goog.isDef(offsetY) ? anychart.utils.normalizeSize(offsetY, parentHeight) : 0;
 
-  anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.utils.NinePositions} */(anchor), offsetX, offsetY);
+  anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.enums.Anchor} */(anchor), offsetX, offsetY);
 
   outerBounds.left = position.x;
   outerBounds.top = position.y;
@@ -891,10 +894,9 @@ anychart.elements.LabelsFactory.prototype.measure = function(formatProvider, pos
 anychart.elements.LabelsFactory.prototype.measureWithTransform = function(formatProvider, positionProvider) {
   var bounds = this.getDimension_(formatProvider, positionProvider);
   var rotationAngle = /** @type {number} */(this.rotation());
-  var anchor = anychart.utils.ninePositionsToAnchor(/** @type {anychart.utils.NinePositions} */(this.anchor()));
 
-  var point = acgraph.vector.getCoordinateByAnchor(bounds, anchor);
-  var tx = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(rotationAngle), point[0], point[1]);
+  var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(this.anchor()));
+  var tx = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(rotationAngle), point.x, point.y);
 
   var arr = bounds.toCoordinateBox() || [];
   tx.transform(arr, 0, arr, 0, 4);
@@ -1416,12 +1418,12 @@ anychart.elements.LabelsFactory.Label.prototype.rotation = function(opt_value) {
 
 /**
  * Getter for label anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!anychart.elements.LabelsFactory.Label|anychart.utils.NinePositions} .
+ * @param {(anychart.enums.Anchor|string)=} opt_value .
+ * @return {!anychart.elements.LabelsFactory.Label|anychart.enums.Anchor} .
  */
 anychart.elements.LabelsFactory.Label.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.settingsObj.anchor !== opt_value) {
       this.settingsObj.anchor = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
@@ -1467,19 +1469,19 @@ anychart.elements.LabelsFactory.Label.prototype.offsetY = function(opt_value) {
 
 /**
  * Getter for current label position settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!anychart.elements.LabelsFactory.Label|anychart.utils.NinePositions} .
+ * @param {string=} opt_value .
+ * @return {!anychart.elements.LabelsFactory.Label|string} .
  */
 anychart.elements.LabelsFactory.Label.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = String(opt_value);
     if (this.settingsObj.position != opt_value) {
       this.settingsObj.position = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return /** @type {anychart.utils.NinePositions} */(this.settingsObj.position);
+    return /** @type {anychart.enums.Position} */(this.settingsObj.position);
   }
 };
 
@@ -1739,7 +1741,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
             this.settingsObj.offsetX :
             parentLabelsFactory.offsetX();
 
-    var anchor = notSelfSettings ?
+    var anchor = /** @type {anychart.enums.Anchor} */(notSelfSettings ?
         goog.isDef(this.superSettingsObj['anchor']) ?
             this.superSettingsObj['anchor'] :
                 settingsChangedStates && settingsChangedStates['anchor'] ?
@@ -1749,7 +1751,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
                 parentLabelsFactory.anchor() :
         goog.isDef(this.settingsObj.anchor) ?
             this.settingsObj.anchor :
-            parentLabelsFactory.anchor();
+            parentLabelsFactory.anchor());
 
     var rotationAngle = notSelfSettings ?
         goog.isDef(this.superSettingsObj['rotation']) ?
@@ -1842,7 +1844,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     //calculate text width and outer width
     var width, textX, textWidth;
     if (isWidthSet) {
-      width = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(widthSettings), parentWidth));
+      width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(widthSettings), parentWidth));
       if (padding) {
         textX = padding.left();
         textWidth = padding.tightenWidth(width);
@@ -1869,7 +1871,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     //calculate text height and outer height
     var height, textY, textHeight;
     if (isHeightSet) {
-      height = Math.ceil(anychart.utils.normalize(/** @type {number|string} */(heightSettings), parentHeight));
+      height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(heightSettings), parentHeight));
       if (padding) {
         textY = padding.top();
         textHeight = padding.tightenHeight(height);
@@ -1894,16 +1896,15 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
     var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-        new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height),
-        /** @type {anychart.utils.NinePositions} */(anchor));
+        new acgraph.math.Rect(0, 0, outerBounds.width, outerBounds.height), anchor);
 
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
 
-    offsetX = goog.isDef(offsetX) ? anychart.utils.normalize(/** @type {number|string} */(offsetX), parentWidth) : 0;
-    offsetY = goog.isDef(offsetY) ? anychart.utils.normalize(/** @type {number|string} */(offsetY), parentHeight) : 0;
+    offsetX = goog.isDef(offsetX) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), parentWidth) : 0;
+    offsetY = goog.isDef(offsetY) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), parentHeight) : 0;
 
-    anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.utils.NinePositions} */(anchor), offsetX, offsetY);
+    anychart.utils.applyOffsetByAnchor(position, anchor, offsetX, offsetY);
 
     textX += position.x;
     textY += position.y;
@@ -1915,8 +1916,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     this.backgroundElement_.pixelBounds(outerBounds);
     this.backgroundElement_.draw();
 
-    this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle),
-        anychart.utils.ninePositionsToAnchor(/** @type {anychart.utils.NinePositions} */(anchor)));
+    this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle), anchor);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS);
   }

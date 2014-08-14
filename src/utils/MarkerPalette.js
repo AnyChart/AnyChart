@@ -1,6 +1,6 @@
 goog.provide('anychart.utils.MarkerPalette');
 goog.require('anychart.Base');
-goog.require('anychart.elements.Marker.Type');
+goog.require('anychart.enums');
 goog.require('goog.array');
 
 
@@ -21,8 +21,8 @@ anychart.utils.MarkerPalette = function() {
   this.markers_ = [];
 
   // Initialize default marker palette using all marker types framework supports.
-  for (var key in anychart.elements.Marker.Type) {
-    this.markers_.push(anychart.elements.Marker.Type[key]);
+  for (var key in anychart.enums.MarkerType) {
+    this.markers_.push(anychart.enums.MarkerType[key]);
   }
 };
 goog.inherits(anychart.utils.MarkerPalette, anychart.Base);
@@ -39,7 +39,7 @@ anychart.utils.MarkerPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
  * Setter for the marker at index if the opt_marker set, getter otherwise.
  * @param {number} index Index of marker to get/set.
  * @param {string=} opt_marker Type of the marker to set.
- * @return {anychart.elements.Marker.Type|anychart.utils.MarkerPalette} Marker by index or self for chaining.
+ * @return {anychart.enums.MarkerType|anychart.utils.MarkerPalette} Marker by index or self for chaining.
  */
 anychart.utils.MarkerPalette.prototype.markerAt = function(index, opt_marker) {
   if (!this.markers_) this.markers_ = [];

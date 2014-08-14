@@ -1,15 +1,11 @@
 goog.provide('anychart.ui.ScrollBar');
-
-goog.require('acgraph.events');
-goog.require('acgraph.math.Rect');
-goog.require('acgraph.vector.Layer');
-
+goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
 goog.require('anychart.color');
+goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.ui.Button');
 goog.require('anychart.utils');
-
 goog.require('goog.events.Event');
 goog.require('goog.math');
 
@@ -69,10 +65,10 @@ anychart.ui.ScrollBar = function() {
 
   /**
    * Layout.
-   * @type {anychart.utils.Layout}
+   * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_ = anychart.utils.Layout.VERTICAL;
+  this.layout_ = anychart.enums.Layout.VERTICAL;
 
   /**
    * Pixel bounds cache. Allows to avoid re-calculation of pixel bounds.
@@ -209,12 +205,12 @@ anychart.ui.ScrollBar.SCROLL_RATIO_STEP = .05;
  * Getter/setter for layout.
  * NOTE: Doesn't modify actual bounds.
  *
- * @param {(anychart.utils.Layout|string)=} opt_value - Value to be set.
- * @return {(anychart.utils.Layout|anychart.ui.ScrollBar)} - Current layout or itself for chaining.
+ * @param {(anychart.enums.Layout|string)=} opt_value - Value to be set.
+ * @return {(anychart.enums.Layout|anychart.ui.ScrollBar)} - Current layout or itself for chaining.
  */
 anychart.ui.ScrollBar.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeLayout(opt_value);
+    opt_value = anychart.enums.normalizeLayout(opt_value);
     if (opt_value != this.layout_) {
       this.layout_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
@@ -1242,7 +1238,7 @@ anychart.ui.ScrollBar.prototype.draw = function() {
  */
 anychart.ui.ScrollBar.prototype.isVertical_ = function() {
   //Is "horizontal" if layout is directly set as "horizontal". Is "vertical" in all of other cases.
-  return !(this.layout_.toLowerCase() == anychart.utils.Layout.HORIZONTAL);
+  return !(this.layout_.toLowerCase() == anychart.enums.Layout.HORIZONTAL);
 };
 
 
@@ -1326,7 +1322,7 @@ anychart.ui.ScrollBar.prototype.dispatchScrollEvent_ = function(opt_source) {
  * @extends {goog.events.Event}
  */
 anychart.ui.ScrollBar.ScrollEvent = function(opt_target) {
-  goog.base(this, anychart.events.EventType.SCROLL_CHANGE, opt_target);
+  goog.base(this, anychart.enums.EventType.SCROLL_CHANGE, opt_target);
 };
 goog.inherits(anychart.ui.ScrollBar.ScrollEvent, goog.events.Event);
 

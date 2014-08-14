@@ -1,9 +1,10 @@
 goog.provide('anychart.elements.MarkersFactory');
+goog.require('acgraph');
 goog.provide('anychart.elements.MarkersFactory.BrowserEvent');
 goog.provide('anychart.elements.MarkersFactory.Marker');
 goog.require('anychart.VisualBase');
 goog.require('anychart.color');
-goog.require('anychart.elements.Marker.Type');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.events.BrowserEvent');
 
@@ -60,7 +61,7 @@ anychart.elements.MarkersFactory = function() {
 
   /**
    * Type of marker.
-   * @type {(string|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
+   * @type {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
    * @private
    */
   this.type_;
@@ -88,14 +89,14 @@ anychart.elements.MarkersFactory = function() {
 
   /**
    * Marker anchor settings.
-   * @type {anychart.utils.NinePositions|string}
+   * @type {anychart.enums.Anchor|string}
    * @private
    */
   this.anchor_;
 
   /**
    * Marker position settings.
-   * @type {anychart.utils.NinePositions|string}
+   * @type {anychart.enums.Position|string}
    * @private
    */
   this.position_;
@@ -166,7 +167,7 @@ anychart.elements.MarkersFactory = function() {
 
   this.zIndex(70);
   this.size(10);
-  this.anchor(anychart.utils.NinePositions.CENTER);
+  this.anchor(anychart.enums.Anchor.CENTER);
   this.offsetX(0);
   this.offsetY(0);
 
@@ -383,16 +384,16 @@ anychart.elements.MarkersFactory.prototype.positionFormatter = function(opt_valu
  *   }
  *   MMarker.draw(positionProvider);
  * }
- * @param {string=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
+ * @param {string=} opt_value [{@link anychart.enums.Position}.CENTER] Value to set.
  * @return {anychart.elements.MarkersFactory} {@link anychart.elements.MarkersFactory} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.NinePositions|string)=} opt_value Markers position settings.
- * @return {anychart.elements.MarkersFactory|anychart.utils.NinePositions|string} Markers position settings or itself for method chaining.
+ * @param {string=} opt_value Markers position settings.
+ * @return {anychart.elements.MarkersFactory|string} Markers position settings or itself for method chaining.
  */
 anychart.elements.MarkersFactory.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value);
+    opt_value = String(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -407,7 +408,7 @@ anychart.elements.MarkersFactory.prototype.position = function(opt_value) {
 
 /**
  * Getter for anchor settings of all markers.
- * @return {anychart.utils.NinePositions} Current marker anchor settings.
+ * @return {anychart.enums.Anchor} Current marker anchor settings.
  *//**
  * Setter for anchor settings of all markers.
  * @example <t>simple-h100</t>
@@ -423,12 +424,12 @@ anychart.elements.MarkersFactory.prototype.position = function(opt_value) {
  * var MMarker = anychart.elements.markersFactory()
  *     .type('star4')
  *     .fill('blue')
- *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM)
+ *     .anchor(anychart.enums.Anchor.RIGHT_BOTTOM)
  *     .container(stage);
  * // sets custom anchor
  * MMarker
- *     .anchorAt(0, anychart.utils.NinePositions.LEFT_TOP)
- *     .anchorAt(3, anychart.utils.NinePositions.RIGHT_TOP);
+ *     .anchorAt(0, anychart.enums.Anchor.LEFT_TOP)
+ *     .anchorAt(3, anychart.enums.Anchor.RIGHT_TOP);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -440,16 +441,16 @@ anychart.elements.MarkersFactory.prototype.position = function(opt_value) {
  *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
  *   MMarker.draw(positionProvider);
  * }
- * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.CENTER] Value to set.
+ * @param {(anychart.enums.Anchor|string)=} opt_value [{@link anychart.enums.Anchor}.CENTER] Value to set.
  * @return {!anychart.elements.MarkersFactory} {@link anychart.elements.MarkersFactory} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!(anychart.elements.MarkersFactory|anychart.utils.NinePositions|string)} .
+ * @param {(anychart.enums.Anchor|string)=} opt_value .
+ * @return {!(anychart.elements.MarkersFactory|anychart.enums.Anchor|string)} .
  */
 anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -464,7 +465,7 @@ anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
 
 /**
  * Getter for current type settings of all markers.
- * @return {anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
+ * @return {anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
  *  Markers type settings.
  *//**
  * Setter for type settings of all markers.
@@ -505,9 +506,9 @@ anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
  *   };
  *   MMarker.draw(positionProvider);
  * }
- * @param {(anychart.elements.Marker.Type|
+ * @param {(anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.elements.Marker.Type}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom marker
+ *  [{@link anychart.enums.MarkerType}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom marker
  *  must look like this: <code>function(path, x, y, size){
  *    // path - acgraph.vector.Path
  *    // x, y - current marker position
@@ -518,8 +519,8 @@ anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
  * @return {!anychart.elements.MarkersFactory} {@link anychart.elements.MarkersFactory} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.elements.MarkersFactory|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
+ * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.elements.MarkersFactory|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
  */
 anychart.elements.MarkersFactory.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -530,14 +531,14 @@ anychart.elements.MarkersFactory.prototype.type = function(opt_value) {
     this.changedSettings['type'] = true;
     return this;
   } else {
-    return this.type_ || this.autoType_ || anychart.elements.Marker.Type.DIAGONAL_CROSS;
+    return this.type_ || this.autoType_ || anychart.enums.MarkerType.DIAGONAL_CROSS;
   }
 };
 
 
 /**
  * Sets markers type that parent series have set for it.
- * @param {anychart.elements.Marker.Type} value Auto marker type distributed by the series.
+ * @param {anychart.enums.MarkerType} value Auto marker type distributed by the series.
  */
 anychart.elements.MarkersFactory.prototype.setAutoType = function(value) {
   this.autoType_ = value;
@@ -959,12 +960,12 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
 
   var type = this.type();
   var size = /** @type {number} */(this.size());
-  var anchor = /** @type {anychart.utils.NinePositions} */(this.anchor());
+  var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
   var offsetX = /** @type {number} */(this.offsetX());
   var offsetY = /** @type {number} */(this.offsetY());
 
   drawer = goog.isString(type) ?
-      anychart.elements.Marker.getMarkerDrawer(/** @type {anychart.elements.Marker.Type}*/(type)) :
+      anychart.enums.getMarkerDrawer(type) :
       type;
 
   this.measureMarkerElement_.clear();
@@ -980,8 +981,8 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
   position.x -= anchorCoordinate.x;
   position.y -= anchorCoordinate.y;
 
-  var offsetXNorm = goog.isDef(this.offsetX_) ? anychart.utils.normalize(offsetX, parentWidth) : 0;
-  var offsetYNorm = goog.isDef(this.offsetY_) ? anychart.utils.normalize(offsetY, parentHeight) : 0;
+  var offsetXNorm = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(offsetX, parentWidth) : 0;
+  var offsetYNorm = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(offsetY, parentHeight) : 0;
 
   anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNorm, offsetYNorm);
 
@@ -1572,12 +1573,12 @@ anychart.elements.MarkersFactory.Marker.prototype.positionProvider = function(op
 
 /**
  * Getter for current position settings of all markers.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Markers position settings.
- * @return {anychart.elements.MarkersFactory.Marker|anychart.utils.NinePositions|string} Markers position settings or itself for chaining call.
+ * @param {(anychart.enums.Position|string)=} opt_value Markers position settings.
+ * @return {anychart.elements.MarkersFactory.Marker|anychart.enums.Position|string} Markers position settings or itself for chaining call.
  */
 anychart.elements.MarkersFactory.Marker.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value);
+    opt_value = String(opt_value);
     if (this.settingsObj.position_ != opt_value) {
       this.settingsObj.position_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1591,12 +1592,12 @@ anychart.elements.MarkersFactory.Marker.prototype.position = function(opt_value)
 
 /**
  * Getter for anchor settings of all markers.
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!(anychart.elements.MarkersFactory.Marker|anychart.utils.NinePositions|string)} .
+ * @param {(anychart.enums.Anchor|string)=} opt_value .
+ * @return {!(anychart.elements.MarkersFactory.Marker|anychart.enums.Anchor|string)} .
  */
 anychart.elements.MarkersFactory.Marker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizePosition(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.settingsObj.anchor_ != opt_value) {
       this.settingsObj.anchor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1610,8 +1611,8 @@ anychart.elements.MarkersFactory.Marker.prototype.anchor = function(opt_value) {
 
 /**
  * Getter for current type settings of all markers.
- * @param {(anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.elements.MarkersFactory.Marker|anychart.elements.Marker.Type|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
+ * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.elements.MarkersFactory.Marker|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
  */
 anychart.elements.MarkersFactory.Marker.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1923,7 +1924,7 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
         !!(settingsChangedStates && settingsChangedStates['positionFormatter']));
 
     var drawer = goog.isString(type) ?
-        anychart.elements.Marker.getMarkerDrawer(/** @type {anychart.elements.Marker.Type} */(type)) :
+        anychart.enums.getMarkerDrawer(type) :
         type;
 
     //define parent bounds
@@ -1944,15 +1945,15 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
     var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
         new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
-        /** @type {anychart.utils.NinePositions} */(anchor));
+        /** @type {anychart.enums.Anchor} */(anchor));
 
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
 
-    var offsetXNorm = goog.isDef(offsetX) ? anychart.utils.normalize(/** @type {string|number} */(offsetX), parentWidth) : 0;
-    var offsetYNorm = goog.isDef(offsetY) ? anychart.utils.normalize(/** @type {string|number} */(offsetY), parentHeight) : 0;
+    var offsetXNorm = goog.isDef(offsetX) ? anychart.utils.normalizeSize(/** @type {string|number} */(offsetX), parentWidth) : 0;
+    var offsetYNorm = goog.isDef(offsetY) ? anychart.utils.normalizeSize(/** @type {string|number} */(offsetY), parentHeight) : 0;
 
-    anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.utils.NinePositions} */(anchor), offsetXNorm, offsetYNorm);
+    anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.enums.Anchor} */(anchor), offsetXNorm, offsetYNorm);
 
     markerBounds.left = position.x + markerBounds.width / 2;
     markerBounds.top = position.y + markerBounds.height / 2;

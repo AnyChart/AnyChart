@@ -26,74 +26,46 @@
 <div id="status"></div>
 </body>
 <script>
-  anychart.onDocumentLoad(function() {
-//create chart
-    var chart = new anychart.cartesian.Chart();
+  anychart.onDocumentReady(function() {
+    //create data set on our data
+    var dataSet = anychart.data.set([
+      ['P1' , '125', '51'],
+      ['P2' , '132', '91'],
+      ['P3' , '141', '34'],
+      ['P4' , '158', '47'],
+      ['P5' , '133', '63'],
+      ['P6' , '143', '58'],
+      ['P7' , '176', '36'],
+      ['P8' , '194', '77'],
+      ['P9' , '115', '99'],
+      ['P10', '134', '106'],
+      ['P11', '110', '88'],
+      ['P12', '91', '56']
+    ]);
+
+    //map data for the first series, take x from the zero column and value from the first column of data set
+    var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+
+    //map data for the second series, take x from the zero column and value from the second column of data set
+    var seriesData_2 = dataSet.mapAs({x: [1], value: [2]});
+
+    //create area chart
+    chart = anychart.areaChart();
 
     //set container id for the chart
     chart.container('container');
 
     //set chart title text settings
-    chart.title().text('Multi-Series Bubble Chart');
+    chart.title().text('Area Chart');
 
-    //create chart X axis with default settings
-    chart.xAxis();
+    //create first series on mapped data
+    chart.area(seriesData_1);
 
-    //create chart Y axis with default settings
-    chart.yAxis();
-
-    //create horizontal chart grid
-    chart.grid(0)
-        .direction(anychart.utils.Direction.HORIZONTAL);
-
-    //create vertical chart grid
-    chart.grid(1)
-        .evenFill('none')
-        .oddFill('none')
-        .direction(anychart.utils.Direction.VERTICAL);
-
-    //create vertical minor chart grid
-    chart.minorGrid()
-        .evenFill('none')
-        .oddFill('none')
-        .stroke('black 0.075')
-        .direction(anychart.utils.Direction.VERTICAL);
-
-    //create marker series
-    chart.bubble([
-      ['P1', 1420, 7000],
-      ['P2', 12, 7000],
-      ['P3', 1, 12],
-      ['P4', 1, 18],
-      ['P5', 1, 23]
-    ]);
-
-    //create marker series
-    chart.bubble([
-      ['P1', 13, 11],
-      ['P2', 25, 5],
-      ['P3', 76, 19],
-      ['P4', 86, 2],
-      ['P5', 95, 24]
-    ]);
-
-    //create marker series
-    chart.bubble([
-      ['P1', 75, 4],
-      ['P2', 56, 7],
-      ['P3', 67, 14],
-      ['P4', 42, 18],
-      ['P5', 17, 4]
-    ]);
-
-    //create marker series
-    chart.bubble([
-      ['P1', 13, 4],
-      ['P2', 29, 4],
-      ['P3', 26, 4],
-      ['P4', 39, 4],
-      ['P5', 17, 4]
-    ]);
+    //create second series on mapped data
+    var barScale = anychart.scales.linear();
+    barScale.inverted(true);
+    var barSeries = chart.bar(seriesData_2);
+    barSeries.xScale(chart.yScale()).yScale(barScale);
 
     //initiate chart drawing
     chart.draw();

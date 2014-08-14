@@ -1,7 +1,8 @@
 goog.provide('anychart.cartesian.series.BaseWithMarkers');
-
+goog.require('acgraph');
 goog.require('anychart.cartesian.series.Base');
 goog.require('anychart.elements.MarkersFactory');
+goog.require('anychart.enums');
 
 
 
@@ -20,7 +21,7 @@ anychart.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
   this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
   this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
-  this.markers().position(anychart.utils.NinePositions.CENTER);
+  this.markers().position(anychart.enums.Position.CENTER);
   this.registerDisposable(this.markers());
   this.registerDisposable(this.hoverMarkers());
 };
@@ -265,7 +266,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(hovere
     var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
     var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
 
-    var positionProvider = this.createPositionProvider(/** @type {anychart.utils.NinePositions|string} */(position));
+    var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
       marker.positionProvider(positionProvider);
     } else {

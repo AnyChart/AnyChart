@@ -1,7 +1,8 @@
 goog.provide('anychart.elements.Label');
+goog.require('acgraph');
 goog.require('anychart.elements.Background');
 goog.require('anychart.elements.Text');
-goog.require('anychart.math.Coordinate');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Padding');
@@ -76,14 +77,14 @@ anychart.elements.Label = function() {
 
   /**
    * Label position.
-   * @type {anychart.utils.NinePositions}
+   * @type {anychart.enums.Position}
    * @private
    */
   this.position_;
 
   /**
    * Label anchor settings.
-   * @type {anychart.utils.NinePositions}
+   * @type {anychart.enums.Anchor}
    * @private
    */
   this.anchor_;
@@ -461,7 +462,7 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
 
 /**
  * Getter for label anchor settings.
- * @return {anychart.utils.NinePositions} Current label anchor settings.
+ * @return {anychart.enums.Anchor} Current label anchor settings.
  *//**
  * Setter for label anchor settings.<br/>
  * <b>Note:</b> merges label positioning point ({@link anychart.elements.Label#position}) with an anchor.
@@ -470,9 +471,9 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * var label = anychart.elements.label()
  *     .padding(5)
- *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
+ *     .position(anychart.enums.Position.RIGHT_BOTTOM)
  *     .parentBounds(parentBounds.getBounds())
- *     .anchor(anychart.utils.NinePositions.RIGHT_BOTTOM);
+ *     .anchor(anychart.enums.Anchor.RIGHT_BOTTOM);
  * label.background().enabled(true).fill('none').stroke('1 #aaa');
  * label.container(stage).draw();
  * stage.circle(105, 75, 2).stroke('3 red');
@@ -480,9 +481,9 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * parentBounds = stage.rect(120, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * label = anychart.elements.label()
  *     .padding(5)
- *     .position(anychart.utils.NinePositions.RIGHT_BOTTOM)
+ *     .position(anychart.enums.Anchor.RIGHT_BOTTOM)
  *     .parentBounds(parentBounds.getBounds())
- *     .anchor(anychart.utils.NinePositions.CENTER);
+ *     .anchor(anychart.enums.Anchor.CENTER);
  * label.background().enabled(true).fill('none').stroke('1 #aaa');
  * label.container(stage).draw();
  * stage.circle(220, 75, 2).stroke('3 red');
@@ -492,16 +493,16 @@ anychart.elements.Label.prototype.rotation = function(opt_value) {
  * Anchor is marked with red.<br/>
  * Left: anchor is Bottom Right<br/>
  * Right: anchor in Center<br/>
- * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
+ * @param {(anychart.enums.Anchor|string)=} opt_value [{@link anychart.enums.Anchor}.LEFT_TOP] Value to set.
  * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!anychart.elements.Label|anychart.utils.NinePositions} .
+ * @param {(anychart.enums.Anchor|string)=} opt_value .
+ * @return {!anychart.elements.Label|anychart.enums.Anchor} .
  */
 anychart.elements.Label.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -587,7 +588,7 @@ anychart.elements.Label.prototype.anchor = function(opt_value) {
  * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
  *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
  * @illustrationDesc
- * Arrows show offsets direction.
+ * Arrows show offsets layout.
  * @example <t>simple-h100</t>
  * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
  * var label = anychart.elements.label()
@@ -654,7 +655,7 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
 
 /**
  * Getter for current label position settings.
- * @return {anychart.utils.NinePositions} Current label position settings.
+ * @return {anychart.enums.Position} Current label position settings.
  *//**
  * Setter for label position settings.<br/>
  * <b>Note:</b> works only if {@link anychart.elements.Label#container} or {@link anychart.elements.Label#parentBounds} are explicitly set.
@@ -662,23 +663,23 @@ anychart.elements.Label.prototype.offsetY = function(opt_value) {
  * var rect = stage.rect(5, 5, 90, 90).stroke('1 blue');
  * var rectBounds = rect.getBounds();
  * var label = anychart.elements.label();
- * label.position(anychart.utils.NinePositions.CENTER);
+ * label.position(anychart.enums.Position.CENTER);
  * label.parentBounds(rectBounds);
  * label.container(stage).draw();
  * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
  * @illustrationDesc
  * Blue area is an area set in {@link anychart.elements.Label#parentBounds}.<br/>
  * Red dot marks the <i>CENTER</i> of this area.
- * @param {(anychart.utils.NinePositions|string)=} opt_value [{@link anychart.utils.NinePositions}.LEFT_TOP] Value to set.
+ * @param {(anychart.enums.Position|string)=} opt_value [{@link anychart.enums.Position}.LEFT_TOP] Value to set.
  * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.NinePositions|string)=} opt_value .
- * @return {!anychart.elements.Label|anychart.utils.NinePositions} .
+ * @param {(anychart.enums.Position|string)=} opt_value .
+ * @return {!anychart.elements.Label|anychart.enums.Position} .
  */
 anychart.elements.Label.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeNinePositions(opt_value);
+    opt_value = anychart.enums.normalizePosition(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -967,14 +968,14 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
     parentWidth = this.parentBounds_.width;
     parentHeight = this.parentBounds_.height;
     if (goog.isDefAndNotNull(this.width_)) {
-      this.backgroundWidth_ = width = anychart.utils.normalize(/** @type {number|string} */(this.width_), parentWidth);
+      this.backgroundWidth_ = width = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
       autoWidth = false;
     } else {
       width = 0;
       autoWidth = true;
     }
     if (goog.isDefAndNotNull(this.height_)) {
-      this.backgroundHeight_ = height = anychart.utils.normalize(/** @type {number|string} */(this.height_), parentHeight);
+      this.backgroundHeight_ = height = anychart.utils.normalizeSize(/** @type {number|string} */(this.height_), parentHeight);
       autoHeight = false;
     } else {
       height = 0;
@@ -1031,8 +1032,8 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
     this.resumeSignalsDispatching(false);
   }
 
-  this.textX_ = anychart.utils.normalize(/** @type {number|string} */ (padding.left()), this.backgroundWidth_);
-  this.textY_ = anychart.utils.normalize(/** @type {number|string} */ (padding.top()), this.backgroundHeight_);
+  this.textX_ = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth_);
+  this.textY_ = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight_);
 };
 
 
@@ -1074,47 +1075,47 @@ anychart.elements.Label.prototype.draw = function() {
 
     if (this.parentBounds_) {
       switch (this.position_) {
-        case anychart.utils.NinePositions.LEFT_TOP:
+        case anychart.enums.Position.LEFT_TOP:
           position.x = parentX;
           position.y = parentY;
           break;
 
-        case anychart.utils.NinePositions.LEFT_CENTER:
+        case anychart.enums.Position.LEFT_CENTER:
           position.x = parentX;
           position.y = parentY + parentHeight / 2;
           break;
 
-        case anychart.utils.NinePositions.LEFT_BOTTOM:
+        case anychart.enums.Position.LEFT_BOTTOM:
           position.x = parentX;
           position.y = parentY + parentHeight;
           break;
 
-        case anychart.utils.NinePositions.TOP:
+        case anychart.enums.Position.CENTER_TOP:
           position.x = parentX + parentWidth / 2;
           position.y = parentY;
           break;
 
-        case anychart.utils.NinePositions.CENTER:
+        case anychart.enums.Position.CENTER:
           position.x = parentX + parentWidth / 2;
           position.y = parentY + parentHeight / 2;
           break;
 
-        case anychart.utils.NinePositions.BOTTOM:
+        case anychart.enums.Position.CENTER_BOTTOM:
           position.x = parentX + parentWidth / 2;
           position.y = parentY + parentHeight;
           break;
 
-        case anychart.utils.NinePositions.RIGHT_TOP:
+        case anychart.enums.Position.RIGHT_TOP:
           position.x = parentX + parentWidth;
           position.y = parentY;
           break;
 
-        case anychart.utils.NinePositions.RIGHT_CENTER:
+        case anychart.enums.Position.RIGHT_CENTER:
           position.x = parentX + parentWidth;
           position.y = parentY + parentHeight / 2;
           break;
 
-        case anychart.utils.NinePositions.RIGHT_BOTTOM:
+        case anychart.enums.Position.RIGHT_BOTTOM:
           position.x = parentX + parentWidth;
           position.y = parentY + parentHeight;
           break;
@@ -1131,8 +1132,8 @@ anychart.elements.Label.prototype.draw = function() {
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
 
-    var offsetX = goog.isDef(this.offsetX_) ? anychart.utils.normalize(this.offsetX_, parentWidth) : 0;
-    var offsetY = goog.isDef(this.offsetY_) ? anychart.utils.normalize(this.offsetY_, parentHeight) : 0;
+    var offsetX = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(this.offsetX_, parentWidth) : 0;
+    var offsetY = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(this.offsetY_, parentHeight) : 0;
     anychart.utils.applyOffsetByAnchor(position, this.anchor_, offsetX, offsetY);
 
     this.textX_ += position.x;
@@ -1306,8 +1307,8 @@ anychart.elements.Label.prototype.restoreDefaults = function() {
   this.height(null);
   this.padding(0);
   this.background(null);
-  this.position(anychart.utils.NinePositions.LEFT_TOP);
-  this.anchor(anychart.utils.NinePositions.LEFT_TOP);
+  this.position(anychart.enums.Position.LEFT_TOP);
+  this.anchor(anychart.enums.Anchor.LEFT_TOP);
   this.offsetX(0);
   this.offsetY(0);
   this.rotation(0);

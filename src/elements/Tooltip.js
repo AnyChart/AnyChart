@@ -1,6 +1,7 @@
 goog.provide('anychart.elements.Tooltip');
 goog.require('anychart.Base');
 goog.require('anychart.elements.TooltipItem');
+goog.require('anychart.enums');
 goog.require('anychart.utils.TooltipsContainer');
 
 
@@ -270,8 +271,8 @@ anychart.elements.Tooltip.prototype.offsetY = function(opt_value) {
 
 /**
  * Gets or sets Tooltip anchor settings.
- * @param {(anychart.utils.NinePositions|string)=} opt_value Tooltip anchor settings.
- * @return {!(anychart.elements.Tooltip|anychart.utils.NinePositions)} Tooltip anchor settings or itself for method chaining.
+ * @param {(anychart.enums.Anchor|string)=} opt_value Tooltip anchor settings.
+ * @return {!(anychart.elements.Tooltip|anychart.enums.Anchor)} Tooltip anchor settings or itself for method chaining.
  */
 anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
   this.maybeCreateTooltipItem_();
@@ -280,7 +281,7 @@ anychart.elements.Tooltip.prototype.anchor = function(opt_value) {
     this.item_.anchor(opt_value);
     return this;
   } else {
-    return /** @type {anychart.utils.NinePositions}*/ (this.item_.anchor());
+    return /** @type {anychart.enums.Anchor}*/ (this.item_.anchor());
   }
 };
 

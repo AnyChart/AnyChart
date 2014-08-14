@@ -1,6 +1,7 @@
 goog.provide('anychart.data.ConcatView');
 
 goog.require('anychart.data.View');
+goog.require('anychart.enums');
 goog.require('goog.array');
 
 
@@ -23,7 +24,7 @@ anychart.data.ConcatView = function(parentView, secondView) {
    */
   this.secondView_ = secondView;
 
-  secondView.listen(anychart.Base.SIGNAL, this.parentViewChangedHandler, false, this);
+  secondView.listen(anychart.enums.EventType.SIGNAL, this.parentViewChangedHandler, false, this);
 };
 goog.inherits(anychart.data.ConcatView, anychart.data.View);
 

@@ -1,5 +1,5 @@
 goog.provide('anychart.utils.PrintHelper');
-
+goog.require('acgraph');
 goog.require('goog.Disposable');
 goog.require('goog.Uri.QueryData');
 goog.require('goog.dom');

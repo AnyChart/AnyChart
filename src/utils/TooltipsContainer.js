@@ -1,4 +1,5 @@
 goog.provide('anychart.utils.TooltipsContainer');
+goog.require('acgraph');
 goog.require('anychart.elements.TooltipItem');
 goog.require('goog.Disposable');
 goog.require('goog.array');
