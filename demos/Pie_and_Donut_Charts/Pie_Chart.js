@@ -1,32 +1,13 @@
 anychart.onDocumentReady(function() {
 
-  //create pie chart with passed data
-  var chart = anychart.pieChart([
-    ['Product A', 1222],
-    ['Product B', 2431],
-    ['Product C', 3624],
-    ['Product D', 5243],
-    ['Product E', 8813]
+  chart = anychart.pieChart([
+    ['Chocolate paste', 5],
+    ['White honey', 2],
+    ['Strawberry jam', 2],
+    ['Сondensed milk', 1]
   ]);
-
-  //set container id for the chart
+  chart.title().text('The kind of pancakes preferred at the Sochi 2014 Olympic Games');
   chart.container('container');
-
-  //set chart title text settings
-  chart.title().text('Pie Chart');
-
-  //enable legend title and title separator
-  chart.legend().title().enabled(true);
-  chart.legend().titleSeparator().enabled(true);
-
-  //set legend title text settings
-  chart.legend().title().text('Products Sales');
-
-  //set legend position and items layout
-  chart.legend().position('bottom');
-  chart.legend().itemsLayout('horizontal');
-  chart.legend().align('center');
-
-  //initiate chart drawing
   chart.draw();
+
 });

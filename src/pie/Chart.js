@@ -178,10 +178,10 @@ anychart.pie.Chart = function(opt_data) {
   tooltip.isFloating(true);
   tooltip.content().useHtml(true);
   tooltip.titleFormatter(function() {
-    return this['name'];
+    return this['x'] || this['name'];
   });
   tooltip.contentFormatter(function() {
-    return this['name'] + '<br>' + this['value'];
+    return (this['x'] || this['name']) + '<br>' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
 
@@ -1581,11 +1581,14 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
   var data = [];
   var iterator = this.getIterator().reset();
 
+
   while (iterator.advance()) {
     var index = iterator.getIndex();
+    var x = iterator.get('x');
+
     data.push({
       'index': index,
-      'text': iterator.get('name') || 'Point - ' + index,
+      'text': iterator.get('name') || (goog.isNumber(x) ? 'Point - ' + index : x),
       'iconType': anychart.enums.LegendItemIconType.CIRCLE,
       'iconStroke': 'none',
       'iconFill': this.getFillColor(true, false),
