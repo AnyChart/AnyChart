@@ -370,9 +370,17 @@ anychart.cartesian.series.OHLC.prototype.calculateStatistics = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.OHLC.prototype.getType = function() {
+  return anychart.cartesian.series.Type.OHLC;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.OHLC;
+  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.risingStroke())) {
     if (window.console) {

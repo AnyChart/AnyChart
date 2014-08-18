@@ -72,9 +72,17 @@ anychart.cartesian.series.Line.prototype.strokeInternal = (function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Line.prototype.getType = function() {
+  return anychart.cartesian.series.Type.LINE;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.LINE;
+  json['seriesType'] = this.getType();
   return json;
 };
 

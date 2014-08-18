@@ -485,9 +485,17 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(h
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Candlestick.prototype.getType = function() {
+  return anychart.cartesian.series.Type.CANDLESTICK;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.CANDLESTICK;
+  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.risingFill())) {
     if (window.console) {

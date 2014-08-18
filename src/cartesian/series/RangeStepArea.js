@@ -126,9 +126,17 @@ anychart.cartesian.series.RangeStepArea.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.RangeStepArea.prototype.getType = function() {
+  return anychart.cartesian.series.Type.RANGE_STEP_AREA;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.RangeStepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.RANGE_STEP_AREA;
+  json['seriesType'] = this.getType();
   return json;
 };
 

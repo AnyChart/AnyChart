@@ -105,9 +105,17 @@ anychart.cartesian.series.RangeColumn.prototype.calculateStatistics = function()
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.RangeColumn.prototype.getType = function() {
+  return anychart.cartesian.series.Type.RANGE_COLUMN;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.RangeColumn.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.RANGE_COLUMN;
+  json['seriesType'] = this.getType();
   return json;
 };
 

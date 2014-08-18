@@ -1,17 +1,25 @@
-anychart.onDocumentLoad(function() {
-  var data = new anychart.data.Set([
-    ['January', 10000],
-    ['February', 12000],
-    ['March', 18000],
-    ['April', 11000],
-    ['May', 9000]
-  ]);
-  chart = anychart.areaChart(data);
-  var series= chart.area(data);
-  series.labels().enabled(true).rotation(90).offsetX(20).textFormatter(function(point){
-    return point.x;
-  });
-  series.tooltip().enabled(true).title().enabled(true).text('Your Tooltip Title');
-  chart.container('container').draw();
+var chart, s1;
+anychart.onDocumentReady(function() {
 
-})
+  var dataSet = anychart.data.set([
+    ['P1' , '322', '242', '162'],
+    ['P2' , '324', '254', '90'],
+    ['P3' , '329', '226', '50'],
+    ['P4' , '342', '232', '77'],
+    ['P5' , '348', '268', '35']
+  ]);
+
+  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+
+  chart = anychart.columnChart();
+  chart.container('container');
+
+  s1 = chart.column(seriesData_1).fill('orange .4');//.hatchFill('diagonalcross');
+  chart.column(seriesData_2).fill('red .3');//.hatchFill('diagonalbrick');
+  chart.column(seriesData_3).fill('green .7').hatchFill('horizontal');
+
+  chart.legend().enabled(true);
+  chart.draw();
+});

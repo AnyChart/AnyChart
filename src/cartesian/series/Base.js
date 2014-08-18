@@ -1944,10 +1944,11 @@ anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
   return {
     'index': this.index_,
     'text': goog.isDef(this.name_) ? this.name_ : 'Series: ' + this.index_,
-    'iconType': null,
+    'iconType': this.getType() || anychart.enums.LegendItemIconType.SQUARE,
     'iconStroke': this.getFinalStroke(false, false),
     'iconFill': this.getFinalFill(false, false),
-    'iconMarker': null,
+    'iconHatchFill': this.getFinalHatchFill(false, false),
+    'iconMarker': (this.markers() && this.markers().enabled()) ? this.autoMarkerType : null,
     'meta': this.meta_
   };
 };
@@ -1966,6 +1967,13 @@ anychart.cartesian.series.Base.prototype.restoreDefaults = function() {
 
   return this;
 };
+
+
+/**
+ * Returns type of current series.
+ * @return {string} Series type.
+ */
+anychart.cartesian.series.Base.prototype.getType = goog.abstractMethod;
 
 
 /**

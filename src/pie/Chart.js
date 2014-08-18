@@ -1589,9 +1589,10 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     data.push({
       'index': index,
       'text': iterator.get('name') || (goog.isNumber(x) ? 'Point - ' + index : x),
-      'iconType': anychart.enums.LegendItemIconType.CIRCLE,
+      'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'iconStroke': 'none',
       'iconFill': this.getFillColor(true, false),
+      'iconHatchFill': this.getFinalHatchFill(true, false),
       'iconMarker': null
     });
   }
@@ -1779,6 +1780,22 @@ anychart.pie.Chart.prototype.serialize = function() {
   if (!goog.isFunction(hoverFill)) chart['hoverFill'] = hoverFill;
   if (!goog.isFunction(hoverStroke)) chart['hoverStroke'] = hoverStroke;
 
+  if (goog.isFunction(this.hatchFill())) {
+    if (window.console) {
+      window.console.log('Warning: We can not serialize hatchFill function, please reset it manually.');
+    }
+  } else {
+    json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+  }
+
+  if (goog.isFunction(this.hoverHatchFill())) {
+    if (window.console) {
+      window.console.log('Warning: We can not serialize hoverHatchFill function, please reset it manually.');
+    }
+  } else {
+    json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverHatchFill()));
+  }
+
   if (data) chart['data'] = data.serialize();
 
   if (this.labels_) chart['labels'] = this.labels_.serialize();
@@ -1818,6 +1835,8 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.stroke(stroke);
   this.hoverFill(hoverFill);
   this.hoverStroke(hoverStroke);
+  this.hatchFill(config['hatchFill']);
+  this.hoverHatchFill(config['hoverHatchFill']);
   this.labels(labels);
 
   this.resumeSignalsDispatching(false);

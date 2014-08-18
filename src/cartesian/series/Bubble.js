@@ -791,9 +791,17 @@ anychart.cartesian.series.Base.prototype.getFinalNegativeHatchFill = function(ho
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Bubble.prototype.getType = function() {
+  return anychart.cartesian.series.Type.BUBBLE;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.BUBBLE;
+  json['seriesType'] = this.getType();
   json['minimumSize'] = this.minimumSize();
   json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();

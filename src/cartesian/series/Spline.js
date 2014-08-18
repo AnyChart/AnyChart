@@ -96,9 +96,17 @@ anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Spline.prototype.getType = function() {
+  return anychart.cartesian.series.Type.SPLINE;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Spline.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.SPLINE;
+  json['seriesType'] = this.getType();
   return json;
 };
 

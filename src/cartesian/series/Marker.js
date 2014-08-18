@@ -466,9 +466,17 @@ anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Marker.prototype.getType = function() {
+  return anychart.cartesian.series.Type.MARKER;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.MARKER;
+  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.type())) {
     if (window.console) {

@@ -96,9 +96,17 @@ anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.StepLine.prototype.getType = function() {
+  return anychart.cartesian.series.Type.STEP_LINE;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.StepLine.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.STEP_LINE;
+  json['seriesType'] = this.getType();
   return json;
 };
 

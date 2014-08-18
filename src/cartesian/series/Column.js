@@ -69,9 +69,17 @@ anychart.cartesian.series.Column.prototype.drawSubsequentPoint = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Column.prototype.getType = function() {
+  return anychart.cartesian.series.Type.COLUMN;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Column.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.COLUMN;
+  json['seriesType'] = this.getType();
   return json;
 };
 

@@ -124,9 +124,17 @@ anychart.cartesian.series.Area.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Area.prototype.getType = function() {
+  return anychart.cartesian.series.Type.AREA;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Area.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.AREA;
+  json['seriesType'] = this.getType();
   return json;
 };
 

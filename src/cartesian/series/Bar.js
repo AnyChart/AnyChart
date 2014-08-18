@@ -71,9 +71,17 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.Bar.prototype.getType = function() {
+  return anychart.cartesian.series.Type.BAR;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.Bar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.BAR;
+  json['seriesType'] = this.getType();
   return json;
 };
 

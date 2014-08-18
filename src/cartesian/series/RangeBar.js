@@ -90,9 +90,17 @@ anychart.cartesian.series.RangeBar.prototype.createPositionProvider = function(p
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.RangeBar.prototype.getType = function() {
+  return anychart.cartesian.series.Type.RANGE_BAR;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.RangeBar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.RANGE_BAR;
+  json['seriesType'] = this.getType();
   return json;
 };
 

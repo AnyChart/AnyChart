@@ -693,6 +693,7 @@ anychart.elements.Legend.prototype.moveTooltip = function(event) {
     'iconType': item.iconType(),
     'iconStroke': item.iconStroke(),
     'iconFill': item.iconFill(),
+    'iconHatchFill': item.iconHatchFill(),
     'iconMarker': item.iconMarker(),
     'meta': this.legendItemsMeta_[index]
   };
@@ -912,6 +913,7 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       item.iconType(provider['iconType'] ? provider['iconType'] : anychart.enums.LegendItemIconType.SQUARE);
       item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
       item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
+      item.iconHatchFill(provider['iconHatchFill'] ? provider['iconHatchFill'] : null);
       item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : 'none');
 
       item.text(provider['text'] ? provider['text'] : 'Item ' + i);
@@ -1655,6 +1657,7 @@ anychart.elements.Legend.prototype.deserialize = function(config) {
  *    iconType: (string|null|undefined),
  *    iconStroke: (acgraph.vector.Stroke|null|undefined),
  *    iconFill: (acgraph.vector.Fill|null|undefined),
+ *    iconHatchFill: (acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|null|undefined),
  *    iconMarker: (string|null|undefined),
  *    meta: (Object|null|undefined)
  * }}

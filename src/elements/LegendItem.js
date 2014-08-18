@@ -44,6 +44,7 @@ anychart.elements.LegendItem = function() {
   this.y(0);
   this.iconType(anychart.enums.LegendItemIconType.SQUARE);
   this.iconFill('black');
+  this.iconHatchFill(null);
   this.iconStroke('none');
   this.iconMarker(null);
   this.iconTextSpacing(5);
@@ -476,6 +477,23 @@ anychart.elements.LegendItem.prototype.iconStroke = function(opt_value) {
 
 
 /**
+ * Getter/setter for icon fill setting.
+ * @param {(acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill)=} opt_value Icon fill setting.
+ * @return {(acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|string|anychart.elements.LegendItem)} Icon fill setting or self for method chaining.
+ */
+anychart.elements.LegendItem.prototype.iconHatchFill = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.iconHatchFill_ != opt_value) {
+      this.iconHatchFill_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconHatchFill_;
+};
+
+
+/**
  * Getter/setter for marker type.
  * Usable with line, spline, step line icon types.
  * @param {?string=} opt_value Marker type.
@@ -731,7 +749,19 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.icon_ = this.layer_.path();
     this.registerDisposable(this.icon_);
     this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.icon_.translate(0, 0);
+  }
+
+  var needHatch = goog.isDef(this.iconHatchFill_) && (!anychart.utils.isNone(this.iconHatchFill_) && !this.hatch_);
+  if (needHatch) {
+    /**
+     * Legend icon hatchFill path.
+     * @type {acgraph.vector.Path}
+     * @private
+     */
+    this.hatch_ = this.layer_.path();
+    this.registerDisposable(this.hatch_);
+    this.hatch_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+    this.hatch_.stroke('none');
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -753,16 +783,22 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.applyTextSettings(this.textElement_, isInitial);
     if (this.redrawIcon_ && !isInitial) {
       drawer.call(this, this.icon_, this.iconSize_);
+      if (this.hatch_)
+        drawer.call(this, this.hatch_, this.iconSize_);
       this.redrawIcon_ = false;
     }
     this.icon_.fill(this.iconFill_);
     this.icon_.stroke(this.iconStroke_);
+    if (this.hatch_)
+      this.hatch_.fill(this.iconHatchFill_);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateBounds_();
     drawer.call(this, this.icon_, this.iconSize_);
+    if (this.hatch_)
+      drawer.call(this, this.hatch_, this.iconSize_);
     this.redrawIcon_ = false;
     this.textElement_.x(/** @type {number} */(this.iconSize_ + this.iconTextSpacing_));
     this.textElement_.y(0);
@@ -789,6 +825,7 @@ anychart.elements.LegendItem.prototype.serialize = function() {
 
   json['iconFill'] = this.iconFill();
   json['iconStroke'] = this.iconStroke();
+  json['iconHatchFill'] = this.iconHatchFill();
   json['iconMarker'] = this.iconMarker();
   json['iconTextSpacing'] = this.iconTextSpacing();
   json['maxWidth'] = this.maxWidth();
@@ -812,6 +849,7 @@ anychart.elements.LegendItem.prototype.deserialize = function(config) {
   this.iconType(config['iconType']);
   this.iconFill(config['iconFill']);
   this.iconStroke(config['iconStroke']);
+  this.iconHatchFill(config['iconHatchFill']);
   this.iconMarker(config['iconMarker']);
   this.iconTextSpacing(config['iconTextSpacing']);
   this.maxWidth(config['maxWidth']);
@@ -924,6 +962,7 @@ anychart.elements.LegendItem.prototype['y'] = anychart.elements.LegendItem.proto
 anychart.elements.LegendItem.prototype['iconType'] = anychart.elements.LegendItem.prototype.iconType;
 anychart.elements.LegendItem.prototype['iconFill'] = anychart.elements.LegendItem.prototype.iconFill;
 anychart.elements.LegendItem.prototype['iconStroke'] = anychart.elements.LegendItem.prototype.iconStroke;
+anychart.elements.LegendItem.prototype['iconHatchFill'] = anychart.elements.LegendItem.prototype.iconHatchFill;
 anychart.elements.LegendItem.prototype['iconTextSpacing'] = anychart.elements.LegendItem.prototype.iconTextSpacing;
 anychart.elements.LegendItem.prototype['maxWidth'] = anychart.elements.LegendItem.prototype.maxWidth;
 anychart.elements.LegendItem.prototype['maxHeight'] = anychart.elements.LegendItem.prototype.maxHeight;

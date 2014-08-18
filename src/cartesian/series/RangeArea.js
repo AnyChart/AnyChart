@@ -101,9 +101,17 @@ anychart.cartesian.series.RangeArea.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.RangeArea.prototype.getType = function() {
+  return anychart.cartesian.series.Type.RANGE_AREA;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.RangeArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.RANGE_AREA;
+  json['seriesType'] = this.getType();
   return json;
 };
 

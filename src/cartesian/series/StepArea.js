@@ -153,9 +153,17 @@ anychart.cartesian.series.StepArea.prototype.finalizeSegment = function() {
 /**
  * @inheritDoc
  */
+anychart.cartesian.series.StepArea.prototype.getType = function() {
+  return anychart.cartesian.series.Type.STEP_AREA;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.cartesian.series.StepArea.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = anychart.cartesian.series.Type.STEP_AREA;
+  json['seriesType'] = this.getType();
   return json;
 };
 
