@@ -567,9 +567,41 @@ anychart.Chart.prototype.onLegendSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Create chart label.
+ * Getter for chart label.
+ * @param {(string|null)=} opt_index [0] Index of instance.
+ * @return {!anychart.elements.Label} An instance of {@link anychart.elements.Label} for method chaining.
+ *//**
+ * Setter for chart label.
+ * @example <t>lineChart</t>
+ * chart.line([1, 2, 1.3, 2.9]);
+ * chart.label(
+ *   anychart.elements.label()
+ *        .text('custom text')
+ * );
+ * @param {(anychart.elements.Label|Object|string|null)=} opt_value Chart label instance to add by index 0.
+ * @return {!anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
+ *//**
+ * Setter for chart label.
+ * @example <t>lineChart</t>
+ * chart.line([1, 2, 1.3, 2.9]);
+ * chart.label(0,
+ *     anychart.elements.label().text('Left chart label')
+ * );
+ * chart.label(1,
+ *     anychart.elements.label()
+ *         .text('Right chart label')
+ *         .position('centertop')
+ *         .position('righttop')
+ *         .anchor('righttop')
+ * );
+ * chart.container(stage).draw();
+ * @param {(string|null)=} opt_index Index of instance.
+ * @param {(anychart.elements.Label|Object|string|null)=} opt_value  Chart label instance.
+ * @return {!anychart.Chart} An instance of {@link anychart.Chart} for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Label|Object|string|number|null)=} opt_indexOrValue Chart label instance to add.
- * @param {anychart.elements.Label=} opt_value Chart label instance.
+ * @param {(anychart.elements.Label|Object|string|null)=} opt_value Chart label instance.
  * @return {!(anychart.elements.Label|anychart.Chart)} Chart label instance or itself for chaining call.
  */
 anychart.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
@@ -1061,7 +1093,7 @@ anychart.Chart.prototype['background'] = anychart.Chart.prototype.background;//d
 anychart.Chart.prototype['margin'] = anychart.Chart.prototype.margin;//doc|ex
 anychart.Chart.prototype['padding'] = anychart.Chart.prototype.padding;//doc|ex
 anychart.Chart.prototype['legend'] = anychart.Chart.prototype.legend;//doc|ex
-anychart.Chart.prototype['label'] = anychart.Chart.prototype.label;
+anychart.Chart.prototype['label'] = anychart.Chart.prototype.label;//doc|ex
 anychart.Chart.prototype['credits'] = anychart.Chart.prototype.credits;//doc|ex
 anychart.Chart.prototype['draw'] = anychart.Chart.prototype.draw;//doc
 anychart.Chart.prototype['toJson'] = anychart.Chart.prototype.toJson;//|need-ex
