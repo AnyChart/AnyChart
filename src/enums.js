@@ -558,8 +558,20 @@ anychart.enums.getMarkerDrawer = function(type) {
  * @enum {string}
  */
 anychart.enums.MapAsTableMode = {
+  /**
+   * Single values.<br/>
+   * Means, that each series is represented by one column in the table + shared X column (own Y values).
+   */
   VALUE: 'value',
+  /**
+   * High-Low values.<br/>
+   * Means, that each series is represented by two columns per series + shared X.
+   */
   RANGE: 'range',
+  /**
+   * Open-High-Low-Close values.<br/>
+   * Means, that each series is represented by four columns per series + shared X.
+   */
   OHLC: 'ohlc'
 };
 
@@ -1034,9 +1046,9 @@ goog.exportSymbol('anychart.enums.MarkerType.STAR6', anychart.enums.MarkerType.S
 goog.exportSymbol('anychart.enums.MarkerType.STAR7', anychart.enums.MarkerType.STAR7);
 goog.exportSymbol('anychart.enums.MarkerType.STAR10', anychart.enums.MarkerType.STAR10);
 
-goog.exportSymbol('anychart.enums.MapAsTableMode.VALUE', anychart.enums.MapAsTableMode.VALUE);
-goog.exportSymbol('anychart.enums.MapAsTableMode.RANGE', anychart.enums.MapAsTableMode.RANGE);
-goog.exportSymbol('anychart.enums.MapAsTableMode.OHLC', anychart.enums.MapAsTableMode.OHLC);
+goog.exportSymbol('anychart.enums.MapAsTableMode.VALUE', anychart.enums.MapAsTableMode.VALUE);//doc
+goog.exportSymbol('anychart.enums.MapAsTableMode.RANGE', anychart.enums.MapAsTableMode.RANGE);//doc
+goog.exportSymbol('anychart.enums.MapAsTableMode.OHLC', anychart.enums.MapAsTableMode.OHLC);//doc
 
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TREE', anychart.enums.TreeFillingMethod.AS_TREE);
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TABLE', anychart.enums.TreeFillingMethod.AS_TABLE);

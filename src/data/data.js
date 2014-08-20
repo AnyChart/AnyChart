@@ -12,17 +12,16 @@ goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 
 /**
- Classes for handling data structures/sources<br/>
- The following data types/hierarchy is supported:
- <ul>
-  <li>Linear ({@link anychart.data.Set})</li>
-  <li>Tree ({@link anychart.data.Tree})</li>
-  <li>Table ({@link anychart.data.Table})</li>
- </ul>
- You can map any of these data sets to ({@link anychart.data.View}), and then
- work with it using {@link anychart.data.Iterator} iterator.
- @namespace
- @name anychart.data
+ * Classes for handling data structures/sources<br/>
+ * The following data types/hierarchy is supported:
+ * <ul>
+ *  <li>Linear ({@link anychart.data.Set} and {@link anychart.data.Table})</li>
+ *  <li>Tree ({@link anychart.data.Tree})</li>
+ * </ul>
+ * You can map any of these data sets to ({@link anychart.data.View}), and then
+ * work with it using {@link anychart.data.Iterator} iterator.
+ * @namespace
+ * @name anychart.data
  */
 
 
@@ -31,10 +30,32 @@ goog.require('anychart.enums');
  * The function treats the table as a source for several series of points, that have the same X value.
  * Each row of the table is treated as a bunch of points, one for each series. Column number 0 is treated as an X value.
  * Other columns (number per series depends on the opt_mode) are treated as data values.
+ * @example <t>lineChart</t>
+ * var data = [
+ *   ['A1', 100, 200, 150, 115],
+ *   ['A2', 115, 101, 175, 230],
+ *   ['A3', 70, 60, 125, 100],
+ *   ['A4', 156, 98, 150, 180],
+ *   ['A5', 213, 150, 160, 210],
+ *   ['A6', '173', '205', '150', '140'],
+ *   ['A7', 95, 190, 140, 60]
+ * ];
+ * var series = anychart.data.mapAsTable(data, 'range');
+ * for (var i in series) {
+ *   chart.rangeColumn(series[i]);
+ * };
+ * @example <c>Lifehack using .apply()</c>
+ * var data = [
+ *   ['A1', 100, 200, 150, 115],
+ *   ['A2', 115, 101, 175, 230],
+ *   ['A3', 70, 60, 125, 100],
+ *   ['A4', 156, 98, 150, 180]
+ * ];
+ * anychart.lineChart
+ *     .apply(this, anychart.data.mapAsTable(data))
+ *     .container(stage).draw();
  * @param {Array.<Array.<*>>} data Source data table.
- * @param {(anychart.enums.MapAsTableMode|string)=} opt_mode Mapping mode. VALUE means, that each series
- *    is represented by one column in the table + shared X column (own Y values), RANGE means two columns per series
- *    + shared X column (high and low values) and OHLC means four columns per series + shared X (open, high, low, close).
+ * @param {(anychart.enums.MapAsTableMode|string)=} opt_mode Mapping mode.
  * @param {number=} opt_seriesCount Explicit number of series to make mapping for. If not set, auto-determination by
  *    the first table row is used.
  * @return {!Array.<anychart.data.Mapping>} Returns an array of mappings, one per series.
@@ -103,4 +124,4 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
 
 
 //exports
-goog.exportSymbol('anychart.data.mapAsTable', anychart.data.mapAsTable);
+goog.exportSymbol('anychart.data.mapAsTable', anychart.data.mapAsTable);//doc|ex
