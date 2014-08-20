@@ -54,13 +54,15 @@ anychart.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * Sets bounds of the element using one parameter.<br/>
  * @example <t>lineChart</t>
- * chart.bounds( anychart.math.rect(10, 10, 100, 100) );
+ * chart.line([1, 1.8, 1.2, 2.8]);
+ * chart.bounds( anychart.math.rect(10, 10, 350, 250) );
  * @param {(anychart.utils.RectObj|anychart.math.Rect|anychart.utils.Bounds)=} opt_value Bounds of element.
  * @return {!anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
  * Setter for the element bounds settings.
  * @example <t>lineChart</t>
- * chart.bounds(0, 50, '50%', '200px');
+ * chart.spline([1, 1.8, 1.2, 2.8]);
+ * chart.bounds(0, 50, '50%', '250px');
  * @param {(number|string)=} opt_x X-coordinate.
  * @param {(number|string)=} opt_y Y-coordinate.
  * @param {(number|string)=} opt_width Width.
@@ -94,6 +96,7 @@ anychart.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, opt_y, 
  *//**
  * Sets element left.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.left('20%');
  * @param {(number|string|null)=} opt_value Left bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -117,6 +120,7 @@ anychart.VisualBaseWithBounds.prototype.left = function(opt_value) {
  *//**
  * Sets element right.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.right('20%');
  * @param {(number|string|null)=} opt_value Right bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -140,6 +144,7 @@ anychart.VisualBaseWithBounds.prototype.right = function(opt_value) {
  *//**
  * Sets element top.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.top('20%');
  * @param {(number|string|null)=} opt_value Top bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -163,6 +168,7 @@ anychart.VisualBaseWithBounds.prototype.top = function(opt_value) {
  *//**
  * Sets element bottom.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.bottom('20%');
  * @param {(number|string|null)=} opt_value Bottom bound settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -186,6 +192,7 @@ anychart.VisualBaseWithBounds.prototype.bottom = function(opt_value) {
  *//**
  * Sets element width.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.width('80%');
  * @param {(number|string|null)=} opt_value Width settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -209,6 +216,7 @@ anychart.VisualBaseWithBounds.prototype.width = function(opt_value) {
  *//**
  * Sets element height.
  * @example <t>lineChart</t>
+ * chart.spline([1, 1.8, 1.2, 2.8]);
  * chart.height('80%');
  * @param {(number|string|null)=} opt_value Height settings for the element.
  * @return {!anychart.VisualBaseWithBounds} Returns self for method chaining.
@@ -241,13 +249,16 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
  * element.bounds(0, 10, 200, 300);
  * element.pixelBounds(); // returns Rect with size: 200x300
  * // container size: 400 x 100
- * element.bounds(0, 10, '50%', '57%');
+ * element.bounds(0, 10, '60%', '67%');
  * element.pixelBounds(400, 100); // returns Rect with size: 200x57
  * @example <c>Using setter</c><t>listingOnly</t>
- * var rect = anychart.math.rect( 0, 0, 100, 100);
+ * var rect = anychart.math.rect(0, 0, 350, 250);
  * element.pixelBounds(rect);
  * element.pixelBounds(); // returns the value of variable rect.
  * element.pixelBounds(400, 100); // returns the value of variable rect.
+ * @example <t>lineChart</t>
+ * chart.line([1, 1.8, 1.2, 2.8]);
+ * chart.pixelBounds(350, 250);
  * @param {number=} opt_containerWidth The width of a container in pixels.
  * @param {number=} opt_containerHeight Height of a container in pixels.
  * @return {!anychart.math.Rect} Returns the rect with determined pixel bounds.
@@ -256,7 +267,8 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
  * <b>Note:</b> If you pass <b>null</b> then previous value is reset
  * and bounds are autocalculated.
  * @example <t>lineChart</t>
- * chart.pixelBounds( anychart.math.rect( 0, 0, 100, 100) );
+ * chart.spline([1, 1.8, 1.2, 2.8]);
+ * chart.pixelBounds( anychart.math.rect(0, 0, 350, 250) );
  * @param {(!anychart.math.Rect|null)=} opt_value Value to set.
  * @return {!anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
