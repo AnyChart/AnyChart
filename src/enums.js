@@ -847,14 +847,14 @@ anychart.enums.normalizeTextMarkerAlign = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  TicksPosition
+//  SidePosition
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Ticks position (inside ot outside).
  * @enum {string}
  */
-anychart.enums.TicksPosition = {
+anychart.enums.SidePosition = {
   /**
    * Inside a chart, no matter where an axis is.
    */
@@ -869,24 +869,24 @@ anychart.enums.TicksPosition = {
 /**
  * Normalizes ticks position
  * @param {*} value Ticks position to normalize.
- * @param {anychart.enums.TicksPosition=} opt_default Custom default value (defaults to OUTSIDE).
- * @return {anychart.enums.TicksPosition}
+ * @param {anychart.enums.SidePosition=} opt_default Custom default value (defaults to OUTSIDE).
+ * @return {anychart.enums.SidePosition}
  */
-anychart.enums.normalizeTicksPosition = function(value, opt_default) {
+anychart.enums.normalizeSidePosition = function(value, opt_default) {
   value = (String(value)).toLowerCase();
   switch (value) {
     case 'inside':
     case 'in':
     case 'i':
     case 'inner':
-      return anychart.enums.TicksPosition.INSIDE;
+      return anychart.enums.SidePosition.INSIDE;
     case 'outside':
     case 'out':
     case 'o':
     case 'outer':
-      return anychart.enums.TicksPosition.OUTSIDE;
+      return anychart.enums.SidePosition.OUTSIDE;
   }
-  return opt_default || anychart.enums.TicksPosition.OUTSIDE;
+  return opt_default || anychart.enums.SidePosition.OUTSIDE;
 };
 
 
@@ -1085,8 +1085,8 @@ goog.exportSymbol('anychart.enums.TextMarkerAlign.CENTER', anychart.enums.TextMa
 goog.exportSymbol('anychart.enums.TextMarkerAlign.NEAR', anychart.enums.TextMarkerAlign.NEAR);
 goog.exportSymbol('anychart.enums.TextMarkerAlign.FAR', anychart.enums.TextMarkerAlign.FAR);
 
-goog.exportSymbol('anychart.enums.TicksPosition.INSIDE', anychart.enums.TicksPosition.INSIDE);//in docs/
-goog.exportSymbol('anychart.enums.TicksPosition.OUTSIDE', anychart.enums.TicksPosition.OUTSIDE);//in docs/
+goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
+goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/
 
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OUT', anychart.enums.EventType.POINT_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OVER', anychart.enums.EventType.POINT_MOUSE_OVER);

@@ -639,6 +639,15 @@ anychart.elements.LabelsFactory.prototype.getLabel = function(index) {
 
 
 /**
+ * Labels count
+ * @return {number}
+ */
+anychart.elements.LabelsFactory.prototype.labelsCount = function() {
+  return this.labels_ ? this.labels_.length : 0;
+};
+
+
+/**
  * Возвращает объект с состояниями изменений настроек.
  * @return {!Object.<boolean>}
  */
@@ -767,12 +776,13 @@ anychart.elements.LabelsFactory.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Возвращает размеры лейбла.
- * @param {*} formatProvider Object witch provide info for textFormatter function.
- * @param {*} positionProvider Object witch provide info for positionFormatter function.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
+ * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * @param {Object=} opt_settings .
  * @return {anychart.math.Rect} Label bounds.
  * @private
  */
-anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvider, positionProvider) {
+anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
   var text;
   var textElementBounds;
   var textWidth;
@@ -783,8 +793,24 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   var isHeightSet;
   var parentWidth;
   var parentHeight;
+  var formatProvider;
+  var positionProvider;
 
   if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
+
+  if (!this.measureCustomLabel_) this.measureCustomLabel_ = new anychart.elements.LabelsFactory.Label();
+  else this.measureCustomLabel_.clear();
+
+  if (formatProviderOrLabel instanceof anychart.elements.LabelsFactory.Label) {
+    var label = (/** @type {anychart.elements.LabelsFactory.Label} */(formatProviderOrLabel));
+    this.measureCustomLabel_.deserialize(label.serialize());
+    formatProvider = label.formatProvider();
+    positionProvider = opt_positionProvider || label.positionProvider() || {'value' : {'x': 0, 'y': 0}};
+  } else {
+    formatProvider = formatProviderOrLabel;
+    positionProvider = opt_positionProvider || {'value' : {'x': 0, 'y': 0}};
+  }
+  this.measureCustomLabel_.setSettings(opt_settings);
 
   text = this.textFormatter_.call(formatProvider, formatProvider);
   this.measureTextElement_.width(null);
@@ -799,14 +825,15 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
     parentHeight = this.parentBounds_.height;
   }
 
-  var padding = this.padding();
-  var widthSettings = this.width();
-  var heightSettings = this.height();
-  var offsetY = /** @type {number|string} */(this.offsetY());
-  var offsetX = /** @type {number|string} */(this.offsetX());
-  var anchor = /** @type {string} */(this.anchor());
+  var padding = this.measureCustomLabel_.padding() || this.padding();
+  var widthSettings = this.measureCustomLabel_.width() || this.width();
+  var heightSettings = this.measureCustomLabel_.height() || this.height();
+  var offsetY = /** @type {number|string} */(this.measureCustomLabel_.offsetY() || this.offsetY());
+  var offsetX = /** @type {number|string} */(this.measureCustomLabel_.offsetX() || this.offsetX());
+  var anchor = /** @type {string} */(this.measureCustomLabel_.anchor() || this.anchor());
 
   this.applyTextSettings(this.measureTextElement_, true);
+  this.measureCustomLabel_.applyTextSettings(this.measureTextElement_, false);
 
   //define is width and height setted from settings
   isWidthSet = !goog.isNull(widthSettings);
@@ -864,12 +891,13 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
 
 /**
  * Measure labels using formatProvider, positionProvider and returns labels bounds.
- * @param {*} formatProvider Object witch provide info for textFormatter function.
- * @param {*} positionProvider Object witch provide info for positionFormatter function.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
+ * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * @param {Object=} opt_settings .
  * @return {anychart.math.Rect} Labels bounds.
  */
-anychart.elements.LabelsFactory.prototype.measure = function(formatProvider, positionProvider) {
-  var arr = this.measureWithTransform(formatProvider, positionProvider);
+anychart.elements.LabelsFactory.prototype.measure = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
+  var arr = this.measureWithTransform(formatProviderOrLabel, opt_positionProvider, opt_settings);
   /** @type {anychart.math.Rect} */
   var rect = new anychart.math.Rect(0, 0, 0, 0);
   var outerBounds = new anychart.math.Rect(arr[0], arr[1], 0, 0);
@@ -886,13 +914,14 @@ anychart.elements.LabelsFactory.prototype.measure = function(formatProvider, pos
 /**
  * Измеряет лейбл в его системе коррдинат и возвращает баунды как массив точек с координатами в системе координат
  * родителя.
- * @param {*} formatProvider Object witch provide info for textFormatter function.
- * @param {*} positionProvider Object witch provide info for positionFormatter function.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
+ * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * @param {Object=} opt_settings .
  * @return {Array.<number>} Возвращает набор точек, образующих баунды лейбла, в его системе
  * координат.
  */
-anychart.elements.LabelsFactory.prototype.measureWithTransform = function(formatProvider, positionProvider) {
-  var bounds = this.getDimension_(formatProvider, positionProvider);
+anychart.elements.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
+  var bounds = this.getDimension_(formatProviderOrLabel, opt_positionProvider, opt_settings);
   var rotationAngle = /** @type {number} */(this.rotation());
 
   var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(this.anchor()));
@@ -1604,8 +1633,9 @@ anychart.elements.LabelsFactory.Label.prototype.setSettings = function(opt_setti
   }
   if (goog.isDef(opt_settings2)) this.superSettingsObj = opt_settings2;
 
-  this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ENABLED,
-      anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_settings1) || goog.isDef(opt_settings2))
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ENABLED,
+        anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
   return this;
 };
 

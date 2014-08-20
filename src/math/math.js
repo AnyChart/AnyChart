@@ -72,3 +72,97 @@ anychart.math.log = function(val) {
     return Math.log(val);
   return Math.log(1e-7);
 };
+
+
+/**
+ * Cheking rectangles intersection. Rectangle described by an array of its vertices.
+ * We consider that two rectangles do not intersect, if we find a side of any of two rectangles
+ * relative to which all vertices of another rect lie towards the same direction or lie on this side.
+ * @param {Array.<number>=} opt_first First rect.
+ * @param {Array.<number>=} opt_second Second rect.
+ * @return {boolean} Returns true if rectangles intersect, false
+ * if rectangles do not intersect.
+ */
+anychart.math.checkRectIntersection = function(opt_first, opt_second) {
+  var result = false, k, k1, i, len;
+  if (!opt_first || !opt_second) return false;
+  for (i = 0, len = opt_first.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result = result || anychart.math.checkPointsRelativeLine(
+        opt_first[i], opt_first[i + 1], opt_first[k], opt_first[k1], opt_second);
+  }
+  for (i = 0, len = opt_second.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result = result || anychart.math.checkPointsRelativeLine(
+        opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first);
+  }
+  return !result;
+};
+
+
+/**
+ * Cheking rectangles intersection. Rectangle described by an array of its vertices.
+ * We consider that two rectangles do not intersect, if we find a side of any of two rectangles
+ * relative to which all vertices of another rect lie towards the same direction or lie on this side.
+ * @param {Array.<number>=} opt_first First rect.
+ * @param {Array.<number>=} opt_second Second rect.
+ * @return {boolean|Array.<boolean>} Returns true if rectangles intersect, false
+ * if rectangles do not intersect.
+ */
+anychart.math.checkRectIntersectionExt = function(opt_first, opt_second) {
+  var result = [], k, k1, i, len;
+  if (!opt_first || !opt_second) return false;
+  for (i = 0, len = opt_first.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result.push(anychart.math.checkPointsRelativeLine(
+        opt_first[i], opt_first[i + 1], opt_first[k], opt_first[k1], opt_second));
+  }
+  for (i = 0, len = opt_second.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result.push(anychart.math.checkPointsRelativeLine(
+        opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first));
+  }
+  return result;
+};
+
+
+/**
+ * Check an array of points position in relation to
+ * a line defined by two points.
+ * @param {number} p1x X coordinate of the first point.
+ * @param {number} p1y Y coordinate of the first point.
+ * @param {number} p2x X coordinate of the second point.
+ * @param {number} p2y Y coordinate of the second point.
+ * @param {Array.<number>} pointsArr Array of points to check against the line
+ * defined by two points.
+ * @return {boolean} If all points from an array lie on the line or lie towards the same direction,
+ * returns true, returns false otherwise.
+ */
+anychart.math.checkPointsRelativeLine = function(p1x, p1y, p2x, p2y, pointsArr) {
+  var ok = true;
+  for (var j = 0, len = pointsArr.length; j < len - 1; j = j + 2) {
+    ok = ok && anychart.math.isPointOnLine(p1x, p1y, p2x, p2y, pointsArr[j], pointsArr[j + 1]) <= 0;
+  }
+  return ok;
+};
+
+
+/**
+ * Check a point position against a line defined by two points.
+ * @param {number} p1x X coordinate of the first point.
+ * @param {number} p1y Y coordinate of the first point.
+ * @param {number} p2x X coordinate of the second point.
+ * @param {number} p2y Y coordinate of the second point.
+ * @param {number} p3x X coordinate of a point to check.
+ * @param {number} p3y X coordinate of a point to check.
+ * @return {number} Returns 0 if a point lies on a line, in other cases a sign of a number
+ * defines a direction.
+ */
+anychart.math.isPointOnLine = function(p1x, p1y, p2x, p2y, p3x, p3y) {
+  var result = (p1y - p2y) * p3x + (p2x - p1x) * p3y + (p1x * p2y - p2x * p1y);
+  return result == 0 ? 0 : result > 0 ? 1 : -1;
+};

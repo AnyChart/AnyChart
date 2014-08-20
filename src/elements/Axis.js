@@ -975,8 +975,8 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                 if (k != ticksArrLen - 1 && this.drawLastLabel())
                   bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
 
-                if (!(this.checkLabelsIntersection_(bounds1, bounds2) ||
-                    this.checkLabelsIntersection_(bounds1, bounds3))) {
+                if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
+                    anychart.math.checkRectIntersection(bounds1, bounds3))) {
                   tempRatio = scale.transform(scaleTicksArr[k]);
                   if ((tempRatio <= 0 && this.drawFirstLabel()) || (tempRatio >= 1 && this.drawLastLabel()))
                     nextDrawableLabel = k;
@@ -1020,9 +1020,9 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
                         true :
                     true;
 
-                if (!(this.checkLabelsIntersection_(bounds1, bounds2) ||
-                    this.checkLabelsIntersection_(bounds1, bounds3) ||
-                    this.checkLabelsIntersection_(bounds1, bounds4)) && isLabelEnabled) {
+                if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
+                    anychart.math.checkRectIntersection(bounds1, bounds3) ||
+                    anychart.math.checkRectIntersection(bounds1, bounds4)) && isLabelEnabled) {
 
                   tempRatio = scale.transform(scaleMinorTicksArr[j]);
                   if ((tempRatio <= 0 && this.drawFirstLabel()) || (tempRatio >= 1 && this.drawLastLabel())) {
@@ -1053,7 +1053,7 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
               if (prevDrawableLabel != -1)
                 bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
 
-              if (!this.checkLabelsIntersection_(bounds1, bounds2)) {
+              if (!anychart.math.checkRectIntersection(bounds1, bounds2)) {
                 prevDrawableLabel = i;
                 labels.push(true);
               } else {
@@ -1110,7 +1110,7 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
           bounds1 = this.getLabelBounds_(j, true, opt_bounds);
           bounds2 = this.getLabelBounds_(j + i, true, opt_bounds);
 
-          if (this.checkLabelsIntersection_(bounds1, bounds2)) {
+          if (anychart.math.checkRectIntersection(bounds1, bounds2)) {
             isConvergence = false;
             i++;
             break;
@@ -1143,7 +1143,7 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
         else
           bounds2 = null;
 
-        if (!this.checkLabelsIntersection_(bounds1, bounds2)) {
+        if (!anychart.math.checkRectIntersection(bounds1, bounds2)) {
           prevDrawableLabel = i;
           states[i] = true;
         } else {
@@ -1240,11 +1240,11 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     title.resumeSignalsDispatching(false);
   }
 
-  if (ticks.enabled() && ticks.position() == anychart.enums.TicksPosition.OUTSIDE) {
+  if (ticks.enabled() && ticks.position() == anychart.enums.SidePosition.OUTSIDE) {
     ticksLength = ticks.length();
   }
 
-  if (minorTicks.enabled() && minorTicks.position() == anychart.enums.TicksPosition.OUTSIDE) {
+  if (minorTicks.enabled() && minorTicks.position() == anychart.enums.SidePosition.OUTSIDE) {
     minorTicksLength = minorTicks.length();
   }
 
@@ -1416,7 +1416,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
     case anychart.enums.Orientation.TOP:
       x = Math.round(bounds.left + ratio * bounds.width);
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
-      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         y -= ticksLength;
       }
       break;
@@ -1424,7 +1424,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
       x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
-      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         x += ticksLength;
       }
       break;
@@ -1432,7 +1432,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
       x = Math.round(bounds.left + ratio * bounds.width);
       y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
-      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         y += ticksLength;
       }
       break;
@@ -1440,7 +1440,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
       x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
-      if (position == anychart.enums.TicksPosition.OUTSIDE && isEnabled) {
+      if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         x -= ticksLength;
       }
       break;
@@ -1449,73 +1449,6 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   positionProvider['value']['y'] = y;
 
   return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider);
-};
-
-
-/**
- * Cheking labels intersection. Label is a rectangle described by an array of its vertices.
- * We consider that two labels do not intersect, if we find a side of any of two labels
- * relative to which all vertices of another label lie towards the same direction or lie on this side.
- * @param {Array.<number>=} opt_first First label.
- * @param {Array.<number>=} opt_second Second label.
- * @return {boolean} Returns true if labels intersect, false
- * if labels do not intersect.
- * @private
- */
-anychart.elements.Axis.prototype.checkLabelsIntersection_ = function(opt_first, opt_second) {
-  var result = false, k, k1, i, len;
-  if (!opt_first || !opt_second) return false;
-  for (i = 0, len = opt_first.length; i < len - 1; i = i + 2) {
-    k = i == len - 2 ? 0 : i + 2;
-    k1 = i == len - 2 ? 1 : i + 3;
-    result = result || this.checkPoints_(opt_first[i], opt_first[i + 1], opt_first[k], opt_first[k1], opt_second);
-  }
-  for (i = 0, len = opt_second.length; i < len - 1; i = i + 2) {
-    k = i == len - 2 ? 0 : i + 2;
-    k1 = i == len - 2 ? 1 : i + 3;
-    result = result || this.checkPoints_(opt_second[i], opt_second[i + 1], opt_second[k], opt_second[k1], opt_first);
-  }
-  return !result;
-};
-
-
-/**
- * Check an array of points position in relation to
- * a line defined by two points.
- * @param {number} p1x X coordinate of the first point.
- * @param {number} p1y Y coordinate of the first point.
- * @param {number} p2x X coordinate of the second point.
- * @param {number} p2y Y coordinate of the second point.
- * @param {Array.<number>} pointsArr Array of points to check against the line
- * defined by two points.
- * @return {boolean} If all points from an array lie on the line or lie towards the same direction,
- * returns true, returns false otherwise.
- * @private
- */
-anychart.elements.Axis.prototype.checkPoints_ = function(p1x, p1y, p2x, p2y, pointsArr) {
-  var ok = true;
-  for (var j = 0, len = pointsArr.length; j < len - 1; j = j + 2) {
-    ok = ok && this.isPointOnLine_(p1x, p1y, p2x, p2y, pointsArr[j], pointsArr[j + 1]) <= 0;
-  }
-  return ok;
-};
-
-
-/**
- * Check a point position against a line defined by two points.
- * @param {number} p1x X coordinate of the first point.
- * @param {number} p1y Y coordinate of the first point.
- * @param {number} p2x X coordinate of the second point.
- * @param {number} p2y Y coordinate of the second point.
- * @param {number} p3x X coordinate of a point to check.
- * @param {number} p3y X coordinate of a point to check.
- * @return {number} Returns 0 if a point lies on a line, in other cases a sign of a number
- * defines a direction.
- * @private
- */
-anychart.elements.Axis.prototype.isPointOnLine_ = function(p1x, p1y, p2x, p2y, p3x, p3y) {
-  var result = (p1y - p2y) * p3x + (p2x - p1x) * p3y + (p1x * p2y - p2x * p1y);
-  return result == 0 ? 0 : result > 0 ? 1 : -1;
 };
 
 
@@ -1890,7 +1823,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2 - staggerSize;
 
-      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && this.ticks().enabled()) {
         y -= ticksLength;
       }
       break;
@@ -1898,7 +1831,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2 + staggerSize;
       y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && this.ticks().enabled()) {
         x += ticksLength;
       }
       break;
@@ -1906,7 +1839,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
       y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2 + staggerSize;
 
-      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && this.ticks().enabled()) {
         y += ticksLength;
       }
       break;
@@ -1914,7 +1847,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2 - staggerSize;
       y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-      if (this.ticks_.position() == anychart.enums.TicksPosition.OUTSIDE && this.ticks().enabled()) {
+      if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && this.ticks().enabled()) {
         x -= ticksLength;
       }
       break;
@@ -1948,7 +1881,7 @@ anychart.elements.Axis.prototype.drawTopMinorLabels_ = function(value, ratio, in
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
 
-  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.SidePosition.OUTSIDE && this.minorTicks().enabled()) {
     y -= ticksLength;
   }
 
@@ -1979,7 +1912,7 @@ anychart.elements.Axis.prototype.drawRightMinorLabels_ = function(value, ratio, 
   var x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.SidePosition.OUTSIDE && this.minorTicks().enabled()) {
     x += ticksLength;
   }
   positionProvider['value']['x'] = x;
@@ -2009,7 +1942,7 @@ anychart.elements.Axis.prototype.drawBottomMinorLabels_ = function(value, ratio,
   var x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
   var y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
 
-  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.SidePosition.OUTSIDE && this.minorTicks().enabled()) {
     y += ticksLength;
   }
   positionProvider['value']['x'] = x;
@@ -2039,7 +1972,7 @@ anychart.elements.Axis.prototype.drawLeftMinorLabels_ = function(value, ratio, i
   var x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
   var y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
 
-  if (this.minorTicks().position() == anychart.enums.TicksPosition.OUTSIDE && this.minorTicks().enabled()) {
+  if (this.minorTicks().position() == anychart.enums.SidePosition.OUTSIDE && this.minorTicks().enabled()) {
     x -= ticksLength;
   }
   positionProvider['value']['x'] = x;
