@@ -985,7 +985,7 @@ anychart.enums.ScatterTicksMode = {
 //exports
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);
-goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
+goog.exportSymbol('anychart.enums.Anchor.LEFT_BOTTOM', anychart.enums.Anchor.LEFT_BOTTOM);
 goog.exportSymbol('anychart.enums.Anchor.CENTER_TOP', anychart.enums.Anchor.CENTER_TOP);
 goog.exportSymbol('anychart.enums.Anchor.CENTER', anychart.enums.Anchor.CENTER);
 goog.exportSymbol('anychart.enums.Anchor.CENTER_BOTTOM', anychart.enums.Anchor.CENTER_BOTTOM);
@@ -995,7 +995,7 @@ goog.exportSymbol('anychart.enums.Anchor.RIGHT_BOTTOM', anychart.enums.Anchor.RI
 
 goog.exportSymbol('anychart.enums.Position.LEFT_TOP', anychart.enums.Position.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Position.LEFT_CENTER', anychart.enums.Position.LEFT_CENTER);
-goog.exportSymbol('anychart.enums.Position.LEFT_TOP', anychart.enums.Position.LEFT_TOP);
+goog.exportSymbol('anychart.enums.Position.LEFT_BOTTOM', anychart.enums.Position.LEFT_BOTTOM);
 goog.exportSymbol('anychart.enums.Position.CENTER_TOP', anychart.enums.Position.CENTER_TOP);
 goog.exportSymbol('anychart.enums.Position.CENTER', anychart.enums.Position.CENTER);
 goog.exportSymbol('anychart.enums.Position.CENTER_BOTTOM', anychart.enums.Position.CENTER_BOTTOM);
