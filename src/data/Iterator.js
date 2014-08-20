@@ -46,6 +46,19 @@ anychart.data.Iterator.prototype.currentRow_;
  * [ =(17.22)=, 31.23, 12.2141, 123.3231, 0.123, 34141.1, 2332.0, 12148.91]
  * // After iterator.select(4) is called current index is moved:
  * [17.22, 31.23, 12.2141, 123.3231, =(0.123)=, 34141.1, 2332.0, 12148.91]
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * // move cursor
+ * iterator.select(2);
+ * chart.title().text(iterator.get('x') + ' - ' + iterator.get('value'))
+ * chart.line(data);
  * @param {number} index The index to select.
  * @return {boolean} <b>True</b> Returns true only when index
  * is within a possible range, otherwise returns <b>False</b>.
@@ -64,6 +77,21 @@ anychart.data.Iterator.prototype.select = function(index) {
  * [17.22, 31.23, 12.2141, 123.3231, =(0.123)=, 34141.1, 2332.0, 12148.91]
  * // After Iterator.reset() is called current index is moved to -1 position.
  * =()= [17.22, 31.23, 12.2141, 123.3231, 0.123, 34141.1, 2332.0, 12148.91]
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * // move cursor
+ * iterator.select(2);
+ * iterator.reset();
+ * // after reset current index -1, so get returns undefined.
+ * chart.title().text(iterator.get('x') + ' - ' + iterator.get('value'))
+ * chart.line(data);
  * @return {anychart.data.Iterator} {@link anychart.data.Iterator} class instance for method chaining.
  */
 anychart.data.Iterator.prototype.reset = function() {
@@ -81,6 +109,22 @@ anychart.data.Iterator.prototype.reset = function() {
  * while(iterator.advance()){
  *    // do something
  * }
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * var titles = [];
+ * while(iterator.advance()){
+ *     // collect point x
+ *     titles.push(iterator.get('x'));
+ * }
+ * chart.title().text(titles.join(" "))
+ * chart.line(data);
  * @return {boolean} <b>True</b> Returns <b>True</b> if moved to the next item, otherwise returns <b>False</b>.
  */
 anychart.data.Iterator.prototype.advance = function() {
@@ -104,6 +148,19 @@ anychart.data.Iterator.prototype.advance = function() {
  * if (iterator.select(2)){
  *   var currentName = iterator.get('name');
  * }
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * // move cursor
+ * iterator.select(2);
+ * chart.title().text(iterator.get('x') + ' - ' + iterator.get('value'))
+ * chart.line(data);
  * @param {string} fieldName The name of the field to be fetched from the current row.
  * @return {*} The field value or undefined, if not found.
  */
@@ -137,6 +194,17 @@ anychart.data.Iterator.prototype.getIndex = function() {
  *    {name: 'John', age: 39, contact: 6597001},
  * ]
  * // iterator.getRowsCount() will return 4.
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * chart.title().text("rows count: " + iterator.getRowsCount());
+ * chart.line(data);
  * @return {number} The number of rows in the set.
  */
 anychart.data.Iterator.prototype.getRowsCount = function() {
@@ -198,10 +266,10 @@ anychart.data.Iterator.prototype.meta = function(name, opt_value) {
 
 
 //exports
-anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//in docs/final
-anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//in docs/final
-anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//in docs/final
-anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//in docs/final
-anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//in docs/final
-anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//in docs/final
-anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//in docs/final
+anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//doc|ex
+anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//doc|ex
+anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//doc|ex
+anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//doc|ex
+anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//doc|need-ex
+anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//doc|need-ex
+anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//doc|ex

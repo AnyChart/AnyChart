@@ -163,6 +163,6 @@ anychart.data.Mapping.prototype.getArrayMapping = function() {
 
 
 //exports
-anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//in docs/final
-anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//in docs/final
-anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//in docs/final
+anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//inherited
+anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//inherited
+anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//inherited

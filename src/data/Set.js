@@ -15,7 +15,8 @@ goog.require('goog.array');
  * {@link anychart.data.Set#mapAs} method (you can create as many mappings as you like).<br/>
  * Each field can be a number, a string, a function, an array or an object.
  * Data fields can of any type and they way you read them depends on mapping only:
- * {@link anychart.data.Set#mapAs}. Sample mappings are shown in code samples 3, 4 and 5.
+ * {@link anychart.data.Set#mapAs}. Sample mappings are shown in code samples 3, 4 and 5.<br/>
+ * <b>Note:</b> To create an instance of this class use method {@link anychart.data.set}.
  * @example <c>Sample 1. Data notion.</c><t>listingOnly</t>
  * // Col1 Col2 Col3
  *  [
@@ -149,19 +150,36 @@ anychart.data.Set.prototype.storage_;
  *//**
  * Setter for Set data.
  * @example <t>listingOnly</t>
+ * // as simple arrray
  * dataSet.data([20, 7, 10, 14]);
+ * // as multiple arrays
  * dataSet.data([
  *    [1, 22, 13],
  *    [13, 22, 23],
  *    [17, 22, 33],
  *    [21, 22, 43]
  *  ]);
+ * // as Objects
  * dataSet.data([
  *    {name: 'Point 1', value: 10},
  *    {name: 'Point 2', value: 7},
  *    {name: 'Point 3', value: 20},
  *    {name: 'Point 4', value: 14}
  *  ]);
+ * // as CSV string
+ * dataSet.data(
+ *      'Point 1, 10; Point 2, 14; Point 3, 16',
+ *      {rowsSeparator: ';', columnsSeparator: ','}
+ * );
+ * @example <t>lineChart</t>
+ * var dataSet = anychart.data.set();
+ * dataSet.data([
+ *    {name: 'Point 1', value: 10},
+ *    {name: 'Point 2', value: 7, fill: 'red 0.3'},
+ *    {name: 'Point 3', value: 20},
+ *    {name: 'Point 4', value: 14}
+ * ]);
+ * chart.line(dataSet);
  * @param {Array=} opt_value A value to set.
  * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  *//**
@@ -263,6 +281,21 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
  *    11,                       {close: 4, value: 11}
  *    function(){ return 99;}   {close: 5, value: 99}
  *   ]
+ * @example
+ * var dataSet = anychart.data.set([
+ *      [11, 18, 1, 'red 0.5', 'orange'],
+ *      [21, 15, 2, 'green 0.5', 'blue'],
+ *      [14, 16, 3, 'white', 'black'],
+ *      {value: 17, x: 4, fill: 'yellow'}
+ * ]);
+ * var chart = anychart.barChart();
+ * chart.column(
+ *      dataSet.mapAs({'value': [0], 'x': [2], 'fill': [3]})
+ * );
+ * chart.column(
+ *      dataSet.mapAs({'value': [1], 'x': [2], 'fill': [4]})
+ * );
+ * chart.container(stage).draw();
  * @param {!(Object.<Array.<number>>)=} opt_arrayMapping [{
  *   'x': &#91;0&#93;,
  *   'value': &#91;1, 0&#93;,
@@ -322,6 +355,15 @@ anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping
  *    [2, 2, 2, 2],
  *    {'low': 4, 'high': 11}
  *  ]
+ * @example <t>lineChart</t>
+ * var dataSet = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * dataSet.row(2, ['Point E', 10]);
+ * chart.line(dataSet);
  * @param {number} rowIndex The index of the row to fetch.
  * @param {*=} opt_value The value to set.
  * @return {*} The previous value of the row.
@@ -346,6 +388,15 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 /**
  * Returns the number of the rows in the current data set.
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * chart.title().text("rows count: " + data.getRowsCount());
+ * chart.line(data)
  * @return {number} The number of the rows in the set.
  */
 anychart.data.Set.prototype.getRowsCount = function() {
@@ -365,7 +416,15 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
- * Constructor function.
+ * Return instance of class {@link anychart.data.Set}.
+ * @example <t>lineChart</t>
+ * var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * chart.line(data);
  * @param {(Array|string)=} opt_data Data set raw data can be set here.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -377,8 +436,8 @@ anychart.data.set = function(opt_data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.data.set', anychart.data.set);
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//in docs/final
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//in docs/final
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//in docs/final
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//in docs/final
+goog.exportSymbol('anychart.data.set', anychart.data.set);//doc|ex
+anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//doc|ex
+anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//doc|ex
+anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//doc|ex
+anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//doc|ex

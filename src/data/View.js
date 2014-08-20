@@ -124,6 +124,16 @@ anychart.data.View.prototype.preparePie = function(fieldName, opt_func, opt_othe
 
 /**
  * Creates a derived view, containing just the same data set and order as this view does.
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var derivedView = view.derive();
+ * chart.line(derivedView)
  * @return {!anychart.data.View} The new derived view.
  */
 anychart.data.View.prototype.derive = function() {
@@ -140,6 +150,19 @@ anychart.data.View.prototype.derive = function() {
  *  view.filter('fieldName', function(fieldValue){
  *    return fieldValue > 3;
  *  });
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94],
+ *     ['Point E', 194],
+ *     ['Point F', 45],
+ *     ['Point G', 201]
+ * ]);
+ * var view = data.mapAs();
+ * var filteredView = view.filter('value', function(value){ return value > 100;});
+ * chart.line(filteredView);
  * @param {string} fieldName A field which value will be passed to a filter function.
  * @param {function(*):boolean} func A filter function that should accept a field value and return true if the row
  *  should be included into the resulting view.
@@ -159,6 +182,19 @@ anychart.data.View.prototype.filter = function(fieldName, func) {
  *  view.sort('name', function(value1, value2){
  *    return value1 > value2;
  *  });
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94],
+ *     ['Point E', 194],
+ *     ['Point F', 45],
+ *     ['Point G', 201]
+ * ]);
+ * var view = data.mapAs();
+ * var sortedView = view.sort('value', function(value1, value2){ return value1 > value2;});
+ * chart.line(sortedView);
  * @param {string} fieldName A field name to make sort by.
  * @param {(anychart.enums.Sort|function(*, *):number)=} opt_comparatorOrOrder A sorting function that should accept two
  *    field values and return numeric result of the comparison or string value of anychart.enums.Sort enumeration
@@ -224,6 +260,23 @@ anychart.data.View.prototype.sort = function(fieldName, opt_comparatorOrOrder) {
  *    2,
  *    2
  *  ]
+ * @example <t>lineChart</t>
+ *  var dataSet1 = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ *  ]);
+ *  var dataSet2 = anychart.data.set([
+ *     ['Point E', 194],
+ *     ['Point F', 45],
+ *     ['Point G', 201],
+ *     ['Point H', 104]
+ * ]);
+ * var view1 = dataSet1.mapAs();
+ * var view2 = dataSet2.mapAs();
+ * var concatinatedView = view1.concat(view2);
+ * chart.line(concatinatedView);
  * @param {!(anychart.data.IView|Array)} otherView A view, data set or even an array to concat with.
  * @return {!anychart.data.IView} The new derived view.
  */
@@ -266,6 +319,16 @@ anychart.data.View.prototype.concat = function(otherView) {
  *  ]
  *  view.row(2, [2, 2, 2, 2]); // returns [21, 22, 24, 27]
  *  view.row(3, {'low': 4, 'high': 11}); // returns undefined
+ * @example <t>lineChart</t>
+ * var dataSet = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = dataSet.mapAs();
+ * view.row(2, ['Point E', 10]);
+ * chart.line(view);
  * @see anychart.data.Set#row
  * @param {number} rowIndex An index of the row to fetch.
  * @param {*=} opt_value A value to set.
@@ -294,6 +357,16 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
 
 /**
  * Returns the number of the rows in the current view.
+ * @example <t>lineChart</t>
+ *  var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * chart.title().text("rows count: " + view.getRowsCount());
+ * chart.line(data)
  * @see anychart.data.Iterator#getRowsCount
  * @return {number} The number of the rows in the set.
  */
@@ -316,11 +389,19 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 /**
  * Returns a new iterator for the current view.
- * @example <t>listingOnly</t>
- * // Create a new data Set:
- * var dataSet = anychart.data.set([1,2,3]);
- * // Default mapping and getting an iterator:
- * var iterator = dataSet.mapAs().getIterator();
+ * @example <t>lineChart</t>
+ * var data = anychart.data.set([
+ *     ['Point A', 231],
+ *     ['Point B', 131],
+ *     ['Point C', 212],
+ *     ['Point D', 94]
+ * ]);
+ * var view = data.mapAs();
+ * var iterator = view.getIterator();
+ * // move cursor
+ * iterator.select(2);
+ * chart.title().text(iterator.get('x') + ' - ' + iterator.get('value'))
+ * chart.line(data);
  * @return {!anychart.data.Iterator} New iterator.
  */
 anychart.data.View.prototype.getIterator = function() {
@@ -467,11 +548,11 @@ anychart.data.View.prototype.serialize = function() {
 
 
 //exports
-anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//in docs/final
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//in docs/final
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//in docs/final
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//in docs/final
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//in docs/final
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//in docs/final
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//in docs/final
+anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;//doc|ex
+anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//doc|ex
+anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//doc|ex
+anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//doc|ex
+anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//doc|ex
+anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//doc|ex
+anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//doc|ex
+anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//doc|need-ex
