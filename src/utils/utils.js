@@ -281,14 +281,19 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
  */
 anychart.utils.recursiveClone = function(obj) {
   var res;
-  if (goog.isArray(obj)) {
+
+  if (goog.isFunction(obj)) {
+    return obj;
+  } else if (goog.isArray(obj)) {
     res = new Array(obj.length);
   } else if (goog.isObject(obj)) {
     res = {};
-  } else
-    return obj;
-  for (var key in obj)
+  } else return obj;
+
+  for (var key in obj) {
     res[key] = anychart.utils.recursiveClone(obj[key]);
+  }
+
   return res;
 };
 
