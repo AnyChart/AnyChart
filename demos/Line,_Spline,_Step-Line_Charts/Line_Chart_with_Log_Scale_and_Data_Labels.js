@@ -1,6 +1,7 @@
+var chart;
 anychart.onDocumentReady(function() {
   //create line chart
-  var chart = anychart.lineChart();
+  chart = anychart.lineChart();
 
   //set container for the chart
   chart.container('container');
@@ -10,7 +11,7 @@ anychart.onDocumentReady(function() {
 
   //create logarithmic scale
   var logScale = new anychart.scales.Logarithmic();
-  logScale.minimum(1);
+  logScale.logBase(2);
 
   //set scale for the chart, this scale will be used in all scale dependent entries such axes, grids, etc
   chart.yScale(logScale);
@@ -31,7 +32,7 @@ anychart.onDocumentReady(function() {
     ['P12', '122.56 '],
     ['P13', '87.12'],
     ['P14', '54.32'],
-    ['P15', '33.08']
+    ['P15', '1.1']
   ]);
 
   //enable series data labels

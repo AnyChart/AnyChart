@@ -113,18 +113,13 @@ anychart.scales.DateTime.prototype.calculate = function() {
 
   goog.base(this, 'calculate');
 
-  var newRange = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
-
-  var originalMin = this.min;
-  var originalMax = this.max;
-
+  var newRange = this.minorTicks().setupAsMinor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
   if (this.minimumModeAuto)
     this.min = newRange[0];
-
   if (this.maximumModeAuto)
     this.max = newRange[1];
 
-  this.minorTicks().setupAsMinor(this.min, this.max, originalMin, originalMax);
+  this.ticks().setup(this.min, this.max);
 
   this.range = this.max - this.min;
 };

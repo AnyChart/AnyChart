@@ -159,16 +159,36 @@ anychart.scales.DateTimeTicks.prototype.get = function() {
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
+ */
+anychart.scales.DateTimeTicks.prototype.setup = function(min, max) {
+  this.autoTicks_ = null;
+  if (!this.explicit_) {
+    var ticks = [];
+    var interval = this.interval_ || this.calculateIntervals_(min, max, false);
+    var date = new goog.date.UtcDateTime(new Date(min));
+    var endDate = new goog.date.UtcDateTime(new Date(max));
+    for (; goog.date.Date.compare(date, endDate) <= 0; date.add(interval))
+      ticks.push(date.getTime());
+    this.autoTicks_ = ticks;
+  }
+};
+
+
+/**
+ * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
+ * min and max values for the scale to adjust.
+ * @param {number} min Minimum.
+ * @param {number} max Maximum.
  * @param {boolean=} opt_canModifyMin If the minimum can be modified.
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
-anychart.scales.DateTimeTicks.prototype.setup = function(min, max, opt_canModifyMin, opt_canModifyMax) {
+anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, opt_canModifyMin, opt_canModifyMax) {
   this.autoTicks_ = null;
   var result = [min, max];
   if (!this.explicit_) {
     var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(min, max, false);
+    var interval = this.interval_ || this.calculateIntervals_(min, max, true);
     if (opt_canModifyMin)
       result[0] = min = this.alignDateLeft_(min, interval, 0);
     var date = new goog.date.UtcDateTime(new Date(min));
@@ -180,33 +200,6 @@ anychart.scales.DateTimeTicks.prototype.setup = function(min, max, opt_canModify
     this.autoTicks_ = ticks;
   }
   return result;
-};
-
-
-/**
- * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
- * min and max values for the scale to adjust.
- * @param {number} min Minimum.
- * @param {number} max Maximum.
- * @param {number=} opt_originalMin Original min value (sometimes some minor ticks may be placed before the first major
- *    tick).
- * @param {number=} opt_originalMax Original max value (sometimes some minor ticks may be placed after the first major
- *    tick).
- */
-anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, opt_originalMin, opt_originalMax) {
-  this.autoTicks_ = null;
-  if (!this.explicit_) {
-    var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(
-        goog.isDef(opt_originalMin) ? opt_originalMin : min,
-        goog.isDef(opt_originalMax) ? opt_originalMax : max,
-        true);
-    var date = new goog.date.UtcDateTime(new Date(min));
-    var endDate = new goog.date.UtcDateTime(new Date(max));
-    for (; goog.date.Date.compare(date, endDate) <= 0; date.add(interval))
-      ticks.push(date.getTime());
-    this.autoTicks_ = ticks;
-  }
 };
 
 
@@ -236,6 +229,7 @@ anychart.scales.DateTimeTicks.RANGES_ = [
   60 * 24 * 60 * 60 * 1000, //YEAR_2MONTH
   90 * 24 * 60 * 60 * 1000, //YEAR_QUARTER
   180 * 24 * 60 * 60 * 1000 //YEAR_HALF
+  //365 * 24 * 60 * 60 * 1000 //YEAR_HALF
 ];
 
 

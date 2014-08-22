@@ -54,7 +54,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
 
 /**
  * Default comparator. Can compare any two values including objects and values of
- * different type, setting a stable ordering in ascending order.
+ * different type, setting a stable ordering in ascending order. NaNs are placed to the END of numbers list.
  * @param {*} a First value.
  * @param {*} b Second value.
  * @return {number} Comparison result.
@@ -63,7 +63,7 @@ anychart.utils.compareAsc = function(a, b) {
   var aType = typeof a;
   var bType = typeof b;
   if (aType == 'number' && bType == 'number')
-    return (/** @type {number} */(a) - /** @type {number} */(b)) || 0; // in case of NaN
+    return anychart.utils.compareNumericAsc(/** @type {number} */(a), /** @type {number} */(b));
   a = anychart.utils.hash(a);
   b = anychart.utils.hash(b);
   if (a > b)
@@ -77,13 +77,43 @@ anychart.utils.compareAsc = function(a, b) {
 
 /**
  * Can compare any two values including objects and values of
- * different type, setting a stable ordering in descending order.
+ * different type, setting a stable ordering in descending order. NaNs are placed to the START of numbers list.
  * @param {*} a First value.
  * @param {*} b Second value.
  * @return {number} Comparison result.
  */
 anychart.utils.compareDesc = function(a, b) {
   return -anychart.utils.compareAsc(a, b);
+};
+
+
+/**
+ * Comparator for numbers, that resolves the case of NaNs. Maintains stable ASC ordering,
+ * placing NaNs to the END of list.
+ * @param {number} a First value.
+ * @param {number} b Second value.
+ * @return {number} Comparison result.
+ */
+anychart.utils.compareNumericAsc = function(a, b) {
+  if (isNaN(a))
+    return isNaN(b) ? 0 : 1;
+  else
+    return isNaN(b) ? -1 : (a - b);
+};
+
+
+/**
+ * Comparator for numbers, that resolves the case of NaNs. Maintains stable DESC ordering,
+ * placing NaNs to the END of list (not the same as -compareNumericAsc).
+ * @param {number} a First value.
+ * @param {number} b Second value.
+ * @return {number} Comparison result.
+ */
+anychart.utils.compareNumericDesc = function(a, b) {
+  if (isNaN(a))
+    return isNaN(b) ? 0 : 1;
+  else
+    return isNaN(b) ? -1 : (b - a);
 };
 
 
