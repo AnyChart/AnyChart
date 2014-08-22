@@ -24,7 +24,7 @@ anychart.elements.Axis = function() {
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
 
-  this.zIndex(10);
+  this.zIndex(35);
 
   this.line_ = acgraph.path();
 
@@ -811,7 +811,7 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
 anychart.elements.Axis.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value.clone();
+      this.parentBounds_ = opt_value.clone().round();
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1301,7 +1301,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
   var majorSize = maxLabelSize + ticksLength;
 
   var ticksAndLabelsSize = (minorSize > majorSize) ? minorSize : majorSize;
-  delta = lineThickness + ticksAndLabelsSize + titleSize;
+  delta = ticksAndLabelsSize + titleSize;
   return /** @type {number} */(delta);
 };
 
@@ -1509,7 +1509,7 @@ anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
  * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
  *//**
  * Setter for overlap mode for labels.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [true] Value to set.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [anychart.enums.LabelsOverlapMode.NO_OVERLAP] Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -1683,8 +1683,9 @@ anychart.elements.Axis.prototype.isHorizontal = function() {
  * @private
  */
 anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
   var bounds = this.getPixelBounds_().toRect();
-  var y = bounds.top + bounds.height + pixelShift;
+  var y = bounds.top + bounds.height + lineThickness / 2;
   this.line_
       .moveTo(bounds.left + pixelShift, y)
       .lineTo(bounds.left - pixelShift + bounds.width, y);
@@ -1697,8 +1698,9 @@ anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
  * @private
  */
 anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
   var bounds = this.getPixelBounds_().toRect();
-  var x = bounds.left - pixelShift;
+  var x = bounds.left - lineThickness / 2;
   this.line_
       .moveTo(x, bounds.top + pixelShift)
       .lineTo(x, bounds.top - pixelShift + bounds.height);
@@ -1711,11 +1713,12 @@ anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
  * @private
  */
 anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
   var bounds = this.getPixelBounds_().toRect();
-  var y = bounds.top + pixelShift;
+  var y = bounds.top - lineThickness / 2;
   this.line_
-      .moveTo(bounds.left + pixelShift, y - 1)
-      .lineTo(bounds.left - pixelShift + bounds.width, y - 1);
+      .moveTo(bounds.left + pixelShift, y)
+      .lineTo(bounds.left - pixelShift + bounds.width, y);
 };
 
 
@@ -1725,8 +1728,9 @@ anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
  * @private
  */
 anychart.elements.Axis.prototype.drawLeftLine_ = function(pixelShift) {
+  var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
   var bounds = this.getPixelBounds_().toRect();
-  var x = bounds.left + bounds.width + pixelShift;
+  var x = bounds.left + bounds.width + lineThickness / 2;
   this.line_
       .moveTo(x, bounds.top + pixelShift)
       .lineTo(x, bounds.top - pixelShift + bounds.height);

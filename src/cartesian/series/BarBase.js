@@ -42,3 +42,13 @@ anychart.cartesian.series.BarBase.prototype.applyRatioToBounds = function(ratio,
   }
   return min + ratio * range;
 };
+
+
+/** @inheritDoc */
+anychart.cartesian.series.BarBase.prototype.applyAxesLinesSpace = function(value) {
+  var bounds = this.pixelBounds();
+  var max = bounds.getRight() - +this.axesLinesSpace().right();
+  var min = bounds.getLeft() + +this.axesLinesSpace().left();
+
+  return goog.math.clamp(value, min, max);
+};

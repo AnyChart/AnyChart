@@ -185,6 +185,38 @@ anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
 };
 
 
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.elements.TextMarker.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------

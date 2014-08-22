@@ -147,6 +147,13 @@ anychart.cartesian.series.Base.prototype.parentViewToDispose_;
 
 
 /**
+ * @type {anychart.utils.Padding}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.axesLinesSpace_;
+
+
+/**
  * @type {!anychart.data.Iterator}
  * @private
  */
@@ -469,6 +476,38 @@ anychart.cartesian.series.Base.prototype.clip = function(opt_value) {
     return this;
   } else {
     return this.clip_;
+  }
+};
+
+
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.cartesian.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
   }
 };
 
@@ -920,7 +959,8 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   var res = scale.transform(0);
   if (isNaN(res))
     res = 0;
-  this.zeroY = this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false);
+
+  this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false));
 
   this.checkDrawingNeeded();
 
@@ -929,6 +969,21 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+};
+
+
+/**
+ * Apply axes lines space.
+ * @param {number} value Value.
+ * @return {number} .
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.applyAxesLinesSpace = function(value) {
+  var bounds = this.pixelBounds();
+  var max = bounds.getBottom() - +this.axesLinesSpace().bottom();
+  var min = bounds.getTop() + +this.axesLinesSpace().top();
+
+  return goog.math.clamp(value, min, max);
 };
 
 

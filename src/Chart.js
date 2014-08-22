@@ -781,7 +781,6 @@ anychart.Chart.prototype.draw = function() {
   }
 
   boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
-
   var title = this.title();
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
     title.suspendSignalsDispatching();
@@ -792,8 +791,6 @@ anychart.Chart.prototype.draw = function() {
   }
 
   boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
-
-
   var legend = /** @type {anychart.elements.Legend} */(this.legend());
   var legendParentBounds = boundsWithoutTitle;
   if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND | anychart.ConsistencyState.BOUNDS)) {

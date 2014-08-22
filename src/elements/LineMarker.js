@@ -177,6 +177,38 @@ anychart.elements.LineMarker.prototype.parentBounds = function(opt_value) {
 };
 
 
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.elements.LineMarker.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
@@ -260,6 +292,7 @@ anychart.elements.LineMarker.prototype.draw = function() {
 
     var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
     var bounds = this.parentBounds();
+    var axesLinesSpace = this.axesLinesSpace();
     this.markerElement().clear();
 
     if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
@@ -273,6 +306,8 @@ anychart.elements.LineMarker.prototype.draw = function() {
       this.markerElement().moveTo(x, bounds.getTop());
       this.markerElement().lineTo(x, bounds.getBottom());
     }
+
+    this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 };

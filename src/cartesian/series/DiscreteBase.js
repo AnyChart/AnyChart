@@ -72,8 +72,15 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
-      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
-      this.rootElement.clip(/** @type {!anychart.math.Rect} */(bounds));
+      var clip;
+      if (goog.isBoolean(this.clip())) {
+        var bounds = this.pixelBounds();
+        var axesLinesSpace = this.axesLinesSpace();
+        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      } else {
+        clip = /** @type {!anychart.math.Rect} */(this.clip());
+      }
+      this.rootElement.clip(/** @type {!anychart.math.Rect} */(clip));
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
