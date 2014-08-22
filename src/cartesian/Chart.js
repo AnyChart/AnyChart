@@ -136,7 +136,7 @@ anychart.cartesian.Chart = function() {
 
     var cartesianChart = /** @type {anychart.cartesian.Chart} */ (this);
     var index = event['index'];
-    var series = cartesianChart.series_[index];
+    var series = cartesianChart.getSeries(index);
     if (series) {
       series.enabled(!series.enabled());
     }

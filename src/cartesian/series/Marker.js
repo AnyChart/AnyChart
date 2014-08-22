@@ -452,6 +452,8 @@ anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
 anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
   if (event && goog.isDef(event['markerIndex'])) {
     this.hoverPoint(event['markerIndex'], event);
+    var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
+    acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
   } else
     this.unhover();
 };
@@ -462,7 +464,19 @@ anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
+  var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
+  acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
   this.unhover();
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @private
+ */
+anychart.cartesian.series.Marker.prototype.handleMouseMove_ = function(event) {
+  if (event && goog.isDef(event.target['__tagIndex']))
+    this.hoverPoint(event.target['__tagIndex'], event);
 };
 
 
