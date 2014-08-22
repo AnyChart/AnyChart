@@ -2,11 +2,12 @@ var title, rect, rect2, bg;
 
 function load() {
   title = new anychart.elements.Title();
-  title.text('I\'m a title text!!!!!!!!!!!!!!!!!!\nHAY!!').container('container').background().enabled(false).fill('red 0.3').corners(10);
-  title.margin(10).padding(10).hAlign('center').vAlign('center');
+  title.text('Line chart with Logarithmic Y-Axis and Data Labels').container('container').background().enabled(false).fill('red 0.3').corners(10);
+  title.margin(0).padding(0);
+  //title.hAlign('center').vAlign('center');
   //  title.height(100);
   //  title.width(100);
-  title.background().enabled(true);
+  //title.background().enabled(true);
   title.draw();
   rect = title.container().rect();
   rect2 = title.container().rect();
