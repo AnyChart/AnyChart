@@ -26,6 +26,9 @@ anychart.utils.TooltipsContainer = function() {
   }
   this.children_ = [];
   this.stage_.domElement()['style']['cssText'] = 'position:fixed; left:0; top:0; opacity:1; pointer-events: none';
+  // do not wrap TooltipsContainer stage into relative div
+  // DVF-791
+  this.stage_.wrapped_ = true;
   goog.dom.appendChild(goog.dom.getDocument().body, this.root_);
 };
 goog.inherits(anychart.utils.TooltipsContainer, goog.Disposable);

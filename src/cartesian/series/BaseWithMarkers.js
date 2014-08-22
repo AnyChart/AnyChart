@@ -59,6 +59,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOver = func
   if (this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event))) {
     if (event && goog.isDef(event['markerIndex'])) {
       this.hoverPoint(event['markerIndex'], event);
+      var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
+      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
     } else
       this.unhover();
   }
@@ -70,8 +72,21 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOver = func
  * @protected
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOut = function(event) {
-  if (this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event)))
+  if (this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event))) {
+    var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
+    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
     this.unhover();
+  }
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseMove = function(event) {
+  if (event && goog.isDef(event.target['__tagIndex']))
+    this.hoverPoint(event.target['__tagIndex'], event);
 };
 
 
@@ -313,6 +328,17 @@ anychart.cartesian.series.BaseWithMarkers.prototype.deserialize = function(confi
  */
 anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerColor = function() {
   return this.getFinalFill(false, false);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = function() {
+  var data = goog.base(this, 'getLegendItemData');
+  if (this.markers().enabled())
+    data['iconMarker'] = this.markers().type() || this.autoMarkerType;
+  return data;
 };
 
 

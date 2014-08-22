@@ -63,6 +63,7 @@ anychart.data.ConcatView.prototype.getRowsCount = function() {
 
 /** @inheritDoc */
 anychart.data.ConcatView.prototype.parentViewChangedHandler = function(event) {
+  this.cachedValues = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 };

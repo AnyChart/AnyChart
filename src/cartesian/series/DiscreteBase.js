@@ -146,7 +146,10 @@ anychart.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, event) {
-  if (this.hoverStatus == index) return this;
+  if (this.hoverStatus == index) {
+    this.showTooltip(event);
+    return this;
+  }
   this.unhover();
   if (this.getResetIterator().select(index)) {
     this.colorizeShape(true);

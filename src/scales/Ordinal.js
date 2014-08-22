@@ -315,8 +315,8 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
 anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
   if (this.isInverted) ratio = 1 - ratio;
   //todo(Anton Saukh): needs improvement.
-  var index = ratio * this.values_.length;
-  return this.values_[Math.round(index)];
+  var index = goog.math.clamp(Math.ceil(ratio * this.values_.length) - 1, 0, this.values_.length - 1);
+  return this.values_[index];
 };
 
 

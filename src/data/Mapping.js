@@ -95,6 +95,7 @@ anychart.data.Mapping.prototype.getRowsCount = function() {
 
 /** @inheritDoc */
 anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
+  this.cachedValues = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 };

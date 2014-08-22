@@ -459,7 +459,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.elements.Grid();
-    grid.minor(true);
+    grid.isMinor(true);
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);

@@ -44,3 +44,65 @@ anychart.data.ScatterView.prototype.buildMask = function() {
   }
   return mask;
 };
+
+
+/**
+ * Searches the current scatter view for the specified fieldValue using the
+ * binary search algorithm. Elements are compared using
+ * <code>anychart.utils.compareAsc</code>, which compares the elements using
+ * < and > operators for comparing numbers and anychart.utils.hash for
+ * comparing other types (String, Objects, Functions).
+ *
+ * @private
+ *
+ * @param {number} fieldValue The sought value. Should be number.
+ * @return {number} Lowest index of the fieldValue if found, otherwise index
+ *    of nearest to fieldValue element in view.
+ */
+anychart.data.ScatterView.prototype.search_ = function(fieldValue) {
+  var iterator = this.getIterator();
+  var length = iterator.getRowsCount();
+
+  var left = 0; // inclusive
+  var right = length; // exclusive
+  var found, compareResult;
+
+  while (left < right) {
+    var middle = (left + right) >> 1;
+    iterator.select(middle);
+    compareResult = anychart.utils.compareAsc(fieldValue, iterator.get('x'));
+    if (compareResult > 0) {
+      left = middle + 1;
+    } else {
+      right = middle;
+      found = !compareResult;
+    }
+  }
+
+  if (found || left == 0)
+    return left;
+  else if (left == length)
+    return left - 1;
+  else {
+    iterator.select(left);
+    var cur = /** @type {number} */ (iterator.get('x'));
+    iterator.select(left - 1);
+    var prev = /** @type {number} */ (iterator.get('x'));
+    if (Math.abs(cur - fieldValue) <= Math.abs(prev - fieldValue))
+      return left;
+    else
+      return left - 1;
+  }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.data.ScatterView.prototype.find = function(fieldName, fieldValue) {
+  if (fieldName != 'x')
+    return goog.base(this, 'find', fieldName, fieldValue);
+
+  this.ensureConsistent();
+  return this.search_(/** @type {number} */ (fieldValue));
+};
