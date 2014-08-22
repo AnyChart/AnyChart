@@ -9,7 +9,7 @@ anychart.onDocumentReady(function() {
   chart.title().text('Range Area Chart');
 
   //create area series with passed data
-  chart.rangeArea([
+  chart.rangeStepArea([
     { low: 182, high: 1122},
     { low: 284, high: 1152},
     { low: 255, high: 1139},

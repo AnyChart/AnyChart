@@ -404,6 +404,12 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.restoreDefaults = functi
 
   this.markers(null);
   this.hoverMarkers(null);
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.content().hAlign('left');
+  tooltip.contentFormatter(function() {
+    return 'High: ' + parseFloat(this.high).toFixed(2) + '\n' +
+        'Low: ' + parseFloat(this.low).toFixed(2);
+  });
 
   return result;
 };

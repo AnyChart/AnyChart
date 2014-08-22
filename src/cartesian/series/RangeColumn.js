@@ -18,14 +18,6 @@ anychart.cartesian.series.RangeColumn = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
-
-  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.content().useHtml(true);
-  tooltip.contentFormatter(function() {
-    return this['x'] + '<br>low: ' + this['low'] + '<br>high: ' + this['high'];
-  });
-  tooltip.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.RangeColumn, anychart.cartesian.series.WidthBased);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_COLUMN] = anychart.cartesian.series.RangeColumn;
@@ -84,6 +76,21 @@ anychart.cartesian.series.RangeColumn.prototype.createPositionProvider = functio
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
   }
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.series.RangeColumn.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.content().hAlign('left');
+  tooltip.contentFormatter(function() {
+    return 'High: ' + parseFloat(this.high).toFixed(2) + '\n' +
+        'Low: ' + parseFloat(this.low).toFixed(2);
+  });
+
+  return result;
 };
 
 
