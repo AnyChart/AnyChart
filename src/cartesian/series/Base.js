@@ -2146,16 +2146,16 @@ anychart.cartesian.series.Base.prototype.normalizeColor = function(color, var_ar
  * @return {!anychart.elements.Legend.LegendItemProvider} Color for legend item.
  */
 anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
-  return {
-    'index': this.index_,
-    'text': goog.isDef(this.name_) ? this.name_ : 'Series: ' + this.index_,
+  return /** @type {!anychart.elements.Legend.LegendItemProvider} */ ({
+    'index': this.index(),
+    'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
     'iconType': this.getType() || anychart.enums.LegendItemIconType.SQUARE,
     'iconStroke': this.getFinalStroke(false, false),
     'iconFill': this.getFinalFill(false, false),
     'iconHatchFill': this.getFinalHatchFill(false, false),
-    'iconMarker': (this.markers() && this.markers().enabled()) ? this.autoMarkerType : null,
-    'meta': this.meta_
-  };
+    'iconMarker': null,
+    'meta': this.meta()
+  });
 };
 
 

@@ -19,7 +19,7 @@ anychart.elements.Credits = function() {
    * @type {string}
    * @private
    */
-  this.text_ = 'AnyChart Trial Version';
+  this.text_ = 'AnyChart';
 
   /**
    * @type {string}
@@ -51,6 +51,29 @@ goog.inherits(anychart.elements.Credits, anychart.VisualBase);
 
 /** @inheritDoc */
 anychart.elements.Credits.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REDRAW;
+
+
+/**
+ * Bottom position of credits dom element in px.
+ * @type {number}
+ * @const
+ */
+anychart.elements.Credits.BOTTOM = 6;
+
+
+/**
+ * RIGHT position of credits dom element in px.
+ * @type {number}
+ * @const
+ */
+anychart.elements.Credits.RIGHT = 10;
+
+
+/**
+ * Regular expression for domain check.
+ * @type {RegExp}
+ */
+anychart.elements.Credits.DOMAIN_REGEXP = /^(.*\.)?anychart\.(com|stg|dev)$/i;
 
 
 /**
@@ -228,8 +251,9 @@ anychart.elements.Credits.prototype.parentBounds = function(opt_value) {
  * @return {anychart.elements.Credits} Return itself for chaining call.
  */
 anychart.elements.Credits.prototype.draw = function() {
-  var valid = anychart.isValidKey();
+  var valid = anychart.isValidKey() || anychart.elements.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
   if (!valid && !this.enabled()) this.suspendSignalsDispatching().enabled(true).resumeSignalsDispatching(false);
+
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -258,7 +282,7 @@ anychart.elements.Credits.prototype.draw = function() {
   }
 
   if (!anychart.elements.Credits.creditsCss_) {
-    anychart.elements.Credits.creditsCss_ = this.createCssElement_();
+    anychart.elements.Credits.creditsCss_ = this.createCssElement_(valid);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -278,13 +302,12 @@ anychart.elements.Credits.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
-    var creditSize = goog.style.getBorderBoxSize(this.domElement_);
+    var containerSize = containerElement ? goog.style.getBorderBoxSize(containerElement) : stage ? stage.getBounds() : new anychart.math.Rect(0, 0, 0, 0);
 
-    goog.style.setPosition(
-        this.domElement_,
-        parentBounds.left + parentBounds.width - creditSize.width - 10, //fixed offsets
-        parentBounds.top + parentBounds.height - creditSize.height - 6
-    );
+    var right = anychart.elements.Credits.RIGHT + (containerSize.width - parentBounds.width - parentBounds.left);
+    var bottom = anychart.elements.Credits.BOTTOM + (containerSize.height - parentBounds.height - parentBounds.top);
+
+    this.setPosition_(right, bottom);
     this.markConsistent(anychart.ConsistencyState.POSITION);
   }
 
@@ -294,6 +317,49 @@ anychart.elements.Credits.prototype.draw = function() {
   }
 
   return this;
+};
+
+
+/**
+ * Set credits dom element right and bottom values.
+ * @param {number} right Right value.
+ * @param {number} bottom Bottom value.
+ * @private
+ */
+anychart.elements.Credits.prototype.setPosition_ = function(right, bottom) {
+  // see goog.style.setPosition method
+  var buggyGeckoSubPixelPos = goog.userAgent.GECKO &&
+      (goog.userAgent.MAC || goog.userAgent.X11) &&
+      goog.userAgent.isVersionOrHigher('1.9');
+
+  // Round to the nearest pixel for buggy sub-pixel support.
+  this.domElement_.style.right = (buggyGeckoSubPixelPos ? Math.round(right) : right) + 'px';
+  this.domElement_.style.bottom = (buggyGeckoSubPixelPos ? Math.round(bottom) : bottom) + 'px';
+};
+
+
+/**
+ * @return {anychart.math.Rect} Bounds that remain after credits.
+ */
+anychart.elements.Credits.prototype.getRemainingBounds = function() {
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+  var stage = container ? container.getStage() : null;
+  var parentBounds;
+  if (this.parentBounds_) {
+    parentBounds = this.parentBounds_;
+  } else if (stage) {
+    parentBounds = stage.getBounds();
+  } else {
+    parentBounds = new anychart.math.Rect(0, 0, 0, 0);
+  }
+
+  if (!this.enabled()) return parentBounds;
+
+  var creditsSize = goog.style.getBorderBoxSize(this.domElement_);
+  // chart height - credits height - bottom
+  parentBounds.height = parentBounds.height - creditsSize.height - anychart.elements.Credits.BOTTOM;
+
+  return parentBounds;
 };
 
 
@@ -319,16 +385,17 @@ anychart.elements.Credits.creditsCss_ = null;
 
 /**
  * @private
+ * @param {boolean} valid Is license key valid.
  * @return {Element} Credits css element.
  */
-anychart.elements.Credits.prototype.createCssElement_ = function() {
+anychart.elements.Credits.prototype.createCssElement_ = function(valid) {
   var styles = '';
   var css = goog.dom.createDom(goog.dom.TagName.STYLE);
   css.type = 'text/css';
 
   styles += '.' + anychart.elements.Credits.CssClass_.CREDITS + '{' +
       'position:absolute;' +
-      'width:110px;' +
+      'width:' + (valid ? '55px;' : '120px;') +
       'height:10px;' +
       '}';
 

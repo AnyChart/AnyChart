@@ -331,6 +331,17 @@ anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerColor = function() 
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = function() {
+  var data = goog.base(this, 'getLegendItemData');
+  if (this.markers().enabled())
+    data['iconMarker'] = this.markers().type() || this.autoMarkerType;
+  return data;
+};
+
+
 /** @inheritDoc */
 anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');

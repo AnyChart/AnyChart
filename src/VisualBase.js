@@ -108,6 +108,21 @@ anychart.VisualBase.prototype.container = function(opt_value) {
       } else {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
       }
+
+      // wrapping <svg> to div with position:relative and size of parent container
+      // need to correctly position credits <a> dom element
+      // see DVF-791
+      var innerDom, parentSize;
+      if (this.container_ instanceof acgraph.vector.Stage) {
+        if (!this.container_.wrapped_) {
+          innerDom = goog.dom.createDom(goog.dom.TagName.DIV, {
+            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%'});
+          goog.dom.appendChild(/** @type {Element} */((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
+          this.container_.container(innerDom);
+          this.container_.wrapped_ = true;
+        }
+      }
+
       var state = anychart.ConsistencyState.CONTAINER;
       var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
       if (!goog.math.Rect.equals(containerBounds, newContainerBounds))

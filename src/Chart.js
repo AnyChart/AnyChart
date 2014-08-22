@@ -756,18 +756,19 @@ anychart.Chart.prototype.draw = function() {
   //end clear container consistency states
 
   totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
-  boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var credits = this.credits();
   if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
     credits.suspendSignalsDispatching();
-    if (!credits.container() && credits.enabled())
+    if (!credits.container())
       credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    credits.parentBounds(/** @type {anychart.math.Rect} */ (this.pixelBounds()));
+    credits.parentBounds(/** @type {anychart.math.Rect} */ (totalBounds));
     credits.resumeSignalsDispatching(false);
     credits.draw();
     this.markConsistent(anychart.ConsistencyState.CREDITS);
   }
+
+  boundsWithoutMargin = this.margin().tightenBounds(/** @type {!anychart.math.Rect} */(this.credits().getRemainingBounds()));
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {

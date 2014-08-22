@@ -2,6 +2,7 @@ goog.provide('anychart.utils');
 goog.require('acgraph');
 goog.require('anychart.enums');
 goog.require('anychart.math');
+goog.require('goog.array');
 goog.require('goog.color');
 goog.require('goog.dom.xml');
 goog.require('goog.json.hybrid');
@@ -702,10 +703,10 @@ anychart.utils.getSalt = function() {
   if (anychart.utils.decryptedSalt_) return anychart.utils.decryptedSalt_;
   var l = anychart.utils.crc32Salt_.length;
   var mod = l % 2 == 0 ? l / 2 : (l + 1 / 2);
-  return anychart.utils.decryptedSalt_ = anychart.utils.crc32Salt_.map(function(v, i) {
+  return anychart.utils.decryptedSalt_ = goog.array.map(goog.array.map(anychart.utils.crc32Salt_, function(v, i) {
     var sign = i % 2 ? -1 : 1;
     return v + sign * (i % mod);
-  }).map(function(v) {
+  }), function(v) {
     return String.fromCharCode(v);
   }).join('');
 };
