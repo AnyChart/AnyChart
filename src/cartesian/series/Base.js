@@ -1825,6 +1825,17 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * @param {number=} opt_fy Y ratio of focal point.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).fill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
@@ -1897,6 +1908,17 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
  * @param {number=} opt_opacity Opacity of the gradient.
  * @param {number=} opt_fx X ratio of focal point.
  * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).hoverFill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc

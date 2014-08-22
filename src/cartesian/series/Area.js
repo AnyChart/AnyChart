@@ -161,9 +161,9 @@ anychart.cartesian.series.area = function(data, opt_csvSettings) {
 
 //exports
 goog.exportSymbol('anychart.cartesian.series.area', anychart.cartesian.series.area);
-anychart.cartesian.series.Area.prototype['fill'] = anychart.cartesian.series.Area.prototype.fill;//in docs/
-anychart.cartesian.series.Area.prototype['hoverFill'] = anychart.cartesian.series.Area.prototype.hoverFill;//in docs/
-anychart.cartesian.series.Area.prototype['stroke'] = anychart.cartesian.series.Area.prototype.stroke;//in docs/
-anychart.cartesian.series.Area.prototype['hoverStroke'] = anychart.cartesian.series.Area.prototype.hoverStroke;//in docs/
-anychart.cartesian.series.Area.prototype['hatchFill'] = anychart.cartesian.series.Area.prototype.hatchFill;//in docs/
-anychart.cartesian.series.Area.prototype['hoverHatchFill'] = anychart.cartesian.series.Area.prototype.hoverHatchFill;//in docs/
+anychart.cartesian.series.Area.prototype['fill'] = anychart.cartesian.series.Area.prototype.fill;//inherited
+anychart.cartesian.series.Area.prototype['hoverFill'] = anychart.cartesian.series.Area.prototype.hoverFill;//inherited
+anychart.cartesian.series.Area.prototype['stroke'] = anychart.cartesian.series.Area.prototype.stroke;//inherited
+anychart.cartesian.series.Area.prototype['hoverStroke'] = anychart.cartesian.series.Area.prototype.hoverStroke;//inherited
+anychart.cartesian.series.Area.prototype['hatchFill'] = anychart.cartesian.series.Area.prototype.hatchFill;//inherited
+anychart.cartesian.series.Area.prototype['hoverHatchFill'] = anychart.cartesian.series.Area.prototype.hoverHatchFill;//inherited

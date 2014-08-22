@@ -168,9 +168,30 @@ anychart.cartesian.series.ContinuousBase.prototype.finalizeHatchFill = goog.null
 
 
 /**
- * Getter and setter for connect missing points setting.
- * If set to true, the series will not be interrupted on missing points.
- * Defaults to false. Markers will not be drawn for missing points in both cases.
+ * Getter for connect missing points setting.
+ * @return {boolean} Current setting.
+ *//**
+ * Setter for connect missing points setting.
+ * @example <t>lineChart</t>
+ * var blueLine = chart.line([
+ *    ['A1', 1],
+ *    ['A2', 1.6],
+ *    ['A3', 'missing'],
+ *    ['A4', 1.1],
+ *    ['A5', 1.9]
+ * ]).connectMissingPoints(false);
+ * var redLine = chart.line([
+ *    ['A1', 2],
+ *    ['A2', 2.6],
+ *    ['A3', 'missing'],
+ *    ['A4', 2.1],
+ *    ['A5', 2.9]
+ * ]).connectMissingPoints(true);
+ * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
+ *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {boolean=} opt_value The value to be set.
  * @return {!anychart.cartesian.series.Base|boolean} The setting, or itself for method chaining.
  */
@@ -310,9 +331,9 @@ anychart.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() 
 
 
 //exports
-anychart.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.cartesian.series.ContinuousBase.prototype.startDrawing;
-anychart.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.cartesian.series.ContinuousBase.prototype.drawMissing;
-anychart.cartesian.series.ContinuousBase.prototype['hoverSeries'] = anychart.cartesian.series.ContinuousBase.prototype.hoverSeries;
-anychart.cartesian.series.ContinuousBase.prototype['hoverPoint'] = anychart.cartesian.series.ContinuousBase.prototype.hoverPoint;
-anychart.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.cartesian.series.ContinuousBase.prototype.unhover;
-anychart.cartesian.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints;
+anychart.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.cartesian.series.ContinuousBase.prototype.startDrawing;//inherited
+anychart.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.cartesian.series.ContinuousBase.prototype.drawMissing;//inherited
+anychart.cartesian.series.ContinuousBase.prototype['hoverSeries'] = anychart.cartesian.series.ContinuousBase.prototype.hoverSeries;//inherited
+anychart.cartesian.series.ContinuousBase.prototype['hoverPoint'] = anychart.cartesian.series.ContinuousBase.prototype.hoverPoint;//inherited
+anychart.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.cartesian.series.ContinuousBase.prototype.unhover;//inherited
+anychart.cartesian.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex
