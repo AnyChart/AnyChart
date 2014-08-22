@@ -26,7 +26,9 @@ anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRa
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.inverseTransform = function(ratio) {
   this.calculate();
-  return ratio * this.range + this.min;
+  if (this.isInverted) ratio = 1 - ratio;
+  var x = (ratio * this.range + anychart.math.log(this.min));
+  return anychart.math.round(Math.exp(x), 7);
 };
 
 

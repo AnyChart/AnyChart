@@ -352,7 +352,10 @@ anychart.cartesian.series.Marker.prototype.hoverSeries = function() {
  * @return {!anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  */
 anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
-  if (this.hoverStatus == index) return this;
+  if (this.hoverStatus == index) {
+    this.showTooltip(event);
+    return this;
+  }
   this.unhover();
   if (this.getResetIterator().select(index)) {
     this.drawMarker_(true, true);

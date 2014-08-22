@@ -43,6 +43,8 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   tooltip.resumeSignalsDispatching(false);
   this.statistics_ = {};
 
+  // make label hoverable
+  this.labels().disablePointerEvents(false);
   this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
 
@@ -354,6 +356,8 @@ anychart.cartesian.series.Base.prototype.hoverStroke_ = null;
 anychart.cartesian.series.Base.prototype.handleLabelMouseOver = function(event) {
   if (event && goog.isDef(event['labelIndex'])) {
     this.hoverPoint(event['labelIndex'], event);
+    var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
+    acgraph.events.listen(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
   } else
     this.unhover();
 };
@@ -364,7 +368,19 @@ anychart.cartesian.series.Base.prototype.handleLabelMouseOver = function(event) 
  * @protected
  */
 anychart.cartesian.series.Base.prototype.handleLabelMouseOut = function(event) {
+  var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
+  acgraph.events.unlisten(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
   this.unhover();
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.handleLabelMouseMove = function(event) {
+  if (event && goog.isDef(event.target['__tagIndex']))
+    this.hoverPoint(event.target['__tagIndex'], event);
 };
 
 
@@ -1018,37 +1034,6 @@ anychart.cartesian.series.Base.prototype.drawLabel = function(hovered) {
  * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
  */
 anychart.cartesian.series.Base.prototype.showTooltip = function(opt_event) {
-  this.moveTooltip(opt_event);
-  acgraph.events.listen(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
-};
-
-
-/**
- * Hide data point tooltip.
- * @protected
- */
-anychart.cartesian.series.Base.prototype.hideTooltip = function() {
-  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
-  acgraph.events.unlisten(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
-  tooltip.hide();
-};
-
-
-/**
- * @protected
- * @param {goog.events.BrowserEvent=} opt_event that initiate tooltip to show.
- */
-anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
 
   if (tooltip.isFloating() && opt_event) {
@@ -1060,6 +1045,15 @@ anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
         this.createFormatProvider(),
         new acgraph.math.Coordinate(0, 0));
   }
+};
+
+
+/**
+ * Hide data point tooltip.
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.hideTooltip = function() {
+  /** @type {anychart.elements.Tooltip} */(this.tooltip()).hide();
 };
 
 
@@ -1171,6 +1165,20 @@ anychart.cartesian.series.Base.prototype.applyRatioToBounds = function(ratio, ho
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Get point index by event.
+ * @param {acgraph.events.Event} event .
+ * @protected
+ * @return {?number} Point index.
+ */
+anychart.cartesian.series.Base.prototype.getIndexByEvent = function(event) {
+  if (goog.isDef(event.target['__tagIndex']))
+    return event.target['__tagIndex'];
+  else
+    return null;
+};
+
+
+/**
  * @param {acgraph.events.Event} event .
  * @protected
  */
@@ -1178,10 +1186,22 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
   var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
   if (res) {
     if (event && event.target) {
-      if (goog.isDef(event.target['__tagIndex']))
-        this.hoverPoint(event.target['__tagIndex'], event);
-      else if (event.target['__tagSeriesGlobal'])
-        this.hoverSeries();
+      var index = this.getIndexByEvent(event);
+      if (!goog.isNull(index)) {
+        this.hoverPoint(/** @type {number} */ (index), event);
+        acgraph.events.listen(
+            event.target,
+            acgraph.events.EventType.MOUSEMOVE,
+            this.handleMouseMove,
+            false,
+            this);
+      }
+      // TODO(AntonKagakin):
+      // в связи с тем что континиус серия теперь умеет определять индекс точки по координате
+      // комментируется до лучших времен, ибо пока серия выделятся не будет.
+      // Ждем фидбека об использовании
+      //else if (event.target['__tagSeriesGlobal'])
+      //  this.hoverSeries();
       else
         this.unhover();
     } else
@@ -1194,9 +1214,32 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
  * @param {acgraph.events.Event} event .
  * @protected
  */
+anychart.cartesian.series.Base.prototype.handleMouseMove = function(event) {
+  var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
+  if (res) {
+    if (event && event.target) {
+      var index = this.getIndexByEvent(event);
+      if (!goog.isNull(index)) {
+        this.hoverPoint(/** @type {number} */ (index), event);
+      }
+    }
+  }
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
 anychart.cartesian.series.Base.prototype.handleMouseOut = function(event) {
   var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
   if (res) {
+    acgraph.events.unlisten(
+        event.target,
+        acgraph.events.EventType.MOUSEMOVE,
+        this.handleMouseMove,
+        false,
+        this);
     this.unhover();
   }
 };
