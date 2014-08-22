@@ -95,9 +95,16 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
-      var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+      var clip;
+      if (goog.isBoolean(this.clip())) {
+        var bounds = this.pixelBounds();
+        var axesLinesSpace = this.axesLinesSpace();
+        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      } else {
+        clip = /** @type {!anychart.math.Rect} */(this.clip());
+      }
       for (i = 0; i < len; i++)
-        this.paths[i].clip(bounds);
+        this.paths[i].clip(clip);
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -252,18 +259,46 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverSeries = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.cartesian.series.ContinuousBase.prototype.getIndexByEvent = function(event) {
+  if (goog.isDef(event.target['__tagIndex']))
+    return event.target['__tagIndex'];
+  else {
+    var bounds = this.pixelBounds();
+    var x = event.clientX;
+    var min, range;
+    var value, index;
+
+    min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+    range = bounds.width;
+    var ratio = (x - min) / range;
+    value = this.xScale().inverseTransform(ratio);
+    index = this.data().find('x', value);
+
+    return /** @type {number} */(index);
+  }
+};
+
+
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, event) {
-  if (this.hoverStatus == index) return this;
+  if (this.hoverStatus == index) {
+    this.showTooltip(event);
+    return this;
+  }
   if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
     this.drawLabel(false);
     this.hideTooltip();
   }
-  if (isNaN(this.hoverStatus)) {
+  // TODO(AntonKagakin): пока что комментируем, что бы не выделять серию
+  // ждем обсуждения. смотреть Base.js:1206
+  /*if (isNaN(this.hoverStatus)) {
     this.applyHatchFill(true);
     this.colorizeShape(true);
-  }
+  }*/
   if (this.getResetIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);

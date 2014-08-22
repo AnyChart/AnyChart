@@ -68,7 +68,7 @@ anychart.elements.Grid = function() {
    * @type {boolean}
    * @private
    */
-  this.minor_;
+  this.isMinor_;
 
   this.restoreDefaults();
 };
@@ -202,6 +202,38 @@ anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
 };
 
 
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.elements.Grid.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
@@ -302,16 +334,16 @@ anychart.elements.Grid.prototype.drawLastLine = function(opt_value) {
  * @param {boolean=} opt_value Minor or not.
  * @return {boolean|anychart.elements.Grid} Is minor grid or Grid instance for method chaining.
  */
-anychart.elements.Grid.prototype.minor = function(opt_value) {
+anychart.elements.Grid.prototype.isMinor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.minor_ != opt_value) {
-      this.minor_ = opt_value;
+    if (this.isMinor_ != opt_value) {
+      this.isMinor_ = opt_value;
       this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.minor_;
+    return this.isMinor_;
   }
 };
 
@@ -463,7 +495,7 @@ anychart.elements.Grid.prototype.draw = function() {
     var ratio;
     var prevRatio = NaN;
     var isOrdinal = this.scale_ instanceof anychart.scales.Ordinal;
-    var ticks = isOrdinal ? scale.ticks() : this.minor() ? scale.minorTicks() : scale.ticks();
+    var ticks = isOrdinal ? scale.ticks() : this.isMinor() ? scale.minorTicks() : scale.ticks();
     var ticksArray = ticks.get();
 
     if (this.isHorizontal()) {
@@ -475,6 +507,14 @@ anychart.elements.Grid.prototype.draw = function() {
     this.evenFillElement().clear();
     this.oddFillElement().clear();
     this.lineElement().clear();
+
+    var bounds = this.parentBounds();
+    var axesLinesSpace = this.axesLinesSpace();
+    var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+
+    this.evenFillElement().clip(clip);
+    this.oddFillElement().clip(clip);
+    this.lineElement().clip(clip);
 
     var drawInterlace = layout[1];
     var drawLine = layout[0];
@@ -550,7 +590,7 @@ anychart.elements.Grid.prototype.restoreDefaults = function() {
   this.zIndex(10);
   this.suspendSignalsDispatching();
   this.layout(anychart.enums.Layout.HORIZONTAL);
-  this.minor(false);
+  this.isMinor(false);
   this.oddFill('#FFFFFF 1');
   this.evenFill('#F5F5F5 1');
   this.stroke('#C1C1C1');
@@ -644,7 +684,7 @@ anychart.elements.Grid.prototype.serialize = function() {
   data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
   data['drawFirstLine'] = this.drawFirstLine();
   data['drawLastLine'] = this.drawLastLine();
-  data['minor'] = this.minor();
+  data['isMinor'] = this.isMinor();
 
   return data;
 };
@@ -663,7 +703,7 @@ anychart.elements.Grid.prototype.deserialize = function(value) {
   if (goog.isDef(value['evenFill'])) this.evenFill(value['evenFill']);
   if (goog.isDef(value['drawFirstLine'])) this.drawFirstLine(value['drawFirstLine']);
   if (goog.isDef(value['drawLastLine'])) this.drawLastLine(value['drawLastLine']);
-  if (goog.isDef(value['minor'])) this.minor(value['minor']);
+  if (goog.isDef(value['isMinor'])) this.isMinor(value['isMinor']);
 
   this.resumeSignalsDispatching(true);
 
@@ -692,7 +732,7 @@ anychart.elements.grid = function() {
 
 //exports
 goog.exportSymbol('anychart.elements.grid', anychart.elements.grid);
-anychart.elements.Grid.prototype['minor'] = anychart.elements.Grid.prototype.minor;
+anychart.elements.Grid.prototype['isMinor'] = anychart.elements.Grid.prototype.isMinor;
 anychart.elements.Grid.prototype['oddFill'] = anychart.elements.Grid.prototype.oddFill;
 anychart.elements.Grid.prototype['evenFill'] = anychart.elements.Grid.prototype.evenFill;
 anychart.elements.Grid.prototype['layout'] = anychart.elements.Grid.prototype.layout;

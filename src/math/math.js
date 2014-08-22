@@ -65,12 +65,26 @@ anychart.math.round = function(num, opt_digitsCount) {
 /**
  * Safe log of a value.
  * @param {number} val .
+ * @param {number=} opt_base Must meet (base > 0 && base != 1).
  * @return {number} .
  */
-anychart.math.log = function(val) {
-  if (val > 1e-7)
-    return Math.log(val);
-  return Math.log(1e-7);
+anychart.math.log = function(val, opt_base) {
+  var res = Math.log(Math.max(1e-7, val));
+  if (opt_base)
+    return res / Math.log(opt_base);
+  else
+    return res;
+};
+
+
+/**
+ * Pow with rounding.
+ * @param {number} base
+ * @param {number} pow
+ * @return {number}
+ */
+anychart.math.pow = function(base, pow) {
+  return anychart.math.round(Math.pow(base, pow), 7);
 };
 
 

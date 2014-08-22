@@ -28,6 +28,14 @@ anychart.scales.Linear = function() {
 
   this.canBeStacked = true;
 
+  /**
+   * Log base value. Used mostly for ticks calculation, because it doesn't affect transformation results.
+   * This value is declared here to avoid calculate() method override.
+   * @type {number}
+   * @protected
+   */
+  this.logBaseVal = 10;
+
   goog.base(this);
 };
 goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
@@ -73,15 +81,15 @@ anychart.scales.Linear.prototype.calculate = function() {
 
   goog.base(this, 'calculate');
 
-  var newRange = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+  var setupResult = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto, this.logBaseVal);
 
   if (this.minimumModeAuto)
-    this.min = newRange[0];
+    this.min = setupResult[0]; // new min
 
   if (this.maximumModeAuto)
-    this.max = newRange[1];
+    this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().get(), this.min, this.max);
+  this.minorTicks().setupAsMinor(this.ticks().get(), this.logBaseVal, setupResult[2], setupResult[3]);
 
   this.range = this.max - this.min;
 };

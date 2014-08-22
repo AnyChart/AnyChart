@@ -181,7 +181,7 @@ anychart.pie.Chart = function(opt_data) {
     return this['x'] || this['name'];
   });
   tooltip.contentFormatter(function() {
-    return (this['x'] || this['name']) + '<br>' + this['value'];
+    return (this['name'] || this['x']) + '<br>' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
 

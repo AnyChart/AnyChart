@@ -183,6 +183,38 @@ anychart.elements.RangeMarker.prototype.parentBounds = function(opt_value) {
 };
 
 
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.elements.RangeMarker.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Settings.
 //----------------------------------------------------------------------------------------------------------------------
@@ -295,13 +327,15 @@ anychart.elements.RangeMarker.prototype.draw = function() {
     var shiftMaxValue = -.5;
 
     var bounds = this.parentBounds();
+    var axesLinesSpace = this.axesLinesSpace();
     this.markerElement().clear();
 
     if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
-      var y_max = Math.round(bounds.getTop() + bounds.height - bounds.height * ratioMaxValue);
-      var y_min = Math.round(bounds.getTop() + bounds.height - bounds.height * ratioMinValue);
+      var y_max = Math.round(bounds.getBottom() - bounds.height * ratioMaxValue);
+      var y_min = Math.round(bounds.getBottom() - bounds.height * ratioMinValue);
       var x_start = bounds.getLeft();
-      var x_end = bounds.getLeft() + bounds.width;
+      var x_end = bounds.getRight();
+
       ratioMaxValue == 1 ? y_max -= shiftMaxValue : y_max += shiftMaxValue;
       ratioMinValue == 1 ? y_min -= shiftMinValue : y_min += shiftMinValue;
 
@@ -313,7 +347,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
           .close();
     } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
       var y_start = bounds.getBottom();
-      var y_end = bounds.getBottom() - bounds.height;
+      var y_end = bounds.getTop();
       var x_min = bounds.getLeft() + (bounds.width * ratioMinValue);
       var x_max = bounds.getLeft() + (bounds.width * ratioMaxValue);
       ratioMaxValue == 1 ? x_max += shiftMaxValue : x_max -= shiftMaxValue;
@@ -325,6 +359,8 @@ anychart.elements.RangeMarker.prototype.draw = function() {
           .lineTo(x_max, y_end)
           .lineTo(x_max, y_start)
           .close();
+
+      this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }

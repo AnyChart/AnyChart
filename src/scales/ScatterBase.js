@@ -193,6 +193,7 @@ anychart.scales.ScatterBase.prototype.resetDataRange = function() {
   this.oldDataRangeMax = this.dataRangeMax;
   this.dataRangeMin = Number.MAX_VALUE;
   this.dataRangeMax = -Number.MAX_VALUE;
+  this.consistent = false;
   return this;
 };
 
@@ -206,10 +207,14 @@ anychart.scales.ScatterBase.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
     var value = +arguments[i];
     if (isNaN(value)) value = parseFloat(arguments[i]);
-    if (value < this.dataRangeMin)
+    if (value < this.dataRangeMin) {
       this.dataRangeMin = value;
-    if (value > this.dataRangeMax)
+      this.consistent = false;
+    }
+    if (value > this.dataRangeMax) {
       this.dataRangeMax = value;
+      this.consistent = false;
+    }
   }
   return this;
 };
@@ -254,13 +259,21 @@ anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRa
 anychart.scales.ScatterBase.prototype.calculate = function() {
   if (this.consistent) return;
   this.consistent = true;
+  this.determineScaleMinMax();
+};
+
+
+/**
+ * Determines this.min, this.max and this.range.
+ * @protected
+ */
+anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
   var range = this.dataRangeMax - this.dataRangeMin;
   if (!range) {
     this.dataRangeMin -= 0.5;
     this.dataRangeMax += 0.5;
     range = 1;
   }
-
   if (this.minimumModeAuto) {
     this.min = this.dataRangeMin - range * this.minimumRangeBasedGap;
     if (this.min < 0 && this.dataRangeMin >= 0)
@@ -272,8 +285,6 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
     if (this.max < 0 && this.dataRangeMax >= 0)
       this.max = 0;
   }
-
-  this.range = this.max - this.min;
 };
 
 

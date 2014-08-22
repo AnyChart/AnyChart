@@ -136,7 +136,7 @@ anychart.cartesian.Chart = function() {
 
     var cartesianChart = /** @type {anychart.cartesian.Chart} */ (this);
     var index = event['index'];
-    var series = cartesianChart.series_[index];
+    var series = cartesianChart.getSeries(index);
     if (series) {
       series.enabled(!series.enabled());
     }
@@ -459,7 +459,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.elements.Grid();
-    grid.minor(true);
+    grid.isMinor(true);
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -2118,6 +2118,10 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       var rightOffset = 0;
       var complete = true;
       var boundsWithoutAxes = bounds.clone();
+      this.topAxisPadding_ = NaN;
+      this.bottomAxisPadding_ = NaN;
+      this.leftAxisPadding_ = NaN;
+      this.rightAxisPadding_ = NaN;
 
       for (i = axes.length; i--;) {
         axis = axes[i];
@@ -2130,18 +2134,26 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
             axis.offsetY(topOffset);
             remainingBounds = axis.getRemainingBounds();
             topOffset += contentAreaBounds.height - remainingBounds.height;
+            if (isNaN(this.topAxisPadding_))
+              this.topAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
           } else if (orientation == anychart.enums.Orientation.BOTTOM) {
             axis.offsetY(bottomOffset);
             remainingBounds = axis.getRemainingBounds();
             bottomOffset = contentAreaBounds.height - remainingBounds.height;
+            if (isNaN(this.bottomAxisPadding_))
+              this.bottomAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
           } else if (orientation == anychart.enums.Orientation.LEFT) {
             axis.offsetX(leftOffset);
             remainingBounds = axis.getRemainingBounds();
             leftOffset += contentAreaBounds.width - remainingBounds.width;
+            if (isNaN(this.leftAxisPadding_))
+              this.leftAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
           } else if (orientation == anychart.enums.Orientation.RIGHT) {
             axis.offsetX(rightOffset);
             remainingBounds = axis.getRemainingBounds();
             rightOffset = contentAreaBounds.width - remainingBounds.width;
+            if (isNaN(this.rightAxisPadding_))
+              this.rightAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
           }
           axis.resumeSignalsDispatching(false);
         }
@@ -2177,7 +2189,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     } while (!complete && attempt < anychart.cartesian.Chart.MAX_ATTEMPTS_AXES_CALCULATION_);
 
     //bounds of data area
-    this.dataBounds_ = boundsWithoutAxes.clone();
+    this.dataBounds_ = boundsWithoutAxes.clone().round();
 
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.AXES);
@@ -2194,12 +2206,14 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
         grid.suspendSignalsDispatching();
         grid.parentBounds(this.dataBounds_);
         grid.container(this.rootElement);
+        grid.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
         grid.draw();
         grid.resumeSignalsDispatching(false);
       }
     }
     this.markConsistent(anychart.ConsistencyState.GRIDS);
   }
+
   //draw axes outside of data bounds
   //only inside axes ticks can intersect data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
@@ -2234,6 +2248,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
         axesMarker.suspendSignalsDispatching();
         axesMarker.parentBounds(this.dataBounds_);
         axesMarker.container(this.rootElement);
+        axesMarker.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
         axesMarker.draw();
         axesMarker.resumeSignalsDispatching(false);
       }
@@ -2245,6 +2260,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
+      series.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
       series.pixelBounds(this.dataBounds_);
     }
 

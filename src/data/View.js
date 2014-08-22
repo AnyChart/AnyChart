@@ -388,6 +388,41 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
+ * Searches fieldName with fieldValue and returns it index.
+ * @param {string} fieldName Name of the field.
+ * @param {*} fieldValue Value of the field.
+ * @return {number} Index in view.
+ */
+anychart.data.View.prototype.find = function(fieldName, fieldValue) {
+  this.ensureConsistent();
+  if (!goog.isDef(fieldName) || !goog.isDef(fieldValue))
+    return -1;
+
+  var iterator = this.getIterator();
+  var index = -1;
+  var value;
+
+  if (!this.cachedValues) this.cachedValues = {};
+  if (!this.cachedValues[fieldName]) this.cachedValues[fieldName] = {};
+
+  if (this.cachedValues[fieldName][fieldValue])
+    return this.cachedValues[fieldName][fieldValue];
+
+  while (iterator.advance()) {
+    index = iterator.getIndex();
+    value = iterator.get(fieldName);
+
+    this.cachedValues[fieldName][value] = index;
+
+    if (value == fieldValue) {
+      return index;
+    }
+  }
+  return -1;
+};
+
+
+/**
  * Returns a new iterator for the current view.
  * @example <t>lineChart</t>
  * var data = anychart.data.set([
@@ -426,6 +461,7 @@ anychart.data.View.prototype.buildMask = function() {
  * @protected
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
+  this.cachedValues = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.DATA_CHANGED);
 };

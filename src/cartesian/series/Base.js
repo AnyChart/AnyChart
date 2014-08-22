@@ -43,6 +43,8 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   tooltip.resumeSignalsDispatching(false);
   this.statistics_ = {};
 
+  // make label hoverable
+  this.labels().disablePointerEvents(false);
   this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
 
@@ -142,6 +144,13 @@ anychart.cartesian.series.Base.prototype.parentView_;
  * @private
  */
 anychart.cartesian.series.Base.prototype.parentViewToDispose_;
+
+
+/**
+ * @type {anychart.utils.Padding}
+ * @private
+ */
+anychart.cartesian.series.Base.prototype.axesLinesSpace_;
 
 
 /**
@@ -354,6 +363,8 @@ anychart.cartesian.series.Base.prototype.hoverStroke_ = null;
 anychart.cartesian.series.Base.prototype.handleLabelMouseOver = function(event) {
   if (event && goog.isDef(event['labelIndex'])) {
     this.hoverPoint(event['labelIndex'], event);
+    var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
+    acgraph.events.listen(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
   } else
     this.unhover();
 };
@@ -364,7 +375,19 @@ anychart.cartesian.series.Base.prototype.handleLabelMouseOver = function(event) 
  * @protected
  */
 anychart.cartesian.series.Base.prototype.handleLabelMouseOut = function(event) {
+  var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
+  acgraph.events.unlisten(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
   this.unhover();
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.handleLabelMouseMove = function(event) {
+  if (event && goog.isDef(event.target['__tagIndex']))
+    this.hoverPoint(event.target['__tagIndex'], event);
 };
 
 
@@ -453,6 +476,38 @@ anychart.cartesian.series.Base.prototype.clip = function(opt_value) {
     return this;
   } else {
     return this.clip_;
+  }
+};
+
+
+/**
+ * Axes lines space.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ *    space.
+ * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
+ * @param {(string|number)=} opt_bottom Bottom space.
+ * @param {(string|number)=} opt_left Left space.
+ * @return {!(anychart.VisualBase|anychart.utils.Padding)} .
+ */
+anychart.cartesian.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.axesLinesSpace_) {
+    this.axesLinesSpace_ = new anychart.utils.Padding();
+    this.registerDisposable(this.axesLinesSpace_);
+  }
+
+  if (arguments.length > 0) {
+    if (arguments.length > 1) {
+      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
+    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.utils.Padding) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
+    } else {
+      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
+    }
+    return this;
+  } else {
+    return this.axesLinesSpace_;
   }
 };
 
@@ -904,7 +959,8 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   var res = scale.transform(0);
   if (isNaN(res))
     res = 0;
-  this.zeroY = this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false);
+
+  this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false));
 
   this.checkDrawingNeeded();
 
@@ -913,6 +969,21 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+};
+
+
+/**
+ * Apply axes lines space.
+ * @param {number} value Value.
+ * @return {number} .
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.applyAxesLinesSpace = function(value) {
+  var bounds = this.pixelBounds();
+  var max = bounds.getBottom() - +this.axesLinesSpace().bottom();
+  var min = bounds.getTop() + +this.axesLinesSpace().top();
+
+  return goog.math.clamp(value, min, max);
 };
 
 
@@ -1018,37 +1089,6 @@ anychart.cartesian.series.Base.prototype.drawLabel = function(hovered) {
  * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
  */
 anychart.cartesian.series.Base.prototype.showTooltip = function(opt_event) {
-  this.moveTooltip(opt_event);
-  acgraph.events.listen(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
-};
-
-
-/**
- * Hide data point tooltip.
- * @protected
- */
-anychart.cartesian.series.Base.prototype.hideTooltip = function() {
-  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
-  acgraph.events.unlisten(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
-  tooltip.hide();
-};
-
-
-/**
- * @protected
- * @param {goog.events.BrowserEvent=} opt_event that initiate tooltip to show.
- */
-anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
 
   if (tooltip.isFloating() && opt_event) {
@@ -1060,6 +1100,15 @@ anychart.cartesian.series.Base.prototype.moveTooltip = function(opt_event) {
         this.createFormatProvider(),
         new acgraph.math.Coordinate(0, 0));
   }
+};
+
+
+/**
+ * Hide data point tooltip.
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.hideTooltip = function() {
+  /** @type {anychart.elements.Tooltip} */(this.tooltip()).hide();
 };
 
 
@@ -1171,6 +1220,20 @@ anychart.cartesian.series.Base.prototype.applyRatioToBounds = function(ratio, ho
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Get point index by event.
+ * @param {acgraph.events.Event} event .
+ * @protected
+ * @return {?number} Point index.
+ */
+anychart.cartesian.series.Base.prototype.getIndexByEvent = function(event) {
+  if (goog.isDef(event.target['__tagIndex']))
+    return event.target['__tagIndex'];
+  else
+    return null;
+};
+
+
+/**
  * @param {acgraph.events.Event} event .
  * @protected
  */
@@ -1178,10 +1241,22 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
   var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
   if (res) {
     if (event && event.target) {
-      if (goog.isDef(event.target['__tagIndex']))
-        this.hoverPoint(event.target['__tagIndex'], event);
-      else if (event.target['__tagSeriesGlobal'])
-        this.hoverSeries();
+      var index = this.getIndexByEvent(event);
+      if (!goog.isNull(index)) {
+        this.hoverPoint(/** @type {number} */ (index), event);
+        acgraph.events.listen(
+            event.target,
+            acgraph.events.EventType.MOUSEMOVE,
+            this.handleMouseMove,
+            false,
+            this);
+      }
+      // TODO(AntonKagakin):
+      // в связи с тем что континиус серия теперь умеет определять индекс точки по координате
+      // комментируется до лучших времен, ибо пока серия выделятся не будет.
+      // Ждем фидбека об использовании
+      //else if (event.target['__tagSeriesGlobal'])
+      //  this.hoverSeries();
       else
         this.unhover();
     } else
@@ -1194,9 +1269,32 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
  * @param {acgraph.events.Event} event .
  * @protected
  */
+anychart.cartesian.series.Base.prototype.handleMouseMove = function(event) {
+  var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
+  if (res) {
+    if (event && event.target) {
+      var index = this.getIndexByEvent(event);
+      if (!goog.isNull(index)) {
+        this.hoverPoint(/** @type {number} */ (index), event);
+      }
+    }
+  }
+};
+
+
+/**
+ * @param {acgraph.events.Event} event .
+ * @protected
+ */
 anychart.cartesian.series.Base.prototype.handleMouseOut = function(event) {
   var res = this.dispatchEvent(new anychart.cartesian.series.Base.BrowserEvent(this, event));
   if (res) {
+    acgraph.events.unlisten(
+        event.target,
+        acgraph.events.EventType.MOUSEMOVE,
+        this.handleMouseMove,
+        false,
+        this);
     this.unhover();
   }
 };
@@ -2125,16 +2223,16 @@ anychart.cartesian.series.Base.prototype.normalizeColor = function(color, var_ar
  * @return {!anychart.elements.Legend.LegendItemProvider} Color for legend item.
  */
 anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
-  return {
-    'index': this.index_,
-    'text': goog.isDef(this.name_) ? this.name_ : 'Series: ' + this.index_,
+  return /** @type {!anychart.elements.Legend.LegendItemProvider} */ ({
+    'index': this.index(),
+    'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
     'iconType': this.getType() || anychart.enums.LegendItemIconType.SQUARE,
     'iconStroke': this.getFinalStroke(false, false),
     'iconFill': this.getFinalFill(false, false),
     'iconHatchFill': this.getFinalHatchFill(false, false),
-    'iconMarker': (this.markers() && this.markers().enabled()) ? this.autoMarkerType : null,
-    'meta': this.meta_
-  };
+    'iconMarker': null,
+    'meta': this.meta()
+  });
 };
 
 
