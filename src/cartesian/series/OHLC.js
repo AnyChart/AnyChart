@@ -138,6 +138,7 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('close')}};
