@@ -2194,12 +2194,14 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
     }
   }
 
-  //-----------left domains connectors calculation, applying labels positions--------------------------------
-
-  this.labelConnectors_ = this.labelConnectors_ ?
-      this.labelConnectors_ :
-      this.container().path().stroke(this.connectorStroke());
+  //-----------init connector element------------------------------------------------------------------------
+  if (!this.labelConnectors_) {
+    this.labelConnectors_ = this.rootElement.path();
+    this.labelConnectors_.stroke(this.connectorStroke_);
+  }
   this.labelConnectors_.clear();
+
+  //-----------left domains connectors calculation, applying labels positions--------------------------------
   var k, labelsLen;
 
   for (i = 0, len = leftDomains.length; i < len; i++) {
