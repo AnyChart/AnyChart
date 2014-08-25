@@ -2711,35 +2711,7 @@ anychart.cartesian.Chart.prototype.serialize = function() {
 };
 
 
-/**
- * Возвращает экземпляр Чарта с исходными настроками (без осей, грида, заголовков, легенды и тд).<br/>
- * <b>Note:</b> Для того, что бы получить чарт с предустановками, используйте один из нижеперечисленных методов:
- *  <ul>
- *      <li>{@link anychart.areaChart}</li>
- *      <li>{@link anychart.barChart}</li>
- *      <li>{@link anychart.columnChart}</li>
- *      <li>{@link anychart.financialChart}</li>
- *      <li>{@link anychart.lineChart}</li>
- *  </ul>
- * @example
- * var chart = anychart.cartesian.chart();
- * chart.line([20, 7, 10, 14]);
- * @return {!anychart.cartesian.Chart} Empty chart.
- */
-anychart.cartesian.chart = function() {
-  var chart = new anychart.cartesian.Chart();
-
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
-
-  return chart;
-};
-
 //exports
-goog.exportSymbol('anychart.cartesian.chart', anychart.cartesian.chart);//doc|ex|need-tr
 anychart.cartesian.Chart.prototype['xScale'] = anychart.cartesian.Chart.prototype.xScale;//doc|ex
 anychart.cartesian.Chart.prototype['yScale'] = anychart.cartesian.Chart.prototype.yScale;//doc|ex
 anychart.cartesian.Chart.prototype['barsPadding'] = anychart.cartesian.Chart.prototype.barsPadding;//doc|ex

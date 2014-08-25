@@ -526,6 +526,11 @@ anychart.cartesian.series.Marker.prototype.restoreDefaults = function() {
   this.type_ = type;
   this.hoverType_ = type;
 
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.contentFormatter(function() {
+    return parseFloat(this.value).toFixed(2);
+  });
+
   return res;
 };
 

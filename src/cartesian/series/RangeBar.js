@@ -18,14 +18,6 @@ anychart.cartesian.series.RangeBar = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'low', 'high'];
   this.referenceValueMeanings = ['x', 'y', 'y'];
   this.referenceValuesSupportStack = false;
-
-  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.content().useHtml(true);
-  tooltip.contentFormatter(function() {
-    return this['x'] + '<br>low: ' + this['low'] + '<br>high: ' + this['high'];
-  });
-  tooltip.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.RangeBar, anychart.cartesian.series.BarBase);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_BAR] = anychart.cartesian.series.RangeBar;
@@ -80,6 +72,7 @@ anychart.cartesian.series.RangeBar.prototype.createPositionProvider = function(p
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
@@ -102,6 +95,21 @@ anychart.cartesian.series.RangeBar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = this.getType();
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.series.RangeBar.prototype.restoreDefaults = function() {
+  var result = goog.base(this, 'restoreDefaults');
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.content().hAlign('left');
+  tooltip.contentFormatter(function() {
+    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+        'Low: ' + parseFloat(this['low']).toFixed(2);
+  });
+
+  return result;
 };
 
 

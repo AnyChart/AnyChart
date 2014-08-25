@@ -156,7 +156,7 @@ anychart.onDocumentReady(function() {
   chart = anychart.financialChart()
       .container('container');
 
-  chart.ohlc(data);
+  chart.candlestick(data);
 
   chart.draw();
 });

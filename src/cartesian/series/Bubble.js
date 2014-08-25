@@ -1143,6 +1143,11 @@ anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
   this.markers(null);
   this.hoverMarkers(null);
 
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.contentFormatter(function() {
+    return parseFloat(this.value).toFixed(2);
+  });
+
   return result;
 };
 

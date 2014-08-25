@@ -1053,7 +1053,27 @@ anychart.elements.Axis.prototype.getOverlappedLabels_ = function(opt_bounds) {
               if (prevDrawableLabel != -1)
                 bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
 
-              if (!anychart.math.checkRectIntersection(bounds1, bounds2)) {
+              if (i != ticksArrLen - 1 && this.drawLastLabel())
+                bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
+              else
+                bounds3 = null;
+
+              if (i == 0) {
+                if (this.drawFirstLabel()) {
+                  prevDrawableLabel = i;
+                  labels.push(true);
+                } else {
+                  labels.push(false);
+                }
+              } else if (i == ticksArrLen - 1) {
+                if (this.drawLastLabel()) {
+                  prevDrawableLabel = i;
+                  labels.push(true);
+                } else {
+                  labels.push(false);
+                }
+              } else if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
+                  anychart.math.checkRectIntersection(bounds1, bounds3))) {
                 prevDrawableLabel = i;
                 labels.push(true);
               } else {
@@ -1092,7 +1112,7 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
 
   var scaleTicksArr = scale.ticks().get();
   var ticksArrLen = scaleTicksArr.length;
-  var i, j, k, bounds1, bounds2, states;
+  var i, j, k, bounds1, bounds2, bounds3, states;
 
   if (!this.labels().enabled())
     return {labels: false, minorLabels: false};
@@ -1143,7 +1163,27 @@ anychart.elements.Axis.prototype.applyStaggerMode_ = function(opt_bounds) {
         else
           bounds2 = null;
 
-        if (!anychart.math.checkRectIntersection(bounds1, bounds2)) {
+        if (i != ticksArrLen - 1 && this.drawLastLabel())
+          bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
+        else
+          bounds3 = null;
+
+        if (i == 0) {
+          if (this.drawFirstLabel()) {
+            prevDrawableLabel = i;
+            states[i] = true;
+          } else {
+            states[i] = false;
+          }
+        } else if (i == ticksArrLen - 1) {
+          if (this.drawLastLabel()) {
+            prevDrawableLabel = i;
+            states[i] = true;
+          } else {
+            states[i] = false;
+          }
+        } else if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
+            anychart.math.checkRectIntersection(bounds1, bounds3))) {
           prevDrawableLabel = i;
           states[i] = true;
         } else {

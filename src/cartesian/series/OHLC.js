@@ -138,6 +138,7 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('close')}};
@@ -175,8 +176,7 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
-anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -216,8 +216,7 @@ anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFil
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
-anychart.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+anychart.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverRisingStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -276,8 +275,7 @@ anychart.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(hover) 
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
-anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -317,8 +315,7 @@ anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFi
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
-anychart.cartesian.series.OHLC.prototype.hoverFallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+anychart.cartesian.series.OHLC.prototype.hoverFallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverFallingStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -439,6 +436,21 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
 
   this.markers(null);
   this.hoverMarkers(null);
+
+  var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
+  tooltip.content().hAlign('left');
+  tooltip.contentFormatter(function() {
+    return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
+        'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
+        'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
+        'C: ' + parseFloat(this['close']).toFixed(4) + '\n';
+  });
+
+  var labels = /** @type {anychart.elements.LabelsFactory} */(this.labels());
+  labels.textFormatter(function() {
+    return this['x'];
+  });
+  labels.offsetY(-10);
 
   return result;
 };

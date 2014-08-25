@@ -10,8 +10,19 @@ goog.require('anychart.modules.scatter');
 
 
 /**
- * Default empty chart.
- * @return {anychart.cartesian.Chart} Empty chart.
+ * Возвращает экземпляр Чарта с исходными настроками (без осей, грида, заголовков, легенды и тд).<br/>
+ * <b>Note:</b> Для того, что бы получить чарт с предустановками, используйте один из нижеперечисленных методов:
+ *  <ul>
+ *      <li>{@link anychart.areaChart}</li>
+ *      <li>{@link anychart.barChart}</li>
+ *      <li>{@link anychart.columnChart}</li>
+ *      <li>{@link anychart.financialChart}</li>
+ *      <li>{@link anychart.lineChart}</li>
+ *  </ul>
+ * @example
+ * var chart = anychart.cartesianChart();
+ * chart.line([20, 7, 10, 14]);
+ * @return {!anychart.cartesian.Chart} Empty chart.
  */
 anychart.cartesianChart = function() {
   var chart = new anychart.cartesian.Chart();
@@ -27,4 +38,4 @@ anychart.cartesianChart = function() {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.Chart', anychart.cartesian.Chart);//in docs/
+goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);//doc|ex|need-tr
