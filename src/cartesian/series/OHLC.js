@@ -436,6 +436,7 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
 
   this.markers(null);
   this.hoverMarkers(null);
+
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.content().hAlign('left');
   tooltip.contentFormatter(function() {
@@ -444,6 +445,12 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
         'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
         'C: ' + parseFloat(this['close']).toFixed(4) + '\n';
   });
+
+  var labels = /** @type {anychart.elements.LabelsFactory} */(this.labels());
+  labels.textFormatter(function() {
+    return this['x'];
+  });
+  labels.offsetY(-10);
 
   return result;
 };

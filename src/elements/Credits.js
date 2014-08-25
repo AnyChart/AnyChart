@@ -339,7 +339,7 @@ anychart.elements.Credits.prototype.setPosition_ = function(right, bottom) {
 
 
 /**
- * @return {anychart.math.Rect} Bounds that remain after credits.
+ * @return {!anychart.math.Rect} Bounds that remain after credits.
  */
 anychart.elements.Credits.prototype.getRemainingBounds = function() {
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
