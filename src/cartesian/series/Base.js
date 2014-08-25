@@ -459,7 +459,7 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
  * chart.yScale().minimum(2);
  * chart.line([1, 4, 7, 1]).clip(false);
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
- * @return {anychart.cartesian.series.Base|boolean|anychart.math.Rect} .
+ * @return {anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
@@ -1652,7 +1652,7 @@ anychart.cartesian.series.Base.prototype.calculateStatistics = function() {
  * @return {!acgraph.vector.Fill} Current color.
  *//**
  * Sets color settings using an object or a string.<br/>
- * <b>Note:</b> <u>color</u> methods sets <u>fill</u> and <b>stroke</b> settings, which means it is not wise to pass
+ * <b>Note: </b> <u>color</u> methods sets <b>fill</b> and <b>stroke</b> settings, which means it is not wise to pass
  * image fill here - stroke doesn't accept image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}

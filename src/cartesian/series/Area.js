@@ -152,7 +152,7 @@ anychart.cartesian.series.Area.prototype.deserialize = function(config) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {!anychart.cartesian.series.Area}
+ * @return {!anychart.cartesian.series.Area} {@link anychart.cartesian.series.Area} instance for method chaining.
  */
 anychart.cartesian.series.area = function(data, opt_csvSettings) {
   return new anychart.cartesian.series.Area(data, opt_csvSettings);

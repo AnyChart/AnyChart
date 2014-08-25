@@ -8,18 +8,18 @@ function load() {
     stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
     /////////////////////////////////////////////////////////
 
-    chart = anychart.lineChart();
+ //   chart = anychart.lineChart();
 
 
-  var labelSettings = anychart.elements.labelsFactory();
-  labelSettings.enabled(true);
-  labelSettings.fontColor('white');
-  labelSettings.fontWeight('bold');
-  var series = chart.line([1,2,3]);
-  series.labels(labelSettings);
-  series.labels().enabled(true);
-
-  chart.container(stage).draw();
+//  var chart = anychart.lineChart();
+  anychart.cartesian.series.candlestick([
+  [0, 2, 4, 1, 3],
+  [1, 3, 5, 1, 2],
+  [2, 2, 5, 1, 4]
+ ])
+      .fallingFill('red')
+      .container(stage).draw();
+//  chart.container(stage).draw();
 
 
 

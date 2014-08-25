@@ -5,6 +5,8 @@ goog.require('anychart.cartesian.series.OHLC');
 
 
 /**
+ * Define Candlestick series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#сandlestick}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -273,13 +275,30 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = functi
 
 
 /**
- * Set/get falling hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.candlestick([1, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Falling hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -593,7 +612,14 @@ anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for Candlestick series.<br/>
+ * <b>Note: </b> In most cases, bar series poorly combined with other types of series.
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *  [1, 4, 1, 2],
+ *  [2, 7, 2, 3],
+ *  [3, 7, 3, 7]
+ * ]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
