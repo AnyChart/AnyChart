@@ -82,7 +82,7 @@ anychart.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
 
     var iterator = this.getIterator();
 
-    var rising = +iterator.get('open') < +iterator.get('close');
+    var rising = Number(iterator.get('open')) < Number(iterator.get('close'));
 
     /** @type {!acgraph.vector.Path} */
     var path = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
