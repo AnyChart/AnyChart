@@ -1,45 +1,71 @@
 anychart.onDocumentReady(function() {
+  //create chart
+  chart = anychart.cartesianChart();
 
-  //data
-  var data = [
-    ['White', 507, 511, 506, 510],
-    ['Black', 510, 511, 506, 507],
-    ['Long lower shadow', 508.5, 511, 506, 510],
-    ['Long upper shadow', 508.5, 511, 506, 507],
-    ['Hammer', 510, 511, 506, 511],
-    ['Inverted hammer', 507, 511, 506,506],
-    ['Spinning top white', 508, 511, 506, 509],
-    ['Spinning top black', 509, 511, 506, 508],
-    ['Doji', 508.5, 510, 507, 508.5],
-    ['Long legged doji', 508.5, 511, 506, 508.5],
-    ['Dragonfly doji', 511, 511, 506, 511],
-    ['Gravestone doji', 506, 511, 506, 506],
-    ['Marubozu white', 506, 511, 506, 511],
-    ['Marubozu black', 511, 511, 506, 506]
-  ];
+  //set container id for the chart
+  chart.container('container');
 
-  //chart type
-  chart = anychart.lineChart();
+  //set chart title text settings
+  chart.title().text('Multi-Series Bubble Chart');
 
-  //disabling titles
-  chart.title().enabled(false);
-  chart.xAxis().title().enabled(false);
-  chart.yAxis().title().enabled(false);
+  //create chart X axis with default settings
+  chart.xAxis();
 
-  //rotate x axis labels
-  chart.xAxis().labels().rotation(-90);
+  //create chart Y axis with default settings
+  chart.yAxis();
 
-  //adjust x scale type
-  chart.xScale(anychart.scales.ordinal());
+  //create horizontal chart grid
+  chart.grid().layout('horizontal');
 
-  //set data and adjust colors
-  chart.candlestick(data)
-      .fallingFill('black')
-      .fallingStroke('black')
-      .risingFill('white')
-      .risingStroke('black')
-      .tooltip().enabled(true);
+  //create vertical chart grid
+  chart.grid()
+      .evenFill('none')
+      .oddFill('none')
+      .layout('vertical');
 
-  //draw
-  chart.container('container').draw();
+  //create vertical minor chart grid
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.075')
+      .layout('vertical');
+
+  //create marker series
+  chart.bubble([
+    ['P1', 142, 7],
+    ['P2', 134, 20],
+    ['P3', 156, 12],
+    ['P4', 122, 18],
+    ['P5', 148, 23]
+  ]);
+
+  //create marker series
+  chart.bubble([
+    ['P1', 13, 11],
+    ['P2', 25, 5],
+    ['P3', 76, 19],
+    ['P4', 86, 2],
+    ['P5', 95, 24]
+  ]);
+
+  //create marker series
+  chart.bubble([
+    ['P1', 75, 4],
+    ['P2', 56, 7],
+    ['P3', 67, 14],
+    ['P4', 42, 18],
+    ['P5', 17, 4]
+  ]);
+
+  //create marker series
+  chart.bubble([
+    ['P1', 13, 4],
+    ['P2', 29, 4],
+    ['P3', 26, 4],
+    ['P4', 39, 4],
+    ['P5', 17, 4]
+  ]);
+
+  //initiate chart drawing
+  chart.draw();
 });
