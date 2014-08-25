@@ -108,7 +108,7 @@ anychart.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function()
 
     iterator = this.getIterator();
 
-    var rising = iterator.get('open') < iterator.get('close');
+    var rising = +iterator.get('open') < +iterator.get('close');
 
     /** @type {!acgraph.vector.Path} */
     var path = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
