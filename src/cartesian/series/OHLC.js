@@ -138,6 +138,7 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('close')}};
@@ -438,10 +439,10 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.content().hAlign('left');
   tooltip.contentFormatter(function() {
-    return 'O: ' + parseFloat(this.open).toFixed(4) + '\n' +
-        'H: ' + parseFloat(this.high).toFixed(4) + '\n' +
-        'L: ' + parseFloat(this.low).toFixed(4) + '\n' +
-        'C: ' + parseFloat(this.close).toFixed(4) + '\n';
+    return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
+        'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
+        'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
+        'C: ' + parseFloat(this['close']).toFixed(4) + '\n';
   });
 
   return result;

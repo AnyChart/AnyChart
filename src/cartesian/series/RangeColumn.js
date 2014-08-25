@@ -72,6 +72,7 @@ anychart.cartesian.series.RangeColumn.prototype.createPositionProvider = functio
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
@@ -86,8 +87,8 @@ anychart.cartesian.series.RangeColumn.prototype.restoreDefaults = function() {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.content().hAlign('left');
   tooltip.contentFormatter(function() {
-    return 'High: ' + parseFloat(this.high).toFixed(2) + '\n' +
-        'Low: ' + parseFloat(this.low).toFixed(2);
+    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+        'Low: ' + parseFloat(this['low']).toFixed(2);
   });
 
   return result;
