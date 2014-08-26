@@ -107,6 +107,7 @@ anychart.elements.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @example
  * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits(true);
  * chart.credits().text('Changed credits');
  * chart.container(stage).draw();
  * @param {string=} opt_value Text value.
@@ -139,6 +140,7 @@ anychart.elements.Credits.prototype.text = function(opt_value) {
  * @example
  * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits(true);
  * chart.credits().url('http://www.anychart.com/buy/');
  * chart.container(stage).draw();
  * @param {string=} opt_value Url value.
@@ -171,6 +173,7 @@ anychart.elements.Credits.prototype.url = function(opt_value) {
  * @example
  * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits(true);
  * chart.credits().alt('Custom alternative text.');
  * chart.container(stage).draw();
  * @param {string=} opt_value Title value.
@@ -203,6 +206,7 @@ anychart.elements.Credits.prototype.alt = function(opt_value) {
  * @example
  * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
+ * chart.credits(true);
  * chart.credits().logoSrc(null);
  * chart.container(stage).draw();
  * @param {string=} opt_value Logo source value.
