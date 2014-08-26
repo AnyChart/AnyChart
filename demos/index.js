@@ -1,0 +1,2 @@
+anychart.onDocumentLoad(function() {
+});

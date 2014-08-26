@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../src/deps.js"></script>
+  <meta charset="utf-8">
+  <script>
+    goog.require('anychart.modules.anychart');
+  </script>
+  <script src="index.js"></script>
+  <style>
+    input {
+      width: 80px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body onload="load()">
+<div id="container" style="border: 1px solid; width: 1157px; height: 622px;"></div>
+<table>
+  orientation
+  <tr>
+    <td><input type="button" onclick="oo(this.value)" value="lefttop"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="top"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="righttop"/></td>
+  </tr>
+  <tr>
+    <td><input type="button" onclick="oo(this.value)" value="leftcenter"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="center"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="rightcenter"/></td>
+  </tr>
+  <tr>
+    <td><input type="button" onclick="oo(this.value)" value="leftbottom"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="bottom"/></td>
+    <td><input type="button" onclick="oo(this.value)" value="rightbottom"/></td>
+  </tr>
+</table>
+<table>
+  anchor
+  <tr>
+    <td><input type="button" onclick="aa(this.value)" value="lefttop"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="top"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="righttop"/></td>
+  </tr>
+  <tr>
+    <td><input type="button" onclick="aa(this.value)" value="leftcenter"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="center"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="rightcenter"/></td>
+  </tr>
+  <tr>
+    <td><input type="button" onclick="aa(this.value)" value="leftbottom"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="bottom"/></td>
+    <td><input type="button" onclick="aa(this.value)" value="rightbottom"/></td>
+  </tr>
+</table>
+</body>
+</html>
