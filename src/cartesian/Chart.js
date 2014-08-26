@@ -2105,7 +2105,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
   //calculate axes space first, the result is data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //total bounds of content area
-    var contentAreaBounds = bounds.clone();
+    var contentAreaBounds = bounds.clone().round();
     var attempt = 0;
     do {
       //axes local vars

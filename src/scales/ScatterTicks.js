@@ -237,7 +237,7 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
     this.autoTicks_ = null;
   } else {
     if (this.autoTicks_)
-      this.autoTicks_.lenght = 0;
+      this.autoTicks_.length = 0;
     else
       this.autoTicks_ = [];
     if (values.length < 2) return;
