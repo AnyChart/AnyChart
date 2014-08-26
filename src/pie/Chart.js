@@ -492,17 +492,27 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.pie.Chart|Function} .
  */
-anychart.pie.Chart.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.fill_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.pie.Chart.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.fill_) {
+      this.fill_ = fill;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
-  } else {
-    return this.fill_;
   }
+  return this.fill_;
 };
 
 
@@ -531,17 +541,26 @@ anychart.pie.Chart.prototype.fill = function(opt_value) {
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.pie.Chart|acgraph.vector.Stroke|Function} .
  */
-anychart.pie.Chart.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.stroke_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.pie.Chart.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.stroke_) {
+      this.stroke_ = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
-  } else {
-    return this.stroke_;
   }
+  return this.stroke_;
 };
 
 
@@ -570,17 +589,27 @@ anychart.pie.Chart.prototype.stroke = function(opt_value) {
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value .
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill|anychart.pie.Chart)} .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.pie.Chart|Function} .
  */
-anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.hoverFill_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.pie.Chart.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.hoverFill_) {
+      this.hoverFill_ = fill;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
-  } else {
-    return this.hoverFill_;
   }
+  return this.hoverFill_;
 };
 
 
@@ -609,17 +638,26 @@ anychart.pie.Chart.prototype.hoverFill = function(opt_value) {
  * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value .
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke|anychart.pie.Chart)} .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.pie.Chart|acgraph.vector.Stroke|Function} .
  */
-anychart.pie.Chart.prototype.hoverStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.hoverStroke_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.pie.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.hoverStroke_) {
+      this.hoverStroke_ = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
-  } else {
-    return this.hoverStroke_;
   }
+  return this.hoverStroke_;
 };
 
 
@@ -1195,6 +1233,19 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 
   this.cx_ = bounds.left + bounds.width / 2;
   this.cy_ = bounds.top + bounds.height / 2;
+
+  /**
+   * Bounds of pie. (Not bounds of content area).
+   * Need for radial gradient to set correct bounds.
+   * @type {anychart.math.Rect}
+   * @private
+   */
+  this.pieBounds_ = new anychart.math.Rect(
+      this.cx_ - this.radiusValue_,
+      this.cy_ - this.radiusValue_,
+      this.radiusValue_ * 2,
+      this.radiusValue_ * 2
+      );
 };
 
 
@@ -1282,6 +1333,10 @@ anychart.pie.Chart.prototype.normalizeColor = function(color, var_args) {
     fill = color.call(scope);
   } else
     fill = color;
+  // if fill is instance of radial gradient - set pieBounds_ if they was calculated
+  // pieBounds_ undefined when legend item tries to get iconFill and iconStroke.
+  if (goog.isObject(fill) && goog.isNull(fill.mode) && fill.hasOwnProperty('cx'))
+    fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
   return fill;
 };
 
