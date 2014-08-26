@@ -40,6 +40,32 @@ anychart.elements.LegendItem = function() {
    * @type {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))}
    */
   this.iconType_;
+
+  /**
+   * Object with default stroke for icon type that should always be with stroke.
+   * @type {Object}
+   * @private
+   */
+  this.nonNullableStrokes_ = {
+    'line': 'black',
+    'spline': 'black',
+    'stepline': 'black',
+    'ohlc': 'black',
+    'candlestick': 'black'
+  };
+
+  /**
+   * Icon types that should not have fill.
+   * @type {Object}
+   * @private
+   */
+  this.shouldBeNullFills_ = {
+    'line': true,
+    'spline': true,
+    'stepline': true,
+    'ohlc': true
+  };
+
   this.x(0);
   this.y(0);
   this.iconType(anychart.enums.LegendItemIconType.SQUARE);
@@ -787,8 +813,7 @@ anychart.elements.LegendItem.prototype.draw = function() {
         drawer.call(this, this.hatch_, this.iconSize_);
       this.redrawIcon_ = false;
     }
-    this.icon_.fill(this.iconFill_);
-    this.icon_.stroke(this.iconStroke_);
+    this.applyFillAndStroke_();
     if (this.hatch_)
       this.hatch_.fill(this.iconHatchFill_);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -806,6 +831,23 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.layer_.translate(/** @type {number} */(this.pixelBounds_.left), /** @type {number} */(this.pixelBounds_.top));
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
+};
+
+
+/**
+ * Applies fill and stroke to icon.
+ * @private
+ */
+anychart.elements.LegendItem.prototype.applyFillAndStroke_ = function() {
+  if (anychart.utils.isNone(this.iconStroke_) && (this.iconType_ in this.nonNullableStrokes_))
+    this.icon_.stroke(this.nonNullableStrokes_[this.iconType_]);
+  else
+    this.icon_.stroke(this.iconStroke_);
+
+  if (this.iconType_ in this.shouldBeNullFills_)
+    this.icon_.fill(null);
+  else
+    this.icon_.fill(this.iconFill_);
 };
 
 
