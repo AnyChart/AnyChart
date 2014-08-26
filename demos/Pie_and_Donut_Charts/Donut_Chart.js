@@ -17,6 +17,8 @@ anychart.onDocumentReady(function() {
 
   //create empty area in pie chart
   chart.innerRadius('40%');
+  chart.labelsPosition('outside');
+  chart.labels().fontColor('black');
 
   //initiate chart drawing
   chart.draw();

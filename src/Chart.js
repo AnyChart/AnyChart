@@ -721,6 +721,8 @@ anychart.Chart.prototype.draw = function() {
   var totalBounds;
   //chart area with applied margin
   var boundsWithoutMargin;
+  //chart area bounds with applied margin and copped by credits
+  var boundsWithoutCredits;
   //chart area with applied margin and padding
   var boundsWithoutPadding;
   // chart area with applied margin, padding and title
@@ -756,19 +758,7 @@ anychart.Chart.prototype.draw = function() {
   //end clear container consistency states
 
   totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
-
-  var credits = this.credits();
-  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
-    credits.suspendSignalsDispatching();
-    if (!credits.container())
-      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    credits.parentBounds(/** @type {anychart.math.Rect} */ (totalBounds));
-    credits.resumeSignalsDispatching(false);
-    credits.draw();
-    this.markConsistent(anychart.ConsistencyState.CREDITS);
-  }
-
-  boundsWithoutMargin = this.margin().tightenBounds(/** @type {!anychart.math.Rect} */(this.credits().getRemainingBounds()));
+  boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
@@ -780,7 +770,19 @@ anychart.Chart.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
   }
 
-  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
+  var credits = this.credits();
+  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
+    credits.suspendSignalsDispatching();
+    if (!credits.container())
+      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    credits.parentBounds(/** @type {anychart.math.Rect} */ (boundsWithoutMargin));
+    credits.resumeSignalsDispatching(false);
+    credits.draw();
+    this.markConsistent(anychart.ConsistencyState.CREDITS);
+  }
+  boundsWithoutCredits = this.credits().getRemainingBounds();
+
+  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
   var title = this.title();
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
     title.suspendSignalsDispatching();
