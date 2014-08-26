@@ -45,6 +45,9 @@ anychart.elements.Credits = function() {
    * @private
    */
   this.domElement_ = null;
+
+  //disable by default at anychart related domains
+  this.enabled(!anychart.elements.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
 };
 goog.inherits(anychart.elements.Credits, anychart.VisualBase);
 
