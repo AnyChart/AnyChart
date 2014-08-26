@@ -355,12 +355,13 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  */
 anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var grid = this.grids_[index];
   if (!grid) {
@@ -449,12 +450,13 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  */
 anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var grid = this.minorGrids_[index];
   if (!grid) {
@@ -541,12 +543,13 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var axis = this.xAxes_[index];
   if (!axis) {
@@ -619,12 +622,13 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
  */
 anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var axis = this.yAxes_[index];
   if (!axis) {
@@ -713,12 +717,13 @@ anychart.cartesian.Chart.prototype.onAxisSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
@@ -779,12 +784,13 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
  */
 anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
@@ -847,12 +853,13 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
  */
 anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_value) {
   var index, value;
-  if (goog.isNumber(opt_indexOrValue) || (goog.isString(opt_indexOrValue) && !isNaN(+opt_indexOrValue))) {
-    index = +opt_indexOrValue;
-    value = opt_value;
-  } else {
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
     index = 0;
     value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
   }
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
@@ -1665,15 +1672,7 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
 
   //search for scales in series
   for (i = 0, count = this.series_.length; i < count; i++) {
-    //----------------------------------calc statistics for series
     series = this.series_[i];
-    series.calculateStatistics();
-    max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
-    min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
-    sum += /** @type {number} */(series.statistics('seriesSum'));
-    pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
-    //----------------------------------end calc statistics for series
-
 
     //series X scale
     if (!series.xScale()) {
@@ -1728,6 +1727,14 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
       else
         seriesOfOrdinalScalesWithNamesField[id] = [series];
     }
+
+    //----------------------------------calc statistics for series
+    series.calculateStatistics();
+    max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
+    min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
+    sum += /** @type {number} */(series.statistics('seriesSum'));
+    pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
+    //----------------------------------end calc statistics for series
   }
 
   //----------------------------------calc statistics for series
@@ -2135,25 +2142,25 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
             remainingBounds = axis.getRemainingBounds();
             topOffset += contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.topAxisPadding_))
-              this.topAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
+              this.topAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
           } else if (orientation == anychart.enums.Orientation.BOTTOM) {
             axis.offsetY(bottomOffset);
             remainingBounds = axis.getRemainingBounds();
             bottomOffset = contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.bottomAxisPadding_))
-              this.bottomAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
+              this.bottomAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
           } else if (orientation == anychart.enums.Orientation.LEFT) {
             axis.offsetX(leftOffset);
             remainingBounds = axis.getRemainingBounds();
             leftOffset += contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.leftAxisPadding_))
-              this.leftAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
+              this.leftAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
           } else if (orientation == anychart.enums.Orientation.RIGHT) {
             axis.offsetX(rightOffset);
             remainingBounds = axis.getRemainingBounds();
             rightOffset = contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.rightAxisPadding_))
-              this.rightAxisPadding_ = axis.stroke()['thickness'] ? parseFloat(axis.stroke()['thickness']) : 1;
+              this.rightAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
           }
           axis.resumeSignalsDispatching(false);
         }

@@ -415,8 +415,8 @@ anychart.ui.Paginator.prototype.currentPage = function(opt_value) {
  * @private
  */
 anychart.ui.Paginator.prototype.createTextString_ = function() {
-  var currentPageStr = isNaN(this.currentPage_) ? '-' : (this.currentPage_ + 1).toString();
-  var pageCountStr = isNaN(this.pageCount_) ? '-' : (this.pageCount_).toString();
+  var currentPageStr = isNaN(this.currentPage_) ? '-' : String(this.currentPage_ + 1);
+  var pageCountStr = isNaN(this.pageCount_) ? '-' : String(this.pageCount_);
 
   return currentPageStr + ' / ' + pageCountStr;
 };

@@ -161,6 +161,35 @@ anychart.utils.isPercent = function(value) {
 
 
 /**
+ * Converts value of any type to number, according to these rules:
+ * 1) number -> number
+ * 2) string -> number only if it is a number (no parseFloat, just +)
+ * 3) NaN -> NaN
+ * 4) null -> NaN
+ * 5) boolean -> NaN
+ * 6) undefined -> NaN
+ * 7) Object -> Object.valueOf
+ * @param {*} value
+ * @return {number}
+ */
+anychart.utils.toNumber = function(value) {
+  if (goog.isNull(value) || goog.isBoolean(value))
+    return NaN;
+  return +value;
+};
+
+
+/**
+ * Converts to number and checks if it is NaN.
+ * @param {*} value
+ * @return {boolean}
+ */
+anychart.utils.isNaN = function(value) {
+  return isNaN(anychart.utils.toNumber(value));
+};
+
+
+/**
  * Normalizes passed value to a natural value (strictly-positive integer).
  * If a number-like value passed and if it is greater than 0.5, it is rounded.
  * If it is not a number or it is less than 1 it defaults to opt_default || 1.

@@ -815,7 +815,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   text = this.textFormatter_.call(formatProvider, formatProvider);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
-  this.measureTextElement_.text(goog.isDef(text) ? text.toString() : null);
+  this.measureTextElement_.text(goog.isDef(text) ? String(text) : null);
 
   //we should ask text element about bounds only after text format and text settings are applied
 
@@ -1855,8 +1855,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     this.textElement_.width(null);
     this.textElement_.height(null);
 
-    if (isHtml) this.textElement_.htmlText(goog.isDef(text) ? text.toString() : null);
-    else this.textElement_.text(goog.isDef(text) ? text.toString() : null);
+    if (isHtml) this.textElement_.htmlText(goog.isDef(text) ? String(text) : '');
+    else this.textElement_.text(goog.isDef(text) ? String(text) : '');
 
     parentLabelsFactory.applyTextSettings(this.textElement_, true);
     if (notSelfSettings) labelsFactory.applyTextSettings(this.textElement_, false);

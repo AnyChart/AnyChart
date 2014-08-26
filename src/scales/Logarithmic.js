@@ -37,6 +37,7 @@ anychart.scales.Logarithmic.prototype.logBase = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
+  value = anychart.utils.toNumber(value);
   var result = (anychart.math.log(/** @type {number} */(value), this.logBaseVal) - this.transformedMin_) / this.range;
   return this.isInverted ? 1 - result : result;
 };

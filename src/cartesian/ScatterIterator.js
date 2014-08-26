@@ -145,7 +145,7 @@ anychart.cartesian.ScatterIterator.prototype.findMin = function(var_args) {
   var argsLen = arguments.length;
   var res = NaN;
   for (var i = 0; i < argsLen; i++) {
-    var val = +arguments[i];
+    var val = anychart.utils.toNumber(arguments[i]);
     if (!isNaN(val))
       res = isNaN(res) ? val : Math.min(res, val);
   }

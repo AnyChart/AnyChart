@@ -416,7 +416,7 @@ anychart.cartesian.series.Bubble.prototype.drawSubsequentPoint = function() {
  */
 anychart.cartesian.series.Bubble.prototype.colorizeShape = function(hover) {
   var shape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('shape'));
-  var size = +/** @type {number} */(this.getIterator().meta('size'));
+  var size = anychart.utils.toNumber(this.getIterator().meta('size'));
   if (goog.isDef(shape) && !isNaN(size)) {
     var stroke, fill;
 
@@ -441,7 +441,7 @@ anychart.cartesian.series.Bubble.prototype.colorizeShape = function(hover) {
  */
 anychart.cartesian.series.Bubble.prototype.applyHatchFill = function(hover) {
   var hatchFillShape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('hatchFillShape'));
-  var size = +/** @type {number} */(this.getIterator().meta('size'));
+  var size = anychart.utils.toNumber(this.getIterator().meta('size'));
   if (goog.isDefAndNotNull(hatchFillShape) && !isNaN(size)) {
     var fill;
     if (size < 0) {

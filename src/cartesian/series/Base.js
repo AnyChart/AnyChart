@@ -700,10 +700,11 @@ anychart.cartesian.series.Base.prototype.getReferenceScaleValues = function() {
   if (!this.enabled()) return null;
   var res = [];
   var iterator = this.getIterator();
+  var yScale = this.yScale();
   for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
     if (this.referenceValueMeanings[i] != 'y') continue;
     var val = iterator.get(this.referenceValueNames[i]);
-    if (isNaN(val)) return null;
+    if (yScale.isMissing(val)) return null;
     res.push(val);
   }
   return res;
@@ -741,24 +742,25 @@ anychart.cartesian.series.Base.prototype.getReferenceCoords = function() {
 
     var pix;
 
-    // correct missing checking
-    if (val == null) val = NaN;
-
     switch (this.referenceValueMeanings[i]) {
       case 'x':
-        pix = this.applyRatioToBounds(
+        pix = xScale.isMissing(val) ? NaN : this.applyRatioToBounds(
             xScale.transform(val, /** @type {number} */(this.xPointPosition())),
             true);
         break;
       case 'y':
         if (this.referenceValuesSupportStack)
           val = yScale.applyStacking(val);
+        else if (yScale.isMissing(val))
+          val = NaN;
         pix = this.applyRatioToBounds(yScale.transform(val, 0.5), false);
         break;
       case 'z':
         if (stacked) {
           if (this.referenceValuesSupportStack)
             val = yScale.getPrevVal(val);
+          else if (yScale.isMissing(val))
+            val = NaN;
           pix = this.applyRatioToBounds(goog.math.clamp(yScale.transform(val, 0.5), 0, 1), false);
         } else {
           pix = this.zeroY;
@@ -1623,7 +1625,7 @@ anychart.cartesian.series.Base.prototype.calculateStatistics = function() {
   while (iterator.advance()) {
     var values = this.getReferenceScaleValues();
     if (values) {
-      var y = parseFloat(values[0]);
+      var y = anychart.utils.toNumber(values[0]);
       if (!isNaN(y)) {
         seriesMax = Math.max(seriesMax, y);
         seriesMin = Math.min(seriesMin, y);

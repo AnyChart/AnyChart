@@ -56,6 +56,16 @@ anychart.scales.Base.prototype.inverseTransform = goog.abstractMethod;
 
 
 /**
+ * Checks if passed value will be treated as missing by this scale.
+ * @param {*} value
+ * @return {boolean}
+ */
+anychart.scales.Base.prototype.isMissing = function(value) {
+  return anychart.utils.isNaN(value);
+};
+
+
+/**
  * Getter and setter for scale inversion. If the scale is inverted, axes and series go upside-down or right-to-left
  * instead of bottom-to-top and left-to-right.
  * @param {boolean=} opt_value Inverted state to set.
@@ -287,14 +297,15 @@ anychart.scales.Base.prototype.applyStacking;
  * @return {number} Previously stacked data value. Returns 0, if previous value was NaN.
  */
 anychart.scales.Base.prototype.getPrevVal = function(value) {
-  value = goog.isNull(value) ? NaN : +value;
-  if (this.stackMode_ != anychart.enums.ScaleStackMode.NONE && !isNaN(value)) {
+  value = anychart.utils.toNumber(value);
+  if (this.stackMode_ == anychart.enums.ScaleStackMode.NONE || isNaN(value)) {
+    return 0;
+  } else {
     if (value >= 0)
       return this.stackPositive_;
     else
       return this.stackNegative_;
-  } else
-    return 0;
+  }
 };
 
 
@@ -324,7 +335,7 @@ anychart.scales.Base.prototype.applyModeNone_ = function(value) {
  * @private
  */
 anychart.scales.Base.prototype.applyModeValue_ = function(value) {
-  value = goog.isNull(value) ? NaN : +value;
+  value = anychart.utils.toNumber(value);
   var isNotMissing = !isNaN(value);
   if (isNotMissing) {
     if (/** @type {number} */(value) >= 0) {
@@ -345,7 +356,7 @@ anychart.scales.Base.prototype.applyModeValue_ = function(value) {
  * @private
  */
 anychart.scales.Base.prototype.applyModePercent_ = function(value) {
-  value = goog.isNull(value) ? NaN : +value;
+  value = anychart.utils.toNumber(value);
   var max = /** @type {number} */(value) < 0 ? -this.stackMin_ : this.stackMax_;
   return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, -100, 100));
 };

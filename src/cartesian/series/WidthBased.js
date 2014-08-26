@@ -52,7 +52,7 @@ anychart.cartesian.series.WidthBased.prototype.pointWidth = function(opt_value) 
  * @return {anychart.cartesian.series.WidthBased} Bar width pixel value or Bar instance for chaining call.
  */
 anychart.cartesian.series.WidthBased.prototype.setAutoBarWidth = function(value) {
-  this.autoBarWidth_ = (value * 100).toString() + '%';
+  this.autoBarWidth_ = String(value * 100) + '%';
   return this;
 };
 

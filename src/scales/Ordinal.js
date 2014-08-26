@@ -83,18 +83,7 @@ anychart.scales.Ordinal.ValuesMapNode;
  * @private
  */
 anychart.scales.Ordinal.DEFAULT_COMPARATOR_ = function(a, b) {
-  var aType = goog.typeOf(a.key);
-  var bType = goog.typeOf(b.key);
-  if (aType < bType) {
-    return -1;
-  } else if (aType > bType) {
-    return 1;
-  } if (a.key < b.key) {
-    return -1;
-  } else if (a.key > b.key) {
-    return 1;
-  }
-  return 0;
+  return anychart.utils.compareAsc(a.key, b.key);
 };
 
 
@@ -106,6 +95,12 @@ anychart.scales.Ordinal.DEFAULT_COMPARATOR_ = function(a, b) {
  */
 anychart.scales.Ordinal.createInputDomainMapNode_ = function(key, value) {
   return {key: key, value: value};
+};
+
+
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.isMissing = function(value) {
+  return !goog.isDef(value);
 };
 
 

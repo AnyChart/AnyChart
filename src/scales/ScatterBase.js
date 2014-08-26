@@ -247,6 +247,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
  */
 anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
+  value = anychart.utils.toNumber(value);
   var result = (+(/** @type {number} */(value)) - this.min) / this.range;
   return this.isInverted ? 1 - result : result;
 };

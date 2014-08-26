@@ -205,7 +205,7 @@ anychart.utils.PrintHelper.prototype.load_ = function(svgText) {
 
       'POST',
 
-      data.toString()
+      String(data)
   );
 
   //  $.ajax({

@@ -31,6 +31,19 @@ anychart.scales.DateTime = function() {
 goog.inherits(anychart.scales.DateTime, anychart.scales.ScatterBase);
 
 
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.isMissing = function(value) {
+  if (goog.isString(value)) {
+    var tmp = +new Date(value);
+    if (isNaN(tmp))
+      return isNaN(value);
+    else
+      return isNaN(+value);
+  }
+  return !(value instanceof Date) || goog.base(this, 'isMissing', value);
+};
+
+
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
