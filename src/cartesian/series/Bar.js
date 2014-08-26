@@ -110,7 +110,7 @@ anychart.cartesian.series.bar = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);
+goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);//doc|ex
 anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//inherited
 anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//inherited
 anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//ininherited

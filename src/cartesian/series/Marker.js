@@ -7,6 +7,10 @@ goog.require('anychart.enums');
 
 
 /**
+ * Define Marker series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#marker}.
+ * @example
+ * anychart.cartesian.series.marker([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -68,15 +72,14 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
  *//**
  * Setter for marker type settings.
  * @example <c>By Enum value.</c>
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
+ * chart = anychart.cartesianChart();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .type('star4')
  *    .hoverType('star6');
+ * chart.container(stage).draw();
  * @example <c>By custom function.</c>
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
+ * chart = anychart.cartesianChart();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .type(function(path, x, y, size) {
  *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
  *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
@@ -87,6 +90,7 @@ anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] 
  *          .close();
  *      return path;
  *    });
+ * chart.container(stage).draw();
  * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
  *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
@@ -125,15 +129,12 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *//**
  * Setter for hovered marker type settings.
  * @example <c>By Enum value.</c>
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
+ * anychart.cartesian.series.marker([10, 11, 17, 7, 21])
  *    .type('star4')
- *    .hoverType('star6');
+ *    .hoverType('star6')
+ *    .container(stage).draw();
  * @example <c>By custom function.</c>
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
+ * anychart.cartesian.series.marker([10, 11, 17, 7, 21])
  *    .size(20)
  *    .hoverSize(20)
  *    .hoverType(function(path, x, y, size) {
@@ -145,7 +146,8 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  *          .moveTo(point1.x, point1.y)
  *          .close();
  *      return path;
- *    });
+ *    })
+ *    .container(stage).draw();
  * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
  *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
@@ -182,10 +184,9 @@ anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
  *//**
  * Setter for marker size.
  * @example
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
- *     .size(14);
+ * anychart.cartesian.series.marker([10, 11, 17, 7, 21])
+ *     .size(14)
+ *     .container(stage).draw();
  * @param {number=} opt_value [10] Value to set.
  * @return {anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} class for method chaining.
  *//**
@@ -212,11 +213,10 @@ anychart.cartesian.series.Marker.prototype.size = function(opt_value) {
  *//**
  * Setter for hovered marker size.
  * @example
- * chart = anychart.cartesian.chart();
- * var markerSeries = chart.marker([10, 11, 17, 7, 21]);
- * markerSeries
+ * anychart.cartesian.series.marker([10, 11, 17, 7, 21])
  *     .size(10)
- *     .hoverSize(20);
+ *     .hoverSize(20)
+ *     .container(stage).draw();
  * @param {number=} opt_value [12] Value to set.
  * @return {anychart.cartesian.series.Marker} {@link anychart.cartesian.series.Marker} instance for method chaining.
  *//**
@@ -551,7 +551,9 @@ anychart.cartesian.series.Marker.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for bar series.<br/>
+ * @example
+ * anychart.cartesian.series.marker([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -564,18 +566,18 @@ anychart.cartesian.series.marker = function(data, opt_csvSettings) {
 
 //exports
 goog.exportSymbol('anychart.cartesian.series.marker', anychart.cartesian.series.marker);
-anychart.cartesian.series.Marker.prototype['stroke'] = anychart.cartesian.series.Marker.prototype.stroke;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverStroke'] = anychart.cartesian.series.Marker.prototype.hoverStroke;//in docs/
-anychart.cartesian.series.Marker.prototype['fill'] = anychart.cartesian.series.Marker.prototype.fill;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverFill'] = anychart.cartesian.series.Marker.prototype.hoverFill;//in docs/
-anychart.cartesian.series.Marker.prototype['size'] = anychart.cartesian.series.Marker.prototype.size;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverSize'] = anychart.cartesian.series.Marker.prototype.hoverSize;//in docs/
-anychart.cartesian.series.Marker.prototype['type'] = anychart.cartesian.series.Marker.prototype.type;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverType'] = anychart.cartesian.series.Marker.prototype.hoverType;//in docs/
-anychart.cartesian.series.Marker.prototype['startDrawing'] = anychart.cartesian.series.Marker.prototype.startDrawing;//in docs/
-anychart.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.cartesian.series.Marker.prototype.finalizeDrawing;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverSeries'] = anychart.cartesian.series.Marker.prototype.hoverSeries;//in docs/
-anychart.cartesian.series.Marker.prototype['hoverPoint'] = anychart.cartesian.series.Marker.prototype.hoverPoint;//in docs/
-anychart.cartesian.series.Marker.prototype['unhover'] = anychart.cartesian.series.Marker.prototype.unhover;//in docs/
-anychart.cartesian.series.Marker.prototype['hatchFill'] = anychart.cartesian.series.Marker.prototype.hatchFill;
-anychart.cartesian.series.Marker.prototype['hoverHatchFill'] = anychart.cartesian.series.Marker.prototype.hoverHatchFill;
+anychart.cartesian.series.Marker.prototype['stroke'] = anychart.cartesian.series.Marker.prototype.stroke;//inherited
+anychart.cartesian.series.Marker.prototype['hoverStroke'] = anychart.cartesian.series.Marker.prototype.hoverStroke;//inherited
+anychart.cartesian.series.Marker.prototype['fill'] = anychart.cartesian.series.Marker.prototype.fill;//inherited
+anychart.cartesian.series.Marker.prototype['hoverFill'] = anychart.cartesian.series.Marker.prototype.hoverFill;//inherited
+anychart.cartesian.series.Marker.prototype['size'] = anychart.cartesian.series.Marker.prototype.size;//doc|ex
+anychart.cartesian.series.Marker.prototype['hoverSize'] = anychart.cartesian.series.Marker.prototype.hoverSize;//doc|ex
+anychart.cartesian.series.Marker.prototype['type'] = anychart.cartesian.series.Marker.prototype.type;//doc|ex
+anychart.cartesian.series.Marker.prototype['hoverType'] = anychart.cartesian.series.Marker.prototype.hoverType;//doc|ex
+anychart.cartesian.series.Marker.prototype['startDrawing'] = anychart.cartesian.series.Marker.prototype.startDrawing;//inherited
+anychart.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.cartesian.series.Marker.prototype.finalizeDrawing;//inherited
+anychart.cartesian.series.Marker.prototype['hoverSeries'] = anychart.cartesian.series.Marker.prototype.hoverSeries;//inherited
+anychart.cartesian.series.Marker.prototype['hoverPoint'] = anychart.cartesian.series.Marker.prototype.hoverPoint;//inherited
+anychart.cartesian.series.Marker.prototype['unhover'] = anychart.cartesian.series.Marker.prototype.unhover;//inherited
+anychart.cartesian.series.Marker.prototype['hatchFill'] = anychart.cartesian.series.Marker.prototype.hatchFill;//inherited
+anychart.cartesian.series.Marker.prototype['hoverHatchFill'] = anychart.cartesian.series.Marker.prototype.hoverHatchFill;//inherited

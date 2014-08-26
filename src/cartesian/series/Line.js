@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 
 
 /**
+ * Define Line series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#line} or {@link anychart.Chart#lineChart}.
+ * @example
+ * anychart.cartesian.series.line([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -96,7 +100,9 @@ anychart.cartesian.series.Line.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for line series.<br/>
+ * @example
+ * anychart.cartesian.series.line([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -109,5 +115,5 @@ anychart.cartesian.series.line = function(data, opt_csvSettings) {
 
 //exports
 goog.exportSymbol('anychart.cartesian.series.line', anychart.cartesian.series.line);
-anychart.cartesian.series.Line.prototype['stroke'] = anychart.cartesian.series.Line.prototype.stroke;
-anychart.cartesian.series.Line.prototype['hoverStroke'] = anychart.cartesian.series.Line.prototype.hoverStroke;
+anychart.cartesian.series.Line.prototype['stroke'] = anychart.cartesian.series.Line.prototype.stroke;//inherited
+anychart.cartesian.series.Line.prototype['hoverStroke'] = anychart.cartesian.series.Line.prototype.hoverStroke;//inherited

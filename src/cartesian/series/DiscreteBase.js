@@ -189,6 +189,6 @@ anychart.cartesian.series.DiscreteBase.prototype.unhover = function() {
 
 
 //exports
-anychart.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.cartesian.series.DiscreteBase.prototype.hoverSeries;
-anychart.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.cartesian.series.DiscreteBase.prototype.hoverPoint;
-anychart.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.cartesian.series.DiscreteBase.prototype.unhover;
+anychart.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.cartesian.series.DiscreteBase.prototype.hoverSeries;//inherited
+anychart.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.cartesian.series.DiscreteBase.prototype.hoverPoint;//inherited
+anychart.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.cartesian.series.DiscreteBase.prototype.unhover;//inherited

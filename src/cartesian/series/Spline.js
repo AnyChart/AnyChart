@@ -6,6 +6,10 @@ goog.require('anychart.cartesian.series.SplineDrawer');
 
 
 /**
+ * Define Spline series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#spline}.
+ * @example
+ * anychart.cartesian.series.spline([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -120,7 +124,9 @@ anychart.cartesian.series.Spline.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for spline series.<br/>
+ * @example
+ * anychart.cartesian.series.spline([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -132,6 +138,6 @@ anychart.cartesian.series.spline = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.spline', anychart.cartesian.series.spline);
-anychart.cartesian.series.Spline.prototype['stroke'] = anychart.cartesian.series.Spline.prototype.stroke;
-anychart.cartesian.series.Spline.prototype['hoverStroke'] = anychart.cartesian.series.Spline.prototype.hoverStroke;
+goog.exportSymbol('anychart.cartesian.series.spline', anychart.cartesian.series.spline);//doc|ex
+anychart.cartesian.series.Spline.prototype['stroke'] = anychart.cartesian.series.Spline.prototype.stroke;//inherited
+anychart.cartesian.series.Spline.prototype['hoverStroke'] = anychart.cartesian.series.Spline.prototype.hoverStroke;//inherited

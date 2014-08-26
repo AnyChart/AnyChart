@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.WidthBased');
 
 
 /**
+ * Define RangeColumn series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#rangeColumn}.
+ * @example
+ * anychart.cartesian.series.rangeColumn([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -137,7 +141,9 @@ anychart.cartesian.series.RangeColumn.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for rangeColumn series.<br/>
+ * @example
+ * anychart.cartesian.series.rangeColumn([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -149,10 +155,10 @@ anychart.cartesian.series.rangeColumn = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.rangeColumn', anychart.cartesian.series.rangeColumn);
-anychart.cartesian.series.RangeColumn.prototype['fill'] = anychart.cartesian.series.RangeColumn.prototype.fill;
-anychart.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverFill;
-anychart.cartesian.series.RangeColumn.prototype['stroke'] = anychart.cartesian.series.RangeColumn.prototype.stroke;
-anychart.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.cartesian.series.RangeColumn.prototype.hoverStroke;
-anychart.cartesian.series.RangeColumn.prototype['hatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hatchFill;
-anychart.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverHatchFill;
+goog.exportSymbol('anychart.cartesian.series.rangeColumn', anychart.cartesian.series.rangeColumn);//doc|ex
+anychart.cartesian.series.RangeColumn.prototype['fill'] = anychart.cartesian.series.RangeColumn.prototype.fill;//inherited
+anychart.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverFill;//inherited
+anychart.cartesian.series.RangeColumn.prototype['stroke'] = anychart.cartesian.series.RangeColumn.prototype.stroke;//inherited
+anychart.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.cartesian.series.RangeColumn.prototype.hoverStroke;//inherited
+anychart.cartesian.series.RangeColumn.prototype['hatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hatchFill;//inherited
+anychart.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeColumn.prototype.hoverHatchFill;//inherited

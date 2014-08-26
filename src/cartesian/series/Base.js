@@ -1894,7 +1894,7 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green', 0.4);
+ * chart.column([1, 4, 7, 1]).fill('green', 0.4);
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
@@ -2122,9 +2122,15 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
- * Setter for series stroke by function.
+ * Setter for series stroke by function.<br/>
+ * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
  * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).hoverStroke(
+ * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke(
+ *      function(){
+ *        return '5 '+ this.sourceColor;
+ *      }
+ * );
+ * chart.column([1, 4, 7, 1]).hoverStroke(
  *      function(){
  *        return '5 '+ this.sourceColor;
  *      }
@@ -2139,9 +2145,11 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  *//**
  * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
  * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.column([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

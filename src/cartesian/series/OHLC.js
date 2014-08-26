@@ -6,6 +6,8 @@ goog.require('anychart.utils.TypedLayer');
 
 
 /**
+ * Define OHLC series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#ohlc}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -153,26 +155,53 @@ anychart.cartesian.series.OHLC.prototype.createPositionProvider = function(posit
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke} Current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingStroke(
+ *    function(){
+ *      return '3 '+ this.sourceColor;
+ *    })
+ *  .container(stage).draw();
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * Setter for stroke settings.<br/>
- * Stroke settings are described ar:
+ * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
- * @param {number=} opt_thickness [1] Stroke thickness.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingStroke('orange', 3, '5 2', 'round')
+ *  .container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
- * @param {number=} opt_thickness [1] Stroke thickness.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
@@ -193,14 +222,41 @@ anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFil
 
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke} Current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingStroke(
+ *    function(){
+ *      return '3 '+ this.sourceColor;
+ *    })
+ *  .container(stage).draw();
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * Setter for stroke settings.<br/>
- * Read more about stroke at:
+ * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingStroke('orange', 3, '5 2', 'round')
+ *  .container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
@@ -208,11 +264,11 @@ anychart.cartesian.series.OHLC.prototype.risingStroke = function(opt_strokeOrFil
  * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
@@ -252,14 +308,41 @@ anychart.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(hover) 
 
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke} Current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingStroke(
+ *    function(){
+ *      return '3 '+ this.sourceColor;
+ *    })
+ *  .container(stage).draw();
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * Setter for stroke settings.<br/>
- * Read more abour sroke at:
+ * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingStroke('orange', 3, '5 2', 'round')
+ *  .container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
@@ -267,11 +350,11 @@ anychart.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(hover) 
  * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
@@ -292,26 +375,53 @@ anychart.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strokeOrFi
 
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke} Current stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingStroke(
+ *    function(){
+ *      return '3 '+ this.sourceColor;
+ *    })
+ *  .container(stage).draw();
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * Setter for stroke settings.<br/>
- * Read more on stroke settings at:
+ * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @shortDescription Setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
- * @param {number=} opt_thickness [1] Stroke thickness.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingStroke('orange', 3, '5 2', 'round')
+ *  .container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {!anychart.cartesian.series.OHLC} {@link anychart.cartesian.series.OHLC} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Stroke settings
- *    or fill settings.
- * @param {number=} opt_thickness [1] Stroke thickness.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
  */
@@ -457,7 +567,13 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
 
 
 /**
- * Constructor function.
+ * Constructor function for OHLC series.
+ * @example
+ * anychart.cartesian.series.ohlc([
+ *  [0, 2, 4, 1, 3],
+ *  [1, 3, 5, 1, 2],
+ *  [2, 2, 5, 1, 4]
+ * ]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -469,8 +585,8 @@ anychart.cartesian.series.ohlc = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.ohlc', anychart.cartesian.series.ohlc);
-anychart.cartesian.series.OHLC.prototype['risingStroke'] = anychart.cartesian.series.OHLC.prototype.risingStroke;
-anychart.cartesian.series.OHLC.prototype['hoverRisingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverRisingStroke;
-anychart.cartesian.series.OHLC.prototype['fallingStroke'] = anychart.cartesian.series.OHLC.prototype.fallingStroke;
-anychart.cartesian.series.OHLC.prototype['hoverFallingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverFallingStroke;
+goog.exportSymbol('anychart.cartesian.series.ohlc', anychart.cartesian.series.ohlc);//doc|ex
+anychart.cartesian.series.OHLC.prototype['risingStroke'] = anychart.cartesian.series.OHLC.prototype.risingStroke;//doc|ex
+anychart.cartesian.series.OHLC.prototype['hoverRisingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverRisingStroke;//doc|ex
+anychart.cartesian.series.OHLC.prototype['fallingStroke'] = anychart.cartesian.series.OHLC.prototype.fallingStroke;//doc|ex
+anychart.cartesian.series.OHLC.prototype['hoverFallingStroke'] = anychart.cartesian.series.OHLC.prototype.hoverFallingStroke;//doc|ex
