@@ -21,8 +21,8 @@ anychart.pieChart = function(opt_data) {
 
   chart.legend()
       .enabled(true)
-      .position(anychart.enums.Position.RIGHT_CENTER)
-      .align(anychart.enums.Align.LEFT)
+      .position(anychart.enums.Orientation.BOTTOM)
+      .align(anychart.enums.Align.CENTER)
       .itemsLayout(anychart.enums.Layout.HORIZONTAL);
 
   chart.legend().title()
