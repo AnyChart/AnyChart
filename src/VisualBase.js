@@ -180,9 +180,9 @@ anychart.VisualBase.prototype.zIndex = function(opt_value) {
  * if (!element.enabled())
  *    element.enabled(true);
  * @example <t>lineChart</t>
- * chart.line([1, 1.6, 1.2, 2.1]).enabled(true);
+ * var blueLine = chart.line([1, 1.6, 1.2, 2.1]).enabled(true);
  * // there are no second series.
- * chart.line([11, 11.6, 11.2, 12.1]).enabled(false);
+ * var redLine = chart.line([11, 11.6, 11.2, 12.1]).enabled(false);
  * @param {boolean=} opt_value Value to set.
  * @return {anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
