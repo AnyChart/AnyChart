@@ -193,6 +193,7 @@ anychart.elements.MarkersFactory.prototype.SUPPORTED_SIGNALS = anychart.VisualBa
 anychart.elements.MarkersFactory.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.BOUNDS |
     anychart.ConsistencyState.HANDLERS;
 
 
@@ -1834,7 +1835,8 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
       currentMarkersFactory.enabled(),
       currentMarkersFactory.enabled());
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||
+      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
     if (!enabled) {
       this.markerElement_.parent(null);
       this.markConsistent(anychart.ConsistencyState.ALL);
@@ -1846,7 +1848,8 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
     }
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER) ||
+      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (enabled) {
       if (parentMarkersFactory.getDomElement()) {
         if (!this.container()) this.container(/** @type {acgraph.vector.ILayer} */(parentMarkersFactory.getDomElement()));
@@ -1860,13 +1863,17 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX) ||
+      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     if (this.container()) this.container().zIndex(/** @type {number} */(parentMarkersFactory.zIndex()));
     this.markerElement_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
+      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
+      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+
     var anchor = this.getFinalSettings_(
         this.anchor(),
         this.superSettingsObj['anchor'],

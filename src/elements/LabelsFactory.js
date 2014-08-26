@@ -295,7 +295,7 @@ anychart.elements.LabelsFactory.prototype.backgroundInvalidated_ = function(even
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.changedSettings['background'] = true;
     this.background_.markConsistent(anychart.ConsistencyState.ALL);
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -472,7 +472,7 @@ anychart.elements.LabelsFactory.prototype.rotation = function(opt_value) {
     opt_value = +opt_value;
     if (this.rotationAngle_ != opt_value) {
       this.rotationAngle_ = opt_value;
-      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     this.changedSettings['rotation'] = true;
     return this;
@@ -1666,7 +1666,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
           this.enabled() :
           parentLabelsFactory.enabled();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||
+      labelsFactory.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
     if (!enabled) {
       if (this.layer_) this.layer_.parent(null);
       this.markConsistent(anychart.ConsistencyState.ALL);
@@ -1678,7 +1679,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     }
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER) ||
+      labelsFactory.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (enabled) {
       if ((!parentLabelsFactory.enabled() || (goog.isDef(this.enabled()) && !this.enabled())) && parentLabelsFactory.getDomElement()) {
         if (!this.container()) this.container(parentLabelsFactory.getDomElement());
@@ -1698,7 +1700,9 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
+      labelsFactory.hasInvalidationState(anychart.ConsistencyState.BOUNDS) ||
+      labelsFactory.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var background = notSelfSettings ?
         goog.isDef(this.superSettingsObj['background']) ?
             this.superSettingsObj['background'] :
