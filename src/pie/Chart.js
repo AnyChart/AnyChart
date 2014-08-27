@@ -1726,7 +1726,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
 
     data.push({
       'index': index,
-      'text': iterator.get('name') || (goog.isNumber(x) ? 'Point - ' + index : x),
+      'text': String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x')),
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'iconStroke': 'none',
       'iconFill': this.getFillColor(true, false),
@@ -1858,7 +1858,7 @@ anychart.pie.Chart.prototype.createFormatProvider = function() {
   var formatProvider = {};
 
   formatProvider['index'] = iterator.getIndex();
-  formatProvider['name'] = iterator.get('name') ? iterator.get('name') : 'Point ' + iterator.getIndex();
+  formatProvider['name'] = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
   formatProvider['x'] = iterator.get('x');
   formatProvider['value'] = iterator.get('value');
   if (iterator.meta('groupedPoint') == true) {
