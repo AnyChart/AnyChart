@@ -36,7 +36,8 @@ anychart.elements.Axis = function() {
       .fontColor('rgb(34,34,34)')
       .fontWeight('bold')
       .padding(5)
-      .margin(10, 5, 10, 5);
+      .margin(10, 5, 10, 5)
+      .resumeSignalsDispatching(false);
 
   this.title().background()
       .suspendSignalsDispatching()
