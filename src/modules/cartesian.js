@@ -22,10 +22,12 @@ goog.require('anychart.modules.scatter');
  * @example
  * var chart = anychart.cartesianChart();
  * chart.line([20, 7, 10, 14]);
+ * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.cartesian.Chart} Empty chart.
  */
-anychart.cartesianChart = function() {
-  var chart = new anychart.cartesian.Chart();
+anychart.cartesianChart = function(opt_barChartMode) {
+  var chart = new anychart.cartesian.Chart(opt_barChartMode);
 
   chart.title().enabled(false);
   chart.background().enabled(false);

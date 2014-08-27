@@ -22,7 +22,7 @@ goog.require('anychart.utils.RangeColorPalette');
  * Class define cartesian chart.<br/>
  * Для того, что бы получить чарт используйте один из нижеперечисленных методов:
  *  <ul>
- *      <li>{@link anychart.cartesian.chart}</li>
+ *      <li>{@link anychart.cartesianChart}</li>
  *      <li>{@link anychart.areaChart}</li>
  *      <li>{@link anychart.barChart}</li>
  *      <li>{@link anychart.columnChart}</li>
@@ -33,9 +33,17 @@ goog.require('anychart.utils.RangeColorPalette');
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.Chart}
  * @constructor
+ * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
-anychart.cartesian.Chart = function() {
+anychart.cartesian.Chart = function(opt_barChartMode) {
   goog.base(this);
+
+  /**
+   * If true, all default chart elements layout is swapped.
+   * @type {boolean}
+   */
+  this.barChartMode = !!opt_barChartMode;
 
   /**
    * @type {anychart.scales.Base}
@@ -366,6 +374,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.elements.Grid();
+    grid.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -461,6 +470,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.elements.Grid();
+    grid.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.isMinor(true);
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -554,7 +564,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
   var axis = this.xAxes_[index];
   if (!axis) {
     axis = new anychart.elements.Axis();
-    axis.orientation(anychart.enums.Orientation.BOTTOM);
+    axis.orientation(this.barChartMode ? anychart.enums.Orientation.LEFT : anychart.enums.Orientation.BOTTOM);
     axis.title().text('X-Axis');
     this.xAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -634,7 +644,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
   if (!axis) {
     axis = new anychart.elements.Axis();
     axis.staggerMode(false);
-    axis.orientation(anychart.enums.Orientation.LEFT);
+    axis.orientation(this.barChartMode ? anychart.enums.Orientation.BOTTOM : anychart.enums.Orientation.LEFT);
     axis.title().text('Y-Axis');
     this.yAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -728,6 +738,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.elements.LineMarker();
+    lineMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
@@ -795,6 +806,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = new anychart.elements.RangeMarker();
+    rangeMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
@@ -864,6 +876,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.elements.TextMarker();
+    textMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
@@ -1621,21 +1634,21 @@ anychart.cartesian.Chart.prototype.calculate = function() {
 
     // calculate auto names for scales with predefined names field
     for (id in this.ordinalScalesWithNamesField_) {
-      scale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
-      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(scale)];
-      var fieldName = scale.getNamesField();
+      var ordScale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
+      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(ordScale)];
+      var fieldName = ordScale.getNamesField();
       var autoNames = [];
       for (i = 0; i < series.length; i++) {
         aSeries = series[i];
         iterator = aSeries.getResetIterator();
         while (iterator.advance()) {
-          var valueIndex = scale.getIndexByValue(iterator.get('x'));
+          var valueIndex = ordScale.getIndexByValue(iterator.get('x'));
           var name = iterator.get(fieldName);
           if (!goog.isDef(autoNames[valueIndex]))
             autoNames[valueIndex] = name || iterator.get('x') || iterator.get('value');
         }
       }
-      scale.setAutoNames(autoNames);
+      ordScale.setAutoNames(autoNames);
     }
 
     anychart.Base.resumeSignalsDispatchingTrue(this.series_);
@@ -1773,7 +1786,7 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
     item = layoutBasedElements[i];
 
     if (item && !item.scale()) {
-      if (item.isHorizontal()) {
+      if (!!(item.isHorizontal() ^ this.barChartMode)) {
         item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
       } else {
         item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
@@ -2437,6 +2450,7 @@ anychart.cartesian.Chart.prototype.deserialize = function(config) {
   goog.base(this, 'deserialize', chart);
 
   this.suspendSignalsDispatching();
+  this.barChartMode = ('barChartMode' in config) ? config['barChartMode'] : this.barChartMode;
   var i, json, scale;
   var grids = chart['grids'];
   var minorGrids = chart['minorGrids'];
@@ -2560,6 +2574,7 @@ anychart.cartesian.Chart.prototype.serialize = function() {
   }
 
   chart['type'] = anychart.cartesian.Chart.CHART_TYPE;
+  chart['barChartMode'] = this.barChartMode;
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {

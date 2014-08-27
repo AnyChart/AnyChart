@@ -13,7 +13,7 @@ goog.require('anychart.cartesian.series.RangeBar');
  * @return {anychart.cartesian.Chart} Chart with defaults for line series.
  */
 anychart.barChart = function(var_args) {
-  var chart = new anychart.cartesian.Chart();
+  var chart = new anychart.cartesian.Chart(true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bar(arguments[i]);
@@ -23,24 +23,21 @@ anychart.barChart = function(var_args) {
 
   chart.xScale().inverted(true);
 
-  chart.xAxis().orientation('left');
-  chart.yAxis().orientation('bottom');
+  chart.xAxis();
+  chart.yAxis();
 
-  chart.grid(0)
-      .layout(anychart.enums.Layout.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
+  chart.grid(0);
 
   chart.minorGrid()
       .evenFill('none')
       .oddFill('none')
-      .stroke('black 0.075')
-      .layout(anychart.enums.Layout.VERTICAL).scale(/** @type {anychart.scales.Base} */ (chart.yScale()));
+      .stroke('black 0.075');
 
   chart.grid(1)
       .drawFirstLine(true)
       .drawLastLine(true)
       .evenFill('none')
-      .oddFill('none')
-      .layout(anychart.enums.Layout.HORIZONTAL).scale(/** @type {anychart.scales.Base} */ (chart.xScale()));
+      .oddFill('none');
 
   return chart;
 };

@@ -38,19 +38,19 @@ anychart.elements.Grid = function() {
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.oddFill_;
+  this.oddFill_ = '#FFFFFF';
 
   /**
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.oddFill_;
+  this.evenFill_ = '#F5F5F5';
 
   /**
    * @type {string|acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_;
+  this.stroke_ = '#C1C1C1';
 
   /**
    * @type {anychart.scales.Base}
@@ -68,9 +68,29 @@ anychart.elements.Grid = function() {
    * @type {boolean}
    * @private
    */
-  this.isMinor_;
+  this.isMinor_ = false;
 
-  this.restoreDefaults();
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.layout_ = anychart.enums.Layout.HORIZONTAL;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.drawFirstLine_ = true;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.drawLastLine_ = true;
+
+  this.suspendSignalsDispatching();
+  this.zIndex(10);
+  this.resumeSignalsDispatching(true);
 };
 goog.inherits(anychart.elements.Grid, anychart.VisualBase);
 
@@ -580,23 +600,6 @@ anychart.elements.Grid.prototype.draw = function() {
     }, this);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
-};
-
-
-/**
- * Restore defaults.
- */
-anychart.elements.Grid.prototype.restoreDefaults = function() {
-  this.zIndex(10);
-  this.suspendSignalsDispatching();
-  this.layout(anychart.enums.Layout.HORIZONTAL);
-  this.isMinor(false);
-  this.oddFill('#FFFFFF 1');
-  this.evenFill('#F5F5F5 1');
-  this.stroke('#C1C1C1');
-  this.drawFirstLine(true);
-  this.drawLastLine(true);
-  this.resumeSignalsDispatching(true);
 };
 
 
