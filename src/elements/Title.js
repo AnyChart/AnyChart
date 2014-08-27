@@ -874,9 +874,10 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   if (parentBounds && parentWidth < margin.widenWidth(this.backgroundWidth_)) {
     this.backgroundWidth_ = margin.tightenWidth(parentWidth);
     this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
-  }
-  if (!goog.isNull(this.width_))
     this.text_.width(this.textWidth_);
+  } else if (!goog.isNull(this.width_))
+    this.text_.width(this.textWidth_);
+
   // need to set transformation to drop text bounds cache
   this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   textBounds = this.text_.getBounds();
@@ -892,8 +893,8 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
     this.backgroundHeight_ = margin.tightenHeight(parentHeight);
     this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-  }
-  if (!goog.isNull(this.height_))
+    this.text_.height(this.textHeight_);
+  } else if (!goog.isNull(this.height_))
     this.text_.height(this.textHeight_);
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
