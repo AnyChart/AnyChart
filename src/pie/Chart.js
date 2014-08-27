@@ -999,25 +999,6 @@ anychart.pie.Chart.prototype.innerRadius = function(opt_value) {
 
 
 /**
- * Pie outside labels.
- * @param {string|anychart.enums.SidePosition=} opt_value .
- * @return {string|anychart.enums.SidePosition|anychart.pie.Chart} .
- */
-anychart.pie.Chart.prototype.labelsPosition = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeSidePosition(opt_value);
-    if (this.labelsPosition_ != opt_value) {
-      this.labelsPosition_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.labelsPosition_;
-  }
-};
-
-
-/**
  * Getter for the pie chart center point.<br/>
  * <b>Note:</b> Works only after {@link anychart.pie.Chart#draw} is called.
  * @example
@@ -1212,7 +1193,7 @@ anychart.pie.Chart.prototype.sort = function(opt_value) {
 anychart.pie.Chart.prototype.calculate_ = function(bounds) {
   var minWidthHeight = Math.min(bounds.width, bounds.height);
 
-  this.outsideLabelsSpaceValue_ = this.labelsPosition() == anychart.enums.SidePosition.OUTSIDE ?
+  this.outsideLabelsSpaceValue_ = this.labels().position() == anychart.enums.SidePosition.OUTSIDE ?
       anychart.utils.normalizeSize(this.outsideLabelsSpace_, minWidthHeight) : 0;
   this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight - this.outsideLabelsSpaceValue_);
   this.outsideLabelsMarginValue_ = anychart.utils.normalizeSize(this.outsideLabelsMargin_, this.radiusValue_);
@@ -1486,7 +1467,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     if (!this.labels().container()) this.labels_.container(this.rootElement);
     this.labels().clear();
     var formatProvider, positionProvider;
-    if (this.labelsPosition() == anychart.enums.SidePosition.OUTSIDE) {
+    if (this.labels().position() == anychart.enums.SidePosition.OUTSIDE) {
       this.calculateOutsideLabels();
       this.labelConnectors_.clip(bounds);
     } else {
@@ -1705,7 +1686,7 @@ anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
   this.drawSlice_(true);
   var sliceLabel;
   if (sliceLabel = this.labels().getLabel(iterator.getIndex())) {
-    if (this.labelsPosition() == anychart.enums.SidePosition.OUTSIDE) {
+    if (this.labels().position() == anychart.enums.SidePosition.OUTSIDE) {
       this.labels().clear();
       this.calculateOutsideLabels();
       this.labels().draw();
@@ -2879,7 +2860,6 @@ anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFi
 anychart.pie.Chart.prototype['hoverHatchFill'] = anychart.pie.Chart.prototype.hoverHatchFill;//doc|ex
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;//doc|ex
 anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;//doc|ex
-anychart.pie.Chart.prototype['labelsPosition'] = anychart.pie.Chart.prototype.labelsPosition;
 anychart.pie.Chart.prototype['outsideLabelsSpace'] = anychart.pie.Chart.prototype.outsideLabelsSpace;
 anychart.pie.Chart.prototype['outsideLabelsMargin'] = anychart.pie.Chart.prototype.outsideLabelsMargin;
 anychart.pie.Chart.prototype['outsideLabelsCriticalAngle'] = anychart.pie.Chart.prototype.outsideLabelsCriticalAngle;
