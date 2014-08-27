@@ -1155,7 +1155,7 @@ anychart.pie.Chart.prototype.sort = function(opt_value) {
 anychart.pie.Chart.prototype.calculate_ = function(bounds) {
   var minWidthHeight = Math.min(bounds.width, bounds.height);
 
-  this.outsideLabelsSpaceValue_ = this.labels().position() == anychart.enums.SidePosition.OUTSIDE ?
+  this.outsideLabelsSpaceValue_ = this.isOutsideLabels_() ?
       anychart.utils.normalizeSize(this.outsideLabelsSpace_, minWidthHeight) : 0;
   this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight - this.outsideLabelsSpaceValue_);
   this.outsideLabelsMarginValue_ = anychart.utils.normalizeSize(this.outsideLabelsMargin_, this.radiusValue_);
@@ -1412,7 +1412,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
     if (!this.labels().container()) this.labels_.container(this.rootElement);
     this.labels().clear();
     var formatProvider, positionProvider;
-    if (this.labels().position() == anychart.enums.SidePosition.OUTSIDE) {
+    if (this.isOutsideLabels_()) {
       this.calculateOutsideLabels();
       this.labelConnectors_.clip(bounds);
     } else {
@@ -1631,7 +1631,7 @@ anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
   this.drawSlice_(true);
   var sliceLabel;
   if (sliceLabel = this.labels().getLabel(iterator.getIndex())) {
-    if (this.labels().position() == anychart.enums.SidePosition.OUTSIDE) {
+    if (this.isOutsideLabels_()) {
       this.labels().clear();
       this.calculateOutsideLabels();
       this.labels().draw();
@@ -1639,6 +1639,15 @@ anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
       sliceLabel.positionProvider(this.createPositionProvider()).draw();
     }
   }
+};
+
+
+/**
+ * @private
+ * @return {boolean} Define, is labels have outside position.
+ */
+anychart.pie.Chart.prototype.isOutsideLabels_ = function() {
+  return anychart.enums.normalizeSidePosition(this.labels().position()) == anychart.enums.SidePosition.OUTSIDE;
 };
 
 
