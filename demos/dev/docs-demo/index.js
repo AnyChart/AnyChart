@@ -12,11 +12,12 @@ function load() {
 
 
 //  var chart = anychart.lineChart();
-  chart = anychart.cartesianChart();
-  chart.marker([10, 11, 17, 7, 21])
-      .type('star4')
-      .hoverType('star6');
-  chart.container(stage).draw();
+  var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+  chart.labels()
+      .fontColor('black')
+      .position('outside');
+  chart.connectorLength(20);
+  chart.container(container).draw();
 //  chart.container(stage).draw();
 
 

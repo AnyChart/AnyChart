@@ -718,16 +718,10 @@ anychart.pie.Chart.prototype.hoverHatchFill = function(opt_patternFillOrType, op
  *  ];
  *  var chart = anychart.pieChart(data);
  *  var labels = anychart.elements.labelsFactory();
- *  labels.textFormatter(function(){
- *        var lblText = this['name'];
- *        lblText += ': ' + this['value'];
- *        return lblText;
- *      })
- *      .positionFormatter(function(){
- *        return this['value'];
- *      })
+ *  labels
+ *      .position('outside')
  *      .fontSize(10)
- *      .fontColor('white');
+ *      .fontColor('red');
  *  chart.labels(labels);
  *  chart.container(stage).draw();
  * @param {anychart.elements.LabelsFactory=} opt_value [] LabelsFactory instance.
@@ -762,9 +756,22 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 
 /**
- * Outside labels space. Это пространство в котором будут рисоваться лейблы. Пространство задается радиусом от центра
- * пая. Радиус пая, если задан процентно, считается как процент от разнице между наименьшей стороной родительских
- * баундов и значениеи outside labels space. Лейбы на клипаются по этому радиусу, они клипаются по баундам чарта.
+ * Getter for outside labels space settings.
+ * @return {number|string|null} Current outside labels space.
+ *//**
+ * Setter for outside labels space settings.<br/>
+ * <b>Note: </b> Работает только с режимом лейблов outside.
+ * @example
+ * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+ * chart.labels()
+ *   .fontColor('black')
+ *   .position('outside');
+ * chart.outsideLabelsSpace('15%');
+ * chart.container(stage).draw();
+ * @param {(number|string)=} opt_value [30%] Value to set.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.pie.Chart|number|string|null} Outside labels space or itself for chaining call.
  */
@@ -782,10 +789,22 @@ anychart.pie.Chart.prototype.outsideLabelsSpace = function(opt_value) {
 
 
 /**
- * Outside labels margin. Это радиус отдаления лейблов от пая. Видимая линия от пая к лейблу состоит из двух частей:
- * connector line - крепится одним концом к паю и
- * connector pin - крепится одним концом к лейблу. Длина connector pin статичена - 5px, а длина connector line может
- * меняться в зависмости от позиции лейбла по отношению к его точке (куску пая), а так же от outside labels margin.
+ * Getter for outside labels connector length.
+ * @return {number|string|null} Outside labels connector length.
+ *//**
+ * Setter for outside labels connector length.<br/>
+ * <b>Note: </b> Работает только с режимом лейблов outside.
+ * @example
+ * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+ * chart.labels()
+ *   .fontColor('black')
+ *   .position('outside');
+ * chart.connectorLength(20);
+ * chart.container(stage).draw();
+ * @param {(number|string)=} opt_value [30%] Value to set.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.pie.Chart|number|string|null} Outside labels margin or itself for chaining call.
  */
@@ -803,10 +822,23 @@ anychart.pie.Chart.prototype.connectorLength = function(opt_value) {
 
 
 /**
- * Outside labels critical angle. Критический угол отклонения "поводка" лейбла от нормали (луч нормали для конкретной точки пая
- * выходит из центра пая и проходит через середину дуги этой точки). Согласно текущему алгоритму, углы наклона "поводков"
- * лейблов в результирующем положении не должны превышать критический угол, в противнос соучае такие лейблы не
- * отображаются.
+ * Getter for outside labels connector critical angle settings.
+ * @return {number|string|null} Outside labels critical angle.
+ *//**
+ * Setter for outside labels connector critical angle settings.<br/>
+ * Лейблы с угол коннекторов большим, чем критический не отображаются.<br/>
+ * <b>Note: </b> Работает только с режимом лейблов outside.
+ * @example
+ * var chart = anychart.pieChart([50, 2, 1, 3, 1, 3]);
+ * chart.labels()
+ *   .fontColor('black')
+ *   .position('outside');
+ * chart.outsideLabelsCriticalAngle(20);
+ * chart.container(stage).draw();
+ * @param {(number|string)=} opt_value [60] Value to set.
+ * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value [60] Value to set.
  * @return {!anychart.pie.Chart|number|string|null} Outside labels critical angle  or itself for chaining call.
  */
@@ -824,12 +856,55 @@ anychart.pie.Chart.prototype.outsideLabelsCriticalAngle = function(opt_value) {
 
 
 /**
- * Outside labels stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill ['black .3'] Stroke settings
- *    or fill settings.
- * @param {number=} opt_thickness [1] Stroke thickness.
+ * Getter for outside labels connectors stroke settings.
+ * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ *//**
+ * Setter for outside labels connectors stroke settings by function.<br/>
+ * <b>Note: </b> Работает только с режимом лейблов outside.
+ * @example
+ * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+ * chart.labels()
+ *   .fontColor('black')
+ *   .position('outside');
+ * chart.connectorStroke(
+ *      function(){
+ *        return '3 '+ this.sourceColor;
+ *      }
+ *   );
+ * chart.container(stage).draw();
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ *//**
+ * Setter for outside labels connectors stroke settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note: </b> Работает только с режимом лейблов outside.
+ * @example
+ * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+ * chart.labels()
+ *   .fontColor('black')
+ *   .position('outside');
+ * chart.connectorStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.pie.Chart|acgraph.vector.Stroke|Function} .
  */
@@ -2814,7 +2889,7 @@ anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFi
 anychart.pie.Chart.prototype['hoverHatchFill'] = anychart.pie.Chart.prototype.hoverHatchFill;//doc|ex
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;//doc|ex
 anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;//doc|ex
-anychart.pie.Chart.prototype['outsideLabelsSpace'] = anychart.pie.Chart.prototype.outsideLabelsSpace;
-anychart.pie.Chart.prototype['connectorLength'] = anychart.pie.Chart.prototype.connectorLength;
-anychart.pie.Chart.prototype['outsideLabelsCriticalAngle'] = anychart.pie.Chart.prototype.outsideLabelsCriticalAngle;
-anychart.pie.Chart.prototype['connectorStroke'] = anychart.pie.Chart.prototype.connectorStroke;
+anychart.pie.Chart.prototype['outsideLabelsSpace'] = anychart.pie.Chart.prototype.outsideLabelsSpace;//doc|ex|need-tr
+anychart.pie.Chart.prototype['connectorLength'] = anychart.pie.Chart.prototype.connectorLength;//doc|ex|need-tr
+anychart.pie.Chart.prototype['outsideLabelsCriticalAngle'] = anychart.pie.Chart.prototype.outsideLabelsCriticalAngle;//doc|ex|need-tr
+anychart.pie.Chart.prototype['connectorStroke'] = anychart.pie.Chart.prototype.connectorStroke;//doc|ex
