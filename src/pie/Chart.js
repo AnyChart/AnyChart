@@ -194,7 +194,7 @@ anychart.pie.Chart = function(opt_data) {
   this.legend().enabled(true);
 
   this.outsideLabelsSpace('30%');
-  this.outsideLabelsMargin('30%');
+  this.connectorLength('20%');
   this.outsideLabelsCriticalAngle(60);
   this.connectorStroke('black 0.3');
 
@@ -789,16 +789,16 @@ anychart.pie.Chart.prototype.outsideLabelsSpace = function(opt_value) {
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.pie.Chart|number|string|null} Outside labels margin or itself for chaining call.
  */
-anychart.pie.Chart.prototype.outsideLabelsMargin = function(opt_value) {
+anychart.pie.Chart.prototype.connectorLength = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.outsideLabelsMargin_ != opt_value) {
-      this.outsideLabelsMargin_ = opt_value;
+    if (this.connectorLength_ != opt_value) {
+      this.connectorLength_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
-  return this.outsideLabelsMargin_;
+  return this.connectorLength_;
 };
 
 
@@ -1158,13 +1158,13 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
   this.outsideLabelsSpaceValue_ = this.isOutsideLabels_() ?
       anychart.utils.normalizeSize(this.outsideLabelsSpace_, minWidthHeight) : 0;
   this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight - this.outsideLabelsSpaceValue_);
-  this.outsideLabelsMarginValue_ = anychart.utils.normalizeSize(this.outsideLabelsMargin_, this.radiusValue_);
+  this.connectorLengthValue_ = anychart.utils.normalizeSize(this.connectorLength_, this.radiusValue_);
 
   //todo Don't remove it, it can be useful (blackart)
   //  this.recommendedLabelWidth_ = parseInt(
   //      (bounds.width
   //          - 2 * this.radiusValue_
-  //          - 2 * this.outsideLabelsMarginValue_
+  //          - 2 * this.connectorLengthValue_
   //          - 2 * anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_)
   //      / 2);
 
@@ -1992,7 +1992,7 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
     isRightSide = angleDeg < 90 || angleDeg > 270;
 
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
-    dR = (this.radiusValue_ + this.outsideLabelsMarginValue_) + (exploded ? this.explodeValue_ : 0);
+    dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
 
     //координаты токи присоединения кннектора к паю
     x0 = this.cx_ + dR0 * Math.cos(angle);
@@ -2550,8 +2550,8 @@ anychart.pie.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function() {
 
   var pieCenter = this.pie.getCenterPoint();
   var cx = pieCenter['x'], cy = pieCenter['y'];
-  var bottomLabelsYLimit = cy + this.pie.getPixelRadius() + this.pie.outsideLabelsMarginValue_ - .1;
-  var topLabelsYLimit = cy - (this.pie.getPixelRadius() + this.pie.outsideLabelsMarginValue_) + .1;
+  var bottomLabelsYLimit = cy + this.pie.getPixelRadius() + this.pie.connectorLengthValue_ - .1;
+  var topLabelsYLimit = cy - (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + .1;
 
   for (var j = 0, len = this.labels.length; j < len; j++) {
     label = this.labels[j];
@@ -2609,7 +2609,7 @@ anychart.pie.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function() {
         -anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
 
     dRPie = this.pie.radiusValue_ + (exploded ? this.pie.explodeValue_ : 0);
-    dR = (this.pie.getPixelRadius() + this.pie.outsideLabelsMarginValue_) + (exploded ? this.pie.explodeValue_ : 0);
+    dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0);
 
     //новые координаты точки на орбите лейблов.
     y = startLabelsDrawingYPos;
@@ -2815,6 +2815,6 @@ anychart.pie.Chart.prototype['hoverHatchFill'] = anychart.pie.Chart.prototype.ho
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;//doc|ex
 anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;//doc|ex
 anychart.pie.Chart.prototype['outsideLabelsSpace'] = anychart.pie.Chart.prototype.outsideLabelsSpace;
-anychart.pie.Chart.prototype['outsideLabelsMargin'] = anychart.pie.Chart.prototype.outsideLabelsMargin;
+anychart.pie.Chart.prototype['connectorLength'] = anychart.pie.Chart.prototype.connectorLength;
 anychart.pie.Chart.prototype['outsideLabelsCriticalAngle'] = anychart.pie.Chart.prototype.outsideLabelsCriticalAngle;
 anychart.pie.Chart.prototype['connectorStroke'] = anychart.pie.Chart.prototype.connectorStroke;
