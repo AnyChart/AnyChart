@@ -8,16 +8,17 @@ function load() {
     stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
     /////////////////////////////////////////////////////////
 
-    chart = anychart.lineChart();
+ //   chart = anychart.lineChart();
 
 
-  * var tooltipSettings = anychart.elements.tooltip();
-  * tooltipSettings
-  *     .background()
-  *     .stroke('2 #cc8800').fill('grey 0.5');
-  * chart.line([1, 2, 1.2, 3.2]).tooltip(tooltipSettings);
-
-  chart.container(stage).draw();
+//  var chart = anychart.lineChart();
+  var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
+  chart.labels()
+      .fontColor('black')
+      .position('outside');
+  chart.connectorLength(20);
+  chart.container(container).draw();
+//  chart.container(stage).draw();
 
 
 

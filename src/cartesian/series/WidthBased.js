@@ -33,6 +33,18 @@ anychart.cartesian.series.WidthBased.prototype.autoBarWidth_ = '90%';
 
 
 /**
+ * Getter for current point width settings.
+ * @return {string|number} Point width pixel value.
+ *//**
+ * Setter for point width settings.
+ * @example
+ * chart = anychart.barChart();
+ * chart.bar([1, 1.6, 1.2, 1.9]).pointWidth(35);
+ * chart.container(stage).draw();
+ * @param {(number|string)=} opt_value Point width pixel value.
+ * @return {anychart.cartesian.series.WidthBased} {@link anychart.cartesian.series.WidthBased} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|string)=} opt_value Point width pixel value.
  * @return {string|number|anychart.cartesian.series.WidthBased} Bar width pixel value or Bar instance for chaining call.
  */
@@ -99,4 +111,4 @@ anychart.cartesian.series.WidthBased.prototype.restoreDefaults = function() {
 
 
 //exports
-anychart.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.cartesian.series.WidthBased.prototype.pointWidth;
+anychart.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.cartesian.series.WidthBased.prototype.pointWidth;//doc|ex

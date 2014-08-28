@@ -459,7 +459,7 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
  * chart.yScale().minimum(2);
  * chart.line([1, 4, 7, 1]).clip(false);
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
- * @return {anychart.cartesian.series.Base|boolean|anychart.math.Rect} .
+ * @return {anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
@@ -1655,7 +1655,7 @@ anychart.cartesian.series.Base.prototype.calculateStatistics = function() {
  * @return {!acgraph.vector.Fill} Current color.
  *//**
  * Sets color settings using an object or a string.<br/>
- * <b>Note:</b> <u>color</u> methods sets <u>fill</u> and <b>stroke</b> settings, which means it is not wise to pass
+ * <b>Note: </b> <u>color</u> methods sets <b>fill</b> and <b>stroke</b> settings, which means it is not wise to pass
  * image fill here - stroke doesn't accept image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
@@ -1896,7 +1896,7 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green', 0.4);
+ * chart.column([1, 4, 7, 1]).fill('green', 0.4);
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
@@ -1924,6 +1924,17 @@ anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill
  * @param {number=} opt_opacity Opacity of the gradient.
  * @param {number=} opt_fx X ratio of focal point.
  * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).fill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -1998,6 +2009,17 @@ anychart.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, 
  * @param {number=} opt_opacity Opacity of the gradient.
  * @param {number=} opt_fx X ratio of focal point.
  * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).hoverFill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -2102,9 +2124,15 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  * Getter for current stroke settings.
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
- * Setter for series stroke by function.
+ * Setter for series stroke by function.<br/>
+ * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
  * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).hoverStroke(
+ * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke(
+ *      function(){
+ *        return '5 '+ this.sourceColor;
+ *      }
+ * );
+ * chart.column([1, 4, 7, 1]).hoverStroke(
  *      function(){
  *        return '5 '+ this.sourceColor;
  *      }
@@ -2119,9 +2147,11 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  *//**
  * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
  * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.column([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

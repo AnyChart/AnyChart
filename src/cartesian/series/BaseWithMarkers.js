@@ -108,12 +108,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
  * Setter for series data markers.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
  * @example <t>listingOnly</t>
- * series.markers(null);
- * @example <t>listingOnly</t>
  * var myMarkers = anychart.elements.markersFactory()
  *       .size(10)
- *       .type('star5')
+ *       .type('star5');
  * series.markers(myMarkers);
+ * @example <t>lineChart</t>
+ * chart.spline([1, 1.4, 1.2, 2]).markers(null);
  * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
@@ -153,11 +153,11 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
  * @example <t>listingOnly</t>
  * series.hoverMarkers(null);
- * @example <t>listingOnly</t>
+ * @example <t>lineChart</t>
  * var myMarkers = anychart.elements.markersFactory()
  *       .size(10)
- *       .type('star5')
- * series.hoverMarkers(myMarkers);
+ *       .type('star5');
+ * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers(myMarkers);
  * @param {(anychart.elements.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.cartesian.series.BaseWithMarkers} {@link anychart.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
@@ -362,8 +362,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function()
 
 
 //exports
-anychart.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing;//in docs/
-anychart.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.cartesian.series.BaseWithMarkers.prototype.drawPoint;//in docs/
-anychart.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//in docs/
-anychart.cartesian.series.BaseWithMarkers.prototype['markers'] = anychart.cartesian.series.BaseWithMarkers.prototype.markers;//in docs/
-anychart.cartesian.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers;//in docs/
+anychart.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing;//inherited
+anychart.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.cartesian.series.BaseWithMarkers.prototype.drawPoint;//inherited
+anychart.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//inherited
+anychart.cartesian.series.BaseWithMarkers.prototype['markers'] = anychart.cartesian.series.BaseWithMarkers.prototype.markers;//doc|ex
+anychart.cartesian.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers;//doc|ex

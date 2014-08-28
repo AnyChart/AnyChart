@@ -5,6 +5,8 @@ goog.require('anychart.cartesian.series.OHLC');
 
 
 /**
+ * Define Candlestick series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#candlestick}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -211,13 +213,34 @@ anychart.cartesian.series.Candlestick.prototype.applyHatchFill = function(hover)
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Set/get rising hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingHatchFill('diamiond', 'grey', 5, 5)
+ *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Rising hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -236,13 +259,34 @@ anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_p
 
 
 /**
- * Set/get hover rising hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingHatchFill('diamiond', 'grey', 5, 5)
+ *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hover rising hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -273,13 +317,34 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = functi
 
 
 /**
- * Set/get falling hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingHatchFill('diamiond', 'grey', 5, 5)
+ *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Falling hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -298,13 +363,34 @@ anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_
 
 
 /**
- * Set/get hover falling hatch fill.
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingHatchFill('diamiond', 'grey', 5, 5)
+ *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hover falling hatch fill.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
  */
 anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrType)) {
@@ -338,7 +424,94 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = funct
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingFill(['green', 'yellow'])
+ *  .container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingFill('green', 0.4)
+ *  .container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingFill(['black', 'yellow'], 45, true, 0.5)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .risingFill({
+ *      src: 'http://static.anychart.com/underwater.jpg',
+ *      mode: acgraph.vector.ImageFillMode.STRETCH
+ *    })
+ *  .container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -365,7 +538,94 @@ anychart.cartesian.series.Candlestick.prototype.risingFill = function(opt_fillOr
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingFill(['green', 'yellow'])
+ *  .container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingFill('green', 0.4)
+ *  .container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingFill(['black', 'yellow'], 45, true, 0.5)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverRisingFill({
+ *      src: 'http://static.anychart.com/underwater.jpg',
+ *      mode: acgraph.vector.ImageFillMode.STRETCH
+ *    })
+ *  .container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -410,7 +670,94 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingFill = function(ho
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingFill(['green', 'yellow'])
+ *  .container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingFill('green', 0.4)
+ *  .container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingFill(['black', 'yellow'], 45, true, 0.5)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .fallingFill({
+ *      src: 'http://static.anychart.com/underwater.jpg',
+ *      mode: acgraph.vector.ImageFillMode.STRETCH
+ *    })
+ *  .container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -437,7 +784,94 @@ anychart.cartesian.series.Candlestick.prototype.fallingFill = function(opt_fillO
 
 
 /**
- * Common fill. Note: it can accept function as a first parameter.
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingFill(['green', 'yellow'])
+ *  .container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingFill('green', 0.4)
+ *  .container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingFill(['black', 'yellow'], 45, true, 0.5)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ *  .container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *   [0, 2, 4, 1, 3],
+ *   [1, 3, 5, 1, 2],
+ *   [2, 2, 5, 1, 4]
+ *  ])
+ *  .hoverFallingFill({
+ *      src: 'http://static.anychart.com/underwater.jpg',
+ *      mode: acgraph.vector.ImageFillMode.STRETCH
+ *    })
+ *  .container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -593,7 +1027,13 @@ anychart.cartesian.series.Candlestick.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for Candlestick series.<br/>
+ * @example
+ * anychart.cartesian.series.candlestick([
+ *  [0, 2, 4, 1, 3],
+ *  [1, 3, 5, 1, 2],
+ *  [2, 2, 5, 1, 4]
+ * ]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -605,12 +1045,12 @@ anychart.cartesian.series.candlestick = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.candlestick', anychart.cartesian.series.candlestick);
-anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesian.series.Candlestick.prototype.risingFill;
-anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;
-anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;
-anychart.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingFill;
-anychart.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.risingHatchFill;
-anychart.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;
-anychart.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.fallingHatchFill;
-anychart.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;
+goog.exportSymbol('anychart.cartesian.series.candlestick', anychart.cartesian.series.candlestick);//doc|ex
+anychart.cartesian.series.Candlestick.prototype['risingFill'] = anychart.cartesian.series.Candlestick.prototype.risingFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.cartesian.series.Candlestick.prototype.fallingFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.risingHatchFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.fallingHatchFill;//doc|ex
+anychart.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;//doc|ex

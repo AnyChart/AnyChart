@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.ContinuousRangeBase');
 
 
 /**
+ * Define RangeStepArea series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#rangeStepArea}.
+ * @example
+ * anychart.cartesian.series.rangeStepArea([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -150,7 +154,9 @@ anychart.cartesian.series.RangeStepArea.prototype.deserialize = function(config)
 
 
 /**
- * Constructor function.
+ * Constructor function for rangeStepArea series.<br/>
+ * @example
+ * anychart.cartesian.series.rangeStepArea([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -162,4 +168,12 @@ anychart.cartesian.series.rangeStepArea = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.rangeStepArea', anychart.cartesian.series.rangeStepArea);
+goog.exportSymbol('anychart.cartesian.series.rangeStepArea', anychart.cartesian.series.rangeStepArea);//doc|ex
+anychart.cartesian.series.RangeStepArea.prototype['fill'] = anychart.cartesian.series.RangeStepArea.prototype.fill;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['hoverFill'] = anychart.cartesian.series.RangeStepArea.prototype.hoverFill;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['highStroke'] = anychart.cartesian.series.RangeStepArea.prototype.highStroke;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['hoverHighStroke'] = anychart.cartesian.series.RangeStepArea.prototype.hoverHighStroke;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['lowStroke'] = anychart.cartesian.series.RangeStepArea.prototype.lowStroke;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['hoverLowStroke'] = anychart.cartesian.series.RangeStepArea.prototype.hoverLowStroke;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['hatchFill'] = anychart.cartesian.series.RangeStepArea.prototype.hatchFill;//inherited
+anychart.cartesian.series.RangeStepArea.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeStepArea.prototype.hoverHatchFill;//inherited

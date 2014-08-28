@@ -6,6 +6,10 @@ goog.require('anychart.cartesian.series.SplineDrawer');
 
 
 /**
+ * Define RangeSplineArea series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#rangeSplineArea}.
+ * @example
+ * anychart.cartesian.series.rangeSplineArea([['A1', 1, 4],['A2', 3, 5],['A3', 2, 3]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -145,7 +149,9 @@ anychart.cartesian.series.RangeSplineArea.prototype.deserialize = function(confi
 
 
 /**
- * Constructor function.
+ * Constructor function for rangeSplineArea series.<br/>
+ * @example
+ * anychart.cartesian.series.rangeSplineArea([['A1', 1, 4],['A2', 3, 5],['A3', 2, 3]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -157,4 +163,12 @@ anychart.cartesian.series.rangeSplineArea = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.rangeSplineArea', anychart.cartesian.series.rangeSplineArea);
+goog.exportSymbol('anychart.cartesian.series.rangeSplineArea', anychart.cartesian.series.rangeSplineArea);//doc|ex
+anychart.cartesian.series.RangeSplineArea.prototype['fill'] = anychart.cartesian.series.RangeSplineArea.prototype.fill;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['hoverFill'] = anychart.cartesian.series.RangeSplineArea.prototype.hoverFill;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['highStroke'] = anychart.cartesian.series.RangeSplineArea.prototype.highStroke;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['hoverHighStroke'] = anychart.cartesian.series.RangeSplineArea.prototype.hoverHighStroke;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['lowStroke'] = anychart.cartesian.series.RangeSplineArea.prototype.lowStroke;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['hoverLowStroke'] = anychart.cartesian.series.RangeSplineArea.prototype.hoverLowStroke;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['hatchFill'] = anychart.cartesian.series.RangeSplineArea.prototype.hatchFill;//inherited
+anychart.cartesian.series.RangeSplineArea.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeSplineArea.prototype.hoverHatchFill;//inherited

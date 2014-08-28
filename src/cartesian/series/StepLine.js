@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 
 
 /**
+ * Define StepLine series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#stepLine}.
+ * @example
+ * anychart.cartesian.series.stepLine([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -120,7 +124,9 @@ anychart.cartesian.series.StepLine.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for stepLine series.<br/>
+ * @example
+ * anychart.cartesian.series.stepLine([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -132,6 +138,6 @@ anychart.cartesian.series.stepLine = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.stepLine', anychart.cartesian.series.stepLine);
-anychart.cartesian.series.StepLine.prototype['stroke'] = anychart.cartesian.series.StepLine.prototype.stroke;
-anychart.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.cartesian.series.StepLine.prototype.hoverStroke;
+goog.exportSymbol('anychart.cartesian.series.stepLine', anychart.cartesian.series.stepLine);//doc|ex
+anychart.cartesian.series.StepLine.prototype['stroke'] = anychart.cartesian.series.StepLine.prototype.stroke;//inherited
+anychart.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.cartesian.series.StepLine.prototype.hoverStroke;//inherited

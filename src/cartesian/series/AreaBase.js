@@ -5,7 +5,7 @@ goog.require('anychart.cartesian.series.ContinuousBase');
 
 
 /**
- * A base for all continuous series, like lines, splines, areas, etc.
+ * A base for all continuous areas series as area, spline area.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -86,4 +86,4 @@ anychart.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
 };
 
 //exports
-anychart.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.cartesian.series.AreaBase.prototype.startDrawing;//in docs/
+anychart.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.cartesian.series.AreaBase.prototype.startDrawing;//inherited

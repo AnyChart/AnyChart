@@ -93,7 +93,9 @@ anychart.cartesian.series.Column.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for column series.
+ * @example
+ * anychart.cartesian.series.column([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -105,10 +107,10 @@ anychart.cartesian.series.column = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.column', anychart.cartesian.series.column);
-anychart.cartesian.series.Column.prototype['fill'] = anychart.cartesian.series.Column.prototype.fill;
-anychart.cartesian.series.Column.prototype['hoverFill'] = anychart.cartesian.series.Column.prototype.hoverFill;
-anychart.cartesian.series.Column.prototype['stroke'] = anychart.cartesian.series.Column.prototype.stroke;
-anychart.cartesian.series.Column.prototype['hoverStroke'] = anychart.cartesian.series.Column.prototype.hoverStroke;
-anychart.cartesian.series.Column.prototype['hatchFill'] = anychart.cartesian.series.Column.prototype.hatchFill;
-anychart.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.cartesian.series.Column.prototype.hoverHatchFill;
+goog.exportSymbol('anychart.cartesian.series.column', anychart.cartesian.series.column);//doc|ex
+anychart.cartesian.series.Column.prototype['fill'] = anychart.cartesian.series.Column.prototype.fill;//inherited
+anychart.cartesian.series.Column.prototype['hoverFill'] = anychart.cartesian.series.Column.prototype.hoverFill;//inherited
+anychart.cartesian.series.Column.prototype['stroke'] = anychart.cartesian.series.Column.prototype.stroke;//inherited
+anychart.cartesian.series.Column.prototype['hoverStroke'] = anychart.cartesian.series.Column.prototype.hoverStroke;//inherited
+anychart.cartesian.series.Column.prototype['hatchFill'] = anychart.cartesian.series.Column.prototype.hatchFill;//inherited
+anychart.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.cartesian.series.Column.prototype.hoverHatchFill;//inherited

@@ -179,6 +179,10 @@ anychart.VisualBase.prototype.zIndex = function(opt_value) {
  * @example <t>listingOnly</t>
  * if (!element.enabled())
  *    element.enabled(true);
+ * @example <t>lineChart</t>
+ * var blueLine = chart.line([1, 1.6, 1.2, 2.1]).enabled(true);
+ * // there are no second series.
+ * var redLine = chart.line([11, 11.6, 11.2, 12.1]).enabled(false);
  * @param {boolean=} opt_value Value to set.
  * @return {anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
  *//**
@@ -403,7 +407,7 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
 //exports
 anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//doc|ex
 anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
-anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//in docs/final
+anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//doc|ex
 anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;//doc|ex|need-tr
 anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;//doc|ex|need-tr
 anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;//doc|ex|need-tr

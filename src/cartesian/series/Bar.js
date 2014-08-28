@@ -95,11 +95,14 @@ anychart.cartesian.series.Bar.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for bar series.<br/>
+ * <b>Note: </b> In most cases, bar series poorly combines with other types of series.
+ * @example
+ * anychart.cartesian.series.bar([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {!anychart.cartesian.series.Bar}
+ * @return {!anychart.cartesian.series.Bar} {@link anychart.cartesian.series.Bar} instance for method chaining.
  */
 anychart.cartesian.series.bar = function(data, opt_csvSettings) {
   return new anychart.cartesian.series.Bar(data, opt_csvSettings);
@@ -107,10 +110,10 @@ anychart.cartesian.series.bar = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);
-anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//in docs/
-anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//in docs/
-anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//in docs/
-anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Bar.prototype.hoverStroke;//in docs/
-anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;//in docs/
-anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;//in docs/
+goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);//doc|ex
+anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//inherited
+anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//inherited
+anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//ininherited
+anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Bar.prototype.hoverStroke;//inherited
+anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;//inherited
+anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;//inherited

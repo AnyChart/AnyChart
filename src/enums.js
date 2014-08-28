@@ -886,7 +886,7 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
     case 'outer':
       return anychart.enums.SidePosition.OUTSIDE;
   }
-  return opt_default || anychart.enums.SidePosition.OUTSIDE;
+  return opt_default || anychart.enums.SidePosition.INSIDE;
 };
 
 

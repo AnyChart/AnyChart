@@ -2,7 +2,8 @@ var title, rect, rect2, bg;
 
 function load() {
   title = new anychart.elements.Title();
-  title.text('Line chart with Logarithmic Y-Axis and Data Labels').container('container').background().enabled(false).fill('red 0.3').corners(10);
+  title.text('Line chart with Logarithmic Y-Axis and Data Labelsasdfasdfasdfasdfasdfasdfasdfasdfasdqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqjhkjhasgdkfjhagsdkjhagsdkjghaskdjhfgaskdjhgasdjgfqwerqwerqwerqwerqwerqwerqwerqwerwqer')
+      .container('container').background().enabled(false).fill('red 0.3').corners(10);
   title.margin(0).padding(0);
   //title.hAlign('center').vAlign('center');
   //  title.height(100);

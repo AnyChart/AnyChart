@@ -5,6 +5,10 @@ goog.require('anychart.cartesian.series.BarBase');
 
 
 /**
+ * Define RangeBar series type.<br/>
+ * <b>Note:</b> Better for use methods {@link anychart.cartesian.Chart#rangeBar}.
+ * @example
+ * anychart.cartesian.series.rangeBar([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -137,7 +141,9 @@ anychart.cartesian.series.RangeBar.prototype.deserialize = function(config) {
 
 
 /**
- * Constructor function.
+ * Constructor function for rangeBar series.<br/>
+ * @example
+ * anychart.cartesian.series.rangeBar([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -149,10 +155,10 @@ anychart.cartesian.series.rangeBar = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.rangeBar', anychart.cartesian.series.rangeBar);
-anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.RangeBar.prototype.fill;
-anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.RangeBar.prototype.hoverFill;
-anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.RangeBar.prototype.stroke;
-anychart.cartesian.series.RangeBar.prototype['hoverStroke'] = anychart.cartesian.series.RangeBar.prototype.hoverStroke;
-anychart.cartesian.series.RangeBar.prototype['hatchFill'] = anychart.cartesian.series.RangeBar.prototype.hatchFill;
-anychart.cartesian.series.RangeBar.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeBar.prototype.hoverHatchFill;
+goog.exportSymbol('anychart.cartesian.series.rangeBar', anychart.cartesian.series.rangeBar);//doc|ex
+anychart.cartesian.series.RangeBar.prototype['fill'] = anychart.cartesian.series.RangeBar.prototype.fill;//inherited
+anychart.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.cartesian.series.RangeBar.prototype.hoverFill;//inherited
+anychart.cartesian.series.RangeBar.prototype['stroke'] = anychart.cartesian.series.RangeBar.prototype.stroke;//inherited
+anychart.cartesian.series.RangeBar.prototype['hoverStroke'] = anychart.cartesian.series.RangeBar.prototype.hoverStroke;//inherited
+anychart.cartesian.series.RangeBar.prototype['hatchFill'] = anychart.cartesian.series.RangeBar.prototype.hatchFill;//inherited
+anychart.cartesian.series.RangeBar.prototype['hoverHatchFill'] = anychart.cartesian.series.RangeBar.prototype.hoverHatchFill;//inherited
