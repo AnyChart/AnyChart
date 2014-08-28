@@ -1404,7 +1404,7 @@ anychart.cartesian.Chart.prototype.barGroupsPadding = function(opt_value) {
  *//**
  * Setter for space between bars on the ordinal scale by ratio of bars width.
  * @illustration <t>illustration</t>
- * chart = anychart.cartesian.chart();
+ * chart = anychart.cartesianChart();
  * chart.bar([1, 4, 5]);
  * chart.bar([1, 4, 5]);
  * chart.barsPadding(.6);

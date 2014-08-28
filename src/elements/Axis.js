@@ -1656,7 +1656,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  *//**
  * Setter for maximum stagger lines in autocalculation mode (if {@link anychart.elements.Axis#staggerLines} passed null).<br/>
  * @example
- * var leftChart = anychart.cartesian.chart();
+ * var leftChart = anychart.cartesianChart();
  * var data = [
  *     ['January', 1],
  *     ['Febrary', 2],
@@ -1671,7 +1671,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  * leftChart.line(data);
  * leftChart.bounds(anychart.math.rect(0,0,'49%','100%'));
  * leftChart.container(stage).draw();
- * var rightChart = anychart.cartesian.chart();
+ * var rightChart = anychart.cartesianChart();
  * var data = [
  *     ['January', 1],
  *     ['Febrary', 2],
