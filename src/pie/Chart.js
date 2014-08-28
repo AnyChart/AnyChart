@@ -14,7 +14,7 @@ goog.require('anychart.utils.TypedLayer');
 
 /**
  * Pie (Donut) Chart Class.<br/>
- * <b>Note:</b> Use methods to get intsance of this class:
+ * <b>Note:</b> Use these methods to get an instance of this class:
  *  <ul>
  *      <li>{@link anychart.pie.chart}</li>
  *      <li>{@link anychart.pieChart}</li>
@@ -760,7 +760,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
  * @return {number|string|null} Current outside labels space.
  *//**
  * Setter for outside labels space settings.<br/>
- * <b>Note: </b> Работает только с режимом лейблов outside.
+ * <b>Note: </b> Works only with outside labels mode.
  * @example
  * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
  * chart.labels()
@@ -769,11 +769,11 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
  * chart.outsideLabelsSpace('15%');
  * chart.container(stage).draw();
  * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ * @return {anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {!anychart.pie.Chart|number|string|null} Outside labels space or itself for chaining call.
+ * @return {!anychart.pie.Chart|number|string|null} Outside labels space or self for chaining call.
  */
 anychart.pie.Chart.prototype.outsideLabelsSpace = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -793,7 +793,7 @@ anychart.pie.Chart.prototype.outsideLabelsSpace = function(opt_value) {
  * @return {number|string|null} Outside labels connector length.
  *//**
  * Setter for outside labels connector length.<br/>
- * <b>Note: </b> Работает только с режимом лейблов outside.
+ * <b>Note: </b> Works only with outside labels mode.
  * @example
  * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
  * chart.labels()
@@ -802,11 +802,11 @@ anychart.pie.Chart.prototype.outsideLabelsSpace = function(opt_value) {
  * chart.connectorLength(20);
  * chart.container(stage).draw();
  * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ * @return {anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {!anychart.pie.Chart|number|string|null} Outside labels margin or itself for chaining call.
+ * @return {!anychart.pie.Chart|number|string|null} Outside labels margin or self for chaining call.
  */
 anychart.pie.Chart.prototype.connectorLength = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -826,8 +826,8 @@ anychart.pie.Chart.prototype.connectorLength = function(opt_value) {
  * @return {number|string|null} Outside labels critical angle.
  *//**
  * Setter for outside labels connector critical angle settings.<br/>
- * Лейблы с угол коннекторов большим, чем критический не отображаются.<br/>
- * <b>Note: </b> Работает только с режимом лейблов outside.
+ * Labels with the connector angle greater than critical are not displayed.<br/>
+ * <b>Note: </b> Works only with outside labels mode.
  * @example
  * var chart = anychart.pieChart([50, 2, 1, 3, 1, 3]);
  * chart.labels()
@@ -836,11 +836,11 @@ anychart.pie.Chart.prototype.connectorLength = function(opt_value) {
  * chart.outsideLabelsCriticalAngle(20);
  * chart.container(stage).draw();
  * @param {(number|string)=} opt_value [60] Value to set.
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ * @return {anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|string)=} opt_value [60] Value to set.
- * @return {!anychart.pie.Chart|number|string|null} Outside labels critical angle  or itself for chaining call.
+ * @return {!anychart.pie.Chart|number|string|null} Outside labels critical angle or self for chaining call.
  */
 anychart.pie.Chart.prototype.outsideLabelsCriticalAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -860,7 +860,7 @@ anychart.pie.Chart.prototype.outsideLabelsCriticalAngle = function(opt_value) {
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for outside labels connectors stroke settings by function.<br/>
- * <b>Note: </b> Работает только с режимом лейблов outside.
+ * <b>Note: </b> Works only with outside labels mode.
  * @example
  * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
  * chart.labels()
@@ -883,7 +883,7 @@ anychart.pie.Chart.prototype.outsideLabelsCriticalAngle = function(opt_value) {
  * Setter for outside labels connectors stroke settings.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note: </b> Работает только с режимом лейблов outside.
+ * <b>Note: </b> Works only with outside labels mode.
  * @example
  * var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
  * chart.labels()
@@ -926,17 +926,17 @@ anychart.pie.Chart.prototype.connectorStroke = function(opt_strokeOrFill, opt_th
  * @return {(null|function(*):boolean)} Current grouping function.
  *//**
  * Setter for points grouping function.<br/>
- * Группирует точки по условию заданному в фильтрующей функции и добавляет итоговую точку в конец.
- * <b>Note:</b> For disabling filtering function pass <b>null</b> or <b>'none'</b>.
+ * Groups point and adds final point to the end.
+ * <b>Note:</b> To disable filter function pass <b>null</b> or <b>'none'</b>.
  * @example
  * anychart.pieChart([5, 2, 1, 3, 1, 3])
  *   .group(function(val){ return val > 2; })
  *   .container(stage).draw();
- * @param {(string|null|function(*):boolean)=} opt_value Filtering function or disabling value (null, 'none').
- * @return {anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
+ * @return {anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|null|function(*):boolean)=} opt_value Filtering function or disabling value (null, 'none').
+ * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
  * @return {(anychart.pie.Chart|function(*):boolean|null)} Current grouping function or self for method chaining.
  */
 anychart.pie.Chart.prototype.group = function(opt_value) {
@@ -1155,7 +1155,7 @@ anychart.pie.Chart.prototype.startAngle = function(opt_value) {
  */
 anychart.pie.Chart.prototype.explode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    // TODO(Anton Saukh): Это инлайн бывшего метода normalizeNumberOrStringPercentValue - с этим надо что-то сделать.
+    // TODO(Anton Saukh): that's an inline of ex normalizeNumberOrStringPercentValue - we should do something about it.
     this.explode_ = isNaN(parseFloat(opt_value)) ? 15 : opt_value;
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -2069,11 +2069,11 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
     dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
 
-    //координаты токи присоединения кннектора к паю
+    // coordinates of the point where the connector touches a pie
     x0 = this.cx_ + dR0 * Math.cos(angle);
     y0 = this.cy_ + dR0 * Math.sin(angle);
 
-    //координата точки на орбите лейблов.
+    // coordinate of the point where the connector touches a label
     x = this.cx_ + dR * Math.cos(angle);
     y = this.cy_ + dR * Math.sin(angle);
 
@@ -2686,16 +2686,16 @@ anychart.pie.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     dRPie = this.pie.radiusValue_ + (exploded ? this.pie.explodeValue_ : 0);
     dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0);
 
-    //новые координаты точки на орбите лейблов.
+    // new coordinates of the point where connector touches a label 
     y = startLabelsDrawingYPos;
     var leg = dR * dR - Math.pow(y - cy, 2);
     x = cx + (this.isRightSide ? 1 : -1) * Math.sqrt(Math.abs(leg));
 
-    //координаты токи присоединения кннектора к паю.
+    // coordinates of the point where connector touches a pie
     x0 = cx + dRPie * Math.cos(angle);
     y0 = cy + dRPie * Math.sin(angle);
 
-    //нормальная (до поебразований) координата точки на орбите лейблов.
+    // normal (before transformation) coordinate of the point where connector touches a label.
     x1 = cx + dR * Math.cos(angle);
     y1 = cy + dR * Math.sin(angle);
 
@@ -2739,8 +2739,8 @@ anychart.pie.Chart.PieOutsideLabelsDomain.prototype.calculate = function() {
     var prevDomain = this.pieLabelsDomains[this.pieLabelsDomains.length - 1];
     var boundsPrevDomain;
     if (prevDomain) boundsPrevDomain = prevDomain.getBounds();
-    //Если наш домен разросся так, что мы залазим на предыдущий домент, то жрем предыдущий
-    //домен (забераем его лейблы в текущий домен, а его выкидываем из списка доменов)
+    //If domain is so large that we overlap the previous domain, we assimilate (resistance is futile)
+    //previous domain (take its labels into the current domain and remove the previous from the list of domains)
     if (boundsPrevDomain && !this.isNotIntersect(boundsPrevDomain.top, boundsPrevDomain.height)) {
       this.pieLabelsDomains.pop();
       this.labels = goog.array.concat(prevDomain.labels, this.labels);
@@ -2855,12 +2855,12 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
 
 
 /**
- * Возвращает экземпляр класса Pie (donut) Чарта с исходными настроками.<br/>
- * <b>Note:</b> Для того, что бы получить чарт с предустановками, используйте метод {@link anychart.pieChart}.
+ * Returns Pie (donut) instance with initial settings.<br/>
+ * <b>Note:</b> To get chart initial state use {@link anychart.pieChart}.
  * @example
  * chart = anychart.pie.chart([20, 7, 10, 14]);
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @return {!anychart.pie.Chart} An instance of {@link anychart.pie.Chart} class for method chaining.
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  */
 anychart.pie.chart = function(opt_data) {
   return new anychart.pie.Chart(opt_data);

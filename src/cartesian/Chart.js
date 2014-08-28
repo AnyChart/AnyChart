@@ -19,8 +19,8 @@ goog.require('anychart.utils.RangeColorPalette');
 
 
 /**
- * Class define cartesian chart.<br/>
- * Для того, что бы получить чарт используйте один из нижеперечисленных методов:
+ * Cartesian chart class.<br/>
+ * To get the chart use any of these methods:
  *  <ul>
  *      <li>{@link anychart.cartesian.chart}</li>
  *      <li>{@link anychart.areaChart}</li>
@@ -29,7 +29,7 @@ goog.require('anychart.utils.RangeColorPalette');
  *      <li>{@link anychart.financialChart}</li>
  *      <li>{@link anychart.lineChart}</li>
  *  </ul>
- * Чарт может содержать множество серий.
+ * Chart can contain any number of series.
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.Chart}
  * @constructor
@@ -155,7 +155,7 @@ anychart.chartTypesMap[anychart.cartesian.Chart.CHART_TYPE] = anychart.cartesian
 
 
 /**
- * Максимальное число попыток рассчитать длины для осей чарта.
+ * Maximal number of attempts to calculate axes length.
  * @type {number}
  * @private
  */
@@ -189,7 +189,7 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Setter for default chart X scale.<br/>
  * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.line([
  *   {x: "10-Dec-2004", y: 20},
  *   {x: "11-Dec-2004", y: 40},
@@ -230,7 +230,7 @@ anychart.cartesian.Chart.prototype.xScale = function(opt_value) {
  * Setter for chart Y scale.<br/>
  * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.line([0.07, 0.9, 14, 2, 89]);
  * chart.yScale(anychart.scales.log());
  * chart.xAxis();
@@ -307,7 +307,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
 /**
  * Getter for chart grid.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid()
  *     .layout(anychart.enums.Layout.HORIZONTAL);
@@ -321,7 +321,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  *//**
  * Setter for chart grid.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * var myGrid = anychart.elements.grid()
  *    .layout(anychart.enums.Layout.HORIZONTAL);
@@ -332,7 +332,7 @@ anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
  *//**
  * Setter for chart grid by index.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid(0)
  *     .layout(anychart.enums.Layout.HORIZONTAL);
@@ -389,7 +389,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
 /**
  * Getter for chart minor grid.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid()
  *     .layout(anychart.enums.Layout.HORIZONTAL);
@@ -407,7 +407,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  *//**
  * Setter for chart minor grid.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * var myGrid = anychart.elements.grid()
  *    .layout(anychart.enums.Layout.HORIZONTAL);
@@ -422,7 +422,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  *//**
  * Setter for chart minor grid by index.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.grid(0)
  *     .layout(anychart.enums.Layout.HORIZONTAL);
@@ -503,7 +503,7 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
  *//**
  * Setter for chart X-axis.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.bar([1, 4, 5, 7, 2]);
  * var myAxis = anychart.elements.axis()
  *    .orientation('right')
@@ -515,7 +515,7 @@ anychart.cartesian.Chart.prototype.onGridSignal_ = function(event) {
  *//**
  * Setter for chart X-axis by index.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.xAxis(0)
  *    .orientation('top')
@@ -581,7 +581,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
  *//**
  * Setter for chart Y-axis.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.bar([1, 4, 5, 7, 2]);
  * var myAxis = anychart.elements.axis()
  *    .orientation('left')
@@ -593,7 +593,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
  *//**
  * Setter for chart Y-axis by index.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([1, 4, 5, 7, 2]);
  * chart.yAxis(0)
  *    .orientation('right')
@@ -910,7 +910,7 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
 /**
  * Adds Area series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.area([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array)} data Data for the series.
@@ -930,7 +930,7 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
 /**
  * Adds Bar series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.bar([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -950,7 +950,7 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
 /**
  * Adds Bubble series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.bubble([
  *   [0, 4, 10],
  *   [1, 5, 6],
@@ -975,7 +975,7 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
 /**
  * Adds Candlestick series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.candlestick([
  *   [0, 14, 24, 14, 20],
  *   [1, 15, 15, 5, 10],
@@ -1000,7 +1000,7 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
 /**
  * Adds Column series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.column([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1020,7 +1020,7 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
 /**
  * Adds Line series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.line([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1040,7 +1040,7 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
 /**
  * Adds Marker series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.marker([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1060,7 +1060,7 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
 /**
  * Adds OHLC series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.ohlc([
  *   [0, 14, 24, 14, 20],
  *   [1, 15, 15, 5, 10],
@@ -1085,7 +1085,7 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
 /**
  * Adds RangeArea series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.rangeArea([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
@@ -1110,7 +1110,7 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
 /**
  * Adds RangeBar series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.rangeBar([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
@@ -1135,7 +1135,7 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
 /**
  * Adds RangeColumn series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.rangeColumn([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
@@ -1160,7 +1160,7 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
 /**
  * Adds RangeSplineArea series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.rangeSplineArea([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
@@ -1185,7 +1185,7 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
 /**
  * Adds RangeColumn series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.rangeStepArea([
  *   [0,  24, 14, 20],
  *   [1,  15, 5, 10],
@@ -1210,7 +1210,7 @@ anychart.cartesian.Chart.prototype.rangeStepArea = function(data, opt_csvSetting
 /**
  * Adds Spline series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.spline([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1230,7 +1230,7 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
 /**
  * Adds SplineArea series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.splineArea([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1250,7 +1250,7 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
 /**
  * Adds StepLine series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.stepLine([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -1270,7 +1270,7 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
 /**
  * Adds StepArea series.
  * @example
- * var chart = anychart.cartesianСhart();
+ * var chart = anychart.cartesianChart();
  * chart.stepArea([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.

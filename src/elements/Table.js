@@ -535,12 +535,12 @@ anychart.elements.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys,
  * Table cell border settings for all 4 sides simultaneously. The last usage of border(), leftBorder(), rightBorder(),
  * topBorder() and bottomBorder() methods determines the border for the corresponding side.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -565,12 +565,12 @@ anychart.elements.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_th
  *
  * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -606,12 +606,12 @@ anychart.elements.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, op
  *
  * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.prototype.cellRightBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -647,12 +647,12 @@ anychart.elements.Table.prototype.cellRightBorder = function(opt_strokeOrFill, o
  *
  * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -688,12 +688,12 @@ anychart.elements.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt
  *
  * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.prototype.cellBottomBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1661,12 +1661,12 @@ anychart.elements.Table.Cell.prototype.fill = function(opt_fillOrColorOrKeys, op
  *
  * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table.Cell|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1708,12 +1708,12 @@ anychart.elements.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_t
  *
  * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table.Cell|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1748,12 +1748,12 @@ anychart.elements.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, o
  *
  * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table.Cell|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1788,12 +1788,12 @@ anychart.elements.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, 
  *
  * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table.Cell|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1828,12 +1828,12 @@ anychart.elements.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, op
  *
  * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
  *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки
- *    границ или просто настройки заливки.
- * @param {number=} opt_thickness Толщина линии.
+* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
+ *    settings or fill settings.
+ * @param {number=} opt_thickness Line thickeness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {anychart.elements.Table.Cell|acgraph.vector.Stroke|undefined} .
  */
 anychart.elements.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {

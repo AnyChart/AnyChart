@@ -1686,7 +1686,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  * rightChart.line(data);
  * rightChart.bounds(anychart.math.rect('51%',0,'50%','100%'));
  * rightChart.container(stage).draw();
- * @param {(number|null)=} opt_value [2] Ограничивает наибольшее количество линий, которое может потребоваться при рисоании лейблов. Если для корректной отрисовки лейблов потребуется меньшее число линий, то будет использовано меньшее число, но не больше заданого.
+ * @param {(number|null)=} opt_value [2] Limits the number of lines to be used when drawing labels. If we need less – we use less, but never – more.
  * @return {anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc

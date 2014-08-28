@@ -293,8 +293,8 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
     this.drawLabel(false);
     this.hideTooltip();
   }
-  // TODO(AntonKagakin): пока что комментируем, что бы не выделять серию
-  // ждем обсуждения. смотреть Base.js:1206
+  // TODO(AntonKagakin): comment this to avoid series selection
+  // wating for a feedback. See Base.js:1206
   /*if (isNaN(this.hoverStatus)) {
     this.applyHatchFill(true);
     this.colorizeShape(true);

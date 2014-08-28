@@ -332,7 +332,7 @@ anychart.VisualBase.prototype.getExportData = function() {
 
 
 /**
- * Сохраняет текущее визуальное состояние в PNG file.
+ * Saves the current visual state into PNG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
  * chart.top(50);
@@ -357,7 +357,7 @@ anychart.VisualBase.prototype.saveAsPNG = function() {
 
 
 /**
- * Сохраняет текущее визуальное состояние в JPEG file.
+ * Saves the current visual state into JPEG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
  * chart.top(50);
@@ -381,7 +381,7 @@ anychart.VisualBase.prototype.saveAsJPG = function() {
 
 
 /**
- * Сохраняет текущее визуальное состояние в PDF file.
+ * Saves the current visual state into PDF file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
  * chart.top(50);
@@ -408,6 +408,6 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
 anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//doc|ex
 anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
 anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled;//doc|ex
-anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;//doc|ex|need-tr
-anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;//doc|ex|need-tr
-anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;//doc|ex|need-tr
+anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;//doc|ex
+anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;//doc|ex
+anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;//doc|ex
