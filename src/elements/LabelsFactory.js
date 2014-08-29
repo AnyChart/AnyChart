@@ -8,8 +8,8 @@ goog.require('anychart.enums');
 
 
 /**
- * Этот класс предназначен для рисования множества лейблов с одинаковым набором настроек и последующего управления этими лейблами.
- * Настройки конкретного лейбла могут быть изменены после того, как все лейблы будут нарисованы.
+ * Class for creation of sets of similar labels and management of such sets.
+ * Any individual label can be changed after all labels are displayed.
  * @constructor
  * @extends {anychart.elements.Text}
  */
@@ -81,14 +81,14 @@ anychart.elements.LabelsFactory = function() {
   this.offsetY_;
 
   /**
-   * Функция форматирующая текст лейбла, по умолчанию используем поле value формат провайдера.
+   * Label text formatting function, by default we use value field of the format provider.
    * @type {Function}
    * @private
    */
   this.textFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
-   * Функция форматирования позиции лейбла, по умолчанию она использует значение value из контекста для получения позиции.
+   * Label position function, by default we use value obtained from context.
    * @type {Function}
    * @private
    */
@@ -163,42 +163,42 @@ anychart.elements.LabelsFactory.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @private
  */
 anychart.elements.LabelsFactory.HANDLED_EVENT_TYPES_ = {
-  /** Вызывается когда по элементу кликнули. */
+  /** Click. */
   'click': 0x01,
 
-  /** Вызывается когда по элементу дважды кликнули. */
+  /** Double click. */
   'dblclick': 0x02,
 
-  /** Fires when mouse downed on element */
+  /** Mouse down */
   'mousedown': 0x04,
 
-  /** Fires when mouse upped on element */
+  /** Mouse up */
   'mouseup': 0x08,
 
-  /** Вызывается когда на элемент навели указатель мыши. */
+  /** Mouse over. */
   'mouseover': 0x10,
 
-  /** Вызывается когда с элемента увели указатель мыши. */
+  /** Mouse out. */
   'mouseout': 0x20,
 
-  /** Fires when mouse moved on element */
+  /** Mouse move */
   'mousemove': 0x40,
 
-  /** Fires on touch start */
+  /** Touch start */
   'touchstart': 0x80,
 
-  /** Fires on touch move */
+  /** Touch move */
   'touchmove': 0x100,
 
-  /** Fires on touch end */
+  /** Touch end */
   'touchend': 0x200,
 
-  /** Fires on touch cancel.
+  /** Touch cancel.
    * @see http://www.w3.org/TR/2011/WD-touch-events-20110505/#the-touchcancel-event
    */
   'touchcancel': 0x400
 
-  //  /** Fires on tap (fast touchstart-touchend) */
+  //  /** Tap (fast touchstart-touchend) */
   //  'tap': 0x800
 };
 
@@ -216,14 +216,13 @@ anychart.elements.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 /**
  * Getter for the current element state.
  *
- * Былина о трех состояних - true, false и null.
+ * True, false and null states.
  *
- * true и false по-старинке парвда и лож.
- * А вот если установлено null, то элемент включен, но если он зависит
- * от других сущностей (например, в случае labels() и hoverLabels() в сериях), то null будет значить, что
- * состояние лейбл фактори работает в auto режиме и завит от других обстоятельсв. (Например, если у серии
- * включены обычные лейблы, а хавер лейблам выставлено состояние null, то при хавере настройка enabled возьмется из
- * обычных лейблов и хавер лейблы будут работать. А если обычные лейблы выключить, то и хавер лейблы не будут работать)
+ * True and false are self-explanatory. null state means that element is enabled,
+ * but if it depends on other entities (like, for example, labels() and hoverLabels() in series),
+ * then factory works in auto mode. For example, if series normal labels are enable,
+ * and hover labels are in null state, then upon hover hoverLabels become enabled because of normal.
+ * But if you disable normal labels – hoverLabels are disabled too.
  * @return {?boolean} The current element state.
  *//**
  * Setter for the element enabled state.
@@ -462,9 +461,9 @@ anychart.elements.LabelsFactory.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Метод устанавливает поворот элемента отнонительно заданного якоря. Якори - 9-ть контрольных точек элемента
+ * Sets rotation angle around an anchor.
  * ({@link acgraph.vector.Element}).
- * @param {number=} opt_value Угол поворота лейблов в градусах.
+ * @param {number=} opt_value Rotation angle in degrees.
  * @return {number|anychart.elements.LabelsFactory} Rotation angle in degrees or Itself for chaining call.
  */
 anychart.elements.LabelsFactory.prototype.rotation = function(opt_value) {
@@ -599,7 +598,7 @@ anychart.elements.LabelsFactory.prototype.remove = function() {
 
 
 /**
- * Очищает массив созданных лейблов.
+ * Clears an array of labels.
  * @param {number=} opt_index If set, removes only the label that label.
  * @return {anychart.elements.LabelsFactory} Returns itself for chaining.
  */
@@ -628,7 +627,7 @@ anychart.elements.LabelsFactory.prototype.clear = function(opt_index) {
 
 
 /**
- * Возвращает лейбл по его индексу, если он существует.
+ * Returns label by index (if there is such label).
  * @param {number} index Label index.
  * @return {anychart.elements.LabelsFactory.Label} Already existing label.
  */
@@ -648,7 +647,7 @@ anychart.elements.LabelsFactory.prototype.labelsCount = function() {
 
 
 /**
- * Возвращает объект с состояниями изменений настроек.
+ * Returns object with changed states.
  * @return {!Object.<boolean>}
  */
 anychart.elements.LabelsFactory.prototype.getSettingsChangedStatesObj = function() {
@@ -657,7 +656,7 @@ anychart.elements.LabelsFactory.prototype.getSettingsChangedStatesObj = function
 
 
 /**
- * Return DOM element.
+ * Returns DOM element.
  * @return {acgraph.vector.Layer}
  */
 anychart.elements.LabelsFactory.prototype.getDomElement = function() {
@@ -666,12 +665,12 @@ anychart.elements.LabelsFactory.prototype.getDomElement = function() {
 
 
 /**
- * Создает новый экземпляр класса anychart.elements.LabelsFactory.Label, сохраняет его внутри фабрики
- * и возвращает.
- * @param {*} formatProvider Object witch provide info for textFormatter function.
- * @param {*} positionProvider Object witch provide info for positionFormatter function.
+ * Creates new instance of anychart.elements.LabelsFactory.Label, saves it in the factory
+ * and returns it.
+ * @param {*} formatProvider Object that provides info for textFormatter function.
+ * @param {*} positionProvider Object that provides info for positionFormatter function.
  * @param {number=} opt_index Label index.
- * @return {!anychart.elements.LabelsFactory.Label} Return new label instance.
+ * @return {!anychart.elements.LabelsFactory.Label} Returns new label instance.
  */
 anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positionProvider, opt_index) {
   var label, index;
@@ -771,13 +770,13 @@ anychart.elements.LabelsFactory.prototype.draw = function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Measure.
+//  Measurement.
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Возвращает размеры лейбла.
- * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
- * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * Reaturns label size.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
+ * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
  * @return {anychart.math.Rect} Label bounds.
  * @private
@@ -835,7 +834,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   this.applyTextSettings(this.measureTextElement_, true);
   this.measureCustomLabel_.applyTextSettings(this.measureTextElement_, false);
 
-  //define is width and height setted from settings
+  //define is width and height set from settings
   isWidthSet = !goog.isNull(widthSettings);
   isHeightSet = !goog.isNull(heightSettings);
 
@@ -891,8 +890,8 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
 
 /**
  * Measure labels using formatProvider, positionProvider and returns labels bounds.
- * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
- * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
+ * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
  * @return {anychart.math.Rect} Labels bounds.
  */
@@ -912,13 +911,11 @@ anychart.elements.LabelsFactory.prototype.measure = function(formatProviderOrLab
 
 
 /**
- * Измеряет лейбл в его системе коррдинат и возвращает баунды как массив точек с координатами в системе координат
- * родителя.
- * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object witch provide info for textFormatter function.
- * @param {*=} opt_positionProvider Object witch provide info for positionFormatter function.
+ * Measures label in its coordinate system and returns bounds as an array of points in parent coordinate system.
+ * @param {*|anychart.elements.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
+ * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
- * @return {Array.<number>} Возвращает набор точек, образующих баунды лейбла, в его системе
- * координат.
+ * @return {Array.<number>} Label bounds.
  */
 anychart.elements.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
   var bounds = this.getDimension_(formatProviderOrLabel, opt_positionProvider, opt_settings);
@@ -1196,8 +1193,8 @@ anychart.elements.LabelsFactory.prototype.handleBrowserEvent_ = function(e) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Этот класс предназначен для рисования множества лейблов с одинаковым набором настроек и последующего управления этими лейблами.
- * Настройки конкретного лейбла могут быть изменены после того, как все лейблы будут нарисованы.
+ * Class for creation of sets of similar labels and management of such sets.
+ * Any individual label can be changed after all labels are displayed.
  * @constructor
  * @extends {anychart.elements.Text}
  */
@@ -1260,10 +1257,10 @@ anychart.elements.LabelsFactory.Label.prototype.getDomElement = function() {
 
 
 /**
- * Устанавливает/возвращает родительскую фабрику для лейбла.
+ * Gets/sets parent LabelsFactory.
  * @param {!anychart.elements.LabelsFactory=} opt_value labels factory.
- * @return {anychart.elements.LabelsFactory|anychart.elements.LabelsFactory.Label} Возвращает фабрику лейблов или
- * себя для цеПочечных вызовов.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.LabelsFactory.Label} Returns LabelsFactory or self
+ * for method chainging.
  */
 anychart.elements.LabelsFactory.Label.prototype.parentLabelsFactory = function(opt_value) {
   if (goog.isDefAndNotNull(opt_value)) {
@@ -1299,10 +1296,10 @@ anychart.elements.LabelsFactory.Label.prototype.setIndex = function(index) {
 
 
 /**
- * Устанавливает/возвращает текущую фабрику для лейбла, из которой должны быть взяты настройки.
+ * Gets/sets LabelsFactory to a label.
  * @param {anychart.elements.LabelsFactory=} opt_value labels factory.
- * @return {anychart.elements.LabelsFactory|anychart.elements.LabelsFactory.Label} Возвращает фабрику лейблов или
- * себя для цеПочечных вызовов.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.LabelsFactory.Label} Returns LabelsFactory or self
+ * for method chainging.
  */
 anychart.elements.LabelsFactory.Label.prototype.currentLabelsFactory = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1320,7 +1317,7 @@ anychart.elements.LabelsFactory.Label.prototype.currentLabelsFactory = function(
 /**
  * Gets or sets the Label background settings.
  * @param {anychart.elements.Background=} opt_value Background object to set.
- * @return {!(anychart.elements.LabelsFactory.Label|anychart.elements.Background)} Returns the background or itself for chaining.
+ * @return {!(anychart.elements.LabelsFactory.Label|anychart.elements.Background)} Returns background or itself for chaining.
  */
 anychart.elements.LabelsFactory.Label.prototype.background = function(opt_value) {
   if (!this.settingsObj.background) {
@@ -1426,10 +1423,10 @@ anychart.elements.LabelsFactory.Label.prototype.height = function(opt_value) {
 
 
 /**
- * Метод устанавливает поворот элемента отнонительно заданного якоря. Якори - 9-ть контрольных точек элемента
- * ({@link acgraph.vector.Element}). Метод кажды раз сбрасывает предыдущую трансформацию поворота и применяет новую.
- * @param {number=} opt_value Угол поворота лейблов в градусах.
- * @return {number|anychart.elements.LabelsFactory.Label} Rotation angle in degrees or Itself for chaining call.
+ * Rotates a label around an anchor.
+ * ({@link acgraph.vector.Element}). Method resets transformation and applies a new one.
+ * @param {number=} opt_value Rotation angle in degrees.
+ * @return {number|anychart.elements.LabelsFactory.Label} Rotation angle in degrees or self for chaining call.
  */
 anychart.elements.LabelsFactory.Label.prototype.rotation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1550,7 +1547,7 @@ anychart.elements.LabelsFactory.Label.prototype.textFormatter = function(opt_val
 /**
  * Gets/Sets position formatter.
  * @param {*=} opt_value Position formatter.
- * @return {*} Position formatter or itself for chaining.
+ * @return {*} Position formatter or self for chaining.
  */
 anychart.elements.LabelsFactory.Label.prototype.positionFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1568,7 +1565,7 @@ anychart.elements.LabelsFactory.Label.prototype.positionFormatter = function(opt
 /**
  * Gets/Sets format provider.
  * @param {*=} opt_value Format provider.
- * @return {*} Format provider or itself for chaining.
+ * @return {*} Format provider or self for chaining.
  */
 anychart.elements.LabelsFactory.Label.prototype.formatProvider = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1586,7 +1583,7 @@ anychart.elements.LabelsFactory.Label.prototype.formatProvider = function(opt_va
 /**
  * Gets/Sets position provider.
  * @param {*=} opt_value Position provider.
- * @return {*} Position provider or itself for chaining.
+ * @return {*} Position provider or self for chaining.
  */
 anychart.elements.LabelsFactory.Label.prototype.positionProvider = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1602,7 +1599,7 @@ anychart.elements.LabelsFactory.Label.prototype.positionProvider = function(opt_
 
 
 /**
- * Приводит лейбл в исходное состояние, но оставляет созданные DOM эелемнты, только очищает у них родителя.
+ * Resets label to the initial state, but leaves DOM elements intact, but without the parent.
  */
 anychart.elements.LabelsFactory.Label.prototype.clear = function() {
   this.resetSettings();
@@ -1642,7 +1639,7 @@ anychart.elements.LabelsFactory.Label.prototype.setSettings = function(opt_setti
 
 /**
  * Label drawing.
- * @return {anychart.elements.LabelsFactory.Label} Returns itself for chaining.
+ * @return {anychart.elements.LabelsFactory.Label} Returns self for chaining.
  */
 anychart.elements.LabelsFactory.Label.prototype.draw = function() {
   var parentLabelsFactory = this.parentLabelsFactory();
@@ -1866,7 +1863,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
       this.applyTextSettings(this.textElement_, false);
     }
 
-    //define is width and height setted from settings
+    //define is width and height set from settings
     var isWidthSet = !goog.isNull(widthSettings);
     var isHeightSet = !goog.isNull(heightSettings);
 

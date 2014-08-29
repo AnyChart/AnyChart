@@ -256,14 +256,13 @@ anychart.elements.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 /**
  * Getter for the current element state.
  *
- * Былина о трех состояних - true, false и null.
+  * True, false and null states.
  *
- * true и false по-старинке парвда и лож.
- * А вот если установлено null, то элемент включен, но если он зависит
- * от других сущностей (например, в случае markers() и hoverMarkers() в сериях), то null будет значить, что
- * состояние маркер фактори работает в auto режиме и завит от других обстоятельсв. (Например, если у серии
- * включены обычные маркеры, а хавер маркурам выставлено состояние null, то при хавере настройка enabled возьмется из
- * обычных маркеров и хавер маркеры будут работать. А если обычные маркеры выключить, то и хавер маркеры не будут работать)
+ * True and false are self-explanatory. null state means that element is enabled,
+ * but if it depends on other entities (like, for example, markers() and hoverMarkers() in series),
+ * then factory works in auto mode. For example, if series normal markers are enabled,
+ * and hover markers are in null state, then upon hover hoverMarkers become enabled because of normal.
+ * But if you disable normal markers – hoverMarkers are disabled too.
  * @return {?boolean} The current element state.
  *//**
  * Setter for the element enabled state.
@@ -271,7 +270,7 @@ anychart.elements.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * if (!element.enabled())
  *    element.enabled(true);
  * @param {(null|boolean)=} opt_value Value to set.
- * @return {anychart.MarkersFactory} An instance of {@link anychart.VisualBase} class for method chaining.
+ * @return {anychart.MarkersFactory} {@link anychart.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(null|boolean)=} opt_value Value to set.
@@ -870,12 +869,12 @@ anychart.elements.MarkersFactory.prototype.disablePointerEvents = function(opt_v
 
 
 /**
- * Возвращает баунды отностительно которых идут рассчеты позиционирования элемента.
+ * Returns bounds in which element is positioning.
  * @return {anychart.math.Rect} Current parent bounds.
  *//**
- * Устанавливает баунды отностительно которых идут рассчеты offsets, если они заданы в процентах.
+ * Sets bounds for offsets calculation, if those are set in percents.
  * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.MarkersFactory} Экземпляр класса {@link anychart.elements.MarkersFactory} для цепочного вызова.
+ * @return {!anychart.elements.MarkersFactory} {@link anychart.elements.MarkersFactory} for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.math.Rect=} opt_value .
@@ -1000,8 +999,8 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Очищает массив созданных маркеров.
- * @return {anychart.elements.MarkersFactory} Returns itself for chaining.
+ * Clears an array of markers.
+ * @return {anychart.elements.MarkersFactory} Returns self for chaining.
  */
 anychart.elements.MarkersFactory.prototype.clear = function() {
   if (!this.freeToUseMarkersPool_)
@@ -1020,7 +1019,7 @@ anychart.elements.MarkersFactory.prototype.clear = function() {
 
 
 /**
- * Возвращает маркер по его индексу, если он существует.
+ * Returns a marker by index, if there is a marker with such index.
  * @param {number} index Marker index.
  * @return {anychart.elements.MarkersFactory.Marker|undefined} Already existing label.
  */
@@ -1031,7 +1030,7 @@ anychart.elements.MarkersFactory.prototype.getMarker = function(index) {
 
 
 /**
- * Возвращает объект с состояниями изменений настроек.
+ * Returns object with changed states.
  * @return {Object}
  */
 anychart.elements.MarkersFactory.prototype.getSettingsChangedStatesObj = function() {
@@ -1040,7 +1039,7 @@ anychart.elements.MarkersFactory.prototype.getSettingsChangedStatesObj = functio
 
 
 /**
- * Return DOM element.
+ * Returns DOM element.
  * @return {acgraph.vector.Layer}
  */
 anychart.elements.MarkersFactory.prototype.getDomElement = function() {
@@ -1049,12 +1048,12 @@ anychart.elements.MarkersFactory.prototype.getDomElement = function() {
 
 
 /**
- * Добавляет новый маркер и добавляет в последовательность с учетом positionProvider.<br/>
- * @param {*} positionProvider Объект, содержащий информацию о позиционировании маркера с текщим индеком, который в
- *  обязательном порядке содержит поля <b>x</b> и <b>y</b>, не учитывающие настройки позиционирования offsets. Также
- *  может содержать любую иную информацию, которую Вы сами можете обрабатывать.
+ * Adds new marker and adds it to a set taking positionProvider into account.<br/>
+ * @param {*} positionProvider Object with position settings,
+ *  it must contain <b>x</b> and <b>y</b> without offsets.
+ *  Can contain any additional info, if needed.
  * @param {number=} opt_index Marker index.
- * @return {!anychart.elements.MarkersFactory.Marker} Возвращает добавленный маркер.
+ * @return {!anychart.elements.MarkersFactory.Marker} Returns a new marker.
  */
 anychart.elements.MarkersFactory.prototype.add = function(positionProvider, opt_index) {
   var marker, index;
@@ -1090,7 +1089,7 @@ anychart.elements.MarkersFactory.prototype.add = function(positionProvider, opt_
 
 /**
  * Markers drawing.
- * @return {anychart.elements.MarkersFactory} Returns itself for chaining.
+ * @return {anychart.elements.MarkersFactory} Returns self for method chaining.
  */
 anychart.elements.MarkersFactory.prototype.draw = function() {
   if (!this.layer_) this.layer_ = acgraph.layer();
@@ -1470,7 +1469,7 @@ anychart.elements.MarkersFactory.Marker.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Возвращает DOM элемент маркера.
+ * Returns marker DOM element.
  * @return {acgraph.vector.Element}
  */
 anychart.elements.MarkersFactory.Marker.prototype.getDomElement = function() {
@@ -1479,10 +1478,10 @@ anychart.elements.MarkersFactory.Marker.prototype.getDomElement = function() {
 
 
 /**
- * Устанавливает/возвращает родительскую фабрику для марукра.
+ * Gets/sets parent MarkersFactory.
  * @param {!anychart.elements.MarkersFactory=} opt_value Markers factory.
- * @return {anychart.elements.MarkersFactory|anychart.elements.MarkersFactory.Marker} Возвращает фабрику маркеров или
- * себя для цеПочечных вызовов.
+ * @return {anychart.elements.MarkersFactory|anychart.elements.MarkersFactory.Marker} Returns MarkersFactory
+ * or self for method chaining.
  */
 anychart.elements.MarkersFactory.Marker.prototype.parentMarkersFactory = function(opt_value) {
   if (goog.isDefAndNotNull(opt_value)) {
@@ -1498,10 +1497,10 @@ anychart.elements.MarkersFactory.Marker.prototype.parentMarkersFactory = functio
 
 
 /**
- * Устанавливает/возвращает текущую фабрику для маркера, из которой должны быть взяты настройки.
+ * Gets/sets current MarkersFactory to get settings from.
  * @param {anychart.elements.MarkersFactory=} opt_value Markes factory.
- * @return {anychart.elements.MarkersFactory|anychart.elements.MarkersFactory.Marker} Возвращает фабрику маркеров или
- * себя для цеПочечных вызовов.
+ * @return {anychart.elements.MarkersFactory|anychart.elements.MarkersFactory.Marker} Returns MarkersFactory
+ * or self for method chaining.
  */
 anychart.elements.MarkersFactory.Marker.prototype.currentMarkersFactory = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1539,7 +1538,7 @@ anychart.elements.MarkersFactory.Marker.prototype.setIndex = function(index) {
 /**
  * Gets/Sets position formatter.
  * @param {*=} opt_value Position formatter.
- * @return {*} Position formatter or itself for chaining.
+ * @return {*} Position formatter or self for chaining.
  */
 anychart.elements.MarkersFactory.Marker.prototype.positionFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1557,7 +1556,7 @@ anychart.elements.MarkersFactory.Marker.prototype.positionFormatter = function(o
 /**
  * Gets/Sets position provider.
  * @param {*=} opt_value Position provider.
- * @return {*} Position provider or itself for chaining.
+ * @return {*} Position provider or self for chaining.
  */
 anychart.elements.MarkersFactory.Marker.prototype.positionProvider = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1575,7 +1574,8 @@ anychart.elements.MarkersFactory.Marker.prototype.positionProvider = function(op
 /**
  * Getter for current position settings of all markers.
  * @param {(anychart.enums.Position|string)=} opt_value Markers position settings.
- * @return {anychart.elements.MarkersFactory.Marker|anychart.enums.Position|string} Markers position settings or itself for chaining call.
+ * @return {anychart.elements.MarkersFactory.Marker|anychart.enums.Position|string} Markers position
+ * settings or self for chaining call.
  */
 anychart.elements.MarkersFactory.Marker.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1709,15 +1709,15 @@ anychart.elements.MarkersFactory.Marker.prototype.fill = function(opt_fillOrColo
 
 /**
  * Getter for current stroke settings of all markers.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Настройки заливки границ примитива,
- *    если используется как сеттер.
- * @param {number=} opt_thickness Толщина линии. Если не передано, будет установлено в 1.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
+ *    if used as a setter.
+ * @param {number=} opt_thickness Line thickness. Defaults to 1.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
  *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
  *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Стиль (форма) соединения меду двумя линиями.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
  * @return {acgraph.vector.Stroke|string|anychart.elements.MarkersFactory.Marker} .
  */
 anychart.elements.MarkersFactory.Marker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
@@ -1749,7 +1749,7 @@ anychart.elements.MarkersFactory.Marker.prototype.enabled = function(opt_value) 
 
 
 /**
- * Приводит маркер в исходное состояние, но оставляет созданные DOM эелемнты, только очищает у них родителя.
+ * Resets marker to the initial state, but leaves DOM elements intact, but without the parent.
  */
 anychart.elements.MarkersFactory.Marker.prototype.clear = function() {
   this.resetSettings();
@@ -1786,13 +1786,13 @@ anychart.elements.MarkersFactory.Marker.prototype.setSettings = function(opt_set
 
 
 /**
- * Мержинг настроек лейбла.
- * @param {*} pointSettings Кастомная настройка из точки.
- * @param {*} pointSuperSettings Кастомная настройка из точки (Обычно это насройка для хавер лейблов).
- * @param {*} factorySettings Настройка из родительской фабрики.
- * @param {*} factorySuperSettings Настройка из текущей фабрики.
+ * Merge settings.
+ * @param {*} pointSettings Custom settings from a point.
+ * @param {*} pointSuperSettings Custom settings from a point (hover usually).
+ * @param {*} factorySettings Settings from the parent factory.
+ * @param {*} factorySuperSettings Settings from the current factory.
  * @param {boolean} isFactorySettingsChanged
- * @return {*} Возвращает финальную настройку.
+ * @return {*} Final settings.
  * @private
  */
 anychart.elements.MarkersFactory.Marker.prototype.getFinalSettings_ = function(pointSettings, pointSuperSettings,

@@ -10,8 +10,8 @@ goog.require('anychart.modules.scatter');
 
 
 /**
- * Возвращает экземпляр Чарта с исходными настроками (без осей, грида, заголовков, легенды и тд).<br/>
- * <b>Note:</b> Для того, что бы получить чарт с предустановками, используйте один из нижеперечисленных методов:
+ * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
+ * <b>Note:</b> To get a chart with initial settings use:
  *  <ul>
  *      <li>{@link anychart.areaChart}</li>
  *      <li>{@link anychart.barChart}</li>
@@ -40,4 +40,4 @@ anychart.cartesianChart = function(opt_barChartMode) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);//doc|ex|need-tr
+goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);//doc|ex

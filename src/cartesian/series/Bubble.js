@@ -245,8 +245,8 @@ anychart.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
  * @return {boolean} Display negaitve setting .
  *//**
  * Setter for negative value option.<br/>
- * <b>Note:</b> Отрицательные значения обрабатываются по модулю, но выделяются заливкой другого цвета.
- * См {@link anychart.cartesian.series.Bubble#negativeFill}, {@link anychart.cartesian.series.Bubble#negativeStroke},
+ * <b>Note:</b> Negative values are sized basing on absolute value, but shown in a different color.
+ * See {@link anychart.cartesian.series.Bubble#negativeFill}, {@link anychart.cartesian.series.Bubble#negativeStroke},
  *   {@link anychart.cartesian.series.Bubble#negativeHatchFill}
  * @example
  * anychart.cartesian.series.bubble([
