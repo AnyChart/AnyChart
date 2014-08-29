@@ -10,7 +10,7 @@ goog.require('anychart.utils.Bounds');
 
 /**
  * Axis ticks class.<br/>
- * You can change position, lenght and line features.
+ * You can change position, length and line features.
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -171,7 +171,7 @@ anychart.elements.Ticks.prototype.length = function(opt_value) {
  * @example <t>listingOnly</t>
  *  ticks.stroke('2 blue .7');
  * @param {(acgraph.vector.Stroke)=} opt_value ['black'] Fill style as '[thickness ]color[ opacity]'.
- * @return {anychart.elements.Ticks} An instance of the {@link anychart.elements.Ticks} class for method chaining.
+ * @return {anychart.elements.Ticks} {@link anychart.elements.Ticks} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Stroke)=} opt_value .
@@ -220,7 +220,7 @@ anychart.elements.Ticks.prototype.stroke = function(opt_value) {
  * stage.rect(0, 55, stage.width(), 95).fill('orange 0.1').stroke('0 0')
  * @param {(anychart.enums.SidePosition|string)=} opt_value [{@link anychart.enums.SidePosition}.OUTSIDE]
  *  Value to set.
- * @return {anychart.elements.Ticks} An instance of the {@link anychart.elements.Ticks} class for method chaining.
+ * @return {anychart.elements.Ticks} {@link anychart.elements.Ticks} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.enums.SidePosition|string)=} opt_value .
@@ -248,7 +248,7 @@ anychart.elements.Ticks.prototype.orientation = function(opt_value) {
     if (this.orientation_ != opt_value) {
       this.orientation_ = opt_value;
       this.drawer_ = null;
-      //todo а при смене ориентации ничего диспачится не должно? (blackart)
+      //TODO:blackart do we need to dispatch anything when orientation is changed?
     }
     return this;
   } else {
@@ -278,7 +278,7 @@ anychart.elements.Ticks.prototype.remove = function() {
 
 /**
  * Renders ticks.
- * @return {!anychart.elements.Ticks} An instance of {@link anychart.elements.Ticks} class for method chaining.
+ * @return {!anychart.elements.Ticks} {@link anychart.elements.Ticks} instance for method chaining.
  */
 anychart.elements.Ticks.prototype.draw = function() {
   this.path_.clear();
@@ -332,7 +332,7 @@ anychart.elements.Ticks.prototype.getTicksDrawer = function() {
  * @param {anychart.utils.Bounds} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for a crisp display.
  * @private
  */
 anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
@@ -365,7 +365,7 @@ anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBou
  * @param {anychart.utils.Bounds} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for a crisp display.
  * @private
  */
 anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
@@ -398,7 +398,7 @@ anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineB
  * @param {anychart.utils.Bounds} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for a crisp display.
  * @private
  */
 anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
@@ -431,7 +431,7 @@ anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, line
  * @param {anychart.utils.Bounds} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
- * @param {number} pixelShift Полупиксельный сдвиг для четкого отображения элементов графики.
+ * @param {number} pixelShift Pixel shift for a crisp display.
  * @private
  */
 anychart.elements.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {

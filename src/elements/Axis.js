@@ -1656,7 +1656,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  *//**
  * Setter for maximum stagger lines in autocalculation mode (if {@link anychart.elements.Axis#staggerLines} passed null).<br/>
  * @example
- * var leftChart = anychart.cartesian.chart();
+ * var leftChart = anychart.cartesianChart();
  * var data = [
  *     ['January', 1],
  *     ['Febrary', 2],
@@ -1671,7 +1671,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  * leftChart.line(data);
  * leftChart.bounds(anychart.math.rect(0,0,'49%','100%'));
  * leftChart.container(stage).draw();
- * var rightChart = anychart.cartesian.chart();
+ * var rightChart = anychart.cartesianChart();
  * var data = [
  *     ['January', 1],
  *     ['Febrary', 2],
@@ -1686,7 +1686,7 @@ anychart.elements.Axis.prototype.staggerLines = function(opt_value) {
  * rightChart.line(data);
  * rightChart.bounds(anychart.math.rect('51%',0,'50%','100%'));
  * rightChart.container(stage).draw();
- * @param {(number|null)=} opt_value [2] Ограничивает наибольшее количество линий, которое может потребоваться при рисоании лейблов. Если для корректной отрисовки лейблов потребуется меньшее число линий, то будет использовано меньшее число, но не больше заданого.
+ * @param {(number|null)=} opt_value [2] Limits the number of lines to be used when drawing labels. If we need less – we use less, but never – more.
  * @return {anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc

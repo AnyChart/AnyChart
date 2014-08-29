@@ -454,15 +454,15 @@ anychart.cartesian.series.Base.prototype.name = function(opt_value) {
  * Getter for series clip settings.
  * @return {boolean|anychart.math.Rect} Current clip settings.
  *//**
- * Setter for series clip settings. Обрезает видимую часть серии по указанному прямоугольнику (или по площади чарта).
+ * Setter for series clip settings. Clips visible part of a series by a rectangle (or chart).
  * @example <t>lineChart</t>
  * chart.yScale().minimum(2);
  * chart.line([1, 4, 7, 1]).clip(false);
- * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
+ * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.cartesian.series.Base} {@link anychart.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(boolean|anychart.math.Rect)=} opt_value [False, если серия создана самостоятельно.<br/>True, если серия создана через чарт] Enable/disable series clip.
+ * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.cartesian.series.Base|boolean|anychart.math.Rect} .
  */
 anychart.cartesian.series.Base.prototype.clip = function(opt_value) {
@@ -1253,9 +1253,9 @@ anychart.cartesian.series.Base.prototype.handleMouseOver = function(event) {
             this);
       }
       // TODO(AntonKagakin):
-      // в связи с тем что континиус серия теперь умеет определять индекс точки по координате
-      // комментируется до лучших времен, ибо пока серия выделятся не будет.
-      // Ждем фидбека об использовании
+      // Due to the fact that continious series can get point index by the coordinate
+      // we comment this for now - so no series selection.
+      // Let's wait for feedback on this.
       //else if (event.target['__tagSeriesGlobal'])
       //  this.hoverSeries();
       else
@@ -1480,7 +1480,7 @@ anychart.cartesian.series.Base.prototype.scaleInvalidated_ = function(event) {
  *     .stroke('2 #cc8800').fill('grey 0.5');
  * chart.line([1, 2, 1.2, 3.2]).tooltip(tooltipSettings);
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
- * <b>Note:</b> Для того, чтобы отключить tooltip необходимо передать <b>null</b> или <b>'none'</b>.
+ * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
  * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
  *//**
  * @ignoreDoc
@@ -1537,7 +1537,7 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
  * var series = chart.line([1,2,3]);
  * series.labels(labelSettings);
  * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
- * <b>Note:</b> Для того, чтобы отключить label необходимо передать <b>null</b> или <b>'none'</b>.
+ * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off a label.
  * @return {!anychart.cartesian.series.Base} An instance of the {@link anychart.cartesian.series.Base} class for method chaining.
  *//**
  * @ignoreDoc
@@ -2123,7 +2123,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  * @return {acgraph.vector.Stroke|Function} Current stroke settings.
  *//**
  * Setter for series stroke by function.<br/>
- * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
+ * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
  * @example <t>lineChart</t>
  * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke(
  *      function(){
@@ -2146,7 +2146,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
  * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Для всех ContiniousBase серий (line/spline/area etc) hoverStroke работает только в совокупности с методом hoverSeries.
+ * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
  * @example <t>lineChart</t>
  * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke('orange', 3, '5 2', 'round');
  * chart.column([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
