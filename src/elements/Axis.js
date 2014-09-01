@@ -2403,7 +2403,7 @@ anychart.elements.axis = function() {
 goog.exportSymbol('anychart.elements.axis', anychart.elements.axis);
 anychart.elements.Axis.prototype['staggerMode'] = anychart.elements.Axis.prototype.staggerMode;//doc|ex
 anychart.elements.Axis.prototype['staggerLines'] = anychart.elements.Axis.prototype.staggerLines;//doc|ex
-anychart.elements.Axis.prototype['staggerMaxLines'] = anychart.elements.Axis.prototype.staggerMaxLines;//doc|ex|need-tr
+anychart.elements.Axis.prototype['staggerMaxLines'] = anychart.elements.Axis.prototype.staggerMaxLines;//doc|ex
 anychart.elements.Axis.prototype['title'] = anychart.elements.Axis.prototype.title;
 anychart.elements.Axis.prototype['name'] = anychart.elements.Axis.prototype.name;
 anychart.elements.Axis.prototype['labels'] = anychart.elements.Axis.prototype.labels;
@@ -2423,5 +2423,3 @@ anychart.elements.Axis.prototype['drawLastLabel'] = anychart.elements.Axis.proto
 anychart.elements.Axis.prototype['overlapMode'] = anychart.elements.Axis.prototype.overlapMode;
 anychart.elements.Axis.prototype['isHorizontal'] = anychart.elements.Axis.prototype.isHorizontal;
 anychart.elements.Axis.prototype['draw'] = anychart.elements.Axis.prototype.draw;
-anychart.elements.Axis.prototype['serialize'] = anychart.elements.Axis.prototype.serialize;
-anychart.elements.Axis.prototype['deserialize'] = anychart.elements.Axis.prototype.deserialize;

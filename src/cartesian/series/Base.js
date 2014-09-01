@@ -2463,9 +2463,9 @@ anychart.cartesian.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt
 
 
 //exports
-anychart.cartesian.series.Base.prototype['clip'] = anychart.cartesian.series.Base.prototype.clip;//doc|ex|need-tr
+anychart.cartesian.series.Base.prototype['clip'] = anychart.cartesian.series.Base.prototype.clip;//doc|ex
 anychart.cartesian.series.Base.prototype['color'] = anychart.cartesian.series.Base.prototype.color;//doc|ex
-anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//doc|ex|need-tr
+anychart.cartesian.series.Base.prototype['name'] = anychart.cartesian.series.Base.prototype.name;//doc|ex
 anychart.cartesian.series.Base.prototype['meta'] = anychart.cartesian.series.Base.prototype.meta;//doc|ex
 anychart.cartesian.series.Base.prototype['data'] = anychart.cartesian.series.Base.prototype.data;//doc|ex
 anychart.cartesian.series.Base.prototype['draw'] = anychart.cartesian.series.Base.prototype.draw;//doc|ex

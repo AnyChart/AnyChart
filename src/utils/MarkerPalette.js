@@ -124,5 +124,3 @@ anychart.utils.markerPalette = function() {
 goog.exportSymbol('anychart.utils.markerPalette', anychart.utils.markerPalette);
 anychart.utils.MarkerPalette.prototype['markerAt'] = anychart.utils.MarkerPalette.prototype.markerAt;
 anychart.utils.MarkerPalette.prototype['markers'] = anychart.utils.MarkerPalette.prototype.markers;
-anychart.utils.MarkerPalette.prototype['serialize'] = anychart.utils.MarkerPalette.prototype.serialize;
-anychart.utils.MarkerPalette.prototype['deserialize'] = anychart.utils.MarkerPalette.prototype.deserialize;

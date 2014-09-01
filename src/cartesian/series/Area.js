@@ -162,7 +162,7 @@ anychart.cartesian.series.area = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.area', anychart.cartesian.series.area);
+goog.exportSymbol('anychart.cartesian.series.area', anychart.cartesian.series.area);//doc|ex
 anychart.cartesian.series.Area.prototype['fill'] = anychart.cartesian.series.Area.prototype.fill;//inherited
 anychart.cartesian.series.Area.prototype['hoverFill'] = anychart.cartesian.series.Area.prototype.hoverFill;//inherited
 anychart.cartesian.series.Area.prototype['stroke'] = anychart.cartesian.series.Area.prototype.stroke;//inherited

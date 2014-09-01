@@ -498,7 +498,7 @@ anychart.elements.credits = function() {
 
 
 //exports
-goog.exportSymbol('anychart.elements.credits', anychart.elements.credits);//doc|ex|need-tr
+goog.exportSymbol('anychart.elements.credits', anychart.elements.credits);//doc|ex
 anychart.elements.Credits.prototype['text'] = anychart.elements.Credits.prototype.text;//doc|ex
 anychart.elements.Credits.prototype['url'] = anychart.elements.Credits.prototype.url;//doc|ex
 anychart.elements.Credits.prototype['alt'] = anychart.elements.Credits.prototype.alt;//doc|ex

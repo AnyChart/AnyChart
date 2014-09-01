@@ -565,7 +565,7 @@ anychart.cartesian.series.marker = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.marker', anychart.cartesian.series.marker);
+goog.exportSymbol('anychart.cartesian.series.marker', anychart.cartesian.series.marker);//doc|ex
 anychart.cartesian.series.Marker.prototype['stroke'] = anychart.cartesian.series.Marker.prototype.stroke;//inherited
 anychart.cartesian.series.Marker.prototype['hoverStroke'] = anychart.cartesian.series.Marker.prototype.hoverStroke;//inherited
 anychart.cartesian.series.Marker.prototype['fill'] = anychart.cartesian.series.Marker.prototype.fill;//inherited
