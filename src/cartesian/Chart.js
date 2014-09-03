@@ -839,7 +839,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
  * var txtMarker = anychart.elements.textMarker()
  *     .text('Marker')
  *     .value(3.3)
- *     .align(anychart.enums.TextMarkerAlign.NEAR)
+ *     .align(anychart.enums.Align.LEFT)
  *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
  * chart.textMarker(txtMarker);
  * chart.lineMarker().value(3.3);

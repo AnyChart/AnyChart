@@ -804,49 +804,6 @@ anychart.enums.LegendItemIconType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  TextMarkerAlign
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Sets marker position relative to an axis
- * @enum {string}
- */
-anychart.enums.TextMarkerAlign = {
-  NEAR: 'near',
-  CENTER: 'center',
-  FAR: 'far'
-};
-
-
-/**
- * Normalizes user input align to its enumeration values. Also accepts 'middle' and null. Defaults to opt_default or
- * 'center'.
- *
- * @param {*} value Align to normalize.
- * @param {anychart.enums.TextMarkerAlign=} opt_default Default align.
- * @return {anychart.enums.TextMarkerAlign} Normalized align.
- */
-anychart.enums.normalizeTextMarkerAlign = function(value, opt_default) {
-  value = (String(value)).toLowerCase();
-  switch (value) {
-    case 'near':
-    case 'n':
-      return anychart.enums.TextMarkerAlign.NEAR;
-    case 'far':
-    case 'f':
-      return anychart.enums.TextMarkerAlign.FAR;
-    case 'center':
-    case 'c':
-    case 'middle':
-    case 'm':
-      return anychart.enums.TextMarkerAlign.CENTER;
-  }
-  return opt_default || anychart.enums.TextMarkerAlign.CENTER;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  SidePosition
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1080,10 +1037,6 @@ goog.exportSymbol('anychart.enums.LegendItemIconType.STEP_LINE', anychart.enums.
 goog.exportSymbol('anychart.enums.LegendItemIconType.STEP_AREA', anychart.enums.LegendItemIconType.STEP_AREA);
 goog.exportSymbol('anychart.enums.LegendItemIconType.CIRCLE', anychart.enums.LegendItemIconType.CIRCLE);
 goog.exportSymbol('anychart.enums.LegendItemIconType.SQUARE', anychart.enums.LegendItemIconType.SQUARE);
-
-goog.exportSymbol('anychart.enums.TextMarkerAlign.CENTER', anychart.enums.TextMarkerAlign.CENTER);
-goog.exportSymbol('anychart.enums.TextMarkerAlign.NEAR', anychart.enums.TextMarkerAlign.NEAR);
-goog.exportSymbol('anychart.enums.TextMarkerAlign.FAR', anychart.enums.TextMarkerAlign.FAR);
 
 goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
 goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/

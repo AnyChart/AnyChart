@@ -41,7 +41,7 @@ anychart.elements.TextMarker = function() {
   this.layout_;
 
   /**
-   * @type {anychart.enums.TextMarkerAlign}
+   * @type {anychart.enums.Align}
    * @private
    */
   this.align_;
@@ -222,12 +222,12 @@ anychart.elements.TextMarker.prototype.axesLinesSpace = function(opt_spaceOrTopO
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/Set align.
- * @param {anychart.enums.TextMarkerAlign=} opt_value TextMarker align.
- * @return {anychart.enums.TextMarkerAlign|anychart.elements.TextMarker} Align or this.
+ * @param {anychart.enums.Align=} opt_value TextMarker align.
+ * @return {anychart.enums.Align|anychart.elements.TextMarker} Align or this.
  */
 anychart.elements.TextMarker.prototype.align = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var align = anychart.enums.normalizeTextMarkerAlign(opt_value);
+    var align = anychart.enums.normalizeAlign(opt_value);
     if (this.align_ != align) {
       this.align_ = align;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -518,9 +518,9 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
     case anychart.enums.Layout.HORIZONTAL:
       y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
       ratio == 1 ? y -= shift : y += shift;
-      if (this.align_ == anychart.enums.TextMarkerAlign.NEAR) {
+      if (this.align_ == anychart.enums.Align.LEFT) {
         x = parentBounds.getLeft();
-      } else if (this.align_ == anychart.enums.TextMarkerAlign.CENTER) {
+      } else if (this.align_ == anychart.enums.Align.CENTER) {
         x = parentBounds.getLeft() + parentBounds.width / 2;
       } else {
         x = parentBounds.getRight();
@@ -529,9 +529,9 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
     case anychart.enums.Layout.VERTICAL:
       x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
       ratio == 1 ? x += shift : x -= shift;
-      if (this.align_ == anychart.enums.TextMarkerAlign.NEAR) {
+      if (this.align_ == anychart.enums.Align.BOTTOM) {
         y = parentBounds.getBottom();
-      } else if (this.align_ == anychart.enums.TextMarkerAlign.CENTER) {
+      } else if (this.align_ == anychart.enums.Align.CENTER) {
         y = parentBounds.getTop() + parentBounds.height / 2;
       } else {
         y = parentBounds.getTop();
@@ -549,7 +549,7 @@ anychart.elements.TextMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
   this.zIndex(27);
   this.layout(anychart.enums.Layout.HORIZONTAL);
-  this.align(anychart.enums.TextMarkerAlign.CENTER);
+  this.align(anychart.enums.Align.CENTER);
   this.anchor(anychart.enums.Anchor.CENTER);
   this.value(0);
   this.text('Text marker');
