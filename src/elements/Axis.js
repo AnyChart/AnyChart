@@ -2350,7 +2350,8 @@ anychart.elements.Axis.prototype.deserialize = function(value) {
   this.name(value['name']);
   this.length(parseFloat(value['length']));
   this.offsetX(value['offsetX']);
-  this.stroke(value['offsetY']);
+  this.offsetY(value['offsetY']);
+  this.stroke(value['stroke']);
   this.orientation(value['orientation']);
   this.drawFirstLabel(value['drawFirstLabel']);
   this.drawLastLabel(value['drawLastLabel']);

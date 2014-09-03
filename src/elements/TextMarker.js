@@ -602,6 +602,8 @@ anychart.elements.TextMarker.prototype.deserialize = function(value) {
 
   goog.base(this, 'deserialize', value);
 
+  this.textSettings(value);
+
   this.layout(value['layout']);
   this.align(value['align']);
   this.anchor(value['anchor']);
