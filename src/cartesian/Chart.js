@@ -307,6 +307,20 @@ anychart.cartesian.Chart.prototype.seriesOfXScaleMap_;
 anychart.cartesian.Chart.prototype.seriesOfYScaleMap_;
 
 
+/**
+ * Sets default scale for layout based element depending on barChartMode.
+ * @param {anychart.elements.LineMarker|anychart.elements.RangeMarker|anychart.elements.TextMarker|anychart.elements.Grid} item Item to set scale.
+ * @private
+ */
+anychart.cartesian.Chart.prototype.setDefaultScaleForLayoutBasedElements_ = function(item) {
+  if (!!(item.isHorizontal() ^ this.barChartMode)) {
+    item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+  } else {
+    item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Grids.
@@ -378,7 +392,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS);
+    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -475,7 +489,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS);
+    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -570,6 +584,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
+    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -650,6 +665,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
+    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -742,7 +758,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
+    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -810,7 +826,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
+    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -880,7 +896,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
+    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1763,37 +1779,6 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   }
   //----------------------------------end calc statistics for series
 
-  for (i = 0, count = this.xAxes_.length; i < count; i++) {
-    item = this.xAxes_[i];
-    if (item && !item.scale())
-      item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-  }
-
-  for (i = 0, count = this.yAxes_.length; i < count; i++) {
-    item = this.yAxes_[i];
-    if (item && !item.scale())
-      item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-  }
-
-  var layoutBasedElements = goog.array.concat(
-      this.lineAxesMarkers_,
-      this.rangeAxesMarkers_,
-      this.textAxesMarkers_,
-      this.grids_,
-      this.minorGrids_);
-
-  for (i = 0, count = layoutBasedElements.length; i < count; i++) {
-    item = layoutBasedElements[i];
-
-    if (item && !item.scale()) {
-      if (!!(item.isHorizontal() ^ this.barChartMode)) {
-        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
-      } else {
-        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
-      }
-    }
-  }
-
   this.seriesOfStackedScaleMap_ = seriesOfStackedScaleMap;
   this.yScales_ = yScales;
   this.xScales_ = xScales;
@@ -2122,11 +2107,28 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
 
+  // set default scales for axis if they not set
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.AXES)) {
+    var item;
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      item = this.xAxes_[i];
+      if (item && !item.scale())
+        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      item = this.yAxes_[i];
+      if (item && !item.scale())
+        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+    }
+  }
+
   //calculate axes space first, the result is data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     //total bounds of content area
     var contentAreaBounds = bounds.clone().round();
     var attempt = 0;
+
     do {
       //axes local vars
       var remainingBounds;
@@ -2224,6 +2226,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       var grid = grids[i];
       if (grid) {
         grid.suspendSignalsDispatching();
+        if (!grid.scale())
+          this.setDefaultScaleForLayoutBasedElements_(grid);
         grid.parentBounds(this.dataBounds_);
         grid.container(this.rootElement);
         grid.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
@@ -2266,6 +2270,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       var axesMarker = markers[i];
       if (axesMarker) {
         axesMarker.suspendSignalsDispatching();
+        if (!axesMarker.scale())
+          this.setDefaultScaleForLayoutBasedElements_(axesMarker);
         axesMarker.parentBounds(this.dataBounds_);
         axesMarker.container(this.rootElement);
         axesMarker.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);

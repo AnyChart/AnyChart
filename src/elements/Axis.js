@@ -703,6 +703,7 @@ anychart.elements.Axis.prototype.scale = function(opt_value) {
     if (this.scale_ != opt_value) {
       this.scale_ = opt_value;
       this.scale_.listenSignals(this.scaleInvalidated_, this);
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {

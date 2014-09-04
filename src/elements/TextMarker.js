@@ -128,6 +128,8 @@ anychart.elements.TextMarker.prototype.scale = function(opt_value) {
     if (this.scale_ != opt_value) {
       this.scale_ = opt_value;
       this.scale_.listenSignals(this.scaleInvalidated_, this);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {

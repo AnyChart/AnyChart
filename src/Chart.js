@@ -620,6 +620,7 @@ anychart.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
     this.chartLabels_[index] = label;
     this.registerDisposable(label);
     label.listenSignals(this.onLabelSignal_, this);
+    this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -750,7 +751,6 @@ anychart.Chart.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (this.enabled()) {
       this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-      if (this.title().enabled()) this.title_.container(this.rootElement);
     }
 
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
@@ -786,6 +786,7 @@ anychart.Chart.prototype.draw = function() {
   var title = this.title();
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
     title.suspendSignalsDispatching();
+    if (!title.container()) title.container(this.rootElement);
     title.parentBounds(boundsWithoutPadding);
     title.resumeSignalsDispatching(false);
     title.draw();
@@ -1028,7 +1029,7 @@ anychart.Chart.prototype.restoreDefaults = function() {
   background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
   background.stroke('none');
 
-  this.title('Chart title');
+  this.title().text('Chart title');
 
   var legend = /** @type {anychart.elements.Legend} */(this.legend());
   legend.enabled(false);
