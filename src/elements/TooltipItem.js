@@ -642,12 +642,15 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.VISIBILITY)) {
+    var tooltipsContainer = anychart.utils.TooltipsContainer.getInstance();
     if (this.visible()) {
       this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      tooltipsContainer.setShown(true);
       this.timer_.stop();
     } else {
       if (this.hideDelay_ <= 0) {
         this.remove();
+        tooltipsContainer.setShown(false);
       } else if (!this.timer_.isActive()) {
         this.timer_.start();
       }

@@ -15,7 +15,7 @@ goog.require('goog.dom');
  */
 anychart.utils.TooltipsContainer = function() {
   goog.base(this);
-  this.root_ = goog.dom.createElement('div');
+  this.root_ = goog.dom.createDom('div', {'style': 'display: none'});
   var aw = goog.dom.getWindow().screen.availWidth;
   var ah = goog.dom.getWindow().screen.availHeight;
 
@@ -54,6 +54,18 @@ anychart.utils.TooltipsContainer.prototype.stage_ = null;
  * @private
  */
 anychart.utils.TooltipsContainer.prototype.children_ = null;
+
+
+/**
+ * Set parameters to div element.
+ * Inner use only.
+ * @param {boolean} isShown Whether to show container or not.
+ */
+anychart.utils.TooltipsContainer.prototype.setShown = function(isShown) {
+  isShown ?
+      goog.dom.setProperties(this.root_, {'style': 'position:absolute; z-index: 9999'}) :
+      goog.dom.setProperties(this.root_, {'style': 'display: none'});
+};
 
 
 /**
