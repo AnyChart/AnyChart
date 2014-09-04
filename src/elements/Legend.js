@@ -914,7 +914,7 @@ anychart.elements.Legend.prototype.initializeLegendItems_ = function() {
       item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
       item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
       item.iconHatchFill(provider['iconHatchFill'] ? provider['iconHatchFill'] : null);
-      item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : 'none');
+      item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : null);
 
       item.text(provider['text'] ? provider['text'] : 'Item ' + i);
       item.iconTextSpacing(this.iconTextSpacing_);
