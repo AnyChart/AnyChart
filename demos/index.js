@@ -20,13 +20,19 @@ anychart.onDocumentReady(function() {
   var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
 
   //create column chart
-  chart = anychart.columnChart();
+  var chart = anychart.columnChart();
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title().text('Multi-Series Bar Chart');
+  chart.title()
+      .text('Multi-Series Bar Chart')
+      .margin('40%', '50%', '40%', 0)
+      //.margin(0)
+      .padding(0)
+      //.padding('20%', 0, '40%', 10)
+      .background().fill('blue .3').enabled(true);
 
   //helper function to setup label settings for all series
   var setupSeriesLabels = function(series) {
@@ -63,4 +69,7 @@ anychart.onDocumentReady(function() {
 
   //initiate chart drawing
   chart.draw();
+
+
+  chart.container().rect().setBounds(chart.title().getContentBounds());
 });

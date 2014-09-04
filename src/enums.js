@@ -498,6 +498,42 @@ anychart.enums.MarkerType = {
 /**
  * Method to get marker drawer.
  * @param {*} type Marker type.
+ * @param {anychart.enums.MarkerType=} opt_default Default marker type. Defaults to anychart.enums.MarkerType.STAR5.
+ * @return {anychart.enums.MarkerType} Normalized marker type.
+ */
+anychart.enums.normalizeMarkerType = function(type, opt_default) {
+  type = (String(type)).toLowerCase();
+  switch (type) {
+    case 'star4':
+      return anychart.enums.MarkerType.STAR4;
+    case 'star6':
+      return anychart.enums.MarkerType.STAR6;
+    case 'star7':
+      return anychart.enums.MarkerType.STAR7;
+    case 'star10':
+      return anychart.enums.MarkerType.STAR10;
+    case 'diamond':
+      return anychart.enums.MarkerType.DIAMOND;
+    case 'triangleup':
+      return anychart.enums.MarkerType.TRIANGLE_UP;
+    case 'triangledown':
+      return anychart.enums.MarkerType.TRIANGLE_DOWN;
+    case 'cross':
+      return anychart.enums.MarkerType.CROSS;
+    case 'diagonalcross':
+      return anychart.enums.MarkerType.DIAGONAL_CROSS;
+    case 'circle':
+      return anychart.enums.MarkerType.CIRCLE;
+    case 'square':
+      return anychart.enums.MarkerType.SQUARE;
+  }
+  return opt_default || anychart.enums.MarkerType.STAR5;
+};
+
+
+/**
+ * Method to get marker drawer.
+ * @param {*} type Marker type.
  * @return {function(!acgraph.vector.Path, number, number, number):acgraph.vector.Path} Marker drawer.
  */
 anychart.enums.getMarkerDrawer = function(type) {

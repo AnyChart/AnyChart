@@ -524,6 +524,7 @@ anychart.elements.MarkersFactory.prototype.anchor = function(opt_value) {
  */
 anychart.elements.MarkersFactory.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeMarkerType(opt_value);
     if (this.type_ != opt_value) {
       this.type_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);

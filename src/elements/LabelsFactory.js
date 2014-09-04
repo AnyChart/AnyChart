@@ -1338,7 +1338,7 @@ anychart.elements.LabelsFactory.Label.prototype.background = function(opt_value)
     this.settingsObj.background.resumeSignalsDispatching(true);
     return this;
   }
-  return this.settingsObj.background_;
+  return this.settingsObj.background;
 };
 
 
@@ -1363,13 +1363,13 @@ anychart.elements.LabelsFactory.Label.prototype.backgroundInvalidated_ = functio
  * @return {anychart.elements.LabelsFactory.Label|anychart.utils.Padding} .
  */
 anychart.elements.LabelsFactory.Label.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  if (!this.settingsObj.padding_) {
+  if (!this.settingsObj.padding) {
     this.settingsObj.padding = new anychart.utils.Padding();
-    this.registerDisposable(this.settingsObj.padding_);
+    this.registerDisposable(this.settingsObj.padding);
     this.settingsObj.padding.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.settingsObj.padding.set.apply(this.settingsObj.padding_, arguments);
+    this.settingsObj.padding.set.apply(this.settingsObj.padding, arguments);
     return this;
   }
   return this.settingsObj.padding;
@@ -1870,15 +1870,15 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     //we should ask text element about bounds only after text format and text settings are applied
     var textElementBounds = this.textElement_.getBounds();
 
-    /** @type {anychart.math.Rect} */
+    /** @type  {anychart.math.Rect} */
     var outerBounds = new anychart.math.Rect(0, 0, 0, 0);
     //calculate text width and outer width
     var width, textX, textWidth;
     if (isWidthSet) {
       width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(widthSettings), parentWidth));
       if (padding) {
-        textX = padding.left();
         textWidth = padding.tightenWidth(width);
+        textX = anychart.utils.normalizeSize(padding.left(), width);
       } else {
         textX = 0;
         textWidth = width;
@@ -1887,8 +1887,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     } else {
       width = textElementBounds.width;
       if (padding) {
-        textX = padding.left();
         outerBounds.width = padding.widenWidth(width);
+        textX = anychart.utils.normalizeSize(padding.left(), outerBounds.width);
       } else {
         textX = 0;
         outerBounds.width = width;
@@ -1904,8 +1904,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     if (isHeightSet) {
       height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(heightSettings), parentHeight));
       if (padding) {
-        textY = padding.top();
         textHeight = padding.tightenHeight(height);
+        textY = anychart.utils.normalizeSize(padding.top(), height);
       } else {
         textY = 0;
         textHeight = height;
@@ -1914,8 +1914,8 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     } else {
       height = textElementBounds.height;
       if (padding) {
-        textY = padding.top();
         outerBounds.height = padding.widenHeight(height);
+        textY = anychart.utils.normalizeSize(padding.top(), outerBounds.height);
       } else {
         textY = 0;
         outerBounds.height = height;

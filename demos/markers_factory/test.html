@@ -20,7 +20,7 @@
         ]);
 
         var chart = anychart.barChart(data);
-        chart.bar(data).markers().enabled(false);
+        chart.bar(data).markers().type('cRoSS').enabled(true);
         chart.container('container').draw();
       });
 

@@ -900,7 +900,7 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
   var leftMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.left()), this.backgroundWidth_);
-  var topMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.top()), this.backgroundWidth_);
+  var topMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.top()), this.backgroundHeight_);
 
   if (parentBounds) {
     switch (this.orientation_) {

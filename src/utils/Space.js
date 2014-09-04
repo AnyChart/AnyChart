@@ -205,12 +205,10 @@ anychart.utils.Space.prototype.bottom = function(opt_value) {
  * @return {!anychart.math.Rect} New rectangle with applied margin.
  */
 anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
-  var width = this.getWidthToTighten(boundsRect.width);
-  var height = this.getHeightToTighten(boundsRect.height);
-  var left = anychart.utils.normalizeSize(this.left_, width);
-  var right = anychart.utils.normalizeSize(this.right_, width);
-  var top = anychart.utils.normalizeSize(this.top_, height);
-  var bottom = anychart.utils.normalizeSize(this.bottom_, height);
+  var left = anychart.utils.normalizeSize(this.left_, boundsRect.width);
+  var right = anychart.utils.normalizeSize(this.right_, boundsRect.width);
+  var top = anychart.utils.normalizeSize(this.top_, boundsRect.height);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, boundsRect.height);
   return new anychart.math.Rect(
       boundsRect.left + left,
       boundsRect.top + top,
@@ -226,7 +224,6 @@ anychart.utils.Space.prototype.tightenBounds = function(boundsRect) {
  * @return {number} New width.
  */
 anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
-  initialWidth = this.getHeightToTighten(initialWidth);
   var left = anychart.utils.normalizeSize(this.left_, initialWidth);
   var right = anychart.utils.normalizeSize(this.right_, initialWidth);
   return initialWidth - left - right;
@@ -239,7 +236,6 @@ anychart.utils.Space.prototype.tightenWidth = function(initialWidth) {
  * @return {number} New height.
  */
 anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
-  initialHeight = this.getHeightToTighten(initialHeight);
   var top = anychart.utils.normalizeSize(this.top_, initialHeight);
   var bottom = anychart.utils.normalizeSize(this.bottom_, initialHeight);
   return initialHeight - top - bottom;
@@ -252,12 +248,10 @@ anychart.utils.Space.prototype.tightenHeight = function(initialHeight) {
  * @return {!anychart.math.Rect} New rectangle.
  */
 anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
-  var width = this.getWidthToWiden(boundsRect.width);
-  var height = this.getHeightToWiden(boundsRect.height);
-  var left = anychart.utils.normalizeSize(this.left_, width);
-  var right = anychart.utils.normalizeSize(this.right_, width);
-  var top = anychart.utils.normalizeSize(this.top_, height);
-  var bottom = anychart.utils.normalizeSize(this.bottom_, height);
+  var left = anychart.utils.normalizeSize(this.left_, boundsRect.width);
+  var right = anychart.utils.normalizeSize(this.right_, boundsRect.width);
+  var top = anychart.utils.normalizeSize(this.top_, boundsRect.height);
+  var bottom = anychart.utils.normalizeSize(this.bottom_, boundsRect.height);
   return new anychart.math.Rect(
       boundsRect.left - left,
       boundsRect.top - top,
@@ -273,7 +267,6 @@ anychart.utils.Space.prototype.widenBounds = function(boundsRect) {
  * @return {number} New width.
  */
 anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
-  initialWidth = this.getWidthToWiden(initialWidth);
   var left = anychart.utils.normalizeSize(this.left_, initialWidth);
   var right = anychart.utils.normalizeSize(this.right_, initialWidth);
   return initialWidth + left + right;
@@ -286,52 +279,9 @@ anychart.utils.Space.prototype.widenWidth = function(initialWidth) {
  * @return {number} New height.
  */
 anychart.utils.Space.prototype.widenHeight = function(initialHeight) {
-  initialHeight = this.getHeightToWiden(initialHeight);
   var top = anychart.utils.normalizeSize(this.top_, initialHeight);
   var bottom = anychart.utils.normalizeSize(this.bottom_, initialHeight);
   return initialHeight + top + bottom;
-};
-
-
-/**
- * Corrects height to calculate percentage from.
- * @param {number} initialWidth
- * @return {number}
- */
-anychart.utils.Space.prototype.getWidthToWiden = function(initialWidth) {
-  return initialWidth;
-};
-
-
-/**
- * Corrects height to calculate percentage from.
- * @param {number} initialWidth
- * @return {number}
- */
-anychart.utils.Space.prototype.getWidthToTighten = function(initialWidth) {
-  return initialWidth;
-};
-
-
-/**
- * Corrects height to calculate percentage from.
- * @param {number} initialHeight
- * @return {number}
- * @protected
- */
-anychart.utils.Space.prototype.getHeightToWiden = function(initialHeight) {
-  return initialHeight;
-};
-
-
-/**
- * Corrects height to calculate percentage from.
- * @param {number} initialHeight
- * @return {number}
- * @protected
- */
-anychart.utils.Space.prototype.getHeightToTighten = function(initialHeight) {
-  return initialHeight;
 };
 
 

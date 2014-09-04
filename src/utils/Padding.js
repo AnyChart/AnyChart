@@ -23,46 +23,50 @@ goog.inherits(anychart.utils.Padding, anychart.utils.Space);
 
 
 /** @inheritDoc */
-anychart.utils.Padding.prototype.getWidthToWiden = function(initialWidth) {
-  var top = this.top();
-  var bottom = this.bottom();
-  var topIsPercent = anychart.utils.isPercent(top);
-  var bottomIsPercent = anychart.utils.isPercent(bottom);
-  if (topIsPercent || bottomIsPercent) {
-    var ratio = 1;
-    if (topIsPercent)
-      ratio -= parseFloat(top) / 100;
-    else
-      initialWidth -= goog.isNumber(top) ? top : parseFloat(top);
-    if (bottomIsPercent)
-      ratio -= parseFloat(bottom) / 100;
-    else
-      initialWidth -= goog.isNumber(bottom) ? bottom : parseFloat(bottom);
-    return initialWidth / ratio;
-  } else {
-    return initialWidth;
-  }
+anychart.utils.Padding.prototype.widenBounds = function(boundsRect) {
+  var width = this.widenWidth(boundsRect.width);
+  var height = this.widenWidth(boundsRect.height);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.left()), width);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.top()), height);
+  return new anychart.math.Rect(
+      boundsRect.left - left,
+      boundsRect.top - top,
+      width, height
+  );
 };
 
 
 /** @inheritDoc */
-anychart.utils.Padding.prototype.getHeightToWiden = function(initialHeight) {
+anychart.utils.Padding.prototype.widenHeight = function(initialHeight) {
+  var top = this.top();
+  var bottom = this.bottom();
+  var ratio = 1;
+  if (anychart.utils.isPercent(top))
+    ratio -= parseFloat(top) / 100;
+  else
+    initialHeight += goog.isNumber(top) ? top : parseFloat(top);
+  if (anychart.utils.isPercent(bottom))
+    ratio -= parseFloat(bottom) / 100;
+  else
+    initialHeight += goog.isNumber(bottom) ? bottom : parseFloat(bottom);
+  if (ratio == 0) ratio = 1e-7;
+  return initialHeight / ratio;
+};
+
+
+/** @inheritDoc */
+anychart.utils.Padding.prototype.widenWidth = function(initialWidth) {
   var left = this.left();
   var right = this.right();
-  var leftIsPercent = anychart.utils.isPercent(left);
-  var rightIsPercent = anychart.utils.isPercent(right);
-  if (leftIsPercent || rightIsPercent) {
-    var ratio = 1;
-    if (leftIsPercent)
-      ratio -= parseFloat(left) / 100;
-    else
-      initialHeight -= goog.isNumber(left) ? left : parseFloat(left);
-    if (rightIsPercent)
-      ratio -= parseFloat(right) / 100;
-    else
-      initialHeight -= goog.isNumber(right) ? right : parseFloat(right);
-    return initialHeight / ratio;
-  } else {
-    return initialHeight;
-  }
+  var ratio = 1;
+  if (anychart.utils.isPercent(left))
+    ratio -= parseFloat(left) / 100;
+  else
+    initialWidth += goog.isNumber(left) ? left : parseFloat(left);
+  if (anychart.utils.isPercent(right))
+    ratio -= parseFloat(right) / 100;
+  else
+    initialWidth += goog.isNumber(right) ? right : parseFloat(right);
+  if (ratio == 0) ratio = 1e-7;
+  return initialWidth / ratio;
 };
