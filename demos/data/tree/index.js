@@ -46,10 +46,13 @@ anychart.onDocumentReady(function() {
   
   data1 = new anychart.data.Tree(rawData1);
   console.log(data1.getChildren());
+  data1.listen('treeDataChange', function(evt) {
+    console.log(evt);
+  });
+
+  data1.getChildAt(0).set('hello', 'hell');
 
 
-  data2 = new anychart.data.Tree(rawData2, anychart.data.Tree.FillMethod.PARENT_POINTER);
-  console.log(data2.getChildren());
 
 });
 
