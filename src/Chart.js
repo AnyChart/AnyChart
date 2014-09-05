@@ -1029,7 +1029,9 @@ anychart.Chart.prototype.restoreDefaults = function() {
   background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
   background.stroke('none');
 
-  this.title().text('Chart title');
+  var title = /** @type {anychart.elements.Title} */(this.title());
+  title.text('Chart title');
+  title.margin().bottom(15);
 
   var legend = /** @type {anychart.elements.Legend} */(this.legend());
   legend.enabled(false);
