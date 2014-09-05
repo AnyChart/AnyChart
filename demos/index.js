@@ -1,10 +1,26 @@
 anychart.onDocumentReady(function() {
   //create data set on our data
-  var dataSet = new anychart.data.Set([
-    ['P1', 128.14, 90.54, 43.76, 122.56],
-    ['P2', 112.61, 104.19, 61.34, 187.12],
-    ['P3', 163.21, 150.67, 34.17, 54.32],
-    ['P4', 229.98, 120.43, 45.72, 33.08]
+  var dataSet = anychart.data.set([
+    ['P1' , '162', '42'],
+    ['P2' , '134', '54'],
+    ['P3' , '116', '26'],
+    ['P4' , '122', '32'],
+    ['P5' , '178', '68'],
+    ['P6' , '144', '54'],
+    ['P7' , '125', '35'],
+    ['P8' , '176', '66'],
+    ['P9' , '156', 'missing'],  //data row with missing value, it also can be null or NaN
+    ['P10', '195', '120'],
+    ['P11', '215', '115'],
+    ['P12', '176', '36'],
+    ['P13', '167', '47'],
+    ['P14', '142', '72'],
+    ['P15', '117', '37'],
+    ['P16', '113', '23'],
+    ['P17', '132', 'missing'],  //data row with missing value, it also can be null or NaN
+    ['P18', '146', '46'],
+    ['P19', '169', '59'],
+    ['P20', '184', '44']
   ]);
 
   //map data for the first series, take x from the zero column and value from the first column of data set
@@ -13,63 +29,38 @@ anychart.onDocumentReady(function() {
   //map data for the second series, take x from the zero column and value from the second column of data set
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
 
-  //map data for the third series, take x from the zero column and value from the third column of data set
-  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
-
-  //map data for the fourth series, take x from the zero column and value from the fourth column of data set
-  var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
-
-  //create column chart
-  var chart = anychart.columnChart();
+  //create area chart
+  chart = anychart.areaChart();
 
   //set container id for the chart
   chart.container('container');
 
   //set chart title text settings
-  chart.title()
-      .text('Multi-Series Bar Chart')
-      .margin('40%', '50%', '40%', 0)
-      //.margin(0)
-      .padding(0)
-      //.padding('20%', 0, '40%', 10)
-      .background().fill('blue .3').enabled(true);
+  chart.title().text('Spline-Area Chart with Missing Points');
 
-  //helper function to setup label settings for all series
-  var setupSeriesLabels = function(series) {
-    var seriesLabels = series.labels();
-    seriesLabels.enabled(true);
-    seriesLabels.position('centerleft');
-    seriesLabels.anchor('center');
-    seriesLabels.offsetX(10);
-    seriesLabels.fontWeight('bold');
-    seriesLabels.rotation(-45);
-    seriesLabels.offsetY(-15);
-    seriesLabels.offsetX(20);
-    series.tooltip().enabled(false);
+  //set yAxis elements position settings
+  var yAxis = chart.yAxis();
+  yAxis.title().margin().bottom(20);
+  yAxis.labels().padding().right(15);
+
+  //using fill function we can create a pretty gradient for the series
+  //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
+  var fillFunction = function() {
+    return {keys: [
+      {offset: 0, color: this.sourceColor},
+      {offset: 1, color: anychart.color.darken(this.sourceColor)}
+    ], angle: -90, opacity: 1};
   };
 
-  //temp variable to store series instance
-  var series;
+  //create second area series on mapped data and specify series fill function
+  chart.splineArea(seriesData_1)
+      .fill(fillFunction);
 
-  //create first series with mapped data
-  series = chart.column(seriesData_1);
-  setupSeriesLabels(series);
-
-  //create second series with mapped data
-  series = chart.column(seriesData_2);
-  setupSeriesLabels(series);
-
-  //create third series with mapped data
-  series = chart.column(seriesData_3);
-  setupSeriesLabels(series);
-
-  //create fourth series with mapped data
-  series = chart.column(seriesData_4);
-  setupSeriesLabels(series);
+  //create first area series on mapped data, specify series fill function and color
+  chart.splineArea(seriesData_2)
+      .color('#EEEE25')
+      .fill(fillFunction);
 
   //initiate chart drawing
   chart.draw();
-
-
-  chart.container().rect().setBounds(chart.title().getContentBounds());
 });
