@@ -1166,6 +1166,12 @@ anychart.elements.MarkersFactory.prototype.disposeInternal = function() {
 };
 
 
+/** @inheritDoc */
+anychart.elements.MarkersFactory.prototype.remove = function() {
+  this.layer_.remove();
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Events

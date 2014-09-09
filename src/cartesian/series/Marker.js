@@ -262,11 +262,8 @@ anychart.cartesian.series.Marker.prototype.drawSubsequentPoint = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.remove = function() {
-  this.marker_.suspendSignalsDispatching();
-  this.marker_.container(null);
-  this.marker_.clear();
-  this.invalidate(anychart.ConsistencyState.CONTAINER);
-  this.marker_.resumeSignalsDispatching(false);
+  this.marker_.remove();
+  this.marker_.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 
 
@@ -280,12 +277,16 @@ anychart.cartesian.series.Marker.prototype.createPositionProvider = function(pos
 /** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
+  if (this.isConsistent() || !this.enabled()) return;
+
   this.marker_.suspendSignalsDispatching();
-  this.marker_.clear();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+    this.marker_.clear();
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.marker_.zIndex(/** @type {number} */(this.zIndex()));
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -302,7 +303,6 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.marker_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
 
@@ -324,7 +324,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+  if (!this.isConsistent() && this.enabled()) {
     this.marker_.draw();
     this.marker_.resumeSignalsDispatching(false);
   }
@@ -335,6 +335,14 @@ anychart.cartesian.series.Marker.prototype.finalizeDrawing = function() {
       this.hatchFillElement_.resumeSignalsDispatching(false);
     }
   }
+
+  if (this.enabled()) {
+    this.markConsistent(
+        anychart.ConsistencyState.CONTAINER |
+            anychart.ConsistencyState.Z_INDEX
+    );
+  }
+
   goog.base(this, 'finalizeDrawing');
 };
 

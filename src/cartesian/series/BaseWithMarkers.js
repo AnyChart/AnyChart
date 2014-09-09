@@ -22,8 +22,6 @@ anychart.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
   this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().position(anychart.enums.Position.CENTER);
-  this.registerDisposable(this.markers());
-  this.registerDisposable(this.hoverMarkers());
 };
 goog.inherits(anychart.cartesian.series.BaseWithMarkers, anychart.cartesian.series.Base);
 
@@ -214,6 +212,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   markers.setAutoStroke(strokeColor);
   markers.setAutoType(this.autoMarkerType);
 
+  markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
