@@ -2216,6 +2216,7 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.AXES);
     this.invalidate(anychart.ConsistencyState.GRIDS);
+    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
     this.invalidate(anychart.ConsistencyState.SERIES);
   }
 

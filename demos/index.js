@@ -1,66 +1,26 @@
-anychart.onDocumentReady(function() {
-  //create data set on our data
-  var dataSet = anychart.data.set([
-    ['P1' , '162', '42'],
-    ['P2' , '134', '54'],
-    ['P3' , '116', '26'],
-    ['P4' , '122', '32'],
-    ['P5' , '178', '68'],
-    ['P6' , '144', '54'],
-    ['P7' , '125', '35'],
-    ['P8' , '176', '66'],
-    ['P9' , '156', 'missing'],  //data row with missing value, it also can be null or NaN
-    ['P10', '195', '120'],
-    ['P11', '215', '115'],
-    ['P12', '176', '36'],
-    ['P13', '167', '47'],
-    ['P14', '142', '72'],
-    ['P15', '117', '37'],
-    ['P16', '113', '23'],
-    ['P17', '132', 'missing'],  //data row with missing value, it also can be null or NaN
-    ['P18', '146', '46'],
-    ['P19', '169', '59'],
-    ['P20', '184', '44']
+anychart.onDocumentLoad(function() {
+  var chart = anychart.columnChart();
+
+  chart.column([
+    ['P1' , 11],
+    ['P2' , 8],
+    ['P3' , 18],
+    ['P4' , 16],
+    ['P5' , 26],
+    ['P6' , 30],
+    ['P7' , 6],
+    ['P8' , 20]
+
   ]);
 
-  //map data for the first series, take x from the zero column and value from the first column of data set
-  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
-
-  //map data for the second series, take x from the zero column and value from the second column of data set
-  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
-
-  //create area chart
-  chart = anychart.areaChart();
-
-  //set container id for the chart
   chart.container('container');
-
-  //set chart title text settings
-  chart.title().text('Spline-Area Chart with Missing Points');
-
-  //set yAxis elements position settings
-  var yAxis = chart.yAxis();
-  yAxis.title().margin().bottom(20);
-  yAxis.labels().padding().right(15);
-
-  //using fill function we can create a pretty gradient for the series
-  //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
-  var fillFunction = function() {
-    return {keys: [
-      {offset: 0, color: this.sourceColor},
-      {offset: 1, color: anychart.color.darken(this.sourceColor)}
-    ], angle: -90, opacity: 1};
-  };
-
-  //create second area series on mapped data and specify series fill function
-  chart.splineArea(seriesData_1)
-      .fill(fillFunction);
-
-  //create first area series on mapped data, specify series fill function and color
-  chart.splineArea(seriesData_2)
-      .color('#EEEE25')
-      .fill(fillFunction);
-
-  //initiate chart drawing
   chart.draw();
+
+  chart.lineMarker().value(9).stroke('1 red').layout('horizontal');
+  chart.textMarker().value(36).text('36TextMarker');
+  chart.rangeMarker().from(18).to(27);
+
+  chart.yAxis().title(null);
+  chart.xAxis().title(null);
+  chart.title(null);
 });
