@@ -760,10 +760,11 @@ anychart.elements.LegendItem.prototype.mouseDoubleClickHandler_ = function(event
 
 /**
  * Draws legend item.
+ * @return {anychart.elements.LegendItem} An instance of {@link anychart.elements.LegendItem} class for method chaining.
  */
 anychart.elements.LegendItem.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   var isInitial;
   if (isInitial = !this.icon_) {
@@ -831,6 +832,8 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.layer_.translate(/** @type {number} */(this.pixelBounds_.left), /** @type {number} */(this.pixelBounds_.top));
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
+
+  return this;
 };
 
 

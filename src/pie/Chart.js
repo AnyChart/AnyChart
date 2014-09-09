@@ -1307,6 +1307,20 @@ anychart.pie.Chart.prototype.calculate_ = function(bounds) {
 
 /**
  * Method that gets final fill color for the current point, with all fallbacks taken into account.
+ * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
+ * @protected
+ */
+anychart.pie.Chart.prototype.getLegendItemIconColor = function() {
+  var iterator = this.getIterator();
+
+  return this.normalizeColor(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke|Function} */(iterator.get('legendItemIconColor') ||
+      iterator.get('fill') ||
+      this.palette().colorAt(iterator.getIndex())));
+};
+
+
+/**
+ * Method that gets final fill color for the current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
  * @param {boolean} hover If the fill should be a hover fill.
  * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
@@ -1368,6 +1382,17 @@ anychart.pie.Chart.prototype.getFinalHatchFill = function(usePointSettings, hove
 
 
 /**
+ * Identifies fill or stroke as radial gradient.
+ * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)} fillOrStroke Fill or stroke.
+ * @return {boolean} is fill or stroke radial gradient.
+ * @private
+ */
+anychart.pie.Chart.prototype.isRadialGradientMode_ = function(fillOrStroke) {
+  return goog.isObject(fillOrStroke) && fillOrStroke.hasOwnProperty('mode') && fillOrStroke.hasOwnProperty('cx');
+};
+
+
+/**
  * Gets final normalized fill or stroke color.
  * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
  * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
@@ -1389,10 +1414,6 @@ anychart.pie.Chart.prototype.normalizeColor = function(color, var_args) {
     fill = color.call(scope);
   } else
     fill = color;
-  // if fill is instance of radial gradient - set pieBounds_ if they was calculated
-  // pieBounds_ undefined when legend item tries to get iconFill and iconStroke.
-  if (goog.isObject(fill) && goog.isNull(fill.mode) && fill.hasOwnProperty('cx'))
-    fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
   return fill;
 };
 
@@ -1643,8 +1664,15 @@ anychart.pie.Chart.prototype.drawSlice_ = function(opt_update) {
 anychart.pie.Chart.prototype.colorizeSlice = function(hover) {
   var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
   if (goog.isDef(slice)) {
-    slice.stroke(this.getStrokeColor(true, hover));
-    slice.fill(this.getFillColor(true, hover));
+    var fill = this.getFillColor(true, hover);
+    if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
+      fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+    slice.fill(fill);
+
+    fill = this.getStrokeColor(true, hover);
+    if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
+      fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+    slice.stroke(fill);
   }
 };
 
@@ -1859,7 +1887,7 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
       'text': String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x')),
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'iconStroke': 'none',
-      'iconFill': this.getFillColor(true, false),
+      'iconFill': this.getLegendItemIconColor(),
       'iconHatchFill': this.getFinalHatchFill(true, false),
       'iconMarker': null
     });

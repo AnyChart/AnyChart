@@ -1339,10 +1339,11 @@ anychart.elements.Legend.prototype.remove = function() {
 
 /**
  * Draw legend.
+ * @return {anychart.elements.Legend} An instance of {@link anychart.elements.Legend} class for method chaining.
  */
 anychart.elements.Legend.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   if (!this.rootElement) {
     /**
@@ -1468,6 +1469,8 @@ anychart.elements.Legend.prototype.draw = function() {
   this.drawLegendContent_(pageToDraw, contentBounds);
 
   if (manualSuspend) stage.resume();
+
+  return this;
 };
 
 
@@ -1534,7 +1537,7 @@ anychart.elements.Legend.prototype.clearLastDrawedPage_ = function() {
     var items = this.distributedItems_[this.drawedPage_];
     if (items) {
       for (var i = 0; i < items.length; i++) {
-        items[i].enabled(false).draw(0, 0);
+        items[i].enabled(false).draw();
       }
     }
   }

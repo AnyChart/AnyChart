@@ -800,7 +800,9 @@ anychart.Chart.prototype.draw = function() {
     legend.suspendSignalsDispatching();
     if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
     legend.parentBounds(legendParentBounds);
-    legend.itemsProvider(this.createLegendItemsProvider());
+    if (!legend.itemsProvider()) {
+      legend.itemsProvider(this.createLegendItemsProvider());
+    }
     legend.resumeSignalsDispatching(false);
     legend.draw();
     this.markConsistent(anychart.ConsistencyState.LEGEND);
