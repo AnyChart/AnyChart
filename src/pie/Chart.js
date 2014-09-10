@@ -176,12 +176,11 @@ anychart.pie.Chart = function(opt_data) {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
   tooltip.isFloating(true);
-  tooltip.content().useHtml(true);
   tooltip.titleFormatter(function() {
-    return this['x'] || this['name'];
+    return this['name'] || this['x'];
   });
   tooltip.contentFormatter(function() {
-    return (this['name'] || this['x']) + '<br>' + this['value'];
+    return (this['name'] || this['x']) + '\n' + this['value'];
   });
   tooltip.resumeSignalsDispatching(false);
 
@@ -190,6 +189,7 @@ anychart.pie.Chart = function(opt_data) {
       .fontColor('white')
       .fontSize(13)
       .padding(1);
+  (/** @type {anychart.elements.LabelsFactory} */(this.hoverLabels())).enabled(null);
   this.data(opt_data);
   this.legend().enabled(true);
 
@@ -790,6 +790,32 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
     return this;
   }
   return this.labels_;
+};
+
+
+/**
+ * Gets or sets series hover data labels.
+ * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value pie hover data labels settings.
+ * @return {!(anychart.elements.LabelsFactory|anychart.pie.Chart)} Labels instance or itself for chaining call.
+ */
+anychart.pie.Chart.prototype.hoverLabels = function(opt_value) {
+  if (!this.hoverLabels_) {
+    this.hoverLabels_ = new anychart.elements.LabelsFactory();
+    this.registerDisposable(this.hoverLabels_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.elements.LabelsFactory) {
+      var data = opt_value.serialize();
+      this.hoverLabels_.deserialize(data);
+    } else if (goog.isObject(opt_value)) {
+      this.hoverLabels_.deserialize(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.hoverLabels_.enabled(false);
+    }
+    return this;
+  }
+  return this.hoverLabels_;
 };
 
 
@@ -1552,8 +1578,14 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.drawSlice_();
       start += sweep;
     }
+    if (this.drawnConnectors_) {
+      for (var i in this.drawnConnectors_) {
+        this.drawnConnectors_[i].stroke(this.connectorStroke_);
+      }
+    }
 
-    if (this.labelConnectors_) this.labelConnectors_.stroke(this.connectorStroke());
+    if (this.hoveredLabelConnectorPath_)
+      this.hoveredLabelConnectorPath_.stroke(this.connectorStroke_);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
@@ -1562,18 +1594,14 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     if (!this.labels().container()) this.labels_.container(this.rootElement);
     this.labels().clear();
-    var formatProvider, positionProvider;
+
     if (this.isOutsideLabels_()) {
       this.calculateOutsideLabels();
-      this.labelConnectors_.clip(bounds);
     } else {
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
-        formatProvider = this.createFormatProvider();
-        positionProvider = this.createPositionProvider();
-        // index for positionProvider function, cause label set it as an argument
-        this.labels_.add(formatProvider, positionProvider, iterator.getIndex());
+        this.drawLabel_(false);
       }
     }
     this.labels().draw();
@@ -1652,6 +1680,139 @@ anychart.pie.Chart.prototype.drawSlice_ = function(opt_update) {
   acgraph.events.listen(slice, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
 
   return true;
+};
+
+
+/**
+ * Draws outside label for a slice.
+ * @private
+ * @param {boolean} hovered If it is a hovered label drawing.
+ * @param {boolean=} opt_updateConnector Whether to update connector or not.
+ * @return {anychart.elements.LabelsFactory.Label} Label.
+ */
+anychart.pie.Chart.prototype.drawOutsideLabel_ = function(hovered, opt_updateConnector) {
+  var iterator = this.getIterator();
+
+  var sliceLabel = iterator.get('label');
+  var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
+
+  var index = iterator.getIndex();
+
+  var labelsFactory = /** @type {anychart.elements.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+
+  var label = this.labels().getLabel(index);
+
+  var labelEnabledState = sliceLabel && goog.isDef(sliceLabel['enabled']) ? sliceLabel['enabled'] : null;
+  var labelHoverEnabledState = hoverSliceLabel && goog.isDef(hoverSliceLabel['enabled']) ? hoverSliceLabel['enabled'] : null;
+
+  var isDraw = hovered ?
+      goog.isNull(labelHoverEnabledState) ?
+          goog.isNull(this.hoverLabels().enabled()) ?
+              goog.isNull(labelEnabledState) ?
+                  (label && goog.isDef(label.enabled())) ?
+                      label.enabled() :
+                      this.labels().enabled() :
+                  labelEnabledState :
+              this.hoverLabels().enabled() :
+          labelHoverEnabledState :
+      goog.isNull(labelEnabledState) ?
+          (label && goog.isDef(label.enabled())) ?
+              label.enabled() :
+              this.labels().enabled() :
+          labelEnabledState;
+
+  var enabled;
+  var wasNoLabel;
+  var anchor;
+  if (isDraw) {
+    if (wasNoLabel = !label) {
+      label = this.labels().add(this.createFormatProvider(), this.createPositionProvider(), index);
+    }
+
+    // save enabled setting for label
+    enabled = label.enabled();
+
+    label.resetSettings();
+    label.currentLabelsFactory(labelsFactory);
+    label.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
+    label.enabled(/** @type {boolean} */(enabled));
+
+    anchor = iterator.meta('anchor');
+    if (goog.isDef(anchor))
+      label.anchor(/** @type {string} */(anchor));
+
+    if (!wasNoLabel)
+      label.draw();
+
+  } else if (label) {
+    enabled = label.enabled();
+    label.clear();
+    label.enabled(/** @type {boolean} */(enabled));
+  } else {
+    label = this.labels().add(this.createFormatProvider(), this.createPositionProvider(), index);
+    anchor = iterator.meta('anchor');
+    if (goog.isDef(anchor))
+      label.anchor(/** @type {string} */(anchor));
+    label.enabled(false);
+  }
+  if (opt_updateConnector)
+    this.updateConnector_(label, isDraw);
+  return label;
+};
+
+
+/**
+ * Draws label for a slice.
+ * @private
+ * @param {boolean} hovered If it is a hovered label drawing.
+ * @param {boolean=} opt_updateConnector Whether to update connector or not. Used only with outside labels.
+ * @return {anychart.elements.LabelsFactory.Label} Label.
+ */
+anychart.pie.Chart.prototype.drawLabel_ = function(hovered, opt_updateConnector) {
+  if (this.isOutsideLabels_())
+    return this.drawOutsideLabel_(hovered, opt_updateConnector);
+
+  var iterator = this.getIterator();
+  var sliceLabel = iterator.get('label');
+  var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
+  var index = iterator.getIndex();
+  var labelsFactory = /** @type {anychart.elements.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+
+  var label = this.labels().getLabel(index);
+
+  var labelEnabledState = sliceLabel && goog.isDef(sliceLabel['enabled']) ? sliceLabel['enabled'] : null;
+
+  var labelHoverEnabledState = hoverSliceLabel && goog.isDef(hoverSliceLabel['enabled']) ? hoverSliceLabel['enabled'] : null;
+  var isDraw = hovered ?
+      goog.isNull(labelHoverEnabledState) ?
+          goog.isNull(this.hoverLabels().enabled()) ?
+              goog.isNull(labelEnabledState) ?
+                  this.labels().enabled() :
+                  labelEnabledState :
+              this.hoverLabels().enabled() :
+          labelHoverEnabledState :
+      goog.isNull(labelEnabledState) ?
+          this.labels().enabled() :
+          labelEnabledState;
+
+  if (isDraw) {
+    var positionProvider = this.createPositionProvider();
+    var formatProvider = this.createFormatProvider();
+    if (label) {
+      label.formatProvider(formatProvider);
+      label.positionProvider(positionProvider);
+    } else {
+      label = this.labels().add(formatProvider, positionProvider, index);
+    }
+
+    label.resetSettings();
+    label.currentLabelsFactory(labelsFactory);
+    label.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
+    label.draw();
+  } else if (label) {
+    label.clear();
+  }
+  return label;
 };
 
 
@@ -1751,6 +1912,7 @@ anychart.pie.Chart.prototype.hoverSlice = function(index, opt_event) {
     this.colorizeSlice(true);
     this.applyHatchFill(true);
     this.showTooltip(opt_event);
+    this.drawLabel_(true, true);
   }
   this.hoverStatus = index;
   return this;
@@ -1767,6 +1929,7 @@ anychart.pie.Chart.prototype.unhover = function() {
     this.colorizeSlice(false);
     this.applyHatchFill(false);
     this.hideTooltip();
+    this.drawLabel_(false, true);
   }
   this.hoverStatus = NaN;
   return this;
@@ -1787,16 +1950,14 @@ anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
     iterator.meta('exploded', !exploded);
   }
   this.drawSlice_(true);
-  var sliceLabel;
-  if (sliceLabel = this.labels().getLabel(iterator.getIndex())) {
-    if (this.isOutsideLabels_()) {
-      this.labels().clear();
-      this.calculateOutsideLabels();
-      this.labels().draw();
-    } else {
-      sliceLabel.positionProvider(this.createPositionProvider()).draw();
-    }
+  var index = iterator.getIndex();
+  if (this.isOutsideLabels_()) {
+    this.labels().clear();
+    this.calculateOutsideLabels();
+    this.labels().draw();
+    iterator.select(index);
   }
+  this.drawLabel_(this.hoverStatus == index, this.hoverStatus == index);
 };
 
 
@@ -2113,9 +2274,9 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
   var iterator = this.getIterator();
   var label, x0, y0, x, y, dR, dR0, isRightSide;
 
-  var connectorAnchorCoords = [];
+  this.connectorAnchorCoords = [];
   var connector;
-  var formatProvider;
+
   var positionProvider;
 
   //--------calculate absolute labels position, sort labels, separation of the labels on the left and right side--------
@@ -2150,29 +2311,22 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
     isRightSide = angleDeg < 90 || angleDeg > 270;
 
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
-    dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
 
     // coordinates of the point where the connector touches a pie
     x0 = this.cx_ + dR0 * Math.cos(angle);
     y0 = this.cy_ + dR0 * Math.sin(angle);
 
-    // coordinate of the point where the connector touches a label
-    x = this.cx_ + dR * Math.cos(angle);
-    y = this.cy_ + dR * Math.sin(angle);
-
     connector = isRightSide ?
         anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_ :
         -anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
+    iterator.meta('connector', connector);
 
-    connectorAnchorCoords.push(x0);
-    connectorAnchorCoords.push(y0);
+    this.connectorAnchorCoords[index * 2] = x0;
+    this.connectorAnchorCoords[index * 2 + 1] = y0;
 
-    formatProvider = this.createFormatProvider();
-    positionProvider = {'value': {'x': x + connector, 'y': y}};
-
-
-    label = this.labels_.add(formatProvider, positionProvider, index);
-    label.anchor(isRightSide ? anychart.enums.Position.LEFT_CENTER : anychart.enums.Position.RIGHT_CENTER);
+    var anchor = isRightSide ? anychart.enums.Position.LEFT_CENTER : anychart.enums.Position.RIGHT_CENTER;
+    iterator.meta('anchor', anchor);
+    label = this.drawLabel_(false, false);
     this.dropLabelBoundsCache(label);
 
     label.angle_ = angleDeg;
@@ -2343,15 +2497,25 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
   }
 
   //-----------init connector element------------------------------------------------------------------------
-  if (!this.labelConnectors_) {
-    this.labelConnectors_ = this.rootElement.path();
-    this.labelConnectors_.stroke(this.connectorStroke_);
+  if (this.connectorsLayer_) {
+    this.connectorsLayer_.clear();
+  } else {
+    this.connectorsLayer_ = new anychart.utils.TypedLayer(function() {
+      return acgraph.path();
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    });
+    this.connectorsLayer_.parent(this.rootElement);
   }
-  this.labelConnectors_.clear();
-
+  this.drawnConnectors_ = [];
+  if (!this.hoveredLabelConnectorPath_) {
+    // path for connector for label disabled by algorithm
+    this.hoveredLabelConnectorPath_ = this.rootElement.path();
+    this.hoveredLabelConnectorPath_.stroke(this.connectorStroke_);
+  }
   //-----------left domains connectors calculation, applying labels positions--------------------------------
   var k, labelsLen;
-
+  var connectorPath;
   for (i = 0, len = leftDomains.length; i < len; i++) {
     domain = leftDomains[i];
     domain.applyPositions();
@@ -2360,18 +2524,12 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
       label = domain.labels[k];
       if (label && label.enabled() != false) {
         index = label.getIndex();
-        j = index * 2;
-        x0 = connectorAnchorCoords[j];
-        y0 = connectorAnchorCoords[j + 1];
 
-        connector = -anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
-
-        positionProvider = label.positionProvider()['value'];
-
-        x = positionProvider['x'] - connector;
-        y = positionProvider['y'];
-
-        this.labelConnectors_.moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
+        if (!this.drawnConnectors_[index]) {
+          this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+          connectorPath.stroke(this.connectorStroke_);
+          this.drawConnectorLine(label, connectorPath);
+        }
       }
     }
   }
@@ -2386,20 +2544,65 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
       label = domain.labels[k];
       if (label && label.enabled() != false) {
         index = label.getIndex();
-        j = index * 2;
-        x0 = connectorAnchorCoords[j];
-        y0 = connectorAnchorCoords[j + 1];
 
-        connector = anychart.pie.Chart.OUTSIDE_LABELS_CONNECTOR_SIZE_;
-        positionProvider = label.positionProvider()['value'];
-
-        x = positionProvider['x'] - connector;
-        y = positionProvider['y'];
-
-        this.labelConnectors_.moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
+        if (!this.drawnConnectors_[index]) {
+          this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+          connectorPath.stroke(this.connectorStroke_);
+          this.drawConnectorLine(label, connectorPath);
+        }
       }
     }
   }
+};
+
+
+/**
+ * Draws connector line for label.
+ * @param {anychart.elements.LabelsFactory.Label} label Label.
+ * @param {acgraph.vector.Path} path Connector path element.
+ */
+anychart.pie.Chart.prototype.drawConnectorLine = function(label, path) {
+  var iterator = this.data().getIterator();
+  var index = label.getIndex();
+  if (iterator.select(index)) {
+    var x0 = this.connectorAnchorCoords[index * 2];
+    var y0 = this.connectorAnchorCoords[index * 2 + 1];
+
+    var connector = /** @type {number} */(iterator.meta('connector'));
+    var positionProvider = label.positionProvider()['value'];
+
+    var x = positionProvider['x'] - connector;
+    var y = positionProvider['y'];
+
+    path.clear().moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
+  }
+};
+
+
+/**
+ * Show or hide connector for label.
+ * @param {anychart.elements.LabelsFactory.Label} label Label.
+ * @param {boolean} show Whether to show connector ot not for label.
+ * @private
+ */
+anychart.pie.Chart.prototype.updateConnector_ = function(label, show) {
+  if (!label || !this.drawnConnectors_)
+    return;
+  var index = label.getIndex();
+  var path;
+  if (!(path = this.drawnConnectors_[index])) {
+    if (!show) {
+      this.hoveredLabelConnectorPath_.clear();
+    } else {
+      this.drawConnectorLine(label, this.hoveredLabelConnectorPath_);
+    }
+    return;
+  }
+
+  if (label && label.enabled() != false && show) {
+    this.drawConnectorLine(label, path);
+  } else
+    path.clear();
 };
 
 
@@ -2409,17 +2612,22 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
  * @protected
  */
 anychart.pie.Chart.prototype.createPositionProvider = function() {
+  var outside = this.isOutsideLabels_();
   var iterator = this.getIterator();
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
   var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
   var angle = (start + sweep / 2) * Math.PI / 180;
-
-  var dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
+  var dR;
+  if (outside)
+    dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
+  else
+    dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
+  var connector = /** @type {number} */ (iterator.meta('connector'));
 
   var x = this.cx_ + dR * Math.cos(angle);
   var y = this.cy_ + dR * Math.sin(angle);
-  return {'value': {'x': x, 'y': y}};
+  return {'value': {'x': x + (outside ? goog.isDef(connector) ? connector : 0 : 0), 'y': y}};
 };
 
 
@@ -2467,7 +2675,8 @@ anychart.pie.Chart.prototype.serialize = function() {
 
   if (data) chart['data'] = data.serialize();
 
-  if (this.labels_) chart['labels'] = this.labels_.serialize();
+  chart['labels'] = this.labels().serialize();
+  chart['hoverLabels'] = this.hoverLabels().serialize();
 
   json['chart'] = chart;
   return json;
@@ -2507,6 +2716,7 @@ anychart.pie.Chart.prototype.deserialize = function(config) {
   this.hatchFill(config['hatchFill']);
   this.hoverHatchFill(config['hoverHatchFill']);
   this.labels(labels);
+  this.hoverLabels(config['hoverLabels']);
 
   this.resumeSignalsDispatching(false);
 
@@ -2736,7 +2946,7 @@ anychart.pie.Chart.PieOutsideLabelsDomain.prototype.calcDomain = function() {
   var criticalAngle = this.pie.outsideLabelsCriticalAngle();
 
   this.labelsPositions.length = 0;
-  var iterator = this.pie.getIterator();
+  var iterator = this.pie.data().getIterator();
   var nextLabelHeight;
   var start, sweep, exploded, angle, angleDeg, dR, dRPie, y, y0, y1, x, x0, x1, connector;
   this.x = NaN;
@@ -2955,6 +3165,7 @@ goog.exportSymbol('anychart.pie.chart', anychart.pie.chart);//doc|ex|non-tr
 anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//doc|ex|
 anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;//doc|ex|non-tr
 anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//doc|ex
+anychart.pie.Chart.prototype['hoverLabels'] = anychart.pie.Chart.prototype.hoverLabels;
 anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//doc|ex
 anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//doc|ex
 anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;//doc|ex

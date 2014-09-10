@@ -37,8 +37,8 @@ anychart.onDocumentLoad(function() {
     {x: 'All other outlets', y: pointData2[2]},
     {x: 'All other outlets', y: pointData2[2]},
 
-    {x: 'Department Stores', y: pointData2[1], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
-    {x: 'Department Stores', y: pointData2[0], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
+    {x: 'Department Stores', hoverLabel: {enabled: false}, y: pointData2[1], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
+    {x: 'Department Stores', label: {enabled: false}, y: pointData2[0], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
 
     {x: 'All \nother \noutlets', y: pointData2[2]},
     {x: 'All other outlets', y: pointData2[2]},
@@ -102,20 +102,20 @@ anychart.onDocumentLoad(function() {
 
   var seriesData3 = [];
   for (var i = 0; i < 450; i++) {
-    seriesData3.push({x: 'All other outlets', y: pointData2[2]})
+    seriesData3.push({x: 'All other outlets', y: pointData2[2]});
   }
 
   chart = anychart.pie.chart(seriesData2)
       .container('container')
       .innerRadius('33%')
-      .labelsPosition('outside')
       .outsideLabelsSpace('30%')
-      .outsideLabelsMargin('30%')
+      .connectorLength('20%')
       .outsideLabelsCriticalAngle(60)
       .connectorStroke('black .3', 1.5, '4 2')
       .radius('50%')
       .startAngle(160)
       .explode(55);
+  chart.labels().position('outside');
 
   chart.listen(anychart.enums.EventType.POINT_CLICK, function(e) {
     return true;

@@ -59,6 +59,7 @@ function load() {
       });
 
   chart.labels().enabled(true);
+  chart.hoverLabels().fontColor('pink').fontSize(25);
   chart.draw();
   var stage = chart.container();
   var trialText = stage.text(0, 0, 'AnyChart Trial Version', {
