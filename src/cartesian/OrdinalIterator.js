@@ -22,7 +22,7 @@ anychart.cartesian.OrdinalIterator = function(series, categories, opt_pointCallb
    */
   this.categories = goog.array.slice(categories, 0);
 
-  goog.base(this, series, opt_pointCallback, opt_missingCallback, opt_beforePointCallback, opt_afterPointCallback);
+  goog.base(this, series, false, opt_pointCallback, opt_missingCallback, opt_beforePointCallback, opt_afterPointCallback);
 };
 goog.inherits(anychart.cartesian.OrdinalIterator, anychart.cartesian.ScatterIterator);
 
@@ -30,4 +30,10 @@ goog.inherits(anychart.cartesian.OrdinalIterator, anychart.cartesian.ScatterIter
 /** @inheritDoc */
 anychart.cartesian.OrdinalIterator.prototype.findMin = function(var_args) {
   return this.categories[this.currentIndex];
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.OrdinalIterator.prototype.normalize = function(value) {
+  return value;
 };

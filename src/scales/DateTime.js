@@ -33,14 +33,7 @@ goog.inherits(anychart.scales.DateTime, anychart.scales.ScatterBase);
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.isMissing = function(value) {
-  if (goog.isString(value)) {
-    var tmp = +new Date(value);
-    if (isNaN(tmp))
-      return isNaN(value);
-    else
-      return isNaN(+value);
-  }
-  return !(value instanceof Date) || goog.base(this, 'isMissing', value);
+  return isNaN(anychart.utils.normalizeTimestamp(value));
 };
 
 
@@ -85,20 +78,7 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    var valueSource = arguments[i];
-    var value;
-    if (goog.isNumber(valueSource)) {
-      value = valueSource;
-    } else if (goog.isString(valueSource)) {
-      value = +new Date(valueSource);
-      if (isNaN(value))
-        value = +valueSource;
-    } else if (valueSource instanceof Date) {
-      value = +valueSource;
-    } else {
-      value = valueSource;
-    }
-    goog.base(this, 'extendDataRange', value);
+    goog.base(this, 'extendDataRange', anychart.utils.normalizeTimestamp(arguments[i]));
   }
   return this;
 };
@@ -106,17 +86,7 @@ anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio) {
-  var res;
-  if (goog.isNumber(value)) {
-    res = value;
-  } else if (goog.isString(value)) {
-    res = parseFloat(value);
-    if (isNaN(value))
-      res = new Date(value);
-  } else {
-    res = value;
-  }
-  return goog.base(this, 'transform', res, opt_subRangeRatio);
+  return goog.base(this, 'transform', anychart.utils.normalizeTimestamp(value), opt_subRangeRatio);
 };
 
 
@@ -135,6 +105,12 @@ anychart.scales.DateTime.prototype.calculate = function() {
   this.ticks().setup(this.min, this.max);
 
   this.range = this.max - this.min;
+};
+
+
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.getCategorisation = function() {
+  return true;
 };
 
 
@@ -193,3 +169,5 @@ anychart.scales.dateTime = function() {
 goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
+anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;
+anychart.scales.DateTime.prototype['extendDataRange)'] = anychart.scales.DateTime.prototype.extendDataRange;

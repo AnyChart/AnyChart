@@ -149,11 +149,11 @@ anychart.scales.Base.prototype.resetDataRange = goog.abstractMethod;
 
 
 /**
- * @return {Array.<*>} Returns categories array if the scale requires series to categorise their data.
+ * @return {!Array.<*>|boolean} Returns categories array if the scale requires series to categorise their data.
  *    Returns null otherwise.
  */
 anychart.scales.Base.prototype.getCategorisation = function() {
-  return null;
+  return false;
 };
 
 

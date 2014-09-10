@@ -212,6 +212,26 @@ anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allow
 
 
 /**
+ * Transforms data value to timestamp
+ * @param {*} value
+ * @return {number}
+ */
+anychart.utils.normalizeTimestamp = function(value) {
+  var result;
+  if (goog.isNumber(value)) {
+    result = value;
+  } else if (goog.isString(value)) {
+    result = +new Date(value);
+    if (isNaN(result))
+      result = +value;
+  } else { // also accepts Date
+    result = Number(value);
+  }
+  return result;
+};
+
+
+/**
  * Gets anchor coordinates by bounds.
  * @param {acgraph.math.Rect} bounds Bounds rectangle.
  * @param {anychart.enums.Anchor|string} anchor Anchor.

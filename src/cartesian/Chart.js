@@ -1501,7 +1501,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
   var series;
   /** @type {anychart.cartesian.series.Base} */
   var aSeries;
-  /** @type {Array.<*>} */
+  /** @type {!Array.<*>|boolean} */
   var categories;
   /** @type {anychart.data.Iterator} */
   var iterator;
@@ -1636,11 +1636,11 @@ anychart.cartesian.Chart.prototype.calculate = function() {
             function() {
               this.resetStack();
             }, scale);
-        if (!!cats) {
-          syncIterator = new anychart.cartesian.OrdinalIterator(xScales[xId], cats,
+        if (goog.isArray(cats)) {
+          syncIterator = new anychart.cartesian.OrdinalIterator(xScales[xId], /** @type {!Array} */(cats),
               pointCallback, null, beforePointCallback);
         } else {
-          syncIterator = new anychart.cartesian.ScatterIterator(xScales[xId],
+          syncIterator = new anychart.cartesian.ScatterIterator(xScales[xId], /** @type {boolean} */(cats),
               pointCallback, null, beforePointCallback);
         }
         while (syncIterator.advance()) {
@@ -2352,10 +2352,10 @@ anychart.cartesian.Chart.prototype.drawSeries_ = function() {
         yScaleNegativeSumms[i] = 0;
       }
     };
-    if (!!categories) {
-      iterator = new anychart.cartesian.OrdinalIterator(series, categories, pointClb, missingClb, beforeClb, afterClb);
+    if (goog.isArray(categories)) {
+      iterator = new anychart.cartesian.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb, beforeClb, afterClb);
     } else {
-      iterator = new anychart.cartesian.ScatterIterator(series, pointClb, missingClb, beforeClb, afterClb);
+      iterator = new anychart.cartesian.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb, afterClb);
     }
     for (i = 0; i < series.length; i++) {
       series[i].startDrawing();

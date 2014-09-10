@@ -335,6 +335,7 @@ anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval
   var hours = dateObj.getUTCHours();
   var minutes = dateObj.getUTCMinutes();
   var seconds = dateObj.getUTCSeconds();
+  var milliseconds = dateObj.getUTCMilliseconds();
 
   if (interval.years) {
     var flagDate = new Date(flagDateValue);
@@ -353,9 +354,12 @@ anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval
   } else if (interval.minutes) {
     minutes = anychart.utils.alignLeft(minutes, interval.minutes);
     return Date.UTC(years, months, days, hours, minutes);
-  } else if (interval.seconds) {
+  } else if (interval.seconds >= 1) {
     seconds = anychart.utils.alignLeft(seconds, interval.seconds);
     return Date.UTC(years, months, days, hours, minutes, seconds);
+  } else if (interval.seconds) {
+    milliseconds = anychart.utils.alignLeft(milliseconds, interval.seconds * 1000);
+    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
   } else {
     return date;
   }

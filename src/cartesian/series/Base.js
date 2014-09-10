@@ -662,10 +662,11 @@ anychart.cartesian.series.Base.prototype.dataInvalidated_ = function(e) {
 
 /**
  * DO NOT PUBLISH.
- * @param {?Array.<*>} categories .
+ * @param {!Array.<*>|boolean} categories If Array - ordinal scale, if false - scatter scale with numbers,
+ *    true - datetime scale.
  */
 anychart.cartesian.series.Base.prototype.categoriseData = function(categories) {
-  this.data_ = this.parentView_.prepare('x', categories || undefined);
+  this.data_ = this.parentView_.prepare('x', categories);
 };
 
 

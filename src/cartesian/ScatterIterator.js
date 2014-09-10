@@ -5,13 +5,14 @@ goog.provide('anychart.cartesian.ScatterIterator');
 /**
  * Synced iterator to iterate over synchronous data sets.
  * @param {!Array.<anychart.cartesian.series.Base>} series .
+ * @param {boolean} isDateTime .
  * @param {Function=} opt_pointCallback .
  * @param {Function=} opt_missingCallback .
  * @param {Function=} opt_beforePointCallback .
  * @param {Function=} opt_afterPointCallback .
  * @constructor
  */
-anychart.cartesian.ScatterIterator = function(series, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
+anychart.cartesian.ScatterIterator = function(series, isDateTime, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
     opt_afterPointCallback) {
   /**
    * @type {!Array.<anychart.cartesian.series.Base>}
@@ -67,6 +68,12 @@ anychart.cartesian.ScatterIterator = function(series, opt_pointCallback, opt_mis
    */
   this.missingCallback = opt_missingCallback || goog.nullFunction;
 
+  /**
+   * @type {boolean}
+   * @protected
+   */
+  this.isDateTime = isDateTime;
+
   for (var i = 0; i < series.length; i++)
     this.iterators.push(series[i].getResetIterator());
   this.reset();
@@ -82,7 +89,7 @@ anychart.cartesian.ScatterIterator.prototype.reset = function() {
 
   for (var i = 0; i < this.iterators.length; i++) {
     this.iteratorsStatus[i] = this.iterators[i].reset().advance();
-    this.xValues[i] = this.iterators[i].get('x');
+    this.xValues[i] = this.normalize(this.iterators[i].get('x'));
   }
   return this;
 };
@@ -140,14 +147,27 @@ anychart.cartesian.ScatterIterator.prototype.invokeCallbacks = function() {
 /**
  * @param {...*} var_args Numbers or NaNs.
  * @return {*} Minimum of numbers except NaNs.
+ * @protected
  */
 anychart.cartesian.ScatterIterator.prototype.findMin = function(var_args) {
   var argsLen = arguments.length;
   var res = NaN;
   for (var i = 0; i < argsLen; i++) {
-    var val = anychart.utils.toNumber(arguments[i]);
+    var val = arguments[i];
     if (!isNaN(val))
       res = isNaN(res) ? val : Math.min(res, val);
   }
   return isNaN(res) ? undefined : res;
+};
+
+
+/**
+ * Normalizes data value to number.
+ * @param {*} value
+ * @return {*}
+ */
+anychart.cartesian.ScatterIterator.prototype.normalize = function(value) {
+  return this.isDateTime ?
+      anychart.utils.normalizeTimestamp(value) :
+      anychart.utils.toNumber(value);
 };
