@@ -37,7 +37,7 @@ function load() {
       .explode(15);
   chart.hatchFill('vertical');
   chart.hoverHatchFill('horizontal');
-  chart.listen(anychart.events.EventType.POINT_CLICK, function(e) {
+  chart.listen(anychart.enums.EventType.POINT_CLICK, function(e) {
     console.log(e);
     return true;
   });

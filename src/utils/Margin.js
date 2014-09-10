@@ -24,7 +24,7 @@ goog.inherits(anychart.utils.Margin, anychart.utils.Space);
 /** @inheritDoc */
 anychart.utils.Margin.prototype.tightenBounds = function(boundsRect) {
   var width = this.tightenWidth(boundsRect.width);
-  var height = this.tightenWidth(boundsRect.height);
+  var height = this.tightenHeight(boundsRect.height);
   var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.left()), width);
   var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.top()), height);
   return new anychart.math.Rect(

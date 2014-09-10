@@ -25,7 +25,7 @@ goog.inherits(anychart.utils.Padding, anychart.utils.Space);
 /** @inheritDoc */
 anychart.utils.Padding.prototype.widenBounds = function(boundsRect) {
   var width = this.widenWidth(boundsRect.width);
-  var height = this.widenWidth(boundsRect.height);
+  var height = this.widenHeight(boundsRect.height);
   var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.left()), width);
   var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.top()), height);
   return new anychart.math.Rect(
