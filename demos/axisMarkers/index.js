@@ -25,7 +25,7 @@ function load() {
       .value(2)
       .text('VERTICAL!!! РАБОТАЕТ!!!')
       .layout('vertical')
-      .align('bottom');
+      .align('center');
 
   chart.container('container').draw();
 

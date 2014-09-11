@@ -47,10 +47,11 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.labels().disablePointerEvents(false);
   this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
   this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
-
   this.labels().position(anychart.enums.Position.CENTER);
   this.labels().enabled(false);
   (/** @type {anychart.elements.LabelsFactory} */(this.hoverLabels())).enabled(null);
+
+  this.hatchFill(false);
 
   this.resumeSignalsDispatching(false);
 };
@@ -83,7 +84,7 @@ anychart.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
  * Default hatch fill type.
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
  */
-anychart.cartesian.series.Base.DEFAULT_HATCH_FILL_TYPE = 'none';
+anychart.cartesian.series.Base.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
 
 
 /**
@@ -108,6 +109,14 @@ anychart.cartesian.series.Base.prototype.index_;
  * @private
  */
 anychart.cartesian.series.Base.prototype.clip_ = false;
+
+
+/**
+ * Root layer.
+ * @type {acgraph.vector.Layer}
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.rootLayer;
 
 
 /**
@@ -297,7 +306,7 @@ anychart.cartesian.series.Base.prototype.autoHatchFill_;
 
 /**
  * Hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null)}
+ * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
  * @private
  */
 anychart.cartesian.series.Base.prototype.hatchFill_ = (function() {
@@ -307,12 +316,10 @@ anychart.cartesian.series.Base.prototype.hatchFill_ = (function() {
 
 /**
  * Hover hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null)}
+ * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
  * @private
  */
-anychart.cartesian.series.Base.prototype.hoverHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Base.prototype.hoverHatchFill_;
 
 
 /**
@@ -950,12 +957,24 @@ anychart.cartesian.series.Base.prototype.drawMissing = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.Base.prototype.remove = function() {
+  if (this.rootLayer)
+    this.rootLayer.remove();
+
+  goog.base(this, 'remove');
+};
+
+
 /**
  * Initializes sereis draw.<br/>
  * If scale is not explicitly set - creates a default one.
  */
 anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.firstPointDrawn = false;
+
+  if (!this.rootLayer)
+    this.rootLayer = acgraph.layer();
 
   /** @type {anychart.scales.Base} */
   var scale = /** @type {anychart.scales.Base} */(this.yScale());
@@ -970,7 +989,7 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
   this.labels().clear();
-  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 
@@ -1744,7 +1763,7 @@ anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
 
 /**
  * Sets series hatch fill type that parent chart have set for it.
- * @param {?acgraph.vector.HatchFill.HatchFillType} value Auto hatch fill type distributed by the chart.
+ * @param {?(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} value Auto hatch fill type distributed by the chart.
  */
 anychart.cartesian.series.Base.prototype.setAutoHatchFill = function(value) {
   this.autoHatchFill_ = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
@@ -1771,16 +1790,16 @@ anychart.cartesian.series.Base.prototype.setAutoHatchFill = function(value) {
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.hatchFill_) {
@@ -1813,17 +1832,20 @@ anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrT
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.hoverHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    this.hoverHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Base.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill !== this.hoverHatchFill_)
+      this.hoverHatchFill_ = hatchFill;
     return this;
   }
   return this.hoverHatchFill_;
@@ -1838,40 +1860,52 @@ anychart.cartesian.series.Base.prototype.hoverHatchFill = function(opt_patternFi
  */
 anychart.cartesian.series.Base.prototype.getFinalHatchFill = function(usePointSettings, hover) {
   var iterator = this.getIterator();
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-      (usePointSettings && iterator.get('hatchFill')) || this.hatchFill());
 
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(hover ?
+  var normalHatchFill;
+  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
+    normalHatchFill = iterator.get('hatchFill');
+  } else {
+    normalHatchFill = this.hatchFill();
+  }
+
+  var hatchFill;
+  if (hover) {
+    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
+      hatchFill = iterator.get('hoverHatchFill');
+    } else if (goog.isDef(this.hoverHatchFill())) {
+      hatchFill = this.hoverHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-              (usePointSettings && iterator.get('hoverHatchFill')) ||
-              this.hoverHatchFill() || normalHatchFill),
-          normalHatchFill) :
-      this.normalizeHatchFill(normalHatchFill));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
 /**
  * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} hatchFill Normal state hatch fill.
- * @param {...(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function)} var_args .
+ * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|string|boolean} hatchFill Normal state hatch fill.
  * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
  * @protected
  */
-anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill, var_args) {
+anychart.cartesian.series.Base.prototype.normalizeHatchFill = function(hatchFill) {
   var fill;
+  var index = this.getIterator().getIndex();
   if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = arguments.length > 1 ?
-        this.normalizeHatchFill.apply(this, goog.array.slice(arguments, 1)) :
-        this.autoHatchFill_ ||
+    var sourceHatchFill = this.autoHatchFill_ ||
         acgraph.vector.normalizeHatchFill(anychart.cartesian.series.Base.DEFAULT_HATCH_FILL_TYPE);
-
     var scope = {
-      'index': this.getIterator().getIndex(),
+      'index': index,
       'sourceHatchFill': sourceHatchFill,
       'iterator': this.getIterator()
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
+  } else if (goog.isBoolean(hatchFill)) {
+    fill = hatchFill ? this.autoHatchFill_ : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;

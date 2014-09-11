@@ -44,15 +44,6 @@ anychart.cartesian.series.DiscreteBase.prototype.rootTypedLayerInitializer = fun
 };
 
 
-/**
- * Remove all element content from a container.
- */
-anychart.cartesian.series.DiscreteBase.prototype.remove = function() {
-  if (this.rootElement)
-    this.rootElement.remove();
-};
-
-
 /** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
@@ -64,23 +55,24 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
         goog.nullFunction);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.rootElement.zIndex(/** @type {number} */(this.zIndex()));
+    /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
+    this.rootElement.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
     if (this.hatchFillRootElement)
-      this.hatchFillRootElement.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillRootElement.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
+  var clip, bounds, axesLinesSpace;
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
-      var clip;
       if (goog.isBoolean(this.clip())) {
-        var bounds = this.pixelBounds();
-        var axesLinesSpace = this.axesLinesSpace();
+        bounds = this.pixelBounds();
+        axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
       } else {
         clip = /** @type {!anychart.math.Rect} */(this.clip());
       }
-      this.rootElement.clip(/** @type {!anychart.math.Rect} */(clip));
+      this.rootLayer.clip(clip);
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -89,26 +81,25 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
     this.rootElement.clear();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.rootLayer.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     if (this.hatchFillRootElement)
-      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var fill = this.getFinalHatchFill(false, false);
-    if (!this.hatchFillRootElement && !anychart.utils.isNone(fill)) {
+    var fill = this.getFinalHatchFill(true, false);
+    var hoverFill = this.getFinalHatchFill(true, true);
+    if (!this.hatchFillRootElement && (!anychart.utils.isNone(fill) || !anychart.utils.isNone(hoverFill))) {
       this.hatchFillRootElement = new anychart.utils.TypedLayer(
           this.rootTypedLayerInitializer,
           goog.nullFunction);
 
-      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-      this.hatchFillRootElement.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+      this.hatchFillRootElement.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
       this.hatchFillRootElement.disablePointerEvents(true);
     }
-
-    if (this.hatchFillRootElement)
-      this.hatchFillRootElement.clear();
   }
 };
 

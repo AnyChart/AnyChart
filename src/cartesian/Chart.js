@@ -13,6 +13,7 @@ goog.require('anychart.elements.TextMarker');
 goog.require('anychart.enums');
 goog.require('anychart.scales');
 goog.require('anychart.utils.DistinctColorPalette');
+goog.require('anychart.utils.HatchFillPalette');
 goog.require('anychart.utils.MarkerPalette');
 goog.require('anychart.utils.RangeColorPalette');
 
@@ -119,6 +120,12 @@ anychart.cartesian.Chart = function(opt_barChartMode) {
   this.markerPalette_ = null;
 
   /**
+   * @type {anychart.utils.HatchFillPalette}
+   * @private
+   */
+  this.hatchFillPalette_ = null;
+
+  /**
    * Cache of chart data bounds.
    * @type {acgraph.math.Rect}
    * @private
@@ -178,11 +185,40 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.PALETTE |
     anychart.ConsistencyState.MARKER_PALETTE |
+    anychart.ConsistencyState.HATCH_FILL_PALETTE |
     anychart.ConsistencyState.SCALES |
     anychart.ConsistencyState.SERIES |
     anychart.ConsistencyState.AXES |
     anychart.ConsistencyState.AXES_MARKERS |
     anychart.ConsistencyState.GRIDS;
+
+
+/**
+ * Series z-index.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_SERIES = 0;
+
+
+/**
+ * Hatch fill z-index.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_HATCH_FILL = 1;
+
+
+/**
+ * Marker z-index.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_MARKER = 3;
+
+
+/**
+ * Label z-index.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_LABEL = 4;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1342,6 +1378,7 @@ anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, op
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
@@ -2007,6 +2044,35 @@ anychart.cartesian.Chart.prototype.markerPalette = function(opt_value) {
 
 
 /**
+ * Chart hatch fill palette settings.
+ * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.utils.HatchFillPalette)=} opt_value Chart
+ * hatch fill palette settings to set.
+ * @return {anychart.utils.HatchFillPalette|anychart.cartesian.Chart} Return current chart hatch fill palette or itself
+ * for chaining call.
+ */
+anychart.cartesian.Chart.prototype.hatchFillPalette = function(opt_value) {
+  if (!this.hatchFillPalette_) {
+    this.hatchFillPalette_ = new anychart.utils.HatchFillPalette();
+    this.hatchFillPalette_.listenSignals(this.hatchFillPaletteInvalidated_, this);
+    this.registerDisposable(this.hatchFillPalette_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.utils.HatchFillPalette) {
+      this.hatchFillPalette_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.hatchFillPalette_.deserialize(opt_value);
+    } else if (goog.isArray(opt_value)) {
+      this.hatchFillPalette_.hatchFills(opt_value);
+    }
+    return this;
+  } else {
+    return this.hatchFillPalette_;
+  }
+};
+
+
+/**
  * @param {Function} cls Palette constructor.
  * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette)=} opt_cloneFrom Settings to clone from.
  * @private
@@ -2046,6 +2112,18 @@ anychart.cartesian.Chart.prototype.paletteInvalidated_ = function(event) {
 anychart.cartesian.Chart.prototype.markerPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal marker palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.cartesian.Chart.prototype.hatchFillPaletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2103,6 +2181,15 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.SERIES);
     this.markConsistent(anychart.ConsistencyState.MARKER_PALETTE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.SERIES);
+    this.markConsistent(anychart.ConsistencyState.HATCH_FILL_PALETTE);
   }
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);

@@ -122,7 +122,7 @@ anychart.elements.LabelsFactory = function() {
    */
   this.labels_;
 
-  this.zIndex(50);
+  this.zIndex(anychart.cartesian.Chart.ZINDEX_LABEL);
   this.background(null);
   this.anchor(anychart.enums.Anchor.CENTER);
   this.padding(5, 10, 5, 10);

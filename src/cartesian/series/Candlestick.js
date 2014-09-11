@@ -57,39 +57,31 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingFill_ = (function() 
 
 
 /**
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Candlestick.prototype.risingHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Candlestick.prototype.risingHatchFill_ = null;
 
 
 /**
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill_;
 
 
 /**
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Candlestick.prototype.fallingHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Candlestick.prototype.fallingHatchFill_ = null;
 
 
 /**
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill_;
 
 
 /** @inheritDoc */
@@ -144,16 +136,18 @@ anychart.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function()
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var hatchFillShape = this.hatchFillRootElement ?
-        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
-        null;
     iterator = this.getIterator();
-    iterator.meta('hatchFillShape', hatchFillShape);
+    var hatchFillShape = iterator.meta('hatchFillShape');
+    if (!hatchFillShape) {
+      hatchFillShape = this.hatchFillRootElement ?
+          /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+          null;
+      iterator.meta('hatchFillShape', hatchFillShape);
+    }
     var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-
     this.applyHatchFill(false);
   }
 
@@ -228,7 +222,7 @@ anychart.cartesian.series.Candlestick.prototype.applyHatchFill = function(hover)
  *  .risingHatchFill('diamiond', 'grey', 5, 5)
  *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -236,16 +230,16 @@ anychart.cartesian.series.Candlestick.prototype.applyHatchFill = function(hover)
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.risingHatchFill_) {
@@ -282,17 +276,21 @@ anychart.cartesian.series.Candlestick.prototype.risingHatchFill = function(opt_p
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    this.hoverRisingHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (this.hoverRisingHatchFill_ != hatchFill)
+      this.hoverRisingHatchFill_ = hatchFill;
+
     return this;
   }
   return this.hoverRisingHatchFill_;
@@ -306,13 +304,29 @@ anychart.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = function(
  */
 anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = function(hover) {
   var iterator = this.getIterator();
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-      iterator.get('risingHatchFill') || this.risingHatchFill());
 
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(hover ?
-      this.normalizeHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-          iterator.get('hoverRisingHatchFill') || this.hoverRisingHatchFill() || normalHatchFill), normalHatchFill) :
-      this.normalizeHatchFill(normalHatchFill));
+  var normalHatchFill;
+  if (goog.isDef(iterator.get('risingHatchFill'))) {
+    normalHatchFill = iterator.get('risingHatchFill');
+  } else {
+    normalHatchFill = this.risingHatchFill();
+  }
+
+  var hatchFill;
+  if (hover) {
+    if (goog.isDef(iterator.get('hoverRisingHatchFill'))) {
+      hatchFill = iterator.get('hoverRisingHatchFill');
+    } else if (goog.isDef(this.hoverRisingHatchFill())) {
+      hatchFill = this.hoverRisingHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
+      this.normalizeHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
@@ -332,7 +346,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = functi
  *  .fallingHatchFill('diamiond', 'grey', 5, 5)
  *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -340,16 +354,16 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = functi
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.fallingHatchFill_) {
@@ -386,17 +400,21 @@ anychart.cartesian.series.Candlestick.prototype.fallingHatchFill = function(opt_
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    this.hoverFallingHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill !== this.hoverFallingHatchFill_)
+      this.hoverFallingHatchFill_ = hatchFill;
+
     return this;
   }
   return this.hoverFallingHatchFill_;
@@ -410,16 +428,29 @@ anychart.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = function
  */
 anychart.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = function(hover) {
   var iterator = this.getIterator();
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-      iterator.get('fallingHatchFill') || this.fallingHatchFill());
 
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(hover ?
+  var normalHatchFill;
+  if (goog.isDef(iterator.get('fallingHatchFill'))) {
+    normalHatchFill = iterator.get('fallingHatchFill');
+  } else {
+    normalHatchFill = this.fallingHatchFill();
+  }
+
+  var hatchFill;
+  if (hover) {
+    if (goog.isDef(iterator.get('hoverFallingHatchFill'))) {
+      hatchFill = iterator.get('hoverFallingHatchFill');
+    } else if (goog.isDef(this.hoverFallingHatchFill())) {
+      hatchFill = this.hoverFallingHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-              iterator.get('hoverFallingHatchFill') ||
-              this.hoverFallingHatchFill() || normalHatchFill),
-          normalHatchFill) :
-      this.normalizeHatchFill(normalHatchFill));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 

@@ -48,13 +48,6 @@ anychart.cartesian.series.ContinuousBase = function(data, opt_csvSettings) {
 goog.inherits(anychart.cartesian.series.ContinuousBase, anychart.cartesian.series.BaseWithMarkers);
 
 
-/** @inheritDoc */
-anychart.cartesian.series.ContinuousBase.prototype.remove = function() {
-  for (var i = this.paths.length; i--;)
-    this.paths[i].remove();
-};
-
-
 /**
  * Draws all series points.
  */
@@ -87,24 +80,25 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
     for (i = 0; i < len; i++)
-      this.paths[i].zIndex(/** @type {number} */(this.zIndex()));
-    if (this.hatchFillPath) this.hatchFillPath.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.paths[i].zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
+    if (this.hatchFillPath)
+      this.hatchFillPath.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
+  var clip, bounds, axesLinesSpace;
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
-      var clip;
       if (goog.isBoolean(this.clip())) {
-        var bounds = this.pixelBounds();
-        var axesLinesSpace = this.axesLinesSpace();
+        bounds = this.pixelBounds();
+        axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
       } else {
         clip = /** @type {!anychart.math.Rect} */(this.clip());
       }
-      for (i = 0; i < len; i++)
-        this.paths[i].clip(clip);
+      this.rootLayer.clip(clip);
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -117,22 +111,24 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
+    this.rootLayer.parent(container);
     for (i = 0; i < len; i++)
-      this.paths[i].parent(container);
-    if (this.hatchFillPath) this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+      this.paths[i].parent(this.rootLayer);
+    if (this.hatchFillPath)
+      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
     var fill = this.getFinalHatchFill(false, false);
-    if (!this.hatchFillPath && !anychart.utils.isNone(fill)) {
+    var hoverFill = this.getFinalHatchFill(false, true);
+    if (!this.hatchFillPath && (!anychart.utils.isNone(fill) || !anychart.utils.isNone(hoverFill))) {
       this.hatchFillPath = acgraph.path();
-      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-      this.hatchFillPath.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+      this.hatchFillPath.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
       this.hatchFillPath.disablePointerEvents(true);
     }
   }
-
 };
 
 
@@ -236,7 +232,7 @@ anychart.cartesian.series.ContinuousBase.prototype.colorizeShape = function(hove
 anychart.cartesian.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
   if (this.hatchFillPath) {
     this.hatchFillPath.stroke(null);
-    this.hatchFillPath.fill(this.getFinalHatchFill(true, hover));
+    this.hatchFillPath.fill(this.getFinalHatchFill(false, hover));
   }
 };
 

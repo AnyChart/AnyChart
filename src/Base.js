@@ -67,9 +67,9 @@ anychart.ConsistencyState = {
    */
   MARKERS: 0x00002000,
   /**
-   * Free to use.
+   * Hatch fill palette has changed.
    */
-  FREE_STATE: 0x00004000,
+  HATCH_FILL_PALETTE: 0x00004000,
   /**
    * Labels have changed.
    */

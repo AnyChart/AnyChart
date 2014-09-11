@@ -268,7 +268,7 @@ anychart.VisualBase.prototype.checkDrawingNeeded = function() {
  * Remove all elements content from the container.
  * @protected
  */
-anychart.VisualBase.prototype.remove = goog.abstractMethod;
+anychart.VisualBase.prototype.remove = goog.nullFunction;
 
 
 //----------------------------------------------------------------------------------------------------------------------

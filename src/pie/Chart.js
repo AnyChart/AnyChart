@@ -7,6 +7,7 @@ goog.require('anychart.elements.Tooltip');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.utils.DistinctColorPalette');
+goog.require('anychart.utils.HatchFillPalette');
 goog.require('anychart.utils.RangeColorPalette');
 goog.require('anychart.utils.TypedLayer');
 
@@ -85,6 +86,12 @@ anychart.pie.Chart = function(opt_data) {
   this.palette_ = null;
 
   /**
+   * @type {anychart.utils.HatchFillPalette}
+   * @private
+   */
+  this.hatchFillPalette_ = null;
+
+  /**
    * Pie chart default palette type.
    * Internal use only.
    * @private
@@ -156,17 +163,18 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Hatch fill.
-   * @type {acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|string|Function}
+   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
    * @private
    */
   this.hatchFill_ = null;
 
+
   /**
    * Hover hatch fill.
-   * @type {acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|string|Function}
+   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
    * @private
    */
-  this.hoverHatchFill_ = null;
+  this.hoverHatchFill_;
 
   /**
    * @type {!anychart.data.Iterator}
@@ -185,6 +193,7 @@ anychart.pie.Chart = function(opt_data) {
   tooltip.resumeSignalsDispatching(false);
 
   this.palette();
+  this.hatchFillPalette();
   this.labels()
       .fontColor('white')
       .fontSize(13)
@@ -465,6 +474,35 @@ anychart.pie.Chart.prototype.palette = function(opt_value) {
 
 
 /**
+ * Chart hatch fill palette settings.
+ * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.utils.HatchFillPalette)=} opt_value Chart
+ * hatch fill palette settings to set.
+ * @return {anychart.utils.HatchFillPalette|anychart.pie.Chart} Return current chart hatch fill palette or itself
+ * for chaining call.
+ */
+anychart.pie.Chart.prototype.hatchFillPalette = function(opt_value) {
+  if (!this.hatchFillPalette_) {
+    this.hatchFillPalette_ = new anychart.utils.HatchFillPalette();
+    this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
+    this.registerDisposable(this.hatchFillPalette_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.utils.HatchFillPalette) {
+      this.hatchFillPalette_.deserialize(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.hatchFillPalette_.deserialize(opt_value);
+    } else if (goog.isArray(opt_value)) {
+      this.hatchFillPalette_.hatchFills(opt_value);
+    }
+    return this;
+  } else {
+    return this.hatchFillPalette_;
+  }
+};
+
+
+/**
  * Getter for the pie slices fill in normal state.
  * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the normal state.
  *//**
@@ -672,7 +710,7 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickn
  *  chart.hatchFill('diagonalbrick');
  *  chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -680,16 +718,16 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickn
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pie.Chart|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pie.Chart|Function|boolean} Hatch fill.
  */
-anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.hatchFill_) {
@@ -698,7 +736,7 @@ anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrType, opt_col
     }
     return this;
   }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */ (this.hatchFill_);
+  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hatchFill_);
 };
 
 
@@ -713,7 +751,7 @@ anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrType, opt_col
  *  chart.hoverHatchFill('diagonalbrick');
  *  chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -721,20 +759,24 @@ anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrType, opt_col
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pie.Chart|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.pie.Chart|Function|boolean} Hatch fill.
  */
-anychart.pie.Chart.prototype.hoverHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    this.hoverHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.pie.Chart.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (this.hoverHatchFill_ != hatchFill)
+      this.hoverHatchFill_ = hatchFill;
+
     return this;
   }
-  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */ (this.hoverHatchFill_);
+  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hoverHatchFill_);
 };
 
 
@@ -1395,15 +1437,30 @@ anychart.pie.Chart.prototype.getStrokeColor = function(usePointSettings, hover) 
  */
 anychart.pie.Chart.prototype.getFinalHatchFill = function(usePointSettings, hover) {
   var iterator = this.getIterator();
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-      (usePointSettings && iterator.get('hatchFill')) || this.hatchFill());
 
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(hover ?
+  var normalHatchFill;
+  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
+    normalHatchFill = iterator.get('hatchFill');
+  } else {
+    normalHatchFill = this.hatchFill();
+  }
+
+  var hatchFill;
+  if (hover) {
+    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
+      hatchFill = iterator.get('hoverHatchFill');
+    } else if (goog.isDef(this.hoverHatchFill())) {
+      hatchFill = this.hoverHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-          (usePointSettings && iterator.get('hoverHatchFill')) || this.hoverHatchFill() || normalHatchFill),
-          normalHatchFill) :
-      this.normalizeHatchFill(normalHatchFill));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
@@ -1420,7 +1477,7 @@ anychart.pie.Chart.prototype.isRadialGradientMode_ = function(fillOrStroke) {
 
 /**
  * Gets final normalized fill or stroke color.
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function|boolean} color Normal state color.
  * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
  * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
  * @protected
@@ -1446,24 +1503,24 @@ anychart.pie.Chart.prototype.normalizeColor = function(color, var_args) {
 
 /**
  * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} hatchFill Normal state hatch fill.
- * @param {...(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function)} var_args .
+ * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} hatchFill Normal state hatch fill.
  * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
  * @protected
  */
-anychart.pie.Chart.prototype.normalizeHatchFill = function(hatchFill, var_args) {
+anychart.pie.Chart.prototype.normalizeHatchFill = function(hatchFill) {
   var fill;
+  var index = this.getIterator().getIndex();
   if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = arguments.length > 1 ?
-        this.normalizeHatchFill.apply(this, goog.array.slice(arguments, 1)) :
-        acgraph.vector.normalizeHatchFill(anychart.pie.Chart.DEFAULT_HATCH_FILL_TYPE);
-
+    var sourceHatchFill = acgraph.vector.normalizeHatchFill(
+        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)));
     var scope = {
-      'index': this.getIterator().getIndex(),
+      'index': index,
       'sourceHatchFill': sourceHatchFill,
       'iterator': this.getIterator()
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
+  } else if (goog.isBoolean(hatchFill)) {
+    fill = hatchFill ? this.hatchFillPalette().hatchFillAt(index) : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;
@@ -1547,16 +1604,14 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       this.dataLayer_.parent(this.rootElement);
     }
 
-    if (this.hatchLayer_) {
-      this.hatchLayer_.clear();
-    } else {
+    if (!this.hatchLayer_) {
       this.hatchLayer_ = new anychart.utils.TypedLayer(function() {
         return acgraph.path();
       }, function(child) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
       this.hatchLayer_.parent(this.rootElement);
-      this.hatchLayer_.zIndex(/** @type {number} */ (this.zIndex() + 1)).disablePointerEvents(true);
+      this.hatchLayer_.zIndex(/** @type {number} */(this.zIndex())).disablePointerEvents(true);
     }
 
     var start = /** @type {number} */ (this.startAngle_);
@@ -1639,7 +1694,6 @@ anychart.pie.Chart.prototype.drawSlice_ = function(opt_update) {
   if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return false;
   var exploded = !!iterator.meta('exploded');
 
-  var needHatchFill = (!anychart.utils.isNone(this.getFinalHatchFill(true, false)));
   var slice, hatchSlice;
   if (opt_update) {
     slice = /** @type {acgraph.vector.Path} */ (iterator.meta('slice'));
@@ -1649,7 +1703,8 @@ anychart.pie.Chart.prototype.drawSlice_ = function(opt_update) {
   } else {
     slice = this.dataLayer_.genNextChild();
     iterator.meta('slice', slice);
-    if (needHatchFill) {
+    hatchSlice = iterator.meta('hatchSlice');
+    if (!hatchSlice) {
       hatchSlice = this.hatchLayer_.genNextChild();
       iterator.meta('hatchSlice', hatchSlice);
     }
@@ -3179,7 +3234,7 @@ anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//doc|e
 anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//doc|ex
 anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//doc|ex
 anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//doc|ex
-anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFill;//doc|ex
+anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFill;
 anychart.pie.Chart.prototype['hoverHatchFill'] = anychart.pie.Chart.prototype.hoverHatchFill;//doc|ex
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;//doc|ex
 anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;//doc|ex

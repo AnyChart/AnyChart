@@ -51,16 +51,18 @@ anychart.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var hatchFillShape = this.hatchFillRootElement ?
-        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
-        null;
     var iterator = this.getIterator();
-    iterator.meta('hatchFillShape', hatchFillShape);
+    var hatchFillShape = iterator.meta('hatchFillShape');
+    if (!hatchFillShape) {
+      hatchFillShape = this.hatchFillRootElement ?
+          /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+          null;
+      iterator.meta('hatchFillShape', hatchFillShape);
+    }
     var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-
     this.applyHatchFill(false);
   }
 
@@ -113,7 +115,7 @@ anychart.cartesian.series.bar = function(data, opt_csvSettings) {
 goog.exportSymbol('anychart.cartesian.series.bar', anychart.cartesian.series.bar);//doc|ex
 anychart.cartesian.series.Bar.prototype['fill'] = anychart.cartesian.series.Bar.prototype.fill;//inherited
 anychart.cartesian.series.Bar.prototype['hoverFill'] = anychart.cartesian.series.Bar.prototype.hoverFill;//inherited
-anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//ininherited
+anychart.cartesian.series.Bar.prototype['stroke'] = anychart.cartesian.series.Bar.prototype.stroke;//inherited
 anychart.cartesian.series.Bar.prototype['hoverStroke'] = anychart.cartesian.series.Bar.prototype.hoverStroke;//inherited
 anychart.cartesian.series.Bar.prototype['hatchFill'] = anychart.cartesian.series.Bar.prototype.hatchFill;//inherited
 anychart.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.cartesian.series.Bar.prototype.hoverHatchFill;//inherited

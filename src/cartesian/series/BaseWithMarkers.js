@@ -213,7 +213,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   markers.setAutoType(this.autoMarkerType);
 
   markers.clear();
-  markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  markers.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
   markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 

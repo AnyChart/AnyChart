@@ -121,22 +121,18 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeFill_ = (function() {
 
 /**
  * Hatch fill.
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Base.prototype.negativeHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Base.prototype.negativeHatchFill_ = null;
 
 
 /**
  * Hover hatch fill.
- * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|null)}
+ * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
+anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill_;
 
 
 /**
@@ -402,18 +398,19 @@ anychart.cartesian.series.Bubble.prototype.drawSubsequentPoint = function() {
     this.makeHoverable(circle);
   }
 
-
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var hatchFillShape = this.hatchFillRootElement ?
-        (/** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild())) :
-        null;
     var iterator = this.getIterator();
-    iterator.meta('hatchFillShape', hatchFillShape);
+    var hatchFillShape = iterator.meta('hatchFillShape');
+    if (!hatchFillShape) {
+      hatchFillShape = this.hatchFillRootElement ?
+          /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+          null;
+      iterator.meta('hatchFillShape', hatchFillShape);
+    }
     var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-
     this.applyHatchFill(false);
   }
 
@@ -954,16 +951,16 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeFill = function(hover
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
     if (hatchFill != this.negativeHatchFill_) {
@@ -1003,17 +1000,21 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patter
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function} Hatch fill.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_patternFillOrType, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrType)) {
-    this.hoverNegativeHatchFill_ = goog.isFunction(opt_patternFillOrType) ?
-        opt_patternFillOrType :
+anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
         acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (this.hoverNegativeHatchFill_ != hatchFill)
+      this.hoverNegativeHatchFill_ = hatchFill;
+
     return this;
   }
   return this.hoverNegativeHatchFill_;
@@ -1027,17 +1028,29 @@ anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_p
  */
 anychart.cartesian.series.Base.prototype.getFinalNegativeHatchFill = function(hover) {
   var iterator = this.getIterator();
-  var normalHatchFill = /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-      iterator.get('negativeHatchFill') ||
-      this.negativeHatchFill());
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(hover ?
+
+  var normalHatchFill;
+  if (goog.isDef(iterator.get('negativeHatchFill'))) {
+    normalHatchFill = iterator.get('negativeHatchFill');
+  } else {
+    normalHatchFill = this.negativeHatchFill();
+  }
+
+  var hatchFill;
+  if (hover) {
+    if (goog.isDef(iterator.get('hoverNegativeHatchFill'))) {
+      hatchFill = iterator.get('hoverNegativeHatchFill');
+    } else if (goog.isDef(this.hoverNegativeHatchFill())) {
+      hatchFill = this.hoverNegativeHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function} */(
-              iterator.get('hoverNegativeHatchFill') ||
-              this.hoverNegativeHatchFill() ||
-              normalHatchFill),
-          normalHatchFill) :
-      this.normalizeHatchFill(normalHatchFill));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
@@ -1180,8 +1193,8 @@ anychart.cartesian.series.Bubble.prototype['negativeFill'] = anychart.cartesian.
 anychart.cartesian.series.Bubble.prototype['hoverNegativeFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeFill;//doc|ex
 anychart.cartesian.series.Bubble.prototype['negativeStroke'] = anychart.cartesian.series.Bubble.prototype.negativeStroke;//doc|ex
 anychart.cartesian.series.Bubble.prototype['hoverNegativeStroke'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeStroke;//doc|ex
-anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;//doc|ex
-anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;//doc|ex
+anychart.cartesian.series.Bubble.prototype['negativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.negativeHatchFill;
+anychart.cartesian.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill;
 anychart.cartesian.series.Bubble.prototype['fill'] = anychart.cartesian.series.Bubble.prototype.fill;//inherited
 anychart.cartesian.series.Bubble.prototype['hoverFill'] = anychart.cartesian.series.Bubble.prototype.hoverFill;//inherited
 anychart.cartesian.series.Bubble.prototype['stroke'] = anychart.cartesian.series.Bubble.prototype.stroke;//inherited

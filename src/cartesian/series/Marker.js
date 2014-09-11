@@ -261,13 +261,6 @@ anychart.cartesian.series.Marker.prototype.drawSubsequentPoint = function() {
 
 
 /** @inheritDoc */
-anychart.cartesian.series.Marker.prototype.remove = function() {
-  this.marker_.remove();
-  this.marker_.invalidate(anychart.ConsistencyState.CONTAINER);
-};
-
-
-/** @inheritDoc */
 anychart.cartesian.series.Marker.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
@@ -286,7 +279,25 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.marker_.zIndex(/** @type {number} */(this.zIndex()));
+    /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
+    this.marker_.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
+    if (this.hatchFillElement_)
+      this.hatchFillElement_.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
+  }
+
+  var clip, bounds, axesLinesSpace;
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    if (this.clip()) {
+      if (goog.isBoolean(this.clip())) {
+        bounds = this.pixelBounds();
+        axesLinesSpace = this.axesLinesSpace();
+        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      } else {
+        clip = /** @type {!anychart.math.Rect} */(this.clip());
+      }
+      this.rootLayer.clip(clip);
+    }
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -302,7 +313,10 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.marker_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.rootLayer.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.marker_.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+    if (this.hatchFillElement_)
+      this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
   }
 
 
@@ -310,13 +324,9 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
     var fill = this.getFinalHatchFill(false, false);
     if (!this.hatchFillElement_ && !anychart.utils.isNone(fill)) {
       this.hatchFillElement_ = new anychart.elements.MarkersFactory();
-      this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-      this.hatchFillElement_.zIndex(/** @type {number} */(this.zIndex() + 1));
+      this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+      this.hatchFillElement_.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
       this.hatchFillElement_.disablePointerEvents(true);
-    }
-
-    if (this.hatchFillElement_) {
-      this.hatchFillElement_.suspendSignalsDispatching();
     }
   }
 };
@@ -435,20 +445,26 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_u
  * @protected
  */
 anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
-  var iterator = this.getIterator();
-  var index = iterator.getIndex();
-
   if (this.hatchFillElement_) {
+    var iterator = this.getIterator();
+    var index = iterator.getIndex();
+
+    var pointType = iterator.get('type');
+    var pointSize = iterator.get('markerSize');
+    var pointHoverType = iterator.get('hoverType');
+    var pointHoverSize = iterator.get('hoverMarkerSize');
+
     var markersFactory = /** @type {anychart.elements.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
     var hatchFill = this.hatchFillElement_.add(this.createPositionProvider(anychart.enums.Position.CENTER), index);
 
+    var settings = {'type': pointType, 'size': pointSize, 'fill': this.getFinalHatchFill(true, hovered), 'stroke': null};
+    var settingsHover = {'type': pointHoverType, 'size': pointHoverSize, 'fill': this.getFinalHatchFill(true, hovered), 'stroke': null};
+
     hatchFill.resetSettings();
-    hatchFill.parentMarkersFactory(markersFactory);
 
-    var fill = this.getFinalHatchFill(true, hovered);
-
-    hatchFill.fill(fill);
-    hatchFill.stroke(null);
+    hatchFill.parentMarkersFactory(this.marker_);
+    hatchFill.currentMarkersFactory(markersFactory);
+    hatchFill.setSettings(settings, settingsHover);
 
     hatchFill.draw();
   }
@@ -531,10 +547,7 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 anychart.cartesian.series.Marker.prototype.restoreDefaults = function() {
   var res = goog.base(this, 'restoreDefaults');
 
-  var type = this.autoMarkerType || anychart.enums.MarkerType.STAR5;
-
-  this.type_ = type;
-  this.hoverType_ = type;
+  this.type_ = this.autoMarkerType || anychart.enums.MarkerType.STAR5;
 
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.contentFormatter(function() {
