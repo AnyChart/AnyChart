@@ -18,11 +18,20 @@
         ['P2', 19, 26, 39, 45, 61],
         ['P3', 27, 38, 35, 41, 58]
       ]);
-      var data_1 = data.mapAs({x: [0], value: [1]});
-      var data_2 = data.mapAs({x: [0], value: [2]});
+      var data_1 = data.mapAs({x: [0], open: [1], high:[2], low:[3], close:[4]});
+//      var data_1 = data.mapAs({x: [0], value: [1], high:[2], low:[3], close:[4]});
 
-      chart.bar(data_1).hatchFill('diagonalcross');
-      chart.bar(data_2).hatchFill('diagonalbrick');
+      chart.grid(0).enabled(false);
+      chart.grid(1).enabled(false);
+      chart.minorGrid().enabled(false);
+      chart.xAxis().enabled(false);
+      chart.yAxis().enabled(false);
+      chart.title().enabled(false);
+      chart.background().enabled(false);
+      chart.credits().enabled(false);
+
+      chart.candlestick(data_1).risingHatchFill(true).fallingHatchFill(true);
+//      chart.bar(data_1).hatchFill(true);
 
       chart.draw();
     });

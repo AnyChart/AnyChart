@@ -89,9 +89,7 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var fill = this.getFinalHatchFill(true, false);
-    var hoverFill = this.getFinalHatchFill(true, true);
-    if (!this.hatchFillRootElement && (!anychart.utils.isNone(fill) || !anychart.utils.isNone(hoverFill))) {
+    if (!this.hatchFillRootElement) {
       this.hatchFillRootElement = new anychart.utils.TypedLayer(
           this.rootTypedLayerInitializer,
           goog.nullFunction);

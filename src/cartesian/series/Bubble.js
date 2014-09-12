@@ -124,7 +124,7 @@ anychart.cartesian.series.Bubble.prototype.hoverNegativeFill_ = (function() {
  * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Base.prototype.negativeHatchFill_ = null;
+anychart.cartesian.series.Bubble.prototype.negativeHatchFill_ = null;
 
 
 /**
@@ -132,7 +132,7 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill_ = null;
  * @type {(acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|null)}
  * @private
  */
-anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill_;
+anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill_;
 
 
 /**
@@ -957,7 +957,7 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeFill = function(hover
  * @param {number=} opt_size Pattern size.
  * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+anychart.cartesian.series.Bubble.prototype.negativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
         opt_patternFillOrTypeOrState :
@@ -1006,7 +1006,7 @@ anychart.cartesian.series.Base.prototype.negativeHatchFill = function(opt_patter
  * @param {number=} opt_size Pattern size.
  * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.cartesian.series.Base|Function|boolean} Hatch fill.
  */
-anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+anychart.cartesian.series.Bubble.prototype.hoverNegativeHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
         opt_patternFillOrTypeOrState :
@@ -1026,7 +1026,7 @@ anychart.cartesian.series.Base.prototype.hoverNegativeHatchFill = function(opt_p
  * @param {boolean} hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final negative hatch fill for the current row.
  */
-anychart.cartesian.series.Base.prototype.getFinalNegativeHatchFill = function(hover) {
+anychart.cartesian.series.Bubble.prototype.getFinalNegativeHatchFill = function(hover) {
   var iterator = this.getIterator();
 
   var normalHatchFill;

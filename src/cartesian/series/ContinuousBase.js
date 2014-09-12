@@ -120,9 +120,7 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
-    var fill = this.getFinalHatchFill(false, false);
-    var hoverFill = this.getFinalHatchFill(false, true);
-    if (!this.hatchFillPath && (!anychart.utils.isNone(fill) || !anychart.utils.isNone(hoverFill))) {
+    if (!this.hatchFillPath) {
       this.hatchFillPath = acgraph.path();
       this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
       this.hatchFillPath.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
