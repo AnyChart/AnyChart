@@ -20,6 +20,7 @@ anychart.cartesian.series.AreaBase = function(data, opt_csvSettings) {
    * @protected
    */
   this.strokePath = acgraph.path();
+  this.strokePath.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES + 0.1);
 
   this.paths.push(this.strokePath);
 };
@@ -27,7 +28,7 @@ goog.inherits(anychart.cartesian.series.AreaBase, anychart.cartesian.series.Cont
 
 
 /**
- * Last drawn X in case of non-stacked scale, NaN otherwise.
+ * Last drawn X in case of non-stacked scalthis.pathse, NaN otherwise.
  * @type {number}
  * @protected
  */

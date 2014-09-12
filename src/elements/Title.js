@@ -46,7 +46,6 @@ anychart.elements.Title = function() {
       .fontSize('11')
       .fontWeight('bold')
       .fontColor('rgb(34,34,34)')
-      .zIndex(80)
       .margin(5, 5, 5, 5)
       .padding(5)
       .background(null);

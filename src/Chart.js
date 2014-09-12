@@ -105,6 +105,34 @@ anychart.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.CREDITS;
 
 
+/**
+ * Background z-index in chart root layer.
+ * @type {number}
+ */
+anychart.Chart.ZINDEX_BACKGROUND = 1;
+
+
+/**
+ * Legend z-index in chart root layer.
+ * @type {number}
+ */
+anychart.Chart.ZINDEX_LEGEND = 20;
+
+
+/**
+ * Chart label z-index in chart root layer.
+ * @type {number}
+ */
+anychart.Chart.ZINDEX_LABEL = 50;
+
+
+/**
+ * Title z-index in chart root layer.
+ * @type {number}
+ */
+anychart.Chart.ZINDEX_TITLE = 80;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Margin.
@@ -389,6 +417,7 @@ anychart.Chart.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.elements.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
+    this.background_.zIndex(anychart.Chart.ZINDEX_BACKGROUND);
     this.registerDisposable(this.background_);
   }
 
@@ -396,8 +425,10 @@ anychart.Chart.prototype.background = function(opt_value) {
     this.background_.suspendSignalsDispatching();
     if (opt_value instanceof anychart.elements.Background) {
       this.background_.deserialize(opt_value.serialize());
+      if (this.background_.zIndex() == 0) this.background_.zIndex(anychart.Chart.ZINDEX_BACKGROUND);
     } else if (goog.isObject(opt_value)) {
       this.background_.deserialize(opt_value);
+      if (this.background_.zIndex() == 0) this.background_.zIndex(anychart.Chart.ZINDEX_BACKGROUND);
     } else if (anychart.utils.isNone(opt_value)) {
       this.background_.enabled(false);
     }
@@ -450,6 +481,7 @@ anychart.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.elements.Title();
     this.title_.listenSignals(this.onTitleSignal_, this);
+    this.title_.zIndex(anychart.Chart.ZINDEX_TITLE);
     this.registerDisposable(this.title_);
   }
 
@@ -457,8 +489,10 @@ anychart.Chart.prototype.title = function(opt_value) {
     this.suspendSignalsDispatching();
     if (opt_value instanceof anychart.elements.Title) {
       this.title_.deserialize(opt_value.serialize());
+      if (this.title_.zIndex() == 0) this.title_.zIndex(anychart.Chart.ZINDEX_TITLE);
     } else if (goog.isObject(opt_value)) {
       this.title_.deserialize(opt_value);
+      if (this.title_.zIndex() == 0) this.title_.zIndex(anychart.Chart.ZINDEX_TITLE);
     } else if (anychart.utils.isNone(opt_value)) {
       this.title_.enabled(false);
     }
@@ -521,6 +555,7 @@ anychart.Chart.prototype.onTitleSignal_ = function(event) {
 anychart.Chart.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.elements.Legend();
+    this.legend_.zIndex(anychart.Chart.ZINDEX_LEGEND);
     this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal_, this);
   }
@@ -528,8 +563,10 @@ anychart.Chart.prototype.legend = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.Legend) {
       this.legend_.deserialize(opt_value.serialize());
+      if (this.legend_.zIndex() == 0) this.legend_.zIndex(anychart.Chart.ZINDEX_LEGEND);
     } else if (goog.isObject(opt_value)) {
       this.legend_.deserialize(opt_value);
+      if (this.legend_.zIndex() == 0) this.legend_.zIndex(anychart.Chart.ZINDEX_LEGEND);
     } else if (anychart.utils.isNone(opt_value)) {
       this.legend_.enabled(false);
     }
@@ -617,6 +654,7 @@ anychart.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   if (!label) {
     label = new anychart.elements.Label();
     label.text('Chart label');
+    label.zIndex(anychart.Chart.ZINDEX_LABEL);
     this.chartLabels_[index] = label;
     this.registerDisposable(label);
     label.listenSignals(this.onLabelSignal_, this);
@@ -626,8 +664,10 @@ anychart.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.Label) {
       label.deserialize(value.serialize());
+      if (label.zIndex() == 0) label.zIndex(anychart.Chart.ZINDEX_LABEL);
     } else if (goog.isObject(value)) {
       label.deserialize(value);
+      if (label.zIndex() == 0) label.zIndex(anychart.Chart.ZINDEX_LABEL);
     } else if (anychart.utils.isNone(value)) {
       label.enabled(false);
     }

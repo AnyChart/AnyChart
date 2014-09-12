@@ -1301,7 +1301,6 @@ anychart.elements.Label.prototype.deserialize = function(config) {
  * Restore label default settings.
  */
 anychart.elements.Label.prototype.restoreDefaults = function() {
-  this.zIndex(50);
   this.parentBounds(null);
   this.width(null);
   this.height(null);

@@ -20,12 +20,13 @@ anychart.cartesian.series.ContinuousRangeBase = function(data, opt_csvSettings) 
    * @protected
    */
   this.highPath = acgraph.path();
-
+  this.highPath.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES + 0.1);
   /**
    * @type {!acgraph.vector.Path}
    * @protected
    */
   this.lowPath = acgraph.path();
+  this.lowPath.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES + 0.1);
 
   this.paths.push(this.highPath, this.lowPath);
 };

@@ -89,7 +89,6 @@ anychart.elements.Grid = function() {
   this.drawLastLine_ = true;
 
   this.suspendSignalsDispatching();
-  this.zIndex(10);
   this.resumeSignalsDispatching(true);
 };
 goog.inherits(anychart.elements.Grid, anychart.VisualBase);

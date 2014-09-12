@@ -24,8 +24,6 @@ anychart.elements.Axis = function() {
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
 
-  this.zIndex(35);
-
   this.line_ = acgraph.path();
 
   this.title()

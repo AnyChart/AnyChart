@@ -96,8 +96,6 @@ anychart.elements.Legend = function() {
 
   this.drawedPage_ = NaN;
 
-  this.zIndex(10);
-
   this.fontFamily('Verdana')
     .fontSize('10')
     .fontWeight('normal')

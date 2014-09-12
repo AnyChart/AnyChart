@@ -194,31 +194,31 @@ anychart.cartesian.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Series z-index.
+ * Grid z-index in chart root layer.
  * @type {number}
  */
-anychart.cartesian.Chart.ZINDEX_SERIES = 0;
+anychart.cartesian.Chart.ZINDEX_GRID = 10;
 
 
 /**
- * Hatch fill z-index.
+ * Series z-index in chart root layer.
  * @type {number}
  */
-anychart.cartesian.Chart.ZINDEX_HATCH_FILL = 1;
+anychart.cartesian.Chart.ZINDEX_SERIES = 30;
 
 
 /**
- * Marker z-index.
+ * Axis z-index in chart root layer.
  * @type {number}
  */
-anychart.cartesian.Chart.ZINDEX_MARKER = 3;
+anychart.cartesian.Chart.ZINDEX_AXIS = 35;
 
 
 /**
- * Label z-index.
+ * Axis marker z-index in chart root layer.
  * @type {number}
  */
-anychart.cartesian.Chart.ZINDEX_LABEL = 4;
+anychart.cartesian.Chart.ZINDEX_AXIS_MARKER = 100;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -425,6 +425,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
   if (!grid) {
     grid = new anychart.elements.Grid();
     grid.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -434,8 +435,10 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.Grid) {
       grid.deserialize(value.serialize());
+      if (grid.zIndex() == 0) grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
+      if (grid.zIndex() == 0) grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
@@ -521,6 +524,7 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
   if (!grid) {
     grid = new anychart.elements.Grid();
     grid.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     grid.isMinor(true);
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -531,8 +535,10 @@ anychart.cartesian.Chart.prototype.minorGrid = function(opt_indexOrValue, opt_va
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.Grid) {
       grid.deserialize(value.serialize());
+      if (grid.zIndex() == 0) grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     } else if (goog.isObject(value)) {
       grid.deserialize(value);
+      if (grid.zIndex() == 0) grid.zIndex(anychart.cartesian.Chart.ZINDEX_GRID);
     } else if (anychart.utils.isNone(value)) {
       grid.enabled(false);
     }
@@ -615,6 +621,7 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
   if (!axis) {
     axis = new anychart.elements.Axis();
     axis.orientation(this.barChartMode ? anychart.enums.Orientation.LEFT : anychart.enums.Orientation.BOTTOM);
+    axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     axis.title().text('X-Axis');
     this.xAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -626,8 +633,10 @@ anychart.cartesian.Chart.prototype.xAxis = function(opt_indexOrValue, opt_value)
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.Axis) {
       axis.deserialize(value.serialize());
+      if (axis.zIndex() == 0) axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
+      if (axis.zIndex() == 0) axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
@@ -696,6 +705,7 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
     axis = new anychart.elements.Axis();
     axis.staggerMode(false);
     axis.orientation(this.barChartMode ? anychart.enums.Orientation.BOTTOM : anychart.enums.Orientation.LEFT);
+    axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     axis.title().text('Y-Axis');
     this.yAxes_[index] = axis;
     this.restoreDefaultsForAxis(axis);
@@ -707,8 +717,10 @@ anychart.cartesian.Chart.prototype.yAxis = function(opt_indexOrValue, opt_value)
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.Axis) {
       axis.deserialize(value.serialize());
+      if (axis.zIndex() == 0) axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     } else if (goog.isObject(value)) {
       axis.deserialize(value);
+      if (axis.zIndex() == 0) axis.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS);
     } else if (anychart.utils.isNone(value)) {
       axis.enabled(false);
     }
@@ -791,6 +803,7 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
   if (!lineMarker) {
     lineMarker = new anychart.elements.LineMarker();
     lineMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    lineMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
@@ -800,8 +813,10 @@ anychart.cartesian.Chart.prototype.lineMarker = function(opt_indexOrValue, opt_v
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.LineMarker) {
       lineMarker.deserialize(value.serialize());
+      if (lineMarker.zIndex() == 0) lineMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (goog.isObject(value)) {
       lineMarker.deserialize(value);
+      if (lineMarker.zIndex() == 0) lineMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (anychart.utils.isNone(value)) {
       lineMarker.enabled(false);
     }
@@ -859,6 +874,7 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
   if (!rangeMarker) {
     rangeMarker = new anychart.elements.RangeMarker();
     rangeMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    rangeMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
@@ -868,8 +884,10 @@ anychart.cartesian.Chart.prototype.rangeMarker = function(opt_indexOrValue, opt_
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.RangeMarker) {
       rangeMarker.deserialize(value.serialize());
+      if (rangeMarker.zIndex() == 0) rangeMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (goog.isObject(value)) {
       rangeMarker.deserialize(value);
+      if (rangeMarker.zIndex() == 0) rangeMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (anychart.utils.isNone(value)) {
       rangeMarker.enabled(false);
     }
@@ -929,6 +947,7 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
   if (!textMarker) {
     textMarker = new anychart.elements.TextMarker();
     textMarker.layout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
+    textMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
@@ -938,8 +957,10 @@ anychart.cartesian.Chart.prototype.textMarker = function(opt_indexOrValue, opt_v
   if (goog.isDef(value)) {
     if (value instanceof anychart.elements.TextMarker) {
       textMarker.deserialize(value.serialize());
+      if (textMarker.zIndex() == 0) textMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (goog.isObject(value)) {
       textMarker.deserialize(value);
+      if (textMarker.zIndex() == 0) textMarker.zIndex(anychart.cartesian.Chart.ZINDEX_AXIS_MARKER);
     } else if (anychart.utils.isNone(value)) {
       textMarker.enabled(false);
     }
@@ -1374,7 +1395,9 @@ anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, op
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
     this.series_.push(instance);
-    instance.index(this.series_.length - 1);
+    var index = this.series_.length - 1;
+    instance.index(index);
+    instance.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES + index * 0.00001);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));

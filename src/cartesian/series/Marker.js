@@ -26,6 +26,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.marker_ = new anychart.elements.MarkersFactory();
   this.marker_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver_, false, this);
   this.marker_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut_, false, this);
+  this.marker_.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES);
   this.marker_.enabled(true);
   this.registerDisposable(this.marker_);
 
@@ -280,9 +281,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
-    this.marker_.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
-    if (this.hatchFillElement_)
-      this.hatchFillElement_.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   var clip, bounds, axesLinesSpace;
@@ -325,7 +324,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
     if (!this.hatchFillElement_ && !anychart.utils.isNone(fill)) {
       this.hatchFillElement_ = new anychart.elements.MarkersFactory();
       this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillElement_.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
+      this.hatchFillElement_.zIndex(anychart.cartesian.series.Base.ZINDEX_HATCH_FILL);
       this.hatchFillElement_.disablePointerEvents(true);
     }
   }

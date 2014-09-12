@@ -62,8 +62,6 @@ anychart.elements.Background = function(opt_cornerType, var_args) {
    */
   this.stroke_ = '#000';
 
-  this.zIndex(0);
-
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.elements.Background, anychart.VisualBaseWithBounds);

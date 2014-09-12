@@ -20,6 +20,7 @@ anychart.cartesian.series.ContinuousBase = function(data, opt_csvSettings) {
    * @protected
    */
   this.path = acgraph.path();
+  this.path.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES);
 
   /**
    * @type {acgraph.vector.Path}
@@ -32,12 +33,6 @@ anychart.cartesian.series.ContinuousBase = function(data, opt_csvSettings) {
    * @protected
    */
   this.paths = [this.path];
-
-  /**
-   * @type {Array.<!acgraph.vector.Path>}
-   * @protected
-   */
-  this.hatchFillPaths = [this.hatchFillPath];
 
   /**
    * @type {boolean}
@@ -81,10 +76,6 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
-    for (i = 0; i < len; i++)
-      this.paths[i].zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
-    if (this.hatchFillPath)
-      this.hatchFillPath.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -123,7 +114,7 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
     if (!this.hatchFillPath) {
       this.hatchFillPath = acgraph.path();
       this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillPath.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
+      this.hatchFillPath.zIndex(anychart.cartesian.series.Base.ZINDEX_HATCH_FILL);
       this.hatchFillPath.disablePointerEvents(true);
     }
   }

@@ -49,16 +49,15 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;
 
-  if (!this.rootElement)
+  if (!this.rootElement) {
     this.rootElement = new anychart.utils.TypedLayer(
         this.rootTypedLayerInitializer,
         goog.nullFunction);
+    this.rootElement.zIndex(anychart.cartesian.series.Base.ZINDEX_SERIES);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
-    this.rootElement.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES);
-    if (this.hatchFillRootElement)
-      this.hatchFillRootElement.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -95,7 +94,7 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
           goog.nullFunction);
 
       this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillRootElement.zIndex(anychart.cartesian.Chart.ZINDEX_HATCH_FILL);
+      this.hatchFillRootElement.zIndex(anychart.cartesian.series.Base.ZINDEX_HATCH_FILL);
       this.hatchFillRootElement.disablePointerEvents(true);
     }
   }

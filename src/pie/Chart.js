@@ -234,6 +234,27 @@ anychart.chartTypesMap[anychart.pie.Chart.CHART_TYPE] = anychart.pie.Chart;
 
 
 /**
+ * Series element z-index in series root layer.
+ * @type {number}
+ */
+anychart.pie.Chart.ZINDEX_PIE = 30;
+
+
+/**
+ * Hatch fill z-index in series root layer.
+ * @type {number}
+ */
+anychart.pie.Chart.ZINDEX_HATCH_FILL = 31;
+
+
+/**
+ * Label z-index in series root layer.
+ * @type {number}
+ */
+anychart.pie.Chart.ZINDEX_LABEL = 32;
+
+
+/**
  * @type {number}
  * @private
  */
@@ -814,6 +835,7 @@ anychart.pie.Chart.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrSt
 anychart.pie.Chart.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.LabelsFactory();
+    this.labels_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
     this.labels_.textFormatter(function() {
       return (this['value'] * 100 / this['sum']).toFixed(1) + '%';
     });
@@ -828,6 +850,7 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
   if (goog.isDef(opt_value) && (opt_value instanceof anychart.elements.LabelsFactory || goog.isNull(opt_value))) {
     this.labels_.deserialize(opt_value ? opt_value.serialize() : {});
+    if (this.labels_.zIndex() == 0) this.labels_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
@@ -843,15 +866,17 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 anychart.pie.Chart.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.elements.LabelsFactory();
+    this.hoverLabels_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
 
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.LabelsFactory) {
-      var data = opt_value.serialize();
-      this.hoverLabels_.deserialize(data);
+      this.hoverLabels_.deserialize(opt_value.serialize());
+      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
     } else if (goog.isObject(opt_value)) {
       this.hoverLabels_.deserialize(opt_value);
+      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
     } else if (anychart.utils.isNone(opt_value)) {
       this.hoverLabels_.enabled(false);
     }
@@ -1601,6 +1626,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
       }, function(child) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
+      this.dataLayer_.zIndex(anychart.pie.Chart.ZINDEX_PIE);
       this.dataLayer_.parent(this.rootElement);
     }
 
@@ -1611,7 +1637,7 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
         (/** @type {acgraph.vector.Path} */ (child)).clear();
       });
       this.hatchLayer_.parent(this.rootElement);
-      this.hatchLayer_.zIndex(/** @type {number} */(this.zIndex())).disablePointerEvents(true);
+      this.hatchLayer_.zIndex(/** @type {number} */(anychart.pie.Chart.ZINDEX_HATCH_FILL)).disablePointerEvents(true);
     }
 
     var start = /** @type {number} */ (this.startAngle_);

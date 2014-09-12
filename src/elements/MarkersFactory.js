@@ -165,7 +165,6 @@ anychart.elements.MarkersFactory = function() {
 
   this.positionFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
-  this.zIndex(anychart.cartesian.Chart.ZINDEX_MARKER);
   this.size(10);
   this.anchor(anychart.enums.Anchor.CENTER);
   this.offsetX(0);
