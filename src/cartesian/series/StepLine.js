@@ -97,21 +97,17 @@ anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
 });
 
 
-/**
- * @inheritDoc
- */
-anychart.cartesian.series.StepLine.prototype.getType = function() {
-  return anychart.cartesian.series.Type.STEP_LINE;
+/** @inheritDoc */
+anychart.cartesian.series.StepLine.prototype.getMarkerFill = function() {
+  return this.getFinalStroke(false, false);
 };
 
 
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.StepLine.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
+anychart.cartesian.series.StepLine.prototype.getType = function() {
+  return anychart.cartesian.series.Type.STEP_LINE;
 };
 
 

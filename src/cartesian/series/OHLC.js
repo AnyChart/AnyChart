@@ -487,7 +487,6 @@ anychart.cartesian.series.OHLC.prototype.getType = function() {
  */
 anychart.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.risingStroke())) {
     if (window.console) {
@@ -545,7 +544,6 @@ anychart.cartesian.series.OHLC.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 
   this.markers(null);
-  this.hoverMarkers(null);
 
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.content().hAlign('left');

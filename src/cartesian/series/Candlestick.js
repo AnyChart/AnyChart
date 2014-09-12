@@ -960,7 +960,6 @@ anychart.cartesian.series.Candlestick.prototype.getType = function() {
  */
 anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.risingFill())) {
     if (window.console) {

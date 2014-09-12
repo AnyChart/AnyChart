@@ -92,6 +92,12 @@ anychart.cartesian.series.Spline.prototype.strokeInternal = (function() {
 
 
 /** @inheritDoc */
+anychart.cartesian.series.Spline.prototype.getMarkerFill = function() {
+  return this.getFinalStroke(false, false);
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
   this.queue_.finalizeProcessing();
 };
@@ -102,16 +108,6 @@ anychart.cartesian.series.Spline.prototype.finalizeSegment = function() {
  */
 anychart.cartesian.series.Spline.prototype.getType = function() {
   return anychart.cartesian.series.Type.SPLINE;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.cartesian.series.Spline.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
 };
 
 

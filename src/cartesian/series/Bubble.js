@@ -1067,7 +1067,6 @@ anychart.cartesian.series.Bubble.prototype.getType = function() {
  */
 anychart.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
   json['minimumSize'] = this.minimumSize();
   json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();
@@ -1154,7 +1153,6 @@ anychart.cartesian.series.Bubble.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 
   this.markers(null);
-  this.hoverMarkers(null);
 
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.contentFormatter(function() {

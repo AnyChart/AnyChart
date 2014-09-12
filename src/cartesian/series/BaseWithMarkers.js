@@ -205,11 +205,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   markers.suspendSignalsDispatching();
   hoverMarkers.suspendSignalsDispatching();
 
-  var fillColor = this.getMarkerColor();
-  var strokeColor = /** @type {acgraph.vector.Stroke} */(anychart.color.darken(fillColor));
-
+  var fillColor = this.getMarkerFill();
   markers.setAutoFill(fillColor);
+
+  var strokeColor = /** @type {acgraph.vector.Stroke} */(this.getMarkerStroke());
   markers.setAutoStroke(strokeColor);
+
   markers.setAutoType(this.autoMarkerType);
 
   markers.clear();
@@ -325,8 +326,17 @@ anychart.cartesian.series.BaseWithMarkers.prototype.deserialize = function(confi
  * Return marker color for series.
  * @return {!acgraph.vector.Fill} Marker color for series.
  */
-anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerColor = function() {
+anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerFill = function() {
   return this.getFinalFill(false, false);
+};
+
+
+/**
+ * Return marker color for series.
+ * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Marker color for series.
+ */
+anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerStroke = function() {
+  return anychart.color.darken(this.markers().fill());
 };
 
 

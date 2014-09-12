@@ -132,16 +132,6 @@ anychart.cartesian.series.Area.prototype.getType = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.Area.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.cartesian.series.Area.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

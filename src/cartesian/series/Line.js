@@ -73,21 +73,17 @@ anychart.cartesian.series.Line.prototype.strokeInternal = (function() {
 });
 
 
-/**
- * @inheritDoc
- */
-anychart.cartesian.series.Line.prototype.getType = function() {
-  return anychart.cartesian.series.Type.LINE;
+/** @inheritDoc */
+anychart.cartesian.series.Line.prototype.getMarkerFill = function() {
+  return this.getFinalStroke(false, false);
 };
 
 
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.Line.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
+anychart.cartesian.series.Line.prototype.getType = function() {
+  return anychart.cartesian.series.Type.LINE;
 };
 
 

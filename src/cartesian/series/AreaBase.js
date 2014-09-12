@@ -80,7 +80,6 @@ anychart.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');
 
   this.markers(null);
-  this.hoverMarkers(null);
 
   return result;
 };

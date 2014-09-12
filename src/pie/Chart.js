@@ -1520,7 +1520,7 @@ anychart.pie.Chart.prototype.normalizeHatchFill = function(hatchFill) {
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
   } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? this.hatchFillPalette().hatchFillAt(index) : null;
+    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)) : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;

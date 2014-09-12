@@ -519,7 +519,6 @@ anychart.cartesian.series.Marker.prototype.getType = function() {
  */
 anychart.cartesian.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
 
   if (goog.isFunction(this.type())) {
     if (window.console) {

@@ -79,16 +79,6 @@ anychart.cartesian.series.Column.prototype.getType = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.Column.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.cartesian.series.Column.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

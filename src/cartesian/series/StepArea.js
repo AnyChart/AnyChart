@@ -165,16 +165,6 @@ anychart.cartesian.series.StepArea.prototype.getType = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.StepArea.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.cartesian.series.StepArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

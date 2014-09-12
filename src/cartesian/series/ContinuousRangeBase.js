@@ -499,7 +499,6 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.restoreDefaults = functi
   var result = goog.base(this, 'restoreDefaults');
 
   this.markers(null);
-  this.hoverMarkers(null);
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.content().hAlign('left');
   tooltip.contentFormatter(function() {

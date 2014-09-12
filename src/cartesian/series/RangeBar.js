@@ -94,16 +94,6 @@ anychart.cartesian.series.RangeBar.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.cartesian.series.RangeBar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
 /** @inheritDoc */
 anychart.cartesian.series.RangeBar.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');

@@ -2311,6 +2311,7 @@ anychart.cartesian.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['data'] = this.data().serialize();
   json['name'] = this.name();
+  json['seriesType'] = this.getType();
 
   json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
 

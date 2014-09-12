@@ -133,16 +133,6 @@ anychart.cartesian.series.RangeSplineArea.prototype.getType = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.RangeSplineArea.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.cartesian.series.RangeSplineArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };

@@ -36,6 +36,7 @@ anychart.barChart = function(var_args) {
   chart.grid(1)
       .drawFirstLine(true)
       .drawLastLine(true)
+      .layout(anychart.enums.Layout.HORIZONTAL)
       .evenFill('none')
       .oddFill('none');
 

@@ -113,16 +113,6 @@ anychart.cartesian.series.RangeArea.prototype.getType = function() {
 /**
  * @inheritDoc
  */
-anychart.cartesian.series.RangeArea.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['seriesType'] = this.getType();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.cartesian.series.RangeArea.prototype.deserialize = function(config) {
   return goog.base(this, 'deserialize', config);
 };
