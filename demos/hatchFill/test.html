@@ -10,7 +10,7 @@
   <script>
     var chart, axis, minor;
     anychart.onDocumentLoad(function() {
-      chart = anychart.barChart();
+      chart = anychart.columnChart();
       chart.container('container');
 
       var data = new anychart.data.Set([
@@ -18,26 +18,27 @@
         ['P2', 19, 26, 39, 45, 61],
         ['P3', 27, 38, 35, 41, 58]
       ]);
-      var data_1 = data.mapAs({x: [0], open: [1], high:[2], low:[3], close:[4]});
-//      var data_1 = data.mapAs({x: [0], value: [1], high:[2], low:[3], close:[4]});
+//      var data_1 = data.mapAs({x: [0], open: [1], high:[2], low:[3], close:[4]});
+      var data_1 = data.mapAs({x: [0], value: [1]});
 
       chart.grid(0).enabled(false);
       chart.grid(1).enabled(false);
       chart.minorGrid().enabled(false);
       chart.xAxis().enabled(false);
-      chart.yAxis().enabled(false);
+//      chart.yAxis().enabled(false);
       chart.title().enabled(false);
       chart.background().enabled(false);
       chart.credits().enabled(false);
 
-      chart.candlestick(data_1).risingHatchFill(true).fallingHatchFill(true);
-//      chart.bar(data_1).hatchFill(true);
+      chart.lineMarker(anychart.elements.lineMarker().value(22));
+
+      chart.column(data_1);
 
       chart.draw();
     });
 
-    var width = 400;
-    var height = 300;
+    var width = 1400;
+    var height = 1300;
 
     function jj(val) {
       width += val * document.getElementById('step').value;

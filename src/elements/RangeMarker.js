@@ -374,7 +374,6 @@ anychart.elements.RangeMarker.prototype.draw = function() {
  */
 anychart.elements.RangeMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(25);
   this.layout(anychart.enums.Layout.HORIZONTAL);
   this.from(0);
   this.to(0);
