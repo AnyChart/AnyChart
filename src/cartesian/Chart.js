@@ -201,6 +201,27 @@ anychart.cartesian.Chart.ZINDEX_GRID = 10;
 
 
 /**
+ * Axis range marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_AXIS_RANGE_MARKER = 25.1;
+
+
+/**
+ * Axis line marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_AXIS_LINE_MARKER = 25.2;
+
+
+/**
+ * Axis text marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_AXIS_TEXT_MARKER = 25.3;
+
+
+/**
  * Series z-index in chart root layer.
  * @type {number}
  */
@@ -212,27 +233,6 @@ anychart.cartesian.Chart.ZINDEX_SERIES = 30;
  * @type {number}
  */
 anychart.cartesian.Chart.ZINDEX_AXIS = 35;
-
-
-/**
- * Axis range marker z-index in chart root layer.
- * @type {number}
- */
-anychart.cartesian.Chart.ZINDEX_AXIS_RANGE_MARKER = 100;
-
-
-/**
- * Axis line marker z-index in chart root layer.
- * @type {number}
- */
-anychart.cartesian.Chart.ZINDEX_AXIS_LINE_MARKER = 101;
-
-
-/**
- * Axis text marker z-index in chart root layer.
- * @type {number}
- */
-anychart.cartesian.Chart.ZINDEX_AXIS_TEXT_MARKER = 102;
 
 
 //----------------------------------------------------------------------------------------------------------------------
