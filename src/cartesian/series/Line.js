@@ -74,7 +74,7 @@ anychart.cartesian.series.Line.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.Line.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return acgraph.vector.normalizeStroke(this.getFinalStroke(false, false));
 };
 
 
