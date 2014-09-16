@@ -93,7 +93,7 @@ anychart.cartesian.series.Spline.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.Spline.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return acgraph.vector.normalizeStroke(this.getFinalStroke(false, false));
 };
 
 
