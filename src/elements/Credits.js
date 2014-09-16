@@ -353,7 +353,7 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
   var stage = container ? container.getStage() : null;
   var parentBounds;
   if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
+    parentBounds = this.parentBounds_.clone();
   } else if (stage) {
     parentBounds = stage.getBounds();
   } else {
