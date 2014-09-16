@@ -502,6 +502,7 @@ anychart.enums.MarkerType = {
  * @return {anychart.enums.MarkerType} Normalized marker type.
  */
 anychart.enums.normalizeMarkerType = function(type, opt_default) {
+  if (goog.isFunction(type)) return type;
   type = (String(type)).toLowerCase();
   switch (type) {
     case 'star4':
