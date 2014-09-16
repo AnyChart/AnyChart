@@ -484,7 +484,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * chart.grid(myGrid);
  * myGrid.oddFill('none')
  *    .evenFill('none')
- *    .layout(anychart.enums.Layout.HORIZONTAL).minor(true);
+ *    .layout(anychart.enums.Layout.HORIZONTAL).isMinor(true);
  * chart.minorGrid(myGrid)
  * chart.container(stage).draw();
  * @param {(anychart.elements.Grid|Object)=} opt_value Chart minor grid settings to set.

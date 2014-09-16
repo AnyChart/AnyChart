@@ -12,12 +12,16 @@ function load() {
 
 
 //  var chart = anychart.lineChart();
-  var chart = anychart.pieChart([5, 2, 1, 3, 1, 3]);
-  chart.labels()
-      .fontColor('black')
-      .position('outside');
-  chart.connectorLength(20);
-  chart.container(container).draw();
+  var chart = anychart.cartesianChart();
+chart.column([1, 4, 5, 7, 2]);
+var myGrid = anychart.elements.grid()
+   .layout(anychart.enums.Layout.HORIZONTAL);
+chart.grid(myGrid);
+myGrid.oddFill('none')
+   .evenFill('none')
+   .layout(anychart.enums.Layout.HORIZONTAL).minor(true);
+chart.minorGrid(myGrid)
+chart.container(stage).draw();
 //  chart.container(stage).draw();
 
 
