@@ -30,8 +30,6 @@ anychart.cartesian.series.Spline = function(data, opt_csvSettings) {
    * @private
    */
   this.queue_ = new anychart.cartesian.series.SplineDrawer(this.path);
-
-  this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Spline, anychart.cartesian.series.ContinuousBase);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.SPLINE] = anychart.cartesian.series.Spline;

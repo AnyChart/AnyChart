@@ -549,7 +549,6 @@ anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift)
  */
 anychart.elements.TextMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(27);
   this.layout(anychart.enums.Layout.HORIZONTAL);
   this.align(anychart.enums.Align.CENTER);
   this.anchor(anychart.enums.Anchor.CENTER);

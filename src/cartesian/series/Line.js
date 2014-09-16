@@ -23,7 +23,6 @@ anychart.cartesian.series.Line = function(data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
 
-  this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Line, anychart.cartesian.series.ContinuousBase);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.LINE] = anychart.cartesian.series.Line;
