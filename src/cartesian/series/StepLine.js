@@ -22,8 +22,6 @@ anychart.cartesian.series.StepLine = function(data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = true;
-
-  this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.StepLine, anychart.cartesian.series.ContinuousBase);
 anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.STEP_LINE] = anychart.cartesian.series.StepLine;
@@ -99,7 +97,7 @@ anychart.cartesian.series.StepLine.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.StepLine.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return acgraph.vector.normalizeStroke(this.getFinalStroke(false, false));
 };
 
 

@@ -872,7 +872,6 @@ anychart.ui.Button.prototype.handleMouseUp = function(event) {
  * @protected
  */
 anychart.ui.Button.prototype.restoreDefaults = function() {
-  this.zIndex(90);
   this.textSettings('vAlign', acgraph.vector.Text.VAlign.MIDDLE);
   this.textSettings('hAlign', acgraph.vector.Text.HAlign.CENTER);
   this.padding(3, 8, 3, 8);

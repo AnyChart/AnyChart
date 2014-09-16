@@ -2594,6 +2594,7 @@ anychart.pie.Chart.prototype.calculateOutsideLabels = function() {
       (/** @type {acgraph.vector.Path} */ (child)).clear();
     });
     this.connectorsLayer_.parent(this.rootElement);
+    this.connectorsLayer_.zIndex(anychart.pie.Chart.ZINDEX_LABEL);
   }
   this.drawnConnectors_ = [];
   if (!this.hoveredLabelConnectorPath_) {
