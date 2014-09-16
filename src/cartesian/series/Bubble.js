@@ -571,7 +571,7 @@ anychart.cartesian.series.Bubble.prototype.negativeStroke = function(opt_strokeO
  *      function(){
  *        return '3 '+ this.sourceColor;
  *      }
- *   );
+ *   )
  *  .container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);

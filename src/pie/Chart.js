@@ -426,15 +426,21 @@ anychart.pie.Chart.prototype.prepareData_ = function(data) {
  * @example
  *  var data = [20, 7, 10, 14, 8, 14, 7, 12];
  *  anychart.pieChart(data)
+ *     .labels(null)
+ *     .legend(null)
  *     .container(stage)
  *     .bounds(0,0,'33%', '100%')
  *     .draw();
  *  anychart.pieChart(data)
+ *     .labels(null)
+ *     .legend(null)
  *     .container(stage)
  *     .bounds('33%',0,'33%', '100%')
  *     .palette(['#00F', '#00E', '#00D', '#00C', '#00B', '#00A', '#009', '#008'])
  *     .draw();
  *  anychart.pieChart(data)
+ *     .labels(null)
+ *     .legend(null)
  *     .container(stage)
  *     .bounds('66%',0,'33%', '100%')
  *     .palette(
@@ -536,6 +542,7 @@ anychart.pie.Chart.prototype.hatchFillPalette = function(opt_value) {
  *  chart.fill(function(){
  *     return 'rgba(210,' + (50 * (this.index + 1) - 10) + ',100,1)';
  *  });
+ *  chart.legend(null);
  *  chart.stroke('none');
  *  chart.container(stage).draw();
  * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return the fill from the default pallete.
@@ -739,7 +746,7 @@ anychart.pie.Chart.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickn
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -780,7 +787,7 @@ anychart.pie.Chart.prototype.hatchFill = function(opt_patternFillOrTypeOrState, 
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.

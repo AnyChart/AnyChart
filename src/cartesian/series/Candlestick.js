@@ -222,7 +222,7 @@ anychart.cartesian.series.Candlestick.prototype.applyHatchFill = function(hover)
  *  .risingHatchFill('diamiond', 'grey', 5, 5)
  *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
@@ -346,7 +346,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = functi
  *  .fallingHatchFill('diamiond', 'grey', 5, 5)
  *  .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string, boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
