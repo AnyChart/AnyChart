@@ -909,7 +909,10 @@ anychart.enums.EventType = {
 
   SPLITTER_CHANGE: 'splitterChange',
 
-  SIGNAL: 'signal'
+  SIGNAL: 'signal',
+
+  TREE_DATA_CHANGE:'treeDataChange',
+  TREE_META_CHANGE:'treeMetaChange'
 };
 
 
