@@ -387,6 +387,50 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 
 /**
+ * Appends new rows to the set. Each argument is a row that will be appended to the Set.
+ * @param {...*} var_args Rows to append.
+ * @return {!anychart.data.Set} Returns itself for chaining.
+ */
+anychart.data.Set.prototype.append = function(var_args) {
+  anychart.globalLock.lock();
+  this.storage_.push.apply(this.storage_, arguments);
+  this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+  anychart.globalLock.unlock();
+  return this;
+};
+
+
+/**
+ * Inserts the row to the set at the specified position.
+ * @param {*} row Row to insert.
+ * @param {number=} opt_index The index at which to insert the object. If omitted,
+ *      treated as 0. A negative index is counted from the end of the array.
+ * @return {!anychart.data.Set} Itself for chaining.
+ */
+anychart.data.Set.prototype.insert = function(row, opt_index) {
+  anychart.globalLock.lock();
+  goog.array.insertAt(this.storage_, row, opt_index);
+  this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+  anychart.globalLock.unlock();
+  return this;
+};
+
+
+/**
+ * Removes the row by index.
+ * @param {number} index Index of the row to remove.
+ * @return {!anychart.data.Set}
+ */
+anychart.data.Set.prototype.remove = function(index) {
+  anychart.globalLock.lock();
+  goog.array.removeAt(this.storage_, index);
+  this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+  anychart.globalLock.unlock();
+  return this;
+};
+
+
+/**
  * Returns the number of the rows in the current data set.
  * @example <t>lineChart</t>
  *  var data = anychart.data.set([
@@ -440,4 +484,7 @@ goog.exportSymbol('anychart.data.set', anychart.data.set);//doc|ex
 anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//doc|ex
 anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//doc|ex
 anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//doc|ex
+anychart.data.Set.prototype['append'] = anychart.data.Set.prototype.append;
+anychart.data.Set.prototype['insert'] = anychart.data.Set.prototype.insert;
+anychart.data.Set.prototype['remove'] = anychart.data.Set.prototype.remove;
 anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//doc|ex

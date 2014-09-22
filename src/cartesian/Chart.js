@@ -1616,6 +1616,8 @@ anychart.cartesian.Chart.prototype.calculate = function() {
     for (id in this.xScales_) {
       scale = this.xScales_[id];
       series = this.seriesOfXScaleMap_[goog.getUid(scale)];
+      for (i = 0; i < series.length; i++)
+        series[i].resetCategorisation();
       // we can crash or warn user here if the scale is stacked, if we want.
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();
@@ -1741,6 +1743,35 @@ anychart.cartesian.Chart.prototype.calculate = function() {
       ordScale.setAutoNames(autoNames);
     }
 
+    var max = -Infinity;
+    var min = Infinity;
+    var sum = 0;
+    var pointsCount = 0;
+
+    for (i = 0; i < this.series_.length; i++) {
+      //----------------------------------calc statistics for series
+      aSeries = this.series_[i];
+      aSeries.calculateStatistics();
+      max = Math.max(max, /** @type {number} */(aSeries.statistics('seriesMax')));
+      min = Math.min(min, /** @type {number} */ (aSeries.statistics('seriesMin')));
+      sum += /** @type {number} */(aSeries.statistics('seriesSum'));
+      pointsCount += /** @type {number} */(aSeries.statistics('seriesPointsCount'));
+      //----------------------------------end calc statistics for series
+    }
+
+    //----------------------------------calc statistics for series
+    //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
+    var average = sum / pointsCount;
+    for (i = 0; i < this.series_.length; i++) {
+      aSeries = this.series_[i];
+      aSeries.statistics('max', max);
+      aSeries.statistics('min', min);
+      aSeries.statistics('sum', sum);
+      aSeries.statistics('average', average);
+      aSeries.statistics('pointsCount', pointsCount);
+    }
+    //----------------------------------end calc statistics for series
+
     anychart.Base.resumeSignalsDispatchingTrue(this.series_);
 
     this.markConsistent(anychart.ConsistencyState.SCALES);
@@ -1767,11 +1798,6 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
   var scale;
   var item;
   var series;
-
-  var max = -Infinity;
-  var min = Infinity;
-  var sum = 0;
-  var pointsCount = 0;
 
   //search for scales in series
   for (i = 0, count = this.series_.length; i < count; i++) {
@@ -1831,27 +1857,7 @@ anychart.cartesian.Chart.prototype.makeScaleMaps_ = function() {
         seriesOfOrdinalScalesWithNamesField[id] = [series];
     }
 
-    //----------------------------------calc statistics for series
-    series.calculateStatistics();
-    max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
-    min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
-    sum += /** @type {number} */(series.statistics('seriesSum'));
-    pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
-    //----------------------------------end calc statistics for series
   }
-
-  //----------------------------------calc statistics for series
-  //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
-  var average = sum / pointsCount;
-  for (i = 0, count = this.series_.length; i < count; i++) {
-    series = this.series_[i];
-    series.statistics('max', max);
-    series.statistics('min', min);
-    series.statistics('sum', sum);
-    series.statistics('average', average);
-    series.statistics('pointsCount', pointsCount);
-  }
-  //----------------------------------end calc statistics for series
 
   this.seriesOfStackedScaleMap_ = seriesOfStackedScaleMap;
   this.yScales_ = yScales;

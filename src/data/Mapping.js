@@ -14,12 +14,15 @@ goog.require('goog.array');
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
  *    Doesn't work if a row is an object.
  * @param {!Array.<string>=} opt_indexProps Array of the names in case other options fail.
+ * @param {boolean=} opt_writeToFirstFieldByMapping If true, in case of object rows, values are written to the first
+ *    fieldName, defined by object field mapping (they are written to the field they are read from by default).
  * @constructor
  * @extends {anychart.data.View}
  */
-anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
+anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
+    opt_writeToFirstFieldByMapping) {
   goog.base(this, parentSet);
-  this.initMappingInfo(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
+  this.initMappingInfo(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps, opt_writeToFirstFieldByMapping);
 };
 goog.inherits(anychart.data.Mapping, anychart.data.View);
 
@@ -45,7 +48,7 @@ anychart.data.Mapping.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
  * @param {string} fieldName The name of the field to fetch from the row.
  * @return {*} The field value or undefined if not found.
  */
-anychart.data.Mapping.prototype.get = function(row, rowIndex, fieldName) {
+anychart.data.Mapping.prototype.getInternal = function(row, rowIndex, fieldName) {
   /** @type {*} */
   var result;
   if (goog.isDefAndNotNull(row)) {
@@ -72,6 +75,44 @@ anychart.data.Mapping.prototype.get = function(row, rowIndex, fieldName) {
     }
   }
   return result;
+};
+
+
+/**
+ * Sets field of the row to the specified value and returns the row.
+ * @param {*} row The row to fetch field value from.
+ * @param {string} fieldName The name of the field to fetch from the row.
+ * @param {*} value The value to set.
+ * @return {*} The row with new value set (because in some cases the total row need to be changed and reset to data.Set).
+ */
+anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
+  if (goog.isDefAndNotNull(row)) {
+    /** @type {string} */
+    var rowType = goog.typeOf(row);
+    if (rowType == 'array') {
+      /** @type {Array.<number>} */
+      var indexes = this.arrayMapping_[fieldName];
+      if (indexes) {
+        for (var i = 0; i < indexes.length; i++) {
+          if (indexes[i] < row.length) {
+            row[indexes[i]] = value;
+            return row;
+          }
+        }
+      }
+      anychart.utils.consoleWarn('Cannot set value for field \'' + fieldName + '\' to array row if it is not mapped');
+    } else if (rowType == 'object') {
+      anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
+          this.writeToFirstFieldByMapping_);
+    } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
+      if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
+        anychart.utils.consoleWarn('Settings complex value to default field \'' + fieldName + '\' alters row behaviour');
+      row = value;
+    } else {
+      anychart.utils.consoleWarn('Cannot set value for field \'' + fieldName + '\' to row that is not object or array');
+    }
+  }
+  return row;
 };
 
 
@@ -108,9 +149,12 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
  *    Doesn't work if a row is an object.
  * @param {!Array.<string>=} opt_indexProps Array of the names in case other options fail.
+ * @param {boolean=} opt_writeToFirstFieldByMapping If true, in case of object rows, values are written to the first
+ *    fieldName, defined by object field mapping (they are written to the field they are read from by default).
  * @protected
  */
-anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
+anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
+    opt_writeToFirstFieldByMapping) {
   /**
    * Mapping settings for array rows.
    * @type {!Object.<Array.<number>>}
@@ -151,6 +195,8 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    * @private
    */
   this.indexProps_ = opt_indexProps || ['x'];
+
+  this.writeToFirstFieldByMapping_ = !!opt_writeToFirstFieldByMapping;
 };
 
 

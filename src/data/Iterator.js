@@ -165,7 +165,8 @@ anychart.data.Iterator.prototype.advance = function() {
  * @return {*} The field value or undefined, if not found.
  */
 anychart.data.Iterator.prototype.get = function(fieldName) {
-  return this.view_.getRowMapping(this.currentIndex_).get(this.currentRow_, this.currentIndex_, fieldName);
+  // iterator does not use this.view_.get(), because of more light currentRow_ cache usage through direct getInternal call.
+  return this.view_.getRowMapping(this.currentIndex_).getInternal(this.currentRow_, this.currentIndex_, fieldName);
 };
 
 

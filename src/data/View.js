@@ -343,13 +343,7 @@ anychart.data.View.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
   rowIndex = this.mask ? this.mask[rowIndex] : rowIndex;
   if (goog.isDef(rowIndex)) {
-    if (arguments.length > 1) {
-      anychart.globalLock.lock();
-      var res = this.parentView.row(rowIndex, opt_value);
-      anychart.globalLock.unlock();
-      return res;
-    } else
-      return this.parentView.row(rowIndex);
+    return this.parentView.row.apply(this.parentView, arguments);
   }
   return rowIndex; // undefined
 };
@@ -398,15 +392,15 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
   if (!goog.isDef(fieldName) || !goog.isDef(fieldValue))
     return -1;
 
-  var iterator = this.getIterator();
-  var index = -1;
-  var value;
-
   if (!this.cachedValues) this.cachedValues = {};
   if (!this.cachedValues[fieldName]) this.cachedValues[fieldName] = {};
 
   if (this.cachedValues[fieldName][fieldValue])
     return this.cachedValues[fieldName][fieldValue];
+
+  var iterator = this.getIterator();
+  var index = -1;
+  var value;
 
   while (iterator.advance()) {
     index = iterator.getIndex();
@@ -419,6 +413,30 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
     }
   }
   return -1;
+};
+
+
+/**
+ * Gets the value from the row by row index and field name.
+ * @param {number} rowIndex Index of the row to get field value from.
+ * @param {string} fieldName The name of the field to be fetched from the current row.
+ * @return {*} The field value or undefined, if not found.
+ */
+anychart.data.View.prototype.get = function(rowIndex, fieldName) {
+  return this.getRowMapping(rowIndex).getInternal(this.row(rowIndex), rowIndex, fieldName);
+};
+
+
+/**
+ * Sets the value to the row field by row index and field name.
+ * @param {number} rowIndex
+ * @param {string} fieldName
+ * @param {*} value
+ * @return {!anychart.data.View} Itself for chaining.
+ */
+anychart.data.View.prototype.set = function(rowIndex, fieldName, value) {
+  this.row(rowIndex, this.getRowMapping(rowIndex).setInternal(this.row(rowIndex), fieldName, value));
+  return this;
 };
 
 
@@ -592,3 +610,5 @@ anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//doc|ex
 anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//doc|ex
 anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//doc|ex
 anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//doc|need-ex
+anychart.data.View.prototype['get'] = anychart.data.View.prototype.get;
+anychart.data.View.prototype['set'] = anychart.data.View.prototype.set;
