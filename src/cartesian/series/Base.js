@@ -231,13 +231,6 @@ anychart.cartesian.series.Base.prototype.hoverLabels_ = null;
 
 
 /**
- * @type {anychart.elements.LabelsFactory}
- * @private
- */
-anychart.cartesian.series.Base.prototype.realLabels_ = null;
-
-
-/**
  * @type {anychart.elements.Tooltip}
  * @private
  */
@@ -690,6 +683,16 @@ anychart.cartesian.series.Base.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
   }
+};
+
+
+/**
+ * DO NOT PUBLISH.
+ */
+anychart.cartesian.series.Base.prototype.resetCategorisation = function() {
+  if (this.data_ != this.parentView_)
+    goog.dispose(this.data_);
+  this.data_ = /** @type {!anychart.data.View} */(this.parentView_);
 };
 
 

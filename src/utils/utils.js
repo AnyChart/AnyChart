@@ -21,7 +21,7 @@ goog.require('goog.json.hybrid');
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Gets or sets obj property, takes in account fields addresses.
- * Fields are first looked using mapping order, then -   field order (e.g. mapping is empty).
+ * Fields are first looked using mapping order, then - field order (e.g. mapping is empty).
  * If field can not be found - field is written.
  * If used as setter - previous value (or undefined) is returned.
  *
@@ -31,9 +31,10 @@ goog.require('goog.json.hybrid');
  * @param {string} field Field name.
  * @param {?Array.<string>} mapping Mapping.
  * @param {*=} opt_setValue Value to set.
+ * @param {boolean=} opt_setToFirstByMapping If true, sets value to the first fieldName by mapping.
  * @return {*} Current or previous value.
  */
-anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
+anychart.utils.mapObject = function(obj, field, mapping, opt_setValue, opt_setToFirstByMapping) {
   if (mapping) {
     for (var i = 0; i < mapping.length; i++) {
       var propName = mapping[i];
@@ -45,7 +46,7 @@ anychart.utils.mapObject = function(obj, field, mapping, opt_setValue) {
   }
   if (arguments.length > 3) {
     var result = obj[field];
-    obj[mapping ? mapping[0] : field] = opt_setValue;
+    obj[(mapping && opt_setToFirstByMapping) ? mapping[0] : field] = opt_setValue;
     return result;
   }
   return obj[field];

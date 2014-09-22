@@ -1,7 +1,7 @@
-var chart, s1;
+var chart, s1, dataSet, seriesData_1, seriesData_2, seriesData_3;
 anychart.onDocumentReady(function() {
 
-  var dataSet = anychart.data.set([
+  dataSet = anychart.data.set([
     ['P1' , '322', '242', '162'],
     ['P2' , '324', '254', '90'],
     ['P3' , '329', '226', '50'],
@@ -9,9 +9,9 @@ anychart.onDocumentReady(function() {
     ['P5' , '348', '268', '35']
   ]);
 
-  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
-  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
-  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+  seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+  seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+  seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
   chart = anychart.columnChart();
   chart.container('container');
