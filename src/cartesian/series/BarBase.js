@@ -29,6 +29,12 @@ anychart.cartesian.series.BarBase.prototype.getPointWidth = function() {
 
 
 /** @inheritDoc */
+anychart.cartesian.series.BarBase.prototype.isBarBased = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.BarBase.prototype.applyRatioToBounds = function(ratio, horizontal) {
   /** @type {acgraph.math.Rect} */
   var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());

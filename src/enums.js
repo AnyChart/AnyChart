@@ -987,6 +987,36 @@ anychart.enums.ScatterTicksMode = {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  CartesianSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.CartesianSeriesType = {
+  AREA: 'area',
+  BAR: 'bar',
+  BUBBLE: 'bubble',
+  CANDLESTICK: 'candlestick',
+  COLUMN: 'column',
+  LINE: 'line',
+  MARKER: 'marker',
+  OHLC: 'ohlc',
+  RANGE_AREA: 'rangearea',
+  RANGE_BAR: 'rangebar',
+  RANGE_COLUMN: 'rangecolumn',
+  RANGE_SPLINE_AREA: 'rangesplinearea',
+  RANGE_STEP_AREA: 'rangesteparea',
+  SPLINE: 'spline',
+  SPLINE_AREA: 'splinearea',
+  STEP_AREA: 'steparea',
+  STEP_LINE: 'stepline'
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);

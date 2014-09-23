@@ -32,7 +32,7 @@ anychart.cartesian.series.RangeSplineArea = function(data, opt_csvSettings) {
   this.queue_ = new anychart.cartesian.series.SplineDrawer(this.path);
 };
 goog.inherits(anychart.cartesian.series.RangeSplineArea, anychart.cartesian.series.ContinuousRangeBase);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_SPLINE_AREA] = anychart.cartesian.series.RangeSplineArea;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA] = anychart.cartesian.series.RangeSplineArea;
 
 
 /** @inheritDoc */
@@ -126,7 +126,7 @@ anychart.cartesian.series.RangeSplineArea.prototype.finalizeSegment = function()
  * @inheritDoc
  */
 anychart.cartesian.series.RangeSplineArea.prototype.getType = function() {
-  return anychart.cartesian.series.Type.RANGE_SPLINE_AREA;
+  return anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA;
 };
 
 

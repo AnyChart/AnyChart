@@ -63,7 +63,7 @@ anychart.cartesian.series.Marker = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Marker, anychart.cartesian.series.Base);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.MARKER] = anychart.cartesian.series.Marker;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.MARKER] = anychart.cartesian.series.Marker;
 
 
 /**
@@ -509,7 +509,7 @@ anychart.cartesian.series.Marker.prototype.handleMouseMove_ = function(event) {
  * @inheritDoc
  */
 anychart.cartesian.series.Marker.prototype.getType = function() {
-  return anychart.cartesian.series.Type.MARKER;
+  return anychart.enums.CartesianSeriesType.MARKER;
 };
 
 

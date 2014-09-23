@@ -23,7 +23,7 @@ anychart.cartesian.series.OHLC = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.OHLC, anychart.cartesian.series.WidthBased);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.OHLC] = anychart.cartesian.series.OHLC;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.OHLC] = anychart.cartesian.series.OHLC;
 
 
 /**
@@ -478,7 +478,7 @@ anychart.cartesian.series.OHLC.prototype.calculateStatistics = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.OHLC.prototype.getType = function() {
-  return anychart.cartesian.series.Type.OHLC;
+  return anychart.enums.CartesianSeriesType.OHLC;
 };
 
 

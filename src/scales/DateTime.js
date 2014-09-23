@@ -170,4 +170,4 @@ goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
 anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;
-anychart.scales.DateTime.prototype['extendDataRange)'] = anychart.scales.DateTime.prototype.extendDataRange;
+anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;

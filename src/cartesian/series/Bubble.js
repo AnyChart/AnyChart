@@ -50,7 +50,7 @@ anychart.cartesian.series.Bubble = function(data, opt_csvSettings) {
   this.labels().position(anychart.enums.Position.CENTER);
 };
 goog.inherits(anychart.cartesian.series.Bubble, anychart.cartesian.series.DiscreteBase);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.BUBBLE] = anychart.cartesian.series.Bubble;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.BUBBLE] = anychart.cartesian.series.Bubble;
 
 
 /**
@@ -277,6 +277,12 @@ anychart.cartesian.series.Bubble.prototype.displayNegative = function(opt_value)
 
 
 /** @inheritDoc */
+anychart.cartesian.series.Bubble.prototype.isSizeBased = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.Bubble.prototype.rootTypedLayerInitializer = function() {
   return acgraph.circle();
 };
@@ -309,10 +315,7 @@ anychart.cartesian.series.Bubble.prototype.startDrawing = function() {
 };
 
 
-/**
- * Calculates size scale for the series. If opt_minMax is passed, also compares with opt_minMax members.
- * @param {Array.<number>=} opt_minMax Array of two values: [min, max].
- */
+/** @inheritDoc */
 anychart.cartesian.series.Bubble.prototype.calculateSizeScale = function(opt_minMax) {
   if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
     this.selfMinimumBubbleValue_ = Number.MAX_VALUE;
@@ -343,16 +346,10 @@ anychart.cartesian.series.Bubble.prototype.calculateSizeScale = function(opt_min
 };
 
 
-/**
- *
- * @param {number} min .
- * @param {number} max .
- * @return {!anychart.cartesian.series.Bubble} .
- */
+/** @inheritDoc */
 anychart.cartesian.series.Bubble.prototype.setAutoSizeScale = function(min, max) {
   this.minimumBubbleValue_ = min;
   this.maximumBubbleValue_ = max;
-  return this;
 };
 
 
@@ -1058,7 +1055,7 @@ anychart.cartesian.series.Bubble.prototype.getFinalNegativeHatchFill = function(
  * @inheritDoc
  */
 anychart.cartesian.series.Bubble.prototype.getType = function() {
-  return anychart.cartesian.series.Type.BUBBLE;
+  return anychart.enums.CartesianSeriesType.BUBBLE;
 };
 
 

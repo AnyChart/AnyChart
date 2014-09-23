@@ -26,7 +26,7 @@ anychart.cartesian.series.StepLine = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.StepLine, anychart.cartesian.series.ContinuousBase);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.STEP_LINE] = anychart.cartesian.series.StepLine;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.STEP_LINE] = anychart.cartesian.series.StepLine;
 
 
 /**
@@ -107,7 +107,7 @@ anychart.cartesian.series.StepLine.prototype.getMarkerFill = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.StepLine.prototype.getType = function() {
-  return anychart.cartesian.series.Type.STEP_LINE;
+  return anychart.enums.CartesianSeriesType.STEP_LINE;
 };
 
 

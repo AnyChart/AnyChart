@@ -1,4 +1,5 @@
 goog.provide('anychart.gantt.Chart');
+goog.require('anychart.Chart');
 
 
 /**

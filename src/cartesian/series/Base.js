@@ -1,7 +1,6 @@
 goog.provide('anychart.cartesian.series.Base');
 goog.require('acgraph');
 goog.require('anychart.VisualBaseWithBounds');
-goog.require('anychart.cartesian.series');
 goog.require('anychart.color');
 goog.require('anychart.data');
 goog.require('anychart.elements.LabelsFactory');
@@ -54,6 +53,34 @@ anychart.cartesian.series.Base = function(data, opt_csvSettings) {
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.cartesian.series.Base, anychart.VisualBaseWithBounds);
+
+
+/**
+ * Map of series constructors by type.
+ * @type {Object.<anychart.enums.CartesianSeriesType, Function>}
+ */
+anychart.cartesian.series.Base.SeriesTypesMap = {};
+
+
+/**
+ * For internal use.
+ * @param {number} value Calculated bar width ratio.
+ */
+anychart.cartesian.series.Base.prototype.setAutoBarWidth = goog.nullFunction;
+
+
+/**
+ * Calculates size scale for the series. If opt_minMax is passed, also compares with opt_minMax members.
+ * @param {Array.<number>=} opt_minMax Array of two values: [min, max].
+ */
+anychart.cartesian.series.Base.prototype.calculateSizeScale = goog.nullFunction;
+
+
+/**
+ * @param {number} min .
+ * @param {number} max .
+ */
+anychart.cartesian.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 
 
 /**
@@ -890,6 +917,33 @@ anychart.cartesian.series.Base.prototype.xPointPosition = function(opt_position)
 anychart.cartesian.series.Base.prototype.setAutoXPointPosition = function(position) {
   this.autoPointPosition_ = +position;
   return this;
+};
+
+
+/**
+ * Tester if the series is width based (column, rangeColumn).
+ * @return {boolean}
+ */
+anychart.cartesian.series.Base.prototype.isWidthBased = function() {
+  return false;
+};
+
+
+/**
+ * Tester if the series is bar based (bar, rangeBar).
+ * @return {boolean}
+ */
+anychart.cartesian.series.Base.prototype.isBarBased = function() {
+  return false;
+};
+
+
+/**
+ * Tester if the series is size based (bubble).
+ * @return {boolean}
+ */
+anychart.cartesian.series.Base.prototype.isSizeBased = function() {
+  return false;
 };
 
 
@@ -2305,7 +2359,7 @@ anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
   return /** @type {!anychart.elements.Legend.LegendItemProvider} */ ({
     'index': this.index(),
     'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
-    'iconType': this.getType() || anychart.enums.LegendItemIconType.SQUARE,
+    'iconType': this.getLegendIconType() || anychart.enums.LegendItemIconType.SQUARE,
     'iconStroke': this.getFinalStroke(false, false),
     'iconFill': this.getFinalFill(false, false),
     'iconHatchFill': this.getFinalHatchFill(false, false),
@@ -2325,16 +2379,24 @@ anychart.cartesian.series.Base.prototype.getLegendItemData = function() {
  * @return {anychart.cartesian.series.Base} Return itself for chaining call.
  */
 anychart.cartesian.series.Base.prototype.restoreDefaults = function() {
-
   return this;
 };
 
 
 /**
  * Returns type of current series.
- * @return {string} Series type.
+ * @return {anychart.enums.CartesianSeriesType} Series type.
  */
 anychart.cartesian.series.Base.prototype.getType = goog.abstractMethod;
+
+
+/**
+ * Gets legend icon type for the series.
+ * @return {anychart.enums.LegendItemIconType}
+ */
+anychart.cartesian.series.Base.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(this.getType());
+};
 
 
 /**
