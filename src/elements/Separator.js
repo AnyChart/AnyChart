@@ -564,8 +564,7 @@ anychart.elements.Separator.prototype.marginInvalidated_ = function(event) {
  */
 anychart.elements.Separator.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.zIndex(60)
-      .enabled(true)
+  this.enabled(true)
       .margin(0, 3, 3, 3)
       .orientation(anychart.enums.Orientation.TOP)
       .width('100%')

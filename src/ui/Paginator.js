@@ -98,8 +98,7 @@ anychart.ui.Paginator = function() {
    */
   this.text_ = null;
 
-  this.zIndex(20)
-      .fontFamily('Verdana')
+  this.fontFamily('Verdana')
       .fontSize('10')
       .fontWeight('normal')
       .fontColor('rgb(35,35,35)')

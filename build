@@ -178,8 +178,7 @@ def __get_not_optimized_compiler_args():
 
 
 def __get_developers_edition_compiler_args():
-    global arguments
-    flag = str(arguments['develop']).lower()
+    flag = 'true' if __is_develop() else 'false'
     return [
         '--compiler_flags=--define="goog.DEBUG=%s"' % flag,
         '--compiler_flags=--define="anychart.DEVELOP=%s"' % flag,
@@ -281,7 +280,9 @@ def __build_project_sources(modules):
 
 
 def __build_project(modules):
-    output_file = os.path.join(OUT_PATH, '_'.join(modules) + '.min.js')
+    dev_postfix = '.dev' if __is_develop() else ''
+    file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
+    output_file = os.path.join(OUT_PATH, file_name)
     print output_file
     print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s" % (', '.join(modules), output_file, __get_version(True), str(arguments['develop']))
     commands = __get_default_compiler_args() + \
@@ -611,6 +612,10 @@ def __get_version(opt_commits_count=False):
         return "%s.%s.%s.%s" % (major, minor, patch, commit_count)
     else:
         return "%s.%s.%s" % (major, minor, patch)
+
+def __is_develop():
+    global arguments
+    return 'develop' in arguments and str(arguments['develop']) == 'True'
 
 
 #=======================================================================================================================

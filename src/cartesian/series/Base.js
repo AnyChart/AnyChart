@@ -2177,12 +2177,13 @@ anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSetting
   var iterator = this.getIterator();
   var normalColor = /** @type {acgraph.vector.Fill|Function} */(
       (usePointSettings && iterator.get('fill')) || this.fill());
-  return /** @type {!acgraph.vector.Fill} */(hover ?
+  var result = /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
               (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
+  return acgraph.vector.normalizeFill(result);
 };
 
 
@@ -2315,7 +2316,7 @@ anychart.cartesian.series.Base.prototype.getFinalStroke = function(usePointSetti
   var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
       (usePointSettings && iterator.get('stroke')) ||
       this.stroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
+  var result = /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Stroke|Function} */(
               (iterator.get('hoverStroke') && usePointSettings) ||
@@ -2323,6 +2324,8 @@ anychart.cartesian.series.Base.prototype.getFinalStroke = function(usePointSetti
               normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
+
+  return acgraph.vector.normalizeStroke(result);
 };
 
 

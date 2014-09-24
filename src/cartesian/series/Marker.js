@@ -112,7 +112,7 @@ anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType
  */
 anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeMarkerType(opt_value);
+    if (!goog.isFunction(opt_value)) opt_value = anychart.enums.normalizeMarkerType(opt_value);
     if (this.type_ != opt_value) {
       this.type_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -170,7 +170,8 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
  */
 anychart.cartesian.series.Marker.prototype.hoverType = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeMarkerType(opt_value);
+    if (!goog.isFunction(opt_value))
+      opt_value = anychart.enums.normalizeMarkerType(opt_value);
     if (this.hoverType_ != opt_value) {
       this.hoverType_ = opt_value;
     }

@@ -231,6 +231,13 @@ anychart.cartesian.Chart.ZINDEX_SERIES = 30;
 
 
 /**
+ * Line-like series should have bigger zIndex value than other series.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_LINE_SERIES = 31;
+
+
+/**
  * Axis z-index in chart root layer.
  * @type {number}
  */
@@ -493,7 +500,7 @@ anychart.cartesian.Chart.prototype.grid = function(opt_indexOrValue, opt_value) 
  * chart.grid(myGrid);
  * myGrid.oddFill('none')
  *    .evenFill('none')
- *    .layout(anychart.enums.Layout.HORIZONTAL).minor(true);
+ *    .layout(anychart.enums.Layout.HORIZONTAL).isMinor(true);
  * chart.minorGrid(myGrid)
  * chart.container(stage).draw();
  * @param {(anychart.elements.Grid|Object)=} opt_value Chart minor grid settings to set.
@@ -1141,7 +1148,8 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
       anychart.enums.CartesianSeriesType.LINE,
       data,
-      opt_csvSettings
+      opt_csvSettings,
+      anychart.cartesian.Chart.ZINDEX_LINE_SERIES
   );
 };
 
@@ -1331,7 +1339,8 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
       anychart.enums.CartesianSeriesType.SPLINE,
       data,
-      opt_csvSettings
+      opt_csvSettings,
+      anychart.cartesian.Chart.ZINDEX_LINE_SERIES
   );
 };
 
@@ -1371,7 +1380,8 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
       anychart.enums.CartesianSeriesType.STEP_LINE,
       data,
-      opt_csvSettings
+      opt_csvSettings,
+      anychart.cartesian.Chart.ZINDEX_LINE_SERIES
   );
 };
 
@@ -1401,19 +1411,23 @@ anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
+ * @param {number=} opt_zIndex Optional series zIndex.
  * @private
  * @return {anychart.cartesian.series.Base}
  */
-anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, opt_csvSettings) {
+anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
   var ctl = anychart.cartesian.series.Base.SeriesTypesMap[/** @type {anychart.enums.CartesianSeriesType} */(type)];
   var instance;
+  var zIndex;
+  var index;
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
     this.series_.push(instance);
-    var index = this.series_.length - 1;
+    index = this.series_.length - 1;
+    zIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.cartesian.Chart.ZINDEX_SERIES) + index * 0.00001;
     instance.index(index);
-    instance.zIndex(anychart.cartesian.Chart.ZINDEX_SERIES + index * 0.00001);
+    instance.zIndex(zIndex);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
