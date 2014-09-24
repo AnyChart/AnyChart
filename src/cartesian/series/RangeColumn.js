@@ -24,7 +24,7 @@ anychart.cartesian.series.RangeColumn = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.cartesian.series.RangeColumn, anychart.cartesian.series.WidthBased);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.RANGE_COLUMN] = anychart.cartesian.series.RangeColumn;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.RANGE_COLUMN] = anychart.cartesian.series.RangeColumn;
 
 
 /** @inheritDoc */
@@ -120,7 +120,7 @@ anychart.cartesian.series.RangeColumn.prototype.calculateStatistics = function()
  * @inheritDoc
  */
 anychart.cartesian.series.RangeColumn.prototype.getType = function() {
-  return anychart.cartesian.series.Type.RANGE_COLUMN;
+  return anychart.enums.CartesianSeriesType.RANGE_COLUMN;
 };
 
 

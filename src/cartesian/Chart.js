@@ -1,10 +1,12 @@
 goog.provide('anychart.cartesian.Chart');
 
+goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.Chart');
 goog.require('anychart.cartesian.OrdinalIterator');
 goog.require('anychart.cartesian.ScatterIterator');
-goog.require('anychart.cartesian.series');
 goog.require('anychart.cartesian.series.BarBase');
+goog.require('anychart.cartesian.series.Base');
+goog.require('anychart.cartesian.series.WidthBased');
 goog.require('anychart.elements.Axis');
 goog.require('anychart.elements.Grid');
 goog.require('anychart.elements.LineMarker');
@@ -1027,7 +1029,7 @@ anychart.cartesian.Chart.prototype.onMarkersSignal_ = function(event) {
  */
 anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.AREA,
+      anychart.enums.CartesianSeriesType.AREA,
       data,
       opt_csvSettings
   );
@@ -1047,7 +1049,7 @@ anychart.cartesian.Chart.prototype.area = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.BAR,
+      anychart.enums.CartesianSeriesType.BAR,
       data,
       opt_csvSettings
   );
@@ -1072,7 +1074,7 @@ anychart.cartesian.Chart.prototype.bar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.BUBBLE,
+      anychart.enums.CartesianSeriesType.BUBBLE,
       data,
       opt_csvSettings
   );
@@ -1097,7 +1099,7 @@ anychart.cartesian.Chart.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.CANDLESTICK,
+      anychart.enums.CartesianSeriesType.CANDLESTICK,
       data,
       opt_csvSettings
   );
@@ -1117,7 +1119,7 @@ anychart.cartesian.Chart.prototype.candlestick = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.COLUMN,
+      anychart.enums.CartesianSeriesType.COLUMN,
       data,
       opt_csvSettings
   );
@@ -1137,7 +1139,7 @@ anychart.cartesian.Chart.prototype.column = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.LINE,
+      anychart.enums.CartesianSeriesType.LINE,
       data,
       opt_csvSettings
   );
@@ -1157,7 +1159,7 @@ anychart.cartesian.Chart.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.MARKER,
+      anychart.enums.CartesianSeriesType.MARKER,
       data,
       opt_csvSettings
   );
@@ -1182,7 +1184,7 @@ anychart.cartesian.Chart.prototype.marker = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.OHLC,
+      anychart.enums.CartesianSeriesType.OHLC,
       data,
       opt_csvSettings
   );
@@ -1207,7 +1209,7 @@ anychart.cartesian.Chart.prototype.ohlc = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.RANGE_AREA,
+      anychart.enums.CartesianSeriesType.RANGE_AREA,
       data,
       opt_csvSettings
   );
@@ -1232,7 +1234,7 @@ anychart.cartesian.Chart.prototype.rangeArea = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.RANGE_BAR,
+      anychart.enums.CartesianSeriesType.RANGE_BAR,
       data,
       opt_csvSettings
   );
@@ -1257,7 +1259,7 @@ anychart.cartesian.Chart.prototype.rangeBar = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.RANGE_COLUMN,
+      anychart.enums.CartesianSeriesType.RANGE_COLUMN,
       data,
       opt_csvSettings
   );
@@ -1282,7 +1284,7 @@ anychart.cartesian.Chart.prototype.rangeColumn = function(data, opt_csvSettings)
  */
 anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.RANGE_SPLINE_AREA,
+      anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA,
       data,
       opt_csvSettings
   );
@@ -1307,7 +1309,7 @@ anychart.cartesian.Chart.prototype.rangeSplineArea = function(data, opt_csvSetti
  */
 anychart.cartesian.Chart.prototype.rangeStepArea = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.RANGE_STEP_AREA,
+      anychart.enums.CartesianSeriesType.RANGE_STEP_AREA,
       data,
       opt_csvSettings
   );
@@ -1327,7 +1329,7 @@ anychart.cartesian.Chart.prototype.rangeStepArea = function(data, opt_csvSetting
  */
 anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.SPLINE,
+      anychart.enums.CartesianSeriesType.SPLINE,
       data,
       opt_csvSettings
   );
@@ -1347,7 +1349,7 @@ anychart.cartesian.Chart.prototype.spline = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.SPLINE_AREA,
+      anychart.enums.CartesianSeriesType.SPLINE_AREA,
       data,
       opt_csvSettings
   );
@@ -1367,7 +1369,7 @@ anychart.cartesian.Chart.prototype.splineArea = function(data, opt_csvSettings) 
  */
 anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.STEP_LINE,
+      anychart.enums.CartesianSeriesType.STEP_LINE,
       data,
       opt_csvSettings
   );
@@ -1387,7 +1389,7 @@ anychart.cartesian.Chart.prototype.stepLine = function(data, opt_csvSettings) {
  */
 anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.cartesian.series.Type.STEP_AREA,
+      anychart.enums.CartesianSeriesType.STEP_AREA,
       data,
       opt_csvSettings
   );
@@ -1403,7 +1405,7 @@ anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
  * @return {anychart.cartesian.series.Base}
  */
 anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, opt_csvSettings) {
-  var ctl = anychart.cartesian.series.seriesTypesMap[type];
+  var ctl = anychart.cartesian.series.Base.SeriesTypesMap[/** @type {anychart.enums.CartesianSeriesType} */(type)];
   var instance;
 
   if (ctl) {
@@ -1913,7 +1915,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
       aSeries = series[i];
       scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
       id = goog.getUid(scale);
-      if (aSeries instanceof anychart.cartesian.series.BarBase) {
+      if (aSeries.isBarBased()) {
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           numBarClusters++;
         } else {
@@ -1922,7 +1924,7 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
             seenScalesWithBars[id] = true;
           }
         }
-      } else if (aSeries instanceof anychart.cartesian.series.WidthBased) {
+      } else if (aSeries.isWidthBased()) {
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           numColumnClusters++;
         } else {
@@ -1939,8 +1941,8 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
       currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
       seenScales = {};
       for (i = 0; i < series.length; i++) {
-        wSeries = /** @type {anychart.cartesian.series.WidthBased} */(series[i]);
-        if (wSeries instanceof anychart.cartesian.series.WidthBased && !(wSeries instanceof anychart.cartesian.series.BarBase)) {
+        wSeries = series[i];
+        if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
           if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
@@ -1967,8 +1969,8 @@ anychart.cartesian.Chart.prototype.distributeSeries_ = function() {
       currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
       seenScales = {};
       for (i = 0; i < series.length; i++) {
-        wSeries = /** @type {anychart.cartesian.series.Bar} */(series[i]);
-        if (wSeries instanceof anychart.cartesian.series.BarBase) {
+        wSeries = series[i];
+        if (wSeries.isBarBased()) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
           if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
@@ -2001,12 +2003,12 @@ anychart.cartesian.Chart.prototype.calcBubbleSizes_ = function() {
   var i;
   var minMax = [Number.MAX_VALUE, -Number.MAX_VALUE];
   for (i = this.series_.length; i--;) {
-    if (this.series_[i] instanceof anychart.cartesian.series.Bubble)
-      /** @type {anychart.cartesian.series.Bubble} */(this.series_[i]).calculateSizeScale(minMax);
+    if (this.series_[i].isSizeBased())
+      this.series_[i].calculateSizeScale(minMax);
   }
   for (i = this.series_.length; i--;) {
-    if (this.series_[i] instanceof anychart.cartesian.series.Bubble)
-      /** @type {anychart.cartesian.series.Bubble} */(this.series_[i]).setAutoSizeScale(minMax[0], minMax[1]);
+    if (this.series_[i].isSizeBased())
+      this.series_[i].setAutoSizeScale(minMax[0], minMax[1]);
   }
 };
 

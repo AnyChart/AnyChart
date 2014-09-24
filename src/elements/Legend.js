@@ -5,6 +5,7 @@ goog.require('anychart.elements.LegendItem');
 goog.require('anychart.elements.Separator');
 goog.require('anychart.elements.Text');
 goog.require('anychart.elements.Title');
+goog.require('anychart.elements.Tooltip');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.ui.Paginator');

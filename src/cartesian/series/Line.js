@@ -26,7 +26,7 @@ anychart.cartesian.series.Line = function(data, opt_csvSettings) {
   this.zIndex(40);
 };
 goog.inherits(anychart.cartesian.series.Line, anychart.cartesian.series.ContinuousBase);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.LINE] = anychart.cartesian.series.Line;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.LINE] = anychart.cartesian.series.Line;
 
 
 /** @inheritDoc */
@@ -83,7 +83,7 @@ anychart.cartesian.series.Line.prototype.getMarkerFill = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Line.prototype.getType = function() {
-  return anychart.cartesian.series.Type.LINE;
+  return anychart.enums.CartesianSeriesType.LINE;
 };
 
 

@@ -17,7 +17,7 @@ anychart.cartesian.series.Candlestick = function(data, opt_csvSettings) {
   goog.base(this, data, opt_csvSettings);
 };
 goog.inherits(anychart.cartesian.series.Candlestick, anychart.cartesian.series.OHLC);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.CANDLESTICK] = anychart.cartesian.series.Candlestick;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.CANDLESTICK] = anychart.cartesian.series.Candlestick;
 
 
 /**
@@ -951,7 +951,7 @@ anychart.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(h
  * @inheritDoc
  */
 anychart.cartesian.series.Candlestick.prototype.getType = function() {
-  return anychart.cartesian.series.Type.CANDLESTICK;
+  return anychart.enums.CartesianSeriesType.CANDLESTICK;
 };
 
 

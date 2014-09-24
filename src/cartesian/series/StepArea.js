@@ -24,7 +24,7 @@ anychart.cartesian.series.StepArea = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.StepArea, anychart.cartesian.series.AreaBase);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.STEP_AREA] = anychart.cartesian.series.StepArea;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.STEP_AREA] = anychart.cartesian.series.StepArea;
 
 
 /**
@@ -158,7 +158,7 @@ anychart.cartesian.series.StepArea.prototype.finalizeSegment = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.StepArea.prototype.getType = function() {
-  return anychart.cartesian.series.Type.STEP_AREA;
+  return anychart.enums.CartesianSeriesType.STEP_AREA;
 };
 
 

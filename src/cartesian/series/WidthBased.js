@@ -58,14 +58,15 @@ anychart.cartesian.series.WidthBased.prototype.pointWidth = function(opt_value) 
 };
 
 
-/**
- * For internal use.
- * @param {number} value Calculated bar width ratio.
- * @return {anychart.cartesian.series.WidthBased} Bar width pixel value or Bar instance for chaining call.
- */
+/** @inheritDoc */
 anychart.cartesian.series.WidthBased.prototype.setAutoBarWidth = function(value) {
   this.autoBarWidth_ = String(value * 100) + '%';
-  return this;
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.series.WidthBased.prototype.isWidthBased = function() {
+  return true;
 };
 
 

@@ -20,7 +20,7 @@ anychart.cartesian.series.Column = function(data, opt_csvSettings) {
   this.referenceValuesSupportStack = true;
 };
 goog.inherits(anychart.cartesian.series.Column, anychart.cartesian.series.WidthBased);
-anychart.cartesian.series.seriesTypesMap[anychart.cartesian.series.Type.COLUMN] = anychart.cartesian.series.Column;
+anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.COLUMN] = anychart.cartesian.series.Column;
 
 
 /** @inheritDoc */
@@ -72,7 +72,7 @@ anychart.cartesian.series.Column.prototype.drawSubsequentPoint = function() {
  * @inheritDoc
  */
 anychart.cartesian.series.Column.prototype.getType = function() {
-  return anychart.cartesian.series.Type.COLUMN;
+  return anychart.enums.CartesianSeriesType.COLUMN;
 };
 
 
