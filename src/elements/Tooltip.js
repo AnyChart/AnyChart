@@ -467,15 +467,19 @@ anychart.elements.Tooltip.prototype.serialize = function() {
   json['title'] = this.title().serialize();
 
   if (goog.isFunction(this.titleFormatter_)) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize titleFormatter function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Tooltip titleFormatter']
+    );
   }
 
   if (goog.isFunction(this.contentFormatter_)) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize contentFormatter function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Tooltip contentFormatter']
+    );
   }
   return json;
 };

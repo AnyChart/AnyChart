@@ -2057,6 +2057,13 @@ anychart.elements.Axis.prototype.checkDrawingNeeded = function() {
  * Axis drawing.
  */
 anychart.elements.Axis.prototype.draw = function() {
+  var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
+
+  if (!scale) {
+    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    return;
+  }
+
   if (!this.checkDrawingNeeded())
     return;
 
@@ -2163,125 +2170,124 @@ anychart.elements.Axis.prototype.draw = function() {
   }
 
   if (goog.isDef(ticksDrawer) || goog.isDef(minorTicksDrawer) || goog.isDef(minorLabelsDrawer)) {
-    var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
-    if (scale && this.container()) {
-      var i, j, overlappedLabels, needDrawLabels, needDrawMinorLabels;
 
-      var scaleTicksArr = scale.ticks().get();
-      var ticksArrLen = scaleTicksArr.length;
-      var tickThickness = this.ticks().stroke()['thickness'] ? parseFloat(this.ticks_.stroke()['thickness']) : 1;
-      var tickVal, ratio, drawLabel, drawTick;
-      var pixelBounds = this.getPixelBounds_();
-      var lineBounds = this.line_.getBounds();
-      lineThickness = this.line_.stroke()['thickness'] ? parseFloat(this.line_.stroke()['thickness']) : 1;
+    var i, j, overlappedLabels, needDrawLabels, needDrawMinorLabels;
 
-      if (scale instanceof anychart.scales.ScatterBase) {
-        overlappedLabels = this.calcLabels_();
+    var scaleTicksArr = scale.ticks().get();
+    var ticksArrLen = scaleTicksArr.length;
+    var tickThickness = this.ticks().stroke()['thickness'] ? parseFloat(this.ticks_.stroke()['thickness']) : 1;
+    var tickVal, ratio, drawLabel, drawTick;
+    var pixelBounds = this.getPixelBounds_();
+    var lineBounds = this.line_.getBounds();
+    lineThickness = this.line_.stroke()['thickness'] ? parseFloat(this.line_.stroke()['thickness']) : 1;
 
-        if (goog.isObject(overlappedLabels)) {
-          needDrawLabels = overlappedLabels.labels;
-          needDrawMinorLabels = overlappedLabels.minorLabels;
-        } else {
-          needDrawLabels = !overlappedLabels;
-          needDrawMinorLabels = !overlappedLabels;
-        }
+    if (scale instanceof anychart.scales.ScatterBase) {
+      overlappedLabels = this.calcLabels_();
 
-        var scaleMinorTicksArr = scale.minorTicks().get();
-        var minorTickThickness = this.minorTicks_.stroke()['thickness'] ? parseFloat(this.minorTicks_.stroke()['thickness']) : 1;
+      if (goog.isObject(overlappedLabels)) {
+        needDrawLabels = overlappedLabels.labels;
+        needDrawMinorLabels = overlappedLabels.minorLabels;
+      } else {
+        needDrawLabels = !overlappedLabels;
+        needDrawMinorLabels = !overlappedLabels;
+      }
 
-        i = 0;
-        j = 0;
-        var minorTicksArrLen = scaleMinorTicksArr.length;
-        var minorTickVal, minorRatio, prevMajorRatio;
+      var scaleMinorTicksArr = scale.minorTicks().get();
+      var minorTickThickness = this.minorTicks_.stroke()['thickness'] ? parseFloat(this.minorTicks_.stroke()['thickness']) : 1;
 
-        while (i < ticksArrLen || j < minorTicksArrLen) {
-          tickVal = scaleTicksArr[i];
-          minorTickVal = scaleMinorTicksArr[j];
-          ratio = scale.transform(tickVal);
-          minorRatio = scale.transform(minorTickVal);
+      i = 0;
+      j = 0;
+      var minorTicksArrLen = scaleMinorTicksArr.length;
+      var minorTickVal, minorRatio, prevMajorRatio;
 
-          if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
-            var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
-            drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
-            drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);
-            if (drawTick && ticksDrawer)
-              ticksDrawer.call(
-                  ticks,
-                  ratio,
-                  pixelBounds,
-                  lineBounds,
-                  lineThickness,
-                  majorPixelShift);
+      while (i < ticksArrLen || j < minorTicksArrLen) {
+        tickVal = scaleTicksArr[i];
+        minorTickVal = scaleMinorTicksArr[j];
+        ratio = scale.transform(tickVal);
+        minorRatio = scale.transform(minorTickVal);
 
-            if (drawLabel)
-              this.drawLabel_(tickVal, scale.transform(tickVal, .5), i, majorPixelShift);
-            prevMajorRatio = ratio;
-            i++;
-          } else {
-            var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
-            drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
-            drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
-
-            if (drawTick && minorTicksDrawer && prevMajorRatio != minorRatio)
-              minorTicksDrawer.call(
-                  minorTicks,
-                  minorRatio,
-                  pixelBounds,
-                  lineBounds,
-                  lineThickness,
-                  minorPixelShift);
-
-            if (drawLabel && minorLabelsDrawer && prevMajorRatio != minorRatio)
-              minorLabelsDrawer.call(this, minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift);
-            j++;
-          }
-        }
-        if (minorLabelsDrawer) this.minorLabels().draw();
-
-      } else if (scale instanceof anychart.scales.Ordinal) {
-        var labelsStates = this.calcLabels_();
-        needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !overlappedLabels;
-
-        for (i = 0; i < ticksArrLen; i++) {
-          tickVal = scaleTicksArr[i];
-          var leftTick, rightTick, labelPosition;
-          if (goog.isArray(tickVal)) {
-            leftTick = tickVal[0];
-            rightTick = tickVal[1];
-            labelPosition = (scale.transform(tickVal[0], 0) + scale.transform(tickVal[1], 1)) / 2;
-          } else {
-            leftTick = rightTick = tickVal;
-            labelPosition = scale.transform(tickVal, .5);
-          }
-          ratio = scale.transform(leftTick, 0);
-          pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
-
-          if (ticksDrawer) {
+        if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
+          var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
+          drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
+          drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);
+          if (drawTick && ticksDrawer)
             ticksDrawer.call(
                 ticks,
                 ratio,
                 pixelBounds,
                 lineBounds,
                 lineThickness,
-                pixelShift);
+                majorPixelShift);
 
-            if (i == ticksArrLen - 1)
-              ticksDrawer.call(
-                  ticks,
-                  scale.transform(rightTick, 1),
-                  pixelBounds,
-                  lineBounds,
-                  lineThickness,
-                  pixelShift);
-          }
-
-          drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
           if (drawLabel)
-            this.drawLabel_(leftTick, labelPosition, i, pixelShift);
+            this.drawLabel_(tickVal, scale.transform(tickVal, .5), i, majorPixelShift);
+          prevMajorRatio = ratio;
+          i++;
+        } else {
+          var minorPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
+          drawLabel = goog.isArray(needDrawMinorLabels) ? needDrawMinorLabels[j] : needDrawMinorLabels;
+          drawTick = (goog.isArray(needDrawMinorLabels) && needDrawMinorLabels[j]) || goog.isBoolean(needDrawMinorLabels);
+
+          if (drawTick && minorTicksDrawer && prevMajorRatio != minorRatio)
+            minorTicksDrawer.call(
+                minorTicks,
+                minorRatio,
+                pixelBounds,
+                lineBounds,
+                lineThickness,
+                minorPixelShift);
+
+          if (drawLabel && minorLabelsDrawer && prevMajorRatio != minorRatio)
+            minorLabelsDrawer.call(this, minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift);
+          j++;
         }
       }
-      this.labels().draw();
+      if (minorLabelsDrawer) this.minorLabels().draw();
+
+    } else if (scale instanceof anychart.scales.Ordinal) {
+      var labelsStates = this.calcLabels_();
+      needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !overlappedLabels;
+
+      for (i = 0; i < ticksArrLen; i++) {
+        tickVal = scaleTicksArr[i];
+        var leftTick, rightTick, labelPosition;
+        if (goog.isArray(tickVal)) {
+          leftTick = tickVal[0];
+          rightTick = tickVal[1];
+          labelPosition = (scale.transform(tickVal[0], 0) + scale.transform(tickVal[1], 1)) / 2;
+        } else {
+          leftTick = rightTick = tickVal;
+          labelPosition = scale.transform(tickVal, .5);
+        }
+        ratio = scale.transform(leftTick, 0);
+        pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
+
+        if (ticksDrawer) {
+          ticksDrawer.call(
+              ticks,
+              ratio,
+              pixelBounds,
+              lineBounds,
+              lineThickness,
+              pixelShift);
+
+          if (i == ticksArrLen - 1)
+            ticksDrawer.call(
+                ticks,
+                scale.transform(rightTick, 1),
+                pixelBounds,
+                lineBounds,
+                lineThickness,
+                pixelShift);
+        }
+
+        drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
+        if (drawLabel)
+          this.drawLabel_(leftTick, labelPosition, i, pixelShift);
+      }
     }
+    this.labels().draw();
+
   }
 
   this.title().resumeSignalsDispatching(false);

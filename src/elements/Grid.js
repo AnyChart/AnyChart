@@ -488,7 +488,13 @@ anychart.elements.Grid.prototype.drawInterlaceVertical = function(ratio, prevRat
  */
 anychart.elements.Grid.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
-  if (!this.checkDrawingNeeded() || !scale)
+
+  if (!scale) {
+    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    return;
+  }
+
+  if (!this.checkDrawingNeeded())
     return;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

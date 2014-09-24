@@ -756,6 +756,8 @@ anychart.Chart.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  var startTime = new Date().getTime();
+
   this.suspendSignalsDispatching();
 
   //total chart area bounds, do not override, it can be useful later
@@ -901,6 +903,9 @@ anychart.Chart.prototype.draw = function() {
   this.resumeSignalsDispatching(false);
 
   this.dispatchDetachedEvent(new anychart.Chart.DrawEvent(this));
+
+  var msg = 'Chart rendering time: ' + (new Date().getTime() - startTime);
+  anychart.utils.info(msg);
 
   return this;
 };

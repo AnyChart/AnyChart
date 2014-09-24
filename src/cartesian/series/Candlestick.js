@@ -962,68 +962,84 @@ anychart.cartesian.series.Candlestick.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.risingFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize risingFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series risingFill']
+    );
   } else {
     json['risingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.risingFill()));
   }
 
   if (goog.isFunction(this.hoverRisingFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize hoverRisingFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series hoverRisingFill']
+    );
   } else {
     json['hoverRisingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverRisingFill()));
   }
 
 
   if (goog.isFunction(this.fallingFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize fallingFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series fallingFill']
+    );
   } else {
     json['fallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fallingFill()));
   }
 
   if (goog.isFunction(this.hoverFallingFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize hoverFallingFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series hoverFallingFill']
+    );
   } else {
     json['hoverFallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFallingFill()));
   }
 
 
   if (goog.isFunction(this.fallingHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize fallingHatchFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series fallingHatchFill']
+    );
   } else {
     json['fallingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fallingHatchFill()));
   }
 
   if (goog.isFunction(this.hoverFallingHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize hoverFallingHatchFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series hoverFallingHatchFill']
+    );
   } else {
     json['hoverFallingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFallingHatchFill()));
   }
 
 
   if (goog.isFunction(this.risingHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize risingHatchFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series risingHatchFill']
+    );
   } else {
     json['risingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.risingHatchFill()));
   }
 
   if (goog.isFunction(this.hoverRisingHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize hoverRisingHatchFill function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series hoverRisingHatchFill']
+    );
   } else {
     json['hoverRisingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverRisingHatchFill()));
   }

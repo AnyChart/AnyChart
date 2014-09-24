@@ -170,14 +170,12 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
           found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
           goog.array.insertAt(uitems, found, pos);
           found.meta('nc', true);
-          anychart.utils.consoleWarn('[Warning while adding new data to tree]: data item with ID=\'' + id + '\' already exists in tree' +
-              'and will be used as parent for all related data items.');
+          anychart.utils.warning(anychart.enums.WarningCode.DUPLICATED_DATA_ITEM, null, [id]);
         } else {
           goog.array.insertAt(uitems, dataItem, pos);
         }
       } else {
-        anychart.utils.consoleWarn('[Warning while adding new data to tree]: data item with ID=\'' + id +
-            '\' is not unique. First met object will be used.');
+        anychart.utils.warning(anychart.enums.WarningCode.REFERENCE_IS_NOT_UNIQUE, null, [id]);
       }
     }
   }
@@ -196,9 +194,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
           found.addChildWithoutIndexing(tdi);
         } else {
           this.roots_.push(tdi);
-          anychart.utils.consoleWarn('[Warning while adding new data to tree]: one of data items was looking for parent ' +
-              'with ID=\'' + parentId + '\', but did not find it. Please check the data. \nPLEASE NOTE: this data item will ' +
-              'be added as root to avoid loss of information.');
+          anychart.utils.warning(anychart.enums.WarningCode.MISSING_PARENT_ID, null, [parentId]);
         }
         this.indexBranch_(tdi);
       } else {
@@ -212,14 +208,16 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     }
   }
 
-
   //Third passage. Looking for cycles.
   if (anychart.DEVELOP) {
     for (i = 0; i < tdis.length; i++) {
       tdi = tdis[i]; //Tree data item.
-      if (!tdi.meta('nc')) anychart.utils.consoleWarn('[Warning while adding new data to tree]: data item {ID=\'' +
-          tdi.get(anychart.data.Tree.DataItem.ID) + '\', PARENT=\'' +
-          tdi.getParent().get(anychart.data.Tree.DataItem.ID) + '\'} belongs to cycle and will not be added to the tree.');
+      if (!tdi.meta('nc'))
+        anychart.utils.warning(
+            anychart.enums.WarningCode.CYCLE_REFERENCE,
+            null,
+            [tdi.get(anychart.data.Tree.DataItem.ID), tdi.getParent().get(anychart.data.Tree.DataItem.ID)]
+        );
     }
   }
 

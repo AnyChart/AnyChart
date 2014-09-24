@@ -291,7 +291,10 @@ def __build_project(modules):
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
-               ['--compiler_flags=--output_wrapper=(function(){%output%})()']
+               ['--compiler_flags=--output_wrapper=(function(){%output%})()',
+               '--compiler_flags=--property_map_output_file=%s' % output_file + '_prop_out.txt',
+               '--compiler_flags=--variable_map_output_file=%s' % output_file + '_var_out.txt']
+
 
     __call_compiler(commands)
 

@@ -863,9 +863,11 @@ anychart.elements.LegendItem.prototype.serialize = function() {
   json['x'] = this.x();
   json['y'] = this.y();
   if (goog.isFunction(this.iconType_)) {
-    if (window.console) {
-      window.console.log('Warning: We cant serialize iconType function, you should reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Legend Item iconType']
+    );
   } else json['iconType'] = this.iconType();
 
   json['iconFill'] = this.iconFill();

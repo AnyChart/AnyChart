@@ -489,34 +489,42 @@ anychart.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.risingStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize risingStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  risingStroke']
+    );
   } else {
     json['risingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.risingStroke()));
   }
 
   if (goog.isFunction(this.hoverRisingStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverRisingStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  hoverRisingStroke']
+    );
   } else {
     json['hoverRisingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverRisingStroke()));
   }
 
 
   if (goog.isFunction(this.fallingStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize fallingStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  fallingStroke']
+    );
   } else {
     json['fallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.fallingStroke()));
   }
 
   if (goog.isFunction(this.hoverFallingStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverFallingStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  hoverFallingStroke']
+    );
   } else {
     json['hoverFallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverFallingStroke()));
   }

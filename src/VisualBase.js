@@ -105,6 +105,14 @@ anychart.VisualBase.prototype.container = function(opt_value) {
         // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
         this.container_ = acgraph.create();
         this.container_.container(/** @type {Element} */(opt_value));
+
+        //if graphics engine can't recognize passed container
+        //we should destroy stage to avoid uncontrolled behaviour
+        if (!this.container_.container()) {
+          this.container_.dispose();
+          this.container_ = null;
+          return this;
+        }
       } else {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
       }
@@ -112,7 +120,7 @@ anychart.VisualBase.prototype.container = function(opt_value) {
       // wrapping <svg> to div with position:relative and size of parent container
       // need to correctly position credits <a> dom element
       // see DVF-791
-      var innerDom, parentSize;
+      var innerDom;
       if (this.container_ instanceof acgraph.vector.Stage) {
         if (!this.container_.wrapped_) {
           innerDom = goog.dom.createDom(goog.dom.TagName.DIV, {
@@ -257,6 +265,9 @@ anychart.VisualBase.prototype.checkDrawingNeeded = function() {
       this.markConsistent(anychart.ConsistencyState.ENABLED);
       this.invalidate(anychart.ConsistencyState.CONTAINER);
     }
+    return false;
+  } else if (!this.container()) {
+    anychart.utils.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
     return false;
   }
   this.markConsistent(anychart.ConsistencyState.ENABLED);

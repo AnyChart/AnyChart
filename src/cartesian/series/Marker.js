@@ -521,17 +521,21 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.type())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize type function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Marker type']
+    );
   } else {
     json['type'] = this.type();
   }
 
   if (goog.isFunction(this.hoverType())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverType function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Marker hoverType']
+    );
   } else {
     json['hoverType'] = this.hoverType();
   }

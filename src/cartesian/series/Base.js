@@ -2414,49 +2414,61 @@ anychart.cartesian.series.Base.prototype.serialize = function() {
   json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
 
   if (goog.isFunction(this.fill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize fill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series fill']
+    );
   } else {
     json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
   }
 
   if (goog.isFunction(this.hoverFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hoverFill']
+    );
   } else {
     json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
   }
 
   if (goog.isFunction(this.stroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize stroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series stroke']
+    );
   } else {
     json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
   }
 
   if (goog.isFunction(this.hoverStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hoverStroke']
+    );
   } else {
     json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
   }
 
   if (goog.isFunction(this.hatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hatchFill']
+    );
   } else {
     json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
   }
 
   if (goog.isFunction(this.hoverHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverHatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hoverHatchFill']
+    );
   } else {
     json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverHatchFill()));
   }

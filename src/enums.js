@@ -1020,6 +1020,51 @@ anychart.enums.CartesianSeriesType = {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Errors, Warnings, Info
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @enum {number}
+ */
+anychart.enums.ErrorCode = {
+  CONTAINER_NOT_SET: 1,
+  SCALE_NOT_SET: 2
+};
+
+
+/**
+ * @enum {number}
+ */
+anychart.enums.InfoCode = {
+  PERFORMANCE_REPORT: 0,
+  BULLET_TOO_MUCH_RANGES: 1,
+  BULLET_TOO_MUCH_MEASURES: 2,
+  PIE_TOO_MUCH_POINTS: 3
+};
+
+
+/**
+ * @enum {number}
+ */
+anychart.enums.WarningCode = {
+  //anychart.data.Tree
+  DUPLICATED_DATA_ITEM: 1,
+  REFERENCE_IS_NOT_UNIQUE: 2,
+  MISSING_PARENT_ID: 3,
+  CYCLE_REFERENCE: 4,
+
+  //anychart.data.Mapping
+  NOT_MAPPED_FIELD: 5,
+  COMPLEX_VALUE_TO_DEFAULT_FIELD: 6,
+  NOT_OBJECT_OR_ARRAY: 7,
+
+
+  CANT_SERIALIZE_FUNCTION: 8
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);

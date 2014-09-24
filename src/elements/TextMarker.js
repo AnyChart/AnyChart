@@ -432,7 +432,13 @@ anychart.elements.TextMarker.prototype.isHorizontal = function() {
  */
 anychart.elements.TextMarker.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
-  if (!this.checkDrawingNeeded() || !scale)
+
+  if (!scale) {
+    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    return;
+  }
+
+  if (!this.checkDrawingNeeded())
     return;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {

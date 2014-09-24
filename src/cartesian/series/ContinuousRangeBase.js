@@ -443,33 +443,41 @@ anychart.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.highStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize highStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series highStroke']
+    );
   } else {
     json['highStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.highStroke()));
   }
 
   if (goog.isFunction(this.hoverHighStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverHighStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hoverHighStroke']
+    );
   } else {
     json['hoverHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverHighStroke()));
   }
 
   if (goog.isFunction(this.lowStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize lowStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series lowStroke']
+    );
   } else {
     json['lowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.lowStroke()));
   }
 
   if (goog.isFunction(this.hoverLowStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverLowStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series hoverLowStroke']
+    );
   } else {
     json['hoverLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverLowStroke()));
   }

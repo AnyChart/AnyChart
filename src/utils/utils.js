@@ -617,16 +617,6 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
 
 
 /**
- * Wrapper for safe console usage on develop version of anychart component.
- * @param {*} msg - Warning message.
- */
-anychart.utils.consoleWarn = function(msg) {
-  //TODO (A.Kudryavtsev): Add another console notifications if needed (log(), error(), info() ... ).
-  if (anychart.DEVELOP && goog.global['console']) goog.global['console']['warn'](msg);
-};
-
-
-/**
  * RegExp of what we allow to be serialized as an xml attribute.
  * @type {RegExp}
  * @private
@@ -789,6 +779,159 @@ anychart.utils.getSalt = function() {
   }), function(v) {
     return String.fromCharCode(v);
   }).join('');
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Errors and Warnings.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Log en error by code.
+ * @param {anychart.enums.ErrorCode} code Error internal code,. @see anychart.enums.ErrorCode.
+ * @param {*=} opt_exception Exception.
+ * @param {Array.<*>=} opt_descArgs Description message arguments.
+ */
+anychart.utils.error = function(code, opt_exception, opt_descArgs) {
+  anychart.utils.callLog_(
+      'error',
+      ('Error: ' + code + '\nDescription: ' + anychart.utils.getErrorDescription(code, opt_descArgs)),
+      (opt_exception || '')
+  );
+};
+
+
+/**
+ * @param {anychart.enums.ErrorCode} code Warning code.
+ * @param {Array.<*>=} opt_arguments Message arguments.
+ * @return {string}
+ */
+anychart.utils.getErrorDescription = function(code, opt_arguments) {
+  switch (code) {
+    case anychart.enums.ErrorCode.CONTAINER_NOT_SET:
+      return 'Container is not set or can not be properly recognized. Use container() method to set it.';
+
+    case anychart.enums.ErrorCode.SCALE_NOT_SET:
+      return 'Scale is not set. Use scale() method to set it.';
+
+    default:
+      return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
+          'We will be very grateful for your report.';
+  }
+};
+
+
+/**
+ * Log en info by code.
+ * @param {anychart.enums.InfoCode|string} codeOrMsg Info internal code,. @see anychart.enums.InfoCode.
+ * @param {Array.<*>=} opt_descArgs Description message arguments.
+ */
+anychart.utils.info = function(codeOrMsg, opt_descArgs) {
+  if (anychart.DEVELOP) {
+    if (goog.isNumber(codeOrMsg)) {
+      anychart.utils.callLog_(
+          'info',
+          ('Info: ' + codeOrMsg + '\nDescription: ' + anychart.utils.getInfoDescription(codeOrMsg, opt_descArgs)),
+          ''
+      );
+    } else {
+      anychart.utils.callLog_('info', codeOrMsg, '');
+    }
+  }
+};
+
+
+/**
+ * @param {anychart.enums.InfoCode} code Warning code.
+ * @param {Array.<*>=} opt_arguments Message arguments.
+ * @return {string}
+ */
+anychart.utils.getInfoDescription = function(code, opt_arguments) {
+  switch (code) {
+    case anychart.enums.InfoCode.BULLET_TOO_MUCH_RANGES:
+      return 'It is not recommended to use more than 5 ranges in Bullet Chart. Currently there are \'' + opt_arguments[0] + '\' ranges.\nExpert opinion at http://cdn.anychart.com/warning/1.html';
+
+    case anychart.enums.InfoCode.BULLET_TOO_MUCH_MEASURES:
+      return 'It is not recommended to use more than 2 markers in Bullet Chart. Currently there are \'' + opt_arguments[0] + '\' markers.\nExpert opinion at http://cdn.anychart.com/warning/2.html';
+
+    case anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS:
+      return 'It is not recommended to use more then 5 - 7 points in Pie Chart. Currently there are \'' + opt_arguments[0] + '\' points.\nExpert opinion at http://cdn.anychart.com/warning/3.html';
+
+    default:
+      return 'We think we can help you improve your data visualization, please contact us at http://support.anychart.com/.';
+  }
+};
+
+
+/**
+ * Log en warning by code.
+ * @param {anychart.enums.WarningCode} code Warning internal code,. @see anychart.enums.WarningCode.
+ * @param {*=} opt_exception Exception.
+ * @param {Array.<*>=} opt_descArgs Description message arguments.
+ */
+anychart.utils.warning = function(code, opt_exception, opt_descArgs) {
+  if (anychart.DEVELOP) {
+    anychart.utils.callLog_(
+        'warn',
+        ('Warning: ' + code + '\nDescription: ' + anychart.utils.getWarningDescription(code, opt_descArgs)),
+        (opt_exception || '')
+    );
+  }
+};
+
+
+/**
+ * @param {anychart.enums.WarningCode} code Warning code.
+ * @param {Array.<*>=} opt_arguments Message arguments.
+ * @return {string}
+ */
+anychart.utils.getWarningDescription = function(code, opt_arguments) {
+  switch (code) {
+    case anychart.enums.WarningCode.DUPLICATED_DATA_ITEM:
+      return 'Data item with ID=\'' + opt_arguments[0] + '\' already exists in the tree and will be used as the parent for all related data items.';
+
+    case anychart.enums.WarningCode.REFERENCE_IS_NOT_UNIQUE:
+      return 'Data item with ID=\'' + opt_arguments[0] + '\' is not unique. First met object will be used.';
+
+    case anychart.enums.WarningCode.MISSING_PARENT_ID:
+      return 'One of the data items was looking for the parent with ID=\'' + opt_arguments[0] + '\', but did not find it. Please check the data.' +
+          '\nPLEASE NOTE: this data item will be added as the root to avoid loss of information.';
+
+    case anychart.enums.WarningCode.CYCLE_REFERENCE:
+      return 'Data item {ID=\'' + opt_arguments[0] + '\', PARENT=\'' + opt_arguments[1] + '\'} belongs to a cycle and will not be added to the tree.';
+
+    case anychart.enums.WarningCode.NOT_MAPPED_FIELD:
+      return 'Can not set value for the \'' + opt_arguments[0] + '\' field to an array row if it is not mapped.';
+
+    case anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD:
+      return 'Setting complex value to the default \'' + opt_arguments[0] + '\' field changes row behaviour.';
+
+    case anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY:
+      return 'Can not set value for the \'' + opt_arguments[0] + '\' field to a row that is not an object or an array.';
+
+    case anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION:
+      return 'We can not serialize \'' + opt_arguments[0] + '\' function, please reset it manually.';
+
+    default:
+      return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
+          'We will be very grateful for your report!';
+  }
+};
+
+
+/**
+ * @param {string} name Log function name.
+ * @param {string} message Message text.
+ * @param {*=} opt_exception Exception.
+ * @private
+ */
+anychart.utils.callLog_ = function(name, message, opt_exception) {
+  var console = goog.global['console'];
+  if (console) {
+    var log = console[name] || console['log'];
+    if (log) {
+      log.call(console, message, opt_exception);
+    }
+  }
 };
 
 

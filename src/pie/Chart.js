@@ -1575,11 +1575,10 @@ anychart.pie.Chart.prototype.drawContent = function(bounds) {
   var iterator = this.getIterator();
   var exploded;
   var value;
+  var rowsCount = iterator.getRowsCount();
 
-  if (iterator.getRowsCount() >= 10) {
-    if (window.console) {
-      window.console.log('Warning: Too much points in Pie chart. See https://anychart.atlassian.net/wiki/pages/viewpage.action?pageId=17301506 for details.');
-    }
+  if (rowsCount >= 7) {
+    anychart.utils.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
   }
 
   if (this.palette_ && this.palette_ instanceof anychart.utils.RangeColorPalette) {
@@ -2747,17 +2746,21 @@ anychart.pie.Chart.prototype.serialize = function() {
   if (!goog.isFunction(hoverStroke)) chart['hoverStroke'] = hoverStroke;
 
   if (goog.isFunction(this.hatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Pie Chart hatchFill']
+    );
   } else {
     json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
   }
 
   if (goog.isFunction(this.hoverHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverHatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Pie Chart hoverHatchFill']
+    );
   } else {
     json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverHatchFill()));
   }

@@ -1069,49 +1069,61 @@ anychart.cartesian.series.Bubble.prototype.serialize = function() {
   json['displayNegative'] = this.displayNegative();
 
   if (goog.isFunction(this.negativeFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize negativeFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series negativeFill']
+    );
   } else {
     json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
   }
 
   if (goog.isFunction(this.hoverNegativeFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverNegativeFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series hoverNegativeFill']
+    );
   } else {
     json['hoverNegativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeFill()));
   }
 
   if (goog.isFunction(this.negativeStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize negativeStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series negativeStroke']
+    );
   } else {
     json['negativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.negativeStroke()));
   }
 
   if (goog.isFunction(this.hoverNegativeStroke())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverNegativeStroke function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series hoverNegativeStroke']
+    );
   } else {
     json['hoverNegativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverNegativeStroke()));
   }
 
   if (goog.isFunction(this.negativeHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize negativeHatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series negativeHatchFill']
+    );
   } else {
     json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
   }
 
   if (goog.isFunction(this.hoverNegativeHatchFill())) {
-    if (window.console) {
-      window.console.log('Warning: We can not serialize hoverNegativeHatchFill function, please reset it manually.');
-    }
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Bubble Series hoverNegativeHatchFill']
+    );
   } else {
     json['hoverNegativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeHatchFill()));
   }

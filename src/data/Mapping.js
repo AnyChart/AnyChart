@@ -100,16 +100,16 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
           }
         }
       }
-      anychart.utils.consoleWarn('Cannot set value for field \'' + fieldName + '\' to array row if it is not mapped');
+      anychart.utils.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
     } else if (rowType == 'object') {
       anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
           this.writeToFirstFieldByMapping_);
     } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
       if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
-        anychart.utils.consoleWarn('Settings complex value to default field \'' + fieldName + '\' alters row behaviour');
+        anychart.utils.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
       row = value;
     } else {
-      anychart.utils.consoleWarn('Cannot set value for field \'' + fieldName + '\' to row that is not object or array');
+      anychart.utils.warning(anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY, null, [fieldName]);
     }
   }
   return row;
