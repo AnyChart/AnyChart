@@ -911,8 +911,8 @@ anychart.enums.EventType = {
 
   SIGNAL: 'signal',
 
-  TREE_DATA_CHANGE:'treeDataChange',
-  TREE_META_CHANGE:'treeMetaChange'
+  TREE_DATA_CHANGE: 'treeDataChange',
+  TREE_META_CHANGE: 'treeMetaChange'
 };
 
 

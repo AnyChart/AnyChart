@@ -67,6 +67,7 @@ goog.inherits(anychart.data.Tree, anychart.Base);
  */
 anychart.data.Tree.IndexKeyValue;
 
+
 /**
  * @typedef {{
  *    type: string,
