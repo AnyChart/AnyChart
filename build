@@ -571,6 +571,9 @@ def __get_graphics_export_string():
 
 def __print_exports(target=SRC_PATH):
     print '\n'.join(__get_exports_sting(target))
+
+def __print_non_doc_exports(target=SRC_PATH):
+    print '\n'.join([i for i in __get_exports_sting(target) if not re.search('.+//.+', i)])
 #=======================================================================================================================
 #                            Logging.
 #=======================================================================================================================
@@ -662,6 +665,9 @@ def __exec_main_script():
     # create the parser for the "exports" command
     subparsers.add_parser('exports', help='Print exports list in console')
 
+    # create the parser for the "non-doc-exports" command
+    subparsers.add_parser('non-doc-exports', help='Print non document exports list in console')
+
     # create the parser for the "contrib" command
     docs_parser = subparsers.add_parser('docs', help='Generate project documentation')
     docs_parser.add_argument('-c', '--compile', action='store_true', help='Compile project before docs generation')
@@ -699,6 +705,8 @@ def __exec_main_script():
         __build_js_doc()
     elif command == 'exports':
         __print_exports()
+    elif command == 'non-doc-exports':
+        __print_non_doc_exports()
 
     __print_warnings_list()
 

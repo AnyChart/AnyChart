@@ -14,6 +14,13 @@ goog.require('anychart.utils');
 
 
 /**
+ * Axis Class.<br/>
+ * Any axis must be bound to a scale.<br/>
+ * To obtain a new instance of Axis use {@link anychart.elements.axis}.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *    .scale(anychart.scales.linear())
+ *    .container(stage).draw();
  * @constructor
  * @extends {anychart.VisualBase}
  */
@@ -126,7 +133,7 @@ anychart.elements.Axis = function() {
   this.resumeSignalsDispatching(true);
 
   /**
-   * Const to save space.
+   * Constant to save space.
    * @type {number}
    * @private
    */
@@ -334,6 +341,11 @@ anychart.elements.Axis.prototype.minorLabelsBounds_ = null;
  * @return {string} Axis name.
  *//**
  * Setter for axis name.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *    .name('New title for my axis')
+ *    .scale(anychart.scales.linear())
+ *    .container(stage).draw();
  * @param {string=} opt_value Name.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -353,12 +365,15 @@ anychart.elements.Axis.prototype.name = function(opt_value) {
 
 
 /**
- * Getter for the title axis.
+ * Getter for the axis title.
  * @return {string|anychart.elements.Title} Axis title.
  *//**
- * Setter for the title axis.
+ * Setter for the axis title.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.xAxis().title('New title for my axis')
  * @param {(string|anychart.elements.Title)=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|anychart.elements.Title)=} opt_value Axis title.
@@ -413,8 +428,13 @@ anychart.elements.Axis.prototype.titleInvalidated_ = function(event) {
  * @return {anychart.elements.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * var labels = anychart.elements.labelsFactory();
+ * labels.fontSize(14).rotation(-90);
+ * chart.xAxis().labels(labels);
  * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
@@ -467,8 +487,13 @@ anychart.elements.Axis.prototype.labelsInvalidated_ = function(event) {
  * @return {anychart.elements.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * var labels = anychart.elements.labelsFactory();
+ * labels.enabled(true).fontSize(6).rotation(-45);
+ * chart.yAxis().labels(labels);
  * @param {anychart.elements.LabelsFactory=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {anychart.elements.LabelsFactory=} opt_value Axis labels.
@@ -522,6 +547,10 @@ anychart.elements.Axis.prototype.minorLabelsInvalidated_ = function(event) {
  * @return {anychart.elements.Ticks} Axis ticks.
  *//**
  * Setter for axis ticks.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().ticks().stroke('5 blue').length(5);
+ * chart.xAxis().ticks(chart.yAxis().ticks());
  * @param {anychart.elements.Ticks=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -578,6 +607,11 @@ anychart.elements.Axis.prototype.ticksInvalidated_ = function(event) {
  * @return {anychart.elements.Ticks} Axis ticks.
  *//**
  * Setter for minor axis ticks.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
+ * chart.xScale(anychart.scales.linear());
+ * chart.xAxis().minorTicks(chart.yAxis().minorTicks());
  * @param {anychart.elements.Ticks=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -631,7 +665,12 @@ anychart.elements.Axis.prototype.minorTicksInvalidated_ = function(event) {
  * Getter for axis line stroke.
  * @return {string|acgraph.vector.Stroke} Axis line stroke settings.
  *//**
- * Setter for axis line stroke.
+ * Setter for axis line stroke by one value.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().stroke('3 darkgreen 0.8');
  * @param {(string|acgraph.vector.Stroke)=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -663,12 +702,15 @@ anychart.elements.Axis.prototype.stroke = function(opt_value) {
  * @return {string|anychart.enums.Orientation} Axis orientation.
  *//**
  * Setter for axis orientation.
- * @param {(string|anychart.enums.Orientation)=} opt_value Value to set.
- * @return {!anychart.elements.Axis} An instance of the {@link anychart.elements.Axis} class for method chaining.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().orientation('right');
+ * @param {(string|anychart.enums.Orientation)=} opt_value ['top'] Value to set.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(string|anychart.enums.Orientation)=} opt_value Axis orientation.
- * @return {string|anychart.enums.Orientation|anychart.elements.Axis} Axis orientation oe itself for method chaining.
+ * @return {string|anychart.enums.Orientation|anychart.elements.Axis} Axis orientation or itself for method chaining.
  */
 anychart.elements.Axis.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -689,6 +731,11 @@ anychart.elements.Axis.prototype.orientation = function(opt_value) {
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * var scale = anychart.scales.ordinal();
+ * scale.values(['A1', 'A2', 'A3', 'B1', 'B2']);
+ * chart.yAxis(1).orientation('right').scale(scale);
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -727,7 +774,13 @@ anychart.elements.Axis.prototype.scaleInvalidated_ = function(event) {
  * Getter for axis X offset.
  * @return {number} Offset by X.
  *//**
- * Setter for axis X offset.
+ * Setter for axis X offset.<br/>
+ * <b>Note:</b> Works only if you create an independent axis object.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *   .offsetX(15)
+ *   .scale(anychart.scales.ordinal().values([1,2,3]))
+ *   .container(stage).draw();
  * @param {number=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -751,9 +804,15 @@ anychart.elements.Axis.prototype.offsetX = function(opt_value) {
  * Getter for axis Y offset.
  * @return {number} Offset by Y.
  *//**
- * Setter for axis Y offset.
+ * Setter for axis Y offset.<br/>
+ * <b>Note:</b> Works only if you create an independent axis object.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *   .offsetX(15)
+ *   .scale(anychart.scales.ordinal().values([1,2,3]))
+ *   .container(stage).draw();
  * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} for method chaining.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value Value to set.
@@ -776,7 +835,13 @@ anychart.elements.Axis.prototype.offsetY = function(opt_value) {
  * @return {number} Axis length.
  *//**
  * Setter for axis length.<br/>
- * <b>Note:</b> width and height swap in case of horizontal axis.
+ * <b>Note:</b> width and height swap in case of horizontal axis.<br/>
+ * <b>Note:</b> Works only if you create an independent axis object.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *   .length(200)
+ *   .scale(anychart.scales.ordinal().values([1,2,3]))
+ *   .container(stage).draw();
  * @param {number=} opt_value Axis length.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -800,7 +865,13 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
  * Getter for parentBounds.
  * @return {acgraph.math.Rect} Current parent bounds.
  *//**
- * Setter for parentBounds.
+ * Setter for parentBounds.<br/>
+ * <b>Note:</b> Works only if you create an independent axis object.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *   .parentBounds(anychart.math.rect(40, 0, 240, 40))
+ *   .scale(anychart.scales.ordinal().values([1,2,3]))
+ *   .container(stage).draw();
  * @param {acgraph.math.Rect=} opt_value Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
  *//**
@@ -1348,6 +1419,22 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
 
 /**
  * Returns remaining parent bounds to use elsewhere.
+ * @example <t>simple-h100</t>
+ * var axis = anychart.elements.axis();
+ * axis
+ *     .orientation('left')
+ *     .scale(anychart.scales.ordinal().values([1,2,3]))
+ *     .container(stage).draw();
+ * var label = anychart.elements.label();
+ * label
+ *     .parentBounds(axis.getRemainingBounds())
+ *     .width('100%')
+ *     .height('100%')
+ *     .padding(15)
+ *     .background()
+ *       .enabled(true)
+ *       .fill('blue 0.2')
+ * label.container(stage).draw();
  * @return {anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Axis.prototype.getRemainingBounds = function() {
@@ -1497,6 +1584,9 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
  * @return {boolean} Drawing flag.
  *//**
  * Setter for the first label drawing flag.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.4, 1.6, 1.9]);
+ * chart.yAxis().drawFirstLabel(false);
  * @param {boolean=} opt_value [true] Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -1523,6 +1613,9 @@ anychart.elements.Axis.prototype.drawFirstLabel = function(opt_value) {
  * @return {boolean} Drawing flag.
  *//**
  * Setter for the last label drawing flag.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.4, 1.6, 1.9]);
+ * chart.yAxis().drawFirstLabel(false);
  * @param {boolean=} opt_value [true] Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -1549,6 +1642,19 @@ anychart.elements.Axis.prototype.drawLastLabel = function(opt_value) {
  * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
  *//**
  * Setter for overlap mode for labels.
+ * @example <t>lineChart</t>
+ * var data = [
+ *     ['2002 January', 1],
+ *     ['2002 Febrary', 2],
+ *     ['2002 March', 4],
+ *     ['2002 April', 3],
+ *     ['2002 May', 2],
+ *     ['2002 June', 4],
+ *     ['2002 Jule', 5],
+ *     ['2002 August', 1]
+ * ];
+ * chart.xAxis().staggerMode(false).overlapMode(true);
+ * chart.line(data);
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [anychart.enums.LabelsOverlapMode.NO_OVERLAP] Value to set.
  * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
  *//**
@@ -1816,7 +1922,7 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
-    //TODO as soon as it becomes possible:
+    //TODO as soon as it is possible:
     //sum -- the sum data values from series bound to this axis (depends on orientation)
     //average -- the sum divided by the number of points
     //median -- axis median
@@ -2397,7 +2503,12 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
 
 
 /**
- * Constructor function.
+ * Возвращает экземпляр оси.<br/>
+ * <b>Note:</b> Любая Ось, которая создается как самостоятельный элемент, обязательно должна быть привязана к шкале.
+ * @example <t>simple-h100</t>
+ * anychart.elements.axis()
+ *    .scale(anychart.scales.linear())
+ *    .container(stage).draw();
  * @return {!anychart.elements.Axis}
  */
 anychart.elements.axis = function() {
@@ -2406,26 +2517,26 @@ anychart.elements.axis = function() {
 
 
 //exports
-goog.exportSymbol('anychart.elements.axis', anychart.elements.axis);
+goog.exportSymbol('anychart.elements.axis', anychart.elements.axis);//doc|ex
 anychart.elements.Axis.prototype['staggerMode'] = anychart.elements.Axis.prototype.staggerMode;//doc|ex
 anychart.elements.Axis.prototype['staggerLines'] = anychart.elements.Axis.prototype.staggerLines;//doc|ex
 anychart.elements.Axis.prototype['staggerMaxLines'] = anychart.elements.Axis.prototype.staggerMaxLines;//doc|ex
-anychart.elements.Axis.prototype['title'] = anychart.elements.Axis.prototype.title;
+anychart.elements.Axis.prototype['title'] = anychart.elements.Axis.prototype.title;//doc|ex
 anychart.elements.Axis.prototype['name'] = anychart.elements.Axis.prototype.name;
-anychart.elements.Axis.prototype['labels'] = anychart.elements.Axis.prototype.labels;
-anychart.elements.Axis.prototype['minorLabels'] = anychart.elements.Axis.prototype.minorLabels;
-anychart.elements.Axis.prototype['ticks'] = anychart.elements.Axis.prototype.ticks;
-anychart.elements.Axis.prototype['minorTicks'] = anychart.elements.Axis.prototype.minorTicks;
-anychart.elements.Axis.prototype['stroke'] = anychart.elements.Axis.prototype.stroke;
-anychart.elements.Axis.prototype['orientation'] = anychart.elements.Axis.prototype.orientation;
-anychart.elements.Axis.prototype['scale'] = anychart.elements.Axis.prototype.scale;
-anychart.elements.Axis.prototype['offsetX'] = anychart.elements.Axis.prototype.offsetX;
-anychart.elements.Axis.prototype['offsetY'] = anychart.elements.Axis.prototype.offsetY;
-anychart.elements.Axis.prototype['length'] = anychart.elements.Axis.prototype.length;
-anychart.elements.Axis.prototype['parentBounds'] = anychart.elements.Axis.prototype.parentBounds;
-anychart.elements.Axis.prototype['getRemainingBounds'] = anychart.elements.Axis.prototype.getRemainingBounds;
-anychart.elements.Axis.prototype['drawFirstLabel'] = anychart.elements.Axis.prototype.drawFirstLabel;
-anychart.elements.Axis.prototype['drawLastLabel'] = anychart.elements.Axis.prototype.drawLastLabel;
-anychart.elements.Axis.prototype['overlapMode'] = anychart.elements.Axis.prototype.overlapMode;
-anychart.elements.Axis.prototype['isHorizontal'] = anychart.elements.Axis.prototype.isHorizontal;
-anychart.elements.Axis.prototype['draw'] = anychart.elements.Axis.prototype.draw;
+anychart.elements.Axis.prototype['labels'] = anychart.elements.Axis.prototype.labels;//doc|ex
+anychart.elements.Axis.prototype['minorLabels'] = anychart.elements.Axis.prototype.minorLabels;//doc|ex
+anychart.elements.Axis.prototype['ticks'] = anychart.elements.Axis.prototype.ticks;//doc|ex
+anychart.elements.Axis.prototype['minorTicks'] = anychart.elements.Axis.prototype.minorTicks;//doc|ex
+anychart.elements.Axis.prototype['stroke'] = anychart.elements.Axis.prototype.stroke;//doc|ex
+anychart.elements.Axis.prototype['orientation'] = anychart.elements.Axis.prototype.orientation;//doc|ex
+anychart.elements.Axis.prototype['scale'] = anychart.elements.Axis.prototype.scale;//doc|ex
+anychart.elements.Axis.prototype['offsetX'] = anychart.elements.Axis.prototype.offsetX;//doc|ex
+anychart.elements.Axis.prototype['offsetY'] = anychart.elements.Axis.prototype.offsetY;//doc|ex
+anychart.elements.Axis.prototype['length'] = anychart.elements.Axis.prototype.length;//doc|ex
+anychart.elements.Axis.prototype['parentBounds'] = anychart.elements.Axis.prototype.parentBounds;//doc|ex
+anychart.elements.Axis.prototype['getRemainingBounds'] = anychart.elements.Axis.prototype.getRemainingBounds;//doc|ex
+anychart.elements.Axis.prototype['drawFirstLabel'] = anychart.elements.Axis.prototype.drawFirstLabel;//doc|ex
+anychart.elements.Axis.prototype['drawLastLabel'] = anychart.elements.Axis.prototype.drawLastLabel;//doc|ex
+anychart.elements.Axis.prototype['overlapMode'] = anychart.elements.Axis.prototype.overlapMode;//doc|ex
+anychart.elements.Axis.prototype['isHorizontal'] = anychart.elements.Axis.prototype.isHorizontal;//doc
+anychart.elements.Axis.prototype['draw'] = anychart.elements.Axis.prototype.draw;//doc
