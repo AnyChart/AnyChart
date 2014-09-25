@@ -772,12 +772,6 @@ anychart.data.Tree.DataItem.prototype.set = function(key, value) {
     this.data_[key] = value;
     this.tree_.addToIndex(this, key);
     this.dispatchSignal_();
-    this.tree_.dispatchEvent({
-      type: anychart.enums.EventType.TREE_DATA_CHANGE,
-      dataItem: this,
-      key: key,
-      value: value
-    });
   }
 
   return this;
@@ -795,12 +789,6 @@ anychart.data.Tree.DataItem.prototype.meta = function(key, opt_value) {
     if (this.meta_[key] != opt_value) {
       this.meta_[key] = opt_value;
       this.dispatchSignal_();
-      this.tree_.dispatchEvent({
-        type: anychart.enums.EventType.TREE_META_CHANGE,
-        dataItem: this,
-        key: key,
-        value: opt_value
-      });
     }
     return this;
   }
