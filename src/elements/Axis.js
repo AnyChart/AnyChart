@@ -2503,8 +2503,8 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
 
 
 /**
- * Возвращает экземпляр оси.<br/>
- * <b>Note:</b> Любая Ось, которая создается как самостоятельный элемент, обязательно должна быть привязана к шкале.
+ * Returns axis instance.<br/>
+ * <b>Note:</b> Any axis must be bound to a scale.
  * @example <t>simple-h100</t>
  * anychart.elements.axis()
  *    .scale(anychart.scales.linear())
