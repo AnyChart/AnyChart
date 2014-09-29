@@ -505,6 +505,99 @@ anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
 };
 
 
+/**
+ * Adds an event listener. A listener can only be added once to an
+ * object and if it is added again the key for the listener is
+ * returned. Note that if the existing listener is a one-off listener
+ * (registered via listenOnce), it will no longer be a one-off
+ * listener after a call to listen().
+ *
+ * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
+ *     method.
+ * @param {boolean=} opt_useCapture Whether to fire in capture phase
+ *     (defaults to false).
+ * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
+ *     listener.
+ * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @template SCOPE,EVENTOBJ
+ */
+anychart.Base.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
+  return goog.base(this, 'listen', type, listener, opt_useCapture, opt_listenerScope);
+};
+
+
+/**
+ * Adds an event listener that is removed automatically after the
+ * listener fired once.
+ *
+ * If an existing listener already exists, listenOnce will do
+ * nothing. In particular, if the listener was previously registered
+ * via listen(), listenOnce() will not turn the listener into a
+ * one-off listener. Similarly, if there is already an existing
+ * one-off listener, listenOnce does not modify the listeners (it is
+ * still a once listener).
+ *
+ * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
+ *     method.
+ * @param {boolean=} opt_useCapture Whether to fire in capture phase
+ *     (defaults to false).
+ * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
+ *     listener.
+ * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @template SCOPE,EVENTOBJ
+ */
+anychart.Base.prototype.listenOnce = function(type, listener, opt_useCapture, opt_listenerScope) {
+  return goog.base(this, 'listenOnce', type, listener, opt_useCapture, opt_listenerScope);
+};
+
+
+/**
+ * Removes an event listener which was added with listen() or listenOnce().
+ *
+ * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
+ * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
+ *     method.
+ * @param {boolean=} opt_useCapture Whether to fire in capture phase
+ *     (defaults to false).
+ * @param {SCOPE=} opt_listenerScope Object in whose scope to call
+ *     the listener.
+ * @return {boolean} Whether any listener was removed.
+ * @template SCOPE,EVENTOBJ
+ */
+anychart.Base.prototype.unlisten = function(type, listener, opt_useCapture, opt_listenerScope) {
+  return goog.base(this, 'unlisten', type, listener, opt_useCapture, opt_listenerScope);
+};
+
+
+/**
+ * Removes an event listener which was added with listen() by the key
+ * returned by listen().
+ *
+ * @param {goog.events.ListenableKey} key The key returned by
+ *     listen() or listenOnce().
+ * @return {boolean} Whether any listener was removed.
+ */
+anychart.Base.prototype.unlistenByKey = function(key) {
+  return goog.base(this, 'unlistenByKey', key);
+};
+
+
+/**
+ * Removes all listeners from this listenable. If type is specified,
+ * it will only remove listeners of the particular type. otherwise all
+ * registered listeners will be removed.
+ *
+ * @param {string=} opt_type Type of event to remove, default is to
+ *     remove all types.
+ * @return {number} Number of listeners removed.
+ */
+anychart.Base.prototype.removeAllListeners = function(opt_type) {
+  return goog.base(this, 'removeAllListeners', opt_type);
+};
+
+
 //exports
 anychart.Base.prototype['listen'] = anychart.Base.prototype.listen;
 anychart.Base.prototype['listenOnce'] = anychart.Base.prototype.listenOnce;
