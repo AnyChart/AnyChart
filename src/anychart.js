@@ -14,15 +14,25 @@ goog.require('goog.json.hybrid');
 
 
 /**
- * Current version of the framework, replaced on compile time.
- * @define {string} Current version of the framework.
+ * Current version of the framework.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.3, 1.6]);
+ * chart.title().text('Current version is ' + anychart.VERSION);
+ * @define {string} Replaced on compile time.
  */
 anychart.VERSION = '';
 
 
 /**
  * Define, if is developers edition.
- * @define {boolean} Is developers version.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.3, 1.6]);
+ * if (!anychart.DEVELOP){
+ *   chart.title().text('It is production edition');
+ * }else{
+ *   chart.title().text('It is developers edition');
+ * }
+ * @define {boolean} Replaced on compile time.
  */
 anychart.DEVELOP = true;
 
@@ -123,7 +133,20 @@ anychart.createChartByType = function(type) {
 
 
 /**
- * Creates an element by config.
+ * Creates an element by JSON config.
+ * @example
+ *  var json = {
+ *    "chart": {
+ *      "type": "pie",
+ *      "data": [
+ *        ["Product A", 1222],
+ *        ["Product B", 2431],
+ *        ["Product C", 3624]
+ *      ]
+ *    }
+ *  };
+ * var chart = anychart.fromJson(json);
+ * chart.container('container').draw();
  * @param {(Object|string)} jsonConfig Config.
  * @return {*} Element created by config.
  */
@@ -151,7 +174,21 @@ anychart.fromJson = function(jsonConfig) {
 
 
 /**
- * Creates an element by config.
+ * Creates an element by XML config.
+ * @example
+ * var xmlString = '<xml>' +
+ *   '<chart type="pie" >' +
+ *     '<data>' +
+ *       '<point name="Product A" value="1222"/>' +
+ *       '<point name="Product B" value="2431"/>' +
+ *       '<point name="Product C" value="3624"/>' +
+ *       '<point name="Product D" value="5243"/>' +
+ *       '<point name="Product E" value="8813"/>' +
+ *     '</data>' +
+ *   '</chart>' +
+ * '</xml>';
+ * var chart = anychart.fromXml(xmlString);
+ * chart.container('container').draw();
  * @param {string|Node} xmlConfig Config.
  * @return {*} Element created by config.
  */
@@ -212,7 +249,8 @@ anychart.documentLoadCallbacks_;
 
 
 /**
- * Add callback for the document load event.
+ * Add callback for the document load event.<br/>
+ * It is fired when the entire page loads, including its content (images, css, scripts, etc.).
  * @param {Function} func Function which will be called on document load event.
  * @param {*=} opt_scope Function call context.
  */
@@ -314,11 +352,10 @@ anychart.ready_ = function(event) {
 
 
 /**
- * Please be watchful and careful with this method.
- * Callback is invoked prior to full page LOAD, which means you
- * have no access to CSS and other elemnents outside page head and async loaded elements
- *
- * Add callback for document load event.
+ * Add callback for document ready event.<br/>
+ * It is called when the DOM is ready which can be prior to images and other external content is loaded.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.4, 1.2, 1.9]);
  * @param {Function} func Function which will called on document load event.
  * @param {*=} opt_scope Function call context.
  */
@@ -351,9 +388,14 @@ anychart.licenseKey_ = null;
 
 
 /**
- * License key.
- * @param {string=} opt_value
- * @return {?string}
+ * Setter for AnyChart license key.<br/>
+ * To purchase a license proceed to <a href="http://www.anychart.com/buy/">Buy AnyChart</a> page.
+ * @example
+ * anychart.licenseKey('YOUR-LICENSE-KEY');
+ * var chart = anychart.pieChart([1, 2, 3]);
+ * chart.container(stage).draw();
+ * @param {string=} opt_value Your licence key.
+ * @return {?string} Current licence key.
  */
 anychart.licenseKey = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -377,11 +419,11 @@ anychart.isValidKey = function() {
 
 
 //exports
-goog.exportSymbol('anychart.VERSION', anychart.VERSION);
-goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);
-goog.exportSymbol('anychart.graphics', anychart.graphics);
-goog.exportSymbol('anychart.fromJson', anychart.fromJson);
-goog.exportSymbol('anychart.fromXml', anychart.fromXml);
-goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//in docs/
-goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);
-goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);
+goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
+goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
+goog.exportSymbol('anychart.graphics', anychart.graphics);//import
+goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex
+goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
+goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
+goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
+goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
