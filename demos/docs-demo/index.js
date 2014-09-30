@@ -11,12 +11,20 @@ function load() {
   //   chart = anychart.lineChart();
 
 
-  var chart = anychart.lineChart();
+ var chart = anychart.columnChart();
 
-  chart.spline([1.1, 1.4, 1.6, 1.9]);
-  chart.yAxis().drawFirstLabel(false);
+* var data = anychart.data.set([
+*     {x: 'A1', value: 8, fill: 'yellow'},
+*     {x: 'A2', value: 11, fill: 'orange'},
+*     {x: 'A3', value: 12, fill: 'red'},
+*     {x: 'A4', value: 9, fill: 'grey'}
+* ]);
+* chart.column(data);
+* chart.container(stage).draw();
+* var view = data.mapAs();
+* var pointX = view.get(2, 'x');
+* var pointFill = view.get(2, 'fill');
+*   chart.title().text('point \''+ pointX +'\' has \'' + pointFill + '\' fill.');
 
-
-  chart.container(stage).draw();
 
 }

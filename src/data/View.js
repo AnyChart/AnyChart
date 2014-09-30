@@ -382,7 +382,21 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
- * Searches fieldName with fieldValue and returns it index.
+ * Searches fieldName by fieldValue and returns it index (or the first match).
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     {x: 'A1', value: 8},
+ *     {x: 'A2', value: 11, fill: 'orange'},
+ *     {x: 'A3', value: 12},
+ *     {x: 'A4', value: 9}
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * var view = data.mapAs();
+ * var index = view.find('x', 'A2');
+ * view.set(index, 'x', 'changed');
+ * view.set(index, 'fill', 'grey');
  * @param {string} fieldName Name of the field.
  * @param {*} fieldValue Value of the field.
  * @return {number} Index in view.
@@ -418,6 +432,20 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 
 /**
  * Gets the value from the row by row index and field name.
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     {x: 'A1', value: 8, fill: 'yellow'},
+ *     {x: 'A2', value: 11, fill: 'orange'},
+ *     {x: 'A3', value: 12, fill: 'red'},
+ *     {x: 'A4', value: 9, fill: 'grey'}
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * var view = data.mapAs();
+ * var pointX = view.get(2, 'x');
+ * var pointFill = view.get(2, 'fill');
+ * chart.title().text('point \''+ pointX +'\' has \'' + pointFill + '\' fill.');
  * @param {number} rowIndex Index of the row to get field value from.
  * @param {string} fieldName The name of the field to be fetched from the current row.
  * @return {*} The field value or undefined, if not found.
@@ -429,6 +457,18 @@ anychart.data.View.prototype.get = function(rowIndex, fieldName) {
 
 /**
  * Sets the value to the row field by row index and field name.
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     ['A1', 8],
+ *     ['A2', 11],
+ *     ['A3', 12],
+ *     ['A4', 9]
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * var view = data.mapAs();
+ * view.set(2, 'x', 'B1');
  * @param {number} rowIndex
  * @param {string} fieldName
  * @param {*} value
@@ -610,5 +650,6 @@ anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//doc|ex
 anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//doc|ex
 anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//doc|ex
 anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//doc|need-ex
-anychart.data.View.prototype['get'] = anychart.data.View.prototype.get;
-anychart.data.View.prototype['set'] = anychart.data.View.prototype.set;
+anychart.data.View.prototype['get'] = anychart.data.View.prototype.get;//doc|ex
+anychart.data.View.prototype['set'] = anychart.data.View.prototype.set;//doc|ex
+anychart.data.View.prototype['find'] = anychart.data.View.prototype.find;//doc|ex

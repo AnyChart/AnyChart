@@ -311,7 +311,7 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
  *  if a row is a string, number or a function. Does not work in cases when a row is an object.
  * @param {!(Array.<string>)=} opt_indexProps [&#91;'x'&#93;] The names of the fields to be mapped to the current index
  *  if other options failed.
- * @return {!anychart.data.Mapping} The mapping for the data set.
+ * @return {!anychart.data.Mapping} The instance of {@link anychart.data.Mapping} class for method chaining.
  */
 anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps) {
   var res = new anychart.data.Mapping(this, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps);
@@ -388,8 +388,23 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 
 /**
  * Appends new rows to the set. Each argument is a row that will be appended to the Set.
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     ['A1', 8],
+ *     ['A2', 11],
+ *     ['A3', 12],
+ *     ['A4', 9]
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * // You can use differenet data formats.
+ * data.append(
+ *   {x: 'B1', value: 14},
+ *   ['B2', 16]
+ * );
  * @param {...*} var_args Rows to append.
- * @return {!anychart.data.Set} Returns itself for chaining.
+ * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  */
 anychart.data.Set.prototype.append = function(var_args) {
   anychart.globalLock.lock();
@@ -402,10 +417,20 @@ anychart.data.Set.prototype.append = function(var_args) {
 
 /**
  * Inserts the row to the set at the specified position.
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     ['A1', 8],
+ *     ['A2', 11],
+ *     ['A3', 12],
+ *     ['A4', 9]
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * data.insert({x: 'B1', value: 14, fill: 'grey'}, 2);
  * @param {*} row Row to insert.
- * @param {number=} opt_index The index at which to insert the object. If omitted,
- *      treated as 0. A negative index is counted from the end of the array.
- * @return {!anychart.data.Set} Itself for chaining.
+ * @param {number=} opt_index [0] The index at which to insert the object. A negative index is counted from the end of the array.
+ * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  */
 anychart.data.Set.prototype.insert = function(row, opt_index) {
   anychart.globalLock.lock();
@@ -418,8 +443,19 @@ anychart.data.Set.prototype.insert = function(row, opt_index) {
 
 /**
  * Removes the row by index.
+ * @example
+ * var chart = anychart.columnChart();
+ * var data = anychart.data.set([
+ *     ['A1', 8],
+ *     ['A2', 11],
+ *     ['A3', 12],
+ *     ['A4', 9]
+ * ]);
+ * chart.column(data);
+ * chart.container(stage).draw();
+ * data.remove(2); // remove 'A3' point.
  * @param {number} index Index of the row to remove.
- * @return {!anychart.data.Set}
+ * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  */
 anychart.data.Set.prototype.remove = function(index) {
   anychart.globalLock.lock();
@@ -472,7 +508,7 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
  * @param {(Array|string)=} opt_data Data set raw data can be set here.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {!anychart.data.Set}
+ * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
  */
 anychart.data.set = function(opt_data, opt_csvSettings) {
   return new anychart.data.Set(opt_data, opt_csvSettings);
@@ -484,7 +520,7 @@ goog.exportSymbol('anychart.data.set', anychart.data.set);//doc|ex
 anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//doc|ex
 anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//doc|ex
 anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//doc|ex
-anychart.data.Set.prototype['append'] = anychart.data.Set.prototype.append;
-anychart.data.Set.prototype['insert'] = anychart.data.Set.prototype.insert;
-anychart.data.Set.prototype['remove'] = anychart.data.Set.prototype.remove;
+anychart.data.Set.prototype['append'] = anychart.data.Set.prototype.append;//doc|ex
+anychart.data.Set.prototype['insert'] = anychart.data.Set.prototype.insert;//doc|ex
+anychart.data.Set.prototype['remove'] = anychart.data.Set.prototype.remove;//doc|ex
 anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//doc|ex
