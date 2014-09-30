@@ -7,7 +7,8 @@ goog.require('anychart.scales.ScatterTicks');
 
 /**
  * Represents simple linear scale that transforms values from domain [a, b] to domain [0, 1].
- * Note that a can be greater than b. The only condition for the scale is that a != b.
+ * Note that a can be greater than b. The only condition for the scale is that a != b.<br/>
+ * <b>Note:</b> To create instance use method {@link anychart.scales.linear}.
  * @constructor
  * @extends {anychart.scales.ScatterBase}
  */
@@ -42,6 +43,17 @@ goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
 
 
 /**
+ * Getter for set of scale ticks in terms of data values.
+ * @return {!anychart.scales.ScatterTicks} Current ticks.
+ *//**
+ * Setter for set of scale ticks in terms of data values.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.9]);
+ * chart.yScale().ticks([-1, 1, 3, 5]);
+ * @param {!Array=} opt_value An array of ticks to set.
+ * @return {!anychart.scales.Linear} An instance of {@link anychart.scales.Linear} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
@@ -59,7 +71,18 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
 
 
 /**
- * Gets or sets a set of scale minor ticks in terms of data values.
+ * Getter for set of scale minor ticks in terms of data values.
+ * @return {!anychart.scales.ScatterTicks} Current ticks.
+ *//**
+ * Setter for set of scale minor ticks in terms of data values.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.9]);
+ * chart.yScale().minorTicks([1.1, 1.15, 1.2, 1.3]);
+ * @param {!Array=} opt_value An array of ticks to set.
+ * @return {!anychart.scales.Linear} An instance of {@link anychart.scales.Linear} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
@@ -149,7 +172,15 @@ anychart.scales.Linear.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut to create a linear scale.
+ * Constructor function for linear scale.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.yScale(anychart.scales.linear());
  * @return {anychart.scales.Linear} Linear scale.
  */
 anychart.scales.linear = function() {
@@ -158,6 +189,7 @@ anychart.scales.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);
-anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;
-anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;
+goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
+anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;//doc|ex
+anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex
+anychart.scales.Linear.prototype['stackMode'] = anychart.scales.Linear.prototype.stackMode;//inherited

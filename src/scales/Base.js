@@ -5,6 +5,7 @@ goog.require('anychart.enums');
 
 
 /**
+ * Basic methods for scales.
  * @constructor
  * @extends {anychart.Base}
  */
@@ -66,8 +67,19 @@ anychart.scales.Base.prototype.isMissing = function(value) {
 
 
 /**
- * Getter and setter for scale inversion. If the scale is inverted, axes and series go upside-down or right-to-left
+ * Getter for scale inversion.
+ * @return {boolean} Current inversion state.
+ *//**
+ * Setter for scale inversion. If the scale is <b>inverted</b>, axes and series go upside-down or right-to-left
  * instead of bottom-to-top and left-to-right.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.4, 1.2, 1.6]);
+ * chart.yScale().inverted(true);
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.scales.Base} An instance of {@link anychart.scales.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * Getter and setter for scale inversion.
  * @param {boolean=} opt_value Inverted state to set.
  * @return {(!anychart.scales.Base|boolean)} Inverted state or itself for method chaining.
  */
@@ -229,13 +241,28 @@ anychart.scales.Base.prototype.canBeStacked = false;
 
 
 /**
+ * Getter for stacked mode.
+ * @return {anychart.enums.ScaleStackMode} Current Stack Mode.
+ *//**
+ * Setter for stacked mode.
+ * @example
+ * var chart = anychart.columnChart();
+ * chart.column([10, 11, 10, 12]);
+ * chart.column([7, 3, 4, 1]);
+ * chart.column([6, 4, 8, 16]);
+ * chart.yScale().stackMode('percent');
+ * chart.container(stage).draw();
+ * @param {anychart.enums.ScaleStackMode=} opt_value ['none'] Value to set.
+ * @return {anychart.scales.Base} An instance of {@link anychart.scales.Base} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Accepts 'none', 'value', 'percent'.
- * @param {anychart.enums.ScaleStackMode=} opt_stackMode Stack mode if used as a setter.
+ * @param {anychart.enums.ScaleStackMode=} opt_value Stack mode if used as a setter.
  * @return {anychart.scales.Base|anychart.enums.ScaleStackMode} StackMode or itself for method chaining.
  */
-anychart.scales.Base.prototype.stackMode = function(opt_stackMode) {
-  if (goog.isDef(opt_stackMode)) {
-    var str = anychart.enums.normalizeScaleStackMode(opt_stackMode);
+anychart.scales.Base.prototype.stackMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var str = anychart.enums.normalizeScaleStackMode(opt_value);
     var res, fn;
     if (this.canBeStacked && str == anychart.enums.ScaleStackMode.PERCENT) {
       res = anychart.enums.ScaleStackMode.PERCENT;
@@ -392,7 +419,6 @@ anychart.scales.Base.prototype.deserialize = function(value) {
 
 
 //exports
-anychart.scales.Base.prototype['stackMode'] = anychart.scales.Base.prototype.stackMode;
-anychart.scales.Base.prototype['inverted'] = anychart.scales.Base.prototype.inverted;
-anychart.scales.Base.prototype['startAutoCalc'] = anychart.scales.Base.prototype.startAutoCalc;
-anychart.scales.Base.prototype['finishAutoCalc'] = anychart.scales.Base.prototype.finishAutoCalc;
+anychart.scales.Base.prototype['inverted'] = anychart.scales.Base.prototype.inverted;//doc|ex
+anychart.scales.Base.prototype['startAutoCalc'] = anychart.scales.Base.prototype.startAutoCalc;//doc|need-ex
+anychart.scales.Base.prototype['finishAutoCalc'] = anychart.scales.Base.prototype.finishAutoCalc;//doc|need-ex

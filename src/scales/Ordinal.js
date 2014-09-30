@@ -7,7 +7,8 @@ goog.require('goog.array');
 
 
 /**
- * Ordinal scale.
+ * Define Ordinal scale.<br/>
+ * <b>Note:</b> To create instance use method {@link anychart.scales.ordinal}.
  * @constructor
  * @extends {anychart.scales.Base}
  */
@@ -105,6 +106,26 @@ anychart.scales.Ordinal.prototype.isMissing = function(value) {
 
 
 /**
+ * Getter for set of scale ticks in terms of data values.
+ * @return {!anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
+ *//**
+ * Setter for set of scale ticks in terms of data values.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *  ['A1', 1.1],
+ *  ['A2', 1.4],
+ *  ['A3', 1.2],
+ *  ['A4', 1.9],
+ *  ['B1', 1.1],
+ *  ['B2', 1.4],
+ *  ['B3', 1.2],
+ *  ['B4', 1.9]
+ * ]);
+ * chart.xScale().ticks([0,2,4,6]);
+ * @param {!Array=} opt_value An array of indexes of ticks values.
+ * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Ordinal|anychart.scales.OrdinalTicks)} Ticks or itself for chaining.
@@ -124,6 +145,25 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
 
 
 /**
+ * Getter for scale input domain.
+ * @return {Array.<number|string>} Current input domain.
+ *//**
+ * Setter for scale input domain.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.xScale().values(['A1', 'A2', 'B1', 'B2']);
+ * //the same that
+ * //chart.xScale().values('A1', 'A2', 'B1', 'B2');
+ * @param {(Array.<*>|*|null)=} opt_values Array of values, or values, or null for autocalc.
+ * @param {...*} var_args Other values, that should be contained in input domain.
+ * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(Array.<*>|*|null)=} opt_values Array of values, or values, or null for autocalc.
  * @param {...*} var_args Other values, that should be contained in input domain.
  * @return {!(anychart.scales.Ordinal|Array.<number|string>)} This or input domain.
@@ -151,7 +191,26 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
 
 
 /**
- * Getter/setter for scale names.
+ * Getter for scale ticks names.
+ * @return {Array.<*>} Current scale ticks names.
+ *//**
+ * Setter for scale ticks names.
+ * @example <t>lineChart</t>
+ * var data = [
+ *   {x:10, myName: 'Q1', value: 1.1},
+ *   {x:11, myName: 'Q2', value: 1.4},
+ *   {x:12, myName: 'Q3', value: 1.2},
+ *   {x:13, myName: 'Q4', value: 1.9}
+ * ];
+ * chart.line(data);
+ * chart.xScale().names('myName');
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.9]);
+ * chart.xScale().names(['C1', 'C2', 'C3', 'C4']);
+ * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
+ * @return {anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
  * @return {(Array.<*>|anychart.scales.Ordinal)} Scale names or self for chaining.
  */
@@ -252,8 +311,10 @@ anychart.scales.Ordinal.prototype.checkScaleChanged = function(silently) {
 
 
 /**
+ * Расширяет текущий input domain переданными значениями (если, такого значения ранее не было).
+ * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drop all passed values.
  * @param {...*} var_args Values that are supposed to extend the input domain.
- * @return {!anychart.scales.Ordinal} Itself for chaining.
+ * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
  */
 anychart.scales.Ordinal.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
@@ -288,6 +349,20 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
 
 
 /**
+ * Возвращает пропорциональное положение тика относительно всей шкалы по его имени.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * @example
+ * var chart = anychart.lineChart();
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.container(stage).draw();
+ * // Пытаемся получить положение середины тика 'A2'.
+ * var position = chart.xScale().transform('A2', 0.5);
+ * // Вернется значение 0.375
  * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
  * @return {number} Value transformed to output scope.
@@ -304,6 +379,20 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
 
 
 /**
+ * Возвращает имя тика по переданному положению относительно всей шкалы.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * @example
+ * var chart = anychart.lineChart();
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.container(stage).draw();
+ * // Пытаемся получить ближайший тик.
+ * var position = chart.xScale().inverseTransform(0.375);
+ * // Вернется значение 'A2'.
  * @param {number} ratio Value to transform in input scope.
  * @return {*} Value transformed to output scope.
  */
@@ -354,7 +443,15 @@ anychart.scales.Ordinal.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut way to create ordinal scale.
+ * Constructor function for ordinal scale.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.xScale(anychart.scales.ordinal());
  * @return {anychart.scales.Ordinal} Ordinal scale.
  */
 anychart.scales.ordinal = function() {
@@ -363,10 +460,10 @@ anychart.scales.ordinal = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);
-anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;
-anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;
-anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;
-anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;
-anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;
-anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;
+goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);//doc|ex
+anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;//doc|ex|need-tr
+anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;//doc|ex|need-tr
+anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;//doc|ex
+anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;//doc|ex
+anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;//doc|ex
+anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;//doc|need-ex|need-tr

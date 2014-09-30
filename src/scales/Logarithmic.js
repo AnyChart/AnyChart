@@ -7,6 +7,8 @@ goog.require('anychart.scales.Linear');
 
 
 /**
+ * Define Logarithmic scale.<br/>
+ * <b>Note:</b> To create instance use method {@link anychart.scales.log}.
  * @constructor
  * @extends {anychart.scales.Linear}
  */
@@ -17,6 +19,18 @@ goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 
 
 /**
+ * Getter for Log base value.
+ * @return {number} Current Log base.
+ *//**
+ * Setter for Log base value.<br/>
+ * <b>Note:</b> Affects tick values auto calculation.
+ * @example <t>lineChart</t>
+ * chart.line([2, 16, 4, 64]);
+ * chart.yScale(anychart.scales.log().logBase(2));
+ * @param {number=} opt_value [10] Log base to set. Takes any number greater than 1.
+ * @return {anychart.scales.Logarithmic} An instance of {@link anychart.scales.Logarithmic} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Log base value. Affects tick values auto calculation.
  * @param {number=} opt_value Log base to set.
  * @return {anychart.scales.Logarithmic|number}
@@ -119,7 +133,10 @@ anychart.scales.Logarithmic.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut to create a logarithmic scale.
+ * Constructor function for logarithmic scale.
+ * @example <t>lineChart</t>
+ * chart.line([2, 16, 4, 64]);
+ * chart.yScale(anychart.scales.log());
  * @return {anychart.scales.Logarithmic} Logarithmic scale.
  */
 anychart.scales.log = function() {
@@ -128,7 +145,7 @@ anychart.scales.log = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.log', anychart.scales.log);
-anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;
-anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;
-anychart.scales.Logarithmic.prototype['logBase'] = anychart.scales.Logarithmic.prototype.logBase;
+goog.exportSymbol('anychart.scales.log', anychart.scales.log);//doc|ex
+anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;//inherited
+anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;//inherited
+anychart.scales.Logarithmic.prototype['logBase'] = anychart.scales.Logarithmic.prototype.logBase;//doc|ex

@@ -6,7 +6,7 @@ goog.require('goog.array');
 
 
 /**
- * Scale ticks.
+ * Scale ticks settings.
  * @param {!anychart.scales.Ordinal} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.Base}
@@ -80,7 +80,23 @@ anychart.scales.OrdinalTicks.prototype.autoNames_ = null;
 
 
 /**
- * Gets or sets ticks interval value. Passed value as rounded and defaults to 1 in case of incorrect settings.
+ * Getter for ticks interval value.
+ * @return {number} Current interval value.
+ *//**
+ * Setter for ticks interval value. Passed value as rounded and defaults to 1 in case of incorrect settings.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *   ['A1', 1.1],
+ *   ['A2', 1.4],
+ *   ['A3', 1.2],
+ *   ['A4', 1.9]
+ * ]);
+ * chart.xScale().ticks().interval(2);
+ * @param {number=} opt_value Value to set.
+ * @return {anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * Gets or sets ticks interval value.
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.OrdinalTicks)} Interval value or itself for chaining.
  */
@@ -101,8 +117,19 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
 
 
 /**
- * Setups ticks as an explicit array of fixed ticks IN TERMS OF SCALE VALUE INDEXES.
- * Each
+ * Setups ticks as an explicit array of fixed ticks.
+ * @example <t>lineChart</t>
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9],
+ *    ['B1', 1.1],
+ *    ['B2', 1.4],
+ *    ['B3', 1.2],
+ *    ['B4', 1.9]
+ * ]);
+ * chart.xScale().ticks().set([0,2,4,6]);
  * @param {Array} ticks Explicit ticks array.
  * @return {!anychart.scales.OrdinalTicks} Returns itself for chaining.
  */
@@ -122,6 +149,17 @@ anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
 
 
 /**
+ * Getter for tick names.
+ * @return {Array} Current ticks names.
+ *//**
+ * Setter for tick names.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.9]);
+ * chart.xScale().ticks().names(['C1', 'C2', 'C3', 'C4']);
+ * @param {Array=} opt_values An array of tick aliases.
+ * @return {anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter and setter for tick names.
  * @param {Array=} opt_values An array of tick aliases.
  * @return {!(anychart.scales.OrdinalTicks|Array)} Names or this for chaining.
@@ -155,9 +193,22 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
 
 
 /**
- * Returns an array of ticks. Each tick can be:
- *    1) A value in terms of data, to make a tick on.
- *    2) An array of two values to make the tick from the first one to the second one.
+ * Returns an array of ticks. Each tick can be:<br/>
+ * <ol>
+ *    <li> A value in terms of data, to make a tick on.</li>
+ *    <li> An array of two values to make the tick from the first one to the second one.</li>
+ * </ol>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * @example
+ * chart.line([
+ *    ['A1', 1.1],
+ *    ['A2', 1.4],
+ *    ['A3', 1.2],
+ *    ['A4', 1.9]
+ * ]);
+ * chart.container(stage).draw();
+ * var currentTicks = chart.xScale().ticks().get();
+ * // Returns ["A1", "A2", "A3", "A4"].
  * @return {!Array} Array of ticks.
  */
 anychart.scales.OrdinalTicks.prototype.get = function() {
@@ -229,7 +280,7 @@ anychart.scales.OrdinalTicks.prototype.deserialize = function(value) {
 
 
 //exports
-anychart.scales.OrdinalTicks.prototype['interval'] = anychart.scales.OrdinalTicks.prototype.interval;
-anychart.scales.OrdinalTicks.prototype['set'] = anychart.scales.OrdinalTicks.prototype.set;
-anychart.scales.OrdinalTicks.prototype['get'] = anychart.scales.OrdinalTicks.prototype.get;
-anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.prototype.names;
+anychart.scales.OrdinalTicks.prototype['interval'] = anychart.scales.OrdinalTicks.prototype.interval;//doc|ex
+anychart.scales.OrdinalTicks.prototype['set'] = anychart.scales.OrdinalTicks.prototype.set;//doc|ex
+anychart.scales.OrdinalTicks.prototype['get'] = anychart.scales.OrdinalTicks.prototype.get;//doc|ex
+anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.prototype.names;//doc|ex

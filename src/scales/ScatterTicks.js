@@ -79,9 +79,19 @@ anychart.scales.ScatterTicks.prototype.mode_ = anychart.enums.ScatterTicksMode.L
 
 
 /**
- * Gets or sets ticks interval value. Note that interval value can be read only if it was set explicitly.
- * It is returned as NaN otherwise. If opt_value is defined but is not a number or less than 0, it defaults to NaN and
- * count() resets to 5.
+ * Getter for ticks interval value.<br/>
+ * <b>Note:</b> you can get interval value only if it was set explicitly, otherwise its returns NaN.
+ * @return {number} Current interval value.
+ *//**
+ * Setter for ticks interval value.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.yScale().ticks().interval(3);
+ * @param {number=} opt_value Ticks interval value.<br/>
+ * <b>Note:</b> If value is defined but is not a number or less than 0, it defaults to NaN and count() resets to 5.
+ * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for chaining.
  */
@@ -106,7 +116,18 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
 
 
 /**
- * Gets or sets ticks count value. If opt_value is defined, but not a number or less than 2, it defaults to 5.
+ * Getter for ticks count value.
+ * @return {number} Current count value.
+ *//**
+ * Setter for ticks count value.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.yScale().ticks().count(3);
+ * @param {number=} opt_value Ticks count value.<br/>
+ * <b>Note:</b> If value is defined, but not a number or less than 2, it defaults to 5.
+ * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for method chaining.
  */
@@ -126,8 +147,21 @@ anychart.scales.ScatterTicks.prototype.count = function(opt_value) {
 
 
 /**
- * Sets base value, by which auto ticks are arranged.
- * @param {number=} opt_value Base value, if used as a setter.
+ * Getter for ticks base value.
+ * @return {number} Current base value.
+ *//**
+ * Setter for ticks base value.<br/>
+ * <b>Note:</b> it is a number that is guaranteed to set a tick if the number is located between minimum and maximum values of the scale.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.yScale().ticks()
+ *   .base(-1)
+ *   .interval(5);
+ * @param {number=} opt_value Base value for ticks.
+ * @return {anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value Base value for ticks.
  * @return {(number|anychart.scales.ScatterTicks)} Base value or itself for chaining.
  */
 anychart.scales.ScatterTicks.prototype.base = function(opt_value) {
@@ -147,6 +181,9 @@ anychart.scales.ScatterTicks.prototype.base = function(opt_value) {
 
 /**
  * Setups ticks as an explicit array of fixed ticks.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.9, 1.1, 1.4, 1.2, 1.9]);
+ * chart.yScale().ticks().set([0,2,4,6]);
  * @param {Array} ticks Explicit ticks array.
  * @return {!anychart.scales.ScatterTicks} Returns itself for method chaining.
  */
@@ -164,7 +201,13 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
 
 
 /**
- * Returns an array of ticks. Each tick is a value in terms of data, to make a tick on.
+ * Returns an array of ticks. Each tick is a value in terms of data, to make a tick on.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>
+ * @example
+ * chart.line([-2, 11, 2, 4]);
+ * chart.container(stage).draw();
+ * var currentTicks = chart.yScale().ticks().get();
+ * // Returns [-4, 0, 4, 8, 12, 16].
  * @return {!Array} Array of ticks.
  */
 anychart.scales.ScatterTicks.prototype.get = function() {
@@ -176,7 +219,20 @@ anychart.scales.ScatterTicks.prototype.get = function() {
 
 
 /**
- * Scatter ticks mode. Linear or logarithmic.
+ * Getter for ticks mode.
+ * @return {anychart.enums.ScatterTicksMode} Current ticks mode.
+ *//**
+ * Setter for ticks mode.<br/>
+ * <b>Note:</b> Use only with logarithmic scales.
+ * @example <t>lineChart</t>
+ * chart.line([0.1, 11, 2, 40]);
+ * chart.yScale(anychart.scales.log());
+ * chart.yScale().ticks().mode('log');
+ * chart.yScale().minorTicks().mode('linear');
+ * @param {(anychart.enums.ScatterTicksMode|string)=} opt_value Value to set.
+ * @return {anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.enums.ScatterTicksMode|string)=} opt_value Value to set.
  * @return {anychart.enums.ScatterTicksMode|anychart.scales.ScatterTicks} Value or itself.
  */
@@ -514,9 +570,9 @@ anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
 
 
 //exports
-anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;
-anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;
-anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;
-anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;
-anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;
-anychart.scales.ScatterTicks.prototype['mode'] = anychart.scales.ScatterTicks.prototype.mode;
+anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;//doc|ex
+anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;//doc|ex
+anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;//doc|ex
+anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;//doc|ex
+anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;//doc|ex
+anychart.scales.ScatterTicks.prototype['mode'] = anychart.scales.ScatterTicks.prototype.mode;//doc|ex

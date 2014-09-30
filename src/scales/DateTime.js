@@ -6,7 +6,8 @@ goog.require('anychart.scales.ScatterBase');
 
 
 /**
- * Scatter datetime scale.
+ * Define Datetime scale.<br/>
+ * <b>Note:</b> To create instance use method {@link anychart.scales.dateTime}.
  * @constructor
  * @extends {anychart.scales.ScatterBase}
  */
@@ -38,9 +39,28 @@ anychart.scales.DateTime.prototype.isMissing = function(value) {
 
 
 /**
+ * Getter for set of scale ticks in terms of data values.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * Setter for set of scale ticks in terms of data values.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks([1188172800000, 1188432000000, 1188604800000]);
+ * chart.container(stage).draw();
+ * @param {!Array=} opt_value An array of ticks to set.
+ * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
+ *//**
+ * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for method chaining.
+ * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
  */
 anychart.scales.DateTime.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
@@ -57,9 +77,29 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
 
 
 /**
- * Gets or sets a set of scale minor ticks in terms of data values.
+ * Getter for set of scale ticks in terms of data values.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * Setter for set of scale ticks in terms of data values.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().interval('P3D');
+ * chart.xScale().minorTicks([1188172800000, 1188432000000, 1188604800000]);
+ * chart.container(stage).draw();
  * @param {!Array=} opt_value An array of ticks to set.
- * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for method chaining.
+ * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * Gets or sets a set of scale ticks in terms of data values.
+ * @param {!Array=} opt_value An array of ticks to set.
+ * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
  */
 anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
@@ -157,7 +197,18 @@ anychart.scales.DateTime.prototype.deserialize = function(value) {
 //  Shortcut functions
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Shortcut to create DateTime scale.
+ * Constructor function for DateTime scale.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale(anychart.scales.dateTime());
+ * chart.container(stage).draw();
  * @return {anychart.scales.DateTime} DateTime scale.
  */
 anychart.scales.dateTime = function() {
@@ -166,8 +217,8 @@ anychart.scales.dateTime = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);
-anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;
-anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;
-anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;
-anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;
+goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);//doc|ex
+anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;//doc|ex
+anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
+anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited
+anychart.scales.DateTime.prototype['extendDataRange)'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited

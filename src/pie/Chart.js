@@ -866,7 +866,29 @@ anychart.pie.Chart.prototype.labels = function(opt_value) {
 
 
 /**
- * Gets or sets series hover data labels.
+ * Getter for series hover data labels.
+ * @return {!anychart.elements.LabelsFactory} Current labels instance.
+ *//**
+ * Setter for series hover data labels.
+ * @example
+ *  var data = [
+ *    {name: 'Point 1', value: 10},
+ *    {name: 'Point 2', value: 7},
+ *    {name: 'Point 3', value: 20},
+ *    {name: 'Point 4', value: 14}
+ *  ];
+ *  var chart = anychart.pieChart(data);
+ *  var labels = anychart.elements.labelsFactory();
+ *  labels
+ *      .fontSize(10)
+ *      .fontStyle('italic')
+ *      .fontColor('red');
+ *  chart.hoverLabels(labels);
+ *  chart.container(stage).draw();
+ * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value pie hover data labels settings.
+ * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value pie hover data labels settings.
  * @return {!(anychart.elements.LabelsFactory|anychart.pie.Chart)} Labels instance or itself for chaining call.
  */
@@ -3257,7 +3279,7 @@ goog.exportSymbol('anychart.pie.chart', anychart.pie.chart);//doc|ex|non-tr
 anychart.pie.Chart.prototype['data'] = anychart.pie.Chart.prototype.data;//doc|ex|
 anychart.pie.Chart.prototype['group'] = anychart.pie.Chart.prototype.group;//doc|ex|non-tr
 anychart.pie.Chart.prototype['labels'] = anychart.pie.Chart.prototype.labels;//doc|ex
-anychart.pie.Chart.prototype['hoverLabels'] = anychart.pie.Chart.prototype.hoverLabels;
+anychart.pie.Chart.prototype['hoverLabels'] = anychart.pie.Chart.prototype.hoverLabels;//doc|ex
 anychart.pie.Chart.prototype['radius'] = anychart.pie.Chart.prototype.radius;//doc|ex
 anychart.pie.Chart.prototype['innerRadius'] = anychart.pie.Chart.prototype.innerRadius;//doc|ex
 anychart.pie.Chart.prototype['startAngle'] = anychart.pie.Chart.prototype.startAngle;//doc|ex
@@ -3271,7 +3293,7 @@ anychart.pie.Chart.prototype['fill'] = anychart.pie.Chart.prototype.fill;//doc|e
 anychart.pie.Chart.prototype['stroke'] = anychart.pie.Chart.prototype.stroke;//doc|ex
 anychart.pie.Chart.prototype['hoverFill'] = anychart.pie.Chart.prototype.hoverFill;//doc|ex
 anychart.pie.Chart.prototype['hoverStroke'] = anychart.pie.Chart.prototype.hoverStroke;//doc|ex
-anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFill;
+anychart.pie.Chart.prototype['hatchFill'] = anychart.pie.Chart.prototype.hatchFill;//doc|ex
 anychart.pie.Chart.prototype['hoverHatchFill'] = anychart.pie.Chart.prototype.hoverHatchFill;//doc|ex
 anychart.pie.Chart.prototype['explodeSlice'] = anychart.pie.Chart.prototype.explodeSlice;//doc|ex
 anychart.pie.Chart.prototype['tooltip'] = anychart.pie.Chart.prototype.tooltip;//doc|ex

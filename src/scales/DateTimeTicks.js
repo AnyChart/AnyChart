@@ -65,9 +65,64 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
 
 
 /**
- * Gets or sets ticks interval value. Note, that interval value can be read only if it was set explicitly.
- * It is returned as NaN otherwise. If opt_value is defined but is not a number or less than 0, it defaults to NaN and
- * count() resets to 5.
+ * Getter for ticks interval value.<br/>
+ * <b>Note:</b> you can get interval value only if it was set explicitly, otherwise its returns NaN.
+ * @return {string} Current interval value in  ISO 8601 interval string.
+ *//**
+ * Setter for ticks interval value by string representing date part or ISO 8601 interval string.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().interval('P2D');
+ * chart.container(stage).draw();
+ * @param {string=} opt_isodate Value to set.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * Setter for ticks interval value by unit.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().interval('d', 2);
+ * chart.container(stage).draw();
+ * @param {string=} opt_unit Set unit by first letter. 'year' is 'y', 'month' is 'm' etc.<br/>
+ * <b>Note:</b> 'minutes' is 'n'.
+ * @param {number=} opt_count Any positive value.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * Setter for ticks interval value.<br/>
+ * <b>Note:</b> If any passed value is defined but is not a number or less than 0, it defaults to NaN and count() resets to 5.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().interval(0,0,0,12);
+ * chart.container(stage).draw();
+ * @param {number=} opt_years Any positive value.
+ * @param {number=} opt_months Any positive value.
+ * @param {number=} opt_days Any positive value.
+ * @param {number=} opt_hours Any positive value.
+ * @param {number=} opt_minutes Any positive value.
+ * @param {number=} opt_seconds Any positive value.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number|string=} opt_years Years or string representing date part or ISO 8601 interval string.
  * @param {number=} opt_months Months or number of whatever date part specified
  *     by first parameter.
@@ -106,7 +161,26 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
 
 
 /**
- * Gets or sets ticks count value. If opt_value is defined but not a number or less than 2, it defaults to 5.
+ * Getter for ticks count value.
+ * @return {number} Current ticks count value.
+ *//**
+ * Setter for ticks count value.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().count(3);
+ * chart.container(stage).draw();
+ * @param {number=} opt_value Ticks count value.<br/>
+ * <b>Note:</b> If value is defined, but not a number or less than 2, it defaults to 5.
+ * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.DateTimeTicks)} Interval value or itself for method chaining.
  */
@@ -127,6 +201,17 @@ anychart.scales.DateTimeTicks.prototype.count = function(opt_value) {
 
 /**
  * Setups ticks as an explicit array of fixed ticks.
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.xScale().ticks().set([1188172800000, 1188432000000, 1188604800000]);
+ * chart.container(stage).draw();
  * @param {Array} ticks Explicit ticks array.
  * @return {!anychart.scales.DateTimeTicks} Returns itself for method chaining.
  */
@@ -143,7 +228,20 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
 
 
 /**
- * Returns an array of ticks. Each tick is a value in terms of data, to make a tick on.
+ * Returns an array of ticks. Each tick is a value in terms of data, to make a tick on.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>
+ * @example
+ * var chart = anychart.financialChart();
+ * chart.ohlc([
+ *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
+ *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
+ *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
+ *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
+ * ]);
+ * chart.container(stage).draw();
+ * var currentTicks = chart.xScale().ticks().get();
+ * // Returns [1188172800000, 1188259200000, 1188345600000, 1188432000000, 1188518400000, 1188604800000].
  * @return {!Array} Array of ticks.
  */
 anychart.scales.DateTimeTicks.prototype.get = function() {
@@ -389,7 +487,7 @@ anychart.scales.DateTimeTicks.prototype.deserialize = function(value) {
 
 
 //exports
-anychart.scales.DateTimeTicks.prototype['interval'] = anychart.scales.DateTimeTicks.prototype.interval;
-anychart.scales.DateTimeTicks.prototype['count'] = anychart.scales.DateTimeTicks.prototype.count;
-anychart.scales.DateTimeTicks.prototype['set'] = anychart.scales.DateTimeTicks.prototype.set;
-anychart.scales.DateTimeTicks.prototype['get'] = anychart.scales.DateTimeTicks.prototype.get;
+anychart.scales.DateTimeTicks.prototype['interval'] = anychart.scales.DateTimeTicks.prototype.interval;//doc|ex
+anychart.scales.DateTimeTicks.prototype['count'] = anychart.scales.DateTimeTicks.prototype.count;//doc|ex
+anychart.scales.DateTimeTicks.prototype['set'] = anychart.scales.DateTimeTicks.prototype.set;//doc|ex
+anychart.scales.DateTimeTicks.prototype['get'] = anychart.scales.DateTimeTicks.prototype.get;//doc|ex
