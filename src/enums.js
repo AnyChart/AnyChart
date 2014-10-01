@@ -1061,7 +1061,11 @@ anychart.enums.WarningCode = {
   NOT_OBJECT_OR_ARRAY: 7,
 
 
-  CANT_SERIALIZE_FUNCTION: 8
+  CANT_SERIALIZE_FUNCTION: 8,
+
+  //anychart.elements.DataGrid incorrect component usage.
+  DG_INCORRECT_METHOD_USAGE: 9
+
 };
 
 

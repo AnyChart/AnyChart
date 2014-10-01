@@ -681,11 +681,13 @@ anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positio
   }
 
   if (label) {
+    label.suspendSignalsDispatching();
     label.clear();
   } else {
     label = this.freeToUseLabelsPool_ && this.freeToUseLabelsPool_.length > 0 ?
         this.freeToUseLabelsPool_.pop() :
         new anychart.elements.LabelsFactory.Label();
+    label.suspendSignalsDispatching();
 
     if (goog.isDef(index)) {
       this.labels_[index] = label;
@@ -699,6 +701,7 @@ anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positio
   label.formatProvider(formatProvider);
   label.positionProvider(positionProvider);
   label.parentLabelsFactory(this);
+  label.resumeSignalsDispatching(false);
 
   return label;
 };

@@ -151,8 +151,8 @@ anychart.Signal = {
   NEEDS_RECALCULATION: 0x00000004,
   BOUNDS_CHANGED: 0x00000008,
   DATA_CHANGED: 0x00000010,
+  META_CHANGED: 0x00000020,
 
-  RESERVED_6: 0x00000020,
   RESERVED_7: 0x00000040,
   RESERVED_8: 0x00000080,
   RESERVED_9: 0x00000100,
@@ -488,6 +488,15 @@ anychart.SignalEvent.prototype.targetDataChanged = function() {
 
 
 /**
+ * If target signalled meta change.
+ * @return {boolean}
+ */
+anychart.SignalEvent.prototype.targetMetaChanged = function() {
+  return this.hasSignal(anychart.Signal.META_CHANGED);
+};
+
+
+/**
  * If target needs to be reapplied.
  * @return {boolean}
  */
@@ -608,5 +617,6 @@ goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);
 anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;
 anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;
 anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.prototype.targetDataChanged;
+anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;
 anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;
 anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;

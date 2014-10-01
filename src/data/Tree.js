@@ -83,7 +83,7 @@ anychart.data.Tree.ChangeEvent;
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.data.Tree.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
+anychart.data.Tree.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED | anychart.Signal.META_CHANGED;
 
 
 /** @inheritDoc */
@@ -740,17 +740,6 @@ anychart.data.Tree.DataItem.prototype.resumeSignals_ = function(doDispatchSuspen
 
 
 /**
- * Dispatches DATA_CHANGED signal by tree.
- * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
- * @private
- */
-anychart.data.Tree.DataItem.prototype.dispatchSignal_ = function() {
-  this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
-  return this;
-};
-
-
-/**
  * Gets a value from data by key.
  * @param {string} key - Key.
  * @return {*} - Value.
@@ -771,7 +760,7 @@ anychart.data.Tree.DataItem.prototype.set = function(key, value) {
     this.tree_.removeFromIndex(this, key);
     this.data_[key] = value;
     this.tree_.addToIndex(this, key);
-    this.dispatchSignal_();
+    this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
 
   return this;
@@ -788,7 +777,7 @@ anychart.data.Tree.DataItem.prototype.meta = function(key, opt_value) {
   if (arguments.length > 1) {
     if (this.meta_[key] != opt_value) {
       this.meta_[key] = opt_value;
-      this.dispatchSignal_();
+      this.tree_.dispatchSignal(anychart.Signal.META_CHANGED);
     }
     return this;
   }
@@ -819,7 +808,7 @@ anychart.data.Tree.DataItem.prototype.getParent = function() {
 anychart.data.Tree.DataItem.prototype.setParent_ = function(parent) {
   if (this.parent_ != parent) {
     this.parent_ = parent;
-    this.dispatchSignal_();
+    this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
   return this;
 };
@@ -971,7 +960,7 @@ anychart.data.Tree.DataItem.prototype.removeChildren = function() {
     }
     this.resumeSignals_(false);
     this.children_.length = 0;
-    this.dispatchSignal_();
+    this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
   return this;
 };

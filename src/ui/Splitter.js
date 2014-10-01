@@ -947,21 +947,21 @@ anychart.ui.Splitter.prototype.dragEndHandler_ = function() {
 
   if (this.considerSplitterWidth_) {
     newPos = isVertical ?
-        currentBounds.getLeft() + this.dragAreaLength_ :
-        currentBounds.getTop() + this.dragAreaLength_;
+        currentBounds.left + this.dragAreaLength_ - this.pixelBoundsCache_.left :
+        currentBounds.top + this.dragAreaLength_ - this.pixelBoundsCache_.top;
 
     newRatio = isVertical ?
-        newPos / (this.pixelBoundsCache_.getLeft() + this.pixelBoundsCache_.getWidth() - this.splitterWidth_) :
-        newPos / (this.pixelBoundsCache_.getTop() + this.pixelBoundsCache_.getHeight() - this.splitterWidth_);
+        newPos / (this.pixelBoundsCache_.width - this.splitterWidth_) :
+        newPos / (this.pixelBoundsCache_.height - this.splitterWidth_);
 
   } else {
     newPos = isVertical ?
-        currentBounds.getLeft() + currentBounds.getWidth() / 2 : //X axis for vertical.
-        currentBounds.getTop() + currentBounds.getHeight() / 2;  //Y axis for horizontal.
+        currentBounds.left + currentBounds.width / 2 - this.pixelBoundsCache_.left : //X axis for vertical.
+        currentBounds.top + currentBounds.height / 2 - this.pixelBoundsCache_.top;  //Y axis for horizontal.
 
     newRatio = isVertical ?
-        newPos / (this.pixelBoundsCache_.getLeft() + this.pixelBoundsCache_.getWidth()) :
-        newPos / (this.pixelBoundsCache_.getTop() + this.pixelBoundsCache_.getHeight());
+        newPos / this.pixelBoundsCache_.width :
+        newPos / this.pixelBoundsCache_.height;
   }
 
   this.position(anychart.math.round(newRatio, 4));

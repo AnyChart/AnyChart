@@ -1,6 +1,8 @@
 goog.provide('anychart.gantt.Chart');
 goog.require('anychart.Chart');
 
+goog.require('anychart.elements.DataGrid');
+
 
 /**
  * @type {string}

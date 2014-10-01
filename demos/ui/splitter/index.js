@@ -17,6 +17,7 @@ anychart.onDocumentReady(function() {
 
   split = new anychart.ui.Splitter();
   split.container(stage)
+      .bounds(20, 20, 400, 300)
       .layout('vertical')
       .position('30%')
       .dragAreaLength(15)

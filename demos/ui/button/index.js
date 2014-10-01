@@ -13,7 +13,9 @@ function disa() {
 function load() {
   button = new anychart.ui.Button();
   button.container('container');
-  button.text('My shiny little button');
+  button.parentBounds(button.container().getStage().getBounds());
+  button.text('+');
+  button.width(15).height(15).hAlign('center').vAlign('middle');
   button.position({x: '25%', y: '40%'});
   button.draw();
 

@@ -57,6 +57,14 @@ anychart.data.Traverser = function(tree) {
    */
   this.traverseChildrenCondition_ = this.defaultTraverseChildrenCondition_;
 
+
+  /**
+   * Current depth.
+   * @type {number}
+   * @private
+   */
+  this.currentDepth_ = -1;
+
 };
 
 
@@ -90,6 +98,7 @@ anychart.data.Traverser.prototype.reset = function() {
   this.currentPosition_.length = 1;
   this.currentPosition_[0] = -1;
   this.currentItem_ = undefined;
+  this.currentDepth_ = -1;
   return this;
 };
 
@@ -100,6 +109,15 @@ anychart.data.Traverser.prototype.reset = function() {
  */
 anychart.data.Traverser.prototype.current = function() {
   return this.currentItem_;
+};
+
+
+/**
+ * Gets depth of current data item.
+ * @return {number} - Depth.
+ */
+anychart.data.Traverser.prototype.getDepth = function() {
+  return this.currentDepth_;
 };
 
 
@@ -246,15 +264,17 @@ anychart.data.Traverser.prototype.findNextSuitableItem_ = function(itemsSet) {
 
 
 /**
- * Gets current items set by current path.
+ * Gets current items set by current path. Also sets current item's depth.
  * @return {Array.<anychart.data.Tree.DataItem>} - Current items set.
  * @private
  */
 anychart.data.Traverser.prototype.getItemsSet_ = function() {
   var items = this.tree_.getChildrenUnsafe();
+  this.currentDepth_ = 0;
   if (this.currentPosition_.length > 1) {
     for (var i = 0; i < this.currentPosition_.length - 1; i++) {
       var item = items[this.currentPosition_[i]];
+      this.currentDepth_ = i + 1;
       items = item.getChildrenUnsafe();
     }
   }
@@ -268,6 +288,7 @@ anychart.data.Traverser.prototype['current'] = anychart.data.Traverser.prototype
 anychart.data.Traverser.prototype['get'] = anychart.data.Traverser.prototype.get;
 anychart.data.Traverser.prototype['set'] = anychart.data.Traverser.prototype.set;
 anychart.data.Traverser.prototype['meta'] = anychart.data.Traverser.prototype.meta;
+anychart.data.Traverser.prototype['getDepth'] = anychart.data.Traverser.prototype.getDepth;
 anychart.data.Traverser.prototype['advance'] = anychart.data.Traverser.prototype.advance;
 anychart.data.Traverser.prototype['toArray'] = anychart.data.Traverser.prototype.toArray;
 anychart.data.Traverser.prototype['nodeYieldCondition'] = anychart.data.Traverser.prototype.nodeYieldCondition;

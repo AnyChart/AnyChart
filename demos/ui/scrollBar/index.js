@@ -58,7 +58,7 @@ anychart.onDocumentReady(function() {
 
 
   //Adding a scroll change events.
-  verticalScroll.listen(anychart.events.EventType.SCROLL_CHANGE, function(e) {
+  verticalScroll.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
     rect2.setBounds(e.visibleBounds);
 
     //Notifying the horizontal scroll bar about changed visual bounds for sync purposes.
@@ -79,7 +79,7 @@ anychart.onDocumentReady(function() {
   });
 
 
-  horizontalScroll.listen(anychart.events.EventType.SCROLL_CHANGE, function(e) {
+  horizontalScroll.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
     rect2.setBounds(e.visibleBounds);
 
     //Notifying the vertical scroll bar about changed visual bounds for sync purposes.

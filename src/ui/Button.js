@@ -513,6 +513,7 @@ anychart.ui.Button.prototype.drawInternal = function(settings) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateButtonBounds_();
+    this.drawText(settings['text']);
     this.invalidate(anychart.ConsistencyState.BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -680,6 +681,11 @@ anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
   if (parentBounds && parentHeight < height) {
     // if width becomes bigger than parent height - make it equal to parent height
     height = parentHeight;
+  }
+
+  if (hasText) {
+    this.textElement.width(width);
+    this.textElement.height(height);
   }
 
   // calcualte position if it is set

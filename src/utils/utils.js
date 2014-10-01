@@ -914,6 +914,11 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION:
       return 'We can not serialize \'' + opt_arguments[0] + '\' function, please reset it manually.';
 
+    case anychart.enums.WarningCode.DG_INCORRECT_METHOD_USAGE:
+      return 'Data grid incorrect method \'' + opt_arguments[0] + '()\'usage: You use not standalone data grid. Perform all operations ' +
+          'on data grid using the controller, but not directly. In current case, use \'' + opt_arguments[1] + '()\' instead. ' +
+          opt_arguments[2];
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
