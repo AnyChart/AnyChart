@@ -267,6 +267,8 @@ anychart.VisualBase.prototype.checkDrawingNeeded = function() {
     }
     return false;
   } else if (!this.container()) {
+    this.remove(); // It should be removed if it was drawn.
+    this.invalidate(anychart.ConsistencyState.CONTAINER);
     anychart.utils.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
     return false;
   }

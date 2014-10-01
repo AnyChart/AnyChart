@@ -356,6 +356,81 @@ anychart.elements.Table.prototype.getCell = function(row, col) {
 };
 
 
+/**
+ * 1) геттер, возвращает массив массивов с контентами всех ячеек (первый индекс - строка, второй - ячейка в строке).
+ *    Если ячейка перекрыта соседней (через colSpan|rowSpan), то он все равно спросит у нее контент и вернет его.
+ * 2) сеттер для контентов всех ячеек. По размеру переданного массива автоматически выставится размер таблицы
+ *    (количество строк и столбцов), исходя из максимальной длины строки. Передача undefined равносильна передаче null -
+ *    обнуляет контент. Если второй параметр true, то для всех ячеек colSpan и rowSpan сбросится в 1.
+ *
+ * Т.о. любую таблицу можно привести в нужное состояние одним вызовом этого метода:
+ *    var table = anychart.elements.table().container('container');
+ *    table.contents([[1, 2, 3], [4, 5], [6, 7, 8]]);
+ *    table.getCell(1, 1).colSpan(2);
+ *    table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], true);
+ *
+ * @param {Array.<Array.<(anychart.elements.Table.CellContent|string|number|undefined)>>=} opt_tableValues
+ * @param {boolean=} opt_demergeCells
+ * @return {Array.<Array.<(anychart.elements.Table.CellContent)>>|anychart.elements.Table}
+ */
+anychart.elements.Table.prototype.contents = function(opt_tableValues, opt_demergeCells) {
+  var row, col, cell, rowArr;
+  if (goog.isDef(opt_tableValues)) {
+    var fail = !goog.isArray(opt_tableValues);
+    var colsCount = 0, rowsCount;
+    if (!fail) {
+      rowsCount = opt_tableValues.length;
+      for (row = 0; row < rowsCount; row++) {
+        rowArr = opt_tableValues[row];
+        if (goog.isArray(rowArr)) {
+          if (rowArr.length > colsCount)
+            colsCount = rowArr.length;
+        } else {
+          fail = true;
+          break;
+        }
+      }
+    }
+    if (fail || !rowsCount || !colsCount) {
+      anychart.utils.error(anychart.enums.ErrorCode.WRONG_TABLE_CONTENTS);
+    } else {
+      this.suspendSignalsDispatching();
+      this.rowsCount(rowsCount);
+      this.colsCount(colsCount);
+      if (!!opt_demergeCells) {
+        for (row = 0; row < rowsCount; row++) {
+          for (col = 0; col < colsCount; col++) {
+            cell = this.getCell(row, col);
+            cell.rowSpan(1);
+            cell.colSpan(1);
+          }
+        }
+      }
+      for (row = 0; row < rowsCount; row++) {
+        rowArr = opt_tableValues[row];
+        for (col = 0; col < colsCount; col++) {
+          cell = this.getCell(row, col);
+          cell.content(rowArr[col] || null);
+        }
+      }
+      this.resumeSignalsDispatching(true);
+    }
+    return this;
+  } else {
+    // we have no cache here, because we want to return new arrays here anyway. So caching is useless.
+    var result = [];
+    for (row = 0; row < this.rowsCount_; row++) {
+      rowArr = [];
+      for (col = 0; col < this.colsCount_; col++) {
+        rowArr.push(this.getCell(row, col).content());
+      }
+      result.push(rowArr);
+    }
+    return result;
+  }
+};
+
+
 //region Cell settings
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1074,9 +1149,10 @@ anychart.elements.Table.prototype.checkContent_ = function() {
           label = /** @type {anychart.elements.LabelsFactory.Label} */(content);
           if (label.parentLabelsFactory())
             label.parentLabelsFactory().clear(label.getIndex());
-        } else if ((content instanceof anychart.VisualBaseWithBounds) || content.parentBounds) {
+        } else if ((content instanceof anychart.VisualBase) || content.parentBounds) {
           content.container(null);
-          content.draw();
+          content.remove();
+          // no draw here to avoid drawing in to a null container
         }
         content.resumeSignalsDispatching(false);
       }
@@ -1421,13 +1497,7 @@ anychart.elements.Table.prototype.cellPaddingInvalidated_ = function(event) {
  * @private
  */
 anychart.elements.Table.prototype.freeCell_ = function(cell) {
-  var cellContent = cell.content();
-  if (cellContent) {
-    if (this.labelsFactory_ && cellContent instanceof anychart.elements.LabelsFactory.Label)
-      this.labelsFactory_.clear(cellContent.getIndex());
-    else
-      cellContent.container(null);
-  }
+  cell.content(null);
   this.cellsPool_.push(cell);
 };
 
@@ -1987,6 +2057,7 @@ anychart.elements.Table.prototype['rowsCount'] = anychart.elements.Table.prototy
 anychart.elements.Table.prototype['colsCount'] = anychart.elements.Table.prototype.colsCount;
 anychart.elements.Table.prototype['getCell'] = anychart.elements.Table.prototype.getCell;
 anychart.elements.Table.prototype['draw'] = anychart.elements.Table.prototype.draw;
+anychart.elements.Table.prototype['contents'] = anychart.elements.Table.prototype.contents;
 anychart.elements.Table.prototype['colWidth'] = anychart.elements.Table.prototype.colWidth;
 anychart.elements.Table.prototype['rowHeight'] = anychart.elements.Table.prototype.rowHeight;
 anychart.elements.Table.prototype['cellTextFactory'] = anychart.elements.Table.prototype.cellTextFactory;

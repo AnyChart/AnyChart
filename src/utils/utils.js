@@ -813,6 +813,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.SCALE_NOT_SET:
       return 'Scale is not set. Use scale() method to set it.';
 
+    case anychart.enums.ErrorCode.WRONG_TABLE_CONTENTS:
+      return 'Table.contents() accepts only an Array of Arrays as it\'s first argument.';
+
     default:
       return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';

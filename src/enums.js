@@ -1027,7 +1027,10 @@ anychart.enums.CartesianSeriesType = {
  */
 anychart.enums.ErrorCode = {
   CONTAINER_NOT_SET: 1,
-  SCALE_NOT_SET: 2
+  SCALE_NOT_SET: 2,
+
+  //anychart.elements.Table
+  WRONG_TABLE_CONTENTS: 3
 };
 
 
