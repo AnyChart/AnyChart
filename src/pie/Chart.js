@@ -3265,7 +3265,8 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
  * Returns Pie (donut) instance with initial settings.<br/>
  * <b>Note:</b> To get chart initial state use {@link anychart.pieChart}.
  * @example
- * chart = anychart.pie.chart([20, 7, 10, 14]);
+ * anychart.pie.chart([20, 7, 10, 14])
+ *    .container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
  */
