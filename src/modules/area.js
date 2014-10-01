@@ -6,7 +6,6 @@ goog.require('anychart.cartesian.series.Area');
 goog.require('anychart.cartesian.series.RangeArea');
 goog.require('anychart.cartesian.series.RangeSplineArea');
 goog.require('anychart.cartesian.series.RangeStepArea');
-goog.require('anychart.cartesian.series.Spline');
 goog.require('anychart.cartesian.series.SplineArea');
 goog.require('anychart.cartesian.series.StepArea');
 
