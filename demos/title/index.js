@@ -2,9 +2,9 @@ var title, rect, rect2, bg;
 
 function load() {
   title = new anychart.elements.Title();
-  title.text('Line chart with Logarithmic Y-Axis and Data Labelsasdfasdfasdfasdfasdfasdfasdfasdfasdqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqjhkjhasgdkfjhagsdkjhagsdkjghaskdjhfgaskdjhgasdjgfqwerqwerqwerqwerqwerqwerqwerqwerwqer')
+  title.text('Some text')
       .container('container').background().enabled(false).fill('red 0.3').corners(10);
-  title.margin(0).padding(0);
+  title.margin(10).padding(10);
   //title.hAlign('center').vAlign('center');
   //  title.height(100);
   //  title.width(100);
@@ -15,6 +15,7 @@ function load() {
   rect.setBounds(title.getContentBounds());
   rect2.setBounds(title.getRemainingBounds());
   bg = title.background();
+  bg.fill('red 0.5').enabled(false);
   // еще можно поломать все меняя ориентацию и положение тайтла, если его ширина не фиксирована
   title.listen('signal', function() {
     title.draw();
@@ -42,6 +43,18 @@ function pp(side, value) {
 
 function qq(value) {
   title.enabled(value);
+}
+
+function r(value) {
+  title.rotation(value);
+}
+
+function t(value) {
+  title.text(value);
+}
+
+function bbb(value) {
+  title.background().enabled(value);
 }
 
 function qwer() {

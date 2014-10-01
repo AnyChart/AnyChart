@@ -7,6 +7,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('anychart.utils.Margin');
 goog.require('anychart.utils.Padding');
+goog.require('goog.graphics.AffineTransform');
 
 
 
@@ -144,38 +145,6 @@ anychart.elements.Title.prototype.textHeight_ = NaN;
 
 
 /**
- * If the text width is constricted.
- * @type {boolean}
- * @private
- */
-anychart.elements.Title.prototype.widthConstricted_ = false;
-
-
-/**
- * If the text height is constricted.
- * @type {boolean}
- * @private
- */
-anychart.elements.Title.prototype.heightConstricted_ = false;
-
-
-/**
- * Title left position.
- * @type {number}
- * @private
- */
-anychart.elements.Title.prototype.actualLeft_ = NaN;
-
-
-/**
- * Title top position.
- * @type {number}
- * @private
- */
-anychart.elements.Title.prototype.actualTop_ = NaN;
-
-
-/**
  * Parent bounds stored.
  * @type {anychart.math.Rect}
  * @private
@@ -221,6 +190,22 @@ anychart.elements.Title.prototype.orientation_ = anychart.enums.Orientation.TOP;
  * @private
  */
 anychart.elements.Title.prototype.align_ = anychart.enums.Align.CENTER;
+
+
+/**
+ * Title rotation. Value null states to autorotation due to orientation.
+ * @type {?number}
+ * @private
+ */
+anychart.elements.Title.prototype.rotation_ = null;
+
+
+/**
+ * Title transformation matrix.
+ * @type {goog.graphics.AffineTransform}
+ * @private
+ */
+anychart.elements.Title.prototype.transformation_ = null;
 
 
 /**
@@ -589,6 +574,25 @@ anychart.elements.Title.prototype.orientation = function(opt_value) {
 
 
 /**
+ * Title rotation. Set null or NaN to automatic rotation due to title orientation.
+ * @param {?number=} opt_value
+ * @return {anychart.elements.Title|number|null}
+ */
+anychart.elements.Title.prototype.rotation = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (isNaN(opt_value)) opt_value = null;
+    if (this.rotation_ != opt_value) {
+      this.rotation_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+  }
+  return this.rotation_;
+};
+
+
+/**
  * Render the title content.
  * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
  */
@@ -670,9 +674,13 @@ anychart.elements.Title.prototype.draw = function() {
   }
 
   if (needsPositionReset) {
-    elementToPosition.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    elementToPosition.translate(this.actualLeft_, this.actualTop_);
-    elementToPosition.rotate(this.getRotation_(), this.actualLeft_, this.actualTop_);
+    elementToPosition.setTransformationMatrix(
+        this.transformation_.getScaleX(),
+        this.transformation_.getShearY(),
+        this.transformation_.getShearX(),
+        this.transformation_.getScaleY(),
+        this.transformation_.getTranslateX(),
+        this.transformation_.getTranslateY());
   }
 
   // If background appearance changed, we should do something about that.
@@ -799,16 +807,19 @@ anychart.elements.Title.prototype.applyTextSettings = function(textElement, isIn
  * @private
  */
 anychart.elements.Title.prototype.getRotation_ = function() {
-  switch (this.orientation_) {
-    case anychart.enums.Orientation.LEFT:
-      return -90;
-    case anychart.enums.Orientation.RIGHT:
-      return 90;
-    //case anychart.enums.Orientation.TOP:
-    //case anychart.enums.Orientation.BOTTOM:
-    default:
-      return 0;
-  }
+  if (goog.isNull(this.rotation_)) {
+    switch (this.orientation_) {
+      case anychart.enums.Orientation.LEFT:
+        return -90;
+      case anychart.enums.Orientation.RIGHT:
+        return 90;
+      //case anychart.enums.Orientation.TOP:
+      //case anychart.enums.Orientation.BOTTOM:
+      default:
+        return 0;
+    }
+  } else
+    return this.rotation_;
 };
 
 
@@ -896,10 +907,20 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   } else if (!goog.isNull(this.height_))
     this.text_.height(this.textHeight_);
 
-  var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
-  var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
+  this.pixelBounds_ = new anychart.math.Rect(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2, this.backgroundWidth_, this.backgroundHeight_);
+  var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(this.getRotation_()), 0, 0);
+  /** @type {!anychart.math.Rect} */
+  var bounds = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, transform);
+
   var leftMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.left()), this.backgroundWidth_);
+  var rightMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.right()), this.backgroundWidth_);
   var topMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.top()), this.backgroundHeight_);
+  var bottomMargin = anychart.utils.normalizeSize(/** @type {number} */(margin.bottom()), this.backgroundHeight_);
+
+  var wHalf = bounds.width / 2;
+  var hHalf = bounds.height / 2;
+
+  var x, y;
 
   if (parentBounds) {
     switch (this.orientation_) {
@@ -907,13 +928,13 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
       case anychart.enums.Orientation.BOTTOM:
         switch (this.align_) {
           case anychart.enums.Align.LEFT:
-            this.actualLeft_ = parentBounds.getLeft() + leftMargin;
+            x = parentBounds.getLeft() + leftMargin + wHalf;
             break;
           case anychart.enums.Align.RIGHT:
-            this.actualLeft_ = parentBounds.getRight() - widthWithMargin + leftMargin;
+            x = parentBounds.getRight() - rightMargin - wHalf;
             break;
           default:
-            this.actualLeft_ = (parentBounds.getLeft() + parentBounds.getRight() - widthWithMargin) / 2 + leftMargin;
+            x = (parentBounds.getLeft() + parentBounds.getRight() + leftMargin - rightMargin) / 2;
             break;
         }
         break;
@@ -921,14 +942,14 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
         switch (this.align_) {
           case anychart.enums.Align.TOP:
           case anychart.enums.Align.RIGHT:
-            this.actualTop_ = parentBounds.getTop() + widthWithMargin - leftMargin;
+            y = parentBounds.getTop() + rightMargin + hHalf;
             break;
           case anychart.enums.Align.BOTTOM:
           case anychart.enums.Align.LEFT:
-            this.actualTop_ = parentBounds.getBottom() - leftMargin;
+            y = parentBounds.getBottom() - leftMargin - hHalf;
             break;
           default:
-            this.actualTop_ = (parentBounds.getTop() + parentBounds.getBottom() + widthWithMargin) / 2 - leftMargin;
+            y = (parentBounds.getTop() + parentBounds.getBottom() - leftMargin + rightMargin) / 2;
             break;
         }
         break;
@@ -936,66 +957,80 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
         switch (this.align_) {
           case anychart.enums.Align.TOP:
           case anychart.enums.Align.LEFT:
-            this.actualTop_ = parentBounds.getTop() + leftMargin;
+            y = parentBounds.getTop() + leftMargin + hHalf;
             break;
           case anychart.enums.Align.BOTTOM:
           case anychart.enums.Align.RIGHT:
-            this.actualTop_ = parentBounds.getBottom() - widthWithMargin + leftMargin;
+            y = parentBounds.getBottom() - rightMargin - hHalf;
             break;
           default:
-            this.actualTop_ = (parentBounds.getTop() + parentBounds.getBottom() - widthWithMargin) / 2 + leftMargin;
+            y = (parentBounds.getTop() + parentBounds.getBottom() + leftMargin - rightMargin) / 2;
             break;
         }
         break;
     }
     switch (this.orientation_) {
       case anychart.enums.Orientation.TOP:
-        this.actualTop_ = parentBounds.getTop() + topMargin;
-        this.pixelBounds_ = new anychart.math.Rect(
-            this.actualLeft_ - leftMargin,
-            parentBounds.getTop(),
-            widthWithMargin,
-            heightWithMargin);
+        y = parentBounds.getTop() + topMargin + hHalf;
         break;
       case anychart.enums.Orientation.RIGHT:
-        this.actualLeft_ = parentBounds.getRight() - topMargin;
-        this.pixelBounds_ = new anychart.math.Rect(
-            parentBounds.getRight() - heightWithMargin,
-            this.actualTop_ - leftMargin,
-            heightWithMargin,
-            widthWithMargin);
+        x = parentBounds.getRight() - topMargin - wHalf;
         break;
       case anychart.enums.Orientation.BOTTOM:
-        this.actualTop_ = parentBounds.getBottom() - heightWithMargin + topMargin;
-        this.pixelBounds_ = new anychart.math.Rect(
-            this.actualLeft_ - leftMargin,
-            parentBounds.getBottom() - heightWithMargin,
-            widthWithMargin,
-            heightWithMargin);
+        y = parentBounds.getBottom() - bottomMargin - hHalf;
         break;
       case anychart.enums.Orientation.LEFT:
-        this.actualLeft_ = parentBounds.getLeft() + topMargin;
-        this.pixelBounds_ = new anychart.math.Rect(
-            parentBounds.getLeft(),
-            this.actualTop_ - widthWithMargin + leftMargin,
-            heightWithMargin,
-            widthWithMargin);
+        x = parentBounds.getLeft() + topMargin + wHalf;
         break;
     }
   } else {
-    this.actualLeft_ = leftMargin;
-    this.actualTop_ = topMargin;
-    switch (this.orientation_) {
-      case anychart.enums.Orientation.TOP:
-      case anychart.enums.Orientation.BOTTOM:
-        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
-        break;
-      case anychart.enums.Orientation.LEFT:
-      case anychart.enums.Orientation.RIGHT:
-        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
-        break;
-    }
+    x = leftMargin + wHalf;
+    y = topMargin + hHalf;
   }
+  this.transformation_ = this.helperPlacer_(transform, x, y);
+  this.pixelBounds_ = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, this.transformation_);
+  this.transformation_.translate(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2);
+  switch (this.orientation_) {
+    case anychart.enums.Orientation.TOP:
+      this.pixelBounds_.left -= leftMargin;
+      this.pixelBounds_.top -= topMargin;
+      this.pixelBounds_.width += leftMargin + rightMargin;
+      this.pixelBounds_.height += topMargin + bottomMargin;
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      this.pixelBounds_.left -= bottomMargin;
+      this.pixelBounds_.top -= leftMargin;
+      this.pixelBounds_.width += topMargin + bottomMargin;
+      this.pixelBounds_.height += leftMargin + rightMargin;
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      this.pixelBounds_.left -= leftMargin;
+      this.pixelBounds_.top -= topMargin;
+      this.pixelBounds_.width += leftMargin + rightMargin;
+      this.pixelBounds_.height += topMargin + bottomMargin;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      this.pixelBounds_.left -= topMargin;
+      this.pixelBounds_.top -= rightMargin;
+      this.pixelBounds_.width += topMargin + bottomMargin;
+      this.pixelBounds_.height += leftMargin + rightMargin;
+      break;
+  }
+};
+
+
+/**
+ * Helper function for title positioning.
+ * @param {goog.graphics.AffineTransform} tx
+ * @param {number} x
+ * @param {number} y
+ * @return {goog.graphics.AffineTransform}
+ * @private
+ */
+anychart.elements.Title.prototype.helperPlacer_ = function(tx, x, y) {
+  var arr = [x, y, 0, 0];
+  tx.createInverse().transform(arr, 0, arr, 0, 2);
+  return tx.translate(arr[0] - arr[2], arr[1] - arr[3]);
 };
 
 
@@ -1104,6 +1139,7 @@ goog.exportSymbol('anychart.elements.title', anychart.elements.title);
 anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/final
 anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/final
 anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/final
+anychart.elements.Title.prototype['rotation'] = anychart.elements.Title.prototype.rotation;//in docs/final
 anychart.elements.Title.prototype['width'] = anychart.elements.Title.prototype.width;//in docs/final
 anychart.elements.Title.prototype['height'] = anychart.elements.Title.prototype.height;//in docs/final
 anychart.elements.Title.prototype['margin'] = anychart.elements.Title.prototype.margin;//in docs/final
