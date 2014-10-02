@@ -920,7 +920,9 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var wHalf = bounds.width / 2;
   var hHalf = bounds.height / 2;
 
-  var x, y;
+  // initialized for case when there are no parentBounds;
+  var x = leftMargin + wHalf;
+  var y = topMargin + hHalf;
 
   if (parentBounds) {
     switch (this.orientation_) {
@@ -983,9 +985,6 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
         x = parentBounds.getLeft() + topMargin + wHalf;
         break;
     }
-  } else {
-    x = leftMargin + wHalf;
-    y = topMargin + hHalf;
   }
   this.transformation_ = this.helperPlacer_(transform, x, y);
   this.pixelBounds_ = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, this.transformation_);
