@@ -39,7 +39,7 @@ anychart.utils.MarkerPalette.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
  * Setter for the marker at index if the opt_marker set, getter otherwise.
  * @param {number} index Index of marker to get/set.
  * @param {string=} opt_marker Type of the marker to set.
- * @return {anychart.enums.MarkerType|anychart.utils.MarkerPalette} Marker by index or self for chaining.
+ * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.utils.MarkerPalette} Marker by index or self for chaining.
  */
 anychart.utils.MarkerPalette.prototype.markerAt = function(index, opt_marker) {
   if (!this.markers_) this.markers_ = [];

@@ -43,7 +43,15 @@ anychart.scales.ScatterTicks.prototype.interval_ = NaN;
  * @type {number}
  * @private
  */
-anychart.scales.ScatterTicks.prototype.count_ = 5;
+anychart.scales.ScatterTicks.prototype.minCount_ = 4;
+
+
+/**
+ * Fixed ticks count settings.
+ * @type {number}
+ * @private
+ */
+anychart.scales.ScatterTicks.prototype.maxCount_ = 6;
 
 
 /**
@@ -98,11 +106,14 @@ anychart.scales.ScatterTicks.prototype.mode_ = anychart.enums.ScatterTicksMode.L
 anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.interval_ != opt_value) {
-      if (goog.isNull(opt_value) || isNaN(opt_value) || opt_value < 0) {
-        this.count_ = 5;
+      opt_value = anychart.utils.toNumber(opt_value);
+      if (opt_value < 0) {
+        this.minCount_ = 4;
+        this.maxCount_ = 6;
         this.interval_ = NaN;
       } else {
-        this.count_ = NaN;
+        this.minCount_ = NaN;
+        this.maxCount_ = NaN;
         this.interval_ = +opt_value;
       }
       this.explicit_ = null;
@@ -128,21 +139,25 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
  * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {number=} opt_value Ticks interval value if used as a getter.
- * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for method chaining.
+ * @param {number=} opt_valueOrMinValue Ticks count value if used as a setter.
+ * @param {number=} opt_maxValue Ticks count value if used as a setter.
+ * @return {(Array.<number>|anychart.scales.ScatterTicks)} Interval value or itself for method chaining.
  */
-anychart.scales.ScatterTicks.prototype.count = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.count_ != opt_value) {
+anychart.scales.ScatterTicks.prototype.count = function(opt_valueOrMinValue, opt_maxValue) {
+  if (goog.isDef(opt_valueOrMinValue)) {
+    if (this.minCount_ != opt_valueOrMinValue) {
       this.interval_ = NaN;
-      this.count_ = (isNaN(opt_value) || opt_value < 2) ? 5 : Math.ceil(+opt_value);
+      this.minCount_ = Math.ceil(anychart.utils.toNumber(opt_valueOrMinValue));
+      this.maxCount_ = Math.ceil(anychart.utils.toNumber(opt_maxValue));
+      if (!(this.minCount_ >= 2)) this.minCount_ = 4;
+      if (!(this.maxCount_ >= this.minCount_)) this.maxCount_ = this.minCount_;
       this.explicit_ = null;
       this.autoTicks_ = null;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
-  return this.count_;
+  return [this.minCount_, this.maxCount_];
 };
 
 
@@ -189,7 +204,8 @@ anychart.scales.ScatterTicks.prototype.base = function(opt_value) {
  */
 anychart.scales.ScatterTicks.prototype.set = function(ticks) {
   if (!goog.array.equals(this.explicit_, ticks)) {
-    this.count_ = NaN;
+    this.minCount_ = NaN;
+    this.maxCount_ = NaN;
     this.interval_ = NaN;
     this.explicit_ = goog.array.slice(ticks, 0);
     goog.array.sort(this.explicit_, anychart.utils.compareNumericAsc);
@@ -282,7 +298,7 @@ anychart.scales.ScatterTicks.prototype.setup = function(min, max, opt_canModifyM
  * @param {number=} opt_majorDesiredMin If major minimum was explicit and interval was auto, there could be a situation,
  *    when minimum doesn't contain interval. We need to know the value that major interval calculator desired to be the
  *    minimum in that case, to correctly calculate the interval on the part from explicit minimum (which is values[0] in
- *    that case) and first aligned tick (values[1]), as there should be less than this.count_ minor ticks.
+ *    that case) and first aligned tick (values[1]), as there should be less than this.minCount_ minor ticks.
  * @param {number=} opt_majorDesiredMax If major maximum was explicit and interval was auto, there could be a situation,
  *    when maximum doesn't contain interval. We need to know the value that major interval calculator desired to be the
  *    maximum in that case, to correctly calculate the interval on the part from last aligned tick (which is
@@ -350,32 +366,45 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
     var ticks = [];
     var interval = this.interval_;
     if (isNaN(interval)) {
-      // TODO(Anton Saukh): this code can return either count of intervals, or count+1 because of range bounds aligning.
-      var count = this.count_ - 1; // it should be valid here
-      var range = max - min;
-      interval = range / count;
-      // Here we can add other interval rounding options and choose the best
-      // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
-      // with big values: powers of 10 work better, and so long.
-      var log = Math.log(interval);
-      var val1 = Math.pow(10, Math.floor(log * Math.LOG10E));
-      var val2 = Math.pow(10, Math.ceil(log * Math.LOG10E));
-      //var val3 = Math.pow(2, Math.floor(log * Math.LOG2E));
-      //var val4 = Math.pow(2, Math.ceil(log * Math.LOG2E));
-      log = anychart.math.log(interval / val2, 2);
-      var val5 = Math.pow(2, Math.floor(log)) * val2;
-      var val6 = Math.pow(2, Math.ceil(log)) * val2;
-      //var val5 = val1 / 2;
-      //var val6 = val1 / 4;
-      //var val7 = val1 / 8;
-      interval = Math.min(
-          anychart.utils.alignRight(interval, val1),
-          anychart.utils.alignRight(interval, val2),
-          //anychart.utils.alignRight(interval, val3),
-          //anychart.utils.alignRight(interval, val4),
-          anychart.utils.alignRight(interval, val5),
-          anychart.utils.alignRight(interval, val6)
-          );
+      var currentInterval = NaN, currentDiff = NaN;
+      for (var q = this.minCount_; q <= this.maxCount_; q++) {
+        var count = q - 1; // it should be valid here
+        var range = max - min;
+        currentInterval = range / count;
+        //console.log(currentInterval);
+        // Here we can add other interval rounding options and choose the best
+        // For example, with fractional values powers of 2 give better result because they divide interval in 2, 4, 8,
+        // with big values: powers of 10 work better, and so long.
+        var log = Math.log(currentInterval);
+        var val1 = Math.pow(10, Math.floor(log * Math.LOG10E));
+        var val2 = Math.pow(10, Math.ceil(log * Math.LOG10E));
+        var val3 = (currentInterval < val1 + val1) ? val1 / 2 : Number.POSITIVE_INFINITY;
+        log = anychart.math.log(currentInterval / val2, 2);
+        var val5 = Math.pow(2, Math.floor(log)) * val2;
+        var val6 = Math.pow(2, Math.ceil(log)) * val2;
+        //console.log(val1, val2, val3, val5, val6);
+        //console.log(anychart.utils.alignRight(currentInterval, val1),
+        //    anychart.utils.alignRight(currentInterval, val2),
+        //    anychart.utils.alignRight(currentInterval, val3),
+        //    anychart.utils.alignRight(currentInterval, val5),
+        //    anychart.utils.alignRight(currentInterval, val6));
+        currentInterval = Math.min(
+            anychart.utils.alignRight(currentInterval, val1),
+            anychart.utils.alignRight(currentInterval, val2),
+            anychart.utils.alignRight(currentInterval, val3),
+            anychart.utils.alignRight(currentInterval, val5),
+            anychart.utils.alignRight(currentInterval, val6));
+        var tmpDiff1 = anychart.math.round(anychart.utils.alignLeft(min, currentInterval, this.base_), 7) - min;
+        tmpDiff1 *= tmpDiff1;
+        var tmpDiff2 = anychart.math.round(anychart.utils.alignRight(max, currentInterval, this.base_), 7) - max;
+        tmpDiff2 *= tmpDiff2;
+        var tmpDiff = tmpDiff1 + tmpDiff2;
+        //console.log(currentInterval, tmpDiff);
+        if (isNaN(currentDiff) || tmpDiff < currentDiff) {
+          currentDiff = tmpDiff;
+          interval = currentInterval;
+        }
+      }
     }
     interval = Math.max(interval, 1e-7);
     var desiredMin = anychart.math.round(anychart.utils.alignLeft(min, interval, this.base_), 7);
@@ -429,29 +458,42 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, lo
     var ticks = [];
     var interval = this.interval_;
     if (isNaN(interval)) {
-      // calculating the interval here
-      var count = this.count_ - 1; // it should be valid here
-      var range = max - min;
-      interval = range / count;
-      // Here we can add other interval rounding options and choose the best
-      // All interval aligners are rounded, because we cannot show pretty intervals with non-round powers of logBase
-      // Because of that, this algorithm produces from 2 to count+1 ticks here:(
-      var log = Math.log(interval);
-      var val1 = Math.ceil(Math.pow(10, Math.floor(log * Math.LOG10E)));
-      var val2 = Math.ceil(Math.pow(10, Math.ceil(log * Math.LOG10E)));
-      var val3 = Math.ceil(Math.pow(2, Math.floor(log * Math.LOG2E)));
-      var val4 = Math.ceil(Math.pow(2, Math.ceil(log * Math.LOG2E)));
-      var val5 = Math.ceil(val1 / 2);
-      var val6 = Math.ceil(val1 / 4);
-      var val7 = Math.ceil(val1 / 8);
-      interval = Math.min(
-          anychart.utils.alignRight(interval, val1),
-          anychart.utils.alignRight(interval, val2),
-          anychart.utils.alignRight(interval, val3),
-          anychart.utils.alignRight(interval, val4),
-          anychart.utils.alignRight(interval, val5),
-          anychart.utils.alignRight(interval, val6),
-          anychart.utils.alignRight(interval, val7));
+      var currentInterval = NaN, currentDiff = NaN;
+      for (var q = this.minCount_; q <= this.maxCount_; q++) {
+        // calculating the interval here
+        var count = this.minCount_ - 1; // it should be valid here
+        var range = max - min;
+        currentInterval = range / count;
+        // Here we can add other interval rounding options and choose the best
+        // All interval aligners are rounded, because we cannot show pretty intervals with non-round powers of logBase
+        // Because of that, this algorithm produces from 2 to count+1 ticks here:(
+        var log = Math.log(currentInterval);
+        var val1 = Math.ceil(Math.pow(10, Math.floor(log * Math.LOG10E)));
+        var val2 = Math.ceil(Math.pow(10, Math.ceil(log * Math.LOG10E)));
+        var val3 = Math.ceil(Math.pow(2, Math.floor(log * Math.LOG2E)));
+        var val4 = Math.ceil(Math.pow(2, Math.ceil(log * Math.LOG2E)));
+        var val5 = Math.ceil(val1 / 2);
+        var val6 = Math.ceil(val1 / 4);
+        var val7 = Math.ceil(val1 / 8);
+        currentInterval = Math.min(
+            anychart.utils.alignRight(currentInterval, val1),
+            anychart.utils.alignRight(currentInterval, val2),
+            anychart.utils.alignRight(currentInterval, val3),
+            anychart.utils.alignRight(currentInterval, val4),
+            anychart.utils.alignRight(currentInterval, val5),
+            anychart.utils.alignRight(currentInterval, val6),
+            anychart.utils.alignRight(currentInterval, val7));
+        currentInterval = Math.max(currentInterval, 1e-7);
+        var tmpDiff1 = anychart.math.round(anychart.utils.alignLeft(min, currentInterval, this.base_), 7) - min;
+        tmpDiff1 *= tmpDiff1;
+        var tmpDiff2 = anychart.math.round(anychart.utils.alignRight(max, currentInterval, this.base_), 7) - max;
+        tmpDiff2 *= tmpDiff2;
+        var tmpDiff = tmpDiff1 + tmpDiff2;
+        if (isNaN(currentDiff) || tmpDiff < currentDiff) {
+          currentDiff = tmpDiff;
+          interval = currentInterval;
+        }
+      }
     }
     interval = Math.max(interval, 1e-7);
 
@@ -495,7 +537,7 @@ anychart.scales.ScatterTicks.prototype.addMinorLinearTicksPortion_ = function(mi
   var interval = this.interval_;
   if (isNaN(interval)) {
     var range = rangeMax - rangeMin;
-    interval = range / (this.count_ - 1);
+    interval = range / (this.minCount_ - 1);
   }
   interval = Math.max(interval, 1e-7);
   /** @type {number|undefined} */
@@ -526,7 +568,7 @@ anychart.scales.ScatterTicks.prototype.addMinorLogarithmicTicksPortion_ = functi
   rangeMax = anychart.math.log(rangeMax, logBase);
   if (isNaN(interval)) {
     var range = rangeMax - rangeMin;
-    interval = range / (this.count_ - 1);
+    interval = range / (this.minCount_ - 1);
   }
   interval = Math.max(interval, 1e-7);
   /** @type {number|undefined} */
@@ -549,7 +591,8 @@ anychart.scales.ScatterTicks.prototype.serialize = function() {
   data['mode'] = this.mode();
   data['base'] = this.base();
   data['explicit'] = this.explicit_;
-  data['count'] = this.count_;
+  data['minCount'] = this.minCount_;
+  data['maxCount'] = this.maxCount_;
   data['interval'] = this.interval_;
   return data;
 };
@@ -562,7 +605,7 @@ anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
   this.mode(value['mode']);
   this.base(value['base']);
   this.explicit_ = value['explicit'] || null;
-  this.count_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
+  //this.minCount_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
   this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
   this.resumeSignalsDispatching(true);
   return this;
@@ -571,7 +614,7 @@ anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
 
 //exports
 anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;//doc|ex
-anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;//doc|ex
+anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;
 anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;//doc|ex
 anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;//doc|ex
 anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;//doc|ex

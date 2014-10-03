@@ -228,7 +228,14 @@ anychart.elements.Axis.prototype.stroke_ = 'none';
  * @type {string|anychart.enums.Orientation}
  * @private
  */
-anychart.elements.Axis.prototype.orientation_ = anychart.enums.Orientation.TOP;
+anychart.elements.Axis.prototype.orientation_;
+
+
+/**
+ * @type {string|anychart.enums.Orientation}
+ * @private
+ */
+anychart.elements.Axis.prototype.defaultOrientation_ = anychart.enums.Orientation.TOP;
 
 
 /**
@@ -721,8 +728,17 @@ anychart.elements.Axis.prototype.orientation = function(opt_value) {
     }
     return this;
   } else {
-    return this.orientation_;
+    return this.orientation_ || this.defaultOrientation_;
   }
+};
+
+
+/**
+ * Set axis default orientation.
+ * @param {anychart.enums.Orientation} value Default orientation value.
+ */
+anychart.elements.Axis.prototype.setDefaultOrientation = function(value) {
+  this.defaultOrientation_ = value;
 };
 
 
@@ -900,6 +916,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     var stage = container ? container.getStage() : null;
+    var orientation = this.orientation();
 
     var parentBounds;
     if (this.parentBounds_) {
@@ -918,7 +935,7 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
       parentBounds.width = Math.round(parentBounds.width);
       parentBounds.height = Math.round(parentBounds.height);
 
-      if (this.orientation_ == anychart.enums.Orientation.TOP || this.orientation_ == anychart.enums.Orientation.BOTTOM) {
+      if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) {
         parentLength = parentBounds.width;
       } else {
         parentLength = parentBounds.height;
@@ -1337,6 +1354,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
   var minorTicks = this.minorTicks();
   var labels = this.labels();
   var minorLabels = this.minorLabels();
+  var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
 
   var line = this.line_;
   line.stroke(this.stroke_);
@@ -1346,7 +1364,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
     if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     title.suspendSignalsDispatching();
     title.parentBounds(parentBounds);
-    title.orientation(this.orientation_);
+    title.orientation(orientation);
     titleSize = this.isHorizontal() ? title.getContentBounds().height : title.getContentBounds().width;
     title.resumeSignalsDispatching(false);
   }
@@ -1539,7 +1557,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   var isEnabled = ticks.enabled();
   var position = ticks.position();
 
-  switch (this.orientation_) {
+  switch (this.orientation()) {
     case anychart.enums.Orientation.TOP:
       x = Math.round(bounds.left + ratio * bounds.width);
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
@@ -1818,8 +1836,9 @@ anychart.elements.Axis.prototype.staggerMaxLines = function(opt_value) {
  * @return {boolean} If the axis is horizontal.
  */
 anychart.elements.Axis.prototype.isHorizontal = function() {
-  return this.orientation_ == anychart.enums.Orientation.TOP ||
-      this.orientation_ == anychart.enums.Orientation.BOTTOM;
+  var orientation = this.orientation();
+  return orientation == anychart.enums.Orientation.TOP ||
+      orientation == anychart.enums.Orientation.BOTTOM;
 };
 
 
@@ -2173,22 +2192,23 @@ anychart.elements.Axis.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return;
 
-  var orientation, lineDrawer, ticksDrawer, minorTicksDrawer, minorLabelsDrawer;
+  var orientationFuncs, lineDrawer, ticksDrawer, minorTicksDrawer, minorLabelsDrawer;
   var minorTicks, ticks;
   var lineThickness;
+  var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
 
-  switch (this.orientation_) {
+  switch (orientation) {
     case anychart.enums.Orientation.TOP:
-      orientation = [this.drawTopLine_, this.drawTopMinorLabels_];
+      orientationFuncs = [this.drawTopLine_, this.drawTopMinorLabels_];
       break;
     case anychart.enums.Orientation.RIGHT:
-      orientation = [this.drawRightLine_, this.drawRightMinorLabels_];
+      orientationFuncs = [this.drawRightLine_, this.drawRightMinorLabels_];
       break;
     case anychart.enums.Orientation.BOTTOM:
-      orientation = [this.drawBottomLine_, this.drawBottomMinorLabels_];
+      orientationFuncs = [this.drawBottomLine_, this.drawBottomMinorLabels_];
       break;
     case anychart.enums.Orientation.LEFT:
-      orientation = [this.drawLeftLine_, this.drawLeftMinorLabels_];
+      orientationFuncs = [this.drawLeftLine_, this.drawLeftMinorLabels_];
       break;
   }
 
@@ -2209,7 +2229,7 @@ anychart.elements.Axis.prototype.draw = function() {
     lineThickness = this.line_.stroke()['thickness'] ? parseFloat(this.line_.stroke()['thickness']) : 1;
     var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
 
-    lineDrawer = orientation[0];
+    lineDrawer = orientationFuncs[0];
     lineDrawer.call(this, pixelShift);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -2241,7 +2261,7 @@ anychart.elements.Axis.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
     var title = this.title();
     title.parentBounds(this.getPixelBounds_().toRect());
-    title.orientation(this.orientation_);
+    title.orientation(orientation);
     title.draw();
     this.markConsistent(anychart.ConsistencyState.TITLE);
   }
@@ -2269,7 +2289,7 @@ anychart.elements.Axis.prototype.draw = function() {
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(this.parentBounds_);
-    minorLabelsDrawer = orientation[1];
+    minorLabelsDrawer = orientationFuncs[1];
     minorLabels.clear();
 
     this.markConsistent(anychart.ConsistencyState.LABELS);

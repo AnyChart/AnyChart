@@ -840,6 +840,45 @@ anychart.enums.LegendItemIconType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  BulletMarkerType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Predefined bullet marker type.
+ * @enum {string}
+ */
+anychart.enums.BulletMarkerType = {
+  X: 'x',
+  LINE: 'line',
+  ELLIPSE: 'ellipse',
+  BAR: 'bar'
+};
+
+
+/**
+ * Normalizes bullet marker position
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.BulletMarkerType=} opt_default Custom default value (defaults to BAR).
+ * @return {anychart.enums.BulletMarkerType}
+ */
+anychart.enums.normalizeBulletMarkerType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'x':
+      return anychart.enums.BulletMarkerType.X;
+    case 'line':
+      return anychart.enums.BulletMarkerType.LINE;
+    case 'ellipse':
+      return anychart.enums.BulletMarkerType.ELLIPSE;
+    case 'bar':
+      return anychart.enums.BulletMarkerType.BAR;
+  }
+  return opt_default || anychart.enums.BulletMarkerType.BAR;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  SidePosition
 //
 //----------------------------------------------------------------------------------------------------------------------

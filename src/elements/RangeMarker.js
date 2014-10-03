@@ -29,7 +29,7 @@ anychart.elements.RangeMarker = function() {
   this.scale_;
 
   /**
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.parentBounds_ = null;
@@ -39,6 +39,12 @@ anychart.elements.RangeMarker = function() {
    * @private
    */
   this.layout_;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.defaultLayout_;
 
   /**
    * @type {number}
@@ -57,6 +63,13 @@ anychart.elements.RangeMarker = function() {
    * @private
    */
   this.fill_;
+
+  /**
+   * @type {string|acgraph.vector.Fill}
+   * @private
+   */
+  this.defaultFill_;
+
   this.restoreDefaults();
 };
 goog.inherits(anychart.elements.RangeMarker, anychart.VisualBase);
@@ -101,8 +114,17 @@ anychart.elements.RangeMarker.prototype.layout = function(opt_value) {
     }
     return this;
   } else {
-    return this.layout_;
+    return this.layout_ || this.defaultLayout_;
   }
+};
+
+
+/**
+ * Set Default layout.
+ * @param {anychart.enums.Layout} value Layout value.
+ */
+anychart.elements.RangeMarker.prototype.setDefaultLayout = function(value) {
+  this.defaultLayout_ = value;
 };
 
 
@@ -161,15 +183,15 @@ anychart.elements.RangeMarker.prototype.scaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
+ * @return {anychart.math.Rect} Current parent bounds.
  *//**
  * Setter for parentBounds.
- * @param {acgraph.math.Rect=} opt_value Value to set.
+ * @param {anychart.math.Rect=} opt_value Value to set.
  * @return {!anychart.elements.RangeMarker} An instance of the {@link anychart.elements.RangeMarker} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.RangeMarker} Bounds or this.
+ * @param {anychart.math.Rect=} opt_value Bounds for marker.
+ * @return {anychart.math.Rect|anychart.elements.RangeMarker} Bounds or this.
  */
 anychart.elements.RangeMarker.prototype.parentBounds = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -233,8 +255,16 @@ anychart.elements.RangeMarker.prototype.fill = function(opt_value) {
     }
     return this;
   } else {
-    return this.fill_;
+    return this.fill_ || this.defaultFill_;
   }
+};
+
+
+/**
+ * @param {acgraph.vector.Fill} value Default fill value.
+ */
+anychart.elements.RangeMarker.prototype.setDefaultFill = function(value) {
+  this.defaultFill_ = value;
 };
 
 
@@ -281,7 +311,7 @@ anychart.elements.RangeMarker.prototype.to = function(opt_newValue) {
  * @return {boolean} If the marker is horizontal.
  */
 anychart.elements.RangeMarker.prototype.isHorizontal = function() {
-  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
+  return this.layout() == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -315,11 +345,12 @@ anychart.elements.RangeMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.markerElement().fill(/** @type {acgraph.vector.Stroke} */(this.fill_));
+    this.markerElement().fill(/** @type {acgraph.vector.Stroke} */(this.fill()));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    var layout = this.layout();
     var minValue = this.from_, maxValue = this.to_;
     if (this.from_ > this.to_) {
       minValue = this.from_;
@@ -338,7 +369,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
     var axesLinesSpace = this.axesLinesSpace();
     this.markerElement().clear();
 
-    if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
+    if (layout == anychart.enums.Layout.HORIZONTAL) {
       var y_max = Math.round(bounds.getBottom() - bounds.height * ratioMaxValue);
       var y_min = Math.round(bounds.getBottom() - bounds.height * ratioMinValue);
       var x_start = bounds.getLeft();
@@ -353,7 +384,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
           .lineTo(x_end, y_min)
           .lineTo(x_start, y_min)
           .close();
-    } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
+    } else if (layout == anychart.enums.Layout.VERTICAL) {
       var y_start = bounds.getBottom();
       var y_end = bounds.getTop();
       var x_min = bounds.getLeft() + (bounds.width * ratioMinValue);
@@ -380,10 +411,10 @@ anychart.elements.RangeMarker.prototype.draw = function() {
  */
 anychart.elements.RangeMarker.prototype.restoreDefaults = function() {
   this.suspendSignalsDispatching();
-  this.layout(anychart.enums.Layout.HORIZONTAL);
+  this.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
   this.from(0);
   this.to(0);
-  this.fill('black 0.3');
+  this.setDefaultFill('black 0.3');
   this.resumeSignalsDispatching(true);
 };
 

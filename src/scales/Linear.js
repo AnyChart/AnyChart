@@ -89,6 +89,9 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
     this.minorTicksObj = this.createTicks();
+    this.minorTicksObj.suspendSignalsDispatching();
+    this.minorTicksObj.count(5);
+    this.minorTicksObj.resumeSignalsDispatching(false);
   }
   if (goog.isDef(opt_value)) {
     this.minorTicksObj.set(opt_value);
