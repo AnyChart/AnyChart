@@ -459,8 +459,12 @@ def __build_js_doc():
         shutil.rmtree(docs_out_path)
         os.mkdir(docs_out_path)
         os.mkdir(os.path.join(docs_out_path, 'scripts'))
-        shutil.copy(os.path.join(OUT_PATH, 'anychart.min.js'),
-                    os.path.join(docs_out_path, 'scripts', 'anychart.min.js'))
+        prodJS = 'anychart.min.js';
+        devJS = 'anychart.dev.min.js';
+        if not os.path.exists(os.path.join(OUT_PATH, prodJS)):
+            shutil.copy(os.path.join(OUT_PATH, devJS),  os.path.join(docs_out_path, 'scripts', devJS))
+        else:
+            shutil.copy(os.path.join(OUT_PATH, prodJS),  os.path.join(docs_out_path, 'scripts', prodJS))
 
     p = subprocess.Popen(
         ['git', 'tag'],
