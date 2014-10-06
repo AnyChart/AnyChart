@@ -664,3 +664,4 @@ anychart.bullet.Chart.prototype['markerPalette'] = anychart.bullet.Chart.prototy
 anychart.bullet.Chart.prototype['scale'] = anychart.bullet.Chart.prototype.scale;
 anychart.bullet.Chart.prototype['axis'] = anychart.bullet.Chart.prototype.axis;
 anychart.bullet.Chart.prototype['range'] = anychart.bullet.Chart.prototype.range;
+anychart.bullet.Chart.prototype['draw'] = anychart.bullet.Chart.prototype.draw;
