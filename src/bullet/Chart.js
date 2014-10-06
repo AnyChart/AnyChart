@@ -583,6 +583,9 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
         range.resumeSignalsDispatching(false);
       }
     }
+    if (count > 5) {
+      anychart.utils.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_RANGES, [count]);
+    }
     this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
   }
 
@@ -611,6 +614,12 @@ anychart.bullet.Chart.prototype.createMarkers_ = function() {
   });
 
   var iterator = this.data_.getIterator().reset();
+
+  var rowsCount = iterator.getRowsCount();
+  if (rowsCount > 2) {
+    anychart.utils.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_MEASURES, [rowsCount]);
+  }
+
   while (iterator.advance()) {
     this.createMarker_(iterator);
   }

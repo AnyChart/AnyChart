@@ -9,18 +9,22 @@ anychart.onDocumentReady(function() {
   // Create bullet chart
   var chart_1 = anychart.bulletChart([
     {value: 6, fill: 'black'},
-    {value: 11, fill: 'brown'}
+    {value: 11, fill: 'brown'},
+    {value: 17, fill: 'brown'},
   ]);
   // Set chart to render on stage
   chart_1.container(stage);
   // Set chart size and position settings
-  chart_1.bounds(0, 0, '100%', '10%');
+  chart_1.bounds(0, 0, '100%', 150);
   // Set chart layout
   chart_1.layout('horizontal');
   // Create chart ranges
   chart_1.range().from(0).to(5);
   chart_1.range(1).from(5).to(10);
   chart_1.range(2).from(10).to(15);
+  chart_1.range(3).from(10).to(15);
+  chart_1.range(4).from(10).to(15);
+  chart_1.range(5).from(10).to(15);
   //set chart to use palette
   chart_1.rangePalette(palette_1);
   // Initiate chart drawing
