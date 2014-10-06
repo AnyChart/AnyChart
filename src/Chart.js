@@ -699,8 +699,9 @@ anychart.Chart.prototype.onLabelSignal_ = function(event) {
  *//**
  * Setter for chart credits settings.
  * @example <t>lineChart</t>
+ * chart.line([1, 4, 2, 9]);
  * chart.credits(
- *   anychart.elements.credits().text('Click me!')
+ *   anychart.elements.credits().enabled(true).text('Click me!')
  * );
  * @param {(anychart.elements.Credits|Object|boolean)=} opt_value
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.

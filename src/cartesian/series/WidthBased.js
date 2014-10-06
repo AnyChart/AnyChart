@@ -39,7 +39,7 @@ anychart.cartesian.series.WidthBased.prototype.autoBarWidth_ = '90%';
  * Setter for point width settings.
  * @example
  * chart = anychart.barChart();
- * chart.bar([1, 1.6, 1.2, 1.9]).pointWidth(35);
+ * chart.bar([0.3, 1.6, 1.2, 1.9]).pointWidth(35);
  * chart.container(stage).draw();
  * @param {(number|string)=} opt_value Point width pixel value.
  * @return {anychart.cartesian.series.WidthBased} {@link anychart.cartesian.series.WidthBased} instance for method chaining.

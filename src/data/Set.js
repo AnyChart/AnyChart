@@ -295,6 +295,7 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
  * chart.column(
  *      dataSet.mapAs({'value': [1], 'x': [2], 'fill': [4]})
  * );
+ * chart.yScale().minimum(0);
  * chart.container(stage).draw();
  * @param {!(Object.<Array.<number>>)=} opt_arrayMapping [{
  *   'x': &#91;0&#93;,

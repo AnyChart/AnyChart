@@ -1866,7 +1866,7 @@ anychart.cartesian.series.Base.prototype.setAutoHatchFill = function(value) {
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
  * @example
  * var chart = anychart.columnChart();
- * chart.column([1, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
+ * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
  * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
@@ -1908,7 +1908,7 @@ anychart.cartesian.series.Base.prototype.hatchFill = function(opt_patternFillOrT
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
  * @example
  * var chart = anychart.columnChart();
- * chart.column([1, 3, 2.2, 1.7]).hoverHatchFill('diamiond', 'grey', 5, 5);
+ * chart.column([0.3, 3, 2.2, 1.7]).hoverHatchFill('diamiond', 'grey', 5, 5);
  * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.

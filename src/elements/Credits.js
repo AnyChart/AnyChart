@@ -105,7 +105,6 @@ anychart.elements.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @example
- * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
  * chart.credits(true);
  * chart.credits().text('Changed credits');
@@ -138,7 +137,6 @@ anychart.elements.Credits.prototype.text = function(opt_value) {
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @example
- * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
  * chart.credits(true);
  * chart.credits().url('http://www.anychart.com/buy/');
@@ -171,7 +169,6 @@ anychart.elements.Credits.prototype.url = function(opt_value) {
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @example
- * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
  * chart.credits(true);
  * chart.credits().alt('Custom alternative text.');
@@ -204,7 +201,6 @@ anychart.elements.Credits.prototype.alt = function(opt_value) {
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @example
- * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
  * chart.credits(true);
  * chart.credits().logoSrc(null);
@@ -484,10 +480,9 @@ anychart.elements.Credits.prototype.disposeInternal = function() {
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @example
- * anychart.licenseKey('AnyChart-95048498-10629dd6');
  * var chart = anychart.lineChart([10, 1, 7, 10]);
  * chart.credits(
- *     anychart.elements.credits().text('Custom credits')
+ *     anychart.elements.credits().enabled(true).text('Custom credits')
  * );
  * chart.container(stage).draw();
  * @return {anychart.elements.Credits}
