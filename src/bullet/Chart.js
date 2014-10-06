@@ -52,8 +52,6 @@ anychart.bullet.Chart = function(opt_data) {
   title.text('Chart title');
   title.enabled(true);
   title.setDefaultRotation(0);
-
-  this.updateLayoutDefaults();
 };
 goog.inherits(anychart.bullet.Chart, anychart.Chart);
 
@@ -159,7 +157,6 @@ anychart.bullet.Chart.prototype.layout = function(opt_value) {
     opt_value = anychart.enums.normalizeLayout(opt_value, anychart.enums.Layout.HORIZONTAL);
     if (this.layout_ != opt_value) {
       this.layout_ = opt_value;
-      this.updateLayoutDefaults();
       this.invalidate(
           anychart.ConsistencyState.AXES |
               anychart.ConsistencyState.TITLE |
@@ -184,6 +181,7 @@ anychart.bullet.Chart.prototype.updateLayoutDefaults = function() {
   var isHorizontal = this.isHorizontal();
   var markersLayout = /** @type {anychart.enums.Layout} */(this.layout());
   var title = this.title();
+  title.setDefaultRotation(0);
   var axis = this.axis();
 
   if (isHorizontal) {
@@ -515,8 +513,26 @@ anychart.bullet.Chart.prototype.calculate = function() {
 };
 
 
+/** @inheritDoc */
+anychart.bullet.Chart.prototype.draw = function() {
+  //we should update layout before draw
+  var isHorizontal = this.isHorizontal();
+  var title = this.title();
+  var axis = this.axis();
+
+  if (isHorizontal) {
+    axis.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
+    title.setDefaultOrientation(anychart.enums.Orientation.LEFT);
+  } else {
+    axis.setDefaultOrientation(anychart.enums.Orientation.LEFT);
+    title.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
+  }
+  return goog.base(this, 'draw');
+};
+
+
 /**
- * Draw bullet chart content items.
+ * Draw bullet chart c items.
  * @param {anychart.math.Rect} bounds Bounds of bullet chart content area.
  */
 anychart.bullet.Chart.prototype.drawContent = function(bounds) {
@@ -541,7 +557,6 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
     if (!axis.container() && axis.enabled()) {
       axis.container(this.rootElement);
     }
-
     axis.parentBounds(bounds);
     axis.length(NaN); //todo: hack to drop axis length cache, need consultation with Sergey Medvedev to drop it.
     axis.resumeSignalsDispatching(false);
@@ -555,6 +570,11 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
       var range = this.ranges_[i];
       if (range) {
         range.suspendSignalsDispatching();
+        range.setDefaultLayout(
+            this.isHorizontal() ?
+                anychart.enums.Layout.VERTICAL :
+                anychart.enums.Layout.HORIZONTAL
+        );
         range.setDefaultFill(/** @type {acgraph.vector.Fill} */(this.rangePalette().colorAt(i)));
         range.parentBounds(boundsWithoutAxis);
         range.container(this.rootElement);

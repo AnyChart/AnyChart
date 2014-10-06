@@ -879,7 +879,8 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var orientation = this.orientation();
   if (parentBounds) {
     if (orientation == anychart.enums.Orientation.TOP ||
-        orientation == anychart.enums.Orientation.BOTTOM) {
+        orientation == anychart.enums.Orientation.BOTTOM ||
+        this.rotation() % 180 == 0) {
       parentWidth = parentBounds.width;
       parentHeight = parentBounds.height;
     } else {
