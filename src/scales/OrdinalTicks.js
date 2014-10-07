@@ -130,12 +130,13 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
  *    ['B4', 1.9]
  * ]);
  * chart.xScale().ticks().set([0,2,4,6]);
- * @param {Array} ticks Explicit ticks array.
+ * @param {Array} ticks Explicit tick indexes array.
  * @return {!anychart.scales.OrdinalTicks} Returns itself for chaining.
  */
 anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
   if (!goog.array.equals(this.explicitIndexes_, ticks)) {
     this.explicitIndexes_ = goog.array.clone(ticks);
+    this.explicitIndexes_ = goog.array.map(this.explicitIndexes_, function(el) { return anychart.utils.toNumber(el); });
     goog.array.sort(this.explicitIndexes_);
     goog.array.removeDuplicates(this.explicitIndexes_);
     this.explicitIndexes_[0] = 0;
@@ -235,16 +236,21 @@ anychart.scales.OrdinalTicks.prototype.get = function() {
  */
 anychart.scales.OrdinalTicks.prototype.makeValues_ = function(indexes) {
   var len = indexes.length || 0;
-  if (!len) return [];
   var values = this.scale_.values();
-  var result = [];
-  for (var i = 0; i < len - 1; i++) {
+  var valuesLen = values.length;
+  if (!len || !valuesLen) return [];
+  var result = [], last = false;
+  for (var i = 0; i < len && !last; i++) {
     var curr = indexes[i];
-    var next = indexes[i + 1] - 1;
+    var next = indexes[i + 1];
+    if (isNaN(next) || next >= valuesLen) {
+      next = valuesLen - 1;
+      last = true;
+    } else {
+      next--;
+    }
     result.push(curr == next ? values[curr] : [values[curr], values[next]]);
   }
-  var last = indexes[len - 1];
-  result[len - 1] = (last == values.length - 1) ? values[last] : [values[last], values[values.length - 1]];
   return result;
 };
 
