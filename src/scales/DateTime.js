@@ -131,6 +131,12 @@ anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio
 
 
 /** @inheritDoc */
+anychart.scales.DateTime.prototype.inverseTransform = function(ratio) {
+  return Math.round(goog.base(this, 'inverseTransform', ratio));
+};
+
+
+/** @inheritDoc */
 anychart.scales.DateTime.prototype.calculate = function() {
   if (this.consistent) return;
 

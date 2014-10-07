@@ -618,6 +618,7 @@ anychart.elements.LabelsFactory.prototype.clear = function(opt_index) {
       }, this);
       this.labels_.length = 0;
     }
+    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
   } else
     this.labels_ = [];
 
@@ -1605,7 +1606,10 @@ anychart.elements.LabelsFactory.Label.prototype.positionProvider = function(opt_
  */
 anychart.elements.LabelsFactory.Label.prototype.clear = function() {
   this.resetSettings();
-  if (this.layer_) this.layer_.parent(null);
+  if (this.layer_) {
+    this.layer_.parent(null);
+    this.layer_.removeAllListeners();
+  }
   this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 

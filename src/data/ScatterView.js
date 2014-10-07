@@ -80,7 +80,10 @@ anychart.data.ScatterView.prototype.search_ = function(fieldValue) {
   while (left < right) {
     var middle = (left + right) >> 1;
     iterator.select(middle);
-    compareResult = anychart.utils.compareAsc(fieldValue, iterator.get('x'));
+    var currX = iterator.get('x');
+    if (this.dateTimeMode_)
+      currX = anychart.utils.normalizeTimestamp(currX);
+    compareResult = anychart.utils.compareAsc(fieldValue, currX);
     if (compareResult > 0) {
       left = middle + 1;
     } else {
