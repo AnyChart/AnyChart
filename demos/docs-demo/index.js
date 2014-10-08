@@ -7,23 +7,12 @@ function load() {
   /////////////////////////////////////////////////////////
 
 
-//  chart = anychart.columnChart();
-//
-//  chart.spline([1.1, 1.6, 1.4, 1.9]);
-//  var scale = anychart.scales.ordinal();
-//    scale.values(['A1', 'A2', 'A3', 'B1', 'B2']);
-//  scale.ticks().set([0,3]);
-//  chart.yAxis(1).orientation('right').scale(scale);
-//
-//  chart.container(stage).draw();
-
-  label = anychart.elements.label()
-      .text('Some Large text')
-      .width(80)
-      .offsetY(5)
-      .offsetX(10);
-  label.background().enabled(true).fill('none').stroke('1 #00F');
-  label.container(stage).draw();
+  chart = anychart.columnChart();
+  chart.column([1.1, 1.6, 1.4, 1.9]).hoverFill('red');
+  chart.container(stage).draw();
+  console.log('CAT:action(mouseClick,205,163)');
+  console.log('CAT:action(mouseMove,275,130)');
+  console.log('CAT:action(mouseMove,354,208)');
 
 }
 function resizeChart(w, h) {
@@ -34,4 +23,7 @@ function resizeChart(w, h) {
   console.log('resize chart from (', chart.width(), chart.height(), ') to (', w, h, ')');
   chart.width(w);
   chart.height(h);
+}
+function log(var_args){
+  console.log.apply(console, arguments);
 }
