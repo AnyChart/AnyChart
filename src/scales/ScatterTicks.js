@@ -130,12 +130,22 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
  * Getter for ticks count value.
  * @return {number} Current count value.
  *//**
- * Setter for ticks count value.
+ * Setter for ticks count value.<br/>
+ * <b>Note:</b> Итоговое количество тиков может быть больше на 1 тик, чем указано.
  * @example <t>lineChart</t>
  * chart.line([-2, 11, 2, 4]);
  * chart.yScale().ticks().count(3);
  * @param {number=} opt_value Ticks count value.<br/>
  * <b>Note:</b> If value is defined, but not a number or less than 2, it defaults to 5.
+ * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
+ *//**
+ * Setter for ticks count value.<br/>
+ * <b>Note:</b> Итоговое количество тиков может быть больше на 1 тик, чем указанный максимум.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.yScale().ticks().count(3, 5);
+ * @param {number=} opt_minimumCount [4] Value to set.
+ * @param {number=} opt_maximumCount [6] Value to set.
  * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
  *//**
  * @ignoreDoc
@@ -614,7 +624,7 @@ anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
 
 //exports
 anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;//doc|ex
-anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;
+anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;//doc|ex|need-tr
 anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;//doc|ex
 anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;//doc|ex
 anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;//doc|ex

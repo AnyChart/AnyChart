@@ -257,14 +257,16 @@ anychart.scales.DateTimeTicks.prototype.get = function() {
  * min and max values for the scale to adjust.
  * @param {number} min Minimum.
  * @param {number} max Maximum.
+ * @param {number} adjustedMin Adjusted minimum.
+ * @param {number} adjustedMax Adjusted maximum.
  */
-anychart.scales.DateTimeTicks.prototype.setup = function(min, max) {
+anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, adjustedMin, adjustedMax) {
   this.autoTicks_ = null;
   if (!this.explicit_) {
     var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(min, max, false);
-    var date = new goog.date.UtcDateTime(new Date(min));
-    var endDate = new goog.date.UtcDateTime(new Date(max));
+    var interval = this.interval_ || this.calculateIntervals_(min, max, true);
+    var date = new goog.date.UtcDateTime(new Date(adjustedMin));
+    var endDate = new goog.date.UtcDateTime(new Date(adjustedMax));
     for (; goog.date.Date.compare(date, endDate) <= 0; date.add(interval))
       ticks.push(date.getTime());
     this.autoTicks_ = ticks;
@@ -281,12 +283,12 @@ anychart.scales.DateTimeTicks.prototype.setup = function(min, max) {
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
-anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, opt_canModifyMin, opt_canModifyMax) {
+anychart.scales.DateTimeTicks.prototype.setup = function(min, max, opt_canModifyMin, opt_canModifyMax) {
   this.autoTicks_ = null;
   var result = [min, max];
   if (!this.explicit_) {
     var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(min, max, true);
+    var interval = this.interval_ || this.calculateIntervals_(min, max, false);
     if (opt_canModifyMin)
       result[0] = min = this.alignDateLeft_(min, interval, 0);
     var date = new goog.date.UtcDateTime(new Date(min));
@@ -307,27 +309,48 @@ anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, opt_ca
  * @private
  */
 anychart.scales.DateTimeTicks.RANGES_ = [
-  1, //MS5_1MS
-  5, //MS20_5MS
-  20, //MS100_20MS
-  100, //MS500_100MS
-  500, //SECOND2_500MS
-  60000 / 30, //SECOND10_2SECOND
-  60000 / 6, //SECOND30_10SECOND
-  0.5 * 60000, //MINUTE2_30SECOND
-  2 * 60000, //MINUTE10_2MINUTE
-  10 * 60000, //MINUTE30_10MINUTE
-  30 * 60000, //HOUR_30MINUTE
-  24 * 60 * 60 * 1000 / 24, //HOUR3_HOUR
-  24 * 60 * 60 * 1000 / 4, //HOUR12_3HOUR
-  0.5 * 24 * 60 * 60 * 1000, //DAY_12HOUR
-  24 * 60 * 60 * 1000, //MONTH_DAY
-  7 * 24 * 60 * 60 * 1000, //MONTH_7DAYS
-  30 * 24 * 60 * 60 * 1000, //YEAR_MONTH
-  60 * 24 * 60 * 60 * 1000, //YEAR_2MONTH
-  90 * 24 * 60 * 60 * 1000, //YEAR_QUARTER
-  180 * 24 * 60 * 60 * 1000 //YEAR_HALF
-  //365 * 24 * 60 * 60 * 1000 //YEAR_HALF
+  1,
+  2,
+  5,
+  10,
+  20,
+  50,
+  100,
+  200,
+  500,
+  1000,
+  1000 * 2,
+  1000 * 5,
+  1000 * 10,
+  1000 * 20,
+  1000 * 30,
+  1000 * 60,
+  1000 * 60 * 2,
+  1000 * 60 * 5,
+  1000 * 60 * 10,
+  1000 * 60 * 20,
+  1000 * 60 * 30,
+  1000 * 60 * 60,
+  1000 * 60 * 60 * 2,
+  1000 * 60 * 60 * 3,
+  1000 * 60 * 60 * 6,
+  1000 * 60 * 60 * 8,
+  1000 * 60 * 60 * 12,
+  1000 * 60 * 60 * 16,
+  1000 * 60 * 60 * 24,
+  1000 * 60 * 60 * 24 * 2,
+  1000 * 60 * 60 * 24 * 7,
+  1000 * 60 * 60 * 24 * 10,
+  1000 * 60 * 60 * 24 * 14,
+  1000 * 60 * 60 * 24 * 21,
+  1000 * 60 * 60 * 24 * 28,
+  1000 * 60 * 60 * 24 * 365 / 12,
+  1000 * 60 * 60 * 24 * 365 / 12 * 2,
+  1000 * 60 * 60 * 24 * 365 / 12 * 3,
+  1000 * 60 * 60 * 24 * 365 / 12 * 4,
+  1000 * 60 * 60 * 24 * 365 / 12 * 6,
+  1000 * 60 * 60 * 24 * 365,
+  1000 * 60 * 60 * 24 * 365 * 2
 ];
 
 
@@ -337,26 +360,48 @@ anychart.scales.DateTimeTicks.RANGES_ = [
  * @private
  */
 anychart.scales.DateTimeTicks.MINOR_INTERVALS_ = [
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.001), // MS5_1MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.005), // MS20_5MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.020), // MS100_20MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.100), // MS500_100MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.500), // SECOND2_500MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 2), // SECOND10_2SECOND
-  new goog.date.Interval(goog.date.Interval.SECONDS, 10), // SECOND30_10SECOND
-  new goog.date.Interval(goog.date.Interval.SECONDS, 30), // MINUTE2_30SECOND
-  new goog.date.Interval(goog.date.Interval.MINUTES, 2), // MINUTE10_2MINUTE
-  new goog.date.Interval(goog.date.Interval.MINUTES, 10), // MINUTE30_10MINUTE
-  new goog.date.Interval(goog.date.Interval.MINUTES, 30), // HOUR_30MINUTE
-  new goog.date.Interval(goog.date.Interval.HOURS, 1), // HOUR3_HOUR
-  new goog.date.Interval(goog.date.Interval.HOURS, 3), // HOUR12_3HOUR
-  new goog.date.Interval(goog.date.Interval.HOURS, 12), // DAY_12HOUR
-  new goog.date.Interval(goog.date.Interval.DAYS, 1), // MONTH_DAY
-  new goog.date.Interval(goog.date.Interval.DAYS, 7), // MONTH_7DAYS
-  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // YEAR_MONTH
-  new goog.date.Interval(goog.date.Interval.MONTHS, 2), // YEAR_2MONTH
-  new goog.date.Interval(goog.date.Interval.MONTHS, 3), // YEAR_QUARTER
-  new goog.date.Interval(goog.date.Interval.MONTHS, 6) // YEAR_HALF
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.001), // 1
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.001), // 2
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.001), // 3
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.005), // 4
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.005), // 5
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.010), // 6
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.020), // 7
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.040), // 8
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.100), // 9
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.200), // 10
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.500), // 11
+  new goog.date.Interval(goog.date.Interval.SECONDS, 1), // 12
+  new goog.date.Interval(goog.date.Interval.SECONDS, 2), // 13
+  new goog.date.Interval(goog.date.Interval.SECONDS, 5), // 14
+  new goog.date.Interval(goog.date.Interval.SECONDS, 10), // 15
+  new goog.date.Interval(goog.date.Interval.SECONDS, 20), // 16
+  new goog.date.Interval(goog.date.Interval.SECONDS, 30), // 17
+  new goog.date.Interval(goog.date.Interval.MINUTES, 1), // 18
+  new goog.date.Interval(goog.date.Interval.MINUTES, 1), // 19
+  new goog.date.Interval(goog.date.Interval.MINUTES, 5), // 20
+  new goog.date.Interval(goog.date.Interval.MINUTES, 10), // 21
+  new goog.date.Interval(goog.date.Interval.MINUTES, 20), // 22
+  new goog.date.Interval(goog.date.Interval.MINUTES, 30), // 23
+  new goog.date.Interval(goog.date.Interval.HOURS, 1), // 24
+  new goog.date.Interval(goog.date.Interval.HOURS, 2), // 25
+  new goog.date.Interval(goog.date.Interval.HOURS, 2), // 26
+  new goog.date.Interval(goog.date.Interval.HOURS, 3), // 27
+  new goog.date.Interval(goog.date.Interval.HOURS, 4), // 28
+  new goog.date.Interval(goog.date.Interval.HOURS, 8), // 29
+  new goog.date.Interval(goog.date.Interval.HOURS, 12), // 30
+  new goog.date.Interval(goog.date.Interval.DAYS, 1), // 31
+  new goog.date.Interval(goog.date.Interval.DAYS, 2), // 32
+  new goog.date.Interval(goog.date.Interval.DAYS, 7), // 33
+  new goog.date.Interval(goog.date.Interval.DAYS, 7), // 34
+  new goog.date.Interval(goog.date.Interval.DAYS, 7), // 35
+  new goog.date.Interval(goog.date.Interval.DAYS, 7), // 36
+  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // 37
+  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // 38
+  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // 39
+  new goog.date.Interval(goog.date.Interval.MONTHS, 2), // 40
+  new goog.date.Interval(goog.date.Interval.MONTHS, 4), // 41
+  new goog.date.Interval(goog.date.Interval.MONTHS, 6) // 42
 ];
 
 
@@ -366,26 +411,48 @@ anychart.scales.DateTimeTicks.MINOR_INTERVALS_ = [
  * @private
  */
 anychart.scales.DateTimeTicks.MAJOR_INTERVALS_ = [
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.005), // MS5_1MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.020), // MS20_5MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.100), // MS100_20MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 0.500), // MS500_100MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 2), // SECOND2_500MS
-  new goog.date.Interval(goog.date.Interval.SECONDS, 10), // SECOND10_2SECOND
-  new goog.date.Interval(goog.date.Interval.SECONDS, 30), // SECOND30_10SECOND
-  new goog.date.Interval(goog.date.Interval.MINUTES, 2), // MINUTE2_30SECOND
-  new goog.date.Interval(goog.date.Interval.MINUTES, 10), // MINUTE10_2MINUTE
-  new goog.date.Interval(goog.date.Interval.MINUTES, 30), // MINUTE30_10MINUTE
-  new goog.date.Interval(goog.date.Interval.HOURS, 1), // HOUR_30MINUTE
-  new goog.date.Interval(goog.date.Interval.HOURS, 3), // HOUR3_HOUR
-  new goog.date.Interval(goog.date.Interval.HOURS, 12), // HOUR12_3HOUR
-  new goog.date.Interval(goog.date.Interval.DAYS, 1), // DAY_12HOUR
-  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // MONTH_DAY
-  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // MONTH_7DAYS
-  new goog.date.Interval(goog.date.Interval.YEARS, 1), // YEAR_MONTH
-  new goog.date.Interval(goog.date.Interval.YEARS, 1), // YEAR_2MONTH
-  new goog.date.Interval(goog.date.Interval.YEARS, 1), // YEAR_QUARTER
-  new goog.date.Interval(goog.date.Interval.YEARS, 1) // YEAR_HALF
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.001), // 1
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.002), // 2
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.005), // 3
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.010), // 4
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.020), // 5
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.050), // 6
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.100), // 7
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.200), // 8
+  new goog.date.Interval(goog.date.Interval.SECONDS, 0.500), // 9
+  new goog.date.Interval(goog.date.Interval.SECONDS, 1), // 10
+  new goog.date.Interval(goog.date.Interval.SECONDS, 2), // 11
+  new goog.date.Interval(goog.date.Interval.SECONDS, 5), // 12
+  new goog.date.Interval(goog.date.Interval.SECONDS, 10), // 13
+  new goog.date.Interval(goog.date.Interval.SECONDS, 20), // 14
+  new goog.date.Interval(goog.date.Interval.SECONDS, 30), // 15
+  new goog.date.Interval(goog.date.Interval.MINUTES, 1), // 16
+  new goog.date.Interval(goog.date.Interval.MINUTES, 2), // 17
+  new goog.date.Interval(goog.date.Interval.MINUTES, 5), // 18
+  new goog.date.Interval(goog.date.Interval.MINUTES, 10), // 19
+  new goog.date.Interval(goog.date.Interval.MINUTES, 20), // 20
+  new goog.date.Interval(goog.date.Interval.MINUTES, 30), // 21
+  new goog.date.Interval(goog.date.Interval.HOURS, 1), // 22
+  new goog.date.Interval(goog.date.Interval.HOURS, 2), // 23
+  new goog.date.Interval(goog.date.Interval.HOURS, 3), // 24
+  new goog.date.Interval(goog.date.Interval.HOURS, 6), // 25
+  new goog.date.Interval(goog.date.Interval.HOURS, 8), // 26
+  new goog.date.Interval(goog.date.Interval.HOURS, 12), // 27
+  new goog.date.Interval(goog.date.Interval.HOURS, 16), // 28
+  new goog.date.Interval(goog.date.Interval.DAYS, 1), // 29
+  new goog.date.Interval(goog.date.Interval.DAYS, 2), // 30
+  new goog.date.Interval(goog.date.Interval.DAYS, 7), // 31
+  new goog.date.Interval(goog.date.Interval.DAYS, 10), // 32
+  new goog.date.Interval(goog.date.Interval.DAYS, 14), // 33
+  new goog.date.Interval(goog.date.Interval.DAYS, 21), // 34
+  new goog.date.Interval(goog.date.Interval.DAYS, 28), // 35
+  new goog.date.Interval(goog.date.Interval.MONTHS, 1), // 36
+  new goog.date.Interval(goog.date.Interval.MONTHS, 2), // 37
+  new goog.date.Interval(goog.date.Interval.MONTHS, 3), // 38
+  new goog.date.Interval(goog.date.Interval.MONTHS, 4), // 39
+  new goog.date.Interval(goog.date.Interval.MONTHS, 6), // 40
+  new goog.date.Interval(goog.date.Interval.YEARS, 1), // 41
+  new goog.date.Interval(goog.date.Interval.YEARS, 2) // 42
 ];
 
 
@@ -397,10 +464,10 @@ anychart.scales.DateTimeTicks.MAJOR_INTERVALS_ = [
  * @private
  */
 anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max, asMinor) {
-  var range = Math.abs(max - min) / (this.count_ * 2);
+  var range = Math.abs(max - min) / (this.count_);
   var len = anychart.scales.DateTimeTicks.RANGES_.length;
   for (var i = 0; i < len; i++) {
-    if (range < anychart.scales.DateTimeTicks.RANGES_[i]) {
+    if (range <= anychart.scales.DateTimeTicks.RANGES_[i]) {
       if (asMinor)
         return anychart.scales.DateTimeTicks.MINOR_INTERVALS_[i].clone();
       else
@@ -410,9 +477,9 @@ anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max,
   // Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) is always >= 0.5, because the last
   // anychart.scales.DateTimeTicks.RANGES_ is half a year, so there shouldn't be a situation when interval is 0.
   if (asMinor)
-    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)));
+    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) / 4);
   else
-    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000) * 2));
+    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)));
 };
 
 

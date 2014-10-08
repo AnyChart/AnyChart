@@ -114,7 +114,7 @@ anychart.cartesian.ScatterIterator.prototype.advance = function() {
     var index = iteratorsToAdvance[i];
     var tmp = this.iteratorsStatus[index] = this.iterators[index].advance();
     if (tmp)
-      this.xValues[index] = this.iterators[index].get('x');
+      this.xValues[index] = this.normalize(this.iterators[index].get('x'));
     else
       this.xValues[index] = NaN;
   }

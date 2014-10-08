@@ -131,18 +131,24 @@ anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio
 
 
 /** @inheritDoc */
+anychart.scales.DateTime.prototype.inverseTransform = function(ratio) {
+  return Math.round(goog.base(this, 'inverseTransform', ratio));
+};
+
+
+/** @inheritDoc */
 anychart.scales.DateTime.prototype.calculate = function() {
   if (this.consistent) return;
 
   goog.base(this, 'calculate');
 
-  var newRange = this.minorTicks().setupAsMinor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+  var newRange = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+  this.minorTicks().setupAsMinor(this.min, this.max, newRange[0], newRange[1]);
+  // adjusting range AFTER minors calc to avoid range selection change
   if (this.minimumModeAuto)
     this.min = newRange[0];
   if (this.maximumModeAuto)
     this.max = newRange[1];
-
-  this.ticks().setup(this.min, this.max);
 
   this.range = this.max - this.min;
 };

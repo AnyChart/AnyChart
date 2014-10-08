@@ -1,6 +1,4 @@
-var label1, label2;
-var radiusPixel = 0;
-
+var chart;
 function load() {
   var container = 'container';
   var stage = acgraph.create(container, 400, 300);
@@ -8,23 +6,32 @@ function load() {
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-  //   chart = anychart.lineChart();
 
+//  chart = anychart.columnChart();
+//
+//  chart.spline([1.1, 1.6, 1.4, 1.9]);
+//  var scale = anychart.scales.ordinal();
+//    scale.values(['A1', 'A2', 'A3', 'B1', 'B2']);
+//  scale.ticks().set([0,3]);
+//  chart.yAxis(1).orientation('right').scale(scale);
+//
+//  chart.container(stage).draw();
 
- var chart = anychart.columnChart();
+  label = anychart.elements.label()
+      .text('Some Large text')
+      .width(80)
+      .offsetY(5)
+      .offsetX(10);
+  label.background().enabled(true).fill('none').stroke('1 #00F');
+  label.container(stage).draw();
 
-* var data = anychart.data.set([
-*     {x: 'A1', value: 8, fill: 'yellow'},
-*     {x: 'A2', value: 11, fill: 'orange'},
-*     {x: 'A3', value: 12, fill: 'red'},
-*     {x: 'A4', value: 9, fill: 'grey'}
-* ]);
-* chart.column(data);
-* chart.container(stage).draw();
-* var view = data.mapAs();
-* var pointX = view.get(2, 'x');
-* var pointFill = view.get(2, 'fill');
-*   chart.title().text('point \''+ pointX +'\' has \'' + pointFill + '\' fill.');
-
-
+}
+function resizeChart(w, h) {
+  w = w || chart.width() || 400;
+  h = h || chart.height() || 300;
+  w+=10;
+  h+=10;
+  console.log('resize chart from (', chart.width(), chart.height(), ') to (', w, h, ')');
+  chart.width(w);
+  chart.height(h);
 }

@@ -1012,6 +1012,7 @@ anychart.elements.MarkersFactory.prototype.clear = function() {
       marker.clear();
       this.freeToUseMarkersPool_.push(marker);
     }, this);
+    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   this.markers_ = [];
@@ -1297,6 +1298,7 @@ anychart.elements.MarkersFactory.prototype.removeAllListeners = function(opt_typ
  * @private
  */
 anychart.elements.MarkersFactory.prototype.ensureHandler_ = function(type, capture, armed, opt_once) {
+  if (type == 'signal') return;
   opt_once = !!opt_once && armed;
   /** @type {number} */
   var eventTypeCode = acgraph.vector.Element.HANDLED_EVENT_TYPES[type] || 0;
@@ -1760,7 +1762,10 @@ anychart.elements.MarkersFactory.Marker.prototype.enabled = function(opt_value) 
  */
 anychart.elements.MarkersFactory.Marker.prototype.clear = function() {
   this.resetSettings();
-  if (this.markerElement_) this.markerElement_.parent(null);
+  if (this.markerElement_) {
+    this.markerElement_.parent(null);
+    this.markerElement_.removeAllListeners();
+  }
   this.invalidate(anychart.ConsistencyState.CONTAINER);
 };
 

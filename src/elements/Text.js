@@ -428,7 +428,7 @@ anychart.elements.Text.prototype.vAlign = function(opt_value) {
  * @return {!anychart.elements.Text} An instance of {@link anychart.elements.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.VAlign|string=} opt_value .
+ * @param {acgraph.vector.Text.HAlign|string=} opt_value .
  * @return {!anychart.elements.Text|acgraph.vector.Text.HAlign} .
  */
 anychart.elements.Text.prototype.hAlign = function(opt_value) {
