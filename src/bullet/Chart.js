@@ -94,7 +94,7 @@ anychart.bullet.Chart.ZINDEX_RANGES = 2;
  * Axis z-index.
  * @type {number}
  */
-anychart.bullet.Chart.ZINDEX_AXIS = 2;
+anychart.bullet.Chart.ZINDEX_AXIS = 3;
 
 
 /**
@@ -413,10 +413,10 @@ anychart.bullet.Chart.prototype.markerPalette = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.utils.MarkerPalette) {
       this.markerPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.markerPalette_.deserialize(opt_value);
     } else if (goog.isArray(opt_value)) {
       this.markerPalette_.markers(opt_value);
+    } else if (goog.isObject(opt_value)) {
+      this.markerPalette_.deserialize(opt_value);
     }
 
     this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
@@ -564,7 +564,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES);
   }
 
-  var boundsWithoutAxis = axis.getRemainingBounds();
+  var boundsWithoutAxis = axis.enabled() ? axis.getRemainingBounds() : bounds;
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
     for (i = 0, count = this.ranges_.length; i < count; i++) {
       var range = this.ranges_[i];
