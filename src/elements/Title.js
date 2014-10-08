@@ -610,6 +610,7 @@ anychart.elements.Title.prototype.rotation = function(opt_value) {
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
+    return this;
   }
   return goog.isDef(this.rotation_) ? this.rotation_ : this.defaultRotation_;
 };

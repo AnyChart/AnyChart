@@ -564,7 +564,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES);
   }
 
-  var boundsWithoutAxis = axis.getRemainingBounds();
+  var boundsWithoutAxis = axis.enabled() ? axis.getRemainingBounds() : bounds;
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
     for (i = 0, count = this.ranges_.length; i < count; i++) {
       var range = this.ranges_[i];
