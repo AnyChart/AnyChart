@@ -338,8 +338,8 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
       default:
       case anychart.enums.BulletMarkerType.BAR:
         return function(path) {
-          var start = this.scale().transform(0);
-          var end = this.scale().transform(this.value());
+          var start = this.scale().transform(this.scale().minimum());
+          var end = goog.math.clamp(this.scale().transform(this.value(), 0), 0, 1);
           var bounds = this.parentBounds();
 
           var gap = this.gap();
@@ -430,8 +430,8 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
       default:
       case anychart.enums.BulletMarkerType.BAR:
         return function(path) {
-          var start = this.scale().transform(0);
-          var end = this.scale().transform(this.value());
+          var start = this.scale().transform(this.scale().minimum());
+          var end = goog.math.clamp(this.scale().transform(this.value(), 0), 0, 1);
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
