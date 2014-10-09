@@ -244,6 +244,27 @@ anychart.cartesian.Chart.ZINDEX_LINE_SERIES = 31;
 anychart.cartesian.Chart.ZINDEX_AXIS = 35;
 
 
+/**
+ * Marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_MARKER = 40;
+
+
+/**
+ * Label z-index in chart root layer.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_LABEL = 50;
+
+
+/**
+ * Z-index increment multiplier.
+ * @type {number}
+ */
+anychart.cartesian.Chart.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Scales.
@@ -1418,16 +1439,16 @@ anychart.cartesian.Chart.prototype.stepArea = function(data, opt_csvSettings) {
 anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
   var ctl = anychart.cartesian.series.Base.SeriesTypesMap[/** @type {anychart.enums.CartesianSeriesType} */(type)];
   var instance;
-  var zIndex;
-  var index;
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
     this.series_.push(instance);
-    index = this.series_.length - 1;
-    zIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.cartesian.Chart.ZINDEX_SERIES) + index * 0.00001;
+    var index = this.series_.length - 1;
+    var inc = index * anychart.cartesian.Chart.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
-    instance.zIndex(zIndex);
+    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.cartesian.Chart.ZINDEX_SERIES) + inc);
+    instance.markers().setAutoZIndex(anychart.cartesian.Chart.ZINDEX_MARKER + inc);
+    instance.labels().setAutoZIndex(anychart.cartesian.Chart.ZINDEX_LABEL + inc);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));

@@ -10,9 +10,11 @@
     goog.require('anychart.cartesian.Chart');
   </script>
   <script>
+    var chart;
     function load() {
-      var chart = anychart.lineChart();
-      chart.draw();
+      chart = anychart.lineChart();
+      chart.container('container');
+
 
       var dataSet = new anychart.data.Set([
         ['A1' , 1,   5, 2],
@@ -24,11 +26,15 @@
         ['A7' , 5,  2, 0.5]
       ]);
 
-      chart.line(dataSet.mapAs({x: [0], value: [1]}));
-      chart.spline(dataSet.mapAs({x: [0], value: [2]}));
-      chart.area(dataSet.mapAs({x: [0], value: [1]}));
+      var series = chart.area(dataSet.mapAs({x: [0], value: [1]}));
+      chart.area(dataSet.mapAs({x: [0], value: [2]}));
+      chart.area(dataSet.mapAs({x: [0], value: [3]}));
 
-      chart.container('container');
+      series.markers().enabled(true);
+      series.labels().enabled(true);
+      series.hatchFill(true);
+
+      chart.draw();
     }
   </script>
   <style>

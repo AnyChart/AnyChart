@@ -32,7 +32,15 @@ anychart.VisualBase.prototype.container_ = null;
  * @type {number}
  * @private
  */
-anychart.VisualBase.prototype.zIndex_ = 0;
+anychart.VisualBase.prototype.zIndex_;
+
+
+/**
+ * Auto z index of the element.
+ * @type {number}
+ * @private
+ */
+anychart.VisualBase.prototype.autoZIndex_ = 0;
 
 
 /**
@@ -175,7 +183,16 @@ anychart.VisualBase.prototype.zIndex = function(opt_value) {
     }
     return this;
   }
-  return this.zIndex_;
+  return goog.isDef(this.zIndex_) ? this.zIndex_ : this.autoZIndex_;
+};
+
+
+/**
+ * Auto z-index setter.
+ * @param {number} value
+ */
+anychart.VisualBase.prototype.setAutoZIndex = function(value) {
+  this.autoZIndex_ = value;
 };
 
 

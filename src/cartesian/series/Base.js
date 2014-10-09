@@ -127,20 +127,6 @@ anychart.cartesian.series.Base.ZINDEX_HATCH_FILL = 2;
 
 
 /**
- * Marker z-index in series root layer.
- * @type {number}
- */
-anychart.cartesian.series.Base.ZINDEX_MARKER = 3;
-
-
-/**
- * Label z-index in series root layer.
- * @type {number}
- */
-anychart.cartesian.series.Base.ZINDEX_LABEL = 4;
-
-
-/**
  * Series name.
  * @type {string}
  * @private
@@ -1045,6 +1031,8 @@ anychart.cartesian.series.Base.prototype.remove = function() {
   if (this.rootLayer)
     this.rootLayer.remove();
 
+  this.labels().container(null);
+
   goog.base(this, 'remove');
 };
 
@@ -1072,7 +1060,7 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
   this.labels().clear();
-  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 
@@ -1652,7 +1640,6 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.elements.LabelsFactory();
-    this.labels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     this.registerDisposable(this.labels_);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
   }
@@ -1660,10 +1647,8 @@ anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.LabelsFactory) {
       this.labels_.deserialize(opt_value.serialize());
-      if (this.labels_.zIndex() == 0) this.labels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     } else if (goog.isObject(opt_value)) {
       this.labels_.deserialize(opt_value);
-      if (this.labels_.zIndex() == 0) this.labels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     } else if (anychart.utils.isNone(opt_value)) {
       this.labels_.enabled(false);
     }
@@ -1681,17 +1666,14 @@ anychart.cartesian.series.Base.prototype.labels = function(opt_value) {
 anychart.cartesian.series.Base.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.elements.LabelsFactory();
-    this.hoverLabels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
 
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.LabelsFactory) {
       this.hoverLabels_.deserialize(opt_value.serialize());
-      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     } else if (goog.isObject(opt_value)) {
       this.hoverLabels_.deserialize(opt_value);
-      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.cartesian.series.Base.ZINDEX_LABEL);
     } else if (anychart.utils.isNone(opt_value)) {
       this.hoverLabels_.enabled(false);
     }

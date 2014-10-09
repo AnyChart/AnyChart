@@ -122,7 +122,6 @@ anychart.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = 
 anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.elements.MarkersFactory();
-    this.markers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     this.registerDisposable(this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
@@ -130,10 +129,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.MarkersFactory) {
       this.markers_.deserialize(opt_value.serialize());
-      if (this.marker_.zIndex() == 0) this.markers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     } else if (goog.isObject(opt_value)) {
       this.markers_.deserialize(opt_value);
-      if (this.marker_.zIndex() == 0) this.markers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     } else if (anychart.utils.isNone(opt_value)) {
       this.markers_.enabled(false);
     }
@@ -168,7 +165,6 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value
 anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_value) {
   if (!this.hoverMarkers_) {
     this.hoverMarkers_ = new anychart.elements.MarkersFactory();
-    this.hoverMarkers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     this.registerDisposable(this.hoverMarkers_);
     // don't listen to it, for it will be reapplied at the next hover
   }
@@ -176,10 +172,8 @@ anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.elements.MarkersFactory) {
       this.hoverMarkers_.deserialize(opt_value.serialize());
-      if (this.hoverMarkers_.zIndex() == 0) this.hoverMarkers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     } else if (goog.isObject(opt_value)) {
       this.hoverMarkers_.deserialize(opt_value);
-      if (this.hoverMarkers_.zIndex() == 0) this.hoverMarkers_.zIndex(anychart.cartesian.series.Base.ZINDEX_MARKER);
     } else if (anychart.utils.isNone(opt_value)) {
       this.hoverMarkers_.enabled(false);
     }
@@ -202,6 +196,14 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markersInvalidated_ = functi
 
 
 /** @inheritDoc */
+anychart.cartesian.series.BaseWithMarkers.prototype.remove = function() {
+  this.markers().container(null);
+
+  goog.base(this, 'remove');
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
   var markers = this.markers();
@@ -219,7 +221,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
   markers.setAutoType(this.autoMarkerType);
 
   markers.clear();
-  markers.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+  markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
 };
 
