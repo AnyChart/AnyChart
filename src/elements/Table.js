@@ -1172,16 +1172,10 @@ anychart.elements.Table.prototype.checkContent_ = function() {
             content.container(this.contentLayer_);
             if (content instanceof anychart.elements.LabelsFactory.Label) {
               label = /** @type {anychart.elements.LabelsFactory.Label} */(content);
-              // here is proper label position determining. It is done in this way, because we are not sure, that
-              // the label in the cell was created by the table labels factory, so we need to use label's own
-              // methods to determine the correct behaviour. And also, as we don't use this.cellTextFactory() here,
-              // the table factory is not created if it is not used.
-              var position = /** @type {string} */(
-                  label.position() ||
-                  label.currentLabelsFactory() && label.currentLabelsFactory().position() ||
-                  label.parentLabelsFactory() && label.parentLabelsFactory().position());
-              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-              label.positionProvider(positionProvider);
+              label.anchor(anychart.enums.Anchor.LEFT_TOP);
+              label.width(bounds.width);
+              label.height(bounds.height);
+              label.positionProvider({'value': {'x': bounds.left, 'y': bounds.top}});
             } else if (content instanceof anychart.VisualBaseWithBounds) {
               var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
               elementWithBounds.pixelBounds(null);
@@ -1387,6 +1381,8 @@ anychart.elements.Table.prototype.resetFillPaths_ = function() {
  * @private
  */
 anychart.elements.Table.prototype.getBorderPath_ = function(stroke) {
+  if (goog.isObject(stroke) && ('keys' in stroke) && !goog.isObject(stroke['mode']))
+    stroke['mode'] = this.pixelBounds();
   var hash = anychart.utils.hash(stroke);
   if (hash in this.borderPaths_)
     return this.borderPaths_[hash];
