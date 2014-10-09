@@ -1103,7 +1103,10 @@ anychart.enums.WarningCode = {
   CANT_SERIALIZE_FUNCTION: 8,
 
   //anychart.elements.DataGrid incorrect component usage.
-  DG_INCORRECT_METHOD_USAGE: 9
+  DG_INCORRECT_METHOD_USAGE: 9,
+
+
+  BULLET_CHART_OUT_OF_RANGE: 10
 
 };
 

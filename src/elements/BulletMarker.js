@@ -337,9 +337,9 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
     switch (type) {
       default:
       case anychart.enums.BulletMarkerType.BAR:
-        return function(path) {
-          var start = this.scale().transform(this.scale().minimum());
-          var end = goog.math.clamp(this.scale().transform(this.value(), 0), 0, 1);
+        return function(path, ratio) {
+          var start = this.scale().transform(0);
+          start = isNaN(start) ? 0 : goog.math.clamp(start, 0, 1);
           var bounds = this.parentBounds();
 
           var gap = this.gap();
@@ -349,7 +349,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
 
           var left = bounds.left + start * bounds.width;
           var top = bounds.top + pixGap / 2;
-          var width = (end - start) * bounds.width;
+          var width = (ratio - start) * bounds.width;
           var height = bounds.height - pixGap;
           path
               .clear()
@@ -360,8 +360,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
               .close();
         };
       case anychart.enums.BulletMarkerType.LINE:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -381,8 +380,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
               .close();
         };
       case anychart.enums.BulletMarkerType.ELLIPSE:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -398,8 +396,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
           path.circularArc(x, y, rx, ry, 0, 360).close();
         };
       case anychart.enums.BulletMarkerType.X:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -429,18 +426,18 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
     switch (type) {
       default:
       case anychart.enums.BulletMarkerType.BAR:
-        return function(path) {
-          var start = this.scale().transform(this.scale().minimum());
-          var end = goog.math.clamp(this.scale().transform(this.value(), 0), 0, 1);
+        return function(path, ratio) {
+          var start = this.scale().transform(0);
+          start = isNaN(start) ? 0 : goog.math.clamp(start, 0, 1);
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
               anychart.utils.normalizeSize(gap, bounds.width) :
               bounds.width * gap;
           var left = bounds.left + pixGap / 2;//start * bounds.width;
-          var top = bounds.getBottom() - bounds.height * end;
+          var top = bounds.getBottom() - bounds.height * ratio;
           var width = bounds.width - pixGap;//(end - start) * bounds.width;
-          var height = (end - start) * bounds.height;
+          var height = (ratio - start) * bounds.height;
 
           path.clear()
               .moveTo(left - 0.25, top - 0.5)
@@ -450,8 +447,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
               .close();
         };
       case anychart.enums.BulletMarkerType.LINE:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -470,8 +466,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
               .close();
         };
       case anychart.enums.BulletMarkerType.ELLIPSE:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -487,8 +482,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
           path.circularArc(x, y, rx, ry, 0, 360).close();
         };
       case anychart.enums.BulletMarkerType.X:
-        return function(path) {
-          var ratio = this.scale().transform(this.value());
+        return function(path, ratio) {
           var bounds = this.parentBounds();
           var gap = this.gap();
           var pixGap = anychart.utils.isPercent(gap) ?
@@ -561,11 +555,21 @@ anychart.elements.BulletMarker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var drawer = anychart.elements.BulletMarker.getDrawer(
-        /** @type {anychart.enums.Layout} */(this.layout()),
-        /** @type {anychart.enums.BulletMarkerType} */(this.type())
-        );
-    drawer.call(this, this.path_);
+    var value = this.value();
+    var ratio = this.scale().transform(value, 0);
+    this.path_.clear();
+
+    if (isNaN(ratio) || ratio < 0 || ratio > 1) {
+      anychart.utils.warning(anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE, null, [value]);
+    } else {
+      var drawer = anychart.elements.BulletMarker.getDrawer(
+          /** @type {anychart.enums.Layout} */(this.layout()),
+          /** @type {anychart.enums.BulletMarkerType} */(this.type())
+          );
+      drawer.call(this, this.path_, ratio);
+    }
+
+
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

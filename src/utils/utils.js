@@ -919,6 +919,9 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
           'on data grid using the controller, but not directly. In current case, use \'' + opt_arguments[1] + '()\' instead. ' +
           opt_arguments[2];
 
+    case anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE:
+      return 'Bullet Chart point value: ' + arguments[0] + ' is out of scale range. Check minimum and maximum scale settings.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
