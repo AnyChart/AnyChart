@@ -136,10 +136,10 @@ function load() {
   axis1.offsetY(250);
   axis1.container('container');
   axis1.orientation('bottom');
-  axis1.length(666);
-//  axis1.staggerMaxLines(2);
+  axis1.length(700);
+  axis1.staggerMaxLines(20);
 //  axis1.overlapMode('nooverlap');
-//  axis1.staggerLines(3);
+//  axis1.staggerLines(2);
   axis1.staggerMode(true);
   axis1.ticks().length(25).stroke('2 red');
   axis1.minorTicks().stroke('2 green').length(15);

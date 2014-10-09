@@ -748,7 +748,6 @@ anychart.elements.LabelsFactory.prototype.draw = function() {
             }
           }
           this.attachedOnceEvents_ = 0x00;
-
         }
       }
     }, this);
@@ -827,7 +826,7 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
     parentHeight = this.parentBounds_.height;
   }
 
-  var padding = this.measureCustomLabel_.padding() || this.padding();
+  var padding = opt_settings && opt_settings['padding'] ? this.measureCustomLabel_.padding() : this.padding();
   var widthSettings = this.measureCustomLabel_.width() || this.width();
   var heightSettings = this.measureCustomLabel_.height() || this.height();
   var offsetY = /** @type {number|string} */(this.measureCustomLabel_.offsetY() || this.offsetY());

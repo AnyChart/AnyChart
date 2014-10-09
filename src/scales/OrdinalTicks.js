@@ -174,7 +174,7 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
     return this;
   }
   var values = this.get();
-  if (!this.names_ || this.names_.length < values.length || !this.autoNames_) {
+  if ((this.names_ && this.names_.length < values.length) || !this.autoNames_) {
     var scaleNames = this.scale_.names();
     this.autoNames_ = [];
     for (var i = 0; i < values.length; i++) {

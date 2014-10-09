@@ -545,7 +545,7 @@ anychart.elements.Text.prototype.applyTextSettings = function(textElement, isIni
     textElement.opacity(this.settingsObj['fontOpacity']);
   if ('fontDecoration' in this.changedSettings)
     textElement.decoration(this.settingsObj['fontDecoration']);
-  if ('fontStyle' in this.changedSettings)
+  if (isInitial || 'fontStyle' in this.changedSettings)
     textElement.fontStyle(this.settingsObj['fontStyle']);
   if ('fontVariant' in this.changedSettings)
     textElement.fontVariant(this.settingsObj['fontVariant']);

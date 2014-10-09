@@ -2244,7 +2244,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+      this.series_[i].setAutoHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.SERIES);
@@ -2377,7 +2378,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
           this.setDefaultScaleForLayoutBasedElements_(grid);
         grid.parentBounds(this.dataBounds_);
         grid.container(this.rootElement);
-        grid.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
+        grid.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_,
+            this.leftAxisPadding_);
         grid.draw();
         grid.resumeSignalsDispatching(false);
       }
@@ -2421,7 +2423,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
           this.setDefaultScaleForLayoutBasedElements_(axesMarker);
         axesMarker.parentBounds(this.dataBounds_);
         axesMarker.container(this.rootElement);
-        axesMarker.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
+        axesMarker.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_,
+            this.leftAxisPadding_);
         axesMarker.draw();
         axesMarker.resumeSignalsDispatching(false);
       }
@@ -2433,7 +2436,8 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
-      series.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
+      series.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_,
+          this.leftAxisPadding_);
       series.pixelBounds(this.dataBounds_);
     }
 
@@ -2499,9 +2503,11 @@ anychart.cartesian.Chart.prototype.drawSeries_ = function() {
       }
     };
     if (goog.isArray(categories)) {
-      iterator = new anychart.cartesian.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb, beforeClb, afterClb);
+      iterator = new anychart.cartesian.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb,
+          beforeClb, afterClb);
     } else {
-      iterator = new anychart.cartesian.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb, afterClb);
+      iterator = new anychart.cartesian.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb,
+          afterClb);
     }
     for (i = 0; i < series.length; i++) {
       series[i].startDrawing();
