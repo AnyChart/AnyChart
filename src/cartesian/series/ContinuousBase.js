@@ -270,10 +270,11 @@ anychart.cartesian.series.ContinuousBase.prototype.getIndexByEvent = function(ev
 /** @inheritDoc */
 anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) {
-    this.showTooltip(event);
+    if (this.getIterator().select(index))
+      this.showTooltip(event);
     return this;
   }
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
     this.drawLabel(false);
     this.hideTooltip();
@@ -284,7 +285,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
     this.applyHatchFill(true);
     this.colorizeShape(true);
   }*/
-  if (this.getResetIterator().select(index)) {
+  if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
     this.showTooltip(event);
@@ -300,7 +301,7 @@ anychart.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, 
 anychart.cartesian.series.ContinuousBase.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
 
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
     this.drawLabel(false);
     this.hideTooltip();

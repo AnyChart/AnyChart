@@ -373,11 +373,12 @@ anychart.cartesian.series.Marker.prototype.hoverSeries = function() {
  */
 anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) {
-    this.showTooltip(event);
+    if (this.getIterator().select(index))
+      this.showTooltip(event);
     return this;
   }
   this.unhover();
-  if (this.getResetIterator().select(index)) {
+  if (this.getIterator().select(index)) {
     this.drawMarker_(true, true);
     this.applyHatchFill(true);
     this.drawLabel(true);
@@ -394,7 +395,7 @@ anychart.cartesian.series.Marker.prototype.hoverPoint = function(index, event) {
  */
 anychart.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getResetIterator().select(this.hoverStatus)) {
+  if (this.getIterator().select(this.hoverStatus)) {
     this.drawMarker_(false, true);
     this.applyHatchFill(false);
     this.drawLabel(false);

@@ -142,11 +142,12 @@ anychart.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
 /** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) {
-    this.showTooltip(event);
+    if (this.getIterator().select(index))
+      this.showTooltip(event);
     return this;
   }
   this.unhover();
-  if (this.getResetIterator().select(index)) {
+  if (this.getIterator().select(index)) {
     this.colorizeShape(true);
     this.applyHatchFill(true);
     this.drawMarker(true);
@@ -161,7 +162,7 @@ anychart.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, ev
 /** @inheritDoc */
 anychart.cartesian.series.DiscreteBase.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getResetIterator().select(this.hoverStatus)) {
+  if (this.getIterator().select(this.hoverStatus)) {
     var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
     if (goog.isDef(rect)) {
       this.colorizeShape(false);
