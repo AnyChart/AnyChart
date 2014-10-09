@@ -961,7 +961,7 @@ anychart.Chart.prototype.resizeHandler_ = function(evt) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.Chart.prototype.remove = function() {
-  this.rootElement.parent(null);
+  if (this.rootElement) this.rootElement.parent(null);
 };
 
 
