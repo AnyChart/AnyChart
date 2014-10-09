@@ -1069,7 +1069,9 @@ anychart.enums.ErrorCode = {
   SCALE_NOT_SET: 2,
 
   //anychart.elements.Table
-  WRONG_TABLE_CONTENTS: 3
+  WRONG_TABLE_CONTENTS: 3,
+
+  NO_FEATURE_IN_MODULE: 4
 };
 
 

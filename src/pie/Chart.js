@@ -3269,6 +3269,7 @@ anychart.pie.Chart.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
  *    .container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @return {!anychart.pie.Chart} {@link anychart.pie.Chart} instance for method chaining.
+ * @deprecated Use {@link anychart.pieChart} instead.
  */
 anychart.pie.chart = function(opt_data) {
   return new anychart.pie.Chart(opt_data);
