@@ -1953,8 +1953,8 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
 
   return {
     'index': index,
-    'value': labelValue,
-    'name': labelText,
+    'value': labelText,
+    'tickValue': labelValue,
     'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
