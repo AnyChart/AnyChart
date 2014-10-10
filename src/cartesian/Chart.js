@@ -255,7 +255,7 @@ anychart.cartesian.Chart.ZINDEX_MARKER = 40;
  * Label z-index in chart root layer.
  * @type {number}
  */
-anychart.cartesian.Chart.ZINDEX_LABEL = 50;
+anychart.cartesian.Chart.ZINDEX_LABEL = 40;
 
 
 /**
@@ -1449,7 +1449,7 @@ anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, op
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.cartesian.Chart.ZINDEX_SERIES) + inc);
     if (instance.hasMarkers())
       instance.markers().setAutoZIndex(anychart.cartesian.Chart.ZINDEX_MARKER + inc);
-    instance.labels().setAutoZIndex(anychart.cartesian.Chart.ZINDEX_LABEL + inc);
+    instance.labels().setAutoZIndex(anychart.cartesian.Chart.ZINDEX_LABEL + inc + anychart.cartesian.Chart.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
