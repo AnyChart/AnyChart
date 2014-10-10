@@ -933,6 +933,15 @@ anychart.cartesian.series.Base.prototype.isSizeBased = function() {
 };
 
 
+/**
+ * Tester if the series has markers() method.
+ * @return {boolean}
+ */
+anychart.cartesian.series.Base.prototype.hasMarkers = function() {
+  return false;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing.

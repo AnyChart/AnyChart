@@ -49,6 +49,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markers_ = null;
 anychart.cartesian.series.BaseWithMarkers.prototype.hoverMarkers_ = null;
 
 
+/** @inheritDoc */
+anychart.cartesian.series.BaseWithMarkers.prototype.hasMarkers = function() {
+  return true;
+};
+
+
 /**
  * @param {acgraph.events.Event} event .
  * @protected
