@@ -13,7 +13,12 @@ goog.require('anychart.utils.RangeColorPalette');
 
 
 /**
- * Bullet chart.
+ * Bullet chart c§lass.<br/>
+ * <b>Note:</b> Use these methods to get an instance of this class:
+ *  <ul>
+ *      <li>{@link anychart.bullet.chart}</li>
+ *      <li>{@link anychart.bulletChart}</li>
+ *  </ul>
  * @constructor
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
  * @extends {anychart.Chart}
@@ -98,6 +103,20 @@ anychart.bullet.Chart.ZINDEX_AXIS = 3;
 
 
 /**
+ * Getter for chart data.
+ * @return {!anychart.data.View} {@link anychart.data.View} instance for method chaining.
+ *//**
+ * Setter for chart data.<br/>
+ * <b>Note:</b> All data is markers values.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([10, 7, 11]);
+ * bulletChart.range().from(0).to(6);
+ * bulletChart.range(1).from(6).to(12);
+ * bulletChart.container(stage).draw();
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
  * @ignoreDoc
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
@@ -148,6 +167,20 @@ anychart.bullet.Chart.prototype.dataInvalidated_ = function(e) {
 
 
 /**
+ * Getter for bullet chart layout.
+ * @return {anychart.enums.Layout} Current chart layout.
+ *//**
+ * Setter for bullet chart layout.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.layout('horizontal');
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * bulletChart.container(stage).draw();
+ * @param {(string|anychart.enums.Layout)=} opt_value [{@link anychart.enums.Layout}.HORIZONTAL] Value to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter/setter for bullet chart layout.
  * @param {(string|anychart.enums.Layout)=} opt_value [{@link anychart.enums.Layout}.HORIZONTAL] Layout for bullet chart.
  * @return {anychart.enums.Layout|anychart.bullet.Chart} Layout of bullet chart of self for method chaining.
@@ -209,8 +242,8 @@ anychart.bullet.Chart.prototype.updateLayoutDefaults = function() {
 
 
 /**
- * Checks for horizontal layout.
- * @return {boolean} Is layout horizontal.
+ * Whether an bullet chart is horizontal.
+ * @return {boolean} If the bullet chart is horizontal.
  */
 anychart.bullet.Chart.prototype.isHorizontal = function() {
   return (this.layout_ == anychart.enums.Layout.HORIZONTAL);
@@ -218,6 +251,22 @@ anychart.bullet.Chart.prototype.isHorizontal = function() {
 
 
 /**
+ * Getter for default bullet chart scale settings.
+ * @return {!anychart.scales.Base} {@link anychart.scales.Base} instance for method chaining.
+ *//**
+ * Setter for default bullet chart scale settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * var customScale = anychart.scales.linear();
+ * customScale.minimum(10).maximum(15);
+ * bulletChart.scale(customScale);
+ * bulletChart.container(stage).draw();
+ * @param {anychart.scales.Base=} opt_value Scale to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter/setter for default bullet chart scale.
  * @param {anychart.scales.Base=} opt_value Scale to set.
  * @return {!(anychart.scales.Base|anychart.bullet.Chart)} Default chart scale value or itself for method chaining.
@@ -248,6 +297,24 @@ anychart.bullet.Chart.prototype.scale = function(opt_value) {
 
 
 /**
+ * Getter for default bullet chart axis settings.
+ * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
+ *//**
+ * Setter for default bullet chart axis settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * var customAxis = anychart.elements.axis()
+ *    .orientation('top')
+ *    .stroke('red')
+ *    .title(null);
+ * bulletChart.axis(customAxis);
+ * bulletChart.container(stage).draw();
+ * @param {anychart.elements.Axis=} opt_value Scale to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter/setter for bullet chart axis.
  * @param {anychart.elements.Axis=} opt_value
  * @return {(anychart.elements.Axis|anychart.bullet.Chart)}
@@ -307,10 +374,46 @@ anychart.bullet.Chart.prototype.onAxisSignal_ = function(event) {
 
 
 /**
+ * Getter for bullet chart ranges settings.
+ * @param {number=} opt_index [0] Chart range index.
+ * @return {!anychart.elements.RangeMarker} {@link anychart.elements.RangeMarker} instance for method chaining.
+ *//**
+ * Setter for bullet chart first range settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range(
+ *   anychart.elements.rangeMarker()
+ *     .from(0).to(15)
+ *     .fill('green 0.2')
+ *     .layout('vertical')
+ * );
+ * bulletChart.container(stage).draw();
+ * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Value to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * Setter for bullet chart ranges settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range(0, anychart.elements.rangeMarker()
+ *    .from(0).to(10)
+ *    .fill('red 0.2')
+ *    .layout('vertical')
+ * );
+ * bulletChart.range(1, anychart.elements.rangeMarker()
+ *    .from(10).to(20)
+ *    .fill('yellow 0.2')
+ *    .layout('vertical')
+ * );
+ * bulletChart.container(stage).draw();
+ * @param {number=} opt_index [0] Index of range.
+ * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Value to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter/setter for bullet chart ranges.
  * @param {(number|anychart.elements.RangeMarker|Object|string|null)=} opt_indexOrValue Chart range settings to set.
  * @param {(anychart.elements.RangeMarker|Object|string|null)=} opt_value Chart range settings to set.
- * @return {!(anychart.elements.RangeMarker|anychart.bullet.Chart)} Range instance by index or itself for chaining call.
+ * @return {!(anychart.elements.RangeMarker|anychart.bullet.Chart)} Range instance by index or itself for method chaining.
  */
 anychart.bullet.Chart.prototype.range = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -360,6 +463,21 @@ anychart.bullet.Chart.prototype.onRangeSignal_ = function(event) {
 
 
 /**
+ * Getter for range palette settings.
+ * @return {!anychart.utils.DistinctColorPalette} Current palette.
+ *//**
+ * Setter for range palette settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range().from(0).to(5);
+ * bulletChart.range(1).from(5).to(10);
+ * bulletChart.range(2).from(10).to(15);
+ * bulletChart.range(3).from(15).to(20);
+ * bulletChart.rangePalette(['#333', '#777', '#aaa', '#eee']);
+ * bulletChart.container(stage).draw();
+ * @param {(anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
  * @ignoreDoc
  * @param {(anychart.utils.DistinctColorPalette|Array)=} opt_value .
  * @return {!(anychart.utils.DistinctColorPalette|anychart.bullet.Chart)} .
@@ -398,9 +516,24 @@ anychart.bullet.Chart.prototype.onRangePaletteSignal_ = function(event) {
 
 
 /**
- * Chart markers palette settings.
- * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.utils.MarkerPalette)=} opt_value Chart marker palette settings to set.
- * @return {anychart.utils.MarkerPalette|anychart.bullet.Chart} Return current chart markers palette or itself for chaining call.
+ * Getter for markers palette settings.
+ * @return {anychart.utils.MarkerPalette} Current palette.
+ *//**
+ * Setter for markers palette settings.<br/>
+ * <b>Note:</b> Markers sets in data().
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([7,10,11,13]);
+ * bulletChart.range().from(0).to(5);
+ * bulletChart.range(1).from(5).to(10);
+ * bulletChart.range(2).from(10).to(15);
+ * bulletChart.markerPalette(['line', 'line', 'x', 'bar']);
+ * bulletChart.container(stage).draw();
+ * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.utils.MarkerPalette)=} opt_value Value to set.
+ * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(anychart.utils.DistinctColorPalette|Array)=} opt_value .
+ * @return {!(anychart.utils.MarkerPalette|anychart.bullet.Chart)} .
  */
 anychart.bullet.Chart.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
@@ -515,7 +648,7 @@ anychart.bullet.Chart.prototype.calculate = function() {
 
 /** @inheritDoc */
 anychart.bullet.Chart.prototype.draw = function() {
-  //we should update layout before draw
+  //we must update layout before draw
   var isHorizontal = this.isHorizontal();
   var title = this.title();
   var axis = this.axis();
@@ -657,11 +790,30 @@ anychart.bullet.Chart.prototype.createMarker_ = function(iterator) {
 };
 
 
+/**
+ * Returns Bullet chart instance with initial settings.<br/>
+ * <b>Note:</b> To get chart initial state use {@link anychart.bulletChart}.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([17]);
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * bulletChart.container(stage).draw();
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
+ * @return {!anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
+ */
+anychart.bullet.chart = function(opt_data) {
+  return new anychart.bullet.Chart(opt_data);
+};
+
+
 //exports
-anychart.bullet.Chart.prototype['layout'] = anychart.bullet.Chart.prototype.layout;
-anychart.bullet.Chart.prototype['rangePalette'] = anychart.bullet.Chart.prototype.rangePalette;
-anychart.bullet.Chart.prototype['markerPalette'] = anychart.bullet.Chart.prototype.markerPalette;
-anychart.bullet.Chart.prototype['scale'] = anychart.bullet.Chart.prototype.scale;
-anychart.bullet.Chart.prototype['axis'] = anychart.bullet.Chart.prototype.axis;
-anychart.bullet.Chart.prototype['range'] = anychart.bullet.Chart.prototype.range;
-anychart.bullet.Chart.prototype['draw'] = anychart.bullet.Chart.prototype.draw;
+goog.exportSymbol('anychart.bullet.chart', anychart.bullet.chart);//doc|ex
+anychart.bullet.Chart.prototype['data'] = anychart.bullet.Chart.prototype.data;//doc|ex
+anychart.bullet.Chart.prototype['layout'] = anychart.bullet.Chart.prototype.layout;//doc|ex
+anychart.bullet.Chart.prototype['rangePalette'] = anychart.bullet.Chart.prototype.rangePalette;//doc|ex
+anychart.bullet.Chart.prototype['markerPalette'] = anychart.bullet.Chart.prototype.markerPalette;//doc|ex
+anychart.bullet.Chart.prototype['scale'] = anychart.bullet.Chart.prototype.scale;//doc|ex
+anychart.bullet.Chart.prototype['axis'] = anychart.bullet.Chart.prototype.axis;//doc|ex
+anychart.bullet.Chart.prototype['range'] = anychart.bullet.Chart.prototype.range;//doc|ex
+anychart.bullet.Chart.prototype['draw'] = anychart.bullet.Chart.prototype.draw;//inherited
+anychart.bullet.Chart.prototype['isHorizontal'] = anychart.bullet.Chart.prototype.isHorizontal;//doc
