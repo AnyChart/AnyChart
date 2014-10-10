@@ -399,13 +399,13 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
  * ]);
  * chart.column(data);
  * chart.container(stage).draw();
- * // You can use differenet data formats.
+ * // You can use differnet data formats.
  * data.append(
  *   {x: 'B1', value: 14},
  *   ['B2', 16]
  * );
  * @param {...*} var_args Rows to append.
- * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
+ * @return {!anychart.data.Set} {@link anychart.data.Set} instance for method chaining.
  */
 anychart.data.Set.prototype.append = function(var_args) {
   anychart.globalLock.lock();
@@ -430,8 +430,8 @@ anychart.data.Set.prototype.append = function(var_args) {
  * chart.container(stage).draw();
  * data.insert({x: 'B1', value: 14, fill: 'grey'}, 2);
  * @param {*} row Row to insert.
- * @param {number=} opt_index [0] The index at which to insert the object. A negative index is counted from the end of the array.
- * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
+ * @param {number=} opt_index [0] The index at which to insert the object. A negative index is counted from the end of an array.
+ * @return {!anychart.data.Set} {@link anychart.data.Set} instance for method chaining.
  */
 anychart.data.Set.prototype.insert = function(row, opt_index) {
   anychart.globalLock.lock();
@@ -456,7 +456,7 @@ anychart.data.Set.prototype.insert = function(row, opt_index) {
  * chart.container(stage).draw();
  * data.remove(2); // remove 'A3' point.
  * @param {number} index Index of the row to remove.
- * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
+ * @return {!anychart.data.Set} {@link anychart.data.Set} instance for method chaining.
  */
 anychart.data.Set.prototype.remove = function(index) {
   anychart.globalLock.lock();
