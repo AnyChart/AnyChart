@@ -311,10 +311,10 @@ anychart.scales.Ordinal.prototype.checkScaleChanged = function(silently) {
 
 
 /**
- * Расширяет текущий input domain переданными значениями (если, такого значения ранее не было).
- * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drop all passed values.
+ * Extends the current input domain with the passed values (if such don't exist in the domain).
+ * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drops all passed values.
  * @param {...*} var_args Values that are supposed to extend the input domain.
- * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
+ * @return {!anychart.scales.Ordinal} {@link anychart.scales.Ordinal} instance for method chaining.
  */
 anychart.scales.Ordinal.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
@@ -349,8 +349,8 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
 
 
 /**
- * Возвращает пропорциональное положение тика относительно всей шкалы по его имени.<br/>
- * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * Returns tick position ratio by its name.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
  * var chart = anychart.lineChart();
  * chart.line([
@@ -360,9 +360,9 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
  *    ['A4', 1.9]
  * ]);
  * chart.container(stage).draw();
- * // Пытаемся получить положение середины тика 'A2'.
+ * // Trying to get 'A2' position ratio.
  * var position = chart.xScale().transform('A2', 0.5);
- * // Вернется значение 0.375
+ * // Returns 0.375
  * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
  * @return {number} Value transformed to output scope.
@@ -379,8 +379,8 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
 
 
 /**
- * Возвращает имя тика по переданному положению относительно всей шкалы.<br/>
- * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * Returns tick name by its ratio position.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
  * var chart = anychart.lineChart();
  * chart.line([
@@ -390,9 +390,9 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
  *    ['A4', 1.9]
  * ]);
  * chart.container(stage).draw();
- * // Пытаемся получить ближайший тик.
+ * // Trying to get a tick.
  * var position = chart.xScale().inverseTransform(0.375);
- * // Вернется значение 'A2'.
+ * // Returns 'A2'.
  * @param {number} ratio Value to transform in input scope.
  * @return {*} Value transformed to output scope.
  */
@@ -461,9 +461,9 @@ anychart.scales.ordinal = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);//doc|ex
-anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;//doc|ex|need-tr
-anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;//doc|ex|need-tr
+anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;//doc|ex
+anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;//doc|ex
 anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;//doc|ex
 anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;//doc|ex
 anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;//doc|ex
-anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;//doc|need-ex|need-tr
+anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;//doc|need-ex
