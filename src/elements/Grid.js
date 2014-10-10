@@ -485,17 +485,18 @@ anychart.elements.Grid.prototype.drawInterlaceVertical = function(ratio, prevRat
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Drawing.
+ * @return {anychart.elements.Grid} An instance of {@link anychart.elements.Grid} class for method chaining.
  */
 anychart.elements.Grid.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return;
+    return this;
   }
 
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
@@ -607,6 +608,8 @@ anychart.elements.Grid.prototype.draw = function() {
     }, this);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
+
+  return this;
 };
 
 

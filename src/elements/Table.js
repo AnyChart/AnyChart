@@ -11,7 +11,8 @@ goog.require('anychart.utils.Padding');
 
 
 /**
- * Table visual element.
+ * Declares table element.<br/>
+ * <b>Note:</b> Better to use methods in {@link anychart.elements#table}.
  * @param {number=} opt_rowsCount Number of rows in the table.
  * @param {number=} opt_colsCount Number of columns in the table.
  * @constructor
@@ -248,12 +249,27 @@ anychart.elements.Table.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
+ * An instance of {@link anychart.elements.LabelsFactory.Label} class or {@link anychart.VisualBase} class.
+ * @includeDoc
  * @typedef {anychart.elements.LabelsFactory.Label|anychart.VisualBase}
  */
 anychart.elements.Table.CellContent;
 
 
 /**
+ * Getter for table rows count.
+ * @return {number} Current rows count.
+ *//**
+ * Setter for table rows count.<br/>
+ * <b>Note:</b> Calculated from the contents if not defined explicitly.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.rowsCount(3);
+ * table.container(stage).draw();
+ * @param {number=} opt_value [5] Value to set.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter and setter for table rows count.
  * @param {number=} opt_value Rows count to set.
  * @return {!anychart.elements.Table|number}
@@ -275,8 +291,21 @@ anychart.elements.Table.prototype.rowsCount = function(opt_value) {
 
 
 /**
- * Getter and setter for table cols count.
- * @param {number=} opt_value Cols count to set.
+ * Getter for table columns count.
+ * @return {number} Current columns count.
+ *//**
+ * Setter for table columns count..<br/>
+ * <b>Note:</b> Calculated from the contents if not defined explicitly.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.colsCount(2);
+ * table.container(stage).draw();
+ * @param {number=} opt_value [4] Value to set.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * Getter and setter for table columns count.
+ * @param {number=} opt_value columns count to set.
  * @return {!anychart.elements.Table|number}
  */
 anychart.elements.Table.prototype.colsCount = function(opt_value) {
@@ -296,7 +325,23 @@ anychart.elements.Table.prototype.colsCount = function(opt_value) {
 
 
 /**
- * Getter and setter for row height settings. Null sets row height to default value.
+ * Getter for row height settings.
+ * @param {number} row Row number.
+ * @return {string|number|null} Current column width.
+ *//**
+ * Setter for row height settings. <br/>
+ * <b>Note:</b> Pass <b>null</b> to set default value.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.rowHeight(1, 50);
+ * table.container(stage).draw();
+ * @param {number} row Row number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * Getter and setter for row height settings. Null sets row height to the default value.
  * @param {number} row Row number.
  * @param {(string|number|null)=} opt_value Value to set.
  * @return {string|number|null|anychart.elements.Table}
@@ -319,8 +364,24 @@ anychart.elements.Table.prototype.rowHeight = function(row, opt_value) {
 
 
 /**
+ * Getter for column width settings.
+ * @param {number} col Column number.
+ * @return {string|number|null} Current column width.
+ *//**
+ * Setter for column width settings. <br/>
+ * <b>Note:</b> Pass <b>null</b> to set the default value.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.colWidth(0, 200);
+ * table.container(stage).draw();
+ * @param {number} col Column number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Getter and setter for column height settings. Null sets column width to default value.
- * @param {number} col Row number.
+ * @param {number} col Column number.
  * @param {(string|number|null)=} opt_value Value to set.
  * @return {string|number|null|anychart.elements.Table}
  */
@@ -343,9 +404,14 @@ anychart.elements.Table.prototype.colWidth = function(col, opt_value) {
 
 /**
  * Returns cell by its row and column number.
- * @param {number} row
- * @param {number} col
- * @return {anychart.elements.Table.Cell}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * var cell = table.getCell(1,1);
+ * cell.content( anychart.elements.label().text('Text element'));
+ * table.container(stage).draw();
+ * @param {number} row Row index.
+ * @param {number} col Coumn index.
+ * @return {anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
  */
 anychart.elements.Table.prototype.getCell = function(row, col) {
   this.checkTable_();
@@ -357,18 +423,35 @@ anychart.elements.Table.prototype.getCell = function(row, col) {
 
 
 /**
- * 1) геттер, возвращает массив массивов с контентами всех ячеек (первый индекс - строка, второй - ячейка в строке).
- *    Если ячейка перекрыта соседней (через colSpan|rowSpan), то он все равно спросит у нее контент и вернет его.
- * 2) сеттер для контентов всех ячеек. По размеру переданного массива автоматически выставится размер таблицы
- *    (количество строк и столбцов), исходя из максимальной длины строки. Передача undefined равносильна передаче null -
- *    обнуляет контент. Если второй параметр true, то для всех ячеек colSpan и rowSpan сбросится в 1.
- *
- * Т.о. любую таблицу можно привести в нужное состояние одним вызовом этого метода:
- *    var table = anychart.elements.table().container('container');
- *    table.contents([[1, 2, 3], [4, 5], [6, 7, 8]]);
- *    table.getCell(1, 1).colSpan(2);
- *    table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], true);
- *
+ * Getter for table content.<br/>
+ * <b>Note:</b> Returns cells content ignored rowSpan and colSpan.
+ * @return {Array.<Array.<(anychart.elements.Table.CellContent)>>} Current table content.
+ *//**
+ * Setter for table content.<br/>
+ * <b>Note:</b> Pass <b>null</b> to drop table content.
+ * @example
+ * var dataSet = [
+ *   [1.1, 2.3, 1.7, 1.9],
+ *   [1.2, 2.1, 2.7, 1.3],
+ *   [1.0, 1.2, 0.7, 1.1],
+ *   [1.3, 2.4, 1.7, 1.9]
+ * ];
+ * var pie = anychart.pieChart(dataSet).legend(null);
+ * var palette = pie.palette().colors();
+ * var table = anychart.elements.table();
+ * table.contents([
+ *     [pie, anychart.cartesian.series.line(dataSet[0]).color(palette[0])],
+ *     [null, anychart.cartesian.series.line(dataSet[1]).color(palette[1])],
+ *     [null, anychart.cartesian.series.line(dataSet[2]).color(palette[2])],
+ *     [null, anychart.cartesian.series.line(dataSet[3]).color(palette[3])]
+ * ]);
+ * table.getCell(0,0).rowSpan(4);
+ * table.container(stage).draw();
+ * @param {Array.<Array.<(anychart.elements.Table.CellContent|string|number|undefined)>>=} opt_tableValues Values to set.
+ * @param {boolean=} opt_demergeCells [false] Pass <b>true</b> to demerge all cells.
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {Array.<Array.<(anychart.elements.Table.CellContent|string|number|undefined)>>=} opt_tableValues
  * @param {boolean=} opt_demergeCells
  * @return {Array.<Array.<(anychart.elements.Table.CellContent)>>|anychart.elements.Table}
@@ -438,9 +521,27 @@ anychart.elements.Table.prototype.contents = function(opt_tableValues, opt_demer
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter and setter for table cell text factory. You can setup the default text appearance for entire table.
- * These settings apply to cells which content was setup as string or number. If you want to setup text appearance
- * for the particular cell, set cell content as string first, and then feel free to get the content and setup it.
+ * Getter for table cell text factory.
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Table} Current table text factory.
+ *//**
+ * You can setup the default text appearance for entire table.
+ * These settings apply to cells with content set as string or number. If you want to set text appearance
+ * for the particular cell, set cell content as string first, and then feel free to get the content and tune it.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * var textSettings = anychart.elements.labelsFactory();
+ * textSettings.fontColor('blue');
+ * textSettings.fontWeight('bold');
+ * textSettings.fontSize(13);
+ * table.cellTextFactory(textSettings);
+ * table.container(stage).draw();
+ * @shortDescription Setter for table cell text factory.
+ * @param {anychart.elements.LabelsFactory=} opt_value
+ * @return {anychart.elements.LabelsFactory|anychart.elements.Table}
+ *//**
+ * @ignoreDoc
+ * Getter and setter for table cell text factory.
  * @param {anychart.elements.LabelsFactory=} opt_value
  * @return {anychart.elements.LabelsFactory|anychart.elements.Table}
  */
@@ -473,6 +574,45 @@ anychart.elements.Table.prototype.cellTextFactory = function(opt_value) {
 
 
 /**
+ * Getter for the cell padding settings.
+ * @return {anychart.utils.Padding} {@link anychart.utils.Padding} instance for method chaining.
+ *//**
+ * Setter for the cell paddings in pixels using a single value.<br/>
+ * @example <t>listingOnly</t>
+ * // all paddings 15px
+ * table.cellPadding(15);
+ * // all paddings 15px
+ * table.cellPadding('15px');
+ * // top and bottom 5px ,right and left 15px
+ * table.cellPadding(anychart.utils.space(5,15));
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellPadding(10);
+ * table.container(stage).draw();
+ * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Setter for the cell paddings in pixels using several numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * table.cellPadding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * table.cellPadding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * table.cellPadding(10, '15px', '5px', 12);
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellPadding(10, '15px', '5px', 12);
+ * table.container(stage).draw();
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Cell padding settings.
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
@@ -505,15 +645,92 @@ anychart.elements.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndB
 
 
 /**
- * Default table cell background fill getter/setter. If set, resets even and odd cell fills.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill('green 0.2');
+ * table.container(stage).draw();
+ * @example <c>Linear gradient fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill(['green 0.2', 'yellow 0.2']);
+ * table.container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill('green', 0.3);
+ * table.container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill(['black', 'yellow'], 45, true, 0.5);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellFill({
+ *    src: 'http://static.anychart.com/underwater.jpg',
+ *    mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * table.container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.elements.Table} .
+ * @return {acgraph.vector.Fill|anychart.elements.Table|Function} .
  */
 anychart.elements.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
@@ -539,8 +756,85 @@ anychart.elements.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt
 
 
 /**
- * Table cell background fill getter/setter for cells in odd rows. Use null to reset to default cell fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill('green 0.2');
+ * table.container(stage).draw();
+ * @example <c>Linear gradient fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill(['green 0.2', 'yellow 0.2']);
+ * table.container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill('green', 0.3);
+ * table.container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill(['black', 'yellow'], 45, true, 0.5);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill({
+ *    src: 'http://static.anychart.com/underwater.jpg',
+ *    mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * table.container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
@@ -573,8 +867,85 @@ anychart.elements.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, 
 
 
 /**
- * Table cell background fill getter/setter for cells in even rows. Use null to reset to default cell fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellEvenFill('green 0.2');
+ * table.container(stage).draw();
+ * @example <c>Linear gradient fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellOddFill(['green 0.2', 'yellow 0.2']);
+ * table.container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellEvenFill('green', 0.3);
+ * table.container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellEvenFill(['black', 'yellow'], 45, true, 0.5);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellEvenFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellEvenFill({
+ *    src: 'http://static.anychart.com/underwater.jpg',
+ *    mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * table.container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
@@ -607,12 +978,33 @@ anychart.elements.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys,
 
 
 /**
- * Table cell border settings for all 4 sides simultaneously. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickness.
+ * Getter for current cell border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
+ * the border for the corresponding side.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -633,16 +1025,33 @@ anychart.elements.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_th
 
 
 /**
- * Left border settings for all cells. The last usage of cellBorder(), cellLeftBorder(), cellRightBorder(),
- * cellTopBorder() and cellLeftBorder() methods determines the border for the corresponding side.
- * As a getter returns only the side override if any. To determine table default for the left cell border use
- * table.cellLeftBorder() || table.border().
- *
- * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickness.
+ * Getter for current cell left border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell left border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
+ * the border for the corresponding side.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell left border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellLeftBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -674,16 +1083,33 @@ anychart.elements.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, op
 
 
 /**
- * Right border settings for all cells. The last usage of cellBorder(), cellLeftBorder(), cellRightBorder(),
- * cellTopBorder() and cellRightBorder() methods determines the border for the corresponding side.
- * As a getter returns only the side override if any. To determine table default for the right cell border use
- * table.cellRightBorder() || table.border().
- *
- * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell right border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell right border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
+ * the border for the corresponding side.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell right border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellRightBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -715,16 +1141,33 @@ anychart.elements.Table.prototype.cellRightBorder = function(opt_strokeOrFill, o
 
 
 /**
- * Top border settings for all cells. The last usage of cellBorder(), cellLeftBorder(), cellRightBorder(),
- * cellTopBorder() and cellTopBorder() methods determines the border for the corresponding side.
- * As a getter returns only the side override if any. To determine table default for the top cell border use
- * table.cellTopBorder() || table.border().
- *
- * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell top border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell top border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
+ * the border for the corresponding side.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell top border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellTopBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -756,16 +1199,33 @@ anychart.elements.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt
 
 
 /**
- * Bottom border settings for all cells. The last usage of cellBorder(), cellLeftBorder(), cellRightBorder(),
- * cellTopBorder() and cellBottomBorder() methods determines the border for the corresponding side.
- * As a getter returns only the side override if any. To determine table default for the bottom cell border use
- * table.cellBottomBorder() || table.border().
- *
- * Note: If you want to reset side override, use null. If you want to remove border for the side, use 'none'.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell bottom border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell bottom border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
+ * the border for the corresponding side.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell bottom border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
+ * table.cellBottomBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -799,7 +1259,7 @@ anychart.elements.Table.prototype.cellBottomBorder = function(opt_strokeOrFill, 
 
 /**
  * Draws the table.
- * @return {anychart.elements.Table}
+ * @return {anychart.elements.Table} {@link anychart.elements.Table} instance for method chaining.
  */
 anychart.elements.Table.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
@@ -1538,6 +1998,7 @@ anychart.elements.Table.prototype.disposeInternal = function() {
  * @param {number} row
  * @param {number} col
  * @constructor
+ * @includeDoc
  * @extends {goog.Disposable}
  */
 anychart.elements.Table.Cell = function(table, row, col) {
@@ -1636,7 +2097,30 @@ anychart.elements.Table.Cell.prototype.reset = function(row, col) {
 
 
 /**
- *
+ * Getter for cell content.
+ * @return {anychart.elements.Table.CellContent} Current cell content.
+ *//**
+ * Setter for cell content.
+ * @example
+ * var table = anychart.elements.table(3,2);
+ * // resize first column
+ * table.colWidth(0, 100);
+ * // set content to cell as string
+ * table.getCell(0,0)
+ *   .content('text');
+ * // set content to another cell as number
+ * table.getCell(1,0)
+ *   .content(2014);
+ * // set content to another cell as chart
+ * table.getCell(0,1)
+ *   .content(anychart.lineChart([1.1, 1.4, 1.2, 1.6]))
+ *   .rowSpan(3);
+ * table.container(stage).draw();
+ * @param {(anychart.elements.Table.CellContent|string|number)=} opt_value Value to set.<br/>
+ *  <b>Note:</b> Numbers and strings are automaticaly set as instance of {@link anychart.elements.LabelsFactory.Label} class.
+ * @return {anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.elements.Table.CellContent|string|number)=} opt_value
  * @return {anychart.elements.Table.CellContent|anychart.elements.Table.Cell}
  */
@@ -1657,7 +2141,7 @@ anychart.elements.Table.Cell.prototype.content = function(opt_value) {
 
 
 /**
- * Returns cell row number.
+ * Returns current cell row number.
  * @return {number}
  */
 anychart.elements.Table.Cell.prototype.getRow = function() {
@@ -1666,7 +2150,7 @@ anychart.elements.Table.Cell.prototype.getRow = function() {
 
 
 /**
- * Returns cell column number.
+ * Returns current cell column number.
  * @return {number}
  */
 anychart.elements.Table.Cell.prototype.getCol = function() {
@@ -1676,6 +2160,13 @@ anychart.elements.Table.Cell.prototype.getCol = function() {
 
 /**
  * Returns cell bounds without padding counted (bounds which are used for borders drawing).
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.container(stage).draw();
+ * stage.rect().fill('red 0.2').setBounds(
+ *     table.getCell(1,1).getBounds()
+ *   );
  * @return {!anychart.math.Rect}
  */
 anychart.elements.Table.Cell.prototype.getBounds = function() {
@@ -1685,8 +2176,85 @@ anychart.elements.Table.Cell.prototype.getBounds = function() {
 
 
 /**
- * Table cell background fill getter/setter.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill('green 0.2');
+ * table.container(stage).draw();
+ * @example <c>Linear gradient fill</c><t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill(['green 0.2', 'yellow 0.2']);
+ * table.container(stage).draw();
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill('green', 0.3);
+ * table.container(stage).draw();
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill(['black', 'yellow'], 45, true, 0.5);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
+ * table.container(stage).draw();
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).fill({
+ *    src: 'http://static.anychart.com/underwater.jpg',
+ *    mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * table.container(stage).draw();
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
@@ -1722,14 +2290,32 @@ anychart.elements.Table.Cell.prototype.fill = function(opt_fillOrColorOrKeys, op
 
 
 /**
- * Table cell border settings for all 4 sides simultaneously. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
- *
-* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).border('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -1769,14 +2355,32 @@ anychart.elements.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_t
 
 
 /**
- * Left border settings for the cell. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
- *
-* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell left border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell left border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell left border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).leftBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -1809,14 +2413,32 @@ anychart.elements.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, o
 
 
 /**
- * Right border settings for the cell. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
- *
-* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell right border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell right border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell right border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).rightBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -1849,14 +2471,32 @@ anychart.elements.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, 
 
 
 /**
- * Top border settings for the cell. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
- *
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell top border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell top border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell top border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).topBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -1889,14 +2529,32 @@ anychart.elements.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, op
 
 
 /**
- * Bottom border settings for the cell. The last usage of border(), leftBorder(), rightBorder(),
- * topBorder() and bottomBorder() methods determines the border for the corresponding side.
- *
- * Note: If you want to reset cell overrides, use null. If you want to remove border from the cell, use 'none'.
- *
-* @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke fill
- *    settings or fill settings.
- * @param {number=} opt_thickness Line thickeness.
+ * Getter for current cell bottom border settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for cell bottom border settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
+ * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
+ * <b>Note:</b> <u>lineJoin</u> settings not working here.
+ * @shortDescription Setter for cell bottom border settings.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+ * table.getCell(1,1).bottomBorder('orange', 3, '5 2', 'round');
+ * table.container(stage).draw();
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
@@ -1929,7 +2587,22 @@ anychart.elements.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill,
 
 
 /**
- * Getter and setter for cell columns span. Cells that are overlapped by cells with colSpan != 1 are not drawn.
+ * Getter for cell columns span.
+ * @return {number} Current columns span.
+ *//**
+ * Setter for cell columns span.<br/>
+ * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
+ * var cell = table.getCell(1,1);
+ * cell.colSpan(2);
+ * table.container(stage).draw();
+ * @param {number=} opt_value [1] Count of cells to merge right.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * Getter and setter for cell rows span.
  * @param {number=} opt_value
  * @return {!anychart.elements.Table.Cell|number}
  */
@@ -1948,7 +2621,22 @@ anychart.elements.Table.Cell.prototype.colSpan = function(opt_value) {
 
 
 /**
- * Getter and setter for cell rows span. Cells that are overlapped by cells with rowSpan != 1 are not drawn.
+ * Getter for cell rows span.
+ * @return {number} Current rows span.
+ *//**
+ * Setter for cell rows span.<br/>
+ * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
+ * var cell = table.getCell(1,1);
+ * cell.rowSpan(2);
+ * table.container(stage).draw();
+ * @param {number=} opt_value [1] Count of cells to merge down.
+ * @return {!anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * Getter and setter for cell rows span.
  * @param {number=} opt_value
  * @return {!anychart.elements.Table.Cell|number}
  */
@@ -1967,8 +2655,48 @@ anychart.elements.Table.Cell.prototype.rowSpan = function(opt_value) {
 
 
 /**
- * Getter and setter for table cell override of cell padding.
- *
+ * Getter for current cell padding settings.
+ * @return {anychart.utils.Padding} {@link anychart.utils.Padding} instance for method chaining.
+ *//**
+ * Setter for current cell paddings in pixels using a single value.<br/>
+ * @example <t>listingOnly</t>
+ * // all paddings 15px
+ * cell.padding(15);
+ * // all paddings 15px
+ * cell.padding('15px');
+ * // top and bottom 5px ,right and left 15px
+ * cell.padding(anychart.utils.space(5,15));
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
+ * table.cellTextFactory().background().enabled(true);
+ * table.getCell(0,0).padding(0);
+ * table.container(stage).draw();
+ * @param {(string|number|anychart.utils.Space)=} opt_value Value to set.
+ * @return {anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * Setter for current cell paddings in pixels using several numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * table.cellPadding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * table.cellPadding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * table.cellPadding(10, '15px', '5px', 12);
+ * @example <t>simple-h100</t>
+ * var table = anychart.elements.table();
+ * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
+ * table.cellTextFactory().background().enabled(true);
+ * table.getCell(0,0).padding(-5, 0, 0, -15);
+ * table.container(stage).draw();
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.elements.Table.Cell} {@link anychart.elements.Table.Cell} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * Cell padding settings.
  * @param {(string|number|Object|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -2037,7 +2765,8 @@ anychart.elements.Table.Cell.prototype.disposeInternal = function() {
 
 
 /**
- * Constructor function.
+ * Constructor function for table element.
+ * anychart.elements.table(2,3).container(stage).draw();
  * @param {number=} opt_rowsCount Number of rows in the table.
  * @param {number=} opt_colsCount Number of columns in the table.
  * @return {!anychart.elements.Table}
@@ -2048,34 +2777,34 @@ anychart.elements.table = function(opt_rowsCount, opt_colsCount) {
 
 
 //exports
-goog.exportSymbol('anychart.elements.table', anychart.elements.table);
-anychart.elements.Table.prototype['rowsCount'] = anychart.elements.Table.prototype.rowsCount;
-anychart.elements.Table.prototype['colsCount'] = anychart.elements.Table.prototype.colsCount;
-anychart.elements.Table.prototype['getCell'] = anychart.elements.Table.prototype.getCell;
-anychart.elements.Table.prototype['draw'] = anychart.elements.Table.prototype.draw;
-anychart.elements.Table.prototype['contents'] = anychart.elements.Table.prototype.contents;
-anychart.elements.Table.prototype['colWidth'] = anychart.elements.Table.prototype.colWidth;
-anychart.elements.Table.prototype['rowHeight'] = anychart.elements.Table.prototype.rowHeight;
-anychart.elements.Table.prototype['cellTextFactory'] = anychart.elements.Table.prototype.cellTextFactory;
-anychart.elements.Table.prototype['cellFill'] = anychart.elements.Table.prototype.cellFill;
-anychart.elements.Table.prototype['cellPadding'] = anychart.elements.Table.prototype.cellPadding;
-anychart.elements.Table.prototype['cellEvenFill'] = anychart.elements.Table.prototype.cellEvenFill;
-anychart.elements.Table.prototype['cellOddFill'] = anychart.elements.Table.prototype.cellOddFill;
-anychart.elements.Table.prototype['cellBorder'] = anychart.elements.Table.prototype.cellBorder;
-anychart.elements.Table.prototype['cellLeftBorder'] = anychart.elements.Table.prototype.cellLeftBorder;
-anychart.elements.Table.prototype['cellRightBorder'] = anychart.elements.Table.prototype.cellRightBorder;
-anychart.elements.Table.prototype['cellTopBorder'] = anychart.elements.Table.prototype.cellTopBorder;
-anychart.elements.Table.prototype['cellBottomBorder'] = anychart.elements.Table.prototype.cellBottomBorder;
-anychart.elements.Table.Cell.prototype['rowSpan'] = anychart.elements.Table.Cell.prototype.rowSpan;
-anychart.elements.Table.Cell.prototype['colSpan'] = anychart.elements.Table.Cell.prototype.colSpan;
-anychart.elements.Table.Cell.prototype['content'] = anychart.elements.Table.Cell.prototype.content;
-anychart.elements.Table.Cell.prototype['padding'] = anychart.elements.Table.Cell.prototype.padding;
-anychart.elements.Table.Cell.prototype['fill'] = anychart.elements.Table.Cell.prototype.fill;
-anychart.elements.Table.Cell.prototype['border'] = anychart.elements.Table.Cell.prototype.border;
-anychart.elements.Table.Cell.prototype['leftBorder'] = anychart.elements.Table.Cell.prototype.leftBorder;
-anychart.elements.Table.Cell.prototype['rightBorder'] = anychart.elements.Table.Cell.prototype.rightBorder;
-anychart.elements.Table.Cell.prototype['topBorder'] = anychart.elements.Table.Cell.prototype.topBorder;
-anychart.elements.Table.Cell.prototype['bottomBorder'] = anychart.elements.Table.Cell.prototype.bottomBorder;
-anychart.elements.Table.Cell.prototype['getRow'] = anychart.elements.Table.Cell.prototype.getRow;
-anychart.elements.Table.Cell.prototype['getCol'] = anychart.elements.Table.Cell.prototype.getCol;
-anychart.elements.Table.Cell.prototype['getBounds'] = anychart.elements.Table.Cell.prototype.getBounds;
+goog.exportSymbol('anychart.elements.table', anychart.elements.table);//doc|ex
+anychart.elements.Table.prototype['rowsCount'] = anychart.elements.Table.prototype.rowsCount;//doc|ex
+anychart.elements.Table.prototype['colsCount'] = anychart.elements.Table.prototype.colsCount;//doc|ex
+anychart.elements.Table.prototype['getCell'] = anychart.elements.Table.prototype.getCell;//doc|ex
+anychart.elements.Table.prototype['draw'] = anychart.elements.Table.prototype.draw;//doc
+anychart.elements.Table.prototype['contents'] = anychart.elements.Table.prototype.contents;//doc|ex
+anychart.elements.Table.prototype['colWidth'] = anychart.elements.Table.prototype.colWidth;//doc|ex
+anychart.elements.Table.prototype['rowHeight'] = anychart.elements.Table.prototype.rowHeight;//doc|ex
+anychart.elements.Table.prototype['cellTextFactory'] = anychart.elements.Table.prototype.cellTextFactory;//doc|ex
+anychart.elements.Table.prototype['cellFill'] = anychart.elements.Table.prototype.cellFill;//doc|ex
+anychart.elements.Table.prototype['cellPadding'] = anychart.elements.Table.prototype.cellPadding;//doc|ex
+anychart.elements.Table.prototype['cellEvenFill'] = anychart.elements.Table.prototype.cellEvenFill;//doc|ex
+anychart.elements.Table.prototype['cellOddFill'] = anychart.elements.Table.prototype.cellOddFill;//doc|ex
+anychart.elements.Table.prototype['cellBorder'] = anychart.elements.Table.prototype.cellBorder;//doc|ex
+anychart.elements.Table.prototype['cellLeftBorder'] = anychart.elements.Table.prototype.cellLeftBorder;//doc|ex
+anychart.elements.Table.prototype['cellRightBorder'] = anychart.elements.Table.prototype.cellRightBorder;//doc|ex
+anychart.elements.Table.prototype['cellTopBorder'] = anychart.elements.Table.prototype.cellTopBorder;//doc|ex
+anychart.elements.Table.prototype['cellBottomBorder'] = anychart.elements.Table.prototype.cellBottomBorder;//doc|ex
+anychart.elements.Table.Cell.prototype['rowSpan'] = anychart.elements.Table.Cell.prototype.rowSpan;//doc|ex
+anychart.elements.Table.Cell.prototype['colSpan'] = anychart.elements.Table.Cell.prototype.colSpan;//doc|ex
+anychart.elements.Table.Cell.prototype['content'] = anychart.elements.Table.Cell.prototype.content;//doc|ex|need-tr
+anychart.elements.Table.Cell.prototype['padding'] = anychart.elements.Table.Cell.prototype.padding;//doc|ex
+anychart.elements.Table.Cell.prototype['fill'] = anychart.elements.Table.Cell.prototype.fill;//doc|ex
+anychart.elements.Table.Cell.prototype['border'] = anychart.elements.Table.Cell.prototype.border;//doc|ex
+anychart.elements.Table.Cell.prototype['leftBorder'] = anychart.elements.Table.Cell.prototype.leftBorder;//doc|ex
+anychart.elements.Table.Cell.prototype['rightBorder'] = anychart.elements.Table.Cell.prototype.rightBorder;//doc|ex
+anychart.elements.Table.Cell.prototype['topBorder'] = anychart.elements.Table.Cell.prototype.topBorder;//doc|ex
+anychart.elements.Table.Cell.prototype['bottomBorder'] = anychart.elements.Table.Cell.prototype.bottomBorder;//doc|ex
+anychart.elements.Table.Cell.prototype['getRow'] = anychart.elements.Table.Cell.prototype.getRow;//doc
+anychart.elements.Table.Cell.prototype['getCol'] = anychart.elements.Table.Cell.prototype.getCol;//doc
+anychart.elements.Table.Cell.prototype['getBounds'] = anychart.elements.Table.Cell.prototype.getBounds;//doc|ex

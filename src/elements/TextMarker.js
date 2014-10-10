@@ -429,17 +429,18 @@ anychart.elements.TextMarker.prototype.isHorizontal = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Drawing.
+ * @return {anychart.elements.TextMarker} An instance of {@link anychart.elements.TextMarker} class for method chaining.
  */
 anychart.elements.TextMarker.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return;
+    return this;
   }
 
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.applyTextSettings(this.markerElement(), true);
@@ -448,7 +449,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var ratio = goog.math.clamp(scale.transform(this.value_, 0.5), 0, 1);
-    if (isNaN(ratio)) return;
+    if (isNaN(ratio)) return this;
 
     var shift = -.5;
 
@@ -508,6 +509,8 @@ anychart.elements.TextMarker.prototype.draw = function() {
     this.markerElement().parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+  return this;
 };
 
 
