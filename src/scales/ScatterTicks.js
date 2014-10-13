@@ -229,7 +229,7 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
 /**
  * Returns an array of ticks. Each tick is a value in terms of data, to make a tick on.<br/>
  * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>
- * @example
+ * @example <t>lineChart</t>
  * chart.line([-2, 11, 2, 4]);
  * chart.container(stage).draw();
  * var currentTicks = chart.yScale().ticks().get();
