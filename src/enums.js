@@ -1152,6 +1152,11 @@ goog.exportSymbol('anychart.enums.Sort.NONE', anychart.enums.Sort.NONE);
 goog.exportSymbol('anychart.enums.Sort.ASC', anychart.enums.Sort.ASC);
 goog.exportSymbol('anychart.enums.Sort.DESC', anychart.enums.Sort.DESC);
 
+goog.exportSymbol('anychart.enums.BulletMarkerType.X', anychart.enums.BulletMarkerType.X);
+goog.exportSymbol('anychart.enums.BulletMarkerType.BAR', anychart.enums.BulletMarkerType.BAR);
+goog.exportSymbol('anychart.enums.BulletMarkerType.ELLIPSE', anychart.enums.BulletMarkerType.ELLIPSE);
+goog.exportSymbol('anychart.enums.BulletMarkerType.LINE', anychart.enums.BulletMarkerType.LINE);
+
 goog.exportSymbol('anychart.enums.MarkerType.CIRCLE', anychart.enums.MarkerType.CIRCLE);
 goog.exportSymbol('anychart.enums.MarkerType.SQUARE', anychart.enums.MarkerType.SQUARE);
 goog.exportSymbol('anychart.enums.MarkerType.TRIANGLE_UP', anychart.enums.MarkerType.TRIANGLE_UP);
