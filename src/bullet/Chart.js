@@ -108,8 +108,16 @@ anychart.bullet.Chart.ZINDEX_AXIS = 3;
  *//**
  * Setter for chart data.<br/>
  * <b>Note:</b> All data is markers values.
- * @example <t>simple-h100</t>
+ * @example <c>Simple markers</c><t>simple-h100</t>
  * var bulletChart = anychart.bullet.chart([10, 7, 11]);
+ * bulletChart.range().from(0).to(6);
+ * bulletChart.range(1).from(6).to(12);
+ * bulletChart.container(stage).draw();
+ * @example <c>Advanced markers</c><t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([
+ *    {value: 9, type: 'bar', fill: 'blue 0.5', gap: 0.3},
+ *    {value: 10, type: 'X', stroke: 'blue 4'},
+ * ]);
  * bulletChart.range().from(0).to(6);
  * bulletChart.range(1).from(6).to(12);
  * bulletChart.container(stage).draw();
