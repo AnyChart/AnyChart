@@ -532,7 +532,7 @@ anychart.bullet.Chart.prototype.onRangePaletteSignal_ = function(event) {
  * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.DistinctColorPalette|Array)=} opt_value .
+ * @param {(anychart.utils.MarkerPalette|Array)=} opt_value .
  * @return {!(anychart.utils.MarkerPalette|anychart.bullet.Chart)} .
  */
 anychart.bullet.Chart.prototype.markerPalette = function(opt_value) {
