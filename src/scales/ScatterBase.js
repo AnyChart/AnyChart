@@ -152,14 +152,14 @@ anychart.scales.ScatterBase.prototype.maximum = function(opt_value) {
  * Getter for scale minimum gap.
  * @return {number} Current scale minimum gap.
  *//**
- * Отступ от минимума данных в сторону уменьшения относительно всего ренджа данных.<br/>
- * <b>Note:</b> Gap работает только в том случае, если minimum шкалы не задан явно через {@link anychart.scales.ScatterBase#minimum}.
+ * Scale minimum gap.<br/>
+ * <b>Note:</b> Gap works only if scale minimum is not set explicitly using {@link anychart.scales.ScatterBase#minimum}.
  * @shortDescription Setter for scale minimum gap.
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.2, 1.95]);
  * chart.yScale().minimumGap(0.6);
  * @param {number=} opt_value Value from 0 to 1.
- * @return {!anychart.scales.ScatterBase} An instance of {@link anychart.scales.ScatterBase} class for method chaining.
+ * @return {!anychart.scales.ScatterBase} {@link anychart.scales.ScatterBase} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value Value to set.
@@ -185,14 +185,14 @@ anychart.scales.ScatterBase.prototype.minimumGap = function(opt_value) {
  * Getter for scale maximum gap.
  * @return {number} Current scale maximum gap.
  *//**
- * Отступ от максимума данных в сторону увеличения относительно всего ренджа данных.<br/>
- * <b>Note:</b> Gap работает только в том случае, если maximum шкалы не задан явно через {@link anychart.scales.ScatterBase#maximum}.
+ * Scale maximum gap.<br/>
+ * <b>Note:</b> Gap works only if scale minimum is not set explicitly using {@link anychart.scales.ScatterBase#maximum}.
  * @shortDescription Setter for scale maximum gap.
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.2, 1.95]);
  * chart.yScale().maximumGap(0.6);
- * @param {number=} opt_value  Value from 0 to 1.
- * @return {!anychart.scales.ScatterBase} An instance of {@link anychart.scales.ScatterBase} class for method chaining.
+ * @param {number=} opt_value Value from 0 to 1.
+ * @return {!anychart.scales.ScatterBase} {@link anychart.scales.ScatterBase} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {number=} opt_value Value to set.
@@ -243,10 +243,10 @@ anychart.scales.ScatterBase.prototype.resetDataRange = function() {
 
 
 /**
- * Расширяет текущий input domain переданными значениями (если, такого значения ранее не было).<br/>
- * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drop all passed values.
+ * Extends the current input domain with the passed values (if such don't exist in the domain).<br/>
+ * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drops all passed values.
  * @param {...*} var_args Values that are supposed to extend the input domain.
- * @return {!anychart.scales.ScatterBase} An instance of {@link anychart.scales.ScatterBase} class for method chaining.
+ * @return {!anychart.scales.ScatterBase} {@link anychart.scales.ScatterBase} instance for method chaining.
  */
 anychart.scales.ScatterBase.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
@@ -286,19 +286,19 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
 
 
 /**
- * Возвращает пропорциональное положение тика относительно всей шкалы по его имени.<br/>
- * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * Returns tick position ratio by its name.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
  * var chart = anychart.lineChart();
  * chart.line([1.1, 1.4, 1.2, 1.9]);
  * chart.container(stage).draw();
- * // Пытаемся получить положение середины тика '1.25'.
+ * // Trying to get to '1.25' tick position.
  * var position = chart.yScale().transform(1.25);
- * // Вернется значение 0.25
+ * // Returns 0.25
  * @param {*} value Value to transform in input scope.
  * @return {number} Value transformed to scope [0, 1].
  *//**
- * Наследование от интерфейса требует, что бы был параметр opt_subRangeRatio, но он не используется.
+ * Interface requires us to have opt_subRangeRatio, but it is not used.
  * @ignoreDoc
  * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
@@ -349,13 +349,13 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
 
 
 /**
- * Возвращает тик по переданному положению относительно всей шкалы.<br/>
- * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
+ * Returns tick by its position ratio.<br/>
+ * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
  * var chart = anychart.lineChart();
  * chart.line([1.1, 1.4, 1.2, 1.95]);
  * chart.container(stage).draw();
- * Нарисуем красный маркер по найденному тику.
+ * Draw a red marker on the found tick.
  * chart.lineMarker().value(chart.yScale().inverseTransform(0.39));
  * @param {number} ratio Value to transform in input scope.
  * @return {*} Value transformed to output scope.
@@ -399,11 +399,11 @@ anychart.scales.ScatterBase.prototype.deserialize = function(value) {
 
 
 //exports
-anychart.scales.ScatterBase.prototype['transform'] = anychart.scales.ScatterBase.prototype.transform;//doc|ex|need-tr
-anychart.scales.ScatterBase.prototype['inverseTransform'] = anychart.scales.ScatterBase.prototype.inverseTransform;//doc|ex|need-tr
+anychart.scales.ScatterBase.prototype['transform'] = anychart.scales.ScatterBase.prototype.transform;//doc|ex
+anychart.scales.ScatterBase.prototype['inverseTransform'] = anychart.scales.ScatterBase.prototype.inverseTransform;//doc|ex
 anychart.scales.ScatterBase.prototype['minimum'] = anychart.scales.ScatterBase.prototype.minimum;//doc|ex
 anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.prototype.maximum;//doc|ex
-anychart.scales.ScatterBase.prototype['minimumGap'] = anychart.scales.ScatterBase.prototype.minimumGap;//doc|ex|need-tr
-anychart.scales.ScatterBase.prototype['maximumGap'] = anychart.scales.ScatterBase.prototype.maximumGap;//doc|ex|need-tr
-anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex|need-tr
+anychart.scales.ScatterBase.prototype['minimumGap'] = anychart.scales.ScatterBase.prototype.minimumGap;//doc|ex
+anychart.scales.ScatterBase.prototype['maximumGap'] = anychart.scales.ScatterBase.prototype.maximumGap;//doc|ex
+anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex
 anychart.scales.ScatterBase.prototype['stackMode'] = anychart.scales.ScatterBase.prototype.stackMode;//inherited

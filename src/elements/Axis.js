@@ -2088,17 +2088,18 @@ anychart.elements.Axis.prototype.checkDrawingNeeded = function() {
 
 /**
  * Axis drawing.
+ * @return {anychart.elements.Axis} An instance of {@link anychart.elements.Axis} class for method chaining.
  */
 anychart.elements.Axis.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return;
+    return this;
   }
 
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   var lineDrawer, ticksDrawer, minorTicksDrawer, minorLabelsDrawer;
   var minorTicks, ticks;
@@ -2325,6 +2326,8 @@ anychart.elements.Axis.prototype.draw = function() {
   this.minorLabels().resumeSignalsDispatching(false);
   this.ticks().resumeSignalsDispatching(false);
   this.minorTicks().resumeSignalsDispatching(false);
+
+  return this;
 };
 
 

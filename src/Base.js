@@ -515,12 +515,20 @@ anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
 
 
 /**
- * Adds an event listener. A listener can only be added once to an
- * object and if it is added again the key for the listener is
- * returned. Note that if the existing listener is a one-off listener
- * (registered via listenOnce), it will no longer be a one-off
- * listener after a call to listen().
- *
+ * Adds an event listener to an implementing object.<br/>
+ * The listener can be added to an object once, and if it is added one more time,
+ * its key will be returned.<br/>
+ * <b>Note</b> Notice that if the existing listener is one-off (added
+ * using listenOnce), it will cease to be such after calling the listen() method.
+ * @example <t>lineChart</t>
+ * var line = chart.line([1, 4, 2, 6]);
+ * var title = chart.title();
+ * title.text('Click on line series.');
+ * var counter = 0;
+ * line.listen(anychart.enums.EventType.POINT_CLICK, function(e){
+ *    counter++;
+ *    title.text('You clicked ' + counter + ' times. Click again.');
+ *  });
  * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
@@ -529,7 +537,6 @@ anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
  * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
  *     listener.
  * @return {goog.events.ListenableKey} Unique key for the listener.
- * @template SCOPE,EVENTOBJ
  */
 anychart.Base.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
   return goog.base(this, 'listen', type, listener, opt_useCapture, opt_listenerScope);
@@ -537,16 +544,21 @@ anychart.Base.prototype.listen = function(type, listener, opt_useCapture, opt_li
 
 
 /**
- * Adds an event listener that is removed automatically after the
- * listener fired once.
- *
- * If an existing listener already exists, listenOnce will do
- * nothing. In particular, if the listener was previously registered
- * via listen(), listenOnce() will not turn the listener into a
- * one-off listener. Similarly, if there is already an existing
- * one-off listener, listenOnce does not modify the listeners (it is
- * still a once listener).
- *
+ * Adds an event listener to an implementing object.<br/>
+ * <b>After the event is called, its handler will be deleted.</b><br>
+ * If the event handler being added already exists, listenOnce will do nothing. <br/>
+ * <b>Note</b> In particular, if the handler is already registered using listen(), listenOnce()
+ * <b>will not</b> make it one-off. Similarly, if a one-off listener already exists,
+ * listenOnce will not change it (it wil remain one-off).
+ * @example <t>lineChart</t>
+ * var line = chart.line([1, 4, 2, 6]);
+ * var title = chart.title();
+ * title.text('Click on line series.');
+ * var counter = 0;
+ * line.listen(anychart.enums.EventType.POINT_CLICK, function(e){
+ *    counter++;
+ *    title.text('You can\'t click anymore.');
+ *  });
  * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
@@ -563,8 +575,22 @@ anychart.Base.prototype.listenOnce = function(type, listener, opt_useCapture, op
 
 
 /**
- * Removes an event listener which was added with listen() or listenOnce().
- *
+ * Removes a listener added using listen() or listenOnce() methods.
+ * @example <t>lineChart</t>
+ * var line = chart.line([1, 4, 2, 6]);
+ * var title = chart.title();
+ * title.text('Click on line series. You have 3 clicks.');
+ * var counter = 0;
+ * line.listen(anychart.enums.EventType.POINT_CLICK, customListener);
+ * var counter = 3;
+ * function customListener(e){
+ *     counter--;
+ *     title.text('Click on line series. You have ' + counter + ' clicks.');
+ *     if (counter == 0) {
+ *         line.unlisten(anychart.enums.EventType.POINT_CLICK, customListener);
+ *         title.text('You have no more clicks');
+ *     }
+ * }
  * @param {string|!goog.events.EventId.<EVENTOBJ>} type The event type id.
  * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
  *     method.
@@ -581,9 +607,22 @@ anychart.Base.prototype.unlisten = function(type, listener, opt_useCapture, opt_
 
 
 /**
- * Removes an event listener which was added with listen() by the key
- * returned by listen().
- *
+ * Removes an event listener which was added with listen() by the key returned by listen() or listenOnce().
+ * @example <t>lineChart</t>
+ * var line = chart.line([1, 4, 2, 6]);
+ * var title = chart.title();
+ * title.text('Click on line series. You have 3 clicks.');
+ * var counter = 0;
+ * var listenKey = line.listen(anychart.enums.EventType.POINT_CLICK, customListener);
+ * var counter = 3;
+ * function customListener(e){
+ *     counter--;
+ *     title.text('Click on line series. You have ' + counter + ' clicks.');
+ *     if (counter == 0) {
+ *         line.unlistenByKey(listenKey);
+ *         title.text('You have no more clicks');
+ *     }
+ * }
  * @param {goog.events.ListenableKey} key The key returned by
  *     listen() or listenOnce().
  * @return {boolean} Whether any listener was removed.
@@ -594,10 +633,22 @@ anychart.Base.prototype.unlistenByKey = function(key) {
 
 
 /**
- * Removes all listeners from this listenable. If type is specified,
- * it will only remove listeners of the particular type. otherwise all
- * registered listeners will be removed.
- *
+ * Removes all listeners from an object. You can also optionally remove listeners of some particular type.
+ * @example <t>lineChart</t>
+ * var line = chart.line([1, 4, 2, 6]);
+ * var title = chart.title();
+ * title.text('MouseOver the title and click on line series.');
+ * var counter = 0;
+ * line.listen(anychart.enums.EventType.POINT_MOUSE_OUT, function(e){
+ *   title.fontColor('green');
+ * });
+ * line.listen(anychart.enums.EventType.POINT_MOUSE_OVER, function(e){
+ *   title.fontColor('red');
+ * });
+ * line.listen(anychart.enums.EventType.POINT_CLICK, function(e){
+ *   title.text('You can\'t click here anymore.').fontColor('black');
+ *   line.removeAllListeners();
+ * });
  * @param {string=} opt_type Type of event to remove, default is to
  *     remove all types.
  * @return {number} Number of listeners removed.
@@ -608,15 +659,15 @@ anychart.Base.prototype.removeAllListeners = function(opt_type) {
 
 
 //exports
-anychart.Base.prototype['listen'] = anychart.Base.prototype.listen;
-anychart.Base.prototype['listenOnce'] = anychart.Base.prototype.listenOnce;
-anychart.Base.prototype['unlisten'] = anychart.Base.prototype.unlisten;
-anychart.Base.prototype['unlistenByKey'] = anychart.Base.prototype.unlistenByKey;
-anychart.Base.prototype['removeAllListeners'] = anychart.Base.prototype.removeAllListeners;
-goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);
-anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;
-anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;
-anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.prototype.targetDataChanged;
-anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;
-anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;
-anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;
+anychart.Base.prototype['listen'] = anychart.Base.prototype.listen;//doc|ex
+anychart.Base.prototype['listenOnce'] = anychart.Base.prototype.listenOnce;//doc|ex
+anychart.Base.prototype['unlisten'] = anychart.Base.prototype.unlisten;//doc|ex
+anychart.Base.prototype['unlistenByKey'] = anychart.Base.prototype.unlistenByKey;//doc|ex
+anychart.Base.prototype['removeAllListeners'] = anychart.Base.prototype.removeAllListeners;//doc|ex
+goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);//doc
+anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;//doc
+anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;//doc
+anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.prototype.targetDataChanged;//doc
+anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;//doc
+anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;//doc
+anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;//doc

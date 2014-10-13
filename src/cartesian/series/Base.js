@@ -955,6 +955,7 @@ anychart.cartesian.series.Base.prototype.hasMarkers = function() {
  *    .draw(300, 300);
  * @param {number=} opt_parentWidth [0] Optional width of the parent container for series bounds calculation. By default use 100%.
  * @param {number=} opt_parentHeight [0] Optional height of the parent container for series bounds calculation. By default use 100%.
+ * @return {anychart.cartesian.series.Base} An instance of {@link anychart.cartesian.series.Base} class for method chaining.
  */
 anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_parentHeight) {
   this.suspendSignalsDispatching();
@@ -999,6 +1000,8 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
   if (hasParentBounds) this.pixelBounds(null);
   this.resumeSignalsDispatching(false);
   this.markConsistent(anychart.ConsistencyState.ALL);
+
+  return this;
 };
 
 
@@ -2180,7 +2183,7 @@ anychart.cartesian.series.Base.prototype.getFinalFill = function(usePointSetting
 
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
  *//**
  * Setter for series stroke by function.
  * @example <t>lineChart</t>
@@ -2236,7 +2239,7 @@ anychart.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill, opt
 
 /**
  * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
  *//**
  * Setter for series stroke by function.<br/>
  * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.

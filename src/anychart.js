@@ -17,20 +17,20 @@ goog.require('goog.json.hybrid');
  * Current version of the framework.
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.3, 1.6]);
- * chart.title().text('Current version is ' + anychart.VERSION);
+ * chart.title().text('Current version:' + anychart.VERSION);
  * @define {string} Replaced on compile time.
  */
 anychart.VERSION = '';
 
 
 /**
- * Define, if is developers edition.
+ * Defines if it is developer edition.
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.3, 1.6]);
  * if (!anychart.DEVELOP){
  *   chart.title().text('It is production edition');
  * }else{
- *   chart.title().text('It is developers edition');
+ *   chart.title().text('It is developer edition');
  * }
  * @define {boolean} Replaced on compile time.
  */
@@ -127,7 +127,7 @@ anychart.createChartByType = function(type) {
   if (cls) {
     return /** @type {anychart.Chart} */(new cls());
   } else {
-    throw 'Unknown chart type: ' + type + '\nIt can be contains in other modules, see module list for details.';
+    throw 'Unknown chart type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
 };
 
@@ -165,7 +165,7 @@ anychart.fromJson = function(jsonConfig) {
   if (!json) throw 'Empty json config';
 
   var chart = json['chart'];
-  if (!chart) throw 'Config should contains chart node';
+  if (!chart) throw 'Config should contain the chart node';
 
 
   var instance = anychart.createChartByType(chart['type']);
@@ -353,7 +353,7 @@ anychart.ready_ = function(event) {
 
 /**
  * Add callback for document ready event.<br/>
- * It is called when the DOM is ready which can be prior to images and other external content is loaded.
+ * It is called when the DOM is ready, this can happen prior to images and other external content is loaded.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.4, 1.2, 1.9]);
  * @param {Function} func Function which will called on document load event.

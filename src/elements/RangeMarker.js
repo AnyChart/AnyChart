@@ -320,17 +320,18 @@ anychart.elements.RangeMarker.prototype.isHorizontal = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Drawing.
+ * @return {anychart.elements.RangeMarker} An instance of {@link anychart.elements.RangeMarker} class for method chaining.
  */
 anychart.elements.RangeMarker.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return;
+    return this;
   }
 
   if (!this.checkDrawingNeeded())
-    return;
+    return this;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
@@ -360,7 +361,7 @@ anychart.elements.RangeMarker.prototype.draw = function() {
     var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
     var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
 
-    if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return;
+    if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
 
     var shiftMinValue = -.5;
     var shiftMaxValue = -.5;
@@ -403,6 +404,8 @@ anychart.elements.RangeMarker.prototype.draw = function() {
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
+
+  return this;
 };
 
 

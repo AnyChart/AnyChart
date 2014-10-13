@@ -514,7 +514,7 @@ anychart.elements.BulletMarker.getDrawer = function(layout, type) {
 
 /**
  * Draw bullet marker element.
- * @return {anychart.elements.BulletMarker} An instance of {@link anychart.elements.BulletMarker} class for method chaining.
+ * @return {anychart.elements.BulletMarker} {@link anychart.elements.BulletMarker} instance for method chaining.
  */
 anychart.elements.BulletMarker.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
