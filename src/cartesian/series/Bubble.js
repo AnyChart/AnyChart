@@ -397,13 +397,10 @@ anychart.cartesian.series.Bubble.prototype.drawSubsequentPoint = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
     var iterator = this.getIterator();
-    var hatchFillShape = iterator.meta('hatchFillShape');
-    if (!hatchFillShape) {
-      hatchFillShape = this.hatchFillRootElement ?
-          /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
-          null;
-      iterator.meta('hatchFillShape', hatchFillShape);
-    }
+    var hatchFillShape = this.hatchFillRootElement ?
+        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+        null;
+    iterator.meta('hatchFillShape', hatchFillShape);
     var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
