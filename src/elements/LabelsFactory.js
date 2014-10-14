@@ -124,7 +124,7 @@ anychart.elements.LabelsFactory = function() {
 
   this.background(null);
   this.anchor(anychart.enums.Anchor.CENTER);
-  this.padding(5, 10, 5, 10);
+  this.padding(2, 4);
   this.rotation(0);
   this.width(null);
   this.height(null);
