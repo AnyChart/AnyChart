@@ -1947,7 +1947,7 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
     mm = mm < 10 ? '0' + mm : '' + mm;
     dd = dd < 10 ? '0' + dd : '' + dd;
 
-    labelText = mm + '-' + dd;
+    labelText = mm + '-' + dd + '-' + yy;
     labelValue = value;
   }
 
