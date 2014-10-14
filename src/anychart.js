@@ -265,6 +265,7 @@ anychart.onDocumentLoad = function(func, opt_scope) {
       var item = anychart.documentLoadCallbacks_[i];
       item[0].apply(item[1]);
     }
+    anychart.documentLoadCallbacks_.length = 0;
   });
 };
 
