@@ -328,7 +328,7 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
-  var range = this.dataRangeMax - this.dataRangeMin;
+  var range = (this.maximumModeAuto ? this.dataRangeMax : this.max) - (this.minimumModeAuto ? this.dataRangeMin : this.min);
   if (!range) {
     this.dataRangeMin -= 0.5;
     this.dataRangeMax += 0.5;
