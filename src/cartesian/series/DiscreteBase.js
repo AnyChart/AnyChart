@@ -97,6 +97,7 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
       this.hatchFillRootElement.zIndex(anychart.cartesian.series.Base.ZINDEX_HATCH_FILL);
       this.hatchFillRootElement.disablePointerEvents(true);
     }
+    this.hatchFillRootElement.clear();
   }
 };
 

@@ -24,7 +24,7 @@ anychart.financialChart = function(var_args) {
 
   axis.labels()
       .textFormatter(function(value) {
-        var date = new Date(value['value']);
+        var date = new Date(value['tickValue']);
         var options = {year: 'numeric', month: 'short', day: 'numeric'};
         return date.toLocaleDateString('en-US', options);
       });

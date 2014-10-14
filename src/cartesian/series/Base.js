@@ -1630,7 +1630,7 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for curent series data labels.
+ * Getter for current series data labels.
  * @return {anychart.elements.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
