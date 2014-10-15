@@ -1649,8 +1649,8 @@ anychart.elements.Table.prototype.checkContent_ = function() {
               // the table factory is not created if it is not used.
               var position = /** @type {string} */(
                   marker.position() ||
-                  marker.currentMarkersFactory() && marker.currentMarkersFactory().position() ||
-                  marker.parentMarkersFactory() && marker.parentMarkersFactory().position());
+                  (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
+                  (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
               var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
               marker.positionProvider(positionProvider);
               marker.draw();
