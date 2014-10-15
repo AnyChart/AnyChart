@@ -249,9 +249,10 @@ anychart.elements.Table.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * An instance of {@link anychart.elements.LabelsFactory.Label} class or {@link anychart.VisualBase} class.
+ * An instance of {@link anychart.elements.LabelsFactory.Label} class, {@link anychart.elements.MarkersFactory.Marker} class
+ * or {@link anychart.VisualBase} class.
  * @includeDoc
- * @typedef {anychart.elements.LabelsFactory.Label|anychart.VisualBase}
+ * @typedef {anychart.elements.LabelsFactory.Label|anychart.elements.MarkersFactory.Marker|anychart.VisualBase}
  */
 anychart.elements.Table.CellContent;
 
@@ -1599,7 +1600,7 @@ anychart.elements.Table.prototype.checkBorders_ = function() {
  * @private
  */
 anychart.elements.Table.prototype.checkContent_ = function() {
-  var content, bounds, label;
+  var content, bounds, label, marker;
   if (this.shouldRedrawContent) {
     if (this.contentToDispose_) {
       while (this.contentToDispose_.length) {
@@ -1609,6 +1610,10 @@ anychart.elements.Table.prototype.checkContent_ = function() {
           label = /** @type {anychart.elements.LabelsFactory.Label} */(content);
           if (label.parentLabelsFactory())
             label.parentLabelsFactory().clear(label.getIndex());
+        } else if (content instanceof anychart.elements.MarkersFactory.Marker) {
+          marker = /** @type {anychart.elements.MarkersFactory.Marker} */(content);
+          if (marker.parentMarkersFactory())
+            marker.parentMarkersFactory().clear(marker.getIndex());
         } else if ((content instanceof anychart.VisualBase) || content.parentBounds) {
           content.container(null);
           content.remove();
@@ -1636,6 +1641,19 @@ anychart.elements.Table.prototype.checkContent_ = function() {
               label.width(bounds.width);
               label.height(bounds.height);
               label.positionProvider({'value': {'x': bounds.left, 'y': bounds.top}});
+            } else if (content instanceof anychart.elements.MarkersFactory.Marker) {
+              marker = /** @type {anychart.elements.MarkersFactory.Marker} */(content);
+              // here is proper label position determining. It is done in this way, because we are not sure, that
+              // the label in the cell was created by the table labels factory, so we need to use label's own
+              // methods to determine the correct behaviour. And also, as we don't use this.cellTextFactory() here,
+              // the table factory is not created if it is not used.
+              var position = /** @type {string} */(
+                  marker.position() ||
+                  marker.currentMarkersFactory() && marker.currentMarkersFactory().position() ||
+                  marker.parentMarkersFactory() && marker.parentMarkersFactory().position());
+              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+              marker.positionProvider(positionProvider);
+              marker.draw();
             } else if (content instanceof anychart.VisualBaseWithBounds) {
               var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
               elementWithBounds.pixelBounds(null);

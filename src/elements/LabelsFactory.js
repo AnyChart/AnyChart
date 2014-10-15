@@ -598,7 +598,7 @@ anychart.elements.LabelsFactory.prototype.remove = function() {
 
 /**
  * Clears an array of labels.
- * @param {number=} opt_index If set, removes only the label that label.
+ * @param {number=} opt_index If set, removes only the label that is in passed index.
  * @return {anychart.elements.LabelsFactory} Returns itself for chaining.
  */
 anychart.elements.LabelsFactory.prototype.clear = function(opt_index) {
