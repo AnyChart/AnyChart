@@ -974,6 +974,7 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
     }
     scale.finishAutoCalc();
   }
+  this.categoriseData(scale.getCategorisation());
   if (!(scale = this.yScale()))
     this.yScale(scale = new anychart.scales.Linear());
   if (scale.needsAutoCalc()) {
