@@ -1711,7 +1711,7 @@ anychart.elements.Table.prototype.drawBorder_ = function(row, col, rowSpan, colS
     switch (side) {
       case 0: // top
         path.moveTo(bounds.getLeft(), bounds.getTop() + pixelShift);
-        path.lineTo(bounds.getRight(), bounds.getTop() + pixelShift);
+        path.lineTo(bounds.getRight() + 1, bounds.getTop() + pixelShift);
         break;
       case 1: // right
         path.moveTo(bounds.getRight() + pixelShift, bounds.getTop());
@@ -1723,7 +1723,7 @@ anychart.elements.Table.prototype.drawBorder_ = function(row, col, rowSpan, colS
         break;
       case 3: // left
         path.moveTo(bounds.getLeft() + pixelShift, bounds.getTop());
-        path.lineTo(bounds.getLeft() + pixelShift, bounds.getBottom());
+        path.lineTo(bounds.getLeft() + pixelShift, bounds.getBottom() + 1);
         break;
     }
   }
