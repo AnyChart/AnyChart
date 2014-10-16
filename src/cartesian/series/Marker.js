@@ -430,7 +430,7 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_u
 
   var positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
 
-  var marker = this.marker_.add(positionProvider, index);
+  var marker = this.marker_.getMarker(index) || this.marker_.add(positionProvider, index);
   marker.resetSettings();
   marker.currentMarkersFactory(markersFactory);
   marker.setSettings(settings, settingsHover);
@@ -477,6 +477,7 @@ anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
+  console.log(event['markerIndex']);
   if (event && goog.isDef(event['markerIndex'])) {
     this.hoverPoint(event['markerIndex'], event);
     var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
@@ -491,6 +492,7 @@ anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
+  console.log(event['markerIndex']);
   var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
   acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
   this.unhover();
