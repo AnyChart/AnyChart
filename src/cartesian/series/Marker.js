@@ -477,7 +477,6 @@ anychart.cartesian.series.Marker.prototype.applyHatchFill = function(hovered) {
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
-  console.log(event['markerIndex']);
   if (event && goog.isDef(event['markerIndex'])) {
     this.hoverPoint(event['markerIndex'], event);
     var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
@@ -492,7 +491,6 @@ anychart.cartesian.series.Marker.prototype.handleMouseOver_ = function(event) {
  * @private
  */
 anychart.cartesian.series.Marker.prototype.handleMouseOut_ = function(event) {
-  console.log(event['markerIndex']);
   var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
   acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
   this.unhover();
