@@ -693,7 +693,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
   }
 
   var axis = this.axis();
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS)) {
     axis.suspendSignalsDispatching();
     if (!axis.container() && axis.enabled()) {
       axis.container(this.rootElement);
@@ -706,7 +706,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
   }
 
   var boundsWithoutAxis = axis.enabled() ? axis.getRemainingBounds() : bounds;
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.ranges_.length; i < count; i++) {
       var range = this.ranges_[i];
       if (range) {
@@ -730,7 +730,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.markers_.length; i < count; i++) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
