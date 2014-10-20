@@ -1385,7 +1385,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     // min to 3px per autoColumn to make them visible, but not good-looking.
     var autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
     var current = 0;
-    for (i = 0, len = this.colsCount_ - 1; i < len; i++) {
+    for (i = 0, len = this.colsCount_; i < len; i++) {
       if (i in fixedSizes)
         size = fixedSizes[i];
       else
@@ -1393,11 +1393,6 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
       current += size;
       val = Math.round(current) - 1;
       newColRights[i] = val;
-      if (val != this.colRights_[i]) needsRedraw = true;
-    }
-    if (this.colsCount_ > 0) { // last column
-      i = this.colsCount_ - 1;
-      newColRights[i] = val = Math.round(current + ((i in fixedSizes) ? fixedSizes[i] : autoSize));
       if (val != this.colRights_[i]) needsRedraw = true;
     }
 
@@ -1417,7 +1412,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     // min to 3px per autorow to make them visible, but not good-looking.
     autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
     current = 0;
-    for (i = 0, len = this.rowsCount_ - 1; i < len; i++) {
+    for (i = 0, len = this.rowsCount_; i < len; i++) {
       if (i in fixedSizes)
         size = fixedSizes[i];
       else
@@ -1425,11 +1420,6 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
       current += size;
       val = Math.round(current) - 1;
       newRowBottoms[i] = val;
-      if (val != this.rowBottoms_[i]) needsRedraw = true;
-    }
-    if (this.rowsCount_ > 0) { // last row
-      i = this.rowsCount_ - 1;
-      newRowBottoms[i] = val = Math.round(current + ((i in fixedSizes) ? fixedSizes[i] : autoSize));
       if (val != this.rowBottoms_[i]) needsRedraw = true;
     }
 
