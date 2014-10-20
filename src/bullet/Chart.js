@@ -332,6 +332,7 @@ anychart.bullet.Chart.prototype.axis = function(opt_value) {
     this.axis_ = new anychart.elements.Axis();
     this.axis_.zIndex(anychart.bullet.Chart.ZINDEX_AXIS);
     this.axis_.title().enabled(false);
+    this.axis_.staggerMode(false);
     this.registerDisposable(this.axis_);
     this.axis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(
