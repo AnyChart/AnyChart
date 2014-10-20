@@ -859,11 +859,13 @@ anychart.Chart.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
     for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
       var label = this.chartLabels_[i];
-      label.suspendSignalsDispatching();
-      if (!label.container() && label.enabled()) label.container(this.rootElement);
-      label.parentBounds(totalBounds);
-      label.resumeSignalsDispatching(false);
-      label.draw();
+      if (label) {
+        label.suspendSignalsDispatching();
+        if (!label.container() && label.enabled()) label.container(this.rootElement);
+        label.parentBounds(totalBounds);
+        label.resumeSignalsDispatching(false);
+        label.draw();
+      }
     }
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
