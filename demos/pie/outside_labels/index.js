@@ -37,8 +37,8 @@ anychart.onDocumentLoad(function() {
     {x: 'All other outlets', y: pointData2[2]},
     {x: 'All other outlets', y: pointData2[2]},
 
-    {x: 'Department Stores', hoverLabel: {enabled: false}, y: pointData2[1], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
-    {x: 'Department Stores', label: {enabled: false}, y: pointData2[0], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
+    {x: 'Department Stores', hoverLabel: {enabled: true}, y: pointData2[1], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
+    {x: 'Department Stores', label: {enabled: true}, y: pointData2[0], fill: {keys: ['0 red 1', '0.5 green 1', '1 blue 1']}, stroke: 'none', hoverFill: 'pink'},
 
     {x: 'All \nother \noutlets', y: pointData2[2]},
     {x: 'All other outlets', y: pointData2[2]},
