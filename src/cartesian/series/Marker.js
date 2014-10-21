@@ -434,6 +434,7 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_u
   marker.resetSettings();
   marker.currentMarkersFactory(markersFactory);
   marker.setSettings(settings, settingsHover);
+  marker.positionProvider(positionProvider);
 
   if (opt_updateMarker) marker.draw();
 };

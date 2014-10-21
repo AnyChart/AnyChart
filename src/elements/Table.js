@@ -1279,6 +1279,7 @@ anychart.elements.Table.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.shouldRebuildSizes = true; // if sizes changed, it will be checked in drawing
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -1303,12 +1304,51 @@ anychart.elements.Table.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    if (this.container() && this.container().getStage()) {
+      //listen resize event
+      stage = this.container().getStage();
+      if (this.bounds().dependsOnContainerSize()) {
+        this.container().getStage().listen(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      } else {
+        this.container().getStage().unlisten(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      }
+    }
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (manualSuspend) stage.resume();
 
+  //todo(Anton Saukh): refactor this mess!
+  this.listenSignals(this.invalidateHandler_, this);
+  //end mess
+
   return this;
+};
+
+
+/**
+ * @private
+ */
+anychart.elements.Table.prototype.resizeHandler_ = function() {
+  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * @private
+ */
+anychart.elements.Table.prototype.invalidateHandler_ = function() {
+  anychart.globalLock.onUnlock(this.draw, this);
 };
 
 
@@ -1605,6 +1645,8 @@ anychart.elements.Table.prototype.checkContent_ = function() {
           if (marker.parentMarkersFactory())
             marker.parentMarkersFactory().clear(marker.getIndex());
         } else if ((content instanceof anychart.VisualBase) || content.parentBounds) {
+          if (content instanceof anychart.Chart)
+            (/** @type {anychart.Chart} */(content)).autoRedraw(true);
           content.container(null);
           content.remove();
           // no draw here to avoid drawing in to a null container
@@ -1645,6 +1687,8 @@ anychart.elements.Table.prototype.checkContent_ = function() {
               marker.positionProvider(positionProvider);
               marker.draw();
             } else if (content instanceof anychart.VisualBaseWithBounds) {
+              if (content instanceof anychart.Chart)
+                (/** @type {anychart.Chart} */(content)).autoRedraw(false);
               var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
               elementWithBounds.pixelBounds(null);
               var chartBounds = /** @type {anychart.math.Rect} */(elementWithBounds.pixelBounds(bounds.width, bounds.height));
