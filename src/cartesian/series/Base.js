@@ -959,6 +959,8 @@ anychart.cartesian.series.Base.prototype.hasMarkers = function() {
  */
 anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_parentHeight) {
   this.suspendSignalsDispatching();
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
   var iterator;
   var value;
   var scale;
