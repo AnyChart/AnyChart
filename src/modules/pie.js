@@ -5,7 +5,11 @@ goog.require('anychart.pie.Chart');
 
 
 /**
- * Default pie chart.
+ * Default line chart.<br/>
+ * <b>Note:</b> Contains predefined settings for legend and tooltip.
+ * @example
+ * anychart.pieChart([1.3, 2, 1.4])
+ *   .container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @return {anychart.pie.Chart} Default pie chart.
  */

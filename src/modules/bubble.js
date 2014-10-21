@@ -6,8 +6,15 @@ goog.require('anychart.cartesian.series.Bubble');
 
 
 /**
- * Default bubble chart.
- * xAxis, yAxis, grids.
+ * Default bubble chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.bubbleChart([
+ *      [1.3, 2, 1.3],
+ *      [1.6, 1.5, 1.4],
+ *      [1.9, 1.9, 1.1]
+ *   ])
+ *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Bubble chart data.
  * @return {anychart.cartesian.Chart} Chart with defaults for bubble series.
  */
@@ -43,4 +50,4 @@ anychart.bubbleChart = function(var_args) {
 };
 
 //exports
-goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);
+goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);//doc|ex

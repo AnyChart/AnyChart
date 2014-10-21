@@ -7,10 +7,13 @@ goog.require('anychart.cartesian.series.RangeBar');
 
 
 /**
- * Default bar chart.
- * xAxis, yAxis, grids.
+ * Default bar chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.barChart([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Bar chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ * @return {anychart.cartesian.Chart} Chart with defaults for bar series.
  */
 anychart.barChart = function(var_args) {
   var chart = new anychart.cartesian.Chart(true);
@@ -44,4 +47,4 @@ anychart.barChart = function(var_args) {
 };
 
 //exports
-goog.exportSymbol('anychart.barChart', anychart.barChart);
+goog.exportSymbol('anychart.barChart', anychart.barChart);//doc|ex
