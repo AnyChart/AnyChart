@@ -16,10 +16,10 @@ anychart.elements.BulletMarker = function() {
 
   /**
    * Gap for bullet marker.
-   * @type {number|string}
+   * @type {number|string|null}
    * @private
    */
-  this.gap_ = NaN;
+  this.gap_ = null;
 
   /**
    * Value for bullet marker.
@@ -157,7 +157,7 @@ anychart.elements.BulletMarker.prototype.gap = function(opt_value) {
     }
     return this;
   } else {
-    return isNaN(this.gap_) ? anychart.elements.BulletMarker.DEFAULT_GAP_BY_TYPE[this.type()] : this.gap_;
+    return goog.isNull(this.gap_) ? anychart.elements.BulletMarker.DEFAULT_GAP_BY_TYPE[this.type()] : this.gap_;
   }
 };
 
@@ -621,24 +621,23 @@ anychart.elements.BulletMarker.prototype.deserialize = function(value) {
 };
 
 
-/**
- * Constructor function.
- * @return {!anychart.elements.BulletMarker}
- */
-anychart.elements.bulletMarker = function() {
-  return new anychart.elements.BulletMarker();
-};
+///**
+// * Constructor function.
+// * @return {!anychart.elements.BulletMarker}
+// */
+//anychart.elements.bulletMarker = function() {
+//  return new anychart.elements.BulletMarker();
+//};
 
 
-//exports
-goog.exportSymbol('anychart.elements.bulletMarker', anychart.elements.bulletMarker);
-anychart.elements.BulletMarker.prototype['type'] = anychart.elements.BulletMarker.prototype.type;
-anychart.elements.BulletMarker.prototype['gap'] = anychart.elements.BulletMarker.prototype.gap;
-anychart.elements.BulletMarker.prototype['value'] = anychart.elements.BulletMarker.prototype.value;
-anychart.elements.BulletMarker.prototype['layout'] = anychart.elements.BulletMarker.prototype.layout;
-anychart.elements.BulletMarker.prototype['scale'] = anychart.elements.BulletMarker.prototype.scale;
-anychart.elements.BulletMarker.prototype['fill'] = anychart.elements.BulletMarker.prototype.fill;
-anychart.elements.BulletMarker.prototype['stroke'] = anychart.elements.BulletMarker.prototype.stroke;
-anychart.elements.BulletMarker.prototype['parentBounds'] = anychart.elements.BulletMarker.prototype.parentBounds;
-anychart.elements.BulletMarker.prototype['isHorizontal'] = anychart.elements.BulletMarker.prototype.isHorizontal;
-anychart.elements.BulletMarker.prototype['draw'] = anychart.elements.BulletMarker.prototype.draw;
+//goog.exportSymbol('anychart.elements.bulletMarker', anychart.elements.bulletMarker);
+//anychart.elements.BulletMarker.prototype['type'] = anychart.elements.BulletMarker.prototype.type;
+//anychart.elements.BulletMarker.prototype['gap'] = anychart.elements.BulletMarker.prototype.gap;
+//anychart.elements.BulletMarker.prototype['value'] = anychart.elements.BulletMarker.prototype.value;
+//anychart.elements.BulletMarker.prototype['layout'] = anychart.elements.BulletMarker.prototype.layout;
+//anychart.elements.BulletMarker.prototype['scale'] = anychart.elements.BulletMarker.prototype.scale;
+//anychart.elements.BulletMarker.prototype['fill'] = anychart.elements.BulletMarker.prototype.fill;
+//anychart.elements.BulletMarker.prototype['stroke'] = anychart.elements.BulletMarker.prototype.stroke;
+//anychart.elements.BulletMarker.prototype['parentBounds'] = anychart.elements.BulletMarker.prototype.parentBounds;
+//anychart.elements.BulletMarker.prototype['isHorizontal'] = anychart.elements.BulletMarker.prototype.isHorizontal;
+//anychart.elements.BulletMarker.prototype['draw'] = anychart.elements.BulletMarker.prototype.draw;

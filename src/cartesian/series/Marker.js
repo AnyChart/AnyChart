@@ -430,10 +430,11 @@ anychart.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_u
 
   var positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
 
-  var marker = this.marker_.add(positionProvider, index);
+  var marker = this.marker_.getMarker(index) || this.marker_.add(positionProvider, index);
   marker.resetSettings();
   marker.currentMarkersFactory(markersFactory);
   marker.setSettings(settings, settingsHover);
+  marker.positionProvider(positionProvider);
 
   if (opt_updateMarker) marker.draw();
 };

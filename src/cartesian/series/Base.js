@@ -959,6 +959,8 @@ anychart.cartesian.series.Base.prototype.hasMarkers = function() {
  */
 anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_parentHeight) {
   this.suspendSignalsDispatching();
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
   var iterator;
   var value;
   var scale;
@@ -974,6 +976,7 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
     }
     scale.finishAutoCalc();
   }
+  this.categoriseData(scale.getCategorisation());
   if (!(scale = this.yScale()))
     this.yScale(scale = new anychart.scales.Linear());
   if (scale.needsAutoCalc()) {
@@ -1630,7 +1633,7 @@ anychart.cartesian.series.Base.prototype.onTooltipSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for curent series data labels.
+ * Getter for current series data labels.
  * @return {anychart.elements.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.

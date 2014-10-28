@@ -108,8 +108,16 @@ anychart.bullet.Chart.ZINDEX_AXIS = 3;
  *//**
  * Setter for chart data.<br/>
  * <b>Note:</b> All data is markers values.
- * @example <t>simple-h100</t>
+ * @example <c>Simple markers</c><t>simple-h100</t>
  * var bulletChart = anychart.bullet.chart([10, 7, 11]);
+ * bulletChart.range().from(0).to(6);
+ * bulletChart.range(1).from(6).to(12);
+ * bulletChart.container(stage).draw();
+ * @example <c>Advanced markers</c><t>simple-h100</t>
+ * var bulletChart = anychart.bullet.chart([
+ *    {value: 9, type: 'bar', fill: 'blue 0.5', gap: 0.3},
+ *    {value: 10, type: 'X', stroke: 'blue 4'},
+ * ]);
  * bulletChart.range().from(0).to(6);
  * bulletChart.range(1).from(6).to(12);
  * bulletChart.container(stage).draw();
@@ -324,6 +332,7 @@ anychart.bullet.Chart.prototype.axis = function(opt_value) {
     this.axis_ = new anychart.elements.Axis();
     this.axis_.zIndex(anychart.bullet.Chart.ZINDEX_AXIS);
     this.axis_.title().enabled(false);
+    this.axis_.staggerMode(false);
     this.registerDisposable(this.axis_);
     this.axis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(
@@ -532,7 +541,7 @@ anychart.bullet.Chart.prototype.onRangePaletteSignal_ = function(event) {
  * @return {anychart.bullet.Chart} {@link anychart.bullet.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.utils.DistinctColorPalette|Array)=} opt_value .
+ * @param {(anychart.utils.MarkerPalette|Array)=} opt_value .
  * @return {!(anychart.utils.MarkerPalette|anychart.bullet.Chart)} .
  */
 anychart.bullet.Chart.prototype.markerPalette = function(opt_value) {
@@ -685,7 +694,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
   }
 
   var axis = this.axis();
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS)) {
     axis.suspendSignalsDispatching();
     if (!axis.container() && axis.enabled()) {
       axis.container(this.rootElement);
@@ -698,7 +707,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
   }
 
   var boundsWithoutAxis = axis.enabled() ? axis.getRemainingBounds() : bounds;
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.ranges_.length; i < count; i++) {
       var range = this.ranges_[i];
       if (range) {
@@ -722,7 +731,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.markers_.length; i < count; i++) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();

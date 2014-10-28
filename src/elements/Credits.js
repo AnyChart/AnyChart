@@ -356,7 +356,7 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
     parentBounds = new anychart.math.Rect(0, 0, 0, 0);
   }
 
-  if (!this.enabled()) return parentBounds;
+  if (!this.enabled() || !stage) return parentBounds;
 
   var creditsSize = goog.style.getBorderBoxSize(this.domElement_);
   // chart height - credits height - bottom

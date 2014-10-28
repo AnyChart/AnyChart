@@ -2061,9 +2061,11 @@ anychart.pie.Chart.prototype.clickSlice = function(opt_explode) {
   this.drawSlice_(true);
   var index = iterator.getIndex();
   if (this.isOutsideLabels_()) {
+    this.labels().suspendSignalsDispatching();
     this.labels().clear();
     this.calculateOutsideLabels();
     this.labels().draw();
+    this.labels().resumeSignalsDispatching(true);
     iterator.select(index);
   }
   this.drawLabel_(this.hoverStatus == index, this.hoverStatus == index);
@@ -2363,11 +2365,10 @@ anychart.pie.Chart.prototype.domainDefragmentation = function(domain) {
       }
     }
   }
-
-  if (sourcePieLabelsDomains.length - domainsLength > 0) {
-    domain.labels = tmpDomain.labels;
-  } else {
-    if (tmpDomain) {
+  if (tmpDomain) {
+    if (sourcePieLabelsDomains.length - domainsLength > 0) {
+      domain.labels = tmpDomain.labels;
+    } else {
       tmpDomain.clearDroppedLabels();
       if (tmpLabels.length != labels.length)
         domain.labels = tmpLabels;

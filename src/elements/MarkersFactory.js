@@ -1001,21 +1001,29 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Clears an array of markers.
+ * @param {number=} opt_index If set, removes only the marker that is in passed index.
  * @return {anychart.elements.MarkersFactory} Returns self for chaining.
  */
-anychart.elements.MarkersFactory.prototype.clear = function() {
+anychart.elements.MarkersFactory.prototype.clear = function(opt_index) {
   if (!this.freeToUseMarkersPool_)
     this.freeToUseMarkersPool_ = [];
 
   if (this.markers_) {
-    goog.array.forEach(this.markers_, function(marker) {
-      marker.clear();
-      this.freeToUseMarkersPool_.push(marker);
-    }, this);
+    opt_index = +opt_index;
+    if (!isNaN(opt_index) && opt_index in this.markers_) {
+      this.markers_[opt_index].clear();
+      this.freeToUseMarkersPool_.push(this.markers_[opt_index]);
+      delete this.markers_[opt_index];
+    } else {
+      goog.array.forEach(this.markers_, function(marker) {
+        marker.clear();
+        this.freeToUseMarkersPool_.push(marker);
+      }, this);
+      this.markers_.length = 0;
+    }
     this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
-  }
-
-  this.markers_ = [];
+  } else
+    this.markers_ = [];
   return this;
 };
 
@@ -1846,6 +1854,7 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
       parentMarkersFactory.enabled(),
       currentMarkersFactory.enabled(),
       currentMarkersFactory.enabled());
+  if (goog.isNull(enabled)) enabled = true;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||
       currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {

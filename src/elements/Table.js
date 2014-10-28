@@ -249,9 +249,10 @@ anychart.elements.Table.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * An instance of {@link anychart.elements.LabelsFactory.Label} class or {@link anychart.VisualBase} class.
+ * An instance of {@link anychart.elements.LabelsFactory.Label} class, {@link anychart.elements.MarkersFactory.Marker} class
+ * or {@link anychart.VisualBase} class.
  * @includeDoc
- * @typedef {anychart.elements.LabelsFactory.Label|anychart.VisualBase}
+ * @typedef {anychart.elements.LabelsFactory.Label|anychart.elements.MarkersFactory.Marker|anychart.VisualBase}
  */
 anychart.elements.Table.CellContent;
 
@@ -1278,6 +1279,7 @@ anychart.elements.Table.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.shouldRebuildSizes = true; // if sizes changed, it will be checked in drawing
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -1302,12 +1304,51 @@ anychart.elements.Table.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    if (this.container() && this.container().getStage()) {
+      //listen resize event
+      stage = this.container().getStage();
+      if (this.bounds().dependsOnContainerSize()) {
+        this.container().getStage().listen(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      } else {
+        this.container().getStage().unlisten(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      }
+    }
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (manualSuspend) stage.resume();
 
+  //todo(Anton Saukh): refactor this mess!
+  this.listenSignals(this.invalidateHandler_, this);
+  //end mess
+
   return this;
+};
+
+
+/**
+ * @private
+ */
+anychart.elements.Table.prototype.resizeHandler_ = function() {
+  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * @private
+ */
+anychart.elements.Table.prototype.invalidateHandler_ = function() {
+  anychart.globalLock.onUnlock(this.draw, this);
 };
 
 
@@ -1384,7 +1425,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     // min to 3px per autoColumn to make them visible, but not good-looking.
     var autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
     var current = 0;
-    for (i = 0, len = this.colsCount_ - 1; i < len; i++) {
+    for (i = 0, len = this.colsCount_; i < len; i++) {
       if (i in fixedSizes)
         size = fixedSizes[i];
       else
@@ -1392,11 +1433,6 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
       current += size;
       val = Math.round(current) - 1;
       newColRights[i] = val;
-      if (val != this.colRights_[i]) needsRedraw = true;
-    }
-    if (this.colsCount_ > 0) { // last column
-      i = this.colsCount_ - 1;
-      newColRights[i] = val = Math.round(current + ((i in fixedSizes) ? fixedSizes[i] : autoSize));
       if (val != this.colRights_[i]) needsRedraw = true;
     }
 
@@ -1416,7 +1452,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     // min to 3px per autorow to make them visible, but not good-looking.
     autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
     current = 0;
-    for (i = 0, len = this.rowsCount_ - 1; i < len; i++) {
+    for (i = 0, len = this.rowsCount_; i < len; i++) {
       if (i in fixedSizes)
         size = fixedSizes[i];
       else
@@ -1424,11 +1460,6 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
       current += size;
       val = Math.round(current) - 1;
       newRowBottoms[i] = val;
-      if (val != this.rowBottoms_[i]) needsRedraw = true;
-    }
-    if (this.rowsCount_ > 0) { // last row
-      i = this.rowsCount_ - 1;
-      newRowBottoms[i] = val = Math.round(current + ((i in fixedSizes) ? fixedSizes[i] : autoSize));
       if (val != this.rowBottoms_[i]) needsRedraw = true;
     }
 
@@ -1599,7 +1630,7 @@ anychart.elements.Table.prototype.checkBorders_ = function() {
  * @private
  */
 anychart.elements.Table.prototype.checkContent_ = function() {
-  var content, bounds, label;
+  var content, bounds, label, marker;
   if (this.shouldRedrawContent) {
     if (this.contentToDispose_) {
       while (this.contentToDispose_.length) {
@@ -1609,7 +1640,13 @@ anychart.elements.Table.prototype.checkContent_ = function() {
           label = /** @type {anychart.elements.LabelsFactory.Label} */(content);
           if (label.parentLabelsFactory())
             label.parentLabelsFactory().clear(label.getIndex());
+        } else if (content instanceof anychart.elements.MarkersFactory.Marker) {
+          marker = /** @type {anychart.elements.MarkersFactory.Marker} */(content);
+          if (marker.parentMarkersFactory())
+            marker.parentMarkersFactory().clear(marker.getIndex());
         } else if ((content instanceof anychart.VisualBase) || content.parentBounds) {
+          if (content instanceof anychart.Chart)
+            (/** @type {anychart.Chart} */(content)).autoRedraw(true);
           content.container(null);
           content.remove();
           // no draw here to avoid drawing in to a null container
@@ -1636,7 +1673,22 @@ anychart.elements.Table.prototype.checkContent_ = function() {
               label.width(bounds.width);
               label.height(bounds.height);
               label.positionProvider({'value': {'x': bounds.left, 'y': bounds.top}});
+            } else if (content instanceof anychart.elements.MarkersFactory.Marker) {
+              marker = /** @type {anychart.elements.MarkersFactory.Marker} */(content);
+              // here is proper label position determining. It is done in this way, because we are not sure, that
+              // the label in the cell was created by the table labels factory, so we need to use label's own
+              // methods to determine the correct behaviour. And also, as we don't use this.cellTextFactory() here,
+              // the table factory is not created if it is not used.
+              var position = /** @type {string} */(
+                  marker.position() ||
+                  (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
+                  (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
+              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+              marker.positionProvider(positionProvider);
+              marker.draw();
             } else if (content instanceof anychart.VisualBaseWithBounds) {
+              if (content instanceof anychart.Chart)
+                (/** @type {anychart.Chart} */(content)).autoRedraw(false);
               var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
               elementWithBounds.pixelBounds(null);
               var chartBounds = /** @type {anychart.math.Rect} */(elementWithBounds.pixelBounds(bounds.width, bounds.height));
@@ -1693,7 +1745,7 @@ anychart.elements.Table.prototype.drawBorder_ = function(row, col, rowSpan, colS
     switch (side) {
       case 0: // top
         path.moveTo(bounds.getLeft(), bounds.getTop() + pixelShift);
-        path.lineTo(bounds.getRight(), bounds.getTop() + pixelShift);
+        path.lineTo(bounds.getRight() + 1, bounds.getTop() + pixelShift);
         break;
       case 1: // right
         path.moveTo(bounds.getRight() + pixelShift, bounds.getTop());
@@ -1705,7 +1757,7 @@ anychart.elements.Table.prototype.drawBorder_ = function(row, col, rowSpan, colS
         break;
       case 3: // left
         path.moveTo(bounds.getLeft() + pixelShift, bounds.getTop());
-        path.lineTo(bounds.getLeft() + pixelShift, bounds.getBottom());
+        path.lineTo(bounds.getLeft() + pixelShift, bounds.getBottom() + 1);
         break;
     }
   }

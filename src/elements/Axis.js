@@ -1947,7 +1947,7 @@ anychart.elements.Axis.prototype.getLabelsFormatProvider_ = function(index, valu
     mm = mm < 10 ? '0' + mm : '' + mm;
     dd = dd < 10 ? '0' + dd : '' + dd;
 
-    labelText = mm + '-' + dd;
+    labelText = mm + '-' + dd + '-' + yy;
     labelValue = value;
   }
 
@@ -2101,7 +2101,7 @@ anychart.elements.Axis.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
-  var lineDrawer, ticksDrawer, minorTicksDrawer, minorLabelsDrawer;
+  var lineDrawer, ticksDrawer, minorTicksDrawer;
   var minorTicks, ticks;
   var lineThickness;
   var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
@@ -2268,12 +2268,12 @@ anychart.elements.Axis.prototype.draw = function() {
                 lineThickness,
                 minorPixelShift);
 
-          if (drawLabel && minorLabelsDrawer && prevMajorRatio != minorRatio)
+          if (drawLabel && prevMajorRatio != minorRatio)
             this.drawLabel_(minorTickVal, scale.transform(minorTickVal, .5), j, minorPixelShift, false);
           j++;
         }
       }
-      if (minorLabelsDrawer) this.minorLabels().draw();
+      if (needDrawMinorLabels) this.minorLabels().draw();
 
     } else if (scale instanceof anychart.scales.Ordinal) {
       var labelsStates = this.calcLabels_();

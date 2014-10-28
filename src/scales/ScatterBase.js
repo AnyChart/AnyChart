@@ -328,7 +328,7 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
-  var range = this.dataRangeMax - this.dataRangeMin;
+  var range = (this.maximumModeAuto ? this.dataRangeMax : this.max) - (this.minimumModeAuto ? this.dataRangeMin : this.min);
   if (!range) {
     this.dataRangeMin -= 0.5;
     this.dataRangeMax += 0.5;
@@ -355,7 +355,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
  * var chart = anychart.lineChart();
  * chart.line([1.1, 1.4, 1.2, 1.95]);
  * chart.container(stage).draw();
- * Draw a red marker on the found tick.
+ * // Draw a red marker on the found tick.
  * chart.lineMarker().value(chart.yScale().inverseTransform(0.39));
  * @param {number} ratio Value to transform in input scope.
  * @return {*} Value transformed to output scope.

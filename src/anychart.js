@@ -265,6 +265,7 @@ anychart.onDocumentLoad = function(func, opt_scope) {
       var item = anychart.documentLoadCallbacks_[i];
       item[0].apply(item[1]);
     }
+    anychart.documentLoadCallbacks_.length = 0;
   });
 };
 
@@ -507,13 +508,13 @@ goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
-goog.exportSymbol('anychart.areaChart', anychart.areaChart);
-goog.exportSymbol('anychart.barChart', anychart.barChart);
-goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);
-goog.exportSymbol('anychart.bulletChart', anychart.bulletChart);
-goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);
-goog.exportSymbol('anychart.columnChart', anychart.columnChart);
-goog.exportSymbol('anychart.financialChart', anychart.financialChart);
-goog.exportSymbol('anychart.lineChart', anychart.lineChart);
-goog.exportSymbol('anychart.markerChart', anychart.markerChart);
-goog.exportSymbol('anychart.pieChart', anychart.pieChart);
+goog.exportSymbol('anychart.areaChart', anychart.areaChart);//linkedFromModule
+goog.exportSymbol('anychart.barChart', anychart.barChart);//linkedFromModule
+goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);//linkedFromModule
+goog.exportSymbol('anychart.bulletChart', anychart.bulletChart);//linkedFromModule
+goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);//linkedFromModule
+goog.exportSymbol('anychart.columnChart', anychart.columnChart);//linkedFromModule
+goog.exportSymbol('anychart.financialChart', anychart.financialChart);//linkedFromModule
+goog.exportSymbol('anychart.lineChart', anychart.lineChart);//linkedFromModule
+goog.exportSymbol('anychart.markerChart', anychart.markerChart);//linkedFromModule
+goog.exportSymbol('anychart.pieChart', anychart.pieChart);//linkedFromModule

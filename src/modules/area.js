@@ -11,10 +11,13 @@ goog.require('anychart.cartesian.series.StepArea');
 
 
 /**
- * Default area chart.
- * xAxis, yAxis, grids.
+ * Default area chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.areaChart([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Area chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ * @return {anychart.cartesian.Chart} Chart with defaults for area series.
  */
 anychart.areaChart = function(var_args) {
   var chart = new anychart.cartesian.Chart();
@@ -46,4 +49,4 @@ anychart.areaChart = function(var_args) {
 };
 
 //exports
-goog.exportSymbol('anychart.areaChart', anychart.areaChart);
+goog.exportSymbol('anychart.areaChart', anychart.areaChart);//doc|ex

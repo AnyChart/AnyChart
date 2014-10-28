@@ -70,7 +70,7 @@ anychart.Chart = function() {
    * @type {boolean}
    * @private
    */
-  this.autoResize_ = true;
+  this.autoRedraw_ = true;
 
   /**
    * @type {anychart.elements.Credits}
@@ -754,6 +754,13 @@ anychart.Chart.prototype.onCreditsSignal_ = function(event) {
  * @return {anychart.Chart} An instance of {@link anychart.Chart} class for method chaining.
  */
 anychart.Chart.prototype.draw = function() {
+  //todo(Anton Saukh): refactor this mess!
+  if (this.autoRedraw_)
+    this.listenSignals(this.invalidateHandler_, this);
+  else
+    this.unlistenSignals(this.invalidateHandler_, this);
+  //end mess
+
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -859,11 +866,13 @@ anychart.Chart.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
     for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
       var label = this.chartLabels_[i];
-      label.suspendSignalsDispatching();
-      if (!label.container() && label.enabled()) label.container(this.rootElement);
-      label.parentBounds(totalBounds);
-      label.resumeSignalsDispatching(false);
-      label.draw();
+      if (label) {
+        label.suspendSignalsDispatching();
+        if (!label.container() && label.enabled()) label.container(this.rootElement);
+        label.parentBounds(totalBounds);
+        label.resumeSignalsDispatching(false);
+        label.draw();
+      }
     }
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
   }
@@ -874,7 +883,7 @@ anychart.Chart.prototype.draw = function() {
       //listen resize event
       stage = this.container().getStage();
       stage.resize(stage.originalWidth, stage.originalHeight);
-      if (this.autoResize_ && this.bounds().dependsOnContainerSize()) {
+      if (this.bounds().dependsOnContainerSize()) {
         this.container().getStage().listen(
             acgraph.vector.Stage.EventType.STAGE_RESIZE,
             this.resizeHandler_,
@@ -896,10 +905,6 @@ anychart.Chart.prototype.draw = function() {
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
   if (manualSuspend) stage.resume();
-
-  //todo(Anton Saukh): refactor this mess!
-  this.listenSignals(this.invalidateHandler_, this);
-  //end mess
 
   this.resumeSignalsDispatching(false);
 
@@ -925,20 +930,20 @@ anychart.Chart.prototype.drawContent = goog.nullFunction;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Define auto resize settings.
+ * Define auto resize settings. В таком  виде это экспортить нельзя.
  * @param {boolean=} opt_value
  * @return {!(boolean|anychart.Chart)} Auto resize settings or itself for chaining call.
  */
-anychart.Chart.prototype.autoResize = function(opt_value) {
+anychart.Chart.prototype.autoRedraw = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.autoResize_ != opt_value) {
-      this.autoResize_ = opt_value;
+    if (this.autoRedraw_ != opt_value) {
+      this.autoRedraw_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.autoResize_;
+    return this.autoRedraw_;
   }
 };
 
@@ -1038,7 +1043,6 @@ anychart.Chart.prototype.deserialize = function(config) {
   this.background(background);
   this.title(title);
   this.legend(legend);
-  this.autoResize(config['autoResize']);
   this.credits(config['credits']);
 
   this.resumeSignalsDispatching(true);
@@ -1059,7 +1063,6 @@ anychart.Chart.prototype.serialize = function() {
   json['title'] = this.title().serialize();
   json['legend'] = this.legend().serialize();
   json['credits'] = this.credits().serialize();
-  json['autoResize'] = this.autoResize();
 
   return json;
 };

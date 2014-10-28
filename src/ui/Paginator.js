@@ -451,6 +451,35 @@ anychart.ui.Paginator.prototype.draw = function() {
     this.registerDisposable(this.text_);
   }
 
+  this.background().suspendSignalsDispatching();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.calculatePaginatorBounds_();
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.background().container(container).draw();
+    if (this.previousButton_) this.previousButton_.container(container);
+    if (this.text_) this.text_.parent(container);
+    if (this.nextButton_) this.nextButton_.container(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+    this.background_.pixelBounds(new anychart.math.Rect(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_));
+    this.background_.draw();
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    var zIndex = /** @type {number} */ (this.zIndex());
+    if (this.background_) this.background_.zIndex(zIndex);
+    if (this.previousButton_) this.previousButton_.zIndex(zIndex);
+    if (this.text_) this.text_.zIndex(zIndex);
+    if (this.nextButton_) this.nextButton_.zIndex(zIndex);
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.textSettings('text', this.createTextString_());
     this.applyTextSettings(this.text_, isInitial);
@@ -458,7 +487,6 @@ anychart.ui.Paginator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.calculatePaginatorBounds_();
     var textBounds = this.text_.getBounds();
     var buttonSize = textBounds.height;
     var parentBounds = this.parentBounds();
@@ -516,28 +544,7 @@ anychart.ui.Paginator.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
-    this.background_.pixelBounds(new anychart.math.Rect(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_));
-    this.background_.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */ (this.zIndex());
-    if (this.background_) this.background_.zIndex(zIndex);
-    if (this.previousButton_) this.previousButton_.zIndex(zIndex);
-    if (this.text_) this.text_.zIndex(zIndex);
-    if (this.nextButton_) this.nextButton_.zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.background().container(container);
-    if (this.previousButton_) this.previousButton_.container(container);
-    if (this.text_) this.text_.parent(container);
-    if (this.nextButton_) this.nextButton_.container(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
+  this.background().resumeSignalsDispatching(false);
 
   if (manualSuspend) stage.resume();
   return this;

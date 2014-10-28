@@ -312,7 +312,8 @@ anychart.VisualBase.prototype.remove = goog.nullFunction;
 anychart.VisualBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['enabled'] = this.enabled();
-  json['zIndex'] = this.zIndex();
+  if (goog.isDef(this.zIndex_))
+    json['zIndex'] = this.zIndex_;
   return json;
 };
 

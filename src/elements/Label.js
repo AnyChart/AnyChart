@@ -1047,9 +1047,24 @@ anychart.elements.Label.prototype.draw = function() {
 
   var isInitial = this.createTextElement_();
 
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    if (this.background_) this.background_.container(container).draw();
+    if (this.textElement_) this.textElement_.parent(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    var zIndex = /** @type {number} */(this.zIndex());
+    if (this.textElement_) this.textElement_.zIndex(zIndex);
+    if (this.background_) this.background_.zIndex(zIndex);
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -1141,8 +1156,6 @@ anychart.elements.Label.prototype.draw = function() {
     backgroundBounds.left = position.x;
     backgroundBounds.top = position.y;
 
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-
     this.textElement_.width(this.textWidth_);
     this.textElement_.height(this.textHeight_);
 
@@ -1164,19 +1177,6 @@ anychart.elements.Label.prototype.draw = function() {
       this.background_.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    if (this.textElement_) this.textElement_.zIndex(zIndex);
-    if (this.background_) this.background_.zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.background_) this.background_.container(container).draw();
-    if (this.textElement_) this.textElement_.parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   return this;

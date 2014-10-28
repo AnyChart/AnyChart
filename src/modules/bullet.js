@@ -5,7 +5,10 @@ goog.require('anychart.bullet.Chart');
 
 
 /**
- * Shortcut for bullet chart.
+ * Default bullet chart.
+ * @example
+ * anychart.bulletChart([17, 14])
+ *   .container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
  * @return {!anychart.bullet.Chart} Bullet chart.
  */
