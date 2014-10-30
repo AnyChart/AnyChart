@@ -37,7 +37,7 @@ anychart.elements.Credits = function() {
    * @type {string}
    * @private
    */
-  this.logoSrc_ = 'http://static.anychart.com/logo_grey.png';
+  this.logoSrc_ = 'http://static.anychart.com/logo.png';
 
 
   /**
@@ -372,7 +372,7 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.elements.Credits.prototype.getHTMLString_ = function(valid) {
-  return '<img class="' + anychart.elements.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo_grey.png') + '">' +
+  return '<img class="' + anychart.elements.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">' +
       '<span class="' + anychart.elements.Credits.CssClass_.TEXT + '">' + (valid ? this.text_ : 'AnyChart Trial Version') + '</span>';
 };
 
