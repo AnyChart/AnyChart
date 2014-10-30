@@ -200,7 +200,7 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
  *    <li> An array of two values to make the tick from the first one to the second one.</li>
  * </ol>
  * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or after <b>chart.draw()</b>.
- * @example
+ * @example <t>lineChart</t>
  * chart.line([
  *    ['A1', 1.1],
  *    ['A2', 1.4],
