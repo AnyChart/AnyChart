@@ -31,7 +31,7 @@ anychart.onDocumentReady(function() {
   var i;
   var charts = [];
   for (i = 0; i < type.length; i++) {
-    chart = anychart.cartesian.chart();
+    chart = anychart.cartesianChart();
     chart.xAxis();
     chart.yAxis();
     chart.bounds()

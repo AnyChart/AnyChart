@@ -250,6 +250,49 @@ anychart.elements.Credits.prototype.parentBounds = function(opt_value) {
 
 
 /**
+ * Draws svg logo.
+ * @param {Element} element Container for logo.
+ * @private
+ */
+anychart.elements.Credits.prototype.drawLogo_ = function(element) {
+  var stage = acgraph.create(element, '100%', '100%');
+  var borderPath = stage.path();
+  var columnPath = stage.path();
+
+  // border
+  borderPath
+      .moveTo(.5, .5)
+      .lineTo(19.4, .5)
+      .lineTo(19.4, 19.4)
+      .lineTo(.5, 19.4)
+      .close()
+      .fill(null)
+      .stroke('#808080', 1.5)
+      .scale(0.5, 0.5);
+  columnPath
+      .moveTo(4.5, 10) // 1 column
+      .lineTo(6.5, 10)
+      .lineTo(6.5, 16.5)
+      .lineTo(4.5, 16.5)
+      .lineTo(4.5, 10)
+      .moveTo(9, 7.5) // 2 column
+      .lineTo(11, 7.5)
+      .lineTo(11, 16.5)
+      .lineTo(9, 16.5)
+      .lineTo(9, 7.5)
+      .moveTo(13.5, 5) // 3 column
+      .lineTo(15.5, 5)
+      .lineTo(15.5, 16.5)
+      .lineTo(13.5, 16.5)
+      .lineTo(13.5, 5);
+  columnPath
+      .stroke('#808080', 1, 0.9)
+      .fill('#808080', 0.9)
+      .scale(0.5, 0.5);
+};
+
+
+/**
  * Draw credits.
  * @return {anychart.elements.Credits} Return itself for chaining call.
  */
@@ -281,7 +324,7 @@ anychart.elements.Credits.prototype.draw = function() {
     this.domElement_ = goog.dom.createDom(
         goog.dom.TagName.A,
         anychart.elements.Credits.CssClass_.CREDITS
-        );
+    );
   }
 
   if (!anychart.elements.Credits.creditsCss_) {
@@ -301,6 +344,15 @@ anychart.elements.Credits.prototype.draw = function() {
       'target': '_blank'
     });
     this.domElement_.innerHTML = this.getHTMLString_(valid);
+    // get image dom element to check for an error
+    var img = goog.dom.getElementByClass('anychart-credits-logo', this.domElement_);
+    var self = this;
+    img.onerror = function(e) {
+      // draws logo instead of loading image
+      self.drawLogo_(self.domElement_);
+      // remove <img /> element
+      goog.dom.removeNode(img);
+    };
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
