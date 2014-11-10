@@ -25,6 +25,10 @@ goog.require('anychart.cartesian.series.OHLC');
 anychart.financialChart = function(var_args) {
   var chart = new anychart.cartesian.Chart();
 
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart.candlestick(arguments[i]);
+  }
+
   chart.title().text('Chart Title').fontWeight('bold');
   var scale = new anychart.scales.DateTime();
 
@@ -33,8 +37,8 @@ anychart.financialChart = function(var_args) {
   var axis = chart.xAxis();
 
   axis.labels()
-      .textFormatter(function(value) {
-        var date = new Date(value['tickValue']);
+      .textFormatter(function() {
+        var date = new Date(this['tickValue']);
         var options = {year: 'numeric', month: 'short', day: 'numeric'};
         return date.toLocaleDateString('en-US', options);
       });
