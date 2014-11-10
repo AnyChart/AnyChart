@@ -41,6 +41,12 @@ anychart.elements.TextMarker = function() {
   this.layout_;
 
   /**
+   * @type {?number}
+   * @private
+   */
+  this.rotation_ = null;
+
+  /**
    * @type {anychart.enums.Align}
    * @private
    */
@@ -263,6 +269,24 @@ anychart.elements.TextMarker.prototype.layout = function(opt_value) {
 
 
 /**
+ * Get/set rotation in degrees.
+ * If null is provided then rotation angle depends on layout: vertical = -90 degrees; horizontal = 0 degrees.
+ * @param {?number=} opt_value rotation.
+ * @return {number|anychart.elements.TextMarker} Rotation or self for chaining.
+ */
+anychart.elements.TextMarker.prototype.rotation = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.rotation_ != opt_value) {
+      this.rotation_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.rotation_;
+};
+
+
+/**
  * Get/set text marker anchor settings.
  * @param {(anychart.enums.Anchor|string)=} opt_value Text marker anchor settings.
  * @return {anychart.elements.TextMarker|anychart.enums.Anchor} Text marker anchor settings or itself for method chaining.
@@ -457,6 +481,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
     var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
 
     var textElement = this.markerElement();
+    textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     textElement.width(null);
     textElement.height(null);
 
@@ -491,9 +516,16 @@ anychart.elements.TextMarker.prototype.draw = function() {
     anychart.utils.applyOffsetByAnchor(position, anchor, offsetX, offsetY);
     this.applyTextSettings(textElement, true);
 
+    var angle = anychart.utils.toNumber(this.rotation_);
+    var rotation = isNaN(angle) ?
+        this.isHorizontal() ?
+            0 : -90 :
+            angle;
+
     textElement
         .x(position.x)
-        .y(position.y);
+        .y(position.y)
+        .setRotationByAnchor(rotation);
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -594,6 +626,7 @@ anychart.elements.TextMarker.prototype.remove = function() {
 anychart.elements.TextMarker.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
   data['layout'] = this.layout();
+  data['rotation'] = this.rotation();
   data['align'] = this.align();
   data['anchor'] = this.anchor();
   data['value'] = this.value();
@@ -615,6 +648,7 @@ anychart.elements.TextMarker.prototype.deserialize = function(value) {
   this.textSettings(value);
 
   this.layout(value['layout']);
+  this.rotation(value['rotation']);
   this.align(value['align']);
   this.anchor(value['anchor']);
   this.value(value['value']);
@@ -674,6 +708,7 @@ anychart.elements.TextMarker.prototype['parentBounds'] = anychart.elements.TextM
 anychart.elements.TextMarker.prototype['anchor'] = anychart.elements.TextMarker.prototype.anchor;
 anychart.elements.TextMarker.prototype['align'] = anychart.elements.TextMarker.prototype.align;
 anychart.elements.TextMarker.prototype['layout'] = anychart.elements.TextMarker.prototype.layout;
+anychart.elements.TextMarker.prototype['rotation'] = anychart.elements.TextMarker.prototype.rotation;
 anychart.elements.TextMarker.prototype['offsetX'] = anychart.elements.TextMarker.prototype.offsetX;
 anychart.elements.TextMarker.prototype['offsetY'] = anychart.elements.TextMarker.prototype.offsetY;
 anychart.elements.TextMarker.prototype['text'] = anychart.elements.TextMarker.prototype.text;
