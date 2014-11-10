@@ -201,7 +201,6 @@ anychart.elements.Legend = function() {
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
   tooltip.isFloating(true);
-  tooltip.content().useHtml(true);
   tooltip.resumeSignalsDispatching(false);
 
   var tooltipTitle = /** @type {anychart.elements.Title} */(tooltip.title());

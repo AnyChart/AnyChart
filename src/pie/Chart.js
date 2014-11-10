@@ -220,6 +220,10 @@ anychart.pie.Chart = function(opt_data) {
     }
   }, false, this);
 
+  this.legend().tooltip().contentFormatter(function() {
+    return (this['value']) + '\n' + this['meta']['pointValue'];
+  });
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -2155,6 +2159,9 @@ anychart.pie.Chart.prototype.createLegendItemsProvider = function() {
     var x = iterator.get('x');
 
     data.push({
+      'meta': {
+        'pointValue': iterator.get('value')
+      },
       'index': index,
       'text': String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x')),
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
