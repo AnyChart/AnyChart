@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.ScatterTicks');
 goog.require('anychart.Base');
 goog.require('anychart.enums');
+goog.require('goog.array');
 
 
 
@@ -218,6 +219,7 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
     this.maxCount_ = NaN;
     this.interval_ = NaN;
     this.explicit_ = goog.array.slice(ticks, 0);
+    goog.array.removeDuplicates(this.explicit_);
     goog.array.sort(this.explicit_, anychart.utils.compareNumericAsc);
     this.autoTicks_ = null;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -237,8 +239,11 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
  * @return {!Array} Array of ticks.
  */
 anychart.scales.ScatterTicks.prototype.get = function() {
-  if (this.explicit_)
-    return this.explicit_;
+  if (this.explicit_) {
+    return goog.array.filter(this.explicit_, function(el) {
+      return !(el < this.scale_.minimum() || el > this.scale_.maximum());
+    }, this);
+  }
   this.scale_.calculate();
   return /** @type {!Array} */(this.autoTicks_);
 };

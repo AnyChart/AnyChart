@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.DateTimeTicks');
 
 goog.require('anychart.Base');
+goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
 
@@ -219,7 +220,8 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
   if (this.explicit_ != ticks) {
     this.count_ = NaN;
     this.interval_ = null;
-    this.explicit_ = ticks;
+    this.explicit_ = goog.array.clone(ticks);
+    goog.array.removeDuplicates(this.explicit_);
     this.autoTicks_ = null;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
@@ -245,8 +247,11 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
  * @return {!Array} Array of ticks.
  */
 anychart.scales.DateTimeTicks.prototype.get = function() {
-  if (this.explicit_)
-    return this.explicit_;
+  if (this.explicit_) {
+    return goog.array.filter(this.explicit_, function(el) {
+      return !(el < this.scale_.minimum() || el > this.scale_.maximum());
+    }, this);
+  }
   this.scale_.calculate();
   return /** @type {!Array} */(this.autoTicks_);
 };

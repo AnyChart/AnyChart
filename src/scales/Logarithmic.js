@@ -3,6 +3,7 @@ goog.provide('anychart.scales.Logarithmic');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.scales.Linear');
+goog.require('goog.array');
 
 
 
@@ -61,8 +62,8 @@ anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRa
 anychart.scales.Logarithmic.prototype.inverseTransform = function(ratio) {
   this.calculate();
   if (this.isInverted) ratio = 1 - ratio;
-  var x = (ratio * this.range + anychart.math.log(this.min));
-  return anychart.math.round(Math.exp(x), 7);
+  var x = (ratio * this.range + this.transformedMin_);
+  return anychart.math.pow(this.logBaseVal, x);
 };
 
 
