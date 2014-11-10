@@ -503,19 +503,43 @@ anychart.elements.LegendItem.prototype.iconStroke = function(opt_value) {
 
 
 /**
- * Getter/setter for icon fill setting.
- * @param {(acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill)=} opt_value Icon fill setting.
- * @return {(acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|string|anychart.elements.LegendItem)} Icon fill setting or self for method chaining.
+ * Getter for icon hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for icon hatch fill settings.
+ * @example
+ *  var item = anychart.elements.legendItem()
+ *    .x(5)
+ *    .y(5)
+ *    .iconHatchFill('diagonalbrick')
+ *    .container(stage).draw();
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.elements.LegendItem} {@link anychart.elements.LegendItem} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.elements.LegendItem|Function} Hatch fill.
  */
-anychart.elements.LegendItem.prototype.iconHatchFill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.iconHatchFill_ != opt_value) {
-      this.iconHatchFill_ = opt_value;
+anychart.elements.LegendItem.prototype.iconHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+    if (hatchFill != this.iconHatchFill_) {
+      this.iconHatchFill_ = hatchFill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.iconHatchFill_;
+  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} */ (this.iconHatchFill_);
 };
 
 
