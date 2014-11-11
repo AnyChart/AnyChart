@@ -286,7 +286,7 @@ anychart.elements.Credits.prototype.drawLogo_ = function(element) {
       .lineTo(13.5, 16.5)
       .lineTo(13.5, 5);
   columnPath
-      .stroke('#808080', 1, 0.9)
+      .stroke('1 #808080 0.4')
       .fill('#808080', 0.9)
       .scale(0.5, 0.5);
 };
@@ -324,7 +324,7 @@ anychart.elements.Credits.prototype.draw = function() {
     this.domElement_ = goog.dom.createDom(
         goog.dom.TagName.A,
         anychart.elements.Credits.CssClass_.CREDITS
-    );
+        );
   }
 
   if (!anychart.elements.Credits.creditsCss_) {
