@@ -1,9 +1,9 @@
 goog.provide('anychart.modules.bar');
 
-goog.require('anychart');
 goog.require('anychart.cartesian.Chart');
 goog.require('anychart.cartesian.series.Bar');
 goog.require('anychart.cartesian.series.RangeBar');
+goog.require('anychart.modules.base');
 
 
 /**

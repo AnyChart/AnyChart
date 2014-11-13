@@ -1,7 +1,7 @@
 goog.provide('anychart.modules.bullet');
 
-goog.require('anychart');
 goog.require('anychart.bullet.Chart');
+goog.require('anychart.modules.base');
 
 
 /**

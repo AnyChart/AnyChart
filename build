@@ -11,6 +11,7 @@ import shutil
 import time
 import re
 import argparse
+import shlex
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
@@ -30,6 +31,7 @@ JS_DOC_PATH = os.path.join(CONTRIB_PATH, 'jsdoc')
 API_REFERENCE_ENGINE_PATH = os.path.join(CONTRIB_PATH, 'api-reference-engine')
 
 #closure tools
+EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs.js')
 COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'compiler.jar')
 CLOSURE_LIBRARY_PATH = os.path.join(CONTRIB_PATH, 'closure-library')
 CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
@@ -79,7 +81,7 @@ def __sync_contrib():
     if not __has_closure_compiler():
         print 'Download closure compiler'
         __download_and_unzip_from_http(
-            'http://dl.google.com/closure-compiler/compiler-20131014.zip',
+            'http://dl.google.com/closure-compiler/compiler-20141023.zip',
             'compiler'
         )
 
@@ -138,7 +140,7 @@ class OptimizationLevel:
 
 
 def __add_option(flags, flag_name, flag_value):
-    flags.append('--compiler_flags=--' + flag_name + '=' + flag_value)
+    flags.append('--' + flag_name + ' ' + flag_value)
 
 
 def __set_pretty_print(flags):
@@ -156,18 +158,20 @@ def __set_optimization_level(flags, level):
 
 
 def __get_output_file_arg(output_file):
-    return ['--output_file=' + output_file]
+    return ['--js_output_file ' + output_file]
 
 
 def __get_name_spaces(modules):
     result = []
     for module in modules:
-        result.append("--namespace=anychart.modules.%s" % module)
+        result.append("--closure_entry_point anychart.modules.%s" % module)
     return result
 
 
 def __get_roots():
-    return ['--root=%s' % SRC_PATH, '--root=%s' % CLOSURE_LIBRARY_PATH, '--root=%s' % GRAPHICS_SRC_PATH]
+    return ['--js="%s"' % os.path.join(SRC_PATH, '**.js'),
+        '--js="%s"' % os.path.join(CLOSURE_LIBRARY_PATH, '**.js'),
+        '--js="%s"' % os.path.join(GRAPHICS_SRC_PATH, '**.js')]
 
 
 def __get_not_optimized_compiler_args():
@@ -180,36 +184,74 @@ def __get_not_optimized_compiler_args():
 def __get_developers_edition_compiler_args():
     flag = 'true' if __is_develop() else 'false'
     return [
-        '--compiler_flags=--define="goog.DEBUG=%s"' % flag,
-        '--compiler_flags=--define="anychart.DEVELOP=%s"' % flag,
+        '--define "goog.DEBUG=%s"' % flag,
+        '--define "anychart.DEVELOP=%s"' % flag,
     ]
 
 
 def __get_optimized_compiler_args():
     compiler_args = [
-        '--compiler_flags=--warning_level=VERBOSE',
-        '--compiler_flags=--generate_exports',
-        '--compiler_flags=--jscomp_warning=deprecated',
-        '--compiler_flags=--jscomp_warning=checkTypes',
-        '--compiler_flags=--jscomp_warning=nonStandardJsDocs',
-        '--compiler_flags=--jscomp_warning=checkRegExp',
-        '--compiler_flags=--jscomp_warning=checkVars',
-        '--compiler_flags=--jscomp_warning=invalidCasts',
-        '--compiler_flags=--jscomp_warning=missingProperties',
-        '--compiler_flags=--jscomp_warning=undefinedVars',
-        '--compiler_flags=--jscomp_warning=duplicateMessage',
-        '--compiler_flags=--jscomp_warning=globalThis',
-        '--compiler_flags=--jscomp_warning=internetExplorerChecks',
-        '--compiler_flags=--jscomp_warning=misplacedTypeAnnotation',
-        '--compiler_flags=--jscomp_warning=suspiciousCode',
-        '--compiler_flags=--jscomp_warning=strictModuleDepCheck',
-        '--compiler_flags=--jscomp_warning=typeInvalidation',
-        '--compiler_flags=--jscomp_warning=undefinedNames',
-        '--compiler_flags=--jscomp_warning=unknownDefines',
-        '--compiler_flags=--jscomp_warning=uselessCode',
-        '--compiler_flags=--jscomp_warning=visibility',
+        '--warning_level VERBOSE',
+        '--jscomp_warning accessControls',
+        '--jscomp_warning ambiguousFunctionDecl',
+        '--jscomp_warning checkEventfulObjectDisposal',
+        '--jscomp_warning checkRegExp',
+        '--jscomp_warning checkStructDictInheritance',
+        '--jscomp_warning checkTypes',
+        '--jscomp_warning checkVars',
+        '--jscomp_warning conformanceViolations',
+        '--jscomp_warning const',
+        '--jscomp_warning constantProperty',
+        '--jscomp_warning deprecated',
+        '--jscomp_warning duplicateMessage',
+        '--jscomp_warning es3',
+        '--jscomp_warning es5Strict',
+        '--jscomp_warning externsValidation',
+        '--jscomp_warning fileoverviewTags',
+        '--jscomp_warning globalThis',
+        '--jscomp_warning inferredConstCheck',
+        '--jscomp_warning internetExplorerChecks',
+        '--jscomp_warning invalidCasts',
+        '--jscomp_warning misplacedTypeAnnotation',
+        '--jscomp_warning missingGetCssName',
+        '--jscomp_warning missingProperties',
+        '--jscomp_warning missingProvide',
+        '--jscomp_warning missingRequire',
+        '--jscomp_warning missingReturn',
+        '--jscomp_warning newCheckTypes',
+        '--jscomp_warning nonStandardJsDocs',
+        #'--jscomp_warning reportUnknownTypes',
+        '--jscomp_warning suspiciousCode',
+        '--jscomp_warning strictModuleDepCheck',
+        '--jscomp_warning typeInvalidation',
+        '--jscomp_warning undefinedNames',
+        '--jscomp_warning undefinedVars',
+        '--jscomp_warning unknownDefines',
+        '--jscomp_warning uselessCode',
+        #'--jscomp_warning useOfGoogBase',
+        '--jscomp_warning visibility',
+        '--generate_exports'
+        #'--jscomp_warning deprecated',
+        #'--jscomp_warning checkTypes',
+        #'--jscomp_warning nonStandardJsDocs',
+        #'--jscomp_warning checkRegExp',
+        #'--jscomp_warning checkVars',
+        #'--jscomp_warning invalidCasts',
+        #'--jscomp_warning missingProperties',
+        #'--jscomp_warning undefinedVars',
+        #'--jscomp_warning duplicateMessage',
+        #'--jscomp_warning globalThis',
+        #'--jscomp_warning internetExplorerChecks',
+        #'--jscomp_warning misplacedTypeAnnotation',
+        #'--jscomp_warning suspiciousCode',
+        #'--jscomp_warning strictModuleDepCheck',
+        #'--jscomp_warning typeInvalidation',
+        #'--jscomp_warning undefinedNames',
+        #'--jscomp_warning unknownDefines',
+        #'--jscomp_warning uselessCode',
+        #'--jscomp_warning visibility',
         # uncomment to have some fun ;)
-        #'--compiler_flags=--jscomp_warning=reportUnknownTypes',
+        #'--jscomp_warning reportUnknownTypes',
     ]
     __set_optimization_level(compiler_args, OptimizationLevel.ADVANCED)
     return compiler_args
@@ -217,19 +259,21 @@ def __get_optimized_compiler_args():
 
 def __get_default_compiler_args():
     result = [
-        'python',
-        CLOSURE_BUILDER_PATH,
-        '--output_mode=compiled',
-        '--compiler_jar=' + COMPILER_PATH,
-        '--compiler_flags=--charset=UTF-8',
-        '--compiler_flags=--define="goog.DEBUG=true"',
-        '--compiler_flags=--define="anychart.VERSION=\'%s\'"' % __get_version(True),
-        '--compiler_flags=--extra_annotation_name="includeDoc"',
-        '--compiler_flags=--extra_annotation_name="illustration"',
-        '--compiler_flags=--extra_annotation_name="illustrationDesc"',
-        '--compiler_flags=--extra_annotation_name="ignoreDoc"',
-        '--compiler_flags=--extra_annotation_name="propertyDoc"',
-        '--compiler_flags=--extra_annotation_name="shortDescription"',
+        'java -jar',
+        COMPILER_PATH,
+        '--charset UTF-8',
+        '--define "anychart.VERSION=\'%s\'"' % __get_version(True),
+        '--only_closure_dependencies',
+        #'--process_closure_primitives',
+        #'--use_types_for_optimization',
+        #'--use_only_custom_externs',
+        '--externs ' + EXTERNS_PATH,
+        '--extra_annotation_name "includeDoc"',
+        '--extra_annotation_name "illustration"',
+        '--extra_annotation_name "illustrationDesc"',
+        '--extra_annotation_name "ignoreDoc"',
+        '--extra_annotation_name "propertyDoc"',
+        '--extra_annotation_name "shortDescription"',
     ]
 
     return result
@@ -290,15 +334,17 @@ def __build_project(modules):
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
-               ['--compiler_flags=--output_wrapper=(function(){%output%})()',
-               '--compiler_flags=--property_map_output_file=%s' % output_file + '_prop_out.txt',
-               '--compiler_flags=--variable_map_output_file=%s' % output_file + '_var_out.txt']
-
+               ['--output_wrapper "(function(){%output%})()"',
+               '--property_renaming_report %s' % output_file + '_prop_out.txt',
+               '--variable_renaming_report %s' % output_file + '_var_out.txt']
 
     __call_compiler(commands)
 
 
 def __call_compiler(commands):
+    commands = " ".join(commands).replace('\\','\\\\')
+    commands = shlex.split(commands)
+    #print commands
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (output, err) = p.communicate()
     retcode = p.poll()
@@ -721,3 +767,7 @@ if __name__ == '__main__':
     except StandardError as e:
         print e
         sys.exit(1)
+
+
+#java -jar c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\compiler\\compiler.jar --charset UTF-8 --define "goog.DEBUG" --define "anychart.VERSION='7.3.0.505'" --extra_annotation_name "includeDoc" --extra_annotation_name "illustration" --extra_annotation_name "illustrationDesc" --extra_annotation_name "ignoreDoc" --extra_annotation_name "propertyDoc" --extra_annotation_name "shortDescription" --warning_level VERBOSE --jscomp_warning deprecated --jscomp_warning checkTypes --jscomp_warning nonStandardJsDocs --jscomp_warning checkRegExp --jscomp_warning checkVars --jscomp_warning invalidCasts --jscomp_warning missingProperties --jscomp_warning undefinedVars --jscomp_warning duplicateMessage --jscomp_warning globalThis --jscomp_warning internetExplorerChecks --jscomp_warning misplacedTypeAnnotation --jscomp_warning suspiciousCode --jscomp_warning strictModuleDepCheck --jscomp_warning typeInvalidation --jscomp_warning undefinedNames --jscomp_warning unknownDefines --jscomp_warning uselessCode --jscomp_warning visibility --compilation_level ADVANCED_OPTIMIZATIONS --define "goog.DEBUG=false" --define "anychart.DEVELOP=false" --only_closure_dependencies --closure_entry_point anychart.modules.anychart --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\src\\**.js" --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\closure-library\\**.js" --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\graphics\\src\\**.js" --js_output_file c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js --output_wrapper "(function(){%output%})()" --property_renaming_report c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js_prop_out.txt --variable_renaming_report c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js_var_out.txt
+#java -jar c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\compiler\\compiler.jar --charset UTF-8 --define "goog.DEBUG" --define "anychart.VERSION='7.3.0.505'" --extra_annotation_name "includeDoc" --extra_annotation_name "illustration" --extra_annotation_name "illustrationDesc" --extra_annotation_name "ignoreDoc" --extra_annotation_name "propertyDoc" --extra_annotation_name "shortDescription" --warning_level VERBOSE --jscomp_warning deprecated --jscomp_warning checkTypes --jscomp_warning nonStandardJsDocs --jscomp_warning checkRegExp --jscomp_warning checkVars --jscomp_warning invalidCasts --jscomp_warning missingProperties --jscomp_warning undefinedVars --jscomp_warning duplicateMessage --jscomp_warning globalThis --jscomp_warning internetExplorerChecks --jscomp_warning misplacedTypeAnnotation --jscomp_warning suspiciousCode --jscomp_warning strictModuleDepCheck --jscomp_warning typeInvalidation --jscomp_warning undefinedNames --jscomp_warning unknownDefines --jscomp_warning uselessCode --jscomp_warning visibility --compilation_level ADVANCED_OPTIMIZATIONS --define "goog.DEBUG=false" --define "anychart.DEVELOP=false" --only_closure_dependencies --closure_entry_point anychart.modules.anychart --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\src\\**.js" --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\closure-library\\**.js" --js "c:\\Users\\Grasshopper\\Work\\ACDVF\\contrib\\graphics\\src\\**.js" --js_output_file c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js --output_wrapper "(function(){%output%})()" --property_renaming_report c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js_prop_out.txt --variable_renaming_report c:\\Users\\Grasshopper\\Work\\ACDVF\\out\\anychart.min.js_var_out.txt

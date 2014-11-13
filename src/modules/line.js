@@ -1,10 +1,10 @@
 goog.provide('anychart.modules.line');
 
-goog.require('anychart');
 goog.require('anychart.cartesian.Chart');
 goog.require('anychart.cartesian.series.Line');
 goog.require('anychart.cartesian.series.Spline');
 goog.require('anychart.cartesian.series.StepLine');
+goog.require('anychart.modules.base');
 
 
 /**

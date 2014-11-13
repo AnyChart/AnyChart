@@ -1,5 +1,6 @@
 goog.provide('anychart.Base');
 
+goog.require('anychart');
 goog.require('anychart.enums');
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');

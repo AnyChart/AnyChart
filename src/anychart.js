@@ -1,7 +1,6 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
-goog.require('anychart.data');
 goog.require('anychart.math');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');

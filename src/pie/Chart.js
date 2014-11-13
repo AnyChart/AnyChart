@@ -123,8 +123,9 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Default fill function.
-   * @this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * @return {acgraph.vector.Fill} Fill for a pie slice.
+   * this {{index:number, sourceColor: acgraph.vector.Fill}}
+   * return {acgraph.vector.Fill} Fill for a pie slice.
+   * @type {acgraph.vector.Fill|Function}
    * @private
    */
   this.fill_ = function() {
@@ -133,33 +134,36 @@ anychart.pie.Chart = function(opt_data) {
 
   /**
    * Default stroke function.
-   * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * @return {acgraph.vector.Stroke} Stroke for a pie slice.
+   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
+   * return {acgraph.vector.Stroke} Stroke for a pie slice.
+   * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.stroke_ = function() {
+  this.stroke_ = (function() {
     return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
-  };
+  });
 
   /**
    * Default fill function for hover state.
-   * * @this {{index:number, sourceColor: acgraph.vector.Fill}}
-   * @return {acgraph.vector.Fill} Fill for a pie slice in hover state.
+   * this {{index:number, sourceColor: acgraph.vector.Fill}}
+   * return {acgraph.vector.Fill} Fill for a pie slice in hover state.
+   * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.hoverFill_ = function() {
+  this.hoverFill_ = (function() {
     return /** @type {acgraph.vector.Fill} */ (anychart.color.lighten(this['sourceColor']));
-  };
+  });
 
   /**
    * Default stroke function for hover state.
-   * @this {{index:number, sourceColor: acgraph.vector.Stroke}}
-   * @return {acgraph.vector.Stroke} Stroke for a pie slice in hover state.
+   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
+   * return {acgraph.vector.Stroke} Stroke for a pie slice in hover state.
+   * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.hoverStroke_ = function() {
+  this.hoverStroke_ = (function() {
     return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
-  };
+  });
 
   /**
    * Hatch fill.

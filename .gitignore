@@ -3,7 +3,6 @@
 .idea
 *.pid
 contrib/compiler/
-*.swp
 out/
 src/deps.js
 *.swo

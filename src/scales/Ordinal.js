@@ -46,7 +46,7 @@ anychart.scales.Ordinal = function() {
 
   /**
    * Values comparator for discrete input domain.
-   * @type {Function}
+   * @type {!Function}
    * @private
    */
   this.comparator_ = anychart.scales.Ordinal.DEFAULT_COMPARATOR_;

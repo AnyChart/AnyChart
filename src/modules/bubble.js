@@ -1,8 +1,8 @@
 goog.provide('anychart.modules.bubble');
 
-goog.require('anychart');
 goog.require('anychart.cartesian.Chart');
 goog.require('anychart.cartesian.series.Bubble');
+goog.require('anychart.modules.base');
 
 
 /**

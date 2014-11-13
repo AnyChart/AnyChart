@@ -271,14 +271,12 @@ anychart.data.Tree.prototype.addData = function(data, opt_fillingMethod) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Default index comparison function.
- * @param {anychart.data.Tree.IndexKeyValue} item1 - First item.
- * @param {anychart.data.Tree.IndexKeyValue} item2 - Second item.
- * @return {number} - Comparison result.
+ * @type {!Function}
  * @private
  */
-anychart.data.Tree.prototype.comparisonFunction_ = function(item1, item2) {
+anychart.data.Tree.prototype.comparisonFunction_ = (function(item1, item2) {
   return anychart.utils.compareAsc(item1.key, item2.key);
-};
+});
 
 
 /**
@@ -435,10 +433,10 @@ anychart.data.Tree.prototype.search = function(soughtField, valueOrEvaluator, op
   if (this.index_[soughtField]) { //Fast search: index exists.
     var resultIndex = isEvaluator ?
         goog.array.binarySelect(this.index_[soughtField],
-            /** @type {Function} */ (valueOrEvaluator),
+            /** @type {!Function} */ (valueOrEvaluator),
             /** @type {Object} */ (opt_comparisonFnOrEvaluatorContext)) :
         goog.array.binarySearch(this.index_[soughtField], {key: valueOrEvaluator},
-            /** @type {Function} */ (opt_comparisonFnOrEvaluatorContext) || /** @type {Function} */ (this.comparisonFunction_));
+            /** @type {!Function} */ (opt_comparisonFnOrEvaluatorContext) || /** @type {!Function} */ (this.comparisonFunction_));
 
     result = resultIndex >= 0 ? this.index_[soughtField][resultIndex].value : null;
 

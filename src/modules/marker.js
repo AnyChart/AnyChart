@@ -1,8 +1,8 @@
 goog.provide('anychart.modules.marker');
 
-goog.require('anychart');
 goog.require('anychart.cartesian.Chart');
 goog.require('anychart.cartesian.series.Marker');
+goog.require('anychart.modules.base');
 
 
 /**
