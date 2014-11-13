@@ -1155,10 +1155,15 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   } else
     titleBounds = null;
 
+  var contentWidth = this.calculateContentWidth_();
+  var contentHeight = this.calculateContentHeight_();
+
   if (separator.enabled()) {
     separator.parentBounds(null);
     if (titleBounds)
       separator.width(titleBounds.width);
+    else
+      separator.width((separator.orientation() == anychart.enums.Orientation.LEFT || separator.orientation() == anychart.enums.Orientation.RIGHT) ? contentHeight : contentWidth);
     separatorBounds = separator.getContentBounds();
   } else
     separatorBounds = null;
@@ -1167,9 +1172,6 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   paginatorBounds = paginator.getPixelBounds();
 
   var orientation;
-
-  var contentWidth = this.calculateContentWidth_();
-  var contentHeight = this.calculateContentHeight_();
 
   if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
     if (contentWidth > maxWidth) paginator.enabled(true);
