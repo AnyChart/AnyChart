@@ -128,9 +128,9 @@ anychart.pie.Chart = function(opt_data) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.fill_ = function() {
+  this.fill_ = (function() {
     return /** @type {acgraph.vector.Fill} */ (this['sourceColor']);
-  };
+  });
 
   /**
    * Default stroke function.
