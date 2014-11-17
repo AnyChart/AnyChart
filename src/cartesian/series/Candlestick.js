@@ -120,15 +120,14 @@ anychart.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function()
     path.clear()
         .moveTo(x, high)
         .lineTo(x, rising ? close : open)
-        .close()
         .moveTo(x - widthHalf, open)
         .lineTo(x + widthHalf, open)
         .lineTo(x + widthHalf, close)
         .lineTo(x - widthHalf, close)
-        .close()
+        .lineTo(x - widthHalf, open)
         .moveTo(x, low)
-        .lineTo(x, rising ? open : close)
-        .close();
+        .lineTo(x, rising ? open : close);
+
 
     this.colorizeShape(false);
 
@@ -169,7 +168,12 @@ anychart.cartesian.series.Candlestick.prototype.colorizeShape = function(hover) 
       fill = this.getFinalFallingFill(hover);
       stroke = this.getFinalFallingStroke(hover);
     }
-    shape.stroke(stroke, 2, 'none', acgraph.vector.StrokeLineJoin.ROUND);
+
+    var lineCap = stroke && stroke['dash'] && !anychart.utils.isNone(stroke['dash']) ?
+        acgraph.vector.StrokeLineCap.BUTT :
+        acgraph.vector.StrokeLineCap.ROUND;
+
+    shape.stroke(stroke, 2, 'none', acgraph.vector.StrokeLineJoin.MITER, lineCap);
     shape.fill(fill);
   }
 };

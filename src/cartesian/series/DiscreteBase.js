@@ -79,14 +79,6 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
     this.rootElement.clear();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.rootLayer.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-    if (this.hatchFillRootElement)
-      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
     if (!this.hatchFillRootElement) {
       this.hatchFillRootElement = new anychart.utils.TypedLayer(
@@ -98,6 +90,14 @@ anychart.cartesian.series.DiscreteBase.prototype.startDrawing = function() {
       this.hatchFillRootElement.disablePointerEvents(true);
     }
     this.hatchFillRootElement.clear();
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.rootLayer.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+    if (this.hatchFillRootElement)
+      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 };
 

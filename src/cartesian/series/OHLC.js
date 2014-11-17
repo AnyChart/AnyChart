@@ -102,13 +102,10 @@ anychart.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
     path.clear()
         .moveTo(x, high)
         .lineTo(x, low)
-        .close()
         .moveTo(x - widthHalf, open)
         .lineTo(x, open)
-        .close()
         .moveTo(x + widthHalf, close)
-        .lineTo(x, close)
-        .close();
+        .lineTo(x, close);
 
     this.colorizeShape(false);
 
@@ -129,7 +126,11 @@ anychart.cartesian.series.OHLC.prototype.colorizeShape = function(hover) {
     } else {
       stroke = this.getFinalFallingStroke(hover);
     }
-    shape.stroke(stroke, 2, 'none', acgraph.vector.StrokeLineJoin.ROUND);
+    var lineCap = stroke && stroke['dash'] && !anychart.utils.isNone(stroke['dash']) ?
+        acgraph.vector.StrokeLineCap.BUTT :
+        acgraph.vector.StrokeLineCap.ROUND;
+
+    shape.stroke(stroke, 2, 'none', acgraph.vector.StrokeLineJoin.MITER, lineCap);
   }
 };
 
