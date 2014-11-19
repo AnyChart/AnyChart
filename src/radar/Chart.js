@@ -579,13 +579,13 @@ anychart.radar.Chart.prototype.createSeriesByType_ = function(type, data, opt_cs
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.radar.Chart.ZINDEX_SERIES) + inc);
     var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1));
     if (instance.hasMarkers()) {
-      instance.markers().setAutoZIndex(anychart.polar.Chart.ZINDEX_MARKER + inc);
+      instance.markers().setAutoZIndex(anychart.radar.Chart.ZINDEX_MARKER + inc);
       instance.markers().setAutoType(markerType);
     } else {
       // this else would be only if instance is Marker series
       instance.type(markerType);
     }
-    instance.labels().setAutoZIndex(anychart.polar.Chart.ZINDEX_LABEL + inc + anychart.polar.Chart.ZINDEX_INCREMENT_MULTIPLIER / 2);
+    instance.labels().setAutoZIndex(anychart.radar.Chart.ZINDEX_LABEL + inc + anychart.radar.Chart.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(markerType);
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
