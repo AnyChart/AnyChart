@@ -1174,10 +1174,16 @@ anychart.elements.Legend.prototype.calculateBounds_ = function() {
   var orientation;
 
   if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
-    if (contentWidth > maxWidth) paginator.enabled(true);
+    if (contentWidth > maxWidth)
+      paginator.enabled(true);
+    else
+      paginator.enabled(false);
   }
   if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
-    if (contentHeight > maxHeight) paginator.enabled(true);
+    if (contentHeight > maxHeight)
+      paginator.enabled(true);
+    else
+      paginator.enabled(false);
   }
 
   var fullAreaWidth = 0;

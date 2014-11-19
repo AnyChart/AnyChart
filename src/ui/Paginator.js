@@ -426,8 +426,14 @@ anychart.ui.Paginator.prototype.createTextString_ = function() {
  */
 anychart.ui.Paginator.prototype.remove = function() {
   this.background().remove();
-  if (this.previousButton_) this.previousButton_.remove();
-  if (this.nextButton_) this.nextButton_.remove();
+  if (this.previousButton_) {
+    this.previousButton_.remove();
+    this.previousButton_.invalidate(anychart.ConsistencyState.CONTAINER);
+  }
+  if (this.nextButton_) {
+    this.nextButton_.remove();
+    this.nextButton_.invalidate(anychart.ConsistencyState.CONTAINER);
+  }
   if (this.text_) this.text_.parent(null);
 };
 
