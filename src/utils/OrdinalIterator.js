@@ -1,20 +1,20 @@
-goog.provide('anychart.cartesian.OrdinalIterator');
+goog.provide('anychart.utils.OrdinalIterator');
 
-goog.require('anychart.cartesian.ScatterIterator');
+goog.require('anychart.utils.ScatterIterator');
 
 
 
 /**
- * @param {!Array.<anychart.cartesian.series.Base>} series .
+ * @param {!Array.<(anychart.cartesian.series.Base|anychart.polar.series.Base|anychart.radar.series.Base)>} series .
  * @param {!Array} categories .
  * @param {Function=} opt_pointCallback .
  * @param {Function=} opt_missingCallback .
  * @param {Function=} opt_beforePointCallback .
  * @param {Function=} opt_afterPointCallback .
  * @constructor
- * @extends {anychart.cartesian.ScatterIterator}
+ * @extends {anychart.utils.ScatterIterator}
  */
-anychart.cartesian.OrdinalIterator = function(series, categories, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
+anychart.utils.OrdinalIterator = function(series, categories, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
     opt_afterPointCallback) {
   /**
    * @type {!Array}
@@ -24,16 +24,16 @@ anychart.cartesian.OrdinalIterator = function(series, categories, opt_pointCallb
 
   goog.base(this, series, false, opt_pointCallback, opt_missingCallback, opt_beforePointCallback, opt_afterPointCallback);
 };
-goog.inherits(anychart.cartesian.OrdinalIterator, anychart.cartesian.ScatterIterator);
+goog.inherits(anychart.utils.OrdinalIterator, anychart.utils.ScatterIterator);
 
 
 /** @inheritDoc */
-anychart.cartesian.OrdinalIterator.prototype.findMin = function(var_args) {
+anychart.utils.OrdinalIterator.prototype.findMin = function(var_args) {
   return this.categories[this.currentIndex];
 };
 
 
 /** @inheritDoc */
-anychart.cartesian.OrdinalIterator.prototype.normalize = function(value) {
+anychart.utils.OrdinalIterator.prototype.normalize = function(value) {
   return value;
 };

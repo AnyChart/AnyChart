@@ -191,7 +191,7 @@ anychart.cartesian.series.ContinuousBase.prototype.connectMissingPoints = functi
   if (goog.isDef(opt_value)) {
     opt_value = !!opt_value;
     if (this.connectMissing != opt_value) {
-      this.connectMissing = true;
+      this.connectMissing = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

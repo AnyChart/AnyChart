@@ -498,6 +498,70 @@ anychart.pieChart = anychart.pieChart || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.radarChart = anychart.radarChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.polarChart = anychart.polarChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.radarLineChart = anychart.radarLineChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar line chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.polarLineChart = anychart.polarLineChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar line chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.radarAreaChart = anychart.radarAreaChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar area chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.polarAreaChart = anychart.polarAreaChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar area chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.radarMarkerChart = anychart.radarMarkerChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar marker chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.polarMarkerChart = anychart.polarMarkerChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar marker chart']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -517,3 +581,11 @@ goog.exportSymbol('anychart.financialChart', anychart.financialChart);//linkedFr
 goog.exportSymbol('anychart.lineChart', anychart.lineChart);//linkedFromModule
 goog.exportSymbol('anychart.markerChart', anychart.markerChart);//linkedFromModule
 goog.exportSymbol('anychart.pieChart', anychart.pieChart);//linkedFromModule
+goog.exportSymbol('anychart.radarChart', anychart.radarChart);
+goog.exportSymbol('anychart.polarChart', anychart.polarChart);
+goog.exportSymbol('anychart.polarLineChart', anychart.polarLineChart);
+goog.exportSymbol('anychart.polarAreaChart', anychart.polarAreaChart);
+goog.exportSymbol('anychart.polarMarkerChart', anychart.polarMarkerChart);
+goog.exportSymbol('anychart.radarLineChart', anychart.radarLineChart);
+goog.exportSymbol('anychart.radarAreaChart', anychart.radarAreaChart);
+goog.exportSymbol('anychart.radarMarkerChart', anychart.radarMarkerChart);

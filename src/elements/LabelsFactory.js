@@ -921,9 +921,18 @@ anychart.elements.LabelsFactory.prototype.measure = function(formatProviderOrLab
  */
 anychart.elements.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
   var bounds = this.getDimension_(formatProviderOrLabel, opt_positionProvider, opt_settings);
-  var rotationAngle = /** @type {number} */(this.rotation());
 
-  var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(this.anchor()));
+  var rotation, anchor;
+  if (formatProviderOrLabel instanceof anychart.elements.LabelsFactory.Label) {
+    rotation = goog.isDef(formatProviderOrLabel.rotation()) ? formatProviderOrLabel.rotation() : this.rotation();
+    anchor = formatProviderOrLabel.anchor() || this.anchor();
+  } else {
+    rotation = goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.rotation();
+    anchor = goog.isDef(opt_settings) && opt_settings['anchor'] || this.anchor();
+  }
+
+  var rotationAngle = /** @type {number} */(rotation);
+  var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
   var tx = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(rotationAngle), point.x, point.y);
 
   var arr = bounds.toCoordinateBox() || [];

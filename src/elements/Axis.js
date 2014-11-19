@@ -2384,7 +2384,6 @@ anychart.elements.Axis.prototype.deserialize = function(value) {
   this.ticks(value['ticks']);
   this.minorTicks(value['minorTicks']);
 
-  this.stroke(value['stroke']);
   this.name(value['name']);
   this.length(parseFloat(value['length']));
   this.offsetX(value['offsetX']);

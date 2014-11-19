@@ -1,10 +1,10 @@
-goog.provide('anychart.cartesian.ScatterIterator');
+goog.provide('anychart.utils.ScatterIterator');
 
 
 
 /**
  * Synced iterator to iterate over synchronous data sets.
- * @param {!Array.<anychart.cartesian.series.Base>} series .
+ * @param {!Array.<(anychart.cartesian.series.Base|anychart.polar.series.Base|anychart.radar.series.Base)>} series .
  * @param {boolean} isDateTime .
  * @param {Function=} opt_pointCallback .
  * @param {Function=} opt_missingCallback .
@@ -12,10 +12,10 @@ goog.provide('anychart.cartesian.ScatterIterator');
  * @param {Function=} opt_afterPointCallback .
  * @constructor
  */
-anychart.cartesian.ScatterIterator = function(series, isDateTime, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
+anychart.utils.ScatterIterator = function(series, isDateTime, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
     opt_afterPointCallback) {
   /**
-   * @type {!Array.<anychart.cartesian.series.Base>}
+   * @type {!Array.<(anychart.cartesian.series.Base|anychart.polar.series.Base|anychart.radar.series.Base)>}
    * @protected
    */
   this.series = series;
@@ -82,9 +82,9 @@ anychart.cartesian.ScatterIterator = function(series, isDateTime, opt_pointCallb
 
 /**
  * Resets iterator cursor to the point before the first element.
- * @return {anychart.cartesian.ScatterIterator} Returns itself for chaining.
+ * @return {anychart.utils.ScatterIterator} Returns itself for chaining.
  */
-anychart.cartesian.ScatterIterator.prototype.reset = function() {
+anychart.utils.ScatterIterator.prototype.reset = function() {
   this.currentIndex = 0;
 
   for (var i = 0; i < this.iterators.length; i++) {
@@ -99,7 +99,7 @@ anychart.cartesian.ScatterIterator.prototype.reset = function() {
  * Advances the iterator cursor and returns if the next element is available.
  * @return {boolean} Availability if the subsequent element.
  */
-anychart.cartesian.ScatterIterator.prototype.advance = function() {
+anychart.utils.ScatterIterator.prototype.advance = function() {
   var i;
   var min = this.findMin.apply(this, this.xValues);
   var iteratorsToAdvance = [];
@@ -127,7 +127,7 @@ anychart.cartesian.ScatterIterator.prototype.advance = function() {
 /**
  * @protected
  */
-anychart.cartesian.ScatterIterator.prototype.invokeCallbacks = function() {
+anychart.utils.ScatterIterator.prototype.invokeCallbacks = function() {
   var i, activeSeries = [];
   for (i = 0; i < this.series.length; i++) {
     if (this.seriesStatus[i])
@@ -149,7 +149,7 @@ anychart.cartesian.ScatterIterator.prototype.invokeCallbacks = function() {
  * @return {*} Minimum of numbers except NaNs.
  * @protected
  */
-anychart.cartesian.ScatterIterator.prototype.findMin = function(var_args) {
+anychart.utils.ScatterIterator.prototype.findMin = function(var_args) {
   var argsLen = arguments.length;
   var res = NaN;
   for (var i = 0; i < argsLen; i++) {
@@ -166,7 +166,7 @@ anychart.cartesian.ScatterIterator.prototype.findMin = function(var_args) {
  * @param {*} value
  * @return {*}
  */
-anychart.cartesian.ScatterIterator.prototype.normalize = function(value) {
+anychart.utils.ScatterIterator.prototype.normalize = function(value) {
   return this.isDateTime ?
       anychart.utils.normalizeTimestamp(value) :
       anychart.utils.toNumber(value);

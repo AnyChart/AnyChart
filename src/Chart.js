@@ -785,7 +785,10 @@ anychart.Chart.prototype.draw = function() {
 
 
   //create root element only if draw is called
-  if (!this.rootElement) this.rootElement = acgraph.layer();
+  if (!this.rootElement) {
+    this.rootElement = acgraph.layer();
+    this.registerDisposable(this.rootElement);
+  }
 
   //suspend stage
   var stage = this.container() ? this.container().getStage() : null;

@@ -2,8 +2,6 @@ goog.provide('anychart.cartesian.Chart');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.Chart');
-goog.require('anychart.cartesian.OrdinalIterator');
-goog.require('anychart.cartesian.ScatterIterator');
 goog.require('anychart.cartesian.series.BarBase');
 goog.require('anychart.cartesian.series.Base');
 goog.require('anychart.cartesian.series.WidthBased');
@@ -17,7 +15,9 @@ goog.require('anychart.scales');
 goog.require('anychart.utils.DistinctColorPalette');
 goog.require('anychart.utils.HatchFillPalette');
 goog.require('anychart.utils.MarkerPalette');
+goog.require('anychart.utils.OrdinalIterator');
 goog.require('anychart.utils.RangeColorPalette');
+goog.require('anychart.utils.ScatterIterator');
 
 
 
@@ -1627,7 +1627,7 @@ anychart.cartesian.Chart.prototype.calculate = function() {
   var yScalesToCalc;
   /** @type {Object.<!Array.<anychart.cartesian.series.Base>>} */
   var xScales;
-  /** @type {anychart.cartesian.ScatterIterator} */
+  /** @type {anychart.utils.ScatterIterator} */
   var syncIterator;
   /** @type {Array.<*>} */
   var values;
@@ -1751,10 +1751,10 @@ anychart.cartesian.Chart.prototype.calculate = function() {
               this.resetStack();
             }, scale);
         if (goog.isArray(cats)) {
-          syncIterator = new anychart.cartesian.OrdinalIterator(xScales[xId], /** @type {!Array} */(cats),
+          syncIterator = new anychart.utils.OrdinalIterator(xScales[xId], /** @type {!Array} */(cats),
               pointCallback, null, beforePointCallback);
         } else {
-          syncIterator = new anychart.cartesian.ScatterIterator(xScales[xId], /** @type {boolean} */(cats),
+          syncIterator = new anychart.utils.ScatterIterator(xScales[xId], /** @type {boolean} */(cats),
               pointCallback, null, beforePointCallback);
         }
         while (syncIterator.advance()) {
@@ -2525,10 +2525,10 @@ anychart.cartesian.Chart.prototype.drawSeries_ = function() {
       }
     };
     if (goog.isArray(categories)) {
-      iterator = new anychart.cartesian.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb,
+      iterator = new anychart.utils.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb,
           beforeClb, afterClb);
     } else {
-      iterator = new anychart.cartesian.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb,
+      iterator = new anychart.utils.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb,
           afterClb);
     }
     for (i = 0; i < series.length; i++) {

@@ -270,6 +270,45 @@ anychart.enums.normalizeLayout = function(value, opt_default) {
 };
 
 
+/**
+ * Polar layout enumeration.
+ * @enum {string}
+ */
+anychart.enums.RadialGridLayout = {
+  /**
+   * Radial layout.
+   */
+  RADIAL: 'radial',
+  /**
+   * Angle layout.
+   */
+  CIRCUIT: 'circuit'
+};
+
+
+/**
+ * Normalizes user input layout to its enumeration values. Also accepts null. Defaults to opt_default or 'radial'.
+ *
+ * @param {*} value - Layout to normalize.
+ * @param {anychart.enums.RadialGridLayout=} opt_default Orientation to normalize.
+ * @return {anychart.enums.RadialGridLayout} Normalized orientation.
+ */
+anychart.enums.normalizePolarLayout = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'radial':
+    case 'r':
+    case 'rad':
+      return anychart.enums.RadialGridLayout.RADIAL;
+    case 'circuit':
+    case 'c':
+    case 'cir':
+      return anychart.enums.RadialGridLayout.CIRCUIT;
+  }
+  return opt_default || anychart.enums.RadialGridLayout.RADIAL;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Orientation.
@@ -1058,6 +1097,38 @@ anychart.enums.CartesianSeriesType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  RadarSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.RadarSeriesType = {
+  AREA: 'area',
+  LINE: 'line',
+  MARKER: 'marker'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  PolarSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.PolarSeriesType = {
+  AREA: 'area',
+  LINE: 'line',
+  MARKER: 'marker'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1114,6 +1185,9 @@ anychart.enums.WarningCode = {
 
 
 //exports
+goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
+goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
+
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_BOTTOM', anychart.enums.Anchor.LEFT_BOTTOM);
