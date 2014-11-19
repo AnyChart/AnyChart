@@ -83,7 +83,7 @@ anychart.cartesian.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
       if (goog.isBoolean(this.clip())) {
-        bounds = this.pixelBounds();
+        bounds = this.pixelBoundsCache;
         axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
       } else {
@@ -251,7 +251,7 @@ anychart.cartesian.series.ContinuousBase.prototype.getIndexByEvent = function(ev
   if (goog.isDef(event.target['__tagIndex']))
     return event.target['__tagIndex'];
   else {
-    var bounds = this.pixelBounds();
+    var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
     var x = event.clientX;
     var min, range;
     var value, index;

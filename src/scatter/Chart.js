@@ -1271,7 +1271,7 @@ anychart.scatter.Chart.prototype.drawContent = function(bounds) {
       series.container(this.rootElement);
       series.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_,
           this.leftAxisPadding_);
-      series.pixelBounds(this.dataBounds_);
+      series.parentBounds(this.dataBounds_);
     }
 
     this.calcBubbleSizes_();

@@ -145,14 +145,6 @@ anychart.elements.Title.prototype.textHeight_ = NaN;
 
 
 /**
- * Parent bounds stored.
- * @type {anychart.math.Rect}
- * @private
- */
-anychart.elements.Title.prototype.parentBounds_ = null;
-
-
-/**
  * Pixel bounds due to orientation, align, margins, padding, etc.
  * @type {anychart.math.Rect}
  * @private
@@ -221,68 +213,6 @@ anychart.elements.Title.prototype.defaultRotation_;
  * @private
  */
 anychart.elements.Title.prototype.transformation_ = null;
-
-
-/**
- * Returns bounds for positioning.
- * @return {anychart.math.Rect} Current parent bounds.
- *//**
- * Sets bound for positioning.
- * @illustration <t>simple</t>
- * var layer = stage.layer();
- * var stageBounds = anychart.math.rect(0, 0, stage.width(), stage.height());
- * var layerBounds = anychart.math.rect(0, 0, stage.width() / 3, stage.height() / 3);
- * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
- *      .stroke('2 red');
- * layer.text(2, 2, 'stageBounds');
- * var layer2 = stage.layer();
- * layer2.rect(0, 0, stage.width() / 3, stage.height() / 3)
- *      .stroke('2 blue');
- * layer2.text(2, -20, 'layerBounds');
- * layer2.translate(0, stage.height() / 4);
- * anychart.elements.title()
- *     .text('Title\n(stageBounds)')
- *     .container(layer2)
- *     .fontSize(14)
- *     .hAlign('center')
- *     .parentBounds(stageBounds)
- *     .draw();
- * anychart.elements.title()
- *     .text('Title\n(layerBounds)')
- *     .fontSize(14)
- *     .hAlign('center')
- *     .container(layer2)
- *     .parentBounds(layerBounds)
- *     .fontColor('gray')
- *     .draw();
- * @illustrationDesc
- * Title is inside a layer (marked with a blue frame), two title positioning options are shown:<br/>
- *   a. Gray - within the parent container.<br/>
- *   b. Black - when the stage bounds act as parent.
- * @example <t>listingOnly</t>
- * anychart.elements.title()
- *     .text('Title text')
- *     .container(layer2)
- *     .parentBounds(stageBounds)
- *     .draw();
- * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.Title} An instance of {@link anychart.elements.Title} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value .
- * @return {!anychart.elements.Title|anychart.math.Rect} .
- */
-anychart.elements.Title.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
 
 
 /**
@@ -693,7 +623,7 @@ anychart.elements.Title.prototype.draw = function() {
     this.calcActualBounds_();
     if (background) {
       // settings proper bounds to the background
-      background.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
+      background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
       background.draw();
       this.markConsistent(anychart.ConsistencyState.BACKGROUND);
     }
@@ -717,7 +647,7 @@ anychart.elements.Title.prototype.draw = function() {
 
   // If background appearance changed, we should do something about that.
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
-    background.pixelBounds(new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_));
+    background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
     background.draw();
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
   }
@@ -770,19 +700,12 @@ anychart.elements.Title.prototype.remove = function() {
  * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Title.prototype.getRemainingBounds = function() {
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_.clone();
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = stage.getBounds(); // cloned already
-    } else {
-      return new anychart.math.Rect(0, 0, 0, 0);
-    }
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  if (parentBounds)
+    parentBounds = parentBounds.clone();
+  else
+    parentBounds = anychart.math.rect(0, 0, 0, 0);
+
   if (!this.enabled())
     return parentBounds;
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
@@ -867,14 +790,7 @@ anychart.elements.Title.prototype.calcActualBounds_ = function() {
   var padding = this.padding();
   var margin = this.margin();
   /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;
   var orientation = this.orientation();
@@ -1170,7 +1086,6 @@ anychart.elements.title = function() {
 
 //exports
 goog.exportSymbol('anychart.elements.title', anychart.elements.title);
-anychart.elements.Title.prototype['parentBounds'] = anychart.elements.Title.prototype.parentBounds;//in docs/final
 anychart.elements.Title.prototype['text'] = anychart.elements.Title.prototype.text;//in docs/final
 anychart.elements.Title.prototype['background'] = anychart.elements.Title.prototype.background;//in docs/final
 anychart.elements.Title.prototype['rotation'] = anychart.elements.Title.prototype.rotation;//in docs/final

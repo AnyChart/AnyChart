@@ -414,7 +414,7 @@ anychart.elements.DataGrid.prototype.titleHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.isStandalone_) {
       if (this.controller_) {
-        if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.pixelBounds());
+        if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
         this.controller_.availableHeight(this.pixelBoundsCache_.height - opt_value - anychart.elements.DataGrid.ROW_SPACE);
       } else {
         if (this.titleHeight_ != opt_value) {
@@ -899,7 +899,7 @@ anychart.elements.DataGrid.prototype.draw = function() {
       this.controller_ = new anychart.gantt.Controller();
       this.registerDisposable(this.controller_);
 
-      if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.pixelBounds());
+      if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
 
       this.controller_
           .data(this.data_)
@@ -976,7 +976,7 @@ anychart.elements.DataGrid.prototype.drawInternal = function(visibleItems, start
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-      this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.pixelBounds());
+      this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
       this.getBase_().clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.invalidate(anychart.ConsistencyState.GRIDS);
@@ -1224,13 +1224,6 @@ anychart.elements.DataGrid.Column = function(dataGrid) {
    * @private
    */
   this.clip_ = null;
-
-  /**
-   * Parent bounds.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
 
   /**
    * Width of column.
@@ -1512,23 +1505,6 @@ anychart.elements.DataGrid.Column.prototype.titleInvalidated_ = function(event) 
 
 
 /**
- * Gets/sets parent bounds.
- * @param {anychart.math.Rect=} opt_value - Value to be set.
- * @return {(anychart.math.Rect|anychart.elements.DataGrid.Column)} - Current value or itself for method chaining.
- */
-anychart.elements.DataGrid.Column.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
-/**
  * Inner getter for this.base_.
  * @return {acgraph.vector.Layer}
  * @private
@@ -1650,7 +1626,7 @@ anychart.elements.DataGrid.Column.prototype.remove = function() {
  * @return {anychart.math.Rect}
  */
 anychart.elements.DataGrid.Column.prototype.calculateBounds = function() {
-  var parentBounds = this.dataGrid_.pixelBounds();
+  var parentBounds = this.dataGrid_.getPixelBounds();
   var width = anychart.utils.normalizeSize(this.width_ || 0, parentBounds.width);
   width = Math.max(anychart.elements.DataGrid.MIN_COLUMN_WIDTH, width);
   var height = anychart.utils.normalizeSize(this.height_ || 0, parentBounds.height);

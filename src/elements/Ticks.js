@@ -329,7 +329,7 @@ anychart.elements.Ticks.prototype.getTicksDrawer = function() {
 /**
  * Axis ticks drawer for top orientation.
  * @param {number} ratio Scale ratio.
- * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
@@ -337,7 +337,7 @@ anychart.elements.Ticks.prototype.getTicksDrawer = function() {
  */
 anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
+  var x = Math.round(bounds.left + ratio * bounds.width);
   /** @type {number} */
   var y = lineBounds.top;
   /** @type {number} */
@@ -362,7 +362,7 @@ anychart.elements.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBou
 /**
  * Axis ticks drawer for right orientation.
  * @param {number} ratio Scale ratio.
- * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
@@ -372,7 +372,7 @@ anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineB
   /** @type {number} */
   var x = lineBounds.left;
   /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
+  var y = Math.round(bounds.top + bounds.height - ratio * bounds.height);
   /** @type {number} */
   var dx;
 
@@ -395,7 +395,7 @@ anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineB
 /**
  * Axis ticks drawer for bottom orientation.
  * @param {number} ratio Scale ratio.
- * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
@@ -403,7 +403,7 @@ anychart.elements.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineB
  */
 anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
-  var x = Math.round(bounds.left() + ratio * (bounds.width()));
+  var x = Math.round(bounds.left + ratio * (bounds.width));
   /** @type {number} */
   var y = lineBounds.top;
   /** @type {number} */
@@ -428,7 +428,7 @@ anychart.elements.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, line
 /**
  * Axis ticks drawer for left orientation.
  * @param {number} ratio Scale ratio.
- * @param {anychart.utils.Bounds} bounds Axis bounds.
+ * @param {anychart.math.Rect} bounds Axis bounds.
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
@@ -438,7 +438,7 @@ anychart.elements.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineBo
   /** @type {number} */
   var x = lineBounds.left;
   /** @type {number} */
-  var y = Math.round(bounds.top() + bounds.height() - ratio * (bounds.height()));
+  var y = Math.round(bounds.top + bounds.height - ratio * (bounds.height));
   /** @type {number} */
   var dx;
 

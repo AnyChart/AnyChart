@@ -232,7 +232,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
 
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  markers.parentBounds(this.pixelBoundsCache);
 };
 
 
@@ -250,7 +250,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = function()
   this.markers().draw();
 
   if (this.clip()) {
-    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var markerDOM = this.markers().getDomElement();
     if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
   }

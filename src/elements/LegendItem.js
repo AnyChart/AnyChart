@@ -381,24 +381,6 @@ anychart.elements.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for parentBounds.
- * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {(anychart.math.Rect|anychart.elements.LegendItem)} Parent bounds or self for method chaining.
- */
-anychart.elements.LegendItem.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
-/**
  * Getter/setter for X coordinate of legend item.
  * @param {(number|string)=} opt_value New x coordinate.
  * @return {(number|string|anychart.elements.LegendItem)} X coordinate or self for method chaining.
@@ -671,16 +653,7 @@ anychart.elements.LegendItem.prototype.getHeight = function() {
 anychart.elements.LegendItem.prototype.calculateBounds_ = function() {
   var container = /** @type {acgraph.vector.ILayer} */ (this.container());
   var stage = container ? container.getStage() : null;
-  var parentBounds;
-
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
-
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   var parentWidth, parentHeight;
 
   if (parentBounds) {
@@ -1037,7 +1010,6 @@ anychart.elements.legendItem = function() {
 
 //exports
 goog.exportSymbol('anychart.elements.legendItem', anychart.elements.legendItem);
-anychart.elements.LegendItem.prototype['parentBounds'] = anychart.elements.LegendItem.prototype.parentBounds;
 anychart.elements.LegendItem.prototype['x'] = anychart.elements.LegendItem.prototype.x;
 anychart.elements.LegendItem.prototype['y'] = anychart.elements.LegendItem.prototype.y;
 anychart.elements.LegendItem.prototype['iconType'] = anychart.elements.LegendItem.prototype.iconType;

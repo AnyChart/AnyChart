@@ -227,7 +227,7 @@ anychart.radar.series.ContinuousBase.prototype.startDrawing = function() {
 
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  markers.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  markers.parentBounds(this.pixelBoundsCache);
 
   if (this.isConsistent() || !this.enabled()) return;
 

@@ -30,13 +30,6 @@ anychart.ui.Button = function() {
   this.height_ = null;
 
   /**
-   * Bounds of a button parent element.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * Start state of a button.
    * @type {anychart.ui.Button.State}
    * @private
@@ -371,24 +364,6 @@ anychart.ui.Button.prototype.position = function(opt_value) {
 
 
 /**
- * Bounds of button parent element. Need to calculate percent-values of width, height.
- * @param {anychart.math.Rect=} opt_value Parent bounds.
- * @return {(anychart.math.Rect|anychart.ui.Button)} Bounds of parent element or self for method chaining.
- */
-anychart.ui.Button.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
-/**
  * Button width.
  * @param {(number|string)=} opt_value Width value.
  * @return {(number|string|anychart.ui.Button)} Width of button or self for method chaining.
@@ -587,15 +562,7 @@ anychart.ui.Button.prototype.drawDisabled = function(settings) {
 anychart.ui.Button.prototype.calculateButtonBounds_ = function() {
   var container = /** @type {acgraph.vector.ILayer} */ (this.container());
   var stage = container ? container.getStage() : null;
-  var parentBounds;
-
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;
 
@@ -1032,7 +999,6 @@ anychart.ui.button = function() {
 
 //exports
 goog.exportSymbol('anychart.ui.button', anychart.ui.button);
-anychart.ui.Button.prototype['parentBounds'] = anychart.ui.Button.prototype.parentBounds;
 anychart.ui.Button.prototype['text'] = anychart.ui.Button.prototype.text;
 anychart.ui.Button.prototype['padding'] = anychart.ui.Button.prototype.padding;
 anychart.ui.Button.prototype['position'] = anychart.ui.Button.prototype.position;

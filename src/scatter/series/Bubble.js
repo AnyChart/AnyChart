@@ -417,7 +417,7 @@ anychart.scatter.series.Bubble.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
       if (goog.isBoolean(this.clip())) {
-        bounds = this.pixelBounds();
+        bounds = this.pixelBoundsCache;
         axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
       } else {
@@ -453,7 +453,7 @@ anychart.scatter.series.Bubble.prototype.startDrawing = function() {
   // --- end DiscreteBase ---
 
   var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
-      this.pixelBounds().width / 2;
+      this.pixelBoundsCache.width / 2;
 
   /**
    * Calculated minimum size value. For inner use.

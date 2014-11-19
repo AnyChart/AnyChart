@@ -96,64 +96,84 @@ anychart.utils.Bounds.prototype.height_ = null;
 
 /**
  * Normalizes all info stored in this object and returns a standard Rect of it.
- * @param {number=} opt_containerWidth Optional container width to support percent cases.
- * @param {number=} opt_containerHeight Optional container height to support percent cases.
+ * @param {(number|anychart.math.Rect)=} opt_parentLeftOrRect Optional parent left coord to shift bounds if parent in shifted.
+ * @param {number=} opt_parentTop Optional parent top coord to shift bounds if parent in shifted.
+ * @param {number=} opt_parentWidth Optional parent width to support percent cases.
+ * @param {number=} opt_parentHeight Optional parent height to support percent cases.
  * @return {!anychart.math.Rect} Normalized rect.
  */
-anychart.utils.Bounds.prototype.toRect = function(opt_containerWidth, opt_containerHeight) {
+anychart.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt_parentTop, opt_parentWidth, opt_parentHeight) {
+  if (opt_parentLeftOrRect instanceof anychart.math.Rect) {
+    var parentBounds = /** @type {anychart.math.Rect} */(opt_parentLeftOrRect);
+    opt_parentLeftOrRect = +parentBounds.left;
+    opt_parentTop = +parentBounds.top;
+    opt_parentWidth = +parentBounds.width;
+    opt_parentHeight = +parentBounds.height;
+  } else {
+    opt_parentLeftOrRect = anychart.utils.toNumber(opt_parentLeftOrRect);
+    opt_parentTop = anychart.utils.toNumber(opt_parentTop);
+    opt_parentWidth = anychart.utils.toNumber(opt_parentWidth);
+    opt_parentHeight = anychart.utils.toNumber(opt_parentHeight);
+  }
+
   var left, top, width, height;
 
   if (!goog.isNull(this.left_)) {
-    left = anychart.utils.normalizeSize(this.left_, opt_containerWidth);
+    left = anychart.utils.normalizeSize(this.left_, opt_parentWidth);
     if (!goog.isNull(this.right_)) {
-      width = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true) - left;
+      width = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true) - left;
     } else if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
+      width = anychart.utils.normalizeSize(this.width_, opt_parentWidth);
     } else {
-      width = (+opt_containerWidth - left) || 0;
+      width = (+opt_parentWidth - left) || 0;
     }
   } else if (!goog.isNull(this.right_)) {
     if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
-      left = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true) - width;
+      width = anychart.utils.normalizeSize(this.width_, opt_parentWidth);
+      left = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true) - width;
     } else {
       left = 0;
-      width = anychart.utils.normalizeSize(this.right_, opt_containerWidth, true);
+      width = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true);
     }
   } else {
     left = 0;
     if (!goog.isNull(this.width_)) {
-      width = anychart.utils.normalizeSize(this.width_, opt_containerWidth);
+      width = anychart.utils.normalizeSize(this.width_, opt_parentWidth);
     } else {
-      width = +opt_containerWidth || 0;
+      width = +opt_parentWidth || 0;
     }
   }
 
   if (!goog.isNull(this.top_)) {
-    top = anychart.utils.normalizeSize(this.top_, opt_containerHeight);
+    top = anychart.utils.normalizeSize(this.top_, opt_parentHeight);
     if (!goog.isNull(this.bottom_)) {
-      height = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true) - top;
+      height = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true) - top;
     } else if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
+      height = anychart.utils.normalizeSize(this.height_, opt_parentHeight);
     } else {
-      height = (+opt_containerHeight - top) || 0;
+      height = (+opt_parentHeight - top) || 0;
     }
   } else if (!goog.isNull(this.bottom_)) {
     if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
-      top = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true) - height;
+      height = anychart.utils.normalizeSize(this.height_, opt_parentHeight);
+      top = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true) - height;
     } else {
       top = 0;
-      height = anychart.utils.normalizeSize(this.bottom_, opt_containerHeight, true);
+      height = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true);
     }
   } else {
     top = 0;
     if (!goog.isNull(this.height_)) {
-      height = anychart.utils.normalizeSize(this.height_, opt_containerHeight);
+      height = anychart.utils.normalizeSize(this.height_, opt_parentHeight);
     } else {
-      height = +opt_containerHeight || 0;
+      height = +opt_parentHeight || 0;
     }
   }
+
+  if (!isNaN(opt_parentLeftOrRect))
+    left += opt_parentLeftOrRect;
+  if (!isNaN(opt_parentTop))
+    top += opt_parentTop;
 
   return new anychart.math.Rect(left, top, width, height);
 };

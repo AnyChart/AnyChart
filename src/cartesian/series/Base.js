@@ -84,6 +84,13 @@ anychart.cartesian.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 
 
 /**
+ * @type {anychart.math.Rect}
+ * @protected
+ */
+anychart.cartesian.series.Base.prototype.pixelBoundsCache = null;
+
+
+/**
  * Supported signals.
  * @type {number}
  */
@@ -946,11 +953,9 @@ anychart.cartesian.series.Base.prototype.hasMarkers = function() {
  * anychart.cartesian.series.line([1, 2, 1.3, 3])
  *    .container(stage)
  *    .draw(300, 300);
- * @param {number=} opt_parentWidth [0] Optional width of the parent container for series bounds calculation. By default use 100%.
- * @param {number=} opt_parentHeight [0] Optional height of the parent container for series bounds calculation. By default use 100%.
  * @return {anychart.cartesian.series.Base} An instance of {@link anychart.cartesian.series.Base} class for method chaining.
  */
-anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_parentHeight) {
+anychart.cartesian.series.Base.prototype.draw = function() {
   this.suspendSignalsDispatching();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
@@ -983,17 +988,12 @@ anychart.cartesian.series.Base.prototype.draw = function(opt_parentWidth, opt_pa
     scale.finishAutoCalc();
   }
 
-  var hasParentBounds = goog.isDef(opt_parentWidth) && goog.isDef(opt_parentHeight);
-  if (hasParentBounds)
-    this.pixelBounds(/** @type {anychart.math.Rect} */(this.pixelBounds(opt_parentWidth, opt_parentHeight)));
-
   iterator = this.getResetIterator();
   this.startDrawing();
   while (iterator.advance())
     this.drawPoint();
   this.finalizeDrawing();
 
-  if (hasParentBounds) this.pixelBounds(null);
   this.resumeSignalsDispatching(false);
   this.markConsistent(anychart.ConsistencyState.ALL);
 
@@ -1051,6 +1051,7 @@ anychart.cartesian.series.Base.prototype.remove = function() {
  */
 anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.firstPointDrawn = false;
+  this.pixelBoundsCache = this.getPixelBounds();
 
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
@@ -1071,7 +1072,7 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.hoverLabels().suspendSignalsDispatching();
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
 };
 
 
@@ -1082,7 +1083,7 @@ anychart.cartesian.series.Base.prototype.startDrawing = function() {
  * @protected
  */
 anychart.cartesian.series.Base.prototype.applyAxesLinesSpace = function(value) {
-  var bounds = this.pixelBounds();
+  var bounds = this.pixelBoundsCache;
   var max = bounds.getBottom() - +this.axesLinesSpace().bottom();
   var min = bounds.getTop() + +this.axesLinesSpace().top();
 
@@ -1102,7 +1103,7 @@ anychart.cartesian.series.Base.prototype.finalizeDrawing = function() {
   this.labels().draw();
 
   if (this.clip()) {
-    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var labelDOM = this.labels().getDomElement();
     if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
   }
@@ -1305,15 +1306,13 @@ anychart.cartesian.series.Base.prototype.drawSubsequentPoint = goog.abstractMeth
  * @protected
  */
 anychart.cartesian.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
-  /** @type {acgraph.math.Rect} */
-  var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());
   var min, range;
   if (horizontal) {
-    min = bounds.left;
-    range = bounds.width;
+    min = this.pixelBoundsCache.left;
+    range = this.pixelBoundsCache.width;
   } else {
-    min = bounds.getBottom();
-    range = -bounds.height;
+    min = this.pixelBoundsCache.getBottom();
+    range = -this.pixelBoundsCache.height;
   }
   return min + ratio * range;
 };

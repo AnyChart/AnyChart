@@ -23,7 +23,7 @@ goog.inherits(anychart.cartesian.series.BarBase, anychart.cartesian.series.Width
 anychart.cartesian.series.BarBase.prototype.getPointWidth = function() {
   // todo(Anton Saukh): fix for linear scale case.
   var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
-      this.pixelBounds().height;
+      this.pixelBoundsCache.height;
   return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
 };
 
@@ -36,15 +36,13 @@ anychart.cartesian.series.BarBase.prototype.isBarBased = function() {
 
 /** @inheritDoc */
 anychart.cartesian.series.BarBase.prototype.applyRatioToBounds = function(ratio, horizontal) {
-  /** @type {acgraph.math.Rect} */
-  var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());
   var min, range;
   if (horizontal) {
-    min = bounds.getBottom();
-    range = -bounds.height;
+    min = this.pixelBoundsCache.getBottom();
+    range = -this.pixelBoundsCache.height;
   } else {
-    min = bounds.left;
-    range = bounds.width;
+    min = this.pixelBoundsCache.left;
+    range = this.pixelBoundsCache.width;
   }
   return min + ratio * range;
 };
@@ -52,7 +50,7 @@ anychart.cartesian.series.BarBase.prototype.applyRatioToBounds = function(ratio,
 
 /** @inheritDoc */
 anychart.cartesian.series.BarBase.prototype.applyAxesLinesSpace = function(value) {
-  var bounds = this.pixelBounds();
+  var bounds = this.pixelBoundsCache;
   var max = bounds.getRight() - +this.axesLinesSpace().right();
   var min = bounds.getLeft() + +this.axesLinesSpace().left();
 

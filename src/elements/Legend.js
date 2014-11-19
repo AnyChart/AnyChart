@@ -68,13 +68,6 @@ anychart.elements.Legend = function() {
   this.height_ = null;
 
   /**
-   * Bounds of legend parent element.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * Default layout of legend.
    * @type {anychart.enums.Layout}
    * @private
@@ -757,31 +750,6 @@ anychart.elements.Legend.prototype.height = function(opt_value) {
 };
 
 
-/**
- * Getter for legend parent element bounds.
- * @return {anychart.math.Rect} Parent element bounds.
- *//**
- * Setter for legend's parent element bounds.
- * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Legend} An instance of the {@link anychart.elements.Legend} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value Parent element bounds to set.
- * @return {(anychart.math.Rect|!anychart.elements.Legend)} Parent element bounds or self for method chaining.
- */
-anychart.elements.Legend.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
 //todo Need rename. Orientation or Position (blackart)
 /**
  * Getter for legend position setting.
@@ -839,24 +807,13 @@ anychart.elements.Legend.prototype.align = function(opt_value) {
 
 /**
  *
- * @return {anychart.math.Rect} Bounds that remain after legend.
+ * @return {!anychart.math.Rect} Bounds that remain after legend.
  */
 anychart.elements.Legend.prototype.getRemainingBounds = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calculateBounds_();
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_.clone();
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = stage.getBounds(); // cloned already
-    } else {
-      return new anychart.math.Rect(0, 0, 0, 0);
-    }
-  }
+  /** @type {!anychart.math.Rect} */
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
 
   if (!this.enabled()) return parentBounds;
 
@@ -1082,23 +1039,13 @@ anychart.elements.Legend.prototype.calculateContentHeight_ = function() {
  * @private
  */
 anychart.elements.Legend.prototype.calculateBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
-  var stage = container ? container.getStage() : null;
-
   /** @type {anychart.math.Rect} */
-  var parentBounds;
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   /** @type {number} */
   var parentWidth;
   /** @type {number} */
   var parentHeight;
 
-  if (this.parentBounds_ || goog.isNull(this.parentBounds_)) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
   var margin = this.margin();
   var padding = this.padding();
 
@@ -1424,7 +1371,7 @@ anychart.elements.Legend.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
     var background = /** @type {anychart.elements.Background} */(this.background());
     background.suspendSignalsDispatching();
-    background.pixelBounds(boundsWithoutMargin);
+    background.parentBounds(boundsWithoutMargin);
     if (this.enabled()) background.container(this.rootElement);
     background.resumeSignalsDispatching(false);
     background.draw();
@@ -1698,7 +1645,6 @@ anychart.elements.Legend.prototype['paginator'] = anychart.elements.Legend.proto
 anychart.elements.Legend.prototype['tooltip'] = anychart.elements.Legend.prototype.tooltip;
 anychart.elements.Legend.prototype['width'] = anychart.elements.Legend.prototype.width;
 anychart.elements.Legend.prototype['height'] = anychart.elements.Legend.prototype.height;
-anychart.elements.Legend.prototype['parentBounds'] = anychart.elements.Legend.prototype.parentBounds;
 anychart.elements.Legend.prototype['position'] = anychart.elements.Legend.prototype.position;
 anychart.elements.Legend.prototype['align'] = anychart.elements.Legend.prototype.align;
 anychart.elements.Legend.prototype['getRemainingBounds'] = anychart.elements.Legend.prototype.getRemainingBounds;

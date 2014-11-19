@@ -77,6 +77,13 @@ anychart.scatter.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 
 
 /**
+ * @type {anychart.math.Rect}
+ * @protected
+ */
+anychart.scatter.series.Base.prototype.pixelBoundsCache;
+
+
+/**
  * Supported signals.
  * @type {number}
  */
@@ -718,11 +725,13 @@ anychart.scatter.series.Base.prototype.startDrawing = function() {
 
   this.checkDrawingNeeded();
 
+  this.pixelBoundsCache = /** @type {anychart.math.Rect} */(this.getPixelBounds());
+
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  this.labels().parentBounds(this.pixelBoundsCache);
 };
 
 
@@ -733,7 +742,7 @@ anychart.scatter.series.Base.prototype.startDrawing = function() {
  * @protected
  */
 anychart.scatter.series.Base.prototype.applyAxesLinesSpace = function(value) {
-  var bounds = this.pixelBounds();
+  var bounds = this.pixelBoundsCache;
   var max = bounds.getBottom() - +this.axesLinesSpace().bottom();
   var min = bounds.getTop() + +this.axesLinesSpace().top();
 
@@ -753,7 +762,7 @@ anychart.scatter.series.Base.prototype.finalizeDrawing = function() {
   this.labels().draw();
 
   if (this.clip()) {
-    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBounds() : this.clip());
+    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var labelDOM = this.labels().getDomElement();
     if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
   }
@@ -943,7 +952,7 @@ anychart.scatter.series.Base.prototype.drawSeriesPoint = goog.abstractMethod;
  */
 anychart.scatter.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
   /** @type {acgraph.math.Rect} */
-  var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());
+  var bounds = this.pixelBoundsCache;
   var min, range;
   if (horizontal) {
     min = bounds.left;

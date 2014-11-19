@@ -29,12 +29,6 @@ anychart.elements.TextMarker = function() {
   this.scale_;
 
   /**
-   * @type {acgraph.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * @type {anychart.enums.Layout}
    * @private
    */
@@ -167,32 +161,6 @@ anychart.elements.TextMarker.prototype.scaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.TextMarker} An instance of the {@link anychart.elements.TextMarker} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.TextMarker} Bounds or this.
- */
-anychart.elements.TextMarker.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.parentBounds_;
-  }
-};
-
-
 /**
  * Axes lines space.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
@@ -478,6 +446,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
     var shift = -.5;
 
     var parentBounds = /** @type {acgraph.math.Rect} */(this.parentBounds());
+    parentBounds = parentBounds.clone().round();
     var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
 
     var textElement = this.markerElement();
@@ -556,6 +525,7 @@ anychart.elements.TextMarker.prototype.draw = function() {
 anychart.elements.TextMarker.prototype.getTextPosition_ = function(ratio, shift) {
   var x, y;
   var parentBounds = this.parentBounds();
+  parentBounds = parentBounds.clone().round();
   switch (this.layout_) {
     default:
     case anychart.enums.Layout.HORIZONTAL:
@@ -704,7 +674,6 @@ anychart.elements.textMarker = function() {
 goog.exportSymbol('anychart.elements.textMarker', anychart.elements.textMarker);
 anychart.elements.TextMarker.prototype['value'] = anychart.elements.TextMarker.prototype.value;
 anychart.elements.TextMarker.prototype['scale'] = anychart.elements.TextMarker.prototype.scale;
-anychart.elements.TextMarker.prototype['parentBounds'] = anychart.elements.TextMarker.prototype.parentBounds;
 anychart.elements.TextMarker.prototype['anchor'] = anychart.elements.TextMarker.prototype.anchor;
 anychart.elements.TextMarker.prototype['align'] = anychart.elements.TextMarker.prototype.align;
 anychart.elements.TextMarker.prototype['layout'] = anychart.elements.TextMarker.prototype.layout;

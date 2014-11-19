@@ -810,14 +810,14 @@ anychart.Chart.prototype.draw = function() {
   }
   //end clear container consistency states
 
-  totalBounds = /** @type {!anychart.math.Rect} */(this.pixelBounds());
+  totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
   boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
     background.suspendSignalsDispatching();
     if (!background.container()) background.container(this.rootElement);
-    background.pixelBounds(boundsWithoutMargin);
+    background.parentBounds(boundsWithoutMargin);
     background.resumeSignalsDispatching(false);
     background.draw();
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);

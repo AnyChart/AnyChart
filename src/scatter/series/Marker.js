@@ -563,7 +563,7 @@ anychart.scatter.series.Marker.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.clip()) {
       if (goog.isBoolean(this.clip())) {
-        bounds = this.pixelBounds();
+        bounds = this.pixelBoundsCache;
         axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
       } else {

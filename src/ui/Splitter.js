@@ -657,7 +657,7 @@ anychart.ui.Splitter.prototype.bottomLimitSize = function(opt_value) {
  * @private
  */
 anychart.ui.Splitter.prototype.getStartBounds_ = function() {
-  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
   var add = this.considerSplitterWidth_ ? this.splitterWidth_ : 0;
   if (this.isVertical_()) {
     return new acgraph.math.Rect(
@@ -687,7 +687,7 @@ anychart.ui.Splitter.prototype.getStartBounds_ = function() {
  */
 anychart.ui.Splitter.prototype.getEndBounds_ = function() {
   var w, h;
-  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
   if (this.considerSplitterWidth_) {
     w = anychart.math.round((this.pixelBoundsCache_.getWidth() - this.splitterWidth_) * this.position_, 1);
     h = anychart.math.round((this.pixelBoundsCache_.getHeight() - this.splitterWidth_) * this.position_, 1);
@@ -1071,7 +1071,7 @@ anychart.ui.Splitter.prototype.draw = function() {
 
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-      this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.pixelBounds());
+      this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }

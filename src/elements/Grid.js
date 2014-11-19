@@ -59,12 +59,6 @@ anychart.elements.Grid = function() {
   this.scale_;
 
   /**
-   * @type {acgraph.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * @type {boolean}
    * @private
    */
@@ -194,35 +188,6 @@ anychart.elements.Grid.prototype.scaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Grid} {@link anychart.elements.Grid} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.Grid} Bounds or this.
- */
-anychart.elements.Grid.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      if (opt_value) {
-        this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
-      }
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.parentBounds_;
-  }
-};
-
-
 /**
  * Axes lines space.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
@@ -381,7 +346,7 @@ anychart.elements.Grid.prototype.isMinor = function(opt_value) {
  * @protected
  */
 anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
-  var parentBounds = this.parentBounds();
+  var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
   var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
   ratio == 1 ? y -= shift : y += shift;
@@ -397,7 +362,7 @@ anychart.elements.Grid.prototype.drawLineHorizontal = function(ratio, shift) {
  * @protected
  */
 anychart.elements.Grid.prototype.drawLineVertical = function(ratio, shift) {
-  var parentBounds = this.parentBounds();
+  var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
   /** @type {number}*/
   var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
   ratio == 1 ? x += shift : x -= shift;
@@ -431,7 +396,7 @@ anychart.elements.Grid.prototype.isHorizontal = function() {
  */
 anychart.elements.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, layer, shift) {
   if (!isNaN(prevRatio)) {
-    var parentBounds = this.parentBounds();
+    var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var y1, y2, checkIndex;
     y1 = Math.round(parentBounds.getBottom() - prevRatio * parentBounds.height);
     y2 = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
@@ -461,7 +426,7 @@ anychart.elements.Grid.prototype.drawInterlaceHorizontal = function(ratio, prevR
  */
 anychart.elements.Grid.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, layer, shift) {
   if (!isNaN(prevRatio)) {
-    var parentBounds = this.parentBounds();
+    var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var x1, x2, checkIndex;
     x1 = Math.round(parentBounds.getLeft() + prevRatio * parentBounds.width);
     x2 = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
@@ -536,7 +501,7 @@ anychart.elements.Grid.prototype.draw = function() {
     this.oddFillElement().clear();
     this.lineElement().clear();
 
-    var bounds = this.parentBounds();
+    var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var axesLinesSpace = this.axesLinesSpace();
     var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
 
@@ -690,7 +655,6 @@ anychart.elements.Grid.prototype.evenFillElement = function() {
  */
 anychart.elements.Grid.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['parentBounds'] = this.parentBounds();
   data['stroke'] = this.stroke();
   data['layout'] = this.layout();
   data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
@@ -709,7 +673,6 @@ anychart.elements.Grid.prototype.deserialize = function(value) {
 
   goog.base(this, 'deserialize', value);
 
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
   if (goog.isDef(value['layout'])) this.layout(value['layout']);
   if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
@@ -751,7 +714,6 @@ anychart.elements.Grid.prototype['evenFill'] = anychart.elements.Grid.prototype.
 anychart.elements.Grid.prototype['layout'] = anychart.elements.Grid.prototype.layout;
 anychart.elements.Grid.prototype['isHorizontal'] = anychart.elements.Grid.prototype.isHorizontal;
 anychart.elements.Grid.prototype['scale'] = anychart.elements.Grid.prototype.scale;
-anychart.elements.Grid.prototype['parentBounds'] = anychart.elements.Grid.prototype.parentBounds;
 anychart.elements.Grid.prototype['stroke'] = anychart.elements.Grid.prototype.stroke;
 anychart.elements.Grid.prototype['drawFirstLine'] = anychart.elements.Grid.prototype.drawFirstLine;
 anychart.elements.Grid.prototype['drawLastLine'] = anychart.elements.Grid.prototype.drawLastLine;

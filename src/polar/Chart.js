@@ -1041,7 +1041,7 @@ anychart.polar.Chart.prototype.drawContent = function(bounds) {
       var series = this.series_[i];
       series.container(this.rootElement);
       series.startAngle(this.startAngle_);
-      series.pixelBounds(this.dataBounds_);
+      series.parentBounds(this.dataBounds_);
     }
 
     this.drawSeries_();

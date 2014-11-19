@@ -80,13 +80,6 @@ anychart.elements.Separator = function() {
   this.actualTop_ = NaN;
 
   /**
-   * Parent bounds stored.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * Pixel bounds due to orientation, margins, etc.
    * @type {anychart.math.Rect}
    * @private
@@ -126,21 +119,10 @@ anychart.elements.Separator.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.BOUNDS;
 
 
-/**
- * Gets/Sets bounds to calculate position.
- * @param {anychart.math.Rect=} opt_value .
- * @return {!anychart.elements.Separator|anychart.math.Rect} .
- */
-anychart.elements.Separator.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
+/** @inheritDoc */
+anychart.elements.Separator.prototype.invalidateParentBounds = function() {
+  this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -386,19 +368,8 @@ anychart.elements.Separator.prototype.getRemainingBounds = function() {
     this.calculateSeparatorBounds_();
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_.clone();
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = stage.getBounds(); // cloned already
-    } else {
-      return new anychart.math.Rect(0, 0, 0, 0);
-    }
-  }
+  /** @type {!anychart.math.Rect} */
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
 
   if (!this.enabled()) return parentBounds;
 
@@ -433,14 +404,7 @@ anychart.elements.Separator.prototype.calculateSeparatorBounds_ = function() {
   var margin = this.margin();
 
   /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;
   if (parentBounds) {
@@ -637,7 +601,6 @@ anychart.elements.separator = function() {
 
 //exports
 goog.exportSymbol('anychart.elements.separator', anychart.elements.separator);
-anychart.elements.Separator.prototype['parentBounds'] = anychart.elements.Separator.prototype.parentBounds;
 anychart.elements.Separator.prototype['width'] = anychart.elements.Separator.prototype.width;
 anychart.elements.Separator.prototype['height'] = anychart.elements.Separator.prototype.height;
 anychart.elements.Separator.prototype['margin'] = anychart.elements.Separator.prototype.margin;

@@ -28,12 +28,6 @@ anychart.elements.LineMarker = function() {
   this.scale_;
 
   /**
-   * @type {acgraph.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * @type {anychart.enums.Layout}
    * @private
    */
@@ -153,32 +147,6 @@ anychart.elements.LineMarker.prototype.scaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.LineMarker} {@link anychart.elements.LineMarker} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.LineMarker} Bounds or this.
- */
-anychart.elements.LineMarker.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.parentBounds_;
-  }
-};
-
-
 /**
  * Axes lines space.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
@@ -424,7 +392,6 @@ anychart.elements.lineMarker = function() {
 goog.exportSymbol('anychart.elements.lineMarker', anychart.elements.lineMarker);
 anychart.elements.LineMarker.prototype['value'] = anychart.elements.LineMarker.prototype.value;
 anychart.elements.LineMarker.prototype['scale'] = anychart.elements.LineMarker.prototype.scale;
-anychart.elements.LineMarker.prototype['parentBounds'] = anychart.elements.LineMarker.prototype.parentBounds;
 anychart.elements.LineMarker.prototype['layout'] = anychart.elements.LineMarker.prototype.layout;
 anychart.elements.LineMarker.prototype['stroke'] = anychart.elements.LineMarker.prototype.stroke;
 anychart.elements.LineMarker.prototype['draw'] = anychart.elements.LineMarker.prototype.draw;

@@ -310,23 +310,6 @@ anychart.elements.BulletMarker.prototype.setDefaultStroke = function(value) {
 
 
 /**
- * Getter/setter for parentBounds.
- * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {(anychart.math.Rect|anychart.elements.BulletMarker)} Parent bounds or self for method chaining.
- */
-anychart.elements.BulletMarker.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
-/**
  * Get drawer for bullet marker.
  * @param {anychart.enums.Layout} layout Layout.
  * @param {anychart.enums.BulletMarkerType} type Marker type.
@@ -638,6 +621,5 @@ anychart.elements.BulletMarker.prototype.deserialize = function(value) {
 //anychart.elements.BulletMarker.prototype['scale'] = anychart.elements.BulletMarker.prototype.scale;
 //anychart.elements.BulletMarker.prototype['fill'] = anychart.elements.BulletMarker.prototype.fill;
 //anychart.elements.BulletMarker.prototype['stroke'] = anychart.elements.BulletMarker.prototype.stroke;
-//anychart.elements.BulletMarker.prototype['parentBounds'] = anychart.elements.BulletMarker.prototype.parentBounds;
 //anychart.elements.BulletMarker.prototype['isHorizontal'] = anychart.elements.BulletMarker.prototype.isHorizontal;
 //anychart.elements.BulletMarker.prototype['draw'] = anychart.elements.BulletMarker.prototype.draw;

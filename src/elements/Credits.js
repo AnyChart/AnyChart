@@ -225,27 +225,9 @@ anychart.elements.Credits.prototype.logoSrc = function(opt_value) {
 };
 
 
-/**
- * Getter for credits parent element bounds.
- * @return {anychart.math.Rect} Parent element bounds.
- *//**
- * Setter for credits parent element bounds.
- * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Credits} An instance of the {@link anychart.elements.Credits} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value Parent element bounds to set.
- * @return {(anychart.math.Rect|!anychart.elements.Credits)} Parent element bounds or self for method chaining.
- */
-anychart.elements.Credits.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.parentBounds_;
+/** @inheritDoc */
+anychart.elements.Credits.prototype.invalidateParentBounds = function() {
+  this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -305,14 +287,7 @@ anychart.elements.Credits.prototype.draw = function() {
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var stage = container ? container.getStage() : null;
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = new anychart.math.Rect(0, 0, 0, 0);
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var containerElement;
   if (stage)
@@ -397,18 +372,9 @@ anychart.elements.Credits.prototype.setPosition_ = function(right, bottom) {
  * @return {!anychart.math.Rect} Bounds that remain after credits.
  */
 anychart.elements.Credits.prototype.getRemainingBounds = function() {
-  var container = /** @type {acgraph.vector.ILayer} */(this.container());
-  var stage = container ? container.getStage() : null;
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_.clone();
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = new anychart.math.Rect(0, 0, 0, 0);
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || new anychart.math.Rect(0, 0, 0, 0);
 
-  if (!this.enabled() || !stage) return parentBounds;
+  if (!this.enabled()) return parentBounds;
 
   var creditsSize = goog.style.getBorderBoxSize(this.domElement_);
   // chart height - credits height - bottom

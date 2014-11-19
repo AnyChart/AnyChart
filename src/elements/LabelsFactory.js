@@ -109,13 +109,6 @@ anychart.elements.LabelsFactory = function() {
   this.layer_ = null;
 
   /**
-   * Parent bounds stored.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * Labels Array.
    * @type {Array.<anychart.elements.LabelsFactory.Label>}
    * @private
@@ -521,23 +514,6 @@ anychart.elements.LabelsFactory.prototype.height = function(opt_value) {
 };
 
 
-/**
- * Getter and setter for parent element bounds. Used to calculate width, height, offsets passed in percents.
- * @param {anychart.math.Rect=} opt_value Parent bounds to set.
- * @return {!anychart.elements.LabelsFactory|anychart.math.Rect} Itself or parent bounds.
- */
-anychart.elements.LabelsFactory.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
 /** @inheritDoc */
 anychart.elements.LabelsFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
@@ -824,9 +800,10 @@ anychart.elements.LabelsFactory.prototype.getDimension_ = function(formatProvide
   //we should ask text element about bounds only after text format and text settings are applied
 
   //define parent bounds
-  if (this.parentBounds_) {
-    parentWidth = this.parentBounds_.width;
-    parentHeight = this.parentBounds_.height;
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  if (parentBounds) {
+    parentWidth = parentBounds.width;
+    parentHeight = parentBounds.height;
   }
 
   var padding = opt_settings && opt_settings['padding'] ? this.measureCustomLabel_.padding() : this.padding();
@@ -1859,9 +1836,10 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
     }
     //define parent bounds
     var parentWidth, parentHeight;
-    if (this.parentBounds_) {
-      parentWidth = this.parentBounds_.width;
-      parentHeight = this.parentBounds_.height;
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+    if (parentBounds) {
+      parentWidth = parentBounds.width;
+      parentHeight = parentBounds.height;
     }
 
     var isHtml = parentLabelsFactory.useHtml() || labelsFactory.useHtml() || this.useHtml();
@@ -1961,7 +1939,7 @@ anychart.elements.LabelsFactory.Label.prototype.draw = function() {
 
     this.textElement_.x(/** @type {number} */(textX)).y(/** @type {number} */(textY));
 
-    this.backgroundElement_.pixelBounds(outerBounds);
+    this.backgroundElement_.parentBounds(outerBounds);
     this.backgroundElement_.draw();
 
     this.layer_.setRotationByAnchor(/** @type {number} */(rotationAngle), anchor);

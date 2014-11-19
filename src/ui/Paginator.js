@@ -28,13 +28,6 @@ anychart.ui.Paginator = function() {
   this.spacing_ = 10;
 
   /**
-   * Bounds of the parent element.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_;
-
-  /**
    * Margin of paginator.
    * @type {anychart.utils.Margin}
    * @private
@@ -158,24 +151,6 @@ anychart.ui.Paginator.prototype.SUPPORTED_SIGNALS = anychart.elements.Text.proto
 anychart.ui.Paginator.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.elements.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.BACKGROUND;
-
-
-/**
- * Bounds of paginator parent element. Need to calculate percent-values of width, height.
- * @param {anychart.math.Rect=} opt_value Parent bounds.
- * @return {(anychart.math.Rect|anychart.ui.Paginator)} Bounds of parent element or self for chaining.
- */
-anychart.ui.Paginator.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
 
 
 /**
@@ -472,7 +447,7 @@ anychart.ui.Paginator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
-    this.background_.pixelBounds(new anychart.math.Rect(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_));
+    this.background_.parentBounds(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_);
     this.background_.draw();
     this.markConsistent(anychart.ConsistencyState.BACKGROUND);
   }
@@ -495,9 +470,9 @@ anychart.ui.Paginator.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var textBounds = this.text_.getBounds();
     var buttonSize = textBounds.height;
-    var parentBounds = this.parentBounds();
-    this.previousButton_.width(buttonSize).height(buttonSize).parentBounds(/** @type {anychart.math.Rect} */ (parentBounds ? parentBounds : stage.getBounds()));
-    this.nextButton_.width(buttonSize).height(buttonSize).parentBounds(/** @type {anychart.math.Rect} */ (parentBounds ? parentBounds : stage.getBounds()));
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+    this.previousButton_.width(buttonSize).height(buttonSize).parentBounds(parentBounds);
+    this.nextButton_.width(buttonSize).height(buttonSize).parentBounds(parentBounds);
 
     var prevButtonX;
     var prevButtonY;
@@ -623,22 +598,11 @@ anychart.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
   var padding = this.padding();
   var margin = this.margin();
 
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else if (stage) {
-    parentBounds = stage.getBounds();
-  } else {
-    parentBounds = null;
-  }
-
   var parentWidth, parentHeight;
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   if (parentBounds) {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
-  } else {
-    parentWidth = parentHeight = undefined;
   }
 
   var width, height;
@@ -712,19 +676,11 @@ anychart.ui.Paginator.prototype.getPixelBounds = function() {
 anychart.ui.Paginator.prototype.getRemainingBounds = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calculatePaginatorBounds_();
-  /** @type {anychart.math.Rect} */
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_.clone();
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = stage.getBounds(); // cloned already
-    } else {
-      return new anychart.math.Rect(0, 0, 0, 0);
-    }
-  }
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  if (parentBounds)
+    parentBounds = parentBounds.clone();
+  else
+    parentBounds = anychart.math.rect(0, 0, 0, 0);
 
   if (!this.enabled()) return parentBounds;
 
@@ -899,7 +855,6 @@ anychart.ui.paginator = function() {
 
 //exports
 goog.exportSymbol('anychart.ui.paginator', anychart.ui.paginator);
-anychart.ui.Paginator.prototype['parentBounds'] = anychart.ui.Paginator.prototype.parentBounds;
 anychart.ui.Paginator.prototype['background'] = anychart.ui.Paginator.prototype.background;
 anychart.ui.Paginator.prototype['orientation'] = anychart.ui.Paginator.prototype.orientation;
 anychart.ui.Paginator.prototype['padding'] = anychart.ui.Paginator.prototype.padding;

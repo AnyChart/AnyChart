@@ -284,13 +284,6 @@ anychart.elements.Axis.prototype.staggerAutoLines_ = 1;
  * @type {anychart.math.Rect}
  * @private
  */
-anychart.elements.Axis.prototype.parentBounds_ = null;
-
-
-/**
- * @type {anychart.utils.Bounds}
- * @private
- */
 anychart.elements.Axis.prototype.pixelBounds_ = null;
 
 
@@ -883,55 +876,22 @@ anychart.elements.Axis.prototype.length = function(opt_value) {
 };
 
 
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.<br/>
- * <b>Note:</b> Works only if you create an independent axis object.
- * @example <t>simple-h100</t>
- * anychart.elements.axis()
- *   .parentBounds(anychart.math.rect(40, 0, 240, 40))
- *   .scale(anychart.scales.ordinal().values([1,2,3]))
- *   .container(stage).draw();
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.Axis} Bounds or this.
- */
-anychart.elements.Axis.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value.clone().round();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
+/** @inheritDoc */
+anychart.elements.Axis.prototype.invalidateParentBounds = function() {
+  this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
 /**
  * Gets axis pixel bounds.
- * @return {anychart.utils.Bounds} Pixel bounds.
+ * @return {anychart.math.Rect} Pixel bounds.
  * @private
  */
 anychart.elements.Axis.prototype.getPixelBounds_ = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
     var orientation = this.orientation();
 
-    var parentBounds;
-    if (this.parentBounds_) {
-      parentBounds = this.parentBounds_;
-    } else if (stage) {
-      parentBounds = stage.getBounds();
-    } else {
-      parentBounds = null;
-    }
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
     if (parentBounds) {
       var parentLength;
@@ -978,9 +938,9 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
           height = length;
           break;
       }
-      this.pixelBounds_ = new anychart.utils.Bounds(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
+      this.pixelBounds_ = new anychart.math.Rect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
     } else {
-      this.pixelBounds_ = new anychart.utils.Bounds(0, 0, 0, 0);
+      this.pixelBounds_ = new anychart.math.Rect(0, 0, 0, 0);
     }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -1470,18 +1430,7 @@ anychart.elements.Axis.prototype.getSize_ = function(parentBounds, length) {
  * @return {anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.Axis.prototype.getRemainingBounds = function() {
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = /** @type {anychart.math.Rect} */(stage.getBounds());
-    } else {
-      parentBounds = null;
-    }
-  }
+  var parentBounds = this.parentBounds();
 
   if (parentBounds) {
     var remainingBounds = parentBounds.clone();
@@ -1489,18 +1438,18 @@ anychart.elements.Axis.prototype.getRemainingBounds = function() {
 
     switch (this.orientation()) {
       case anychart.enums.Orientation.TOP:
-        remainingBounds.height -= axisBounds.height();
-        remainingBounds.top += axisBounds.height() + this.offsetY();
+        remainingBounds.height -= axisBounds.height;
+        remainingBounds.top += axisBounds.height + this.offsetY();
         break;
       case anychart.enums.Orientation.RIGHT:
-        remainingBounds.width -= axisBounds.width() + this.offsetX();
+        remainingBounds.width -= axisBounds.width + this.offsetX();
         break;
       case anychart.enums.Orientation.BOTTOM:
-        remainingBounds.height -= axisBounds.height() + this.offsetY();
+        remainingBounds.height -= axisBounds.height + this.offsetY();
         break;
       case anychart.enums.Orientation.LEFT:
-        remainingBounds.width -= axisBounds.width();
-        remainingBounds.left += axisBounds.width() + this.offsetX();
+        remainingBounds.width -= axisBounds.width;
+        remainingBounds.left += axisBounds.width + this.offsetX();
         break;
     }
 
@@ -1544,7 +1493,7 @@ anychart.elements.Axis.prototype.getLabelBounds_ = function(index, isMajor, opt_
   if (goog.isDef(boundsCache[index]))
     return boundsCache[index];
 
-  var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds_().toRect();
+  var bounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.getPixelBounds_();
   var lineBounds = goog.isDef(opt_parentBounds) ? opt_parentBounds : this.line_.getBounds();
   var ticks = isMajor ? this.ticks() : this.minorTicks();
   var ticksLength = ticks.length();
@@ -1867,7 +1816,7 @@ anychart.elements.Axis.prototype.isHorizontal = function() {
  */
 anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
   var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  var bounds = this.getPixelBounds_().toRect();
+  var bounds = this.getPixelBounds_();
   var y = bounds.top + bounds.height + lineThickness / 2;
   this.line_
       .moveTo(bounds.left + pixelShift, y)
@@ -1882,7 +1831,7 @@ anychart.elements.Axis.prototype.drawTopLine_ = function(pixelShift) {
  */
 anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
   var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  var bounds = this.getPixelBounds_().toRect();
+  var bounds = this.getPixelBounds_();
   var x = bounds.left - lineThickness / 2;
   this.line_
       .moveTo(x, bounds.top + pixelShift)
@@ -1897,7 +1846,7 @@ anychart.elements.Axis.prototype.drawRightLine_ = function(pixelShift) {
  */
 anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
   var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  var bounds = this.getPixelBounds_().toRect();
+  var bounds = this.getPixelBounds_();
   var y = bounds.top - lineThickness / 2;
   this.line_
       .moveTo(bounds.left + pixelShift, y)
@@ -1912,7 +1861,7 @@ anychart.elements.Axis.prototype.drawBottomLine_ = function(pixelShift) {
  */
 anychart.elements.Axis.prototype.drawLeftLine_ = function(pixelShift) {
   var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  var bounds = this.getPixelBounds_().toRect();
+  var bounds = this.getPixelBounds_();
   var x = bounds.left + bounds.width + lineThickness / 2;
   this.line_
       .moveTo(x, bounds.top + pixelShift)
@@ -2019,7 +1968,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
   var x, y;
   switch (orientation) {
     case anychart.enums.Orientation.TOP:
-      x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
+      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
       y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2 - staggerSize;
 
       if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && ticks.enabled()) {
@@ -2028,14 +1977,14 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       break;
     case anychart.enums.Orientation.RIGHT:
       x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2 + staggerSize;
-      y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
+      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
 
       if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && ticks.enabled()) {
         x += ticksLength;
       }
       break;
     case anychart.enums.Orientation.BOTTOM:
-      x = Math.round(bounds.left() + ratio * bounds.width()) + pixelShift;
+      x = Math.round(bounds.left + ratio * bounds.width) + pixelShift;
       y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2 + staggerSize;
 
       if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && ticks.enabled()) {
@@ -2044,7 +1993,7 @@ anychart.elements.Axis.prototype.drawLabel_ = function(value, ratio, index, pixe
       break;
     case anychart.enums.Orientation.LEFT:
       x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2 - staggerSize;
-      y = Math.round(bounds.top() + bounds.height() - ratio * bounds.height()) + pixelShift;
+      y = Math.round(bounds.top + bounds.height - ratio * bounds.height) + pixelShift;
 
       if (this.ticks_.position() == anychart.enums.SidePosition.OUTSIDE && ticks.enabled()) {
         x -= ticksLength;
@@ -2167,7 +2116,7 @@ anychart.elements.Axis.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
     var title = this.title();
-    title.parentBounds(this.getPixelBounds_().toRect());
+    title.parentBounds(this.getPixelBounds_());
     title.orientation(orientation);
     title.draw();
     this.markConsistent(anychart.ConsistencyState.TITLE);
@@ -2190,12 +2139,12 @@ anychart.elements.Axis.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    labels.parentBounds(this.parentBounds_);
+    labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     labels.clear();
 
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    minorLabels.parentBounds(this.parentBounds_);
+    minorLabels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     minorLabels.clear();
 
     this.markConsistent(anychart.ConsistencyState.LABELS);
@@ -2420,7 +2369,6 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
 
   this.minorTicks_ = null;
 
-  this.parentBounds_ = null;
   this.pixelBounds_ = null;
 
   this.labels_ = null;
@@ -2459,7 +2407,6 @@ anychart.elements.Axis.prototype['scale'] = anychart.elements.Axis.prototype.sca
 anychart.elements.Axis.prototype['offsetX'] = anychart.elements.Axis.prototype.offsetX;//doc|ex
 anychart.elements.Axis.prototype['offsetY'] = anychart.elements.Axis.prototype.offsetY;//doc|ex
 anychart.elements.Axis.prototype['length'] = anychart.elements.Axis.prototype.length;//doc|ex
-anychart.elements.Axis.prototype['parentBounds'] = anychart.elements.Axis.prototype.parentBounds;//doc|ex
 anychart.elements.Axis.prototype['getRemainingBounds'] = anychart.elements.Axis.prototype.getRemainingBounds;//doc|ex
 anychart.elements.Axis.prototype['drawFirstLabel'] = anychart.elements.Axis.prototype.drawFirstLabel;//doc|ex
 anychart.elements.Axis.prototype['drawLastLabel'] = anychart.elements.Axis.prototype.drawLastLabel;//doc|ex

@@ -77,7 +77,7 @@ anychart.cartesian.series.WidthBased.prototype.isWidthBased = function() {
 anychart.cartesian.series.WidthBased.prototype.getPointWidth = function() {
   // todo(Anton Saukh): fix for linear scale case.
   var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
-      this.pixelBounds().width;
+      this.pixelBoundsCache.width;
   return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
 };
 

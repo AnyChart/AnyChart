@@ -683,7 +683,7 @@ anychart.elements.TooltipItem.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
     var background = /** @type {anychart.elements.Background} */(this.background());
     background.suspendSignalsDispatching();
-    background.pixelBounds(this.contentBounds_);
+    background.parentBounds(this.contentBounds_);
     if (this.enabled() && this.visible()) background.container(this.layer_);
     background.resumeSignalsDispatching(false);
     background.draw();

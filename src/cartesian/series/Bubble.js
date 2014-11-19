@@ -295,7 +295,7 @@ anychart.cartesian.series.Bubble.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
 
   var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
-      this.pixelBounds().width / 2;
+      this.pixelBoundsCache.width / 2;
 
   /**
    * Calculated minimum size value. For inner use.

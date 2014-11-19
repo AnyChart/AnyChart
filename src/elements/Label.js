@@ -62,13 +62,6 @@ anychart.elements.Label = function() {
   this.height_ = null;
 
   /**
-   * Parent bounds stored.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * Label width settings.
    * @type {number}
    * @private
@@ -376,64 +369,6 @@ anychart.elements.Label.prototype.height = function(opt_value) {
     return this;
   }
   return this.height_;
-};
-
-
-/**
- * Returns positioning bounds.
- * @return {anychart.math.Rect} Current parent bounds.
- *//**
- * Sets positioning bounds.<br/>
- * If width, height or offsets are set in percents - these are percents of these bounds.
- * @illustration <t>simple-h100</t>
- * var layer = stage.layer();
- * var stageBounds =  anychart.math.rect(0, 0, stage.width(), stage.height());
- * var layerBounds =  anychart.math.rect(100, 20, stage.width() / 3, stage.height() / 3);
- * layer.rect(1, 1, stage.width() - 2, stage.height() - 2)
- *      .stroke('2 red');
- * layer.text(2*stage.width()/3, 2, 'stageBounds');
- * var layer2 = stage.layer();
- * layer2.rect(layerBounds.left, layerBounds.top, layerBounds.width, layerBounds.height)
- *      .stroke('2 blue');
- * layer2.text(layerBounds.left, layerBounds.top+layerBounds.height, 'layerBounds');
- * anychart.elements.label()
- *     .container(layer2)
- *     .parentBounds(stageBounds)
- *     .background(null)
- *     .draw();
- * anychart.elements.label()
- *     .container(layer2)
- *     .background(null)
- *     .parentBounds(layerBounds)
- *     .fontColor('gray')
- *     .draw();
- * @illustrationDesc
- * Label is inside a layer (marked with blue), two positioning options are shown:<br/>
- *   a. Gray - inside parent container bounds.<br/>
- *   b. Black - when stage acts as a parent.
- * @example <t>listingOnly</t>
- * anychart.elements.label()
- *     .container(layer)
- *     .parentBounds(stageBounds)
- *     .background(null)
- *     .draw();
- * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.Label} {@link anychart.elements.Label} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value .
- * @return {!anychart.elements.Label|anychart.math.Rect} .
- */
-anychart.elements.Label.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
 };
 
 
@@ -954,6 +889,7 @@ anychart.elements.Label.prototype.calculateFontSize_ = function(originWidth, ori
  * @private
  */
 anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   /** @type {number} */
   var parentWidth;
   /** @type {number} */
@@ -964,9 +900,9 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
   var autoHeight;
 
   // canAdjustBy = !auto
-  if (this.parentBounds_) {
-    parentWidth = this.parentBounds_.width;
-    parentHeight = this.parentBounds_.height;
+  if (parentBounds) {
+    parentWidth = parentBounds.width;
+    parentHeight = parentBounds.height;
     if (goog.isDefAndNotNull(this.width_)) {
       this.backgroundWidth_ = width = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
       autoWidth = false;
@@ -982,16 +918,16 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
       autoHeight = true;
     }
   } else {
-    if (goog.isNumber(this.width_) && !isNaN(this.width_)) {
+    if (!anychart.utils.isNaN(this.width_)) {
       autoWidth = false;
-      this.backgroundWidth_ = width = this.width_;
+      this.backgroundWidth_ = width = anychart.utils.toNumber(this.width_);
     } else {
       autoWidth = true;
       width = 0;
     }
-    if (goog.isNumber(this.height_) && !isNaN(this.height_)) {
+    if (!anychart.utils.isNaN(this.height_)) {
       autoHeight = false;
-      this.backgroundHeight_ = height = this.height_;
+      this.backgroundHeight_ = height = anychart.utils.toNumber(this.height_);
     } else {
       autoHeight = true;
       height = 0;
@@ -1075,24 +1011,17 @@ anychart.elements.Label.prototype.draw = function() {
     this.calculateLabelBounds_();
 
     //bounds
-    var parentX = 0;
-    var parentY = 0;
-    var parentWidth = 0;
-    var parentHeight = 0;
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
+    var parentX = parentBounds.left;
+    var parentY = parentBounds.top;
+    var parentWidth = parentBounds.width;
+    var parentHeight = parentBounds.height;
     var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_);
-
-    //define parent bounds
-    if (this.parentBounds_) {
-      parentX = this.parentBounds_.left;
-      parentY = this.parentBounds_.top;
-      parentWidth = this.parentBounds_.width;
-      parentHeight = this.parentBounds_.height;
-    }
 
     // calculate position
     var position = new acgraph.math.Coordinate(0, 0);
 
-    if (this.parentBounds_) {
+    if (this.parentBounds()) {
       switch (this.position_) {
         case anychart.enums.Position.LEFT_TOP:
           position.x = parentX;
@@ -1173,7 +1102,7 @@ anychart.elements.Label.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
     if (this.background_) {
       this.background_.suspendSignalsDispatching();
-      this.background_.pixelBounds(backgroundBounds);
+      this.background_.parentBounds(backgroundBounds);
       this.background_.draw();
       this.background_.resumeSignalsDispatching(false);
     }
@@ -1302,7 +1231,6 @@ anychart.elements.Label.prototype.deserialize = function(config) {
  * Restore label default settings.
  */
 anychart.elements.Label.prototype.restoreDefaults = function() {
-  this.parentBounds(null);
   this.width(null);
   this.height(null);
   this.padding(0);
@@ -1352,7 +1280,6 @@ anychart.elements.Label.prototype['background'] = anychart.elements.Label.protot
 anychart.elements.Label.prototype['padding'] = anychart.elements.Label.prototype.padding;//in docs/
 anychart.elements.Label.prototype['width'] = anychart.elements.Label.prototype.width;//in docs/
 anychart.elements.Label.prototype['height'] = anychart.elements.Label.prototype.height;//in docs/
-anychart.elements.Label.prototype['parentBounds'] = anychart.elements.Label.prototype.parentBounds;//in docs/
 anychart.elements.Label.prototype['anchor'] = anychart.elements.Label.prototype.anchor;//in docs/
 anychart.elements.Label.prototype['offsetX'] = anychart.elements.Label.prototype.offsetX;//in docs/
 anychart.elements.Label.prototype['offsetY'] = anychart.elements.Label.prototype.offsetY;//in docs/

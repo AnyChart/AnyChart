@@ -29,12 +29,6 @@ anychart.elements.RangeMarker = function() {
   this.scale_;
 
   /**
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * @type {anychart.enums.Layout}
    * @private
    */
@@ -181,32 +175,6 @@ anychart.elements.RangeMarker.prototype.scaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for parentBounds.
- * @return {anychart.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.
- * @param {anychart.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.RangeMarker} An instance of the {@link anychart.elements.RangeMarker} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value Bounds for marker.
- * @return {anychart.math.Rect|anychart.elements.RangeMarker} Bounds or this.
- */
-anychart.elements.RangeMarker.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value ? opt_value.round() : null;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.parentBounds_;
-  }
-};
-
-
 /**
  * Axes lines space.
  * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
@@ -506,7 +474,6 @@ goog.exportSymbol('anychart.elements.rangeMarker', anychart.elements.rangeMarker
 anychart.elements.RangeMarker.prototype['from'] = anychart.elements.RangeMarker.prototype.from;
 anychart.elements.RangeMarker.prototype['to'] = anychart.elements.RangeMarker.prototype.to;
 anychart.elements.RangeMarker.prototype['scale'] = anychart.elements.RangeMarker.prototype.scale;
-anychart.elements.RangeMarker.prototype['parentBounds'] = anychart.elements.RangeMarker.prototype.parentBounds;
 anychart.elements.RangeMarker.prototype['layout'] = anychart.elements.RangeMarker.prototype.layout;
 anychart.elements.RangeMarker.prototype['fill'] = anychart.elements.RangeMarker.prototype.fill;
 anychart.elements.RangeMarker.prototype['draw'] = anychart.elements.RangeMarker.prototype.draw;

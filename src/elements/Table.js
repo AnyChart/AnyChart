@@ -1408,11 +1408,12 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     var newColRights = new Array(this.colsCount_);
     var newRowBottoms = new Array(this.rowsCount_);
     var i, len, val, size, needsRedraw = false;
+    var pixelBounds = this.getPixelBounds();
 
     var distributedSize = 0;
     var fixedSizes = [];
     var autoSizesCount = 0;
-    var tableSize = this.pixelBounds().width;
+    var tableSize = pixelBounds.width;
     for (i = 0, len = this.colsCount_; i < len; i++) {
       size = anychart.utils.normalizeSize(this.colWidthSettings_[i], tableSize);
       if (isNaN(size)) {
@@ -1439,7 +1440,7 @@ anychart.elements.Table.prototype.checkSizes_ = function() {
     distributedSize = 0;
     fixedSizes.length = 0;
     autoSizesCount = 0;
-    tableSize = this.pixelBounds().height;
+    tableSize = pixelBounds.height;
     for (i = 0, len = this.rowsCount_; i < len; i++) {
       size = anychart.utils.normalizeSize(this.rowHeightSettings_[i], tableSize);
       if (isNaN(size)) {
@@ -1644,7 +1645,7 @@ anychart.elements.Table.prototype.checkContent_ = function() {
           marker = /** @type {anychart.elements.MarkersFactory.Marker} */(content);
           if (marker.parentMarkersFactory())
             marker.parentMarkersFactory().clear(marker.getIndex());
-        } else if ((content instanceof anychart.VisualBase) || content.parentBounds) {
+        } else if (content instanceof anychart.VisualBase) {
           if (content instanceof anychart.Chart)
             (/** @type {anychart.Chart} */(content)).autoRedraw(true);
           content.container(null);
@@ -1686,17 +1687,9 @@ anychart.elements.Table.prototype.checkContent_ = function() {
               var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
               marker.positionProvider(positionProvider);
               marker.draw();
-            } else if (content instanceof anychart.VisualBaseWithBounds) {
+            } else if (content instanceof anychart.VisualBase) {
               if (content instanceof anychart.Chart)
                 (/** @type {anychart.Chart} */(content)).autoRedraw(false);
-              var elementWithBounds = /** @type {anychart.VisualBaseWithBounds} */(content);
-              elementWithBounds.pixelBounds(null);
-              var chartBounds = /** @type {anychart.math.Rect} */(elementWithBounds.pixelBounds(bounds.width, bounds.height));
-              chartBounds.left += bounds.left;
-              chartBounds.top += bounds.top;
-              elementWithBounds.pixelBounds(chartBounds);
-              elementWithBounds.draw();
-            } else if (content.parentBounds) {
               var element = /** @type {anychart.VisualBase} */(content);
               element.parentBounds(bounds);
               element.draw();
@@ -1711,7 +1704,7 @@ anychart.elements.Table.prototype.checkContent_ = function() {
     }
     if (this.labelsFactory_) {
       this.labelsFactory_.container(this.contentLayer_);
-      this.labelsFactory_.parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+      this.labelsFactory_.parentBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
       this.labelsFactory_.draw();
     }
     this.shouldRedrawContent = false;
@@ -1894,7 +1887,7 @@ anychart.elements.Table.prototype.resetFillPaths_ = function() {
  */
 anychart.elements.Table.prototype.getBorderPath_ = function(stroke) {
   if (goog.isObject(stroke) && ('keys' in stroke) && !goog.isObject(stroke['mode']))
-    stroke['mode'] = this.pixelBounds();
+    stroke['mode'] = this.getPixelBounds();
   var hash = anychart.utils.hash(stroke);
   if (hash in this.borderPaths_)
     return this.borderPaths_[hash];
@@ -1951,7 +1944,7 @@ anychart.elements.Table.prototype.getFillPath_ = function(fill) {
  * @return {!anychart.math.Rect}
  */
 anychart.elements.Table.prototype.getCellBounds = function(row, col, rowSpan, colSpan, opt_outBounds) {
-  var tableBounds = this.pixelBounds();
+  var tableBounds = this.getPixelBounds();
   var outBounds = opt_outBounds instanceof anychart.math.Rect ? opt_outBounds : new anychart.math.Rect(0, 0, 0, 0);
   var start = (this.colRights_[col - 1] + 1) || 0;
   var end = this.colRights_[Math.min(col + colSpan, this.colsCount_) - 1];

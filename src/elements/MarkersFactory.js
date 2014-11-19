@@ -18,7 +18,6 @@ goog.require('goog.events.BrowserEvent');
  *   <li>{@link anychart.elements.MarkersFactory#anchor}</li>
  *   <li>{@link anychart.elements.MarkersFactory#position}</li>
  *   <li>{@link anychart.elements.MarkersFactory#offsetX} and {@link anychart.elements.MarkersFactory#offsetY}</li>
- *   <li>{@link anychart.elements.MarkersFactory#parentBounds}</li>
  * </ul>
  * Also you can access any marker from the set and change it:
  * @example <t>simple-h100</t>
@@ -142,13 +141,6 @@ anychart.elements.MarkersFactory = function() {
    * @private
    */
   this.attachedOnceEvents_ = 0;
-
-  /**
-   * Parent bounds stored.
-   * @type {anychart.math.Rect}
-   * @private
-   */
-  this.parentBounds_;
 
   /**
    * Markers array.
@@ -870,30 +862,6 @@ anychart.elements.MarkersFactory.prototype.disablePointerEvents = function(opt_v
 
 
 /**
- * Returns bounds in which element is positioning.
- * @return {anychart.math.Rect} Current parent bounds.
- *//**
- * Sets bounds for offsets calculation, if those are set in percents.
- * @param {anychart.math.Rect=} opt_value [null] Value to set.
- * @return {!anychart.elements.MarkersFactory} {@link anychart.elements.MarkersFactory} for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value .
- * @return {!anychart.elements.MarkersFactory|anychart.math.Rect} .
- */
-anychart.elements.MarkersFactory.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
-};
-
-
-/**
  * MarkersFactory serialization.
  * @return {Object} Serialized data.
  */
@@ -954,9 +922,10 @@ anychart.elements.MarkersFactory.prototype.measure = function(positionProvider) 
   if (!this.measureMarkerElement_) this.measureMarkerElement_ = acgraph.path();
 
   //define parent bounds
-  if (this.parentBounds_) {
-    parentWidth = this.parentBounds_.width;
-    parentHeight = this.parentBounds_.height;
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  if (parentBounds) {
+    parentWidth = parentBounds.width;
+    parentHeight = parentBounds.height;
   }
 
   var type = this.type();
@@ -1960,9 +1929,10 @@ anychart.elements.MarkersFactory.Marker.prototype.draw = function() {
 
     //define parent bounds
     var parentWidth, parentHeight;
-    if (this.parentBounds_) {
-      parentWidth = this.parentBounds_.width;
-      parentHeight = this.parentBounds_.height;
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+    if (parentBounds) {
+      parentWidth = parentBounds.width;
+      parentHeight = parentBounds.height;
     }
 
     this.markerElement_.clear();

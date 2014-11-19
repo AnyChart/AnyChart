@@ -414,7 +414,7 @@ anychart.gantt.Controller.prototype.dataGrid = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.dataGrid_ != opt_value) {
       this.dataGrid_ = opt_value;
-      this.availableHeight_ = this.dataGrid_.pixelBounds().height - this.dataGrid_.titleHeight();
+      this.availableHeight_ = this.dataGrid_.getPixelBounds().height - this.dataGrid_.titleHeight();
       this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;

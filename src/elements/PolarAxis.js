@@ -142,13 +142,6 @@ anychart.elements.PolarAxis.prototype.scale_ = null;
 
 
 /**
- * @type {anychart.math.Rect}
- * @private
- */
-anychart.elements.PolarAxis.prototype.parentBounds_ = null;
-
-
-/**
  * @type {anychart.utils.Bounds}
  * @private
  */
@@ -380,19 +373,9 @@ anychart.elements.PolarAxis.prototype.startAngle = function(opt_value) {
 };
 
 
-/**
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.PolarAxis} Bounds or this.
- */
-anychart.elements.PolarAxis.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value.clone().round();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_.clone();
+/** @inheritDoc */
+anychart.elements.PolarAxis.prototype.invalidateParentBounds = function() {
+  this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -413,17 +396,7 @@ anychart.elements.PolarAxis.prototype.dropBoundsCache_ = function() {
  */
 anychart.elements.PolarAxis.prototype.calculateAxisBounds_ = function() {
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-
-    var parentBounds;
-    if (this.parentBounds_) {
-      parentBounds = this.parentBounds_;
-    } else if (stage) {
-      parentBounds = stage.getBounds();
-    } else {
-      parentBounds = null;
-    }
+    var parentBounds = this.parentBounds();
 
     if (parentBounds) {
       this.radius_ = Math.round(Math.min(parentBounds.width, parentBounds.height) / 2);
@@ -605,18 +578,7 @@ anychart.elements.PolarAxis.prototype.calculateAxisBounds_ = function() {
  * @return {anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.elements.PolarAxis.prototype.getRemainingBounds = function() {
-  var parentBounds;
-  if (this.parentBounds_) {
-    parentBounds = this.parentBounds_;
-  } else {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    var stage = container ? container.getStage() : null;
-    if (stage) {
-      parentBounds = /** @type {anychart.math.Rect} */(stage.getBounds());
-    } else {
-      parentBounds = null;
-    }
-  }
+  var parentBounds = this.parentBounds();
 
   if (parentBounds) {
     this.calculateAxisBounds_();
@@ -851,7 +813,7 @@ anychart.elements.PolarAxis.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    labels.parentBounds(this.parentBounds_);
+    labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     labels.clear();
 
     labelsDrawer = this.drawLabel_;
@@ -988,7 +950,6 @@ anychart.elements.PolarAxis.prototype.disposeInternal = function() {
 
   this.ticks_ = null;
 
-  this.parentBounds_ = null;
   this.pixelBounds_ = null;
 
   this.labels_ = null;
@@ -1012,6 +973,5 @@ anychart.elements.PolarAxis.prototype['labels'] = anychart.elements.PolarAxis.pr
 anychart.elements.PolarAxis.prototype['ticks'] = anychart.elements.PolarAxis.prototype.ticks;
 anychart.elements.PolarAxis.prototype['stroke'] = anychart.elements.PolarAxis.prototype.stroke;
 anychart.elements.PolarAxis.prototype['scale'] = anychart.elements.PolarAxis.prototype.scale;
-anychart.elements.PolarAxis.prototype['parentBounds'] = anychart.elements.PolarAxis.prototype.parentBounds;
 anychart.elements.PolarAxis.prototype['getRemainingBounds'] = anychart.elements.PolarAxis.prototype.getRemainingBounds;
 anychart.elements.PolarAxis.prototype['draw'] = anychart.elements.PolarAxis.prototype.draw;

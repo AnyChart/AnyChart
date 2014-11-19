@@ -490,7 +490,7 @@ anychart.elements.Background.prototype.draw = function() {
   if (manualSuspend) stage.suspend();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var bounds = this.pixelBounds().clone();
+    var bounds = this.getPixelBounds();
     var thicknessHalf = this.rect_.strokeThickness() / 2;
     //TODO(Anton Saukh): remove this fix when graphics is fixed.
     if (isNaN(thicknessHalf)) thicknessHalf = .5;

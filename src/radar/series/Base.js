@@ -74,6 +74,13 @@ anychart.radar.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 
 
 /**
+ * @type {anychart.math.Rect}
+ * @protected
+ */
+anychart.radar.series.Base.prototype.pixelBoundsCache;
+
+
+/**
  * Supported signals.
  * @type {number}
  */
@@ -800,7 +807,7 @@ anychart.radar.series.Base.prototype.getZeroPointCoords = function() {
  */
 anychart.radar.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
   /** @type {acgraph.math.Rect} */
-  var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());
+  var bounds = this.pixelBoundsCache;
   var min, range;
   if (horizontal) {
     min = bounds.left;
@@ -884,8 +891,10 @@ anychart.radar.series.Base.prototype.startDrawing = function() {
     this.registerDisposable(this.rootLayer);
   }
 
+  this.pixelBoundsCache = this.getPixelBounds();
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var bounds = /** @type {acgraph.math.Rect} */(this.pixelBounds());
+    var bounds = this.pixelBoundsCache;
     this.radius = Math.min(bounds.width, bounds.height) / 2;
     this.cx = Math.round(bounds.left + bounds.width / 2);
     this.cy = Math.round(bounds.top + bounds.height / 2);
@@ -907,7 +916,7 @@ anychart.radar.series.Base.prototype.startDrawing = function() {
   this.hoverLabels().suspendSignalsDispatching();
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.pixelBounds()));
+  this.labels().parentBounds(this.pixelBoundsCache);
 };
 
 

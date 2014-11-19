@@ -235,72 +235,11 @@ anychart.VisualBaseWithBounds.prototype.height = function(opt_value) {
 
 
 /**
- * Returns the current bounds.<br/>
- * <b>Note:</b> If the width and/or height were set in percents using {@link anychart.VisualBaseWithBounds#bounds} method,
- * we may have problems with autocalculation (size has never been never passed in pixels for any of the
- * nesting containers). In such case we need to pass pixel size of the container
- * using <b>containerWidth</b> and <b>containerHeight</b>. In any other case you
- * <b>don't need to set them!</b><br/>
- * <b>Note:</b> If this method was used as a setter then no matter what parameters set you
- * get those passed to setter.
- * @shortDescription Returns the current bounds.
- * @example <t>listingOnly</t>
- * // simple usage
- * element.bounds(0, 10, 200, 300);
- * element.pixelBounds(); // returns Rect with size: 200x300
- * // container size: 400 x 100
- * element.bounds(0, 10, '60%', '67%');
- * element.pixelBounds(400, 100); // returns Rect with size: 200x57
- * @example <c>Using setter</c><t>listingOnly</t>
- * var rect = anychart.math.rect(0, 0, 350, 250);
- * element.pixelBounds(rect);
- * element.pixelBounds(); // returns the value of variable rect.
- * element.pixelBounds(400, 100); // returns the value of variable rect.
- * @example <t>lineChart</t>
- * chart.line([1, 1.8, 1.2, 2.8]);
- * chart.pixelBounds(350, 250);
- * @param {number=} opt_containerWidth The width of a container in pixels.
- * @param {number=} opt_containerHeight Height of a container in pixels.
- * @return {!anychart.math.Rect} Returns the rect with determined pixel bounds.
- *//**
- * Sets exact pixel bounds of the element.<br/>
- * <b>Note:</b> If you pass <b>null</b> then previous value is reset
- * and bounds are autocalculated.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.pixelBounds( anychart.math.rect(0, 0, 350, 250) );
- * @param {(!anychart.math.Rect|null)=} opt_value Value to set.
- * @return {!anychart.VisualBase} An instance of {@link anychart.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {(!anychart.math.Rect|null|number)=} opt_valueOrContainerWidth .
- * @param {number=} opt_containerHeight .
- * @return {(!anychart.VisualBase|!anychart.math.Rect)} .
+ * Returns pixel bounds of the element due to parent bounds and self bounds settings.
+ * @return {(!anychart.math.Rect)} .
  */
-anychart.VisualBaseWithBounds.prototype.pixelBounds = function(opt_valueOrContainerWidth, opt_containerHeight) {
-  if ((opt_valueOrContainerWidth instanceof anychart.math.Rect) || goog.isNull(opt_valueOrContainerWidth)) {
-    if (this.pixelBounds_ != opt_valueOrContainerWidth) {
-      this.pixelBounds_ = opt_valueOrContainerWidth;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  if (this.pixelBounds_)
-    return (/** @type {!anychart.math.Rect} */(this.pixelBounds_)).clone();
-  // TODO(Anton Saukh): Refactor when we implement bounds for layers in graphics.
-  var stage = this.container();
-  if (stage)
-    stage = stage.getStage();
-  if (stage) {
-    opt_valueOrContainerWidth = goog.isDef(opt_valueOrContainerWidth) ?
-        opt_valueOrContainerWidth :
-        /** @type {number} */(stage.width());
-    opt_containerHeight = goog.isDef(opt_containerHeight) ?
-        opt_containerHeight :
-        /** @type {number} */(stage.height());
-  }
-  return this.bounds().toRect(opt_valueOrContainerWidth, opt_containerHeight);
+anychart.VisualBaseWithBounds.prototype.getPixelBounds = function() {
+  return this.bounds().toRect(/** @type {anychart.math.Rect} */(this.parentBounds()));
 };
 
 
@@ -321,8 +260,6 @@ anychart.VisualBaseWithBounds.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   json['bounds'] = this.bounds().serialize();
-  if (this.pixelBounds_) // we need it in config only if it is explicitly set.
-    json['pixelBounds'] = this.pixelBounds_.serialize();
 
   return json;
 };
@@ -333,8 +270,6 @@ anychart.VisualBaseWithBounds.prototype.deserialize = function(config) {
   goog.base(this, 'deserialize', config);
 
   this.bounds().deserialize(config['bounds'] || {});
-  if ('pixelBounds' in config) // we need to set it only if it is explicitly set in config.
-    this.pixelBounds(anychart.math.Rect.deserialize(config['pixelBounds']));
 
   return this;
 };
@@ -348,4 +283,4 @@ anychart.VisualBaseWithBounds.prototype['bottom'] = anychart.VisualBaseWithBound
 anychart.VisualBaseWithBounds.prototype['left'] = anychart.VisualBaseWithBounds.prototype.left;//doc|ex
 anychart.VisualBaseWithBounds.prototype['width'] = anychart.VisualBaseWithBounds.prototype.width;//doc|ex
 anychart.VisualBaseWithBounds.prototype['height'] = anychart.VisualBaseWithBounds.prototype.height;//doc|ex
-anychart.VisualBaseWithBounds.prototype['pixelBounds'] = anychart.VisualBaseWithBounds.prototype.pixelBounds;//doc|ex
+anychart.VisualBaseWithBounds.prototype['getPixelBounds'] = anychart.VisualBaseWithBounds.prototype.getPixelBounds;

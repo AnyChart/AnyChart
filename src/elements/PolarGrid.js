@@ -65,12 +65,6 @@ anychart.elements.PolarGrid = function() {
   this.xScale_;
 
   /**
-   * @type {acgraph.math.Rect}
-   * @private
-   */
-  this.parentBounds_ = null;
-
-  /**
    * @type {boolean}
    * @private
    */
@@ -245,38 +239,6 @@ anychart.elements.PolarGrid.prototype.xScaleInvalidated_ = function(event) {
       anychart.ConsistencyState.APPEARANCE;
 
   this.invalidate(state, signal);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Bounds.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.PolarGrid} {@link anychart.elements.PolarGrid} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {acgraph.math.Rect=} opt_value Bounds for marker.
- * @return {acgraph.math.Rect|anychart.elements.PolarGrid} Bounds or this.
- */
-anychart.elements.PolarGrid.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      if (opt_value) {
-        this.parentBounds_ = opt_value ? opt_value.clone().round() : null;
-      }
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.parentBounds_;
-  }
 };
 
 
@@ -763,7 +725,6 @@ anychart.elements.PolarGrid.prototype.evenFillElement = function() {
  */
 anychart.elements.PolarGrid.prototype.serialize = function() {
   var data = goog.base(this, 'serialize');
-  data['parentBounds'] = this.parentBounds();
   data['stroke'] = this.stroke();
   data['layout'] = this.layout();
   data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
@@ -781,7 +742,6 @@ anychart.elements.PolarGrid.prototype.deserialize = function(value) {
 
   goog.base(this, 'deserialize', value);
 
-  if (goog.isDef(value['parentBounds'])) this.parentBounds(value['parentBounds']);
   if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
   if (goog.isDef(value['layout'])) this.layout(value['layout']);
   if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
@@ -823,7 +783,6 @@ anychart.elements.PolarGrid.prototype['layout'] = anychart.elements.PolarGrid.pr
 anychart.elements.PolarGrid.prototype['isRadial'] = anychart.elements.PolarGrid.prototype.isRadial;
 anychart.elements.PolarGrid.prototype['yScale'] = anychart.elements.PolarGrid.prototype.yScale;
 anychart.elements.PolarGrid.prototype['xScale'] = anychart.elements.PolarGrid.prototype.xScale;
-anychart.elements.PolarGrid.prototype['parentBounds'] = anychart.elements.PolarGrid.prototype.parentBounds;
 anychart.elements.PolarGrid.prototype['stroke'] = anychart.elements.PolarGrid.prototype.stroke;
 anychart.elements.PolarGrid.prototype['drawFirstLine'] = anychart.elements.PolarGrid.prototype.drawFirstLine;
 anychart.elements.PolarGrid.prototype['drawLastLine'] = anychart.elements.PolarGrid.prototype.drawLastLine;

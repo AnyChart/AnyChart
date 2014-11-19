@@ -199,20 +199,6 @@ anychart.elements.RadialAxis.prototype.overlapMode_ = anychart.enums.LabelsOverl
 
 
 /**
- * @type {anychart.math.Rect}
- * @private
- */
-anychart.elements.RadialAxis.prototype.parentBounds_ = null;
-
-
-/**
- * @type {anychart.utils.Bounds}
- * @private
- */
-anychart.elements.RadialAxis.prototype.pixelBounds_ = null;
-
-
-/**
  * @type {number}
  * @private
  */
@@ -599,35 +585,9 @@ anychart.elements.RadialAxis.prototype.scaleInvalidated_ = function(event) {
 };
 
 
-/**
- * Getter for parentBounds.
- * @return {acgraph.math.Rect} Current parent bounds.
- *//**
- * Setter for parentBounds.<br/>
- * <b>Note:</b> Works only if you create an independent axis object.
- * @example <t>simple-h100</t>
- * anychart.elements.axis()
- *   .parentBounds(anychart.math.rect(40, 0, 240, 40))
- *   .scale(anychart.scales.ordinal().values([1,2,3]))
- *   .container(stage).draw();
- * @param {acgraph.math.Rect=} opt_value Value to set.
- * @return {!anychart.elements.RadialAxis} {@link anychart.elements.RadialAxis} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {anychart.math.Rect=} opt_value Bounds for marker.
- * @return {anychart.math.Rect|anychart.elements.RadialAxis} Bounds or this.
- */
-anychart.elements.RadialAxis.prototype.parentBounds = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.parentBounds_ != opt_value) {
-      this.parentBounds_ = opt_value.clone().round();
-      this.dropBoundsCache_();
-      this.calculateAxis_();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.parentBounds_;
+/** @inheritDoc */
+anychart.elements.RadialAxis.prototype.invalidateParentBounds = function() {
+  this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
@@ -1336,6 +1296,11 @@ anychart.elements.RadialAxis.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.dropBoundsCache_();
+    this.calculateAxis_();
+  }
+
   var lineDrawer, ticksDrawer, minorTicksDrawer, labelsDrawer, minorLabelsDrawer;
   var minorTicks, ticks;
 
@@ -1392,13 +1357,13 @@ anychart.elements.RadialAxis.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    labels.parentBounds(this.parentBounds_);
+    labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     labels.clear();
     labelsDrawer = this.drawLabel_;
 
     var minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    minorLabels.parentBounds(this.parentBounds_);
+    minorLabels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     minorLabels.clear();
     minorLabelsDrawer = this.drawLabel_;
 
@@ -1579,9 +1544,6 @@ anychart.elements.RadialAxis.prototype.disposeInternal = function() {
 
   this.minorTicks_ = null;
 
-  this.parentBounds_ = null;
-  this.pixelBounds_ = null;
-
   this.labels_ = null;
   this.minorLabels_ = null;
 };
@@ -1611,7 +1573,6 @@ anychart.elements.RadialAxis.prototype['minorTicks'] = anychart.elements.RadialA
 anychart.elements.RadialAxis.prototype['stroke'] = anychart.elements.RadialAxis.prototype.stroke;
 anychart.elements.RadialAxis.prototype['scale'] = anychart.elements.RadialAxis.prototype.scale;
 anychart.elements.RadialAxis.prototype['startAngle'] = anychart.elements.RadialAxis.prototype.startAngle;
-anychart.elements.RadialAxis.prototype['parentBounds'] = anychart.elements.RadialAxis.prototype.parentBounds;
 anychart.elements.RadialAxis.prototype['drawFirstLabel'] = anychart.elements.RadialAxis.prototype.drawFirstLabel;
 anychart.elements.RadialAxis.prototype['drawLastLabel'] = anychart.elements.RadialAxis.prototype.drawLastLabel;
 anychart.elements.RadialAxis.prototype['overlapMode'] = anychart.elements.RadialAxis.prototype.overlapMode;
