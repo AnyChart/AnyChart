@@ -1226,6 +1226,7 @@ anychart.cartesian.series.Base.prototype.createFormatProvider = function() {
   var provider = {
     'index': index,
     'seriesName': this.name_ ? this.name_ : 'Series: ' + this.index_,
+    'meta': this.meta(),
     'seriesPointsCount': this.statistics('seriesPointsCount'),
     'pointsCount': this.statistics('pointsCount')
   };
