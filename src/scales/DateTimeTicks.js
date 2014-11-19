@@ -97,7 +97,7 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
  * ]);
  * chart.xScale().ticks().interval('d', 2);
  * chart.container(stage).draw();
- * @param {string=} opt_unit Set unit by first letter. 'year' is 'y', 'month' is 'm' etc.<br/>
+ * @param {anychart.enums.Interval=} opt_unit Set unit by first letter. 'year' is 'y', 'month' is 'm' etc.<br/>
  * <b>Note:</b> 'minutes' is 'n'.
  * @param {number=} opt_count Any positive value.
  * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
@@ -124,7 +124,7 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
  * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {number|string=} opt_years Years or string representing date part or ISO 8601 interval string.
+ * @param {(number|string|anychart.enums.Interval)=} opt_years Years or string representing date part or ISO 8601 interval string.
  * @param {number=} opt_months Months or number of whatever date part specified
  *     by first parameter.
  * @param {number=} opt_days Days.
@@ -141,8 +141,11 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
       val = null;
     else if (goog.isString(opt_years) && arguments.length == 1)
       val = goog.date.Interval.fromIsoString(opt_years);
-    else
+    else {
+      if (goog.isString(opt_years))
+        opt_years = anychart.enums.normalizeInterval(opt_years);
       val = new goog.date.Interval(opt_years, opt_months, opt_days, opt_hours, opt_minutes, opt_seconds);
+    }
     if (!((val && this.interval_ && this.interval_.equals(val)) || (!val && !this.interval_))) {
       if (!val) {
         this.count_ = 4;

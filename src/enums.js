@@ -1202,6 +1202,70 @@ anychart.enums.WarningCode = {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  DateTimeTicks Interval
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @enum {string}
+ */
+anychart.enums.Interval = {
+  YEARS: 'y',
+  MONTHS: 'm',
+  DAYS: 'd',
+  HOURS: 'h',
+  MINUTES: 'n',
+  SECONDS: 's'
+};
+
+
+/**
+ * Normalizes interval
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.Interval=} opt_default Custom default value (defaults to YEARS).
+ * @return {anychart.enums.Interval}
+ */
+anychart.enums.normalizeInterval = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'years':
+    case 'year':
+    case 'yyyy':
+    case 'yy':
+    case 'y':
+      return anychart.enums.Interval.YEARS;
+    case 'months':
+    case 'month':
+    case 'mm':
+    case 'm':
+      return anychart.enums.Interval.MONTHS;
+    case 'days':
+    case 'day':
+    case 'dd':
+    case 'd':
+      return anychart.enums.Interval.DAYS;
+    case 'hours':
+    case 'hour':
+    case 'hh':
+    case 'h':
+      return anychart.enums.Interval.HOURS;
+    case 'minutes':
+    case 'minute':
+    case 'min':
+    case 'n':
+      return anychart.enums.Interval.MINUTES;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return anychart.enums.Interval.SECONDS;
+  }
+  return opt_default || anychart.enums.Interval.YEARS;
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -1320,3 +1384,10 @@ goog.exportSymbol('anychart.enums.ScaleStackMode.PERCENT', anychart.enums.ScaleS
 
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LINEAR', anychart.enums.ScatterTicksMode.LINEAR);
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LOGARITHMIC', anychart.enums.ScatterTicksMode.LOGARITHMIC);
+
+goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEARS);
+goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTHS);
+goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAYS);
+goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOURS);
+goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTES);
+goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECONDS);
