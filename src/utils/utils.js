@@ -819,6 +819,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE:
       return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
 
+    case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
+      return 'Scatter chart scales should be only scatter type (linear, log)';
+
     default:
       return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';

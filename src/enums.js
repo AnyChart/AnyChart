@@ -1129,6 +1129,22 @@ anychart.enums.PolarSeriesType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  ScatterSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.ScatterSeriesTypes = {
+  BUBBLE: 'bubble',
+  LINE: 'line',
+  MARKER: 'marker'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1142,7 +1158,9 @@ anychart.enums.ErrorCode = {
   //anychart.elements.Table
   WRONG_TABLE_CONTENTS: 3,
 
-  NO_FEATURE_IN_MODULE: 4
+  NO_FEATURE_IN_MODULE: 4,
+
+  INCORRECT_SCALE_TYPE: 5
 };
 
 

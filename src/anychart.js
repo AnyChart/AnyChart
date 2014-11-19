@@ -461,6 +461,14 @@ anychart.cartesianChart = anychart.cartesianChart || function() {
 /**
  * @ignoreDoc
  */
+anychart.scatterChart = anychart.scatterChart || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.columnChart = anychart.columnChart || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
 };
@@ -589,3 +597,4 @@ goog.exportSymbol('anychart.polarMarkerChart', anychart.polarMarkerChart);
 goog.exportSymbol('anychart.radarLineChart', anychart.radarLineChart);
 goog.exportSymbol('anychart.radarAreaChart', anychart.radarAreaChart);
 goog.exportSymbol('anychart.radarMarkerChart', anychart.radarMarkerChart);
+goog.exportSymbol('anychart.scatterChart', anychart.scatterChart);
