@@ -961,6 +961,7 @@ anychart.elements.DataGrid.prototype.drawInternal = function(visibleItems, start
     //Ensure DOM structure is created.
     if (!this.getBase_().numChildren()) {
       this.bgRect_ = this.getBase_().rect();
+      this.registerDisposable(this.bgRect_);
       this.bgRect_.fill(this.backgroundFill_).stroke(null);
 
       this.getBase_()

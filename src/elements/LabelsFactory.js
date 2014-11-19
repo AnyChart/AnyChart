@@ -713,7 +713,10 @@ anychart.elements.LabelsFactory.prototype.add = function(formatProvider, positio
  * @return {anychart.elements.LabelsFactory} Returns itself for chaining.
  */
 anychart.elements.LabelsFactory.prototype.draw = function() {
-  if (!this.layer_) this.layer_ = acgraph.layer();
+  if (!this.layer_) {
+    this.layer_ = acgraph.layer();
+    this.registerDisposable(this.layer_);
+  }
 
   var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();

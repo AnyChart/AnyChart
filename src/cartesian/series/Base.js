@@ -1052,8 +1052,10 @@ anychart.cartesian.series.Base.prototype.remove = function() {
 anychart.cartesian.series.Base.prototype.startDrawing = function() {
   this.firstPointDrawn = false;
 
-  if (!this.rootLayer)
+  if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
+    this.registerDisposable(this.rootLayer);
+  }
 
   /** @type {anychart.scales.Base} */
   var scale = /** @type {anychart.scales.Base} */(this.yScale());

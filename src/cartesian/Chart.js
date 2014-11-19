@@ -1442,6 +1442,7 @@ anychart.cartesian.Chart.prototype.createSeriesByType_ = function(type, data, op
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    this.registerDisposable(instance);
     this.series_.push(instance);
     var index = this.series_.length - 1;
     var inc = index * anychart.cartesian.Chart.ZINDEX_INCREMENT_MULTIPLIER;

@@ -1102,7 +1102,10 @@ anychart.elements.MarkersFactory.prototype.add = function(positionProvider, opt_
  * @return {anychart.elements.MarkersFactory} Returns self for method chaining.
  */
 anychart.elements.MarkersFactory.prototype.draw = function() {
-  if (!this.layer_) this.layer_ = acgraph.layer();
+  if (!this.layer_) {
+    this.layer_ = acgraph.layer();
+    this.registerDisposable(this.layer_);
+  }
   this.layer_.disablePointerEvents(/** @type {boolean} */(this.disablePointerEvents()));
 
   var stage = this.layer_.getStage();

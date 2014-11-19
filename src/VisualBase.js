@@ -112,6 +112,7 @@ anychart.VisualBase.prototype.container = function(opt_value) {
         // Should we use registerDisposable in this case?
         // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
         this.container_ = acgraph.create();
+        this.registerDisposable(this.container_);
         this.container_.container(/** @type {Element} */(opt_value));
 
         //if graphics engine can't recognize passed container

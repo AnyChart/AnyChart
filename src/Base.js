@@ -665,6 +665,7 @@ anychart.Base.prototype['listenOnce'] = anychart.Base.prototype.listenOnce;//doc
 anychart.Base.prototype['unlisten'] = anychart.Base.prototype.unlisten;//doc|ex
 anychart.Base.prototype['unlistenByKey'] = anychart.Base.prototype.unlistenByKey;//doc|ex
 anychart.Base.prototype['removeAllListeners'] = anychart.Base.prototype.removeAllListeners;//doc|ex
+anychart.Base.prototype['dispose'] = anychart.Base.prototype.dispose;
 goog.exportSymbol('anychart.SignalEvent', anychart.SignalEvent);//doc
 anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;//doc
 anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;//doc
@@ -672,3 +673,4 @@ anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.proto
 anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;//doc
 anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;//doc
 anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;//doc
+anychart.SignalEvent.prototype['dispose'] = anychart.SignalEvent.prototype.dispose;
