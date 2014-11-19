@@ -60,7 +60,7 @@ function load() {
       'employer': 'anychart.com'
     }}
   ]);
-  legend.tooltip().textFormatter(function() {
+  legend.tooltip().contentFormatter(function() {
     var meta = this['meta'];
     if (this['text'] == 'chidori') {
       return this['text'] + ' a.k.a ' + meta['name'] + '<br>' + meta['profession'] + ' @ ' + meta['employer'];
@@ -68,6 +68,7 @@ function load() {
       return this['text'];
     }
   });
+  legend.parentBounds(stage.getBounds());
   legend.draw();
 
   stage = legend.container().getStage();

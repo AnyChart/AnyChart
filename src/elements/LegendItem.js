@@ -32,10 +32,6 @@ anychart.elements.LegendItem = function() {
   this.textElement_ = this.layer_.text();
   this.registerDisposable(this.textElement_);
 
-  acgraph.events.listen(this.layer_, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
-  acgraph.events.listen(this.layer_, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
-  acgraph.events.listen(this.layer_, acgraph.events.EventType.DBLCLICK, this.mouseDoubleClickHandler_, false, this);
-
   /**
    * @type {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))}
    */
@@ -802,6 +798,19 @@ anychart.elements.LegendItem.prototype.draw = function() {
     this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   }
 
+  if (!this.rectTheListener_) {
+    this.rectTheListener_ = this.layer_
+      .rect()
+      .stroke(null)
+      .fill('#FFFFFF 0.00001');
+
+    this.registerDisposable(/** @type {goog.disposable.IDisposable} */ (this.rectTheListener_));
+
+    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
+    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
+    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.DBLCLICK, this.mouseDoubleClickHandler_, false, this);
+  }
+
   var needHatch = goog.isDef(this.iconHatchFill_) && (!anychart.utils.isNone(this.iconHatchFill_) && !this.hatch_);
   if (needHatch) {
     /**
@@ -847,6 +856,7 @@ anychart.elements.LegendItem.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateBounds_();
     drawer.call(this, this.icon_, this.iconSize_);
+    this.rectTheListener_.setBounds(anychart.math.rect(0, 0, this.pixelBounds_.width, this.pixelBounds_.height));
     if (this.hatch_)
       drawer.call(this, this.hatch_, this.iconSize_);
     this.redrawIcon_ = false;
