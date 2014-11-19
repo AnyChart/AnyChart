@@ -67,6 +67,13 @@ anychart.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType
 
 
 /**
+ * @type {anychart.enums.MarkerType}
+ * @protected
+ */
+anychart.cartesian.series.Marker.prototype.autoMarkerType_;
+
+
+/**
  * Getter for current marker type settings.
  * @return {string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
  *  Markers type settings.
@@ -119,8 +126,14 @@ anychart.cartesian.series.Marker.prototype.type = function(opt_value) {
     }
     return this;
   } else {
-    return this.type_;
+    return this.type_ || this.autoMarkerType_;
   }
+};
+
+
+/** @inheritDoc */
+anychart.cartesian.series.Marker.prototype.setAutoMarkerType = function(opt_value) {
+  this.autoMarkerType_ = opt_value;
 };
 
 
@@ -303,7 +316,7 @@ anychart.cartesian.series.Marker.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.marker_.fill(this.getFinalFill(false, false));
     this.marker_.stroke(this.getFinalStroke(false, false));
-    this.marker_.type(/** @type {anychart.enums.MarkerType} */(this.type_));
+    this.marker_.type(/** @type {anychart.enums.MarkerType} */(this.type()));
     this.marker_.size(this.size_);
 
     this.hoverMarker_.fill(this.getFinalFill(false, true));
@@ -516,6 +529,15 @@ anychart.cartesian.series.Marker.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.Marker.prototype.getLegendIconType = function() {
+  var markerDrawer = anychart.enums.getMarkerDrawer(this.type());
+  return function(path, size) {
+    return markerDrawer(path, size / 2, size / 2, size / 2);
+  };
+};
+
+
 /**
  * @inheritDoc
  */
@@ -552,11 +574,9 @@ anychart.cartesian.series.Marker.prototype.serialize = function() {
 anychart.cartesian.series.Marker.prototype.restoreDefaults = function() {
   var res = goog.base(this, 'restoreDefaults');
 
-  this.type_ = this.autoMarkerType || anychart.enums.MarkerType.STAR5;
-
   var tooltip = /** @type {anychart.elements.Tooltip} */(this.tooltip());
   tooltip.contentFormatter(function() {
-    return parseFloat(this.value).toFixed(2);
+    return parseFloat(this['value']).toFixed(2);
   });
 
   return res;

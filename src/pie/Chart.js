@@ -3315,3 +3315,4 @@ anychart.pie.Chart.prototype['outsideLabelsSpace'] = anychart.pie.Chart.prototyp
 anychart.pie.Chart.prototype['connectorLength'] = anychart.pie.Chart.prototype.connectorLength;//doc|ex
 anychart.pie.Chart.prototype['outsideLabelsCriticalAngle'] = anychart.pie.Chart.prototype.outsideLabelsCriticalAngle;//doc|ex
 anychart.pie.Chart.prototype['connectorStroke'] = anychart.pie.Chart.prototype.connectorStroke;//doc|ex
+anychart.pie.Chart.prototype['hatchFillPalette'] = anychart.pie.Chart.prototype.hatchFillPalette;

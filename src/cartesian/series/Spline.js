@@ -109,6 +109,12 @@ anychart.cartesian.series.Spline.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.Spline.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SPLINE);
+};
+
+
 /**
  * @inheritDoc
  */

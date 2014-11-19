@@ -355,13 +355,6 @@ anychart.cartesian.series.Base.prototype.hoverHatchFill_;
 
 
 /**
- * @type {anychart.enums.MarkerType}
- * @protected
- */
-anychart.cartesian.series.Base.prototype.autoMarkerType;
-
-
-/**
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
@@ -1840,9 +1833,7 @@ anychart.cartesian.series.Base.prototype.setAutoColor = function(value) {
  * Sets series marker type that parent chart have set for it.
  * @param {anychart.enums.MarkerType} value Auto marker type distributed by the chart.
  */
-anychart.cartesian.series.Base.prototype.setAutoMarkerType = function(value) {
-  this.autoMarkerType = value;
-};
+anychart.cartesian.series.Base.prototype.setAutoMarkerType = goog.abstractMethod;
 
 
 /**
@@ -2392,10 +2383,10 @@ anychart.cartesian.series.Base.prototype.getType = goog.abstractMethod;
 
 /**
  * Gets legend icon type for the series.
- * @return {anychart.enums.LegendItemIconType}
+ * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
  */
 anychart.cartesian.series.Base.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(this.getType());
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SQUARE);
 };
 
 

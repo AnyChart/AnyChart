@@ -202,6 +202,12 @@ anychart.cartesian.series.BaseWithMarkers.prototype.markersInvalidated_ = functi
 
 
 /** @inheritDoc */
+anychart.cartesian.series.BaseWithMarkers.prototype.setAutoMarkerType = function(opt_value) {
+  this.markers().setAutoType(opt_value);
+};
+
+
+/** @inheritDoc */
 anychart.cartesian.series.BaseWithMarkers.prototype.remove = function() {
   this.markers().container(null);
 
@@ -223,8 +229,6 @@ anychart.cartesian.series.BaseWithMarkers.prototype.startDrawing = function() {
 
   var strokeColor = /** @type {acgraph.vector.Stroke} */(this.getMarkerStroke());
   markers.setAutoStroke(strokeColor);
-
-  markers.setAutoType(this.autoMarkerType);
 
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -359,7 +363,7 @@ anychart.cartesian.series.BaseWithMarkers.prototype.getMarkerStroke = function()
 anychart.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = function() {
   var data = goog.base(this, 'getLegendItemData');
   if (this.markers().enabled())
-    data['iconMarker'] = this.markers().type() || this.autoMarkerType;
+    data['iconMarker'] = this.markers().type();
   return data;
 };
 

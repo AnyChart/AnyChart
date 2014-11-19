@@ -86,6 +86,12 @@ anychart.cartesian.series.Line.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.Line.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
+};
+
+
 /**
  * @inheritDoc
  */

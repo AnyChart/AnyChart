@@ -109,6 +109,12 @@ anychart.cartesian.series.StepLine.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.cartesian.series.StepLine.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.STEP_LINE);
+};
+
+
 /**
  * @inheritDoc
  */

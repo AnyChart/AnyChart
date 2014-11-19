@@ -2976,3 +2976,5 @@ anychart.cartesian.Chart.prototype['lineMarker'] = anychart.cartesian.Chart.prot
 anychart.cartesian.Chart.prototype['rangeMarker'] = anychart.cartesian.Chart.prototype.rangeMarker;//doc|ex
 anychart.cartesian.Chart.prototype['textMarker'] = anychart.cartesian.Chart.prototype.textMarker;//doc|ex
 anychart.cartesian.Chart.prototype['palette'] = anychart.cartesian.Chart.prototype.palette;//doc|ex
+anychart.cartesian.Chart.prototype['markerPalette'] = anychart.cartesian.Chart.prototype.markerPalette;
+anychart.cartesian.Chart.prototype['hatchFillPalette'] = anychart.cartesian.Chart.prototype.hatchFillPalette;
