@@ -16,10 +16,10 @@ anychart.elements.Credits = function() {
   goog.base(this);
 
   /**
-   * @type {string}
+   * @type {?string}
    * @private
    */
-  this.text_ = 'AnyChart';
+  this.text_ = null;
 
   /**
    * @type {string}
@@ -45,6 +45,13 @@ anychart.elements.Credits = function() {
    * @private
    */
   this.domElement_ = null;
+
+  /**
+   * Cache for calculated width of element. Need to position creadits correctly.
+   * @type {?number}
+   * @private
+   */
+  this.measuredWidth_ = null;
 
   //disable by default at anychart related domains
   this.enabled(!anychart.elements.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
@@ -120,11 +127,13 @@ anychart.elements.Credits.prototype.text = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.text_ != opt_value) {
       this.text_ = opt_value;
+      // drop cache
+      this.measuredWidth_ = null;
     }
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
-    return this.text_;
+    return this.text_ || 'AnyChart';
   }
 };
 
@@ -337,6 +346,20 @@ anychart.elements.Credits.prototype.draw = function() {
     var right = anychart.elements.Credits.RIGHT + (containerSize.width - parentBounds.width - parentBounds.left);
     var bottom = anychart.elements.Credits.BOTTOM + (containerSize.height - parentBounds.height - parentBounds.top);
 
+    if (!this.measuredWidth_) {
+      var measureText = acgraph.text();
+      measureText.text(/** @type {string} */(valid ? this.text() : 'AnyChart Trial Version'));
+      measureText.lineHeight('10px');
+      measureText.fontSize('10px');
+      measureText.fontFamily('"\"Helvetica Neue\",Helvetica,Arial,sans-serif;"');
+
+      // width - pixel width of text with base css settings. 12 - size of logo(10px) and space between logo and text (2px)
+      this.measuredWidth_ = Math.round(measureText.getBounds().width) + 12;
+      goog.dispose(measureText);
+
+      goog.style.setWidth(this.domElement_, this.measuredWidth_);
+    }
+
     this.setPosition_(right, bottom);
     this.markConsistent(anychart.ConsistencyState.POSITION);
   }
@@ -391,7 +414,7 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
  */
 anychart.elements.Credits.prototype.getHTMLString_ = function(valid) {
   return '<img class="' + anychart.elements.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">' +
-      '<span class="' + anychart.elements.Credits.CssClass_.TEXT + '">' + (valid ? this.text_ : 'AnyChart Trial Version') + '</span>';
+      '<span class="' + anychart.elements.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>';
 };
 
 

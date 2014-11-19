@@ -886,21 +886,12 @@ anychart.Chart.prototype.draw = function() {
       //listen resize event
       stage = this.container().getStage();
       stage.resize(stage.originalWidth, stage.originalHeight);
-      if (this.bounds().dependsOnContainerSize()) {
-        this.container().getStage().listen(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      } else {
-        this.container().getStage().unlisten(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      }
+      this.container().getStage().listen(
+          acgraph.vector.Stage.EventType.STAGE_RESIZE,
+          this.resizeHandler_,
+          false,
+          this
+      );
     }
   }
 
@@ -957,8 +948,12 @@ anychart.Chart.prototype.autoRedraw = function(opt_value) {
  */
 anychart.Chart.prototype.resizeHandler_ = function(evt) {
   this.credits().invalidate(anychart.ConsistencyState.POSITION);
-  this.invalidate(anychart.ConsistencyState.ALL,
-      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  if (this.bounds().dependsOnContainerSize()) {
+    this.invalidate(anychart.ConsistencyState.ALL,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  } else {
+    this.invalidate(anychart.ConsistencyState.CREDITS, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
