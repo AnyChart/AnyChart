@@ -362,8 +362,11 @@ anychart.cartesian.series.Bubble.prototype.setAutoSizeScale = function(min, max)
 anychart.cartesian.series.Bubble.prototype.calculateSize_ = function(size) {
   var negative = size < 0;
   size = Math.abs(size);
-  var ratio = (size - this.minimumBubbleValue_) /
-      (this.maximumBubbleValue_ - this.minimumBubbleValue_);
+  var ratio;
+  if (this.maximumBubbleValue_ == this.minimumBubbleValue_)
+    ratio = 0.5;
+  else
+    ratio = (size - this.minimumBubbleValue_) / (this.maximumBubbleValue_ - this.minimumBubbleValue_);
   size = (this.minimumSizeValue_ + ratio * (this.maximumSizeValue_ - this.minimumSizeValue_));
   return (negative ? -size : size) || this.maximumBubbleValue_;
 };
