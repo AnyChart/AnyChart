@@ -1011,6 +1011,8 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
     width = this.textWidth_ = padding.tightenWidth(width);
   }
 
+  this.textElement_.width(this.textWidth_);
+
   if (autoHeight) {
     height += this.textElement_.getBounds().height;
     this.textHeight_ = height;
@@ -1018,6 +1020,8 @@ anychart.elements.Label.prototype.calculateLabelBounds_ = function() {
   } else {
     height = this.textHeight_ = padding.tightenHeight(height);
   }
+
+  this.textElement_.height(this.textHeight_);
 
   var canAdjustByWidth = !autoWidth;
   var canAdjustByHeight = !autoHeight;
@@ -1155,9 +1159,6 @@ anychart.elements.Label.prototype.draw = function() {
     this.textY_ += position.y;
     backgroundBounds.left = position.x;
     backgroundBounds.top = position.y;
-
-    this.textElement_.width(this.textWidth_);
-    this.textElement_.height(this.textHeight_);
 
     this.textElement_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.textElement_.translate(/** @type {number} */(this.textX_), /** @type {number} */(this.textY_));
@@ -1318,6 +1319,7 @@ anychart.elements.Label.prototype.restoreDefaults = function() {
   this.fontFamily('Tahoma');
   this.fontSize('11');
   this.fontWeight('bold');
+  this.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
   this.invalidate(anychart.ConsistencyState.ALL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
