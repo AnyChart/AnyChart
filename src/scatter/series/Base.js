@@ -721,11 +721,11 @@ anychart.scatter.series.Base.prototype.startDrawing = function() {
   if (isNaN(res))
     res = 0;
 
+  this.pixelBoundsCache = /** @type {anychart.math.Rect} */(this.getPixelBounds());
+
   this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false));
 
   this.checkDrawingNeeded();
-
-  this.pixelBoundsCache = /** @type {anychart.math.Rect} */(this.getPixelBounds());
 
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
