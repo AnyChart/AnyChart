@@ -738,7 +738,7 @@ anychart.radar.Chart.prototype.calculate = function() {
             iterator = aSeries.getResetIterator();
             while (iterator.advance()) {
               value = aSeries.getReferenceScaleValues();
-              if (value) {
+              if (goog.isDef(value)) {
                 if ((/** @type {number} */(value)) > 0)
                   hasPositive = true;
                 else if ((/** @type {number} */(value)) < 0)
@@ -758,7 +758,7 @@ anychart.radar.Chart.prototype.calculate = function() {
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             value = aSeries.getReferenceScaleValues();
-            if (value)
+            if (goog.isDef(value))
               scale.extendDataRange(value);
           }
         }
@@ -783,7 +783,7 @@ anychart.radar.Chart.prototype.calculate = function() {
         var pointCallback = goog.bind(
             function(series) {
               var value = series.getReferenceScaleValues();
-              if (value) {
+              if (goog.isDef(value)) {
                 if (series.supportsStack())
                   this.extendDataRange(this.applyStacking(value));
                 else
