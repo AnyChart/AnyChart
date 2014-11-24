@@ -42,7 +42,8 @@ anychart.radar.series.Line.prototype.drawFirstPoint = function() {
   if (!referenceValues) {
     this.prevPointIsMissing = true;
     return false;
-  }
+  } else
+    this.prevPointIsMissing = false;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var x = referenceValues[0];
@@ -64,7 +65,8 @@ anychart.radar.series.Line.prototype.drawSubsequentPoint = function() {
   if (!referenceValues) {
     this.prevPointIsMissing = true;
     return false;
-  }
+  } else
+    this.prevPointIsMissing = false;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var x = referenceValues[0];
