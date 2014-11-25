@@ -318,13 +318,13 @@ anychart.palettes.RangeColors.prototype.cloneFrom = function(palette) {
  * Constructor function.
  * @return {!anychart.palettes.RangeColors}
  */
-anychart.utils.rangeColorPalette = function() {
+anychart.palettes.rangeColors = function() {
   return new anychart.palettes.RangeColors();
 };
 
 
 //exports
-goog.exportSymbol('anychart.utils.rangeColorPalette', anychart.utils.rangeColorPalette);
+goog.exportSymbol('anychart.palettes.rangeColors', anychart.palettes.rangeColors);
 anychart.palettes.RangeColors.prototype['colorAt'] = anychart.palettes.RangeColors.prototype.colorAt;//in docs/
 anychart.palettes.RangeColors.prototype['colors'] = anychart.palettes.RangeColors.prototype.colors;//in docs/
 anychart.palettes.RangeColors.prototype['count'] = anychart.palettes.RangeColors.prototype.count;//in docs/

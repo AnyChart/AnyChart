@@ -115,12 +115,12 @@ anychart.palettes.Markers.prototype.deserialize = function(config) {
  * Constructor function.
  * @return {!anychart.palettes.Markers}
  */
-anychart.utils.markerPalette = function() {
+anychart.palettes.markers = function() {
   return new anychart.palettes.Markers();
 };
 
 
 //exports
-goog.exportSymbol('anychart.utils.markerPalette', anychart.utils.markerPalette);
+goog.exportSymbol('anychart.palettes.markers', anychart.palettes.marker);
 anychart.palettes.Markers.prototype['markerAt'] = anychart.palettes.Markers.prototype.markerAt;
 anychart.palettes.Markers.prototype['markers'] = anychart.palettes.Markers.prototype.markers;

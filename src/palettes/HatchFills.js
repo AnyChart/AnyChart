@@ -112,13 +112,13 @@ anychart.palettes.HatchFills.prototype.deserialize = function(config) {
  * Constructor function.
  * @return {!anychart.palettes.HatchFills}
  */
-anychart.utils.hatchFillPalette = function() {
+anychart.palettes.hatchFills = function() {
   return new anychart.palettes.HatchFills();
 };
 
 
 //exports
-goog.exportSymbol('anychart.utils.hatchFillPalette', anychart.utils.hatchFillPalette);
+goog.exportSymbol('anychart.palettes.hatchFills', anychart.palettes.hatchFills);
 anychart.palettes.HatchFills.prototype['hatchFillAt'] = anychart.palettes.HatchFills.prototype.hatchFillAt;
 anychart.palettes.HatchFills.prototype['hatchFills'] = anychart.palettes.HatchFills.prototype.hatchFills;
 anychart.palettes.HatchFills.prototype['serialize'] = anychart.palettes.HatchFills.prototype.serialize;

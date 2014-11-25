@@ -186,12 +186,12 @@ anychart.palettes.DistinctColors.prototype.cloneFrom = function(palette) {
  * Constructor function.
  * @return {!anychart.palettes.DistinctColors}
  */
-anychart.utils.distinctColorPalette = function() {
+anychart.palettes.distinctColors = function() {
   return new anychart.palettes.DistinctColors();
 };
 
 
 //exports
-goog.exportSymbol('anychart.utils.distinctColorPalette', anychart.utils.distinctColorPalette);
+goog.exportSymbol('anychart.palettes.distinctColors', anychart.palettes.distinctColors);
 anychart.palettes.DistinctColors.prototype['colorAt'] = anychart.palettes.DistinctColors.prototype.colorAt;//in docs/
 anychart.palettes.DistinctColors.prototype['colors'] = anychart.palettes.DistinctColors.prototype.colors;//in docs/
