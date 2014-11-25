@@ -86,12 +86,6 @@ anychart.core.grids.Radar = function() {
    * @type {boolean}
    * @private
    */
-  this.drawFirstLine_ = true;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
   this.drawLastLine_ = true;
 };
 goog.inherits(anychart.core.grids.Radar, anychart.core.VisualBase);
@@ -313,25 +307,6 @@ anychart.core.grids.Radar.prototype.stroke = function(opt_value) {
     return this;
   } else {
     return this.stroke_;
-  }
-};
-
-
-/**
- * Whether to draw the first line.
- * @param {boolean=} opt_value Whether grid should draw first line.
- * @return {boolean|anychart.core.grids.Radar} Whether grid should draw first line or Grid instance for method chaining.
- */
-anychart.core.grids.Radar.prototype.drawFirstLine = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.drawFirstLine_ != opt_value) {
-      this.drawFirstLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.drawFirstLine_;
   }
 };
 
@@ -600,41 +575,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
     var drawInterlace = layout[1];
     var i;
 
-    if (!this.isRadial()) {
-      isOrdinal = yScale instanceof anychart.scales.Ordinal;
-      ticks = isOrdinal ? yScale.ticks() : this.isMinor() ? yScale.minorTicks() : yScale.ticks();
-      ticksArray = ticks.get();
-      ticksArrLen = ticksArray.length;
-
-      var prevRatio = NaN;
-      for (i = 0; i < ticksArrLen; i++) {
-        var tickVal = ticksArray[i];
-        if (goog.isArray(tickVal)) tickVal = tickVal[0];
-        var ratio = yScale.transform(tickVal);
-
-        if (i % 2 == 0) {
-          fill = this.evenFill_;
-          layer = this.evenFillElement_;
-        } else {
-          fill = this.oddFill_;
-          layer = this.oddFillElement_;
-        }
-
-        if (fill)
-          drawInterlace.call(this, ratio, prevRatio, layer);
-
-        if (i == 0) {
-          if (this.drawFirstLine_)
-            drawLine.call(this, ratio);
-        } else if (i == ticksArrLen - 1) {
-          if (this.drawLastLine_)
-            drawLine.call(this, ratio);
-        } else {
-          drawLine.call(this, ratio);
-        }
-        prevRatio = ratio;
-      }
-    } else {
+    if (this.isRadial()) {
       ticks = xScale.ticks();
       ticksArray = ticks.get();
       ticksArrLen = ticksArray.length;
@@ -661,19 +602,15 @@ anychart.core.grids.Radar.prototype.draw = function() {
 
         x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
         y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
+        layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
-        if (i % 2 == 0) {
-          fill = this.evenFill_;
-          layer = this.evenFillElement_;
+        drawInterlace.call(this, x, y, prevX, prevY, layer);
+
+        if (i == 0) {
+          if (this.drawLastLine_) drawLine.call(this, x, y, xPixelShift, yPixelShift);
         } else {
-          fill = this.oddFill_;
-          layer = this.oddFillElement_;
+          drawLine.call(this, x, y, xPixelShift, yPixelShift);
         }
-
-        if (fill) {
-          drawInterlace.call(this, x, y, prevX, prevY, layer);
-        }
-        drawLine.call(this, x, y, xPixelShift, yPixelShift);
 
         prevX = x;
         prevY = y;
@@ -681,19 +618,33 @@ anychart.core.grids.Radar.prototype.draw = function() {
       }
 
       //draw last line on ordinal
-      if (i % 2 == 0) {
-        fill = this.evenFill_;
-        layer = this.evenFillElement_;
-      } else {
-        fill = this.oddFill_;
-        layer = this.oddFillElement_;
-      }
-
+      layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
       angleRad = angle * Math.PI / 180;
       x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
       y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
-
       drawInterlace.call(this, x, y, prevX, prevY, layer);
+    } else {
+      isOrdinal = yScale instanceof anychart.scales.Ordinal;
+      ticks = isOrdinal ? yScale.ticks() : this.isMinor() ? yScale.minorTicks() : yScale.ticks();
+      ticksArray = ticks.get();
+      ticksArrLen = ticksArray.length;
+
+      var prevRatio = NaN;
+      for (i = 1; i < ticksArrLen; i++) {
+        var tickVal = ticksArray[i];
+        if (goog.isArray(tickVal)) tickVal = tickVal[0];
+        var ratio = yScale.transform(tickVal);
+        layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
+
+        drawInterlace.call(this, ratio, prevRatio, layer);
+
+        if (i == ticksArrLen - 1) {
+          if (this.drawLastLine_) drawLine.call(this, ratio);
+        } else {
+          drawLine.call(this, ratio);
+        }
+        prevRatio = ratio;
+      }
     }
 
     this.markConsistent(anychart.ConsistencyState.POSITION);
@@ -797,8 +748,8 @@ anychart.core.grids.Radar.prototype.serialize = function() {
   data['layout'] = this.layout();
   data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
   data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
-  data['drawFirstLine'] = this.drawFirstLine();
   data['drawLastLine'] = this.drawLastLine();
+  data['isMinor'] = this.isMinor();
 
   return data;
 };
@@ -814,8 +765,8 @@ anychart.core.grids.Radar.prototype.deserialize = function(value) {
   if (goog.isDef(value['layout'])) this.layout(value['layout']);
   if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
   if (goog.isDef(value['evenFill'])) this.evenFill(value['evenFill']);
-  if (goog.isDef(value['drawFirstLine'])) this.drawFirstLine(value['drawFirstLine']);
   if (goog.isDef(value['drawLastLine'])) this.drawLastLine(value['drawLastLine']);
+  if (goog.isDef(value['isMinor'])) this.isMinor(value['isMinor']);
 
   this.resumeSignalsDispatching(true);
 
@@ -842,7 +793,6 @@ anychart.core.grids.Radar.prototype['isRadial'] = anychart.core.grids.Radar.prot
 anychart.core.grids.Radar.prototype['yScale'] = anychart.core.grids.Radar.prototype.yScale;
 anychart.core.grids.Radar.prototype['xScale'] = anychart.core.grids.Radar.prototype.xScale;
 anychart.core.grids.Radar.prototype['stroke'] = anychart.core.grids.Radar.prototype.stroke;
-anychart.core.grids.Radar.prototype['drawFirstLine'] = anychart.core.grids.Radar.prototype.drawFirstLine;
 anychart.core.grids.Radar.prototype['drawLastLine'] = anychart.core.grids.Radar.prototype.drawLastLine;
 anychart.core.grids.Radar.prototype['draw'] = anychart.core.grids.Radar.prototype.draw;
 anychart.core.grids.Radar.prototype['startAngle'] = anychart.core.grids.Radar.prototype.startAngle;

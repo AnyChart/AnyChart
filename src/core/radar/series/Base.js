@@ -782,7 +782,7 @@ anychart.core.radar.series.Base.prototype.getZeroPointCoords = function() {
     yRatio = goog.math.clamp(yRatio, 0, 1);
   }
 
-  var angleRad = goog.math.toRadians(360 * xRatio);
+  var angleRad = goog.math.toRadians(this.startAngle_ - 90 + 360 * xRatio);
   var currRadius = this.radius * yRatio;
   var xPix, yPix;
 

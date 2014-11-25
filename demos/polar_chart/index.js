@@ -487,7 +487,8 @@ anychart.onDocumentLoad(function() {
       .textFormatter(function() {
         return this['value'] + '°'
       });
-
+  chart.xAxis().minorLabels().enabled(true);
+  chart.xAxis().minorTicks().enabled(true);
 
   chart.title(null);
   chart.background().enabled(true);

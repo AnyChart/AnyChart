@@ -54,12 +54,18 @@ var scale;
 function load() {
   var stage = anychart.graphics.create('container');
 
-  scale = anychart.scales.ordinal();
+
+  scale = anychart.scales.linear();
+
+  scale.maximum(360).minimum(0);
+  scale.ticks().interval(15);
+
+//  scale = anychart.scales.ordinal();
 //  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'];
 //  var values = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'];
-  var values = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December December December' ];
-  scale.values(values);
-  scale.ticks().interval(1);
+//  var values = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December December December' ];
+//  scale.values(values);
+//  scale.ticks().interval(1);
 
   parentBounds = new acgraph.math.Rect(0,0,553,720);
   boundsRect = stage.rect();
@@ -67,14 +73,17 @@ function load() {
 
   remainingBounds = stage.rect().stroke('green');
 
-  axis1 = anychart.axes.radar();
-  axis1.startAngle(117);
+  axis1 = anychart.axes.polar();
+  axis1.startAngle(0);
   axis1.scale(scale);
   axis1.container(stage);
   axis1.parentBounds(parentBounds);
   axis1.ticks().length(5);
   axis1.labels().rotation(0);
   axis1.stroke(stroke);
+
+  axis1.minorLabels().enabled(true);
+  axis1.minorTicks().enabled(true);
 
   (drawer = function() {
     axis1.draw();

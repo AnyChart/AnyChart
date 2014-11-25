@@ -62,7 +62,7 @@ anychart.core.axes.Radar = function() {
       .stroke({'color': '#313131', 'lineJoin': 'round', 'lineCap': 'butt'})
       .resumeSignalsDispatching(false);
 
-  this.stroke({'color': 'blac   k', 'opacity': .1, 'lineJoin': 'round', 'lineCap': 'square'});
+  this.stroke({'color': 'black', 'opacity': .1, 'lineJoin': 'round', 'lineCap': 'square'});
   this.startAngle(0);
 
   this.resumeSignalsDispatching(true);

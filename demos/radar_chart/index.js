@@ -84,13 +84,15 @@ anychart.onDocumentLoad(function() {
 
   chart.palette(['blue .5', 'yellow .5', 'green .5', 'red .5']);
   chart.yAxis().enabled(true);
+  chart.xAxis().enabled(true);
 
-
+  //chart.grid(0).enabled(false);
+  chart.grid(anychart.grids.radar().layout(anychart.enums.RadialGridLayout.CIRCUIT).isMinor(true));
   //chart.line(data1).connectMissingPoints(false);
   chart.area(data2);
-  chart.area(data3);
-  chart.area(data4);
-  chart.area(data5);
+  //chart.area(data3);
+  //chart.area(data4);
+  //chart.area(data5);
 
   chart.draw();
 });
