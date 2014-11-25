@@ -1,6 +1,7 @@
 goog.provide('anychart.elements.Credits');
 goog.require('anychart.VisualBase');
 goog.require('goog.dom');
+goog.require('goog.userAgent');
 
 
 
@@ -46,13 +47,6 @@ anychart.elements.Credits = function() {
    */
   this.domElement_ = null;
 
-  /**
-   * Cache for calculated width of element. Need to position creadits correctly.
-   * @type {?number}
-   * @private
-   */
-  this.measuredWidth_ = null;
-
   //disable by default at anychart related domains
   this.enabled(!anychart.elements.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
 };
@@ -76,7 +70,7 @@ anychart.elements.Credits.BOTTOM = 6;
  * @type {number}
  * @const
  */
-anychart.elements.Credits.RIGHT = 10;
+anychart.elements.Credits.RIGHT = 0;
 
 
 /**
@@ -127,10 +121,8 @@ anychart.elements.Credits.prototype.text = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.text_ != opt_value) {
       this.text_ = opt_value;
-      // drop cache
-      this.measuredWidth_ = null;
     }
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.text_ || 'AnyChart';
@@ -246,7 +238,7 @@ anychart.elements.Credits.prototype.invalidateParentBounds = function() {
  * @private
  */
 anychart.elements.Credits.prototype.drawLogo_ = function(element) {
-  var stage = acgraph.create(element, '100%', '100%');
+  var stage = acgraph.create(element, '12px', '100%');
   var borderPath = stage.path();
   var columnPath = stage.path();
 
@@ -304,11 +296,17 @@ anychart.elements.Credits.prototype.draw = function() {
   else
     containerElement = null;
 
-  if (!this.domElement_) {
-    this.domElement_ = goog.dom.createDom(
-        goog.dom.TagName.A,
+  if (!this.divElement_) {
+    this.divElement_ = goog.dom.createDom(
+        goog.dom.TagName.DIV,
         anychart.elements.Credits.CssClass_.CREDITS
         );
+  }
+
+  if (!this.domElement_) {
+    this.domElement_ = goog.dom.createDom(goog.dom.TagName.A);
+    goog.dom.setProperties(this.domElement_, {'style': 'float:right; margin-right:9px;'});
+    goog.dom.appendChild(this.divElement_, this.domElement_);
   }
 
   if (!anychart.elements.Credits.creditsCss_) {
@@ -317,7 +315,7 @@ anychart.elements.Credits.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (containerElement)
-      goog.dom.appendChild(containerElement, this.domElement_);
+      goog.dom.appendChild(containerElement, this.divElement_);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -346,20 +344,6 @@ anychart.elements.Credits.prototype.draw = function() {
     var right = anychart.elements.Credits.RIGHT + (containerSize.width - parentBounds.width - parentBounds.left);
     var bottom = anychart.elements.Credits.BOTTOM + (containerSize.height - parentBounds.height - parentBounds.top);
 
-    if (!this.measuredWidth_) {
-      var measureText = acgraph.text();
-      measureText.text(/** @type {string} */(valid ? this.text() : 'AnyChart Trial Version'));
-      measureText.lineHeight('10px');
-      measureText.fontSize('10px');
-      measureText.fontFamily('"\"Helvetica Neue\",Helvetica,Arial,sans-serif;"');
-
-      // width - pixel width of text with base css settings. 12 - size of logo(10px) and space between logo and text (2px)
-      this.measuredWidth_ = Math.round(measureText.getBounds().width) + 12;
-      goog.dispose(measureText);
-
-      goog.style.setWidth(this.domElement_, this.measuredWidth_);
-    }
-
     this.setPosition_(right, bottom);
     this.markConsistent(anychart.ConsistencyState.POSITION);
   }
@@ -386,8 +370,8 @@ anychart.elements.Credits.prototype.setPosition_ = function(right, bottom) {
       goog.userAgent.isVersionOrHigher('1.9');
 
   // Round to the nearest pixel for buggy sub-pixel support.
-  this.domElement_.style.right = (buggyGeckoSubPixelPos ? Math.round(right) : right) + 'px';
-  this.domElement_.style.bottom = (buggyGeckoSubPixelPos ? Math.round(bottom) : bottom) + 'px';
+  this.divElement_.style.right = (buggyGeckoSubPixelPos ? Math.round(right) : right) + 'px';
+  this.divElement_.style.bottom = (buggyGeckoSubPixelPos ? Math.round(bottom) : bottom) + 'px';
 };
 
 
@@ -399,7 +383,7 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
 
   if (!this.enabled()) return parentBounds;
 
-  var creditsSize = goog.style.getBorderBoxSize(this.domElement_);
+  var creditsSize = goog.style.getBorderBoxSize(this.divElement_);
   // chart height - credits height - bottom
   parentBounds.height = parentBounds.height - creditsSize.height - anychart.elements.Credits.BOTTOM;
 
@@ -413,8 +397,8 @@ anychart.elements.Credits.prototype.getRemainingBounds = function() {
  * @private
  */
 anychart.elements.Credits.prototype.getHTMLString_ = function(valid) {
-  return '<img class="' + anychart.elements.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">' +
-      '<span class="' + anychart.elements.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>';
+  return '<span class="' + anychart.elements.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>' +
+      '<img class="' + anychart.elements.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">';
 };
 
 
@@ -439,24 +423,24 @@ anychart.elements.Credits.prototype.createCssElement_ = function(valid) {
 
   styles += '.' + anychart.elements.Credits.CssClass_.CREDITS + '{' +
       'position:absolute;' +
-      'width:' + (valid ? '55px;' : '120px;') +
+      'width:100%;' +
+      'overflow:hidden;' +
       'height:10px;' +
       '}';
 
   styles += '.' + anychart.elements.Credits.CssClass_.LOGO + '{' +
-      'position:absolute;' +
-      'top:0;' +
-      'left:0;' +
+      'float:right;' +
+      'border:none;' +
+      'margin-right:2px;' +
       'height:10px;' +
       'width:10px;' +
       '}';
 
   styles += '.' + anychart.elements.Credits.CssClass_.TEXT + '{' +
-      'position:absolute;' +
-      'left: 12px;' +
-      'top:0;' +
+      'float:right;' +
       'font-size:10px;' +
-      'line-height:10px;' +
+      'line-height:9px;' +
+      'padding-bottom:1px;' +
       'text-decoration:none;' +
       'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
       'color:#929292;' +
@@ -477,7 +461,7 @@ anychart.elements.Credits.prototype.createCssElement_ = function(valid) {
 
 /** @inheritDoc */
 anychart.elements.Credits.prototype.remove = function() {
-  goog.dom.removeNode(this.domElement_);
+  goog.dom.removeNode(this.divElement_);
 };
 
 
@@ -509,7 +493,8 @@ anychart.elements.Credits.prototype.deserialize = function(config) {
 
 /** @inheritDoc */
 anychart.elements.Credits.prototype.disposeInternal = function() {
-  goog.dom.removeNode(this.domElement_);
+  goog.dom.removeNode(this.divElement_);
+  this.divElement_ = null;
   this.domElement_ = null;
 
   goog.base(this, 'disposeInternal');
