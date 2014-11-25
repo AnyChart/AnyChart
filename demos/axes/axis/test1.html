@@ -33,7 +33,7 @@
     }
 
     function load() {
-      chart = anychart.lineChart().width(733).height(429);
+      chart = anychart.lineChart().width(533).height(429);
 
       var scale = new anychart.scales.Linear();
 //      scale.minimum(20);
@@ -43,14 +43,14 @@
 
 
       chart.yAxis(0).title(null).staggerMode(true);
-//      chart.yAxis(1).title(null).orientation('left').staggerMode(true);
-      chart.yAxis(2).title(null).orientation('right').staggerMode(true);
-//      chart.yAxis(3).title(null).orientation('right').staggerMode(true);
+      chart.yAxis(1).title(null).staggerMode(true).orientation('left');
+      chart.yAxis(2).title(null).staggerMode(true).orientation('right');
+      chart.yAxis(3).title(null).staggerMode(true).orientation('right');
 
       chart.xAxis(0).title(null).staggerMode(true);
-//      chart.xAxis(1).title(null).staggerMode(true);
-//      chart.xAxis(2).orientation('top').title(null).staggerMode(true);
-      chart.xAxis(3).orientation('top').title(null).staggerMode(true);
+      chart.xAxis(1).title(null).staggerMode(true);
+      chart.xAxis(2).title(null).staggerMode(true).orientation('top');
+      chart.xAxis(3).title(null).staggerMode(true).orientation('top');
 
       chart.spline([
         ['January' , 15],
@@ -64,12 +64,11 @@
         ['September' , 525],
         ['October' , 825],
         ['November' , 1025],
-        ['December' , 725],
+        ['December' , 725]
       ]);
 
       chart.container('container');
       chart.draw();
-
 
       widthRanger = document.getElementById('width_');
       heightRanger = document.getElementById('height_');

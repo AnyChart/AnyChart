@@ -133,10 +133,17 @@ function load() {
   axis1 = new anychart.elements.Axis();
   axis1.suspendSignalsDispatching();
   axis1.scale(scale);
-  axis1.offsetY(250);
+
+  //axis1.offsetY(250);
+  //axis1.offsetX(201);
+  //axis1.length(700);
+
+  axis1.padding(250, 0, 0, 201);
+  //axis1.width();
+
+
   axis1.container('container');
   axis1.orientation('bottom');
-  axis1.length(700);
   axis1.staggerMaxLines(20);
 //  axis1.overlapMode('nooverlap');
 //  axis1.staggerLines(2);
@@ -148,7 +155,7 @@ function load() {
 
   var container = axis1.container();
 
-  axis1.offsetX(201);
+
 
   axis1.parentBounds(parentBounds);
 

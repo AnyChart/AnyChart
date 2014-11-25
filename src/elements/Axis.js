@@ -288,24 +288,19 @@ anychart.elements.Axis.prototype.pixelBounds_ = null;
 
 
 /**
- * @type {number}
+ * Axis width.
+ * @type {?(number|string)}
  * @private
  */
-anychart.elements.Axis.prototype.length_ = NaN;
+anychart.elements.Axis.prototype.width_ = null;
 
 
 /**
- * @type {number}
+ * Axis padding.
+ * @type {anychart.utils.Padding}
  * @private
  */
-anychart.elements.Axis.prototype.offsetX_ = 0;
-
-
-/**
- * @type {number}
- * @private
- */
-anychart.elements.Axis.prototype.offsetY_ = 0;
+anychart.elements.Axis.prototype.padding_ = null;
 
 
 /**
@@ -784,100 +779,64 @@ anychart.elements.Axis.prototype.scaleInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis X offset.
- * @return {number} Offset by X.
- *//**
- * Setter for axis X offset.<br/>
- * <b>Note:</b> Works only if you create an independent axis object.
- * @example <t>simple-h100</t>
- * anychart.elements.axis()
- *   .offsetX(15)
- *   .scale(anychart.scales.ordinal().values([1,2,3]))
- *   .container(stage).draw();
- * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
- *//**
  * @ignoreDoc
- * @param {number=} opt_value Value to set.
- * @return {number|anychart.elements.Axis} Offset or itself for method chaining.
+ * @param {?(number|string)=} opt_value .
+ * @return {anychart.elements.Axis|number|string|null} .
  */
-anychart.elements.Axis.prototype.offsetX = function(opt_value) {
+anychart.elements.Axis.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.offsetX_ != opt_value) {
-      this.offsetX_ = opt_value;
+    if (this.width_ != opt_value) {
+      this.width_ = opt_value;
       this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
-  return this.offsetX_;
+  return this.width_;
 };
 
 
 /**
- * Getter for axis Y offset.
- * @return {number} Offset by Y.
- *//**
- * Setter for axis Y offset.<br/>
- * <b>Note:</b> Works only if you create an independent axis object.
- * @example <t>simple-h100</t>
- * anychart.elements.axis()
- *   .offsetX(15)
- *   .scale(anychart.scales.ordinal().values([1,2,3]))
- *   .container(stage).draw();
- * @param {number=} opt_value Value to set.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
- *//**
  * @ignoreDoc
- * @param {number=} opt_value Value to set.
- * @return {number|anychart.elements.Axis} Offset or itself for method chaining.
+ * @param {(string|number|anychart.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {anychart.elements.Axis|anychart.utils.Padding} .
  */
-anychart.elements.Axis.prototype.offsetY = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.offsetY_ != opt_value) {
-      this.offsetY_ = opt_value;
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
+anychart.elements.Axis.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (!this.padding_) {
+    this.padding_ = new anychart.utils.Padding();
+    this.registerDisposable(this.padding_);
+    this.padding_.listenSignals(this.paddingInvalidated_, this);
+  }
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    this.padding_.set.apply(this.padding_, arguments);
     return this;
   }
-  return this.offsetY_;
+  return this.padding_;
 };
 
 
 /**
- * Getter for axis length.
- * @return {number} Axis length.
- *//**
- * Setter for axis length.<br/>
- * <b>Note:</b> width and height swap in case of horizontal axis.<br/>
- * <b>Note:</b> Works only if you create an independent axis object.
- * @example <t>simple-h100</t>
- * anychart.elements.axis()
- *   .length(200)
- *   .scale(anychart.scales.ordinal().values([1,2,3]))
- *   .container(stage).draw();
- * @param {number=} opt_value Axis length.
- * @return {!anychart.elements.Axis} {@link anychart.elements.Axis} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {number=} opt_value Axis lenght.
- * @return {number|anychart.elements.Axis} Length or itself for method chaining.
+ * Listener for padding invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
  */
-anychart.elements.Axis.prototype.length = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.length_ != opt_value) {
-      this.length_ = Math.round(opt_value);
-      this.dropStaggeredLabelsCache_();
-      this.dropBoundsCache_();
-      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
+anychart.elements.Axis.prototype.paddingInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dropStaggeredLabelsCache_();
+    this.dropBoundsCache_();
+    this.invalidate(this.ALL_VISUAL_STATES_,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
   }
-  return this.length_;
 };
 
 
 /** @inheritDoc */
 anychart.elements.Axis.prototype.invalidateParentBounds = function() {
+  this.dropStaggeredLabelsCache_();
+  this.dropBoundsCache_();
   this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
@@ -901,41 +860,51 @@ anychart.elements.Axis.prototype.getPixelBounds_ = function() {
       parentBounds.width = Math.round(parentBounds.width);
       parentBounds.height = Math.round(parentBounds.height);
 
+      var padding = this.padding();
+      var length;
+
       if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) {
         parentLength = parentBounds.width;
+        length = parentLength - padding.left() - padding.right();
       } else {
         parentLength = parentBounds.height;
+        length = parentLength - padding.top() - padding.bottom();
       }
-      var length = isNaN(this.length_) ? this.length_ = /** @type {number} */(parentLength) : this.length_;
-      var size = this.getSize_(parentBounds, length);
+
+      var size;
+      if (this.width_) {
+        size = anychart.utils.normalizeSize(this.width_, parentLength);
+      } else {
+        size = this.getSize_(parentBounds, length);
+      }
 
       var x, y;
 
       var width, height;
       switch (this.orientation()) {
         case anychart.enums.Orientation.TOP:
-          y = parentBounds.top + this.offsetY_;
-          x = parentBounds.left + this.offsetX_;
+          y = parentBounds.top + padding.top();
+          x = parentBounds.left + padding.left();
           height = size;
           width = length;
           break;
         case anychart.enums.Orientation.RIGHT:
-          y = parentBounds.top + this.offsetY_;
-          x = parentBounds.left + (parentBounds.width - size) - this.offsetX_;
-          width = size;
+          y = parentBounds.top + padding.top();
+          x = parentBounds.left + parentBounds.width - padding.left() - size - padding.right();
           height = length;
+          width = size;
           break;
         case anychart.enums.Orientation.BOTTOM:
-          y = parentBounds.top + (parentBounds.height - size) - this.offsetY_;
-          x = parentBounds.left + this.offsetX_;
+          y = parentBounds.top + parentBounds.height - padding.top() - size - padding.bottom();
+          x = parentBounds.left + padding.left();
           height = size;
           width = length;
           break;
         case anychart.enums.Orientation.LEFT:
-          y = parentBounds.top + this.offsetY_;
-          x = parentBounds.left + this.offsetX_;
-          width = size;
+          y = parentBounds.top + padding.top();
+          x = parentBounds.left + padding.left();
           height = length;
+          width = size;
           break;
       }
       this.pixelBounds_ = new anychart.math.Rect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
@@ -1435,21 +1404,22 @@ anychart.elements.Axis.prototype.getRemainingBounds = function() {
   if (parentBounds) {
     var remainingBounds = parentBounds.clone();
     var axisBounds = this.getPixelBounds_();
+    var padding = this.padding();
 
     switch (this.orientation()) {
       case anychart.enums.Orientation.TOP:
-        remainingBounds.height -= axisBounds.height;
-        remainingBounds.top += axisBounds.height + this.offsetY();
+        remainingBounds.height -= axisBounds.height + padding.top() + padding.bottom();
+        remainingBounds.top += axisBounds.height + padding.top() + padding.bottom();
         break;
       case anychart.enums.Orientation.RIGHT:
-        remainingBounds.width -= axisBounds.width + this.offsetX();
+        remainingBounds.width -= axisBounds.width + padding.left() + padding.right();
         break;
       case anychart.enums.Orientation.BOTTOM:
-        remainingBounds.height -= axisBounds.height + this.offsetY();
+        remainingBounds.height -= axisBounds.height + padding.top() + padding.bottom();
         break;
       case anychart.enums.Orientation.LEFT:
-        remainingBounds.width -= axisBounds.width;
-        remainingBounds.left += axisBounds.width + this.offsetX();
+        remainingBounds.width -= axisBounds.width + padding.left() + padding.right();
+        remainingBounds.left += axisBounds.width + padding.left() + padding.right();
         break;
     }
 
@@ -2303,12 +2273,11 @@ anychart.elements.Axis.prototype.serialize = function() {
   data['minorLabels'] = this.minorLabels().serialize();
   data['ticks'] = this.ticks().serialize();
   data['minorTicks'] = this.minorTicks().serialize();
+  data['padding'] = this.padding().serialize();
 
   data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
   data['name'] = this.name();
-  data['length'] = this.length();
-  data['offsetX'] = this.offsetX();
-  data['offsetY'] = this.offsetY();
+  data['width'] = this.width();
   data['orientation'] = this.orientation();
   data['drawFirstLabel'] = this.drawFirstLabel();
   data['drawLastLabel'] = this.drawLastLabel();
@@ -2332,11 +2301,10 @@ anychart.elements.Axis.prototype.deserialize = function(value) {
   this.minorLabels(value['minorLabels']);
   this.ticks(value['ticks']);
   this.minorTicks(value['minorTicks']);
+  this.padding(value['padding']);
 
   this.name(value['name']);
-  this.length(parseFloat(value['length']));
-  this.offsetX(value['offsetX']);
-  this.offsetY(value['offsetY']);
+  this.width(value['width']);
   this.stroke(value['stroke']);
   this.orientation(value['orientation']);
   this.drawFirstLabel(value['drawFirstLabel']);
@@ -2361,6 +2329,7 @@ anychart.elements.Axis.prototype.disposeInternal = function() {
   this.minorLabelsBounds_ = null;
 
   this.title_ = null;
+  this.padding_ = null;
 
   goog.dispose(this.line_);
   this.line_ = null;
@@ -2404,9 +2373,8 @@ anychart.elements.Axis.prototype['minorTicks'] = anychart.elements.Axis.prototyp
 anychart.elements.Axis.prototype['stroke'] = anychart.elements.Axis.prototype.stroke;//doc|ex
 anychart.elements.Axis.prototype['orientation'] = anychart.elements.Axis.prototype.orientation;//doc|ex
 anychart.elements.Axis.prototype['scale'] = anychart.elements.Axis.prototype.scale;//doc|ex
-anychart.elements.Axis.prototype['offsetX'] = anychart.elements.Axis.prototype.offsetX;//doc|ex
-anychart.elements.Axis.prototype['offsetY'] = anychart.elements.Axis.prototype.offsetY;//doc|ex
-anychart.elements.Axis.prototype['length'] = anychart.elements.Axis.prototype.length;//doc|ex
+anychart.elements.Axis.prototype['width'] = anychart.elements.Axis.prototype.width;
+anychart.elements.Axis.prototype['padding'] = anychart.elements.Axis.prototype.padding;
 anychart.elements.Axis.prototype['getRemainingBounds'] = anychart.elements.Axis.prototype.getRemainingBounds;//doc|ex
 anychart.elements.Axis.prototype['drawFirstLabel'] = anychart.elements.Axis.prototype.drawFirstLabel;//doc|ex
 anychart.elements.Axis.prototype['drawLastLabel'] = anychart.elements.Axis.prototype.drawLastLabel;//doc|ex

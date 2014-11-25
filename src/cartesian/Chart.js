@@ -2314,38 +2314,40 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       this.bottomAxisPadding_ = NaN;
       this.leftAxisPadding_ = NaN;
       this.rightAxisPadding_ = NaN;
+      var axisStrokeThickness;
 
       for (i = axes.length; i--;) {
-        axis = axes[i];
+        axis = /** @type {anychart.elements.Axis} */(axes[i]);
         if (axis && axis.enabled()) {
           axis.suspendSignalsDispatching();
           axis.parentBounds(contentAreaBounds);
           orientation = axis.orientation();
+          axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke}} */(axis.stroke()));
 
           if (orientation == anychart.enums.Orientation.TOP) {
-            axis.offsetY(topOffset);
+            axis.padding().top(topOffset);
             remainingBounds = axis.getRemainingBounds();
-            topOffset += contentAreaBounds.height - remainingBounds.height;
+            topOffset = contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.topAxisPadding_))
-              this.topAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
+              this.topAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.BOTTOM) {
-            axis.offsetY(bottomOffset);
+            axis.padding().bottom(bottomOffset);
             remainingBounds = axis.getRemainingBounds();
             bottomOffset = contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.bottomAxisPadding_))
-              this.bottomAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
+              this.bottomAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.LEFT) {
-            axis.offsetX(leftOffset);
+            axis.padding().left(leftOffset);
             remainingBounds = axis.getRemainingBounds();
-            leftOffset += contentAreaBounds.width - remainingBounds.width;
+            leftOffset = contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.leftAxisPadding_))
-              this.leftAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
+              this.leftAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.RIGHT) {
-            axis.offsetX(rightOffset);
+            axis.padding().right(rightOffset);
             remainingBounds = axis.getRemainingBounds();
             rightOffset = contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.rightAxisPadding_))
-              this.rightAxisPadding_ = acgraph.vector.getThickness(axis.stroke());
+              this.rightAxisPadding_ = axisStrokeThickness;
           }
           axis.resumeSignalsDispatching(false);
         }
@@ -2357,20 +2359,23 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
       boundsWithoutAxes.height -= bottomOffset + topOffset;
 
       for (i = axes.length; i--;) {
-        axis = axes[i];
+        axis = /** @type {anychart.elements.Axis} */(axes[i]);
         if (axis && axis.enabled()) {
           axis.suspendSignalsDispatching();
-          var remainingBoundsBeforeSetLength = axis.getRemainingBounds();
+          var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
+
           if (axis.isHorizontal()) {
-            axis.length(parseFloat(boundsWithoutAxes.width));
+            axis.padding().left(leftOffset);
+            axis.padding().right(rightOffset);
             remainingBounds = axis.getRemainingBounds();
-            if (remainingBounds.height != remainingBoundsBeforeSetLength.height) {
+            if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
               complete = false;
             }
           } else {
-            axis.length(parseFloat(boundsWithoutAxes.height));
+            axis.padding().top(topOffset);
+            axis.padding().bottom(bottomOffset);
             remainingBounds = axis.getRemainingBounds();
-            if (remainingBounds.width != remainingBoundsBeforeSetLength.width) {
+            if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
               complete = false;
             }
           }
@@ -2414,16 +2419,16 @@ anychart.cartesian.Chart.prototype.drawContent = function(bounds) {
   //only inside axes ticks can intersect data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
     for (i = 0, count = axes.length; i < count; i++) {
-      axis = axes[i];
+      axis = /** @type {anychart.elements.Axis} */(axes[i]);
       if (axis) {
         axis.suspendSignalsDispatching();
         axis.container(this.rootElement);
         if (axis.isHorizontal()) {
-          axis.offsetX(leftOffset);
-          axis.length(parseFloat(this.dataBounds_.width));
+          axis.padding().left(parseFloat(leftOffset));
+          axis.padding().right(parseFloat(rightOffset));
         } else {
-          axis.offsetY(topOffset);
-          axis.length(parseFloat(this.dataBounds_.height));
+          axis.padding().top(parseFloat(topOffset));
+          axis.padding().bottom(parseFloat(bottomOffset));
         }
         axis.draw();
         axis.resumeSignalsDispatching(false);

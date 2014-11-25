@@ -131,10 +131,8 @@ function load() {
   axis1 = new anychart.elements.Axis();
   axis1.suspendSignalsDispatching();
   axis1.scale(scale);
-  axis1.offsetY(250);
   axis1.container('container');
   axis1.orientation('bottom');
-  axis1.length(666);
 //  axis1.staggerMaxLines(2);
 //  axis1.overlapMode('nooverlap');
 //  axis1.staggerLines(3);
@@ -146,133 +144,11 @@ function load() {
 
   var container = axis1.container();
 
-//  axis3 = new anychart.elements.Axis();
-//  axis3.scale(scale);
-//  axis3.container(container);
-//  axis3.orientation('left');
-//  axis3.length(500);
-
-//  var boundsAxis1 = axis1.getPixelBounds_();
-//  var boundsAxis3 = axis3.getPixelBounds_();
-
-//  axis1.offsetX(boundsAxis3.width());
-  axis1.offsetX(201);
-//  axis1.length(boundsAxis1.width() - 2 * boundsAxis3.width());
-
-//  axis3.offsetY(boundsAxis1.height());
-//  axis3.length(boundsAxis3.height() - 2 * boundsAxis1.height());
-
-//  var parentBounds = new anychart.math.Rect(0, 0, 500, 500);
-
   axis1.parentBounds(parentBounds);
-
-//  axis3.parentBounds(parentBounds);
-//
-//  boundsAxis1 = axis1.getPixelBounds_();
-//  boundsAxis3 = axis3.getPixelBounds_();
-
   axis1.draw();
   axis1.resumeSignalsDispatching(false);
 
-//  axis3.draw();
-//
-//  axis2 = new anychart.elements.Axis();
-//  axis2.scale(scale);
-//  axis2.container(container);
-//  axis2.orientation('bottom');
-//  axis2.parentBounds(parentBounds);
-//  axis2.offsetX(boundsAxis1.left());
-//  axis2.offsetY(1);
-//  axis2.length(boundsAxis1.width());
-//  axis2.draw();
-//
-//
-//  axis4 = new anychart.elements.Axis();
-//  axis4.scale(scale);
-//  axis4.container(container);
-//  axis4.orientation('right');
-//  axis4.parentBounds(parentBounds);
-//  axis4.offsetY(boundsAxis3.top());
-//  axis4.length(boundsAxis3.height());
-//  axis4.draw();
-//
-//
-//  var boundsAxis2 = axis2.getPixelBounds_();
-//  var boundsAxis4 = axis4.getPixelBounds_();
 
-
-//  container.rect().setBounds(boundsAxis1.toRect()).stroke('red');
-//  container.rect().setBounds(boundsAxis2.toRect()).stroke('blue');
-//  container.rect().setBounds(boundsAxis3.toRect()).stroke('green');
-//  container.rect().setBounds(boundsAxis4.toRect()).stroke('yellow');
-
-
-  //axes in chart sample
-//  var data1 = [];
-//  var data2 = [];
-//  var d1 = [], d2 = [];
-//  var t1, t2;
-//  var vals = [];
-//  for (var i = 0; i < 20; i++) {
-//    if (t1 = (Math.random() > 0)) {
-//      d1.push(i);
-//      data1.push([
-//        i,
-//        Math.round(Math.random() * 1000) + 10,
-//        Math.round(Math.random() * 1000) - 500,
-//        Math.round(Math.random() * 1000) + 1000,
-//        Math.round(Math.random() * 1000) - 990,
-//        Math.round(Math.random() * 1000) + 10
-//      ]);
-//    }
-//    if (t2 = (Math.random() > 0.2)) {
-//      d2.push(i);
-//      data2.push([
-//        i,
-//        Math.round(Math.random() * 1000) + 10,
-//        Math.round(Math.random() * 1000) + 1000,
-//        Math.round(Math.random() * 1000) - 990,
-//        Math.round(Math.random() * 1000) + 10
-//      ]);
-//    }
-//    vals.push(i);
-//  }
-
-//  chart = new anychart.cartesian.Chart();
-//  chart.container('chart-container');
-//  chart.bounds(0, 0, 500, 500);
-//  chart.title('Range spline \n area chart');
-//  chart.title().fontSize(14).hAlign('center');
-//  chart.axis().orientation('left');
-//  chart.axis().orientation('right');
-//  chart.axis().orientation('bottom');
-//  chart.axis().orientation('top');
-//  chart.rangeSplineArea(data2).markers(null);
-//  chart.rangeSplineArea(data1).markers(null);
-//  chart.draw();
-
-
-//  $('#container').width(500).height(500);
-
-
-//  var chart = new anychart.cartesian.Chart();
-//  chart.container('container');
-//  chart.line([
-//    [Date.UTC(2010, 01, 01), 10],
-//    [Date.UTC(2010, 02, 01), 40],
-//    [Date.UTC(2010, 03, 01), 20],
-//    [Date.UTC(2010, 04, 01), 60],
-//    [Date.UTC(2010, 05, 01), 20],
-//    [Date.UTC(2010, 06, 01), 30],
-//    [Date.UTC(2010, 07, 01), 70],
-//    [Date.UTC(2010, 07, 30), 40]
-//  ]);
-//  chart.xScale(new anychart.scales.DateTime());
-//  var xAxis = chart.axis().orientation('bottom');
-//  xAxis.labels().offsetY(10);
-//  xAxis.minorLabels().enabled(true);
-//  chart.axis().orientation('left');
-//  chart.draw();
 
   (drawer = function() {
     axis1.draw();

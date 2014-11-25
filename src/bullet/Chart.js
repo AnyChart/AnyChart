@@ -700,7 +700,7 @@ anychart.bullet.Chart.prototype.drawContent = function(bounds) {
       axis.container(this.rootElement);
     }
     axis.parentBounds(bounds);
-    axis.length(NaN); //todo: hack to drop axis length cache, need consultation with Sergey Medvedev to drop it.
+    axis.padding(0); //todo: hack to drop axis length cache, need consultation with Sergey Medvedev to drop it.
     axis.resumeSignalsDispatching(false);
     axis.draw();
     this.markConsistent(anychart.ConsistencyState.AXES);
