@@ -10,13 +10,25 @@ function load() {
 
   //   chart = anychart.lineChart();
 
-  var chart = anychart.financialChart();
-  chart.ohlc([
-    [Date.UTC(2013, 07, 04), 511.53, 514.98, 505.79, 506.40],
-    [Date.UTC(2013, 07, 05), 507.84, 513.30, 507.23, 512.88],
-    [Date.UTC(2013, 07, 06), 512.36, 515.40, 510.58, 511.40],
-    [Date.UTC(2013, 07, 07), 513.10, 516.50, 511.47, 515.25],
-    [Date.UTC(2013, 07, 08), 515.02, 528.00, 514.62, 525.15]
-  ]);
+ var chart = anychart.scatterChart();
+  chart.hatchFillPalette(['percent50', 'diagonalBrick', 'zigzag']);
+ chart.marker([
+    [4.1, 10],
+    [2.3, 6],
+    [3.4, 17],
+    [1.2, 20]
+ ]);
+ chart.marker([
+    [4.4, 20],
+    [2.3, 11],
+    [3.1, 22],
+    [1.6, 5]
+ ]);
+ chart.marker([
+    [4.8, 1],
+    [2.6, 16],
+    [3.9, 7],
+    [1.1, 12]
+ ]);
   chart.container(stage).draw();
 }

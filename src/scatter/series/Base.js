@@ -355,14 +355,21 @@ anychart.scatter.series.Base.prototype.statistics = function(opt_name, opt_value
  *//**
  * Setter for series name. <br/>
  * Basically, name of series is used in Legend displaying, but it can be used in tooltips as well.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.scatterChart();
  * var formatterFunc = function(){ return this.seriesName;};
- * chart.line([1,2,3])
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series
  *     .name('My Custom series name')
- *     .tooltip().contentFormatter(formatterFunc);
- * chart.line([2,3,4])
- *     .tooltip().contentFormatter(formatterFunc);
+ *     .tooltip()
+ *          .contentFormatter(formatterFunc);
  * chart.legend().enabled(true);
+ * chart.container(stage).draw();
  * @param {string=} opt_value Value to set.
  * @return {!anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
@@ -388,9 +395,16 @@ anychart.scatter.series.Base.prototype.name = function(opt_value) {
  * @return {boolean|anychart.math.Rect} Current clip settings.
  *//**
  * Setter for series clip settings. Clips visible part of a series by a rectangle (or chart).
- * @example <t>lineChart</t>
- * chart.yScale().minimum(2);
- * chart.line([1, 4, 7, 1]).clip(false);
+ * @example
+ * chart = anychart.scatterChart();
+ * chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]).clip(false);
+ * chart.yScale().minimum(11);
+ * chart.container(stage).draw();
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
@@ -468,21 +482,36 @@ anychart.scatter.series.Base.prototype.index = function(opt_value) {
  * @return {*} Metadata object by key.
  *//**
  * Setter for series meta data.
- * @example <t>lineChart</t>
- * chart.line([1,2,3]).meta({
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.meta({
  *     'location': 'QA',
  *     'source': 'http://some-url.dmn',
  *     'imageSRC': 'http://some-url.dmn/getImage.php?bySomeParam=Value'
  * });
+ * chart.container(stage).draw();
  * @param {*=} opt_object Object to replace metadata.
  * @return {anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
  * Add/Replace meta data for series by key.
- * @example <t>lineChart</t>
- * var series = chart.line([1,2,3]);
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
  * series.meta('location', 'QA');
  * series.meta('source', 'http://some-url.dmn');
  * series.meta('imageSRC', 'http://some-url.dmn/getImage.php?bySomeParam=Value');
+ * chart.container(stage).draw();
  * @param {string=} opt_key Metadata key.
  * @param {*=} opt_value Metadata value.
  * @return {anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
@@ -1102,22 +1131,26 @@ anychart.scatter.series.Base.prototype.makeHoverable = function(element, opt_ser
  * @return {anychart.scales.ScatterBase} Current series X Scale.
  *//**
  * Setter for series X scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.ordinal();
+ * @example
+ * chart = anychart.scatterChart();
+ * chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * var secondScale = anychart.scales.log();
  * chart.xAxis(1)
  *     .scale(secondScale)
  *     .orientation('top')
- *     .title('DateTime axis');
- * chart.line([
- *    ['A1', 2],
- *    ['A2', 2.4],
- *    ['A3', 1]
- * ]);
- * chart.line([
- *    ['2014-01-01', 1],
- *    ['2014-01-02', 2],
- *    ['2014-01-03', 3]
+ *     .title('Log axis');
+ * chart.marker([
+ *    [4.1, 10],
+ *    [32.3, 6],
+ *    [163.4, 17],
+ *    [761.2, 20]
  * ]).xScale(secondScale);
+ * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {!anychart.scatter.series.Base}  {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
@@ -1151,12 +1184,24 @@ anychart.scatter.series.Base.prototype.xScale = function(opt_value) {
  * @return {anychart.scales.ScatterBase} Current series Y Scale.
  *//**
  * Setter for series Y scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.linear();
+ * @example
+ * chart = anychart.scatterChart();
+ * chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * var secondScale = anychart.scales.log();
  * chart.yAxis(1).scale(secondScale);
  * chart.yAxis(1).orientation('right');
- * chart.line([2, 3, 4]);
- * chart.line([200, 213, 321]).yScale(secondScale);
+ * chart.marker([
+ *    [4.4, 30],
+ *    [2.8, 6],
+ *    [3.0, 127],
+ *    [1.5, 620]
+ * ]).yScale(secondScale);
+ * chart.container(stage).draw();
  * @param {anychart.scales.ScatterBase=} opt_value Value to set.
  * @return {!anychart.scatter.series.Base}  {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
@@ -1212,12 +1257,20 @@ anychart.scatter.series.Base.prototype.onScaleSignal_ = function(event) {
  * @return {anychart.elements.Tooltip} Tooltip instance.
  *//**
  * Setter for series data tooltip.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
  * var tooltipSettings = anychart.elements.tooltip();
  * tooltipSettings
  *     .background()
  *     .stroke('2 #cc8800').fill('grey 0.5');
- * chart.line([1, 2, 1.2, 3.2]).tooltip(tooltipSettings);
+ * series.tooltip(tooltipSettings);
+ * chart.container(stage).draw();
  * @param {(null|string|Object|anychart.elements.Tooltip)=} opt_value Tooltip settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
  * @return {!anychart.scatter.series.Base} An instance of the {@link anychart.scatter.series.Base} class for method chaining.
@@ -1268,13 +1321,20 @@ anychart.scatter.series.Base.prototype.onTooltipSignal_ = function(event) {
  * @return {anychart.elements.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
  * var labelSettings = anychart.elements.labelsFactory();
  * labelSettings.enabled(true);
  * labelSettings.fontColor('white');
  * labelSettings.fontWeight('bold');
- * var series = chart.line([1,2,3]);
  * series.labels(labelSettings);
+ * chart.container(stage).draw();
  * @param {(anychart.elements.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off a label.
  * @return {!anychart.scatter.series.Base} An instance of the {@link anychart.scatter.series.Base} class for method chaining.
@@ -1394,18 +1454,42 @@ anychart.scatter.series.Base.prototype.calculateStatistics = function() {
  * image fill here - stroke doesn't accept image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid color</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green');
- * @example <c>Linear gradient color</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['green', 'yellow']);
+ * @example <c>Solid color</c>
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.color('green');
+ * chart.container(stage).draw();
+ * @example <c>Linear gradient color</c>
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.color(['green', 'yellow']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
  *//**
  * Color with opacity.<br/>
  * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green', 0.4);
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.color('green', 0.4);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.scatter.series.Base} {@link anychart.scatter.series.Base} instance for method chaining.
@@ -1413,8 +1497,16 @@ anychart.scatter.series.Base.prototype.calculateStatistics = function() {
  * Linear gradient.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['black', 'yellow'], 45, true, 0.5);
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.color(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -1424,8 +1516,16 @@ anychart.scatter.series.Base.prototype.calculateStatistics = function() {
  * Radial gradient.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.marker([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.color(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
@@ -2013,17 +2113,17 @@ anychart.scatter.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt_t
 
 
 //exports
-anychart.scatter.series.Base.prototype['clip'] = anychart.scatter.series.Base.prototype.clip;
-anychart.scatter.series.Base.prototype['color'] = anychart.scatter.series.Base.prototype.color;
-anychart.scatter.series.Base.prototype['name'] = anychart.scatter.series.Base.prototype.name;
-anychart.scatter.series.Base.prototype['meta'] = anychart.scatter.series.Base.prototype.meta;
-anychart.scatter.series.Base.prototype['data'] = anychart.scatter.series.Base.prototype.data;
-anychart.scatter.series.Base.prototype['drawPoint'] = anychart.scatter.series.Base.prototype.drawPoint;
-anychart.scatter.series.Base.prototype['startDrawing'] = anychart.scatter.series.Base.prototype.startDrawing;
-anychart.scatter.series.Base.prototype['finalizeDrawing'] = anychart.scatter.series.Base.prototype.finalizeDrawing;
-anychart.scatter.series.Base.prototype['labels'] = anychart.scatter.series.Base.prototype.labels;
-anychart.scatter.series.Base.prototype['tooltip'] = anychart.scatter.series.Base.prototype.tooltip;
-anychart.scatter.series.Base.prototype['getIterator'] = anychart.scatter.series.Base.prototype.getIterator;
-anychart.scatter.series.Base.prototype['getResetIterator'] = anychart.scatter.series.Base.prototype.getResetIterator;
-anychart.scatter.series.Base.prototype['xScale'] = anychart.scatter.series.Base.prototype.xScale;
-anychart.scatter.series.Base.prototype['yScale'] = anychart.scatter.series.Base.prototype.yScale;
+anychart.scatter.series.Base.prototype['clip'] = anychart.scatter.series.Base.prototype.clip;//doc|ex
+anychart.scatter.series.Base.prototype['color'] = anychart.scatter.series.Base.prototype.color;//doc|ex
+anychart.scatter.series.Base.prototype['name'] = anychart.scatter.series.Base.prototype.name;//doc|ex
+anychart.scatter.series.Base.prototype['meta'] = anychart.scatter.series.Base.prototype.meta;//doc|ex
+anychart.scatter.series.Base.prototype['data'] = anychart.scatter.series.Base.prototype.data;//doc
+anychart.scatter.series.Base.prototype['drawPoint'] = anychart.scatter.series.Base.prototype.drawPoint;//doc|need-ex
+anychart.scatter.series.Base.prototype['startDrawing'] = anychart.scatter.series.Base.prototype.startDrawing;//doc|need-ex
+anychart.scatter.series.Base.prototype['finalizeDrawing'] = anychart.scatter.series.Base.prototype.finalizeDrawing;//doc|need-ex
+anychart.scatter.series.Base.prototype['labels'] = anychart.scatter.series.Base.prototype.labels;//doc|ex
+anychart.scatter.series.Base.prototype['tooltip'] = anychart.scatter.series.Base.prototype.tooltip;//doc|ex
+anychart.scatter.series.Base.prototype['getIterator'] = anychart.scatter.series.Base.prototype.getIterator;//doc|need-ex
+anychart.scatter.series.Base.prototype['getResetIterator'] = anychart.scatter.series.Base.prototype.getResetIterator;//doc|need-ex
+anychart.scatter.series.Base.prototype['xScale'] = anychart.scatter.series.Base.prototype.xScale;//doc|ex
+anychart.scatter.series.Base.prototype['yScale'] = anychart.scatter.series.Base.prototype.yScale;//doc|ex

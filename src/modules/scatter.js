@@ -7,13 +7,13 @@ goog.require('anychart.scatter.series.Marker');
 
 
 /**
- * Returns a scatter chart instance with initial settings (axes, no grids, title).<br/>
+ * Returns a scatter chart instance with initial settings (axes, grids, title).<br/>
  * By default creates marker series if arguments is set.
  * @example
- * var chart = anychart.scatterChart([20, 7, 10, 14]);
- * chart.container('container').draw();
+ * anychart.scatterChart([20, 7, 10, 14])
+ *    .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
- * @return {anychart.scatter.Chart} Chart with defaults for marker series.
+ * @return {anychart.scatter.Chart} Chart with defaults for scatter series.
  */
 anychart.scatterChart = function(var_args) {
   var chart = new anychart.scatter.Chart();
@@ -26,6 +26,20 @@ anychart.scatterChart = function(var_args) {
 
   chart.xAxis();
   chart.yAxis();
+
+  chart.grid(0)
+      .layout(anychart.enums.Layout.HORIZONTAL);
+
+  chart.minorGrid()
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.1')
+      .layout(anychart.enums.Layout.HORIZONTAL);
+
+  chart.grid(1)
+      .evenFill('none')
+      .oddFill('none')
+      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };
