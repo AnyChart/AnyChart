@@ -518,6 +518,51 @@ anychart.VisualBase.prototype.saveAsPDF = function() {
 };
 
 
+/**
+ * Saves the current visual state into SVG file.
+ * @example <t>lineChart</t>
+ * chart.line([4, 2, 12]);
+ * chart.top(50);
+ * var button = new anychart.ui.button();
+ * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
+ * .text('Save image')
+ * .padding(10)
+ * .setOnClickListener(function(){
+ *      chart.saveAsSVG();
+ *  })
+ * .container(stage).draw();
+ */
+anychart.VisualBase.prototype.saveAsSVG = function() {
+  var data = this.getExportData();
+  var stage = this.container() ? this.container().getStage() : null;
+
+  if (data.length && stage) {
+    stage.saveAsSVG(data[0], data[1], data[2]);
+  }
+};
+
+
+/**
+ * Returns SVG string if type of content SVG otherwise returns empty string.
+ * @return {string}
+ */
+anychart.VisualBase.prototype.toSVG = function() {
+  var stage = this.container() ? this.container().getStage() : null;
+  var result = '';
+
+  if (stage) {
+    var type = acgraph.type();
+    if (type == acgraph.StageType.SVG) {
+      var serializer = new XMLSerializer();
+      var svgNode = stage.domElement();
+      result = serializer.serializeToString(svgNode);
+    }
+  }
+
+  return result;
+};
+
+
 //exports
 anychart.VisualBase.prototype['container'] = anychart.VisualBase.prototype.container;//doc|ex
 anychart.VisualBase.prototype['zIndex'] = anychart.VisualBase.prototype.zIndex;//in docs/final
@@ -525,4 +570,6 @@ anychart.VisualBase.prototype['enabled'] = anychart.VisualBase.prototype.enabled
 anychart.VisualBase.prototype['saveAsPNG'] = anychart.VisualBase.prototype.saveAsPNG;//doc|ex
 anychart.VisualBase.prototype['saveAsJPG'] = anychart.VisualBase.prototype.saveAsJPG;//doc|ex
 anychart.VisualBase.prototype['saveAsPDF'] = anychart.VisualBase.prototype.saveAsPDF;//doc|ex
+anychart.VisualBase.prototype['saveAsSVG'] = anychart.VisualBase.prototype.saveAsSVG;
+anychart.VisualBase.prototype['toSVG'] = anychart.VisualBase.prototype.toSVG;
 anychart.VisualBase.prototype['parentBounds'] = anychart.VisualBase.prototype.parentBounds;
