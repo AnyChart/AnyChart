@@ -1,6 +1,6 @@
 goog.provide('anychart.data.Set');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('anychart.data.IView');
 goog.require('anychart.data.Mapping');
 //goog.require('anychart.globalLock'); should be here but commented cause of circular dependency in export.js
@@ -121,13 +121,13 @@ goog.require('goog.array');
  *    here as a hash map.
  * @constructor
  * @implements {anychart.data.IView}
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.data.Set = function(opt_data, opt_csvSettings) {
   goog.base(this);
   this.data(opt_data || null, opt_csvSettings);
 };
-goog.inherits(anychart.data.Set, anychart.Base);
+goog.inherits(anychart.data.Set, anychart.core.Base);
 
 
 /**
@@ -288,7 +288,7 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
  *      [14, 16, 3, 'white', 'black'],
  *      {value: 17, x: 4, fill: 'yellow'}
  * ]);
- * var chart = anychart.barChart();
+ * var chart = anychart.bar();
  * chart.column(
  *      dataSet.mapAs({'value': [0], 'x': [2], 'fill': [3]})
  * );
@@ -390,7 +390,7 @@ anychart.data.Set.prototype.row = function(rowIndex, opt_value) {
 /**
  * Appends new rows to the set. Each argument is a row that will be appended to the Set.
  * @example
- * var chart = anychart.columnChart();
+ * var chart = anychart.column();
  * var data = anychart.data.set([
  *     ['A1', 8],
  *     ['A2', 11],
@@ -419,8 +419,7 @@ anychart.data.Set.prototype.append = function(var_args) {
 /**
  * Inserts the row to the set at the specified position.
  * @example
- * var chart = anychart.columnChart();
- * var data = anychart.data.set([
+ * var chart = anychanychart.column* var data = anychart.data.set([
  *     ['A1', 8],
  *     ['A2', 11],
  *     ['A3', 12],

@@ -3,7 +3,7 @@ var tooltip, stage;
 function load() {
   stage = acgraph.create('container', '100%', '100%');
 
-  tooltip = new anychart.elements.Tooltip();
+  tooltip = new anychart.core.ui.Tooltip();
   tooltip.hideDelay(0);
   tooltip.isFloating(true);
   tooltip.allowLeaveScreen(false);

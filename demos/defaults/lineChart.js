@@ -8,7 +8,7 @@ anychart.onDocumentReady(function() {
     {x: 'All other outlets', value: '900000'}
   ];
 
-  chart = anychart.lineChart()
+  chart = anychart.line()
       .container('container');
 
   chart.line(data);

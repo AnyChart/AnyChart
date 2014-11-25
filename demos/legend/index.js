@@ -9,7 +9,7 @@ function load() {
    //    stage.rect(10, 150, 200, 140),
    //    stage.rect(210, 150, 175, 140)
    ];
-   var title = new anychart.elements.Title();
+   var title = new anychart.core.ui.Title();
    title.text('My title for legend')
    .fontSize(10)
    .margin(10)
@@ -20,7 +20,7 @@ function load() {
 
    var orientations = ['top', 'top', 'right', 'bottom'];
    for (rect in rects) {
-   var legend = new anychart.elements.Legend();
+   var legend = new anychart.core.ui.Legend();
    legend.itemsProvider([
    {'text': 'Item 1', iconFill: 'red .3'},
    {'text': 'Item 2', iconFill: 'red .3'},
@@ -46,7 +46,7 @@ function load() {
     'Series 21', 'Series 22', 'Series 23', 'Series 24', 'Series 25'
   ];
 
-  legend = new anychart.elements.Legend();
+  legend = new anychart.core.ui.Legend();
   legend.container('container');
   //legend.width(500);
   legend.itemsProvider([

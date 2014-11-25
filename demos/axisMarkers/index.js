@@ -3,7 +3,7 @@ var parentBounds, container, drawer;
 var textMarker, lineMarker, rangeMarker;
 
 function load() {
-  var chart = anychart.columnChart();
+  var chart = anychart.column();
   var logScale = anychart.scales.log();
   chart.column([0.5, 4, 0.9, 7, 2.5]);
   chart.yAxis(1).orientation('right').scale(logScale);

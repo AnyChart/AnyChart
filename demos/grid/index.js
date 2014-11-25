@@ -2,7 +2,7 @@ var chart, base;
 
 
 function load() {
-  chart = new anychart.cartesian.Chart();
+  chart = new anychart.charts.Cartesian();
   chart.container('container');
   chart.bounds(10, 10, '100%', '100%');
   chart.line([

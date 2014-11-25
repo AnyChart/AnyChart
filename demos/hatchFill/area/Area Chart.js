@@ -2,7 +2,7 @@ var series, series2, chart;
 
 anychart.onDocumentReady(function() {
   //create area chart
-  chart = anychart.areaChart();
+  chart = anychart.area();
 
   //set container id for the chart
   chart.container('container');

@@ -1,6 +1,6 @@
 var ticks;
 function load() {
-  ticks = new anychart.elements.Ticks();
+  ticks = new anychart.core.axes.Ticks();
 
 
   ticks.listen(anychart.utils.Invalidatable.INVALIDATED, function(e) {

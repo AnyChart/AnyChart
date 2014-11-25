@@ -13,7 +13,7 @@ anychart.onDocumentReady(function() {
   var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
   var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
 
-  chart = anychart.columnChart();
+  chart = anychart.column();
   chart.container('container');
 
   s1 = chart.column(seriesData_1).fill('orange .4');//.hatchFill('diagonalcross');

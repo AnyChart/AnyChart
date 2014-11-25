@@ -35,7 +35,7 @@ function load() {
   ];
 
   function createChart(type, x, y, width, height) {
-    var chart = new anychart.cartesian.Chart();
+    var chart = new anychart.charts.Cartesian();
     chart.container(stage);
     chart.bounds(x, y, width, height);
     var seriesData = type.indexOf('range') == -1 ? data : rangeData;

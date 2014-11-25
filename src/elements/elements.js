@@ -1,4 +1,0 @@
-/**
- @namespace
- @name anychart.elements
- */

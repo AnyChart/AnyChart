@@ -1,7 +1,7 @@
 var paginator, rb, rect, container, stage;
 
 function load() {
-  paginator = new anychart.ui.Paginator();
+  paginator = new anychart.core.ui.Paginator();
   paginator.container('container');
   paginator.background({'fill': 'pink'});
   paginator.draw();

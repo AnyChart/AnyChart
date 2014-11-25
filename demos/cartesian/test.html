@@ -6,8 +6,8 @@
   <meta charset="utf-8">
   <script>
     goog.require('anychart.modules.anychart');
-    goog.require('anychart.elements.Axis');
-    goog.require('anychart.cartesian.Chart');
+    goog.require('anychart.core.axes.Linear');
+    goog.require('anychart.charts.Cartesian');
   </script>
   <script>
     var chart, series;
@@ -22,7 +22,7 @@
       scale2.maximum(5);
 
 
-      chart = anychart.barChart([1, 4, 5, 7, 2]);
+      chart = anychart.bar([1, 4, 5, 7, 2]);
       chart.suspendSignalsDispatching();
 
       series = chart.getSeries(0);

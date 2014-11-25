@@ -1,9 +1,9 @@
 goog.provide('anychart.modules.line');
 
-goog.require('anychart.cartesian.Chart');
-goog.require('anychart.cartesian.series.Line');
-goog.require('anychart.cartesian.series.Spline');
-goog.require('anychart.cartesian.series.StepLine');
+goog.require('anychart.charts.Cartesian');
+goog.require('anychart.core.cartesian.series.Line');
+goog.require('anychart.core.cartesian.series.Spline');
+goog.require('anychart.core.cartesian.series.StepLine');
 goog.require('anychart.modules.base');
 
 
@@ -11,13 +11,13 @@ goog.require('anychart.modules.base');
  * Default line chart.<br/>
  * <b>Note:</b> Contains predefined settings for axes and grids.
  * @example
- * anychart.lineChart([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ * anychart.line([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Line chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for line series.
+ * @return {anychart.charts.Cartesian} Chart with defaults for line series.
  */
-anychart.lineChart = function(var_args) {
-  var chart = new anychart.cartesian.Chart();
+anychart.line = function(var_args) {
+  var chart = new anychart.charts.Cartesian();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);
@@ -45,5 +45,19 @@ anychart.lineChart = function(var_args) {
   return chart;
 };
 
+
+/**
+ * Default line chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.line([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Line chart data.
+ * @return {anychart.charts.Cartesian} Chart with defaults for line series.
+ * @deprecated Use anychart.line() instead.
+ */
+anychart.lineChart = anychart.line;
+
 //exports
+goog.exportSymbol('anychart.line', anychart.line);
 goog.exportSymbol('anychart.lineChart', anychart.lineChart);

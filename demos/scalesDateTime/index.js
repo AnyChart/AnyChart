@@ -101,7 +101,7 @@ function load() {
   scale18.maximumGap(0);
   scale18.startAutoCalc().extendDataRange(Date.UTC(2000, 3, 24, 4, 35, 7, 18), Date.UTC(2000, 3, 24, 4, 35, 7, 32)).finishAutoCalc();
 
-  axis1 = new anychart.elements.Axis();
+  axis1 = new anychart.core.axes.Linear();
   axis1.title().text('12 Years');
   axis1.length(280);
   axis1.offsetY(20);
@@ -116,7 +116,7 @@ function load() {
   axis1.orientation('left');
   axis1.draw();
 
-  axis2 = new anychart.elements.Axis();
+  axis2 = new anychart.core.axes.Linear();
   axis2.title().text('36 Months');
   axis2.length(280);
   axis2.offsetY(20);
@@ -130,7 +130,7 @@ function load() {
   axis2.orientation('left');
   axis2.draw();
 
-  axis3 = new anychart.elements.Axis();
+  axis3 = new anychart.core.axes.Linear();
   axis3.title().text('14 Month');
   axis3.length(280);
   axis3.offsetY(20);
@@ -144,7 +144,7 @@ function load() {
   axis3.orientation('left');
   axis3.draw();
 
-  axis4 = new anychart.elements.Axis();
+  axis4 = new anychart.core.axes.Linear();
   axis4.title().text('8 Month');
   axis4.length(280);
   axis4.offsetY(20);
@@ -158,7 +158,7 @@ function load() {
   axis4.orientation('left');
   axis4.draw();
 
-  axis5 = new anychart.elements.Axis();
+  axis5 = new anychart.core.axes.Linear();
   axis5.title().text('2 Month');
   axis5.length(280);
   axis5.offsetY(20);
@@ -172,7 +172,7 @@ function load() {
   axis5.orientation('left');
   axis5.draw();
 
-  axis6 = new anychart.elements.Axis();
+  axis6 = new anychart.core.axes.Linear();
   axis6.title().text('3 Weeks');
   axis6.length(280);
   axis6.offsetY(20);
@@ -187,7 +187,7 @@ function load() {
   axis6.draw();
 
 
-  axis7 = new anychart.elements.Axis();
+  axis7 = new anychart.core.axes.Linear();
   axis7.title().text('2 Weeks');
   axis7.length(280);
   axis7.offsetY(320);
@@ -201,7 +201,7 @@ function load() {
   axis7.orientation('left');
   axis7.draw();
 
-  axis8 = new anychart.elements.Axis();
+  axis8 = new anychart.core.axes.Linear();
   axis8.title().text('11 days');
   axis8.length(280);
   axis8.offsetY(320);
@@ -215,7 +215,7 @@ function load() {
   axis8.orientation('left');
   axis8.draw();
 
-  axis9 = new anychart.elements.Axis();
+  axis9 = new anychart.core.axes.Linear();
   axis9.title().text('3 days');
   axis9.length(280);
   axis9.offsetY(320);
@@ -229,7 +229,7 @@ function load() {
   axis9.orientation('left');
   axis9.draw();
 
-  axis10 = new anychart.elements.Axis();
+  axis10 = new anychart.core.axes.Linear();
   axis10.title().text('19 hours');
   axis10.length(280);
   axis10.offsetY(320);
@@ -243,7 +243,7 @@ function load() {
   axis10.orientation('left');
   axis10.draw();
 
-  axis11 = new anychart.elements.Axis();
+  axis11 = new anychart.core.axes.Linear();
   axis11.title().text('8 hours');
   axis11.length(280);
   axis11.offsetY(320);
@@ -257,7 +257,7 @@ function load() {
   axis11.orientation('left');
   axis11.draw();
 
-  axis12 = new anychart.elements.Axis();
+  axis12 = new anychart.core.axes.Linear();
   axis12.title().text('17 minutes');
   axis12.length(280);
   axis12.offsetY(320);
@@ -271,7 +271,7 @@ function load() {
   axis12.orientation('left');
   axis12.draw();
 
-  axis13 = new anychart.elements.Axis();
+  axis13 = new anychart.core.axes.Linear();
   axis13.title().text('3 minutes');
   axis13.length(280);
   axis13.offsetY(620);
@@ -285,7 +285,7 @@ function load() {
   axis13.orientation('left');
   axis13.draw();
 
-  axis14 = new anychart.elements.Axis();
+  axis14 = new anychart.core.axes.Linear();
   axis14.title().text('66 seconds');
   axis14.length(280);
   axis14.offsetY(620);
@@ -299,7 +299,7 @@ function load() {
   axis14.orientation('left');
   axis14.draw();
 
-  axis15 = new anychart.elements.Axis();
+  axis15 = new anychart.core.axes.Linear();
   axis15.title().text('13 seconds');
   axis15.length(280);
   axis15.offsetY(620);
@@ -313,7 +313,7 @@ function load() {
   axis15.orientation('left');
   axis15.draw();
 
-  axis16 = new anychart.elements.Axis();
+  axis16 = new anychart.core.axes.Linear();
   axis16.title().text('1 second');
   axis16.length(280);
   axis16.offsetY(620);
@@ -327,7 +327,7 @@ function load() {
   axis16.orientation('left');
   axis16.draw();
 
-  axis17 = new anychart.elements.Axis();
+  axis17 = new anychart.core.axes.Linear();
   axis17.title().text('600 milliseconds');
   axis17.length(280);
   axis17.offsetY(620);
@@ -341,7 +341,7 @@ function load() {
   axis17.orientation('left');
   axis17.draw();
 
-  axis18 = new anychart.elements.Axis();
+  axis18 = new anychart.core.axes.Linear();
   axis18.title().text('14 milliseconds');
   axis18.length(280);
   axis18.offsetY(620);

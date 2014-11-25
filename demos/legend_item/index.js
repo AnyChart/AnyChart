@@ -13,7 +13,7 @@ String.prototype.oneOf = function() {
 var legendItem;
 
 function load() {
-  var palette = new anychart.utils.DistinctColorPalette();
+  var palette = new anychart.palettes.DistinctColors();
   var data = [
     'area',
     'bar',
@@ -41,7 +41,7 @@ function load() {
   for (var i = 0, len = data.length; i < len; i++) {
     var color = palette.colorAt(i);
     var text = data[i];
-    li = new anychart.elements.LegendItem();
+    li = new anychart.core.ui.LegendItem();
     li.container(container ? container : 'container');
 
     if (!container) {
@@ -74,7 +74,7 @@ function load() {
     }, false, li);
   }
   /*
-  legendItem = new anychart.elements.LegendItem();
+  legendItem = new anychart.core.ui.LegendItem();
   legendItem.container('container');
   legendItem.fontSize(30);
   legendItem.x('50%');

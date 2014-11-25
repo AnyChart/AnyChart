@@ -8,7 +8,7 @@ anychart.onDocumentReady(function() {
   ]);
 
 
-  var chart = anychart.columnChart(dataSet);
+  var chart = anychart.columnSet);
   chart.container('container');
   chart.draw();
 

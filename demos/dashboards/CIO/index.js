@@ -357,7 +357,7 @@ anychart.onDocumentReady(function() {
    *    setupRowProp(table, 0, ['content', 'padding'], [1, 2, 3, 4]);
    *    It is equivalent to calling cell.content().padding(1, 2, 3, 4) for all cells in row 0.
    * This method fails if the property chain is incorrect (for example there is no such property you ask).
-   * @param {anychart.elements.Table} table Table to setup row for.
+   * @param {anychart.core.ui.Table} table Table to setup row for.
    * @param {number} rowIndex Row index.
    * @param {!Array.<string>|string} propNameOrChain Property name to access, like 'border' or chain of property names
    *    to access, e.g. ['content', 'fontSize']. Note: no checking on valid results is done, so it's up to you to
@@ -409,7 +409,7 @@ anychart.onDocumentReady(function() {
    *    It is equivalent to calling cell.content().padding(1, 2, 3, 4) for all cells in column 0.
    * If the last parameter is set to true, than the first row (that can be a header row) will be skipped.
    * This method fails if the property chain is incorrect (for example there is no such property you ask).
-   * @param {anychart.elements.Table} table Table to setup row for.
+   * @param {anychart.core.ui.Table} table Table to setup row for.
    * @param {number} colIndex Row index.
    * @param {!Array.<string>|string} propNameOrChain Property name to access, like 'border' or chain of property names
    *    to access, e.g. ['content', 'fontSize']. Note: no checking on valid results is done, so it's up to you to
@@ -661,7 +661,7 @@ anychart.onDocumentReady(function() {
     var lineScale = createTightDTScale();
 
     // we create a markers factory to draw some markers and configure it here
-    var markers = anychart.elements.markersFactory();
+    var markers = anychart.ui.markersFactory();
     markers
         .anchor('center')
         .position('center')
@@ -691,7 +691,7 @@ anychart.onDocumentReady(function() {
 
       // we will need one line chart per system
       // we don't need any other chart elements besides the chart line, so we can use line series directly here.
-      var line = anychart.cartesian.series.line(systemData);
+      var line = anychart.core.cartesian.series.line(systemData);
       // we set come line properties to make it look better and also we set the common x scale
       line
           .stroke('2 #000')
@@ -709,7 +709,7 @@ anychart.onDocumentReady(function() {
       // we do not call .draw() method here and we won't call markers.draw(), because the table will do it for us
 
       // we will also need one bullet chart per system to show current situation. We create it and setup.
-      var bullet = anychart.bullet.chart([{'value': avgAvailability, 'type': 'line', 'gap': 0.4}]);
+      var bullet = anychart.bullet([{'value': avgAvailability, 'type': 'line', 'gap': 0.4}]);
       bullet
           .scale(bulletScale)
           .padding(0)
@@ -732,7 +732,7 @@ anychart.onDocumentReady(function() {
 
     // we wil also need an axis to show bullet scale, because they are usless without it
     // so we create and set it up here
-    var axis = anychart.elements.axis();
+    var axis = anychart.axes.linear();
     axis
         .scale(bulletScale)
         .orientation('bottom')
@@ -758,7 +758,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 357, tableHeight + titleHeight);
 
     // we create report title, set it up and draw it to the layer
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -775,7 +775,7 @@ anychart.onDocumentReady(function() {
 
     // we also create a legend for our bullet charts and place it into the title
     var legendParentBounds = anychart.math.rect(reportBounds.left, reportBounds.top, reportBounds.width, titleHeight);
-    var legend = anychart.elements.legend();
+    var legend = anychart.ui.legend();
     // we use custom legend items and custom icon drawers here
     legend.itemsProvider([
       {
@@ -912,7 +912,7 @@ anychart.onDocumentReady(function() {
 
       // we will need one line chart per hardware system
       // we don't need any other chart elements besides the chart line, so we can use line series directly here.
-      var line = anychart.cartesian.series.line(data);
+      var line = anychart.core.cartesian.series.line(data);
       // we set come line properties to make it look better and also we set the common x scale
       line
           .stroke('2 #000')
@@ -926,7 +926,7 @@ anychart.onDocumentReady(function() {
       // we cache ranges array corresponding to current hardware system
       var ranges = arguments[3 + i];
       // we will also need one bullet chart per system
-      var bullet = anychart.bullet.chart([{'value': avg, 'type': 'bar', gap: 0.6}]);
+      var bullet = anychart.bullet([{'value': avg, 'type': 'bar', gap: 0.6}]);
       // we create some ranges using passed ranges array to show what levels of used capacity are good and what are not
       bullet.range(0)
           .from(ranges[0])
@@ -957,7 +957,7 @@ anychart.onDocumentReady(function() {
     }
 
     // we will need an axis to show scale values for bullet charts, so we create it and set it up
-    var axis = anychart.elements.axis();
+    var axis = anychart.axes.linear();
     axis
         .scale(bulletScale)
         .orientation('bottom')
@@ -988,7 +988,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 357, tableHeight + titleHeight);
 
     // we create, setup and draw report title to the layer
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -1007,7 +1007,7 @@ anychart.onDocumentReady(function() {
         .draw();
 
     // then we create, setup and draw a custom legend for bullet charts to make them more useful
-    var legend = anychart.elements.legend();
+    var legend = anychart.ui.legend();
     // we setup legend items first using custom icon drawers
     legend.itemsProvider([
       {
@@ -1155,7 +1155,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 357, chartHeight + titleHeight);
 
     // now we create, setup and draw report title
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -1197,7 +1197,7 @@ anychart.onDocumentReady(function() {
     xAxisScale.minorTicks().interval(0, 0, 0, 1);
 
     // now we create the chart and setup it's bounds.
-    var chart = anychart.cartesianChart();
+    var chart = anychart.cartesian();
     chart
         .container(container)
         .left(0)
@@ -1382,7 +1382,7 @@ anychart.onDocumentReady(function() {
         .maximum(150);
 
     // we create a markers factory to draw some markers and configure it here
-    var markers = anychart.elements.markersFactory();
+    var markers = anychart.ui.markersFactory();
     markers
         .anchor('center')
         .position('center')
@@ -1400,7 +1400,7 @@ anychart.onDocumentReady(function() {
 
       // we want to show a range marker for each metric, so we can't use just standalone series - we need charts
       // so we create and empty cartesian chart
-      var chart = anychart.cartesianChart();
+      var chart = anychart.cartesian();
       // setup X scale
       chart.xScale(createTightDTScale());
       // create and setup a line on it
@@ -1427,7 +1427,7 @@ anychart.onDocumentReady(function() {
 
       // we will also need one bullet chart per system
       // so we crete it
-      var bullet = anychart.bullet.chart([{'value': actualValues[i], 'type': 'bar', 'gap': 0.6}]);
+      var bullet = anychart.bullet([{'value': actualValues[i], 'type': 'bar', 'gap': 0.6}]);
       // setup the scale and some appearance settings
       bullet
           .scale(bulletScale)
@@ -1456,7 +1456,7 @@ anychart.onDocumentReady(function() {
     }
 
     // also we need an axis to show common bullet scale ticks so we create it and set it up here
-    var axis = anychart.elements.axis();
+    var axis = anychart.axes.linear();
     axis
         .scale(bulletScale)
         .orientation('bottom')
@@ -1482,7 +1482,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 380, tableHeight + titleHeight);
 
     // we will need a title for the report, so we create, setup and draw it to the report layer
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -1503,7 +1503,7 @@ anychart.onDocumentReady(function() {
     // also we will need a legend for bullet charts, so we create, setup and draw it to the report layer
     // this legend has custom drawers for legend item icons, as you can see below
     var legendParentBounds = anychart.math.rect(reportBounds.left, reportBounds.top, reportBounds.width, titleHeight);
-    var legend = anychart.elements.legend();
+    var legend = anychart.ui.legend();
     legend
         .container(container)
         .parentBounds(legendParentBounds)
@@ -1679,7 +1679,7 @@ anychart.onDocumentReady(function() {
         .maximum(20);
 
     // and a markers factory to place some markers in rows we want to draw attention to
-    var markers = anychart.elements.markersFactory();
+    var markers = anychart.ui.markersFactory();
     markers
         .anchor('center')
         .position('center')
@@ -1706,7 +1706,7 @@ anychart.onDocumentReady(function() {
 
       // we will also need one bullet chart per system
       // we fill bullet bars with different color depending if the milestone is past or before due
-      var bullet = anychart.bullet.chart([{
+      var bullet = anychart.bullet([{
         'value': diff,
         'type': 'bar',
         'gap': 0.4,
@@ -1740,7 +1740,7 @@ anychart.onDocumentReady(function() {
 
     // to make bullets more clear and comparable we use common axis for them
     // here we create and set it up
-    var axis = anychart.elements.axis();
+    var axis = anychart.axes.linear();
     axis
         .scale(bulletScale)
         .orientation('bottom')
@@ -1763,7 +1763,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 380, tableHeight + tableTop);
 
     // we create, setup and draw a title for the report
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -1885,7 +1885,7 @@ anychart.onDocumentReady(function() {
     var reportBounds = anychart.math.rect(0, 0, 380, tableHeight + tableTop);
 
     // we create, setup and draw the report title
-    var title = anychart.elements.title();
+    var title = anychart.ui.title();
     title
         .container(container)
         .parentBounds(reportBounds)
@@ -1958,7 +1958,7 @@ anychart.onDocumentReady(function() {
   var formattedToday = (new Date(Today)).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
 
   // the first title is a disclaimer and is positioned at the top of everything, aligning to the left, with some padding
-  anychart.elements.title()
+  anychart.ui.title()
       .container(stage)
       .parentBounds(anychart.math.rect(0, 0, stage.width(), stage.height()))
       .fontFamily('trebuchet, helvetica, arial, sans-serif')
@@ -1976,7 +1976,7 @@ anychart.onDocumentReady(function() {
 
   // the second title is a "CIO Dashboard" label, also aligned to the left.
   // but we also use vAlign and height properties combined to make that positioning you see
-  anychart.elements.title()
+  anychart.ui.title()
       .container(stage)
       .parentBounds(anychart.math.rect(0, 0, stage.width(), stage.height()))
       .fontFamily('trebuchet, helvetica, arial, sans-serif')
@@ -1995,7 +1995,7 @@ anychart.onDocumentReady(function() {
 
   // the third title is a today's date label aligned to the right.
   // it also has vAlign and height properties set in combination to make that positioning you see
-  anychart.elements.title()
+  anychart.ui.title()
       .container(stage)
       .parentBounds(anychart.math.rect(0, 0, stage.width(), stage.height()))
       .fontFamily('trebuchet, helvetica, arial, sans-serif')

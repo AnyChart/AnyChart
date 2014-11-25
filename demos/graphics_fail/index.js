@@ -1,7 +1,7 @@
 var title;
 
 function load() {
-  title = new anychart.elements.Title();
+  title = new anychart.core.ui.Title();
   title.text('AAAAAAAAA!!!!').container('container').background().fill('red').corners(10);
   title.margin(0).padding(10).hAlign('center').vAlign('center');
   title.draw();

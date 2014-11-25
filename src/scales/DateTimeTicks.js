@@ -1,6 +1,6 @@
 goog.provide('anychart.scales.DateTimeTicks');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
@@ -11,7 +11,7 @@ goog.require('goog.date.UtcDateTime');
  * Scale ticks.
  * @param {!anychart.scales.DateTime} scale Scale to ask for a setup.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.scales.DateTimeTicks = function(scale) {
   goog.base(this);
@@ -23,7 +23,7 @@ anychart.scales.DateTimeTicks = function(scale) {
    */
   this.scale_ = scale;
 };
-goog.inherits(anychart.scales.DateTimeTicks, anychart.Base);
+goog.inherits(anychart.scales.DateTimeTicks, anychart.core.Base);
 
 
 /**
@@ -72,7 +72,7 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
  *//**
  * Setter for ticks interval value by string representing date part or ISO 8601 interval string.
  * @example
- * var chart = anychart.financialChart();
+ * var chart = anychart.financial();
  * chart.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
@@ -87,8 +87,7 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
  *//**
  * Setter for ticks interval value by unit.
  * @example
- * var chart = anychart.financialChart();
- * chart.ohlc([
+ * var chart = anychanychart.financial* chart.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
@@ -105,8 +104,7 @@ anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
  * Setter for ticks interval value.<br/>
  * <b>Note:</b> If any passed value is defined but is not a number or less than 0, it defaults to NaN and count() resets to 5.
  * @example
- * var chart = anychart.financialChart();
- * chart.ohlc([
+ * var chart = anychart.fanychart.financialrt.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
@@ -170,8 +168,7 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
  *//**
  * Setter for ticks count value.
  * @example
- * var chart = anychart.financialChart();
- * chart.ohlc([
+ * var chart = anychart.financanychart.financiallc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
@@ -206,9 +203,7 @@ anychart.scales.DateTimeTicks.prototype.count = function(opt_value) {
 /**
  * Setups ticks as an explicit array of fixed ticks.
  * @example
- * var chart = anychart.financialChart();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
+ * var chart = anychart.financialChanychart.financial *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
  *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],

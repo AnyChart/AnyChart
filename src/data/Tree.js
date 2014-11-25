@@ -1,6 +1,6 @@
 goog.provide('anychart.data.Tree');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('anychart.data.Traverser');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -14,7 +14,7 @@ goog.require('goog.object');
  * @param {Array.<Object>=} opt_data - Raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.data.Tree = function(opt_data, opt_fillMethod) {
   goog.base(this);
@@ -56,7 +56,7 @@ anychart.data.Tree = function(opt_data, opt_fillMethod) {
   if (opt_data) this.addData(opt_data, opt_fillMethod);
 
 };
-goog.inherits(anychart.data.Tree, anychart.Base);
+goog.inherits(anychart.data.Tree, anychart.core.Base);
 
 
 /**

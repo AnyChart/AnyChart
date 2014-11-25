@@ -76,7 +76,7 @@ anychart.onDocumentLoad(function() {
     ['P11', -258]
   ];
 
-  chart = anychart.radarChart()
+  chart = anychart.radar()
       .container('container')
       .startAngle(90);
 

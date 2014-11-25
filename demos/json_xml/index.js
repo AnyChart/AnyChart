@@ -13,7 +13,7 @@ function load() {
     {x: 'All other outlets', y: pointData[4], fill: 'rgb(143,188,143)'}
   ];
 
-  chart = new anychart.pie.Chart(seriesData)
+  chart = new anychart.charts.Pie(seriesData)
       .container('container')
       .innerRadius('33%')
       .startAngle(0)

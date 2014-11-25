@@ -1,6 +1,6 @@
 var chart;
 anychart.onDocumentReady(function() {
-  /*var credits = new anychart.elements.Credits();
+  /*var credits = new anychart.core.ui.Credits();
   credits.parentBounds(new anychart.math.Rect(0, 0, 200, 200));
   credits.container('container').draw();
   credits.listenSignals(credits.draw);
@@ -31,7 +31,7 @@ anychart.onDocumentReady(function() {
   var i;
   var charts = [];
   for (i = 0; i < type.length; i++) {
-    chart = anychart.cartesianChart();
+    chart = anychart.cartesian();
     chart.xAxis();
     chart.yAxis();
     chart.bounds()

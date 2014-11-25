@@ -1,10 +1,24 @@
 goog.provide('anychart.ui');
-goog.require('anychart.ui.Button');
-goog.require('anychart.ui.Paginator');
-goog.require('anychart.ui.PaginatorButton');
-goog.require('anychart.ui.ScrollBar');
-goog.require('anychart.ui.Splitter');
+goog.require('anychart.ui.Background');
+goog.require('anychart.ui.DataGrid');
+goog.require('anychart.ui.Label');
+goog.require('anychart.ui.LabelsFactory');
+goog.require('anychart.ui.Legend');
+goog.require('anychart.ui.MarkersFactory');
+goog.require('anychart.ui.Table');
+goog.require('anychart.ui.Title');
+
+
 /**
- @namespace
- @name anychart.ui
+ * Namespace with standalone UI elements.
+ * @namespace
+ * @name anychart.ui
  */
+
+
+
+
+
+
+
+

@@ -47,7 +47,7 @@ function load() {
   var scale = new anychart.scales.Linear();
   scale.ticks().interval(10);
 
-  area = new anychart.cartesian.Chart();
+  area = new anychart.charts.Cartesian();
   area
       .bounds(0, y, '100%', 200)
       .container(stage)

@@ -20,7 +20,7 @@
           ['All other outlets', 90000]
         ]);
 
-        chart = anychart.barChart(data).container('container').draw();
+        chart = anychart.bar(data).container('container').draw();
         series = chart.bar(data);
         var tooltip = series.tooltip();
 //        tooltip.content().textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);

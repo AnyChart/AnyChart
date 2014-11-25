@@ -1,5 +1,5 @@
 goog.provide('anychart.scales.Base');
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 
 
@@ -7,7 +7,7 @@ goog.require('anychart.enums');
 /**
  * Basic methods for scales.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.scales.Base = function() {
   goog.base(this);
@@ -29,7 +29,7 @@ anychart.scales.Base = function() {
 
   this.applyStacking = anychart.scales.Base.prototype.applyModeNone_;
 };
-goog.inherits(anychart.scales.Base, anychart.Base);
+goog.inherits(anychart.scales.Base, anychart.core.Base);
 
 
 /**
@@ -246,7 +246,7 @@ anychart.scales.Base.prototype.canBeStacked = false;
  *//**
  * Setter for stacked mode.
  * @example
- * var chart = anychart.columnChart();
+ * var chart = anychart.column();
  * chart.column([10, 11, 10, 12]);
  * chart.column([7, 3, 4, 1]);
  * chart.column([6, 4, 8, 16]);

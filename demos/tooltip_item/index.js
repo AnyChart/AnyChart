@@ -1,7 +1,7 @@
 var tooltipItem;
 
 function load() {
-  tooltipItem = new anychart.elements.TooltipItem();
+  tooltipItem = new anychart.core.ui.TooltipItem();
   tooltipItem.container('container');
   tooltipItem.anchor('lefttop');
   tooltipItem.offsetX(20);

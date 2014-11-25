@@ -1,8 +1,8 @@
 goog.provide('anychart.modules.column');
 
-goog.require('anychart.cartesian.Chart');
-goog.require('anychart.cartesian.series.Column');
-goog.require('anychart.cartesian.series.RangeColumn');
+goog.require('anychart.charts.Cartesian');
+goog.require('anychart.core.cartesian.series.Column');
+goog.require('anychart.core.cartesian.series.RangeColumn');
 goog.require('anychart.modules.base');
 
 
@@ -10,13 +10,13 @@ goog.require('anychart.modules.base');
  * Default column chart.<br/>
  * <b>Note:</b> Contains predefined settings for axes and grids.
  * @example
- * anychart.columnChart([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ * anychart.column([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Column chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for column series.
+ * @return {anychart.charts.Cartesian} Chart with defaults for column series.
  */
-anychart.columnChart = function(var_args) {
-  var chart = new anychart.cartesian.Chart();
+anychart.column = function(var_args) {
+  var chart = new anychart.charts.Cartesian();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.column(arguments[i]);
@@ -44,5 +44,19 @@ anychart.columnChart = function(var_args) {
   return chart;
 };
 
+
+/**
+ * Default column chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.column([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Column chart data.
+ * @return {anychart.charts.Cartesian} Chart with defaults for column series.
+ * @deprecated Use anychart.column() instead.
+ */
+anychart.columnChart = anychart.column;
+
 //exports
+goog.exportSymbol('anychart.column', anychart.column);
 goog.exportSymbol('anychart.columnChart', anychart.columnChart);

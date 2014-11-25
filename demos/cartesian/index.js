@@ -44,7 +44,7 @@ function load() {
       .width(620)
       .hAlign('center');
 
-  bubble = new anychart.cartesian.series.Bubble(data1)
+  bubble = new anychart.core.cartesian.series.Bubble(data1)
       .markers(null)
       .minimumSize(1)
       .maximumSize(20)
@@ -56,7 +56,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeArea = new anychart.cartesian.series.RangeArea(data2);
+  rangeArea = new anychart.core.cartesian.series.RangeArea(data2);
   rangeArea.markers(null);
   rangeArea.container(stage);
   rangeArea.bounds(210, 30, 200, 150);
@@ -65,7 +65,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeSplineArea = new anychart.cartesian.series.RangeSplineArea(data2);
+  rangeSplineArea = new anychart.core.cartesian.series.RangeSplineArea(data2);
   rangeSplineArea.markers(null);
   rangeSplineArea.container(stage);
   rangeSplineArea.bounds(420, 30, 200, 150);
@@ -74,7 +74,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeStepSplineArea = new anychart.cartesian.series.RangeStepArea(data2);
+  rangeStepSplineArea = new anychart.core.cartesian.series.RangeStepArea(data2);
   rangeStepSplineArea.markers(null);
   rangeStepSplineArea.container(stage);
   rangeStepSplineArea.bounds(0, 190, 200, 150);
@@ -83,7 +83,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeBar = new anychart.cartesian.series.RangeBar(data2);
+  rangeBar = new anychart.core.cartesian.series.RangeBar(data2);
   rangeBar.markers(null);
   rangeBar.container(stage);
   rangeBar.bounds(210, 190, 200, 150);
@@ -92,7 +92,7 @@ function load() {
     e.target.draw();
   });
 
-  rangeColumn = new anychart.cartesian.series.RangeColumn(data2);
+  rangeColumn = new anychart.core.cartesian.series.RangeColumn(data2);
   rangeColumn.markers(null);
   rangeColumn.container(stage);
   rangeColumn.bounds(420, 190, 200, 150);
@@ -108,7 +108,7 @@ function load() {
       .width(620)
       .hAlign('center');
 
-  bubbleChart = new anychart.cartesian.Chart();
+  bubbleChart = new anychart.charts.Cartesian();
   bubbleChart.container(stage);
   bubbleChart.bounds(630, 30, 200, 150);
   bubbleChart.title('Bubble chart');
@@ -118,7 +118,7 @@ function load() {
       .markers(null);
   bubbleChart.draw();
 
-  rangeAreaChart = new anychart.cartesian.Chart();
+  rangeAreaChart = new anychart.charts.Cartesian();
   rangeAreaChart.container(stage);
   rangeAreaChart.bounds(840, 30, 200, 150);
   rangeAreaChart.title('Range area chart');
@@ -126,7 +126,7 @@ function load() {
   rangeAreaChart.rangeArea(data2).markers(null);
   rangeAreaChart.draw();
 
-  rangeSplineAreaChart = new anychart.cartesian.Chart();
+  rangeSplineAreaChart = new anychart.charts.Cartesian();
   rangeSplineAreaChart.container(stage);
   rangeSplineAreaChart.bounds(1050, 30, 200, 150);
   rangeSplineAreaChart.title('Range spline \n area chart');
@@ -134,7 +134,7 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data2).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart = new anychart.charts.Cartesian();
   rangeStepAreaChart.container(stage);
   rangeStepAreaChart.bounds(630, 190, 200, 150);
   rangeStepAreaChart.title('Range step line \n area chart');
@@ -142,7 +142,7 @@ function load() {
   rangeStepAreaChart.rangeStepArea(data2).markers(null);
   rangeStepAreaChart.draw();
 
-  rangeBarChart = new anychart.cartesian.Chart();
+  rangeBarChart = new anychart.charts.Cartesian();
   rangeBarChart.container(stage);
   rangeBarChart.bounds(840, 190, 200, 150);
   rangeBarChart.title('Range bar chart');
@@ -150,7 +150,7 @@ function load() {
   rangeBarChart.rangeBar(data2).markers(null);
   rangeBarChart.draw();
 
-  rangeColumnChart = new anychart.cartesian.Chart();
+  rangeColumnChart = new anychart.charts.Cartesian();
   rangeColumnChart.container(stage);
   rangeColumnChart.bounds(1050, 190, 200, 150);
   rangeColumnChart.title('Range bar chart');
@@ -166,7 +166,7 @@ function load() {
       .width(620)
       .hAlign('center');
 
-  bubbleChart = new anychart.cartesian.Chart();
+  bubbleChart = new anychart.charts.Cartesian();
   bubbleChart.container(stage);
   bubbleChart.bounds(0, 400, 200, 150);
   bubbleChart.title('Bubble chart');
@@ -180,7 +180,7 @@ function load() {
       .markers(null);
   bubbleChart.draw();
 
-  rangeAreaChart = new anychart.cartesian.Chart();
+  rangeAreaChart = new anychart.charts.Cartesian();
   rangeAreaChart.container(stage);
   rangeAreaChart.bounds(210, 400, 200, 150);
   rangeAreaChart.title('Range area chart');
@@ -189,7 +189,7 @@ function load() {
   rangeAreaChart.rangeArea(data1).markers(null);
   rangeAreaChart.draw();
 
-  rangeSplineAreaChart = new anychart.cartesian.Chart();
+  rangeSplineAreaChart = new anychart.charts.Cartesian();
   rangeSplineAreaChart.container(stage);
   rangeSplineAreaChart.bounds(420, 400, 200, 150);
   rangeSplineAreaChart.title('Range spline \n area chart');
@@ -198,7 +198,7 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data1).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart = new anychart.charts.Cartesian();
   rangeStepAreaChart.container(stage);
   rangeStepAreaChart.bounds(0, 590, 200, 150);
   rangeStepAreaChart.title('Range step line \n area chart');
@@ -207,7 +207,7 @@ function load() {
   rangeStepAreaChart.rangeStepArea(data1).markers(null);
   rangeStepAreaChart.draw();
 
-  rangeBarChart = new anychart.cartesian.Chart();
+  rangeBarChart = new anychart.charts.Cartesian();
   rangeBarChart.container(stage);
   rangeBarChart.bounds(210, 590, 200, 150);
   rangeBarChart.title('Range bar chart');
@@ -216,7 +216,7 @@ function load() {
   rangeBarChart.rangeBar(data1).markers(null);
   rangeBarChart.draw();
 
-  rangeColumnChart = new anychart.cartesian.Chart();
+  rangeColumnChart = new anychart.charts.Cartesian();
   rangeColumnChart.container(stage);
   rangeColumnChart.bounds(420, 590, 200, 150);
   rangeColumnChart.title('Range bar chart');
@@ -233,7 +233,7 @@ function load() {
       .width(620)
       .hAlign('center');
 
-  bubbleChart = new anychart.cartesian.Chart();
+  bubbleChart = new anychart.charts.Cartesian();
   bubbleChart.container(stage);
   bubbleChart.bounds(630, 400, 200, 150);
   bubbleChart.title('Bubble chart');
@@ -245,7 +245,7 @@ function load() {
       .markers(null);
   bubbleChart.draw();
 
-  rangeAreaChart = new anychart.cartesian.Chart();
+  rangeAreaChart = new anychart.charts.Cartesian();
   rangeAreaChart.container(stage);
   rangeAreaChart.bounds(840, 400, 200, 150);
   rangeAreaChart.title('Range area chart');
@@ -255,7 +255,7 @@ function load() {
   rangeAreaChart.rangeArea(data2).markers(null);
   rangeAreaChart.draw();
 
-  rangeSplineAreaChart = new anychart.cartesian.Chart();
+  rangeSplineAreaChart = new anychart.charts.Cartesian();
   rangeSplineAreaChart.container(stage);
   rangeSplineAreaChart.bounds(1050, 400, 200, 150);
   rangeSplineAreaChart.title('Range spline \n area chart');
@@ -265,7 +265,7 @@ function load() {
   rangeSplineAreaChart.rangeSplineArea(data2).markers(null);
   rangeSplineAreaChart.draw();
 
-  rangeStepAreaChart = new anychart.cartesian.Chart();
+  rangeStepAreaChart = new anychart.charts.Cartesian();
   rangeStepAreaChart.container(stage);
   rangeStepAreaChart.bounds(630, 590, 200, 150);
   rangeStepAreaChart.title('Range step line \n area chart');
@@ -275,7 +275,7 @@ function load() {
   rangeStepAreaChart.rangeStepArea(data2).markers(null);
   rangeStepAreaChart.draw();
 
-  rangeBarChart = new anychart.cartesian.Chart();
+  rangeBarChart = new anychart.charts.Cartesian();
   rangeBarChart.container(stage);
   rangeBarChart.bounds(840, 590, 200, 150);
   rangeBarChart.title('Range bar chart');
@@ -285,7 +285,7 @@ function load() {
   rangeBarChart.rangeBar(data2).markers(null);
   rangeBarChart.draw();
 
-  rangeColumnChart = new anychart.cartesian.Chart();
+  rangeColumnChart = new anychart.charts.Cartesian();
   rangeColumnChart.container(stage);
   rangeColumnChart.bounds(1050, 590, 200, 150);
   rangeColumnChart.title('Range bar chart');

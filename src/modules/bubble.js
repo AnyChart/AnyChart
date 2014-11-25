@@ -1,7 +1,7 @@
 goog.provide('anychart.modules.bubble');
 
-goog.require('anychart.cartesian.Chart');
-goog.require('anychart.cartesian.series.Bubble');
+goog.require('anychart.charts.Cartesian');
+goog.require('anychart.core.cartesian.series.Bubble');
 goog.require('anychart.modules.base');
 
 
@@ -9,17 +9,17 @@ goog.require('anychart.modules.base');
  * Default bubble chart.<br/>
  * <b>Note:</b> Contains predefined settings for axes and grids.
  * @example
- * anychart.bubbleChart([
+ * anychart.bubble([
  *      [1.3, 2, 1.3],
  *      [1.6, 1.5, 1.4],
  *      [1.9, 1.9, 1.1]
  *   ])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Bubble chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for bubble series.
+ * @return {anychart.charts.Cartesian} Chart with defaults for bubble series.
  */
-anychart.bubbleChart = function(var_args) {
-  var chart = new anychart.cartesian.Chart();
+anychart.bubble = function(var_args) {
+  var chart = new anychart.charts.Cartesian();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bubble(arguments[i]);
@@ -49,5 +49,23 @@ anychart.bubbleChart = function(var_args) {
   return chart;
 };
 
+
+/**
+ * Default bubble chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.bubble([
+ *      [1.3, 2, 1.3],
+ *      [1.6, 1.5, 1.4],
+ *      [1.9, 1.9, 1.1]
+ *   ])
+ *   .container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Bubble chart data.
+ * @return {anychart.charts.Cartesian} Chart with defaults for bubble series.
+ * @deprecated Use anychart.bubble() instead.
+ */
+anychart.bubbleChart = anychart.bubble;
+
 //exports
+goog.exportSymbol('anychart.bubble', anychart.bubble);//doc|ex
 goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);//doc|ex

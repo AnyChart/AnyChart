@@ -10,7 +10,7 @@
   <script>
     var chart, axis, minor;
     anychart.onDocumentLoad(function() {
-      chart = anychart.columnChart();
+      chart = anychart.column();
       chart.container('container');
 
       var data = new anychart.data.Set([
@@ -30,7 +30,7 @@
       chart.background().enabled(false);
       chart.credits().enabled(false);
 
-      chart.lineMarker(anychart.elements.lineMarker().value(22));
+      chart.lineMarker(anychart.axisMarkers.line().value(22));
 
       chart.column(data_1);
 

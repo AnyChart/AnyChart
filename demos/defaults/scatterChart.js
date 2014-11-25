@@ -8,7 +8,7 @@ anychart.onDocumentReady(function() {
     {x: 5, value: '900000', size: '6'}
   ];
 
-  var chart = anychart.cartesianChart()
+  var chart = anychart.cartesian()
       .container('container');
 
   chart.bubble(data).minimumSize('25%').maximumSize('45%');

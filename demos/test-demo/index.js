@@ -8,7 +8,7 @@ function load() {
 
 //    var chart;
     var layer = acgraph.layer();
-    var chart = anychart.lineChart();
+    var chart = anychart.line();
     chart.listenOnce(anychart.events.EventType.CHART_DRAW, function() {
         document.getElementById('status').innerHTML = 'chart draw';
         console.log('chart draw');

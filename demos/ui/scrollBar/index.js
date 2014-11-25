@@ -14,7 +14,7 @@ anychart.onDocumentReady(function() {
 
 
   //Initializing a scrolls.
-  verticalScroll = new anychart.ui.ScrollBar();
+  verticalScroll = new anychart.core.ui.ScrollBar();
   verticalScroll
       .container(stage)
       .bounds(10, 20, 15, 180)
@@ -26,7 +26,7 @@ anychart.onDocumentReady(function() {
   verticalScroll.listen('signal', verticalScroll.draw, false, verticalScroll);
 
 
-  horizontalScroll = new anychart.ui.ScrollBar();
+  horizontalScroll = new anychart.core.ui.ScrollBar();
   horizontalScroll
       .container(stage)
       .bounds(40, 215, 180, 15)

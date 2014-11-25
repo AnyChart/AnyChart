@@ -1,6 +1,6 @@
 var chart;
 anychart.onDocumentReady(function() {
-  chart = anychart.columnChart();
+  chart = anychart.column();
   var scale = anychart.scales.dateTime();
   chart.xScale(scale);
   chart.column([

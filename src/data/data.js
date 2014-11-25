@@ -51,7 +51,7 @@ goog.require('anychart.enums');
  *   ['A3', 70, 60, 125, 100],
  *   ['A4', 156, 98, 150, 180]
  * ];
- * anychart.lineChart
+ * anychart.line
  *     .apply(this, anychart.data.mapAsTable(data))
  *     .container(stage).draw();
  * @param {Array.<Array.<*>>} data Source data table.

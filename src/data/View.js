@@ -1,6 +1,6 @@
 goog.provide('anychart.data.View');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('anychart.data.Iterator');
 goog.require('anychart.enums');
 
@@ -14,7 +14,7 @@ goog.require('anychart.enums');
  * @constructor
  * @implements {anychart.data.IView}
  * @name anychart.data.View
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.data.View = function(parentView) {
   goog.base(this);
@@ -30,7 +30,7 @@ anychart.data.View = function(parentView) {
 
   this.invalidate(anychart.ConsistencyState.DATA);
 };
-goog.inherits(anychart.data.View, anychart.Base);
+goog.inherits(anychart.data.View, anychart.core.Base);
 
 
 /**
@@ -384,7 +384,7 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 /**
  * Searches fieldName by fieldValue and returns it index (or the first match).
  * @example
- * var chart = anychart.columnChart();
+ * var chart = anychart.column();
  * var data = anychart.data.set([
  *     {x: 'A1', value: 8},
  *     {x: 'A2', value: 11, fill: 'orange'},
@@ -433,8 +433,7 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 /**
  * Gets the value from the row by row index and field name.
  * @example
- * var chart = anychart.columnChart();
- * var data = anychart.data.set([
+ * var chart = anychanychart.column* var data = anychart.data.set([
  *     {x: 'A1', value: 8, fill: 'yellow'},
  *     {x: 'A2', value: 11, fill: 'orange'},
  *     {x: 'A3', value: 12, fill: 'red'},

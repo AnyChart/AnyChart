@@ -44,7 +44,7 @@ anychart.scales.DateTime.prototype.isMissing = function(value) {
  *//**
  * Setter for set of scale ticks in terms of data values.
  * @example
- * var chart = anychart.financialChart();
+ * var chart = anychart.financial();
  * chart.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
@@ -82,8 +82,7 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
  *//**
  * Setter for set of scale ticks in terms of data values.
  * @example
- * var chart = anychart.financialChart();
- * chart.ohlc([
+ * var chart = anychanychart.financial* chart.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],

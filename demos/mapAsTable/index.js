@@ -10,7 +10,7 @@ function load() {
     ['Point 6', 173, 205, 150],
     ['Point 7', 95, 190, 140]
   ];
-  chart = anychart.lineChart.apply(null, anychart.data.mapAsTable(data1));
+  chart = anychart.line.apply(null, anychart.data.mapAsTable(data1));
   chart.container(container);
   chart.right('50%');
   chart.draw();

@@ -352,7 +352,7 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
  * Returns tick position ratio by its name.<br/>
  * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
- * var chart = anychart.lineChart();
+ * var chart = anychart.line();
  * chart.line([
  *    ['A1', 1.1],
  *    ['A2', 1.4],

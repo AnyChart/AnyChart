@@ -11,7 +11,7 @@ anychart.onDocumentReady(function() {
   s3 = data.mapAs({x: [0], value: [3]});
   s4 = data.mapAs({x: [0], value: [4]});
 
-  chart = anychart.barChart()
+  chart = anychart.bar()
       .container('container');
 
   chart.bar(s1);

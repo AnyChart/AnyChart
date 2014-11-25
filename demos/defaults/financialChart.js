@@ -153,7 +153,7 @@ anychart.onDocumentReady(function() {
     [Date.UTC(2002, 6, 1), '10.0408678182649', '10.5377986568433', '9.69677547209263', '10.4423607827127']
   ]);
 
-  chart = anychart.financialChart()
+  chart = anychart.financial()
       .container('container');
 
   chart.candlestick(data);

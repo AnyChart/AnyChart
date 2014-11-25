@@ -8,7 +8,7 @@ anychart.onDocumentReady(function() {
     {name: 'All other outlets', value: '900000'}
   ];
 
-  chart = anychart.pieChart(data)
+  chart = anychart.pie(data)
       .container('container');
   chart.draw();
 });

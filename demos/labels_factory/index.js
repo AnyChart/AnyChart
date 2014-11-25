@@ -3,7 +3,7 @@ var count = 1;
 var index;
 
 function load() {
-  labels = new anychart.elements.LabelsFactory();
+  labels = new anychart.core.ui.LabelsFactory();
   labels.container('container');
   labels.clear();
 

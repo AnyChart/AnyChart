@@ -6,13 +6,13 @@
   <meta charset="utf-8">
   <script>
     goog.require('anychart.modules.anychart');
-    goog.require('anychart.elements.Axis');
-    goog.require('anychart.cartesian.Chart');
+    goog.require('anychart.core.axes.Linear');
+    goog.require('anychart.charts.Cartesian');
   </script>
   <script>
     function load() {
 
-      var chart = new anychart.cartesian.Chart();
+      var chart = new anychart.charts.Cartesian();
       chart.suspendSignalsDispatching();
       chart.title(null);
       chart.line([1, 4, 5, 7, 2]);

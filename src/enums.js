@@ -1155,7 +1155,7 @@ anychart.enums.ErrorCode = {
   CONTAINER_NOT_SET: 1,
   SCALE_NOT_SET: 2,
 
-  //anychart.elements.Table
+  //anychart.core.ui.Table
   WRONG_TABLE_CONTENTS: 3,
 
   NO_FEATURE_IN_MODULE: 4,
@@ -1193,7 +1193,7 @@ anychart.enums.WarningCode = {
 
   CANT_SERIALIZE_FUNCTION: 8,
 
-  //anychart.elements.DataGrid incorrect component usage.
+  //anychart.core.ui.DataGrid incorrect component usage.
   DG_INCORRECT_METHOD_USAGE: 9, //can't be tested now
 
 

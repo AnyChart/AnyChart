@@ -26,7 +26,7 @@ anychart.onDocumentReady(function() {
   s1 = data.mapAs({x: [0], value: [1]});
   s2 = data.mapAs({x: [0], value: [2]});
 
-  chart = anychart.areaChart()
+  chart = anychart.area()
       .container('container');
 
 

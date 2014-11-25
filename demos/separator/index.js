@@ -11,7 +11,7 @@ function load() {
       '\t.lineTo(bounds.getLeft(), centerY)\n' +
       '\t.close();\n' +
       '});';
-  separator = new anychart.elements.Separator();
+  separator = new anychart.core.ui.Separator();
   separator.container('container');
   separator.margin(10, 200, 50, 10).width('100').height('5');
   separator.draw();

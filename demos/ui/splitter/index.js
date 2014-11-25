@@ -15,7 +15,7 @@ anychart.onDocumentReady(function() {
     'opacity': 1
   }).stroke('3px red');
 
-  split = new anychart.ui.Splitter();
+  split = new anychart.core.ui.Splitter();
   split.container(stage)
       .bounds(20, 20, 400, 300)
       .layout('vertical')

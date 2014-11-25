@@ -1,13 +1,13 @@
 anychart.onDocumentLoad(function() {
   var table = anychart.elements.table();
 
-  var series_1 = anychart.cartesian.series.line([1, 2, 3, 4, 5]);
-  var series_2 = anychart.cartesian.series.line([1, 2, 3, 4, 5]);
-  var series_3 = anychart.cartesian.series.line([5, 4, 3, 2, 1]);
+  var series_1 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);
+  var series_2 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);
+  var series_3 = anychart.core.cartesian.series.line([5, 4, 3, 2, 1]);
 
-  var series_4 = anychart.cartesian.series.line([1, 2, 3, 4, 5]);
-  var series_5 = anychart.cartesian.series.line([1, 2, 3, 4, 5]);
-  var series_6 = anychart.cartesian.series.line([5, 4, 3, 2, 1]);
+  var series_4 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);
+  var series_5 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);
+  var series_6 = anychart.core.cartesian.series.line([5, 4, 3, 2, 1]);
 
   table.container('container');
   table.contents([

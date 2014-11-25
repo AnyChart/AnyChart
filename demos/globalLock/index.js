@@ -5,14 +5,14 @@ function load() {
   var map = ds.mapAs();
   v1 = map.sort('value', function(a, b) { return b - a; });
   v2 = map.sort('value', function(a, b) { return a - b; });
-  chart = new anychart.cartesian.Chart().container(stage).height('50%');
+  chart = new anychart.charts.Cartesian().container(stage).height('50%');
   series1 = chart.column(v1);
   series2 = chart.column(v2);
   chart.xAxis();
   chart.yAxis();
   chart.listen('CHART_DRAW', function() {console.log('chart draw'); });
   chart.draw();
-  chart = new anychart.cartesian.Chart().container(stage).height('50%').top('50%');
+  chart = new anychart.charts.Cartesian().container(stage).height('50%').top('50%');
   series1 = chart.column(v1);
   series2 = chart.column(v2);
   chart.xAxis();

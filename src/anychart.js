@@ -1,7 +1,6 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
-goog.require('anychart.math');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
 
@@ -119,12 +118,12 @@ anychart.chartTypesMap = {};
 
 /**
  * @param {string} type
- * @return {anychart.Chart}
+ * @return {anychart.core.Chart}
  */
-anychart.createChartByType = function(type) {
+anychart.createByType = function(type) {
   var cls = anychart.chartTypesMap[type];
   if (cls) {
-    return /** @type {anychart.Chart} */(new cls());
+    return /** @type {anychart.core.Chart} */(new cls());
   } else {
     throw 'Unknown chart type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
@@ -167,7 +166,7 @@ anychart.fromJson = function(jsonConfig) {
   if (!chart) throw 'Config should contain the chart node';
 
 
-  var instance = anychart.createChartByType(chart['type']);
+  var instance = anychart.createByType(chart['type']);
   instance.deserialize(json);
 };
 
@@ -392,7 +391,7 @@ anychart.licenseKey_ = null;
  * To purchase a license proceed to <a href="http://www.anychart.com/buy/">Buy AnyChart</a> page.
  * @example
  * anychart.licenseKey('YOUR-LICENSE-KEY');
- * var chart = anychart.pieChart([1, 2, 3]);
+ * var chart = anychart.pie([1, 2, 3]);
  * chart.container(stage).draw();
  * @param {string=} opt_value Your licence key.
  * @return {?string} Current licence key.
@@ -421,7 +420,7 @@ anychart.isValidKey = function() {
 /**
  * @ignoreDoc
  */
-anychart.areaChart = anychart.areaChart || function() {
+anychart.area = anychart.area || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Area chart']);
 };
 
@@ -429,7 +428,7 @@ anychart.areaChart = anychart.areaChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.barChart = anychart.barChart || function() {
+anychart.bar = anychart.bar || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bar chart']);
 };
 
@@ -437,7 +436,7 @@ anychart.barChart = anychart.barChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.bubbleChart = anychart.bubbleChart || function() {
+anychart.bubble = anychart.bubble || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble chart']);
 };
 
@@ -445,7 +444,7 @@ anychart.bubbleChart = anychart.bubbleChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.bulletChart = anychart.bulletChart || function() {
+anychart.bullet = anychart.bullet || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bullet chart']);
 };
 
@@ -453,7 +452,7 @@ anychart.bulletChart = anychart.bulletChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.cartesianChart = anychart.cartesianChart || function() {
+anychart.cartesian = anychart.cartesian || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Cartesian chart']);
 };
 
@@ -461,7 +460,7 @@ anychart.cartesianChart = anychart.cartesianChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.scatterChart = anychart.scatterChart || function() {
+anychart.scatter = anychart.scatter || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
 };
 
@@ -469,7 +468,7 @@ anychart.scatterChart = anychart.scatterChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.columnChart = anychart.columnChart || function() {
+anychart.column = anychart.column || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
 };
 
@@ -477,7 +476,7 @@ anychart.columnChart = anychart.columnChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.financialChart = anychart.financialChart || function() {
+anychart.financial = anychart.financial || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Financial chart']);
 };
 
@@ -485,7 +484,7 @@ anychart.financialChart = anychart.financialChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.lineChart = anychart.lineChart || function() {
+anychart.line = anychart.line || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Line chart']);
 };
 
@@ -493,7 +492,7 @@ anychart.lineChart = anychart.lineChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.markerChart = anychart.markerChart || function() {
+anychart.marker = anychart.marker || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker chart']);
 };
 
@@ -501,7 +500,7 @@ anychart.markerChart = anychart.markerChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.pieChart = anychart.pieChart || function() {
+anychart.pie = anychart.pie || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pie chart']);
 };
 
@@ -509,7 +508,7 @@ anychart.pieChart = anychart.pieChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.radarChart = anychart.radarChart || function() {
+anychart.radar = anychart.radar || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar chart']);
 };
 
@@ -517,56 +516,8 @@ anychart.radarChart = anychart.radarChart || function() {
 /**
  * @ignoreDoc
  */
-anychart.polarChart = anychart.polarChart || function() {
+anychart.polar = anychart.polar || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.radarLineChart = anychart.radarLineChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar line chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.polarLineChart = anychart.polarLineChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar line chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.radarAreaChart = anychart.radarAreaChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar area chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.polarAreaChart = anychart.polarAreaChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar area chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.radarMarkerChart = anychart.radarMarkerChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar marker chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.polarMarkerChart = anychart.polarMarkerChart || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar marker chart']);
 };
 
 
@@ -579,22 +530,29 @@ goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
-goog.exportSymbol('anychart.areaChart', anychart.areaChart);//linkedFromModule
-goog.exportSymbol('anychart.barChart', anychart.barChart);//linkedFromModule
-goog.exportSymbol('anychart.bubbleChart', anychart.bubbleChart);//linkedFromModule
-goog.exportSymbol('anychart.bulletChart', anychart.bulletChart);//linkedFromModule
-goog.exportSymbol('anychart.cartesianChart', anychart.cartesianChart);//linkedFromModule
-goog.exportSymbol('anychart.columnChart', anychart.columnChart);//linkedFromModule
-goog.exportSymbol('anychart.financialChart', anychart.financialChart);//linkedFromModule
-goog.exportSymbol('anychart.lineChart', anychart.lineChart);//linkedFromModule
-goog.exportSymbol('anychart.markerChart', anychart.markerChart);//linkedFromModule
-goog.exportSymbol('anychart.pieChart', anychart.pieChart);//linkedFromModule
-goog.exportSymbol('anychart.radarChart', anychart.radarChart);
-goog.exportSymbol('anychart.polarChart', anychart.polarChart);
-goog.exportSymbol('anychart.polarLineChart', anychart.polarLineChart);
-goog.exportSymbol('anychart.polarAreaChart', anychart.polarAreaChart);
-goog.exportSymbol('anychart.polarMarkerChart', anychart.polarMarkerChart);
-goog.exportSymbol('anychart.radarLineChart', anychart.radarLineChart);
-goog.exportSymbol('anychart.radarAreaChart', anychart.radarAreaChart);
-goog.exportSymbol('anychart.radarMarkerChart', anychart.radarMarkerChart);
-goog.exportSymbol('anychart.scatterChart', anychart.scatterChart);
+goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
+goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
+goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule
+goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
+goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
+goog.exportSymbol('anychart.column', anychart.column);//linkedFromModule
+goog.exportSymbol('anychart.financial', anychart.financial);//linkedFromModule
+goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
+goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
+goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
+goog.exportSymbol('anychart.radar', anychart.radar);
+goog.exportSymbol('anychart.polar', anychart.polar);
+goog.exportSymbol('anychart.scatter', anychart.scatter);
+goog.exportSymbol('anychart.areaChart', anychart.area);
+goog.exportSymbol('anychart.barChart', anychart.bar);
+goog.exportSymbol('anychart.bubbleChart', anychart.bubble);
+goog.exportSymbol('anychart.bulletChart', anychart.bullet);
+goog.exportSymbol('anychart.cartesianChart', anychart.cartesian);
+goog.exportSymbol('anychart.columnChart', anychart.column);
+goog.exportSymbol('anychart.financialChart', anychart.financial);
+goog.exportSymbol('anychart.lineChart', anychart.line);
+goog.exportSymbol('anychart.markerChart', anychart.marker);
+goog.exportSymbol('anychart.pieChart', anychart.pie);
+goog.exportSymbol('anychart.radarChart', anychart.radar);
+goog.exportSymbol('anychart.polarChart', anychart.polar);
+goog.exportSymbol('anychart.scatterChart', anychart.scatter);

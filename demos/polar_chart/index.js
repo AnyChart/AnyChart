@@ -471,7 +471,7 @@ anychart.onDocumentLoad(function() {
   ];
 
 
-  chart = anychart.polarChart()
+  chart = anychart.polar()
       .container('container')
       .startAngle(0);
 

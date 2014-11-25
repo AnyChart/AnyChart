@@ -174,7 +174,7 @@ anychart.data.PieView.prototype.parentMeta = function(index, name, opt_value) {
  * @private
  */
 anychart.data.PieView.Mapping_ = function() {
-  anychart.Base.call(this);
+  anychart.core.Base.call(this);
   this.initMappingInfo();
 
   /**

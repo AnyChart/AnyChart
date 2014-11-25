@@ -8,11 +8,11 @@ function load() {
     {offset: 1, color: 'purple'}
   ];
 
-  marker = new anychart.elements.MarkersFactory();
+  marker = new anychart.core.ui.MarkersFactory();
   marker.container('container');
   marker.enabled(true);
 
-  hoverMarker = new anychart.elements.MarkersFactory();
+  hoverMarker = new anychart.core.ui.MarkersFactory();
   hoverMarker
       .size(40)
       .fill({

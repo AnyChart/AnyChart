@@ -1,6 +1,6 @@
 var chart, parser;
 function load() {
-  chart = new anychart.cartesian.series.RangeArea(data2(), {'rowsSeparator': '\r\n\naa', columnsSeparator: ';aaa', ignoreFirstRow: true});
+  chart = new anychart.core.cartesian.series.RangeArea(data2(), {'rowsSeparator': '\r\n\naa', columnsSeparator: ';aaa', ignoreFirstRow: true});
   chart.container('container');
   chart.draw();
 

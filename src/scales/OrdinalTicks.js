@@ -1,6 +1,6 @@
 goog.provide('anychart.scales.OrdinalTicks');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('goog.array');
 
 
@@ -9,7 +9,7 @@ goog.require('goog.array');
  * Scale ticks settings.
  * @param {!anychart.scales.Ordinal} scale Scale to ask for a setup.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.scales.OrdinalTicks = function(scale) {
   goog.base(this);
@@ -21,7 +21,7 @@ anychart.scales.OrdinalTicks = function(scale) {
    */
   this.scale_ = scale;
 };
-goog.inherits(anychart.scales.OrdinalTicks, anychart.Base);
+goog.inherits(anychart.scales.OrdinalTicks, anychart.core.Base);
 
 
 /**

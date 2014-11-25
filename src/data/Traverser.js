@@ -1,6 +1,6 @@
 goog.provide('anychart.data.Traverser');
 
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 
 
 

@@ -66,7 +66,7 @@ anychart.onDocumentReady(function() {
   var tree = generateTree();
 
   stage = acgraph.create('container', '100%', '100%');
-  dataGrid = anychart.elements.dataGrid();
+  dataGrid = anychart.ui.dataGrid();
 
   dataGrid.container(stage);
 

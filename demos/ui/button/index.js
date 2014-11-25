@@ -11,7 +11,7 @@ function disa() {
 }
 
 function load() {
-  button = new anychart.ui.Button();
+  button = new anychart.core.ui.Button();
   button.container('container');
   button.parentBounds(button.container().getStage().getBounds());
   button.text('+');

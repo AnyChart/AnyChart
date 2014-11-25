@@ -57,7 +57,7 @@
         });
         stage.suspend();
 
-        var chart1 = anychart.lineChart();
+        var chart1 = anychart.line();
         chart1.line([
             ['A1' , 3],
             ['A2' , 5],
@@ -70,7 +70,7 @@
         chart1.container(stage);
         chart1.draw();
 
-        var chart2= anychart.lineChart();
+        var chart2= anychart.line();
         chart2.spline([
             ['A1' , 3],
             ['A2' , 5],
@@ -82,7 +82,7 @@
         chart2.container(acgraph.create('container2', 600, 250));
         chart2.draw();
 
-        var chart3 = anychart.lineChart();
+        var chart3 = anychart.line();
         chart3.area([
             ['A1' , 3],
             ['A2' , 5],
@@ -97,7 +97,7 @@
 
         chart3.draw();
 
-        var chart4 = anychart.lineChart();
+        var chart4 = anychart.line();
         chart4.splineArea([
             ['A1' , 3],
             ['A2' , 5],

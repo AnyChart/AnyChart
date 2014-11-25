@@ -18,7 +18,7 @@ function load() {
   }
   data1 = new anychart.data.Set(data1);
 
-  areaChart = new anychart.cartesian.Chart();
+  areaChart = new anychart.charts.Cartesian();
   areaChart.xScale(new anychart.scales.Linear());
   areaChart.container(stage);
   areaChart.bounds(0, 0, 1000, 300);

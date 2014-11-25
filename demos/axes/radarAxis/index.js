@@ -67,7 +67,7 @@ function load() {
 
   remainingBounds = stage.rect().stroke('green');
 
-  axis1 = anychart.elements.radarAxis();
+  axis1 = anychart.axes.radar();
   axis1.startAngle(117);
   axis1.scale(scale);
   axis1.container(stage);

@@ -128,7 +128,7 @@ function load() {
 //      .minimum(parseFloat(ticksArr[0]) > parseFloat(minorTicksArr[0]) ? minorTicksArr[0] : ticksArr[0])
 //      .maximum(parseFloat(ticksArr[ticksArr.length - 1]) > parseFloat(minorTicksArr[minorTicksArr.length - 1]) ? ticksArr[ticksArr.length - 1] : minorTicksArr[minorTicksArr.length - 1]);
 
-  axis1 = new anychart.elements.Axis();
+  axis1 = new anychart.core.axes.Linear();
   axis1.suspendSignalsDispatching();
   axis1.scale(scale);
   axis1.container('container');

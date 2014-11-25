@@ -6,67 +6,67 @@
     "chart": {
       "type": "object",
       "oneOf": [
-        { "$ref": "#/definitions/anychart.pie.Chart" },
-        { "$ref": "#/definitions/anychart.cartesian.Chart" }
+        { "$ref": "#/definitions/anychart.charts.Pie" },
+        { "$ref": "#/definitions/anychart.charts.Cartesian" }
       ]
     }
   },
   "definitions": {
-    "anychart.Chart": {
+    "anychart.core.Chart": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
       ],
       "properties": {
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "margin": { "$ref": "#/definitions/anychart.utils.Space" },
-        "padding": { "$ref": "#/definitions/anychart.utils.Space" },
-        "title": { "$ref": "#/definitions/anychart.elements.Title" },
-        "legend": { "$ref": "#/definitions/anychart.elements.Legend" }
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
+        "margin": { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "padding": { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "title": { "$ref": "#/definitions/anychart.core.ui.Title" },
+        "legend": { "$ref": "#/definitions/anychart.core.ui.Legend" }
       }
     },
-    "anychart.cartesian.Chart": {
+    "anychart.charts.Cartesian": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.Chart" }
+        { "$ref": "#/definitions/anychart.core.Chart" }
       ],
       "properties": {
         "type": { "enum": [ "cartesian" ] },
         "grids": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.Grid" }
+          "items": { "$ref": "#/definitions/anychart.core.grids.Linear" }
         },
         "minorGrids": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.Grid" }
+          "items": { "$ref": "#/definitions/anychart.core.grids.Linear" }
         },
         "xAxes": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.Axis" }
+          "items": { "$ref": "#/definitions/anychart.core.axes.Linear" }
         },
         "yAxes": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.Axis" }
+          "items": { "$ref": "#/definitions/anychart.core.axes.Linear" }
         },
         "lineAxesMarkers": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.LineMarker" }
+          "items": { "$ref": "#/definitions/anychart.core.axisMarkers.Line" }
         },
         "rangeAxesMarkers": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.RangeMarker" }
+          "items": { "$ref": "#/definitions/anychart.core.axisMarkers.Range" }
         },
         "textAxesMarkers": {
           "type": "array",
-          "items": { "$ref": "#/definitions/anychart.elements.TextMarker" }
+          "items": { "$ref": "#/definitions/anychart.core.axisMarkers.Text" }
         },
         "series": {
           "type": "array",
           "items": {
             "type": "object",
             "anyOf": [
-              { "$ref": "#/definitions/anychart.cartesian.series.Base" },
-              { "$ref": "#/definitions/anychart.cartesian.series.BaseWithMarkers" }
+              { "$ref": "#/definitions/anychart.core.cartesian.series.Base" },
+              { "$ref": "#/definitions/anychart.core.cartesian.series.BaseWithMarkers" }
             ]
           }
         },
@@ -79,7 +79,7 @@
       },
       "required": ["type"]
     },
-    "anychart.cartesian.series.Base": {
+    "anychart.core.cartesian.series.Base": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -104,20 +104,20 @@
         }
       }
     },
-    "anychart.cartesian.series.BaseWithMarkers": {
+    "anychart.core.cartesian.series.BaseWithMarkers": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.cartesian.series.Base" }
+        { "$ref": "#/definitions/anychart.core.cartesian.series.Base" }
       ],
       "properties": {
         "markers": { "$ref": "#/definitions/anychart.elements.Multimarker" },
         "hoverMarkers": { "$ref": "#/definitions/anychart.elements.Multimarker" }
       }
     },
-    "anychart.pie.Chart": {
+    "anychart.charts.Pie": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.Chart" }
+        { "$ref": "#/definitions/anychart.core.Chart" }
       ],
       "properties": {
         "type": { "enum": [ "pie" ] },
@@ -141,7 +141,7 @@
 
 
 
-    "anychart.elements.Axis": {
+    "anychart.core.axes.Linear": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -167,25 +167,25 @@
         "drawLastLabel": {
           "type": "boolean"
         },
-        "overlapMode": { "$ref": "#/definitions/anychart.elements.Axis.OverlapMode" },
+        "overlapMode": { "$ref": "#/definitions/anychart.core.axes.Linear.OverlapMode" },
         "labels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
         "minorLabels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
-        "ticks": { "$ref": "#/definitions/anychart.elements.Ticks" },
-        "minorTicks": { "$ref": "#/definitions/anychart.elements.Ticks" },
-        "title": { "$ref": "#/definitions/anychart.elements.Title" }
+        "ticks": { "$ref": "#/definitions/anychart.core.axes.Ticks" },
+        "minorTicks": { "$ref": "#/definitions/anychart.core.axes.Ticks" },
+        "title": { "$ref": "#/definitions/anychart.core.ui.Title" }
       }
     },
-    "anychart.elements.Axis.OverlapMode": {
+    "anychart.core.axes.Linear.OverlapMode": {
       "enum": [ "nooverlap", "overlap" ]
     },
-    "anychart.elements.Background": {
+    "anychart.core.ui.Background": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" },
         { "$ref": "#/definitions/shape" }
       ],
       "properties": {
-        "cornerType": { "$ref": "#/definitions/anychart.elements.Background.CornerType" },
+        "cornerType": { "$ref": "#/definitions/anychart.core.ui.Background.CornerType" },
         "corners": {
           "type": "array",
           "items": {
@@ -194,7 +194,7 @@
         }
       }
     },
-    "anychart.elements.Background.CornerType": { "enum": [ "none", "cut", "round", "roundInner" ] },
+    "anychart.core.ui.Background.CornerType": { "enum": [ "none", "cut", "round", "roundInner" ] },
     "anychart.elements.Base": {
       "type": "object",
       "properties": {
@@ -206,7 +206,7 @@
         }
       }
     },
-    "anychart.elements.Grid": {
+    "anychart.core.grids.Linear": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -230,11 +230,11 @@
         }
       }
     },
-    "anychart.elements.Label": {
+    "anychart.core.ui.Label": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" },
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "adjustFontSize": {
@@ -260,12 +260,12 @@
         "rotation": {
           "type": "number"
         },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "padding":  { "$ref": "#/definitions/anychart.utils.Space" }
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
+        "padding":  { "$ref": "#/definitions/anychart.core.utils.Space" }
       }
 
     },
-    "anychart.elements.LineMarker": {
+    "anychart.core.axisMarkers.Line": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -278,10 +278,10 @@
         "direction": { "$ref": "#/definitions/anychart.utils.Direction" }
       }
     },
-    "anychart.elements.Legend": {
+    "anychart.core.ui.Legend": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "iconTextSpacing": {
@@ -292,22 +292,22 @@
         },
         "position": { "$ref": "#/definitions/anychart.utils.Orientation" },
         "align": { "$ref": "#/definitions/anychart.utils.Align" },
-        "itemsLayout": { "$ref": "#/definitions/anychart.elements.Legend.Layout" },
+        "itemsLayout": { "$ref": "#/definitions/anychart.core.ui.Legend.Layout" },
         "items": {
           "type": "array",
           "items": {
             "type": [ "string", "number", "object" ]
           }
         },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "margin":  { "$ref": "#/definitions/anychart.utils.Space" },
-        "padding":  { "$ref": "#/definitions/anychart.utils.Space" },
-        "title":  { "$ref": "#/definitions/anychart.elements.Title" },
-        "titleSeparator": { "$ref": "#/definitions/anychart.elements.Separator" },
-        "paginator": { "$ref": "#/definitions/anychart.ui.Paginator" }
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
+        "margin":  { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "padding":  { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "title":  { "$ref": "#/definitions/anychart.core.ui.Title" },
+        "titleSeparator": { "$ref": "#/definitions/anychart.core.ui.Separator" },
+        "paginator": { "$ref": "#/definitions/anychart.core.ui.Paginator" }
       }
     },
-    "anychart.elements.Legend.Layout": { "enum": [ "vertical", "horizontal", "table" ] },
+    "anychart.core.ui.Legend.Layout": { "enum": [ "vertical", "horizontal", "table" ] },
     "anychart.elements.Marker.Type": {
       "enum": [ "star4", "star5", "star6", "star7", "star10", "triangleup", "triangledown", "cross", "diamond", "diagonalcross", "circle", "square" ]
     },
@@ -315,7 +315,7 @@
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" },
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "rotation": {
@@ -328,8 +328,8 @@
         "offsetY": {
           "type": "number"
         },
-        "padding": { "$ref": "#/definitions/anychart.utils.Space" },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" }
+        "padding": { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" }
       }
     },
     "anychart.elements.Multimarker": {
@@ -382,7 +382,7 @@
         }
       }
     },
-    "anychart.elements.RangeMarker": {
+    "anychart.core.axisMarkers.Range": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -398,14 +398,14 @@
         "direction": { "$ref": "#/definitions/anychart.utils.Direction" }
       }
     },
-    "anychart.elements.Separator": {
+    "anychart.core.ui.Separator": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" },
         { "$ref": "#/definitions/shape" }
       ],
       "properties": {
-        "margin":  { "$ref": "#/definitions/anychart.utils.Space" },
+        "margin":  { "$ref": "#/definitions/anychart.core.utils.Space" },
         "width": {
           "type": [ "string" , "number" , "null" ]
         },
@@ -417,7 +417,7 @@
         }
       }
     },
-    "anychart.elements.Text": {
+    "anychart.core.Text": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
@@ -491,10 +491,10 @@
         }
       }
     },
-    "anychart.elements.TextMarker": {
+    "anychart.core.axisMarkers.Text": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "stroke": { "$ref": "#/definitions/stroke" },
@@ -511,21 +511,21 @@
           "type": [ "number", "string"]
         },
         "orientation": { "$ref": "#/definitions/anychart.utils.Orientation" },
-        "align": { "$ref": "#/definitions/anychart.elements.TextMarker.Align" },
+        "align": { "$ref": "#/definitions/anychart.core.axisMarkers.Text.Align" },
         "anchor": { "$ref": "#/definitions/anychart.utils.NinePositions" }
       }
     },
-    "anychart.elements.TextMarker.Align": {
+    "anychart.core.axisMarkers.Text.Align": {
       "enum": [ "near", "center", "far" ]
     },
-    "anychart.elements.Ticks": {
+    "anychart.core.axes.Ticks": {
       "type": "object",
       "properties": {
         "length": {
           "type": "number"
         },
         "position": {
-          "$ref": "#/definitions/anychart.elements.Ticks.Position"
+          "$ref": "#/definitions/anychart.core.axes.Ticks.Position"
         },
         "stroke": {
           "$ref": "#/definitions/stroke"
@@ -536,31 +536,31 @@
       },
       "required": ["length", "position", "stroke", "enabled"]
     },
-    "anychart.elements.Ticks.Position": { "enum": [ "inside", "outside" ] },
-    "anychart.elements.Title": {
+    "anychart.core.axes.Ticks.Position": { "enum": [ "inside", "outside" ] },
+    "anychart.core.ui.Title": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "orientation": { "$ref": "#/definitions/anychart.utils.Orientation" },
         "align": { "$ref": "#/definitions/anychart.utils.Align" },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "margin":  { "$ref": "#/definitions/anychart.utils.Space" },
-        "padding":  { "$ref": "#/definitions/anychart.utils.Space" }
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
+        "margin":  { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "padding":  { "$ref": "#/definitions/anychart.core.utils.Space" }
       }
     },
-    "anychart.elements.Tooltip": {
+    "anychart.core.ui.Tooltip": {
       "type": "object",
       "allOf": [
         { "$ref": "#/definitions/anychart.elements.Base" }
       ],
       "properties": {
-        "title":  { "$ref": "#/definitions/anychart.elements.Title" },
-        "separator": { "$ref": "#/definitions/anychart.elements.Separator" },
-        "content": { "$ref": "#/definitions/anychart.elements.Label" },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
-        "padding": { "$ref": "#/definitions/anychart.utils.Space" },
+        "title":  { "$ref": "#/definitions/anychart.core.ui.Title" },
+        "separator": { "$ref": "#/definitions/anychart.core.ui.Separator" },
+        "content": { "$ref": "#/definitions/anychart.core.ui.Label" },
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
+        "padding": { "$ref": "#/definitions/anychart.core.utils.Space" },
         "x": {
           "type": "number"
         },
@@ -586,23 +586,23 @@
 
 
 
-    "anychart.ui.Paginator": {
+    "anychart.core.ui.Paginator": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Text" }
+        { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
         "orientation": { "$ref": "#/definitions/anychart.utils.Orientation" },
-        "layout": { "$ref": "#/definitions/anychart.ui.Paginator.Layout" },
+        "layout": { "$ref": "#/definitions/anychart.core.ui.Paginator.Layout" },
         "pageCount": {
           "type": [ "number", "string" ]
         },
         "currentPage": {
           "type": [ "number", "string" ]
         },
-        "margin":  { "$ref": "#/definitions/anychart.utils.Space" },
-        "padding": { "$ref": "#/definitions/anychart.utils.Space" },
-        "background": { "$ref": "#/definitions/anychart.elements.Background" },
+        "margin":  { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "padding": { "$ref": "#/definitions/anychart.core.utils.Space" },
+        "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
         "x": {
           "type": "number"
         },
@@ -625,7 +625,7 @@
       },
       "required": ["x", "y", "anchor", "visible", "hideDelay"]
     },
-    "anychart.ui.Paginator.Layout": { "enum": [ "vertical", "horizontal"] },
+    "anychart.core.ui.Paginator.Layout": { "enum": [ "vertical", "horizontal"] },
 
 
 
@@ -636,7 +636,7 @@
     },
     "anychart.utils.Orientation": { "enum": [ "top", "left", "right", "bottom" ] },
     "anychart.utils.Sort": { "enum": [ "asc", "desc", "none" ] },
-    "anychart.utils.Space": {
+    "anychart.core.utils.Space": {
       "properties": {
         "top": {
           "type": "number"

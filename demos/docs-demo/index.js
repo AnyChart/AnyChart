@@ -8,7 +8,7 @@ function load() {
   stage.rect(1, 1, stage.width() - 2, stage.height() - 2).fill('none').stroke('0.5 #000');
   /////////////////////////////////////////////////////////
 
-  //   chart = anychart.lineChart();
+  //   chart = anychart.line();
 
  var chart = anychart.scatterChart();
   chart.hatchFillPalette(['percent50', 'diagonalBrick', 'zigzag']);

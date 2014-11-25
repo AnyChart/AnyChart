@@ -289,7 +289,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
  * Returns tick position ratio by its name.<br/>
  * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
  * @example
- * var chart = anychart.lineChart();
+ * var chart = anychart.line();
  * chart.line([1.1, 1.4, 1.2, 1.9]);
  * chart.container(stage).draw();
  * // Trying to get to '1.25' tick position.

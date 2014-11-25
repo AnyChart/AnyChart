@@ -1,7 +1,7 @@
 goog.provide('anychart.modules.marker');
 
-goog.require('anychart.cartesian.Chart');
-goog.require('anychart.cartesian.series.Marker');
+goog.require('anychart.charts.Cartesian');
+goog.require('anychart.core.cartesian.series.Marker');
 goog.require('anychart.modules.base');
 
 
@@ -9,13 +9,13 @@ goog.require('anychart.modules.base');
  * Default marker chart.<br/>
  * <b>Note:</b> Contains predefined settings for axes and grids.
  * @example
- * anychart.markerChart([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ * anychart.marker([1.3, 2, 1.4], [1.1, 1.6, 1.3])
  *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
- * @return {anychart.cartesian.Chart} Chart with defaults for marker series.
+ * @return {anychart.charts.Cartesian} Chart with defaults for marker series.
  */
-anychart.markerChart = function(var_args) {
-  var chart = new anychart.cartesian.Chart();
+anychart.marker = function(var_args) {
+  var chart = new anychart.charts.Cartesian();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);
@@ -45,5 +45,18 @@ anychart.markerChart = function(var_args) {
   return chart;
 };
 
+
+/**
+ * Default marker chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.marker([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
+ * @return {anychart.charts.Cartesian} Chart with defaults for marker series.
+ * @deprecated Use anychart.marker() instead.
+ */
+anychart.markerChart = anychart.marker;
+
 //exports
-goog.exportSymbol('anychart.markerChart', anychart.markerChart);
+goog.exportSymbol('anychart.marker', anychart.marker);

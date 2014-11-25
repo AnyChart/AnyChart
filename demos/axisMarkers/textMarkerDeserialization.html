@@ -22,11 +22,11 @@
 <script>
   var chart, series;
   anychart.onDocumentLoad(function() {
-    chart = anychart.cartesianChart();
+    chart = anychart.cartesian();
     chart.column([1, 4, 5, 7, 2]);
     chart.title().enabled(true).text('X-Axis: stroke - red ');
 
-    var ax = anychart.elements.axis();
+    var ax = anychart.axes.linear();
     ax
         .stroke('red')
         .orientation('right')

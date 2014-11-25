@@ -41,7 +41,7 @@ function load() {
 
   var y = 0, json;
 
-  area = new anychart.cartesian.Chart();
+  area = new anychart.charts.Cartesian();
   area
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -54,7 +54,7 @@ function load() {
 
   y += 210;
 
-  bar = new anychart.cartesian.Chart();
+  bar = new anychart.charts.Cartesian();
   bar
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -69,7 +69,7 @@ function load() {
 
   y += 210;
 
-  bubble = new anychart.cartesian.Chart();
+  bubble = new anychart.charts.Cartesian();
   bubble
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -98,7 +98,7 @@ function load() {
 
   y += 210;
 
-  candlestick = new anychart.cartesian.Chart();
+  candlestick = new anychart.charts.Cartesian();
   candlestick
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -116,7 +116,7 @@ function load() {
 
   y += 210;
 
-  column = new anychart.cartesian.Chart();
+  column = new anychart.charts.Cartesian();
   column
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -130,7 +130,7 @@ function load() {
 
   y += 210;
 
-  line = new anychart.cartesian.Chart();
+  line = new anychart.charts.Cartesian();
   line
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -145,7 +145,7 @@ function load() {
 
   y += 210;
 
-  markers = new anychart.cartesian.Chart();
+  markers = new anychart.charts.Cartesian();
   markers
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -163,7 +163,7 @@ function load() {
 
   y += 210;
 
-  ohlc = new anychart.cartesian.Chart();
+  ohlc = new anychart.charts.Cartesian();
   ohlc
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -181,7 +181,7 @@ function load() {
 
   y += 210;
 
-  rangeArea = new anychart.cartesian.Chart();
+  rangeArea = new anychart.charts.Cartesian();
   rangeArea
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -194,7 +194,7 @@ function load() {
 
   y += 210;
 
-  rangeBar = new anychart.cartesian.Chart();
+  rangeBar = new anychart.charts.Cartesian();
   rangeBar
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -207,7 +207,7 @@ function load() {
 
   y += 210;
 
-  rangeColumn = new anychart.cartesian.Chart();
+  rangeColumn = new anychart.charts.Cartesian();
   rangeColumn
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -221,7 +221,7 @@ function load() {
 
   y += 210;
 
-  rangeSplineArea = new anychart.cartesian.Chart();
+  rangeSplineArea = new anychart.charts.Cartesian();
   rangeSplineArea
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -234,7 +234,7 @@ function load() {
 
   y += 210;
 
-  rangeStepArea = new anychart.cartesian.Chart();
+  rangeStepArea = new anychart.charts.Cartesian();
   rangeStepArea
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -247,7 +247,7 @@ function load() {
 
   y += 210;
 
-  spline = new anychart.cartesian.Chart();
+  spline = new anychart.charts.Cartesian();
   spline
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -260,7 +260,7 @@ function load() {
 
   y += 210;
 
-  splineArea = new anychart.cartesian.Chart();
+  splineArea = new anychart.charts.Cartesian();
   splineArea
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -273,7 +273,7 @@ function load() {
 
   y += 210;
 
-  stepLine = new anychart.cartesian.Chart();
+  stepLine = new anychart.charts.Cartesian();
   stepLine
       .bounds(0, y, '100%', 200)
       .container(stage)
@@ -286,7 +286,7 @@ function load() {
 
   y += 210;
 
-  stepArea = new anychart.cartesian.Chart();
+  stepArea = new anychart.charts.Cartesian();
   stepArea
       .bounds(0, y, '100%', 200)
       .container(stage)

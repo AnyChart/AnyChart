@@ -1,6 +1,6 @@
 var chart;
 anychart.onDocumentReady(function() {
-  chart = anychart.areaChart();
+  chart = anychart.area();
   var scale = anychart.scales.dateTime();
   chart.xScale(scale);
   chart.area([

@@ -133,7 +133,7 @@ function load() {
 
   remainingBounds = stage.rect().stroke('0 green');
 
-  axis1 = anychart.elements.radarAxis();
+  axis1 = anychart.axes.radar();
   axis1.startAngle(startAngleSet);
   axis1.scale(scale);
   axis1.container(stage);
@@ -146,7 +146,7 @@ function load() {
 
   var rb = axis1.getRemainingBounds();
 
-  grid1 = anychart.elements.radarGrid();
+  grid1 = anychart.grids.radar();
   grid1.xScale(scale);
   grid1.startAngle(startAngleSet);
   grid1.container(stage);
@@ -158,7 +158,7 @@ function load() {
   grid1.zIndex(1);
 
 
-  grid2 = anychart.elements.radarGrid();
+  grid2 = anychart.grids.radar();
   grid2.xScale(scale);
   grid2.yScale(scale2);
   grid2.isMinor(false);
@@ -172,7 +172,7 @@ function load() {
   grid2.zIndex(0);
 
 
-  grid3 = anychart.elements.radarGrid();
+  grid3 = anychart.grids.radar();
   grid3.xScale(scale);
   grid3.yScale(scale2);
   grid3.isMinor(true);
@@ -187,7 +187,7 @@ function load() {
 
 
   stroke2 = {color: 'black', thickness: 1, opacity: 0.5};
-  axis2 = anychart.elements.radialAxis();
+  axis2 = anychart.axes.radial();
   axis2.container(stage);
   axis2.scale(scale2);
   axis2.startAngle(startAngleSet);

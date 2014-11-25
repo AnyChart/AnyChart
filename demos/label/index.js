@@ -2,7 +2,7 @@ var label;
 function load() {
   var stage = acgraph.create('container', '100%' , '100%');
   stage.rect(100, 100, 300, 300).fill('pink');
-  label = new anychart.elements.Label();
+  label = new anychart.core.ui.Label();
   label.container(stage);
   label.position('center');
   label.text('Some label text');

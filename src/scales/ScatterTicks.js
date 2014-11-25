@@ -1,5 +1,5 @@
 goog.provide('anychart.scales.ScatterTicks');
-goog.require('anychart.Base');
+goog.require('anychart.core.Base');
 goog.require('anychart.enums');
 goog.require('goog.array');
 
@@ -9,7 +9,7 @@ goog.require('goog.array');
  * Scale ticks.
  * @param {!anychart.scales.Linear} scale Scale to ask for a setup.
  * @constructor
- * @extends {anychart.Base}
+ * @extends {anychart.core.Base}
  */
 anychart.scales.ScatterTicks = function(scale) {
   goog.base(this);
@@ -21,7 +21,7 @@ anychart.scales.ScatterTicks = function(scale) {
    */
   this.scale_ = scale;
 };
-goog.inherits(anychart.scales.ScatterTicks, anychart.Base);
+goog.inherits(anychart.scales.ScatterTicks, anychart.core.Base);
 
 
 /**

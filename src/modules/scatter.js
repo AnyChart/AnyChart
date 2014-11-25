@@ -1,22 +1,23 @@
 goog.provide('anychart.modules.scatter');
-goog.require('anychart');
-goog.require('anychart.scatter.Chart');
-goog.require('anychart.scatter.series.Bubble');
-goog.require('anychart.scatter.series.Line');
-goog.require('anychart.scatter.series.Marker');
+
+goog.require('anychart.charts.Scatter');
+goog.require('anychart.core.scatter.series.Bubble');
+goog.require('anychart.core.scatter.series.Line');
+goog.require('anychart.core.scatter.series.Marker');
+goog.require('anychart.modules.base');
 
 
 /**
  * Returns a scatter chart instance with initial settings (axes, grids, title).<br/>
  * By default creates marker series if arguments is set.
  * @example
- * anychart.scatterChart([20, 7, 10, 14])
+ * anychart.scatter([20, 7, 10, 14])
  *    .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
- * @return {anychart.scatter.Chart} Chart with defaults for scatter series.
+ * @return {anychart.charts.Scatter} Chart with defaults for scatter series.
  */
-anychart.scatterChart = function(var_args) {
-  var chart = new anychart.scatter.Chart();
+anychart.scatter = function(var_args) {
+  var chart = new anychart.charts.Scatter();
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);
@@ -45,4 +46,5 @@ anychart.scatterChart = function(var_args) {
 };
 
 //exports
-goog.exportSymbol('anychart.scatterChart', anychart.scatterChart);
+goog.exportSymbol('anychart.scatter', anychart.scatter);
+goog.exportSymbol('anychart.scatterChart', anychart.scatter);

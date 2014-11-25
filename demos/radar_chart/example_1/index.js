@@ -15,7 +15,7 @@ anychart.onDocumentLoad(function() {
   var data2 = dataSet.mapAs({x: [0], value: [2]});
   var data3 = dataSet.mapAs({x: [0], value: [3]});
 
-  chart = anychart.radarChart()
+  chart = anychart.radar()
       .container('container')
       .startAngle(0);
 

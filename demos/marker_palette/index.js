@@ -1,7 +1,7 @@
 var palette;
 
 function load() {
-  palette = new anychart.utils.MarkerPalette();
+  palette = new anychart.palettes.Markers();
 
   palette.listenSignals(function(event) {
     if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {

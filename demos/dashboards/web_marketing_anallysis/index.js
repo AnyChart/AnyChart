@@ -14,7 +14,7 @@ anychart.onDocumentReady(function() {
   // Dashboard header
   //------------------------------------------------------------------
   //create label instance
-  var header = anychart.elements.label();
+  var header = anychart.ui.label();
   //set layout bounds
   header.parentBounds(new anychart.math.Rect(0, 0, stageSize.width, stageSize.height));
   //set label position
@@ -35,7 +35,7 @@ anychart.onDocumentReady(function() {
   // Current data
   //------------------------------------------------------------------
   //create label instance
-  var curDate = anychart.elements.label();
+  var curDate = anychart.ui.label();
   //set layout bounds
   curDate.parentBounds(new anychart.math.Rect(0, 0, stageSize.width, stageSize.height));
   //set label position
@@ -71,7 +71,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var keyMetricsYTDLegendLabel = anychart.elements.label();
+  var keyMetricsYTDLegendLabel = anychart.ui.label();
   keyMetricsYTDLegendLabel.container(stage);
   keyMetricsYTDLegendLabel.text('Key Metrics YTD');
   keyMetricsYTDLegendLabel.padding().top(8).left(5);
@@ -110,13 +110,13 @@ anychart.onDocumentReady(function() {
   keyMetricsYTDTable.container(stage);
   keyMetricsYTDTable.contents([
       ['Past 12 Months',                                  'Metric',            '% of Target',                    'Actual'],
-      [anychart.cartesian.series.line(lineChartsData[0]), 'Revenue',           createBulletChart([{value: 10}]), '$121,21'],
-      [anychart.cartesian.series.line(lineChartsData[1]), 'Profit',            createBulletChart([{value: 10}]), '$18,62'],
-      [anychart.cartesian.series.line(lineChartsData[2]), 'Avg Order Size',    createBulletChart([{value: 10}]), '$420'],
-      [anychart.cartesian.series.line(lineChartsData[3]), 'On Time Delivery ', createBulletChart([{value: 10}]), '89%'],
-      [anychart.cartesian.series.line(lineChartsData[4]), 'New Customers',     createBulletChart([{value: 10}]), '117'],
-      [anychart.cartesian.series.line(lineChartsData[5]), 'Cust Satisfaction', createBulletChart([{value: 10}]), '4.82/5'],
-      [anychart.cartesian.series.line(lineChartsData[6]), 'Market Share',      createBulletChart([{value: 10}]), '23%']
+      [anychart.core.cartesian.series.line(lineChartsData[0]), 'Revenue',           createBulletChart([{value: 10}]), '$121,21'],
+      [anychart.core.cartesian.series.line(lineChartsData[1]), 'Profit',            createBulletChart([{value: 10}]), '$18,62'],
+      [anychart.core.cartesian.series.line(lineChartsData[2]), 'Avg Order Size',    createBulletChart([{value: 10}]), '$420'],
+      [anychart.core.cartesian.series.line(lineChartsData[3]), 'On Time Delivery ', createBulletChart([{value: 10}]), '89%'],
+      [anychart.core.cartesian.series.line(lineChartsData[4]), 'New Customers',     createBulletChart([{value: 10}]), '117'],
+      [anychart.core.cartesian.series.line(lineChartsData[5]), 'Cust Satisfaction', createBulletChart([{value: 10}]), '4.82/5'],
+      [anychart.core.cartesian.series.line(lineChartsData[6]), 'Market Share',      createBulletChart([{value: 10}]), '23%']
   ]);
   keyMetricsYTDTable.bounds(keyMetricsYTDSizeWithoutLegend);
 
@@ -142,7 +142,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var top8CustomersLabel = anychart.elements.label();
+  var top8CustomersLabel = anychart.ui.label();
   top8CustomersLabel.container(stage);
   top8CustomersLabel.text('Top 8 Customers This Quarter');
   top8CustomersLabel.padding().top(8).left(5);
@@ -197,7 +197,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var revenueQTDLabel = anychart.elements.label();
+  var revenueQTDLabel = anychart.ui.label();
   revenueQTDLabel.container(stage);
   revenueQTDLabel.text('Revenue QTD');
   revenueQTDLabel.padding().top(8).left(5);
@@ -243,7 +243,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var revenueYTDLabel = anychart.elements.label();
+  var revenueYTDLabel = anychart.ui.label();
   revenueYTDLabel.container(stage);
   revenueYTDLabel.text('Revenue YDT');
   revenueYTDLabel.padding().top(8).left(5);
@@ -262,11 +262,11 @@ anychart.onDocumentReady(function() {
   revenueYTDSizeTable.container(stage);
   revenueYTDSizeTable.contents([
     ['Past 12 Months',                                  'Region',        'Actual vs Target',               'Actual'],
-    [anychart.cartesian.series.line(lineChartsData[0]), 'North America', createBulletChart([{value: 10}]), '243,585'],
-    [anychart.cartesian.series.line(lineChartsData[1]), 'Europe',        createBulletChart([{value: 10}]), '201.865'],
-    [anychart.cartesian.series.line(lineChartsData[2]), 'Asia',          createBulletChart([{value: 10}]), '195,766'],
-    [anychart.cartesian.series.line(lineChartsData[3]), 'South America', createBulletChart([{value: 10}]), '119,394'],
-    [anychart.cartesian.series.line(lineChartsData[4]), 'Middle East',   createBulletChart([{value: 10}]), '101.624']
+    [anychart.core.cartesian.series.line(lineChartsData[0]), 'North America', createBulletChart([{value: 10}]), '243,585'],
+    [anychart.core.cartesian.series.line(lineChartsData[1]), 'Europe',        createBulletChart([{value: 10}]), '201.865'],
+    [anychart.core.cartesian.series.line(lineChartsData[2]), 'Asia',          createBulletChart([{value: 10}]), '195,766'],
+    [anychart.core.cartesian.series.line(lineChartsData[3]), 'South America', createBulletChart([{value: 10}]), '119,394'],
+    [anychart.core.cartesian.series.line(lineChartsData[4]), 'Middle East',   createBulletChart([{value: 10}]), '101.624']
   ]);
 
   revenueYTDSizeTable.bounds(revenueYTDSizeWithoutLabel);
@@ -282,7 +282,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var productSalesYTDLabel = anychart.elements.label();
+  var productSalesYTDLabel = anychart.ui.label();
   productSalesYTDLabel.container(stage);
   productSalesYTDLabel.text('Product Sales YDT');
   productSalesYTDLabel.padding().top(8).left(5);
@@ -301,11 +301,11 @@ anychart.onDocumentReady(function() {
   productSalesYTDSizeTable.container(stage);
   productSalesYTDSizeTable.contents([
     ['Past 12 Months',                                  'Product',         'Actual vs Target',               'Revenue vs Target'             , 'Actual'],
-    [anychart.cartesian.series.line(lineChartsData[0]), 'Cabernet',        createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '243,585'],
-    [anychart.cartesian.series.line(lineChartsData[1]), 'Zinfandel',       createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '201.865'],
-    [anychart.cartesian.series.line(lineChartsData[2]), 'Chardonnay',      createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '195,766'],
-    [anychart.cartesian.series.line(lineChartsData[3]), 'Sauvignan Blanc', createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '119,394'],
-    [anychart.cartesian.series.line(lineChartsData[4]), 'Merlot',          createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '101.624']
+    [anychart.core.cartesian.series.line(lineChartsData[0]), 'Cabernet',        createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '243,585'],
+    [anychart.core.cartesian.series.line(lineChartsData[1]), 'Zinfandel',       createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '201.865'],
+    [anychart.core.cartesian.series.line(lineChartsData[2]), 'Chardonnay',      createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '195,766'],
+    [anychart.core.cartesian.series.line(lineChartsData[3]), 'Sauvignan Blanc', createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '119,394'],
+    [anychart.core.cartesian.series.line(lineChartsData[4]), 'Merlot',          createBulletChart([{value: 10}]), createBulletChart([{value: 10}]), '101.624']
   ]);
 
   productSalesYTDSizeTable.bounds(productSalesYTDSizeWithoutLabel);
@@ -322,7 +322,7 @@ anychart.onDocumentReady(function() {
       anychart.utils.normalizeSize('30%', stageSize.height)
   );
 
-  var markerSizeLabel = anychart.elements.label();
+  var markerSizeLabel = anychart.ui.label();
   markerSizeLabel.container(stage);
   markerSizeLabel.text('Market Share');
   markerSizeLabel.padding().top(8).left(5);
@@ -356,7 +356,7 @@ anychart.onDocumentReady(function() {
 });
 
 function createBulletChart(data) {
-  var chart = anychart.bulletChart(data);
+  var chart = anychart.bullet(data);
   chart.title().enabled(false);
   chart.padding(0);
   chart.margin(7, 0, 2, 0);
@@ -369,7 +369,7 @@ function createBulletChart(data) {
 
 
 function createLegend(data, bounds) {
-  var legend = anychart.elements.legend();
+  var legend = anychart.ui.legend();
   legend.itemsLayout('horizontal');
   legend.parentBounds(bounds);
   legend.container(stage);

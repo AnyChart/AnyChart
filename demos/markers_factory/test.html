@@ -19,7 +19,7 @@
           ['All other outlets', 90000]
         ]);
 
-        var chart = anychart.barChart(data);
+        var chart = anychart.bar(data);
         chart.bar(data).markers().type('cRoSS').enabled(true);
         chart.container('container').draw();
       });

@@ -105,7 +105,7 @@
 
     };
 
-    var labels = anychart.elements.labelsFactory();
+    var labels = anychart.ui.labelsFactory();
     setSett(labels, defaultSettings);
     labels.background().enabled(true).fill('grey .1');
     for (var i= 0; i<4; i++){
@@ -114,7 +114,7 @@
     labels.container(stage);
     labels.draw();
 //--------------------------------------------------------------
-    var labels1 = anychart.elements.labelsFactory();
+    var labels1 = anychart.ui.labelsFactory();
     labels1.container(stage);
     setSett(labels1, defaultSettings);
 
@@ -126,7 +126,7 @@
     labels1.draw();
 //--------------------------------------------------------------
 
-    var labels2 = anychart.elements.labelsFactory();
+    var labels2 = anychart.ui.labelsFactory();
     labels2.container(stage);
     setSett(labels2, defaultSettings);
     for (i= 8; i<12; i++){
@@ -141,7 +141,7 @@
     labels2.draw();
 //--------------------------------------------------------------
 
-    var labels3 = anychart.elements.labelsFactory();
+    var labels3 = anychart.ui.labelsFactory();
     labels3.container(stage);
 //        setSett(labels3, defaultSettings);
     for (i= 12; i<16; i++){

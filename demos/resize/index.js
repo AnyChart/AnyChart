@@ -2,7 +2,7 @@ var pieChart, cartesianChart;
 anychart.onDocumentReady(function() {
   var stage = acgraph.create('container', '100%', '100%');
 
-  pieChart = new anychart.pie.Chart([
+  pieChart = new anychart.charts.Pie([
     {x: 'Department Stores', y: 6371664, exploded: true},
     {x: 'Discount Stores', y: 7216301},
     {x: 'Men\'s/Women\'s Stores', y: 1486621},
@@ -13,7 +13,7 @@ anychart.onDocumentReady(function() {
   pieChart.bounds(0, 0, '50%', '40%');
   pieChart.draw();
 
-  cartesianChart = new anychart.cartesian.Chart();
+  cartesianChart = new anychart.charts.Cartesian();
   cartesianChart.container(stage);
   cartesianChart.xAxis();
   cartesianChart.yAxis();
