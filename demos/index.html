@@ -1,24 +1,24 @@
 <!doctype html>
 <html>
 <head>
+  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
   <script src="../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../src/deps.js"></script>
   <meta charset="utf-8">
-  <!--<style>-->
-    <!--#container {-->
-      <!--width: 100%;-->
-      <!--height: 100%;-->
-      <!--margin: 0;-->
-      <!--padding: 0;-->
-      <!--position: absolute;-->
-    <!--}-->
-  <!--</style>-->
+  <style>
+    html, body, #container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
   <script>
     goog.require('anychart.modules.anychart');
   </script>
   <script src="index.js"></script>
 </head>
 <body>
-<div id="container" style="position: absolute; left: 0; top: 0; border: 0 solid; width: 100%; height: 100%; float: left;"></div>
+<div id="container"></div>
 </body>
 </html>

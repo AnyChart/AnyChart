@@ -142,7 +142,7 @@ anychart.VisualBase.prototype.container = function(opt_value) {
       if (this.container_ instanceof acgraph.vector.Stage) {
         if (!this.container_.wrapped_) {
           innerDom = goog.dom.createDom(goog.dom.TagName.DIV, {
-            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%'});
+            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden'});
           goog.dom.appendChild(/** @type {Element} */((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
           this.container_.container(innerDom);
           this.container_.wrapped_ = true;
