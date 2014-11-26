@@ -31,6 +31,7 @@ anychart.polar = function(var_args) {
       .layout(anychart.enums.RadialGridLayout.CIRCUIT);
 
   chart.minorGrid()
+      .enabled(false)
       .evenFill('none')
       .oddFill('none')
       .stroke('black 0.1')

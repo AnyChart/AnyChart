@@ -244,8 +244,9 @@ anychart.core.polar.series.Marker.prototype.drawSubsequentPoint = function() {
     return false;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[4];
-    var y = referenceValues[5];
+    var len = referenceValues.length;
+    var x = referenceValues[len - 2];
+    var y = referenceValues[len - 1];
 
     this.getIterator().meta('x', x).meta('y', y);
 

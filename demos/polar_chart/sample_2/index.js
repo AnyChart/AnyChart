@@ -18,7 +18,6 @@ anychart.onDocumentLoad(function() {
       .container('container')
       .startAngle(0);
 
-  chart.yScale().stackMode(anychart.enums.ScaleStackMode.VALUE);
   chart.yScale().ticks().interval(2);
   chart.xScale().maximum(100);
   chart.xScale().ticks().interval(10);
@@ -26,20 +25,18 @@ anychart.onDocumentLoad(function() {
   chart.xAxis().labels()
       .textFormatter(function() {return this['value'] + '.00'})
       .fontWeight('bold');
-  chart.title(null);
-  chart.background()
-      .enabled(true)
-      .stroke('2 #2466B1')
-      .corners(10);
-  chart.margin(20);
-  chart.padding(10);
 
+  chart.title(null);
+
+  var background = chart.background().enabled(true);
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
+
+  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
   chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('white');
 
   var series1 = chart.line(data4).closed(false);
   series1.markers().size(3).fill({keys: ['#8BC9F0', '#1D8BD1'], cx: 0.4, cy: 0.4});
-  series1.stroke('3 #1D8BD1');
+  series1.stroke('3 rgb(29, 139, 209)');
 
   chart.draw();
 });

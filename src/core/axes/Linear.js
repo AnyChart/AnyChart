@@ -2203,7 +2203,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
 
     } else if (scale instanceof anychart.scales.Ordinal) {
       var labelsStates = this.calcLabels_();
-      needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !overlappedLabels;
+      needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !labelsStates;
       pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 
       for (i = 0; i < ticksArrLen; i++) {

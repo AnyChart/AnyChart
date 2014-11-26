@@ -22,21 +22,42 @@ anychart.onDocumentLoad(function() {
   chart.title().text('Comparison Chart');
 
   chart.yScale().minimum(-.2).maximum(1).ticks().interval(.2);
-  chart.yAxis().enabled(true).minorTicks().enabled(false);
+
+  chart.yAxis().stroke('rgb(51,51,51)').enabled(true).minorTicks().enabled(false);
+  chart.yAxis().ticks().stroke('rgb(51,51,51)');
+
+  chart.xAxis().stroke('rgb(192,192,192)');
 
   chart.legend().enabled(true).margin().top(20);
 
-  chart.grid(0).oddFill('white').evenFill('white');
-  chart.grid(1).oddFill(null).evenFill(null);
+  chart.grid(0).oddFill('white').evenFill('white').stroke('rgb(221,221,221)');
+  chart.grid(1).oddFill(null).evenFill(null).stroke('rgb(192,192,192)');
 
-  chart.background()
-      .enabled(true);
-  chart.margin(20);
-  chart.padding(10);
+  chart.margin().bottom(40);
 
-  chart.line(data1).name('USA');
-  chart.line(data2).name('Russia');
-  chart.line(data3).name('China');
+  var background = chart.background().enabled(true);
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
+
+  var label = chart.label();
+  label.text("This chart compares countries by using specific indicators.\n" +
+  "For each indicator, the value 1 is assigned to the country that has the highest value.\n" +
+  "Other countries have their value computed as a proportion of the country with the highest value.");
+  label.anchor(acgraph.vector.Anchor.CENTER_BOTTOM);
+  label.position(acgraph.vector.Anchor.CENTER_BOTTOM);
+  label.fontWeight('normal');
+  label.fontSize(11);
+  label.fontFamily('tahoma');
+  label.fontColor('rgb(35,35,35)');
+  label.offsetY(15);
+
+
+  var series1 = chart.line(data1).name('USA');
+  var series2 = chart.line(data2).name('Russia');
+  var series3 = chart.line(data3).name('China');
+
+  series1.tooltip().contentFormatter(function() {return '• ' + this.x + ': ' + this.value.toFixed(2)});
+  series2.tooltip().contentFormatter(function() {return '• ' + this.x + ': ' + this.value.toFixed(2)});
+  series3.tooltip().contentFormatter(function() {return '• ' + this.x + ': ' + this.value.toFixed(2)});
 
   chart.draw();
 });

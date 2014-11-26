@@ -80,11 +80,13 @@ anychart.onDocumentLoad(function() {
     [3.5, 5.47]
   ];
 
+
+
   chart = anychart.polar()
       .container('container')
       .startAngle(90);
 
-  chart.yScale().stackMode(anychart.enums.ScaleStackMode.VALUE);
+  chart.yScale().minimum(0).maximum(16);
   chart.yScale().ticks().interval(2);
 
   chart.xScale().maximum(360);
@@ -95,12 +97,15 @@ anychart.onDocumentLoad(function() {
         return this['value'] + '°'
       });
   chart.title(null);
-  chart.background().enabled(true);
 
-  chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('white');
-  //chart.palette(['blue .3', 'red .3']);
+  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
+  chart.grid(1).oddFill('rgb(245, 245, 245) .5').evenFill('rgb(255, 255, 255) .3');
+
+  var background = chart.background().enabled(true);
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
+
   chart.markerPalette(['star5', 'rect', 'diamond']);
+  chart.palette(['rgb(105, 184, 234)','rgb(245, 146, 115)','rgb(116, 228, 116)']);
 
   chart.legend()
       .enabled(true)
@@ -108,19 +113,14 @@ anychart.onDocumentLoad(function() {
       .itemsLayout(anychart.enums.Layout.VERTICAL)
       .align('left');
 
-  chart.background()
-      .enabled(true)
-      .stroke('2 #2466B1')
-      .corners(10);
-  chart.margin(20);
-  chart.padding(15);
+  var series1 = chart.marker(data).name('Signal A');
+  series1.size(3).hoverSize(8).stroke('rgb(19, 93, 140)');
 
-  var series1 = chart.marker(data);
-  series1.size(4).hoverSize(8);
-  var series2 = chart.marker(data2);
-  series2.size(4).hoverSize(8);
-  var series3 = chart.marker(data3);
-  series3.size(4).type('diamond').hoverSize(8);
+  var series2 = chart.marker(data2).name('Signal B');
+  series2.size(2).hoverSize(8).stroke('rgb(164, 48, 11)');
+
+  var series3 = chart.marker(data3).name('Signal C');
+  series3.size(3).type('diamond').hoverSize(8).stroke('rgb(26, 139, 26)');
 
   chart.draw();
 });

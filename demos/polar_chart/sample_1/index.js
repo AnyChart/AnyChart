@@ -372,18 +372,21 @@ anychart.onDocumentLoad(function() {
   chart.yScale().ticks().interval(.2);
   chart.xScale().maximum(360);
   chart.xScale().ticks().interval(15);
-  chart.palette(['blue .5', 'yellow .5', 'green .5', 'red .5']);
+
+  var background = chart.background().enabled(true);
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
+
   chart.yAxis().minorTicks().enabled(false);
   chart.xAxis().labels().textFormatter(function() {return this['value'] + '°'});
+
   chart.title(null);
   chart.background().enabled(true);
 
   chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('white');
+  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
 
-  var series1 = chart.line(data4);
+  var series1 = chart.line(data4).stroke('3 rgb(29, 139, 209)');
   series1.markers().enabled(false);
-  series1.stroke('4 blue .5');
 
   chart.draw();
 });

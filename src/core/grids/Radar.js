@@ -630,7 +630,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
       ticksArrLen = ticksArray.length;
 
       var prevRatio = NaN;
-      for (i = 1; i < ticksArrLen; i++) {
+      for (i = 0; i < ticksArrLen; i++) {
         var tickVal = ticksArray[i];
         if (goog.isArray(tickVal)) tickVal = tickVal[0];
         var ratio = yScale.transform(tickVal);
@@ -640,7 +640,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
 
         if (i == ticksArrLen - 1) {
           if (this.drawLastLine_) drawLine.call(this, ratio);
-        } else {
+        } else if (i != 0) {
           drawLine.call(this, ratio);
         }
         prevRatio = ratio;

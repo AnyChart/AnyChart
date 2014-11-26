@@ -382,11 +382,14 @@ anychart.onDocumentLoad(function() {
         return this['value'] + '°'
       });
   chart.title(null);
-  chart.background().enabled(true);
 
+  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
   chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('white');
-  chart.palette(['blue .3', 'red .3']);
+
+  var background = chart.background().enabled(true);
+  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
+
+  chart.palette(['rgb(29, 139, 209) .3', 'rgb(241, 104, 60) .3']);
 
   chart.legend()
       .enabled(true)
@@ -394,17 +397,10 @@ anychart.onDocumentLoad(function() {
       .itemsLayout(anychart.enums.Layout.VERTICAL)
       .align('left');
 
-  chart.background()
-      .enabled(true)
-      .stroke('2 #2466B1')
-      .corners(10);
-  chart.margin(20);
-  chart.padding(15);
-
-  var series1 = chart.area(data).closed(true);
-  series1.stroke('2 blue');
-  var series2 = chart.area(data2);
-  series2.stroke('2 red');
+  var series1 = chart.area(data).name('Series A');
+  series1.stroke('2 rgb(19, 93, 140)');
+  var series2 = chart.area(data2).name('Series B');
+  series2.stroke('2 rgb(164, 48, 11)');
 
   chart.draw();
 });
