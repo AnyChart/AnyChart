@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<anychart>
+    <charts>
+        <chart plot_type="Scatter">
+            <data>
+                <series type="Marker">
+
+                </series>
+            </data>
+        </chart>
+    </charts>
+</anychart>
