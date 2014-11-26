@@ -60,3 +60,4 @@ anychart.markerChart = anychart.marker;
 
 //exports
 goog.exportSymbol('anychart.marker', anychart.marker);
+goog.exportSymbol('anychart.markerChart', anychart.markerChart);
