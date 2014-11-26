@@ -15,7 +15,7 @@
     "anychart.core.Chart": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "background": { "$ref": "#/definitions/anychart.core.ui.Background" },
@@ -82,7 +82,7 @@
     "anychart.core.cartesian.series.Base": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "data": { "$ref": "#/definitions/data" },
@@ -110,8 +110,8 @@
         { "$ref": "#/definitions/anychart.core.cartesian.series.Base" }
       ],
       "properties": {
-        "markers": { "$ref": "#/definitions/anychart.elements.Multimarker" },
-        "hoverMarkers": { "$ref": "#/definitions/anychart.elements.Multimarker" }
+        "markers": { "$ref": "#/definitions/anychart.core.ui.Multimarker" },
+        "hoverMarkers": { "$ref": "#/definitions/anychart.core.ui.Multimarker" }
       }
     },
     "anychart.charts.Pie": {
@@ -144,7 +144,7 @@
     "anychart.core.axes.Linear": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "stroke": { "$ref": "#/definitions/stroke" },
@@ -168,8 +168,8 @@
           "type": "boolean"
         },
         "overlapMode": { "$ref": "#/definitions/anychart.core.axes.Linear.OverlapMode" },
-        "labels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
-        "minorLabels": { "$ref": "#/definitions/anychart.elements.Multilabel" },
+        "labels": { "$ref": "#/definitions/anychart.core.ui.Multilabel" },
+        "minorLabels": { "$ref": "#/definitions/anychart.core.ui.Multilabel" },
         "ticks": { "$ref": "#/definitions/anychart.core.axes.Ticks" },
         "minorTicks": { "$ref": "#/definitions/anychart.core.axes.Ticks" },
         "title": { "$ref": "#/definitions/anychart.core.ui.Title" }
@@ -181,7 +181,7 @@
     "anychart.core.ui.Background": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.core.ui.Base" },
         { "$ref": "#/definitions/shape" }
       ],
       "properties": {
@@ -195,7 +195,7 @@
       }
     },
     "anychart.core.ui.Background.CornerType": { "enum": [ "none", "cut", "round", "roundInner" ] },
-    "anychart.elements.Base": {
+    "anychart.core.ui.Base": {
       "type": "object",
       "properties": {
         "enabled": {
@@ -209,7 +209,7 @@
     "anychart.core.grids.Linear": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "stroke":  { "$ref": "#/definitions/stroke" },
@@ -233,7 +233,7 @@
     "anychart.core.ui.Label": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.core.ui.Base" },
         { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
@@ -268,7 +268,7 @@
     "anychart.core.axisMarkers.Line": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "stroke": { "$ref": "#/definitions/stroke" },
@@ -308,13 +308,13 @@
       }
     },
     "anychart.core.ui.Legend.Layout": { "enum": [ "vertical", "horizontal", "table" ] },
-    "anychart.elements.Marker.Type": {
+    "anychart.core.ui.Marker.Type": {
       "enum": [ "star4", "star5", "star6", "star7", "star10", "triangleup", "triangledown", "cross", "diamond", "diagonalcross", "circle", "square" ]
     },
-    "anychart.elements.Multilabel": {
+    "anychart.core.ui.Multilabel": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.core.ui.Base" },
         { "$ref": "#/definitions/anychart.core.Text" }
       ],
       "properties": {
@@ -332,16 +332,16 @@
         "background": { "$ref": "#/definitions/anychart.core.ui.Background" }
       }
     },
-    "anychart.elements.Multimarker": {
+    "anychart.core.ui.Multimarker": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.core.ui.Base" },
         { "$ref": "#/definitions/shape" }
       ],
       "properties": {
         "position": { "$ref": "#/definitions/anychart.utils.NinePositions" },
         "anchor": { "$ref": "#/definitions/anychart.utils.NinePositions" },
-        "type": { "$ref": "#/definitions/anychart.elements.Marker.Type" },
+        "type": { "$ref": "#/definitions/anychart.core.ui.Marker.Type" },
         "size": {
           "type": "number"
         },
@@ -364,7 +364,7 @@
               "$ref": "#/definitions/anychart.utils.NinePositions"
             },
             "type": {
-              "$ref": "#/definitions/anychart.elements.Marker.Type"
+              "$ref": "#/definitions/anychart.core.ui.Marker.Type"
             },
             "size": {
               "type": "number"
@@ -385,7 +385,7 @@
     "anychart.core.axisMarkers.Range": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "fill": { "$ref": "#/definitions/fill" },
@@ -401,7 +401,7 @@
     "anychart.core.ui.Separator": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" },
+        { "$ref": "#/definitions/anychart.core.ui.Base" },
         { "$ref": "#/definitions/shape" }
       ],
       "properties": {
@@ -420,7 +420,7 @@
     "anychart.core.Text": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "align": {
@@ -553,7 +553,7 @@
     "anychart.core.ui.Tooltip": {
       "type": "object",
       "allOf": [
-        { "$ref": "#/definitions/anychart.elements.Base" }
+        { "$ref": "#/definitions/anychart.core.ui.Base" }
       ],
       "properties": {
         "title":  { "$ref": "#/definitions/anychart.core.ui.Title" },

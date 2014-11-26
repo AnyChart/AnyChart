@@ -1,5 +1,5 @@
 anychart.onDocumentLoad(function() {
-  var table = anychart.elements.table();
+  var table = anychart.ui.table();
 
   var series_1 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);
   var series_2 = anychart.core.cartesian.series.line([1, 2, 3, 4, 5]);

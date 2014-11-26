@@ -13,7 +13,7 @@ goog.require('anychart.utils');
 
 /**
  * Declares table element.<br/>
- * <b>Note:</b> Better to use methods in {@link anychart.elements#table}.
+ * <b>Note:</b> Better to use methods in {@link anychart.ui.table}.
  * @param {number=} opt_rowsCount Number of rows in the table.
  * @param {number=} opt_colsCount Number of columns in the table.
  * @constructor
@@ -265,7 +265,7 @@ anychart.core.ui.Table.CellContent;
  * Setter for table rows count.<br/>
  * <b>Note:</b> Calculated from the contents if not defined explicitly.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.rowsCount(3);
  * table.container(stage).draw();
  * @param {number=} opt_value [5] Value to set.
@@ -299,7 +299,7 @@ anychart.core.ui.Table.prototype.rowsCount = function(opt_value) {
  * Setter for table columns count..<br/>
  * <b>Note:</b> Calculated from the contents if not defined explicitly.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.colsCount(2);
  * table.container(stage).draw();
  * @param {number=} opt_value [4] Value to set.
@@ -334,7 +334,7 @@ anychart.core.ui.Table.prototype.colsCount = function(opt_value) {
  * Setter for row height settings. <br/>
  * <b>Note:</b> Pass <b>null</b> to set default value.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.rowHeight(1, 50);
  * table.container(stage).draw();
@@ -373,7 +373,7 @@ anychart.core.ui.Table.prototype.rowHeight = function(row, opt_value) {
  * Setter for column width settings. <br/>
  * <b>Note:</b> Pass <b>null</b> to set the default value.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.colWidth(0, 200);
  * table.container(stage).draw();
@@ -407,7 +407,7 @@ anychart.core.ui.Table.prototype.colWidth = function(col, opt_value) {
 /**
  * Returns cell by its row and column number.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * var cell = table.getCell(1,1);
  * cell.content( anychart.ui.label().text('Text element'));
  * table.container(stage).draw();
@@ -440,7 +440,7 @@ anychart.core.ui.Table.prototype.getCell = function(row, col) {
  * ];
  * var pie = anychart.pie(dataSet).legend(null);
  * var palette = pie.palette().colors();
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([
  *     [pie, anychart.core.cartesian.series.line(dataSet[0]).color(palette[0])],
  *     [null, anychart.core.cartesian.series.line(dataSet[1]).color(palette[1])],
@@ -530,7 +530,7 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
  * These settings apply to cells with content set as string or number. If you want to set text appearance
  * for the particular cell, set cell content as string first, and then feel free to get the content and tune it.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * var textSettings = anychart.ui.labelsFactory();
  * textSettings.fontColor('blue');
@@ -588,7 +588,7 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
  * // top and bottom 5px ,right and left 15px
  * table.cellPadding(anychart.utils.space(5,15));
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellPadding(10);
  * table.container(stage).draw();
@@ -604,7 +604,7 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
  * // 3) top 10px, right 15px, bottom 5px, left 12px
  * table.cellPadding(10, '15px', '5px', 12);
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellPadding(10, '15px', '5px', 12);
  * table.container(stage).draw();
@@ -654,12 +654,12 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill('green 0.2');
  * table.container(stage).draw();
  * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill(['green 0.2', 'yellow 0.2']);
  * table.container(stage).draw();
@@ -671,7 +671,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill('green', 0.3);
  * table.container(stage).draw();
@@ -683,7 +683,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill(['black', 'yellow'], 45, true, 0.5);
  * table.container(stage).draw();
@@ -697,7 +697,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
  * table.container(stage).draw();
@@ -714,7 +714,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellFill({
  *    src: 'http://static.anychart.com/underwater.jpg',
@@ -765,12 +765,12 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill('green 0.2');
  * table.container(stage).draw();
  * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill(['green 0.2', 'yellow 0.2']);
  * table.container(stage).draw();
@@ -782,7 +782,7 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill('green', 0.3);
  * table.container(stage).draw();
@@ -794,7 +794,7 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill(['black', 'yellow'], 45, true, 0.5);
  * table.container(stage).draw();
@@ -808,7 +808,7 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
  * table.container(stage).draw();
@@ -825,7 +825,7 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill({
  *    src: 'http://static.anychart.com/underwater.jpg',
@@ -876,12 +876,12 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellEvenFill('green 0.2');
  * table.container(stage).draw();
  * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellOddFill(['green 0.2', 'yellow 0.2']);
  * table.container(stage).draw();
@@ -893,7 +893,7 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellEvenFill('green', 0.3);
  * table.container(stage).draw();
@@ -905,7 +905,7 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellEvenFill(['black', 'yellow'], 45, true, 0.5);
  * table.container(stage).draw();
@@ -919,7 +919,7 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellEvenFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
  * table.container(stage).draw();
@@ -936,7 +936,7 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellEvenFill({
  *    src: 'http://static.anychart.com/underwater.jpg',
@@ -991,7 +991,7 @@ anychart.core.ui.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, 
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -1038,7 +1038,7 @@ anychart.core.ui.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_thi
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell left border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellLeftBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -1096,7 +1096,7 @@ anychart.core.ui.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, opt
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell right border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellRightBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -1154,7 +1154,7 @@ anychart.core.ui.Table.prototype.cellRightBorder = function(opt_strokeOrFill, op
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell top border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellTopBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -1212,7 +1212,7 @@ anychart.core.ui.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt_
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell bottom border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
  * table.cellBottomBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2148,7 +2148,7 @@ anychart.core.ui.Table.Cell.prototype.reset = function(row, col) {
  *//**
  * Setter for cell content.
  * @example
- * var table = anychart.elements.table(3,2);
+ * var table = anychart.ui.table(3,2);
  * // resize first column
  * table.colWidth(0, 100);
  * // set content to cell as string
@@ -2207,7 +2207,7 @@ anychart.core.ui.Table.Cell.prototype.getCol = function() {
 /**
  * Returns cell bounds without padding counted (bounds which are used for borders drawing).
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.container(stage).draw();
  * stage.rect().fill('red 0.2').setBounds(
@@ -2229,12 +2229,12 @@ anychart.core.ui.Table.Cell.prototype.getBounds = function() {
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill('green 0.2');
  * table.container(stage).draw();
  * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill(['green 0.2', 'yellow 0.2']);
  * table.container(stage).draw();
@@ -2246,7 +2246,7 @@ anychart.core.ui.Table.Cell.prototype.getBounds = function() {
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill('green', 0.3);
  * table.container(stage).draw();
@@ -2258,7 +2258,7 @@ anychart.core.ui.Table.Cell.prototype.getBounds = function() {
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill(['black', 'yellow'], 45, true, 0.5);
  * table.container(stage).draw();
@@ -2272,7 +2272,7 @@ anychart.core.ui.Table.Cell.prototype.getBounds = function() {
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
  * table.container(stage).draw();
@@ -2289,7 +2289,7 @@ anychart.core.ui.Table.Cell.prototype.getBounds = function() {
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).fill({
  *    src: 'http://static.anychart.com/underwater.jpg',
@@ -2346,7 +2346,7 @@ anychart.core.ui.Table.Cell.prototype.fill = function(opt_fillOrColorOrKeys, opt
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).border('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2411,7 +2411,7 @@ anychart.core.ui.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_th
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell left border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).leftBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2469,7 +2469,7 @@ anychart.core.ui.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, op
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell right border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).rightBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2527,7 +2527,7 @@ anychart.core.ui.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, o
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell top border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).topBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2585,7 +2585,7 @@ anychart.core.ui.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, opt
  * <b>Note:</b> <u>lineJoin</u> settings not working here.
  * @shortDescription Setter for cell bottom border settings.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
  * table.getCell(1,1).bottomBorder('orange', 3, '5 2', 'round');
  * table.container(stage).draw();
@@ -2639,7 +2639,7 @@ anychart.core.ui.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill, 
  * Setter for cell columns span.<br/>
  * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
  * var cell = table.getCell(1,1);
  * cell.colSpan(2);
@@ -2673,7 +2673,7 @@ anychart.core.ui.Table.Cell.prototype.colSpan = function(opt_value) {
  * Setter for cell rows span.<br/>
  * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
  * var cell = table.getCell(1,1);
  * cell.rowSpan(2);
@@ -2713,7 +2713,7 @@ anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
  * // top and bottom 5px ,right and left 15px
  * cell.padding(anychart.utils.space(5,15));
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
  * table.cellTextFactory().background().enabled(true);
  * table.getCell(0,0).padding(0);
@@ -2730,7 +2730,7 @@ anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
  * // 3) top 10px, right 15px, bottom 5px, left 12px
  * table.cellPadding(10, '15px', '5px', 12);
  * @example <t>simple-h100</t>
- * var table = anychart.elements.table();
+ * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
  * table.cellTextFactory().background().enabled(true);
  * table.getCell(0,0).padding(-5, 0, 0, -15);

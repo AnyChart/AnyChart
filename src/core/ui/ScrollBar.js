@@ -166,6 +166,13 @@ anychart.core.ui.ScrollBar = function() {
   this.tid_ = -1;
 
 
+  /**
+   * Flag if scroll event must be dispatched.
+   * @type {boolean}
+   * @private
+   */
+  this.handlePositionChange_ = true;
+
 };
 goog.inherits(anychart.core.ui.ScrollBar, anychart.core.VisualBaseWithBounds);
 
@@ -312,6 +319,20 @@ anychart.core.ui.ScrollBar.prototype.sliderFill = function(opt_fillOrColorOrKeys
     return this;
   }
   return this.sliderFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a flag if splitter position change must be handled.
+ * @param {boolean=} opt_value - Value to be set.
+ * @return {boolean|anychart.core.ui.ScrollBar} - Current value or itself for method chaining.
+ */
+anychart.core.ui.ScrollBar.prototype.handlePositionChange = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isBoolean(opt_value)) this.handlePositionChange_ = opt_value;
+    return this;
+  }
+  return this.handlePositionChange_;
 };
 
 
@@ -1297,20 +1318,22 @@ anychart.core.ui.ScrollBar.prototype.deserialize = function(config) {
  * @private
  */
 anychart.core.ui.ScrollBar.prototype.dispatchScrollEvent_ = function(opt_source) {
-  var ths = this;
-  if (this.tid_ >= 0) {
-    clearTimeout(this.tid_);
-    this.tid_ = -1;
+  if (this.handlePositionChange_) {
+    var ths = this;
+    if (this.tid_ >= 0) {
+      clearTimeout(this.tid_);
+      this.tid_ = -1;
+    }
+    this.tid_ = setTimeout(function() {
+      var event = new anychart.core.ui.ScrollBar.ScrollEvent(ths);
+      event['startRatio'] = ths.startRatio_;
+      event['endRatio'] = ths.endRatio_;
+      event['visibleBounds'] = ths.visibleBounds_;
+      event['source'] = opt_source || 'user_action';
+      ths.dispatchEvent(event);
+      ths.tid_ = -1;
+    }, 0);
   }
-  this.tid_ = setTimeout(function() {
-    var event = new anychart.core.ui.ScrollBar.ScrollEvent(ths);
-    event['startRatio'] = ths.startRatio_;
-    event['endRatio'] = ths.endRatio_;
-    event['visibleBounds'] = ths.visibleBounds_;
-    event['source'] = opt_source || 'user_action';
-    ths.dispatchEvent(event);
-    ths.tid_ = -1;
-  }, 0);
 };
 
 
@@ -1360,6 +1383,7 @@ goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.
 goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
 anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
 anychart.core.ui.ScrollBar.prototype['backgroundStroke'] = anychart.core.ui.ScrollBar.prototype.backgroundStroke;
+anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
 anychart.core.ui.ScrollBar.prototype['backgroundFill'] = anychart.core.ui.ScrollBar.prototype.backgroundFill;
 anychart.core.ui.ScrollBar.prototype['sliderStroke'] = anychart.core.ui.ScrollBar.prototype.sliderStroke;
 anychart.core.ui.ScrollBar.prototype['sliderFill'] = anychart.core.ui.ScrollBar.prototype.sliderFill;

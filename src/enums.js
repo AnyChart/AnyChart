@@ -1097,6 +1097,47 @@ anychart.enums.CartesianSeriesType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Gantt specific data item field.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gantt reserved names of field in data items.
+ * @enum {string}
+ */
+anychart.enums.GanttDataFields = {
+  ID: 'id',
+  CHILDREN: 'children',
+  ACTUAL: 'actual',
+  ACTUAL_START: 'actualStart',
+  ACTUAL_END: 'actualEnd',
+  BASELINE: 'baseline',
+  BASELINE_START: 'baselineStart',
+  BASELINE_END: 'baselineEnd',
+  PROGRESS: 'progress',
+  PROGRESS_VALUE: 'progressValue',
+  MILESTONE: 'milestone',
+  NAME: 'name',
+  COLLAPSED: 'collapsed',
+  ROW_HEIGHT: 'rowHeight',
+  PERIODS: 'periods',
+  PARENT: 'parent',
+  START: 'start',
+  END: 'end',
+  FILL: 'fill',
+  STROKE: 'stroke',
+  HOVER_FILL: 'hoverFill',
+  HOVER_STROKE: 'hoverStroke',
+  CONNECTOR: 'connector',
+  CONNECT_TO: 'connectTo',
+  CONNECTOR_TYPE: 'connectorType',
+  START_MARKER: 'startMarker',
+  END_MARKER: 'endMarker',
+  LABEL: 'label'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  RadarSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1160,7 +1201,9 @@ anychart.enums.ErrorCode = {
 
   NO_FEATURE_IN_MODULE: 4,
 
-  INCORRECT_SCALE_TYPE: 5
+  INCORRECT_SCALE_TYPE: 5,
+
+  SCALE_DATE_RANGE_NOT_SET: 6
 };
 
 
@@ -1197,7 +1240,11 @@ anychart.enums.WarningCode = {
   DG_INCORRECT_METHOD_USAGE: 9, //can't be tested now
 
 
-  BULLET_CHART_OUT_OF_RANGE: 10
+  BULLET_CHART_OUT_OF_RANGE: 10,
+
+  GANTT_FIT_TO_TASK: 11,
+
+  NOT_FOUND: 404
 
 };
 
@@ -1385,9 +1432,38 @@ goog.exportSymbol('anychart.enums.ScaleStackMode.PERCENT', anychart.enums.ScaleS
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LINEAR', anychart.enums.ScatterTicksMode.LINEAR);
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LOGARITHMIC', anychart.enums.ScatterTicksMode.LOGARITHMIC);
 
+goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL', anychart.enums.GanttDataFields.ACTUAL);
+goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL_START', anychart.enums.GanttDataFields.ACTUAL_START);
+goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL_END', anychart.enums.GanttDataFields.ACTUAL_END);
+goog.exportSymbol('anychart.enums.GanttDataFields.BASELINE_START', anychart.enums.GanttDataFields.BASELINE_START);
+goog.exportSymbol('anychart.enums.GanttDataFields.BASELINE_END', anychart.enums.GanttDataFields.BASELINE_END);
+goog.exportSymbol('anychart.enums.GanttDataFields.CHILDREN', anychart.enums.GanttDataFields.CHILDREN);
+goog.exportSymbol('anychart.enums.GanttDataFields.PROGRESS', anychart.enums.GanttDataFields.PROGRESS);
+goog.exportSymbol('anychart.enums.GanttDataFields.PROGRESS_VALUE', anychart.enums.GanttDataFields.PROGRESS_VALUE);
+goog.exportSymbol('anychart.enums.GanttDataFields.MILESTONE', anychart.enums.GanttDataFields.MILESTONE);
+goog.exportSymbol('anychart.enums.GanttDataFields.NAME', anychart.enums.GanttDataFields.NAME);
+goog.exportSymbol('anychart.enums.GanttDataFields.COLLAPSED', anychart.enums.GanttDataFields.COLLAPSED);
+goog.exportSymbol('anychart.enums.GanttDataFields.ROW_HEIGHT', anychart.enums.GanttDataFields.ROW_HEIGHT);
+goog.exportSymbol('anychart.enums.GanttDataFields.ID', anychart.enums.GanttDataFields.ID);
+goog.exportSymbol('anychart.enums.GanttDataFields.PERIODS', anychart.enums.GanttDataFields.PERIODS);
+goog.exportSymbol('anychart.enums.GanttDataFields.PARENT', anychart.enums.GanttDataFields.PARENT);
+goog.exportSymbol('anychart.enums.GanttDataFields.START', anychart.enums.GanttDataFields.START);
+goog.exportSymbol('anychart.enums.GanttDataFields.END', anychart.enums.GanttDataFields.END);
+goog.exportSymbol('anychart.enums.GanttDataFields.FILL', anychart.enums.GanttDataFields.FILL);
+goog.exportSymbol('anychart.enums.GanttDataFields.STROKE', anychart.enums.GanttDataFields.STROKE);
+goog.exportSymbol('anychart.enums.GanttDataFields.HOVER_FILL', anychart.enums.GanttDataFields.HOVER_FILL);
+goog.exportSymbol('anychart.enums.GanttDataFields.HOVER_STROKE', anychart.enums.GanttDataFields.HOVER_STROKE);
+goog.exportSymbol('anychart.enums.GanttDataFields.CONNECT_TO', anychart.enums.GanttDataFields.CONNECT_TO);
+goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR', anychart.enums.GanttDataFields.CONNECTOR);
+goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR_TYPE', anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+goog.exportSymbol('anychart.enums.GanttDataFields.START_MARKER', anychart.enums.GanttDataFields.START_MARKER);
+goog.exportSymbol('anychart.enums.GanttDataFields.END_MARKER', anychart.enums.GanttDataFields.END_MARKER);
+goog.exportSymbol('anychart.enums.GanttDataFields.LABEL', anychart.enums.GanttDataFields.LABEL);
+
 goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEARS);
 goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTHS);
 goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAYS);
 goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOURS);
 goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTES);
 goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECONDS);
+

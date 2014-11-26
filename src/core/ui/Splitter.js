@@ -1072,6 +1072,7 @@ anychart.core.ui.Splitter.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
+      if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }

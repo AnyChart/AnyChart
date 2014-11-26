@@ -818,6 +818,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE:
       return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
 
+    case anychart.enums.ErrorCode.SCALE_DATE_RANGE_NOT_SET:
+      return 'Dates range must be set for Gantt DateTime scale. Please, use scale.setRange(minDate, maxDate) to set it.';
+
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return 'Scatter chart scales should be only scatter type (linear, log)';
 
@@ -926,6 +929,15 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
 
     case anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE:
       return 'Bullet Chart point value: ' + arguments[0] + ' is out of scale range. Check minimum and maximum scale settings.';
+
+    case anychart.enums.WarningCode.NOT_FOUND:
+      //TODO (A.Kudryavtsev): Make another suggestion what to do.
+      return opt_arguments[0] + ' with id=\'' + opt_arguments[1] + '\' is not found in data tree. Please check what you are looking for.';
+
+    case anychart.enums.WarningCode.GANTT_FIT_TO_TASK:
+      return 'Can not fit gantt chart timeline to task with id \'' + opt_arguments[0] + '\' because both fields \'' +
+          anychart.enums.GanttDataFields.ACTUAL_START + '\' and \'' + anychart.enums.GanttDataFields.ACTUAL_END +
+          '\' must be specified in data item.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

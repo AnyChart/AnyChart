@@ -20,11 +20,8 @@ anychart.onDocumentReady(function() {
       .bounds(20, 20, 400, 300)
       .layout('vertical')
       .position('30%')
-      .dragAreaLength(15)
+      .dragAreaLength(5)
       .dragPreviewFill('black 0.6')
-      .dragPreviewStroke('0.5px blue 0.3')
-      .dragAreaFill('#55f 0.3')
-      .dragAreaStroke('1px green')
       .stroke('1px #000000 1')
       .fill({
         'keys': ['0 #9ccae3', '0.5 #a9dbf6', '1 #e3f4fc'],
@@ -42,10 +39,10 @@ anychart.onDocumentReady(function() {
 
 
   //split.listenSignals(drawer, split); //TODO Not exported
-  split.listen('signal', split.draw, false, split);
+//  split.listen('signal', split.draw, false, split);
 
 
-  split.listen(anychart.events.EventType.SPLITTER_CHANGE, function() {
+  split.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
     var b1 = split.getLeftBounds();
     var b2 = split.getRightBounds();
     r1.setBounds(b1);

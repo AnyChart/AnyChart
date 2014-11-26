@@ -121,6 +121,6 @@ anychart.palettes.markers = function() {
 
 
 //exports
-goog.exportSymbol('anychart.palettes.markers', anychart.palettes.marker);
+goog.exportSymbol('anychart.palettes.markers', anychart.palettes.markers);
 anychart.palettes.Markers.prototype['markerAt'] = anychart.palettes.Markers.prototype.markerAt;
 anychart.palettes.Markers.prototype['markers'] = anychart.palettes.Markers.prototype.markers;

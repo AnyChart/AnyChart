@@ -15,7 +15,7 @@ function load() {
 
 
 
-  marker = new anychart.elements.Marker();
+  marker = new anychart.core.ui.Marker();
   marker
       .container('container')
       .size(35)
@@ -37,7 +37,7 @@ function load() {
   marker.draw();
 
   marker
-      .type(anychart.elements.Marker.Type.STAR10);
+      .type(anychart.core.ui.Marker.Type.STAR10);
   marker.draw();
 
   marker

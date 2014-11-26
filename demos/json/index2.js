@@ -41,7 +41,7 @@ function load() {
 
   var y = 0, json;
 
-  var labels = new anychart.elements.Multilabel();
+  var labels = new anychart.core.ui.Multilabel();
   labels.enabled(true).anchor('bottom').background({fill: 'red', enabled: true});
 
   var scale = new anychart.scales.Linear();

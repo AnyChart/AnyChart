@@ -110,7 +110,7 @@ function testTreeStructureFill() {
         ]}
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.TREE_STRUCTURE);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TREE);
 
     var resultNamesSequence = recursivePassage(treeData.roots_, 'name');
 
@@ -136,7 +136,7 @@ function testTreeStructureFillAddData() {
         {id: '3', foo: 'bar3'}
     ];
 
-    var treeData = new anychart.data.Tree(rawData); //Filled with anychart.data.Tree.FillMethod.TREE_STRUCTURE
+    var treeData = new anychart.data.Tree(rawData); //Filled with anychart.enums.TreeFillingMethod.AS_TREE
 
     var addData = [
         {id: '4', foo: 'bar4', children: [
@@ -144,7 +144,7 @@ function testTreeStructureFillAddData() {
         ]}
     ];
 
-    treeData.addData(addData); //Added with anychart.data.Tree.FillMethod.TREE_STRUCTURE
+    treeData.addData(addData); //Added with anychart.enums.TreeFillingMethod.AS_TREE
 
     var resultNamesSequence = recursivePassage(treeData.roots_, 'foo');
     var expectedNamesSequence = ['bar1', 'bar2', 'bar3', 'bar4', 'bar5'];
@@ -204,7 +204,7 @@ function testParentPointerFill() {
 
      */
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
     var resultValuesSequence = recursivePassage(treeData.roots_, 'value');
 
@@ -242,7 +242,7 @@ function testParentPointerFillAddData() {
 
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
 
     var addData = [
@@ -256,7 +256,7 @@ function testParentPointerFillAddData() {
         {value: 'Parent from previous set', parent: '2'}
     ];
 
-    treeData.addData(addData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    treeData.addData(addData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
     /*
         Expected structure:
@@ -322,7 +322,7 @@ function testCorrectParentOrder() {
         {id: '3', value: 'second id=3'}
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
     var addData = [
         {value: 'parent 1 child 1', parent: '1'},
@@ -331,7 +331,7 @@ function testCorrectParentOrder() {
         {value: 'child of 4', parent: '4'}
     ];
 
-    treeData.addData(addData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    treeData.addData(addData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
 
     /*
@@ -387,7 +387,7 @@ function testCorrectFullPassageSearch() {
         {id: '205', value: 'repeat', parent: '2'}
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
     var searchResult = treeData.search('value', '6');
 
@@ -430,7 +430,7 @@ function testCorrectIndexSearch() {
         {id: '205', value: 'repeat', parent: '2'}
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
     treeData.createIndexOn('value');
 
     var searchResult = treeData.search('value', '6');
@@ -484,7 +484,7 @@ function testCorrectIndexing() {
         {id: '3', control: 'c8', name: 'n2', value: 'v1', parent: '15'}
     ];
 
-    var treeData = new anychart.data.Tree(rawData, anychart.data.Tree.FillMethod.PARENT_POINTER);
+    var treeData = new anychart.data.Tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
     treeData.createIndexOn('name');
     treeData.createIndexOn('value');
 
@@ -579,6 +579,37 @@ function testRemoveChild() {
 
     c1Child.removeChildren();
     assertTrue(!c1Child.numChildren());
+}
+
+
+/**
+ * Tests remove data item.
+ */
+function testRemoveDataItem() {
+    var rawData = [
+        {id: '1', name:'n1', children: [
+            {id:'11', name:'n11'},
+            {id:'12', name:'n12'},
+            {id:'13', name:'n13'}
+        ]},
+        {id: '2', name:'n2', children: [
+            {id:'21', name:'n21'},
+            {id:'22', name:'n22'},
+            {id:'23', name:'n23'}
+        ]}
+    ];
+
+    var tree = new anychart.data.Tree(rawData);
+
+    var rootChild = tree.search('id', '1');
+    var newParent = tree.search('id', '2');
+
+    rootChild = newParent.addChildAt(rootChild, 1);
+    assertEquals(tree.numChildren(), 1);
+    assertEquals(newParent.numChildren(), 4);
+    assertTrue(rootChild.getParent() == newParent);
+    assertEquals(newParent.indexOfChild(rootChild), 1);
+
 }
 
 

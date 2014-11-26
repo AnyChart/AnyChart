@@ -564,7 +564,7 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
  *//**
  * Setter for paginator setting.<br/>
  * <b>Note:</b> To turn Paginator off you need to send null or 'none'.
- * @param {(Object|anychart.elements.Paginator|string|null)=} opt_value Value to set.
+ * @param {(Object|anychart.core.ui.Paginator|string|null)=} opt_value Value to set.
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc

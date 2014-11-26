@@ -1,20 +1,46 @@
-goog.provide('anychart.gantt.Controller');
+goog.provide('anychart.core.gantt.Controller');
 
+goog.require('acgraph');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.ui.ScrollBar');
 
 goog.require('goog.array');
+goog.require('goog.math');
 
 
 
 /**
  * Gantt controller implementation.
  * TODO (A.Kudryavtsev): Describe.
+ * @param {boolean=} opt_isResourceChart - Flag if controller must work in resource chart mode.
  *
  * @constructor
  * @extends {anychart.core.Base}
  */
-anychart.gantt.Controller = function() {
+anychart.core.gantt.Controller = function(opt_isResourceChart) {
   goog.base(this);
+
+  /**
+   * Resource chart works with resources.
+   * Each resource has periods reflected in data model as array of period-objects (Array.<Period>).
+   * Each period has some useful fields (such as 'ID').
+   * Basically, field 'periods' in tree data item is just a raw array, but for resource chart here are some
+   * issues when we need to quickly find a period by id (for example, for connectors).
+   *
+   * Indexing the periods takes a time, so we run it only in resource chart mode.
+   *
+   * @type {boolean}
+   * @private
+   */
+  this.isResourceChart_ = !!opt_isResourceChart;
+
+  /**
+   * The map of periods.
+   * Contains link to the period by its id.
+   * @type {Object}
+   * @private
+   */
+  this.periodsMap_ = {};
 
   /**
    * Tree data.
@@ -45,6 +71,12 @@ anychart.gantt.Controller = function() {
    */
   this.dataGrid_ = null;
 
+  /**
+   * Related timeline.
+   * @type {anychart.core.gantt.Timeline}
+   * @private
+   */
+  this.timeline_ = null;
 
   /**
    * Start index.
@@ -94,8 +126,32 @@ anychart.gantt.Controller = function() {
    */
   this.expandedItemsTraverser_ = null;
 
+
+  /**
+   * Min date timestamp.
+   * @type {number}
+   * @private
+   */
+  this.minDate_ = NaN;
+
+
+  /**
+   * Max date timestamp.
+   * @type {number}
+   * @private
+   */
+  this.maxDate_ = NaN;
+
+
+  /**
+   * Vertical scroll bar.
+   * @type {anychart.core.ui.ScrollBar}
+   * @private
+   */
+  this.verticalScrollBar_ = null;
+
 };
-goog.inherits(anychart.gantt.Controller, anychart.core.Base);
+goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
 
 
 /**
@@ -103,8 +159,8 @@ goog.inherits(anychart.gantt.Controller, anychart.core.Base);
  * @param {anychart.data.Tree.DataItem} item - Tree data item.
  * @return {number} - Data item height.
  */
-anychart.gantt.Controller.getItemHeight = function(item) {
-  return anychart.utils.toNumber(item.get('rowHeight')) || anychart.core.ui.DataGrid.DEFAULT_ROW_HEIGHT;
+anychart.core.gantt.Controller.getItemHeight = function(item) {
+  return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.ui.DataGrid.DEFAULT_ROW_HEIGHT;
 };
 
 
@@ -112,7 +168,7 @@ anychart.gantt.Controller.getItemHeight = function(item) {
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.gantt.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
+anychart.core.gantt.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
 /**
@@ -123,7 +179,7 @@ anychart.gantt.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
  *  POSITION means that new start, end, offset, available height were set. No need to linearize a tree and build new visibility data.
  * @type {number}
  */
-anychart.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.core.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.DATA |
     anychart.ConsistencyState.VISIBILITY |
     anychart.ConsistencyState.POSITION;
@@ -134,20 +190,20 @@ anychart.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {anychart.SignalEvent} event - Invalidation event.
  * @private
  */
-anychart.gantt.Controller.prototype.dataInvalidated_ = function(event) {
+anychart.core.gantt.Controller.prototype.dataInvalidated_ = function(event) {
   var state = 0;
   var signal = anychart.Signal.NEEDS_REAPPLICATION;
 
   /*
-    Here meta_changed_signal comes from tree on tree data item change.
-    We have to initialize rebuilding of visible data items.
-  */
+   Here meta_changed_signal comes from tree on tree data item change.
+   We have to initialize rebuilding of visible data items.
+   */
   if (event.hasSignal(anychart.Signal.META_CHANGED)) state |= anychart.ConsistencyState.VISIBILITY;
 
   /*
-    Here data_changed_signal comes from tree when tree has some structural changes.
-    We have to relinerize data and rebuild visible data items.
-  */
+   Here data_changed_signal comes from tree when tree has some structural changes.
+   We have to relinerize data and rebuild visible data items.
+   */
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.DATA;
 
   this.invalidate(state, signal);
@@ -160,30 +216,56 @@ anychart.gantt.Controller.prototype.dataInvalidated_ = function(event) {
  * @return {boolean} - Whether item is expanded.
  * @private
  */
-anychart.gantt.Controller.prototype.traverseChildrenCondition_ = function(item) {
-  return !item.meta('collapsed');
+anychart.core.gantt.Controller.prototype.traverseChildrenCondition_ = function(item) {
+  return !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
 };
 
 
 /**
  * Linearizes tree. Used to add necessary meta information to data items in a straight tree passage.
- * @return {anychart.gantt.Controller} - Itself for method chaining.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  * @private
  */
-anychart.gantt.Controller.prototype.linearizeData_ = function() {
+anychart.core.gantt.Controller.prototype.linearizeData_ = function() {
   var item;
   var linearIndex = 0;
 
+  this.minDate_ = NaN;
+  this.maxDate_ = NaN;
+
   this.data_.suspendSignalsDispatching();
   var fullPassageTraverser = this.data_.getTraverser();
+
   while (fullPassageTraverser.advance()) {
     item = fullPassageTraverser.current();
+
+    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_START)));
+    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_END)));
+    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_START)));
+    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_END)));
 
     item
         .meta('depth', fullPassageTraverser.getDepth())
         .meta('index', linearIndex++);
 
-    if (item.numChildren() && !!item.get('collapsed')) item.meta('collapsed', true);
+    if (this.isResourceChart_) {
+      this.periodsMap_ = {};
+      var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
+      if (goog.isArray(periods)) {
+        //Working with raw array.
+        for (var i = 0, l = periods.length; i < l; i++) {
+          var period = periods[i];
+          var periodId = period[anychart.enums.GanttDataFields.ID];
+          if (!this.periodsMap_[periodId]) this.periodsMap_[periodId] = period;
+          //This extends dates range.
+          this.checkDate_(period[anychart.enums.GanttDataFields.START]);
+          this.checkDate_(period[anychart.enums.GanttDataFields.END]);
+        }
+      }
+    }
+
+    if (item.numChildren() && goog.isDef(item.get(anychart.enums.GanttDataFields.COLLAPSED)))
+      item.meta(anychart.enums.GanttDataFields.COLLAPSED, item.get(anychart.enums.GanttDataFields.COLLAPSED));
   }
 
   this.data_.resumeSignalsDispatching(false);
@@ -192,11 +274,29 @@ anychart.gantt.Controller.prototype.linearizeData_ = function() {
 
 
 /**
- * Fills this.visibleData_ and this.heightCache with data.
- * @return {anychart.gantt.Controller} - Itself for method chaining.
+ * Checks data item to get it's date fields and extend current min-max range.
+ * @param {number} date - Timestamp.
  * @private
  */
-anychart.gantt.Controller.prototype.getVisibleData_ = function() {
+anychart.core.gantt.Controller.prototype.checkDate_ = function(date) {
+  if (goog.isNumber(date) && !isNaN(date)) {
+    if (isNaN(this.minDate_)) { //If one of dates is NaN - the second one is NaN as well.
+      this.minDate_ = date;
+      this.maxDate_ = date;
+    }
+
+    if (date < this.minDate_) this.minDate_ = date;
+    if (date > this.maxDate_) this.maxDate_ = date;
+  }
+};
+
+
+/**
+ * Fills this.visibleData_ and this.heightCache with data.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   this.visibleData_.length = 0;
   this.heightCache_.length = 0;
 
@@ -206,7 +306,7 @@ anychart.gantt.Controller.prototype.getVisibleData_ = function() {
   while (this.expandedItemsTraverser_.advance()) {
     item = /** @type {anychart.data.Tree.DataItem} */ (this.expandedItemsTraverser_.current());
     this.visibleData_.push(item);
-    height += (anychart.gantt.Controller.getItemHeight(item) + anychart.core.ui.DataGrid.ROW_SPACE);
+    height += (anychart.core.gantt.Controller.getItemHeight(item) + anychart.core.ui.DataGrid.ROW_SPACE);
     this.heightCache_.push(height);
   }
 
@@ -222,7 +322,7 @@ anychart.gantt.Controller.prototype.getVisibleData_ = function() {
  * @return {number} - Actual height.
  * @private
  */
-anychart.gantt.Controller.prototype.getHeightByIndexes_ = function(startIndex, opt_endIndex) {
+anychart.core.gantt.Controller.prototype.getHeightByIndexes_ = function(startIndex, opt_endIndex) {
   if (!this.heightCache_.length) return 0;
 
   var cacheEnd = this.heightCache_.length - 1;
@@ -249,7 +349,7 @@ anychart.gantt.Controller.prototype.getHeightByIndexes_ = function(startIndex, o
  * @private
  * @return {number} - Index.
  */
-anychart.gantt.Controller.prototype.getIndexByHeight_ = function(height) {
+anychart.core.gantt.Controller.prototype.getIndexByHeight_ = function(height) {
   var index = goog.array.binarySearch(this.heightCache_, height);
   return index >= 0 ? index : ~index;
 };
@@ -260,7 +360,7 @@ anychart.gantt.Controller.prototype.getIndexByHeight_ = function(height) {
  *  this.availableHeight_.
  * Clears POSITION consistency state.
  */
-anychart.gantt.Controller.prototype.recalculate = function() {
+anychart.core.gantt.Controller.prototype.recalculate = function() {
   if (this.visibleData_.length) {
 
     var totalHeight = this.getHeightByIndexes_(0, this.heightCache_.length - 1);
@@ -290,10 +390,10 @@ anychart.gantt.Controller.prototype.recalculate = function() {
           this.endIndex_ = this.getIndexByHeight_(this.availableHeight_);
         } else {
           /*
-            This case has another behaviour: when start index is set, we consider the vertical offset.
-            In this case (end index is set instead), we suppose that end index cell is fully visible in the end
-            of data grid. It means that we do not consider the vertical offset and calculate it as well.
-          */
+           This case has another behaviour: when start index is set, we consider the vertical offset.
+           In this case (end index is set instead), we suppose that end index cell is fully visible in the end
+           of data grid. It means that we do not consider the vertical offset and calculate it as well.
+           */
           this.startIndex_ = this.getIndexByHeight_(this.heightCache_[this.endIndex_] - this.availableHeight_);
           this.verticalOffset_ = this.getHeightByIndexes_(this.startIndex_, this.endIndex_) - this.availableHeight_;
         }
@@ -311,11 +411,20 @@ anychart.gantt.Controller.prototype.recalculate = function() {
 
 
 /**
+ * Gets periods map.
+ * @return {Object} - Map that contains related period by its id.
+ */
+anychart.core.gantt.Controller.prototype.getPeriodsMap = function() {
+  return this.periodsMap_;
+};
+
+
+/**
  * Gets/sets source data tree.
  * @param {anychart.data.Tree=} opt_value - Value to be set.
- * @return {(anychart.gantt.Controller|anychart.data.Tree)} - Current value or itself for method chaining.
+ * @return {(anychart.core.gantt.Controller|anychart.data.Tree)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.data = function(opt_value) {
+anychart.core.gantt.Controller.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if ((this.data_ != opt_value) && (opt_value instanceof anychart.data.Tree)) {
       if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this); //Stop listening old tree.
@@ -336,9 +445,9 @@ anychart.gantt.Controller.prototype.data = function(opt_value) {
 /**
  * Gets/sets vertical offset.
  * @param {number=} opt_value - Value to be set.
- * @return {(anychart.gantt.Controller|number)} - Current value or itself for method chaining.
+ * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.verticalOffset = function(opt_value) {
+anychart.core.gantt.Controller.prototype.verticalOffset = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.verticalOffset_ != opt_value) {
       this.verticalOffset_ = opt_value;
@@ -354,9 +463,9 @@ anychart.gantt.Controller.prototype.verticalOffset = function(opt_value) {
  * Gets/sets start index.
  * NOTE: Calling this method sets this.endIndex_ to NaN to recalculate value correctly anew.
  * @param {number=} opt_value - Value to be set.
- * @return {(anychart.gantt.Controller|number)} - Current value or itself for method chaining.
+ * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.startIndex = function(opt_value) {
+anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.startIndex_ != opt_value && !isNaN(opt_value)) {
       this.startIndex_ = opt_value;
@@ -373,9 +482,9 @@ anychart.gantt.Controller.prototype.startIndex = function(opt_value) {
  * Gets/sets end index.
  * NOTE: Calling this method sets this.startIndex_ to NaN to recalculate value correctly anew.
  * @param {number=} opt_value - Value to be set.
- * @return {(anychart.gantt.Controller|number)} - Current value or itself for method chaining.
+ * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.endIndex = function(opt_value) {
+anychart.core.gantt.Controller.prototype.endIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.endIndex_ != opt_value && !isNaN(opt_value)) {
       this.endIndex_ = opt_value;
@@ -391,9 +500,9 @@ anychart.gantt.Controller.prototype.endIndex = function(opt_value) {
 /**
  * Gets/sets available height.
  * @param {number=} opt_value - Value to be set.
- * @return {(anychart.gantt.Controller|number)} - Current value or itself for method chaining.
+ * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.availableHeight = function(opt_value) {
+anychart.core.gantt.Controller.prototype.availableHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.availableHeight_ != opt_value) {
       this.availableHeight_ = opt_value;
@@ -408,13 +517,12 @@ anychart.gantt.Controller.prototype.availableHeight = function(opt_value) {
 /**
  * Gets/sets data grid.
  * @param {anychart.core.ui.DataGrid=} opt_value - Value to be set.
- * @return {(anychart.core.ui.DataGrid|anychart.gantt.Controller)} - Current value or itself for method chaining.
+ * @return {(anychart.core.ui.DataGrid|anychart.core.gantt.Controller)} - Current value or itself for method chaining.
  */
-anychart.gantt.Controller.prototype.dataGrid = function(opt_value) {
+anychart.core.gantt.Controller.prototype.dataGrid = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.dataGrid_ != opt_value) {
       this.dataGrid_ = opt_value;
-      this.availableHeight_ = this.dataGrid_.getPixelBounds().height - this.dataGrid_.titleHeight();
       this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
@@ -424,11 +532,28 @@ anychart.gantt.Controller.prototype.dataGrid = function(opt_value) {
 
 
 /**
+ * Gets/sets timeline.
+ * @param {anychart.core.gantt.Timeline=} opt_value - Value to be set.
+ * @return {(anychart.core.gantt.Timeline|anychart.core.gantt.Controller)} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.timeline = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.timeline_ != opt_value) {
+      this.timeline_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.timeline_;
+};
+
+
+/**
  * Runs controller.
  * Actually clears all consistency states and applies changes to related data grid.
- * @return {anychart.gantt.Controller} - Itself for method chaining.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  */
-anychart.gantt.Controller.prototype.run = function() {
+anychart.core.gantt.Controller.prototype.run = function() {
   if (!this.isConsistent()) {
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
       this.linearizeData_();
@@ -446,9 +571,175 @@ anychart.gantt.Controller.prototype.run = function() {
   }
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
-  this.dataGrid_.drawInternal(this.visibleData_, this.startIndex_, this.endIndex_, this.verticalOffset_, this.availableHeight_, this.positionRecalculated_);
+  if (this.dataGrid_)
+    this.dataGrid_.drawInternal(this.visibleData_, this.startIndex_, this.endIndex_, this.verticalOffset_, this.availableHeight_, this.positionRecalculated_);
+
+  if (this.timeline_)
+    this.timeline_.drawInternal(this.visibleData_, this.startIndex_, this.endIndex_, this.verticalOffset_, this.availableHeight_,
+        this.minDate_, this.maxDate_, this.positionRecalculated_);
+
+  if (this.verticalScrollBar_) {
+    this.verticalScrollBar_.suspendSignalsDispatching();
+    this.verticalScrollBar_.handlePositionChange(false);
+
+    var itemHeight = this.getHeightByIndexes_(this.startIndex_, this.startIndex_);
+    var height = this.heightCache_[this.startIndex_] - itemHeight;
+
+    var start = height + this.verticalOffset_;
+    var end = start + this.availableHeight_;
+
+    var totalEnd = this.heightCache_[this.heightCache_.length - 1];
+
+    var contentBoundsSimulation = new acgraph.math.Rect(0, 0, 0, totalEnd);
+
+    var startRatio = anychart.math.round(start / totalEnd, 4);
+    var endRatio = anychart.math.round(end / totalEnd, 4);
+
+    this.verticalScrollBar_
+        .contentBounds(contentBoundsSimulation)
+        .setRatio(startRatio, endRatio)
+        .draw()
+        .handlePositionChange(true)
+        .resumeSignalsDispatching(false);
+  }
+
   this.positionRecalculated_ = false;
   return this;
 };
 
 
+/**
+ * Generates vertical scroll bar.
+ * @return {anychart.core.ui.ScrollBar} - Scroll bar.
+ */
+anychart.core.gantt.Controller.prototype.getScrollBar = function() {
+  if (!this.verticalScrollBar_) {
+    this.verticalScrollBar_ = new anychart.core.ui.ScrollBar();
+    this.verticalScrollBar_.layout(anychart.enums.Layout.VERTICAL);
+
+    var controller = this;
+
+    this.verticalScrollBar_.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
+      var startRatio = e['startRatio'];
+      var endRatio = e['endRatio'];
+      var totalHeight = controller.heightCache_[controller.heightCache_.length - 1];
+
+      controller.suspendSignalsDispatching();
+
+      if (startRatio == 0) { //This fixed JS rounding troubles.
+        controller
+            .verticalOffset(0)
+            .startIndex(0);
+      } else if (endRatio == 1) { //This fixed JS rounding troubles.
+        controller.endIndex(controller.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
+      } else {
+        var startHeight = Math.round(startRatio * totalHeight);
+        var startIndex = controller.getIndexByHeight_(startHeight);
+        var previousHeight = startIndex ? controller.heightCache_[startIndex - 1] : 0;
+        var verticalOffset = startHeight - previousHeight;
+        controller
+            .verticalOffset(verticalOffset)
+            .startIndex(startIndex);
+      }
+
+      controller.resumeSignalsDispatching(false);
+      controller.run();
+    });
+  }
+  return this.verticalScrollBar_;
+};
+
+
+/**
+ * Scrolls controller to pixel offset specified.
+ * TODO (A.Kudryavtsev): Describe how this method fits to total height and available height.
+ * @param {number} pxOffset - Vertical pixel total offset.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
+  pxOffset = Math.max(pxOffset, 0);
+  var totalHeight = this.heightCache_[this.heightCache_.length - 1];
+  if (pxOffset) {
+    this.suspendSignalsDispatching();
+    if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
+      this.endIndex(this.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
+    } else {
+      var itemIndex = this.getIndexByHeight_(pxOffset);
+      var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
+      var verticalOffset = itemIndex - previousHeight;
+      this
+          .verticalOffset(verticalOffset)
+          .startIndex(itemIndex);
+    }
+
+    this.resumeSignalsDispatching(false);
+    this.run();
+  }
+  return this;
+};
+
+
+/**
+ * Performs vertical scroll to rowIndex specified.
+ * TODO (A.Kudryavtsev): Describe how this method fits to total rows count.
+ * @param {number} rowIndex - Row index to scroll to.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.scrollToRow = function(rowIndex) {
+  rowIndex = goog.math.clamp(rowIndex, 0, this.heightCache_.length - 1);
+  this
+      .suspendSignalsDispatching()
+      .startIndex(rowIndex)
+      .verticalOffset(0)
+      .resumeSignalsDispatching(false)
+      .run();
+  return this;
+};
+
+
+/**
+ * Scrolls controller to set end index specified.
+ * @param {number=} opt_index - End index to be set.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.scrollToEnd = function(opt_index) {
+  opt_index = opt_index || this.heightCache_.length - 1;
+  return /** @type {anychart.core.gantt.Controller} */ (this.endIndex(opt_index));
+};
+
+
+/**
+ * Collapses/expands all.
+ * @param {boolean} value - Value to be set.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.collapseAll_ = function(value) {
+  this.data_.suspendSignalsDispatching();
+  var fullPassageTraverser = this.data_.getTraverser();
+  while (fullPassageTraverser.advance()) {
+    var item = fullPassageTraverser.current();
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+  }
+
+  this.data_.resumeSignalsDispatching(true);
+  return this;
+};
+
+
+/**
+ * Expands all.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.expandAll = function() {
+  return this.collapseAll_(false);
+};
+
+
+/**
+ * Collapses all.
+ * @return {anychart.core.gantt.Controller} - Itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.collapseAll = function() {
+  return this.collapseAll_(true);
+};

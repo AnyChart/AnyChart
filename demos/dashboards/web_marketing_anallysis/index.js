@@ -106,7 +106,7 @@ anychart.onDocumentReady(function() {
   ]);
 
   var keyMetricsYTDSizeWithoutLegend = keyMetricsYTDLegend.getRemainingBounds();
-  var keyMetricsYTDTable = anychart.elements.table();
+  var keyMetricsYTDTable = anychart.ui.table();
   keyMetricsYTDTable.container(stage);
   keyMetricsYTDTable.contents([
       ['Past 12 Months',                                  'Metric',            '% of Target',                    'Actual'],
@@ -160,7 +160,7 @@ anychart.onDocumentReady(function() {
 
 
   var top8CustomersSizeWithoutLegend =  top8CustomersLegend.getRemainingBounds();
-  var top8CustomersTable = anychart.elements.table();
+  var top8CustomersTable = anychart.ui.table();
   top8CustomersTable.container(stage);
   top8CustomersTable.contents([
       ['#', 'Customer',                 createBulletChart([{value: 10}])],
@@ -219,7 +219,7 @@ anychart.onDocumentReady(function() {
 
   var revenueQTDSizeWithoutLegend =  revenueQTDLegend.getRemainingBounds();
   revenueQTDSizeWithoutLegend.top -=45;//todo: something wrong with legend getRemainingBounds with title orientation left
-  var revenueQTDSizeTable = anychart.elements.table();
+  var revenueQTDSizeTable = anychart.ui.table();
   revenueQTDSizeTable.container(stage);
   revenueQTDSizeTable.contents([
     ['Region',        createBulletChart([{value: 10}]), 'Actual'],
@@ -258,7 +258,7 @@ anychart.onDocumentReady(function() {
   revenueYTDSizeWithoutLabel.top = revenueQTDSizeWithoutLegend.top;
   revenueYTDSizeWithoutLabel.height = revenueQTDSizeWithoutLegend.height;
 
-  var revenueYTDSizeTable = anychart.elements.table();
+  var revenueYTDSizeTable = anychart.ui.table();
   revenueYTDSizeTable.container(stage);
   revenueYTDSizeTable.contents([
     ['Past 12 Months',                                  'Region',        'Actual vs Target',               'Actual'],
@@ -297,7 +297,7 @@ anychart.onDocumentReady(function() {
   productSalesYTDSizeWithoutLabel.top += productSalesYTDLabel.getContentBounds().height;
   productSalesYTDSizeWithoutLabel.height -= productSalesYTDLabel.getContentBounds().height;
 
-  var productSalesYTDSizeTable = anychart.elements.table();
+  var productSalesYTDSizeTable = anychart.ui.table();
   productSalesYTDSizeTable.container(stage);
   productSalesYTDSizeTable.contents([
     ['Past 12 Months',                                  'Product',         'Actual vs Target',               'Revenue vs Target'             , 'Actual'],
@@ -337,7 +337,7 @@ anychart.onDocumentReady(function() {
   marketShareSizeWithoutLabel.top += markerSizeLabel.getContentBounds().height;
   marketShareSizeWithoutLabel.height -= markerSizeLabel.getContentBounds().height;
 
-  var marketShareSizeTable = anychart.elements.table();
+  var marketShareSizeTable = anychart.ui.table();
   marketShareSizeTable.container(stage);
   marketShareSizeTable.contents([
     ['Company',         '% of Total Market'],

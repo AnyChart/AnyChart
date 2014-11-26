@@ -834,7 +834,7 @@ anychart.onDocumentReady(function() {
     legend.draw();
 
     // we finally create, setup and draw the table to the layer
-    var table = anychart.elements.table();
+    var table = anychart.ui.table();
     table
         .container(container)
         .top(title.getRemainingBounds().getTop())
@@ -1103,7 +1103,7 @@ anychart.onDocumentReady(function() {
     legend.draw();
 
     // and finally we create, setup and draw the report body - the table
-    var table = anychart.elements.table();
+    var table = anychart.ui.table();
     table
         .container(container)
         .top(title.getRemainingBounds().top + 2)
@@ -1597,7 +1597,7 @@ anychart.onDocumentReady(function() {
     legend.draw();
 
     // finally we can create the main report object - the table
-    var table = anychart.elements.table();
+    var table = anychart.ui.table();
     // we setup some nessessary properties of the table to tell it how and where to be drawn
     table
         .container(container)
@@ -1780,7 +1780,7 @@ anychart.onDocumentReady(function() {
         .draw();
 
     // then we create the report main object - the table
-    var table = anychart.elements.table();
+    var table = anychart.ui.table();
     // we set it up and draw it to the report layer
     table
         .container(container)
@@ -1904,7 +1904,7 @@ anychart.onDocumentReady(function() {
         .draw();
 
     // and then we create, setup and draw the report table
-    var table = anychart.elements.table();
+    var table = anychart.ui.table();
     table
         .container(container)
         .top(tableTop)

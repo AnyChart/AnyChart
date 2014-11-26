@@ -1,0 +1,2082 @@
+<anygantt>
+    <settings>
+        <navigation enabled="True" position="Top" size="30">
+            <buttons collapse_expand_button="false" align="Far" />
+            <text>Servers Status List</text>
+            <font face="Verdana" size="10" bold="true" color="White" />
+            <background>
+                <fill type="Gradient">
+                    <gradient>
+                        <key color="#B0B0B0" position="0" />
+                        <key color="#A0A0A0" position="0.3" />
+                        <key color="#999999" position="0.5" />
+                        <key color="#A0A0A0" position="0.7" />
+                        <key color="#B0B0B0" position="1" />
+                    </gradient>
+                </fill>
+                <border type="Solid" color="#494949" />
+            </background>
+        </navigation>
+    </settings>
+    <datagrid width="273">
+        <columns>
+            <column attribute_name="Name" width="90" allow_autoresize="false" cell_align="Center">
+                <header>
+                    <text>Server</text>
+                </header>
+            </column>
+            <column attribute_name="Working" width="60" allow_autoresize="false" cell_align="Center">
+                <header>
+                    <text>Working</text>
+                </header>
+            </column>
+            <column attribute_name="Maintance" width="60" allow_autoresize="false" cell_align="Center">
+                <header>
+                    <text>Maintance</text>
+                </header>
+            </column>
+            <column attribute_name="Broken" width="60" allow_autoresize="false" cell_align="Center">
+                <header>
+                    <text>Broken</text>
+                </header>
+            </column>
+        </columns>
+    </datagrid>
+    <timeline>
+        <plot line_height="30" item_height="20" />
+        <scale show_start="2008.02.03 08:06:15" show_end="2008.03.08 03:05:34" />
+    </timeline>
+    <styles>
+        <period_styles>
+            <period_style name="Working">
+                <bar_style>
+                    <middle>
+                        <fill color="Green" opacity="0.7" />
+                        <border enabled="false" />
+                    </middle>
+                    <states>
+                        <hover>
+                            <middle>
+                                <fill color="Green" />
+                                <border enabled="true" color="Cyan" />
+                            </middle>
+                        </hover>
+                    </states>
+                </bar_style>
+            </period_style>
+            <period_style name="Maintance">
+                <bar_style>
+                    <middle>
+                        <fill color="#FFFF00" opacity="0.7" />
+                        <border enabled="false" />
+                    </middle>
+                    <states>
+                        <hover>
+                            <middle>
+                                <fill color="Yellow" />
+                                <border enabled="true" color="Cyan" />
+                            </middle>
+                        </hover>
+                    </states>
+                </bar_style>
+            </period_style>
+            <period_style name="Broken">
+                <bar_style>
+                    <middle>
+                        <fill color="Red" opacity="0.7" />
+                        <border enabled="false" />
+                    </middle>
+                    <states>
+                        <hover>
+                            <middle>
+                                <fill color="Red" />
+                                <border enabled="true" color="Cyan" />
+                            </middle>
+                        </hover>
+                    </states>
+                </bar_style>
+            </period_style>
+        </period_styles>
+    </styles>
+    <resource_chart>
+        <resources>
+            <resource name="Server 1" id="server_1">
+                <attributes>
+                    <attribute name="Broken">11%</attribute>
+                    <attribute name="Maintance">20%</attribute>
+                    <attribute name="Working">69%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 2" id="server_2">
+                <attributes>
+                    <attribute name="Broken">9%</attribute>
+                    <attribute name="Maintance">25%</attribute>
+                    <attribute name="Working">66%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 3" id="server_3">
+                <attributes>
+                    <attribute name="Broken">12%</attribute>
+                    <attribute name="Maintance">16%</attribute>
+                    <attribute name="Working">72%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 4" id="server_4">
+                <attributes>
+                    <attribute name="Broken">7%</attribute>
+                    <attribute name="Maintance">15%</attribute>
+                    <attribute name="Working">78%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 5" id="server_5">
+                <attributes>
+                    <attribute name="Broken">6%</attribute>
+                    <attribute name="Maintance">26%</attribute>
+                    <attribute name="Working">68%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 6" id="server_6">
+                <attributes>
+                    <attribute name="Broken">10%</attribute>
+                    <attribute name="Maintance">16%</attribute>
+                    <attribute name="Working">74%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 7" id="server_7">
+                <attributes>
+                    <attribute name="Broken">9%</attribute>
+                    <attribute name="Maintance">13%</attribute>
+                    <attribute name="Working">78%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 8" id="server_8">
+                <attributes>
+                    <attribute name="Broken">14%</attribute>
+                    <attribute name="Maintance">13%</attribute>
+                    <attribute name="Working">73%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 9" id="server_9">
+                <attributes>
+                    <attribute name="Broken">10%</attribute>
+                    <attribute name="Maintance">23%</attribute>
+                    <attribute name="Working">67%</attribute>
+                </attributes>
+            </resource>
+            <resource name="Server 10" id="server_10">
+                <attributes>
+                    <attribute name="Broken">15%</attribute>
+                    <attribute name="Maintance">19%</attribute>
+                    <attribute name="Working">66%</attribute>
+                </attributes>
+            </resource>
+        </resources>
+        <periods>
+            <period resource_id="server_1" style="Working" start="2008.02.01 00:00:00" end="2008.02.02 14:44:51">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.02 14:44:51" end="2008.02.03 08:06:15">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.03 08:06:15" end="2008.02.06 21:28:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.06 21:28:59" end="2008.02.07 08:47:45">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.07 08:47:45" end="2008.02.08 22:18:13">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.08 22:18:13" end="2008.02.09 20:36:25">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.09 20:36:25" end="2008.02.10 15:58:37">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.02.10 15:58:37" end="2008.02.11 11:26:27">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.11 11:26:27" end="2008.02.12 03:20:03">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.12 03:20:03" end="2008.02.15 04:36:44">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.15 04:36:44" end="2008.02.15 15:03:28">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.15 15:03:28" end="2008.02.16 06:14:33">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.16 06:14:33" end="2008.02.17 04:18:32">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.02.17 04:18:32" end="2008.02.18 03:55:13">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.02.18 03:55:13" end="2008.02.19 01:45:17">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.19 01:45:17" end="2008.02.22 01:42:25">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.02.22 01:42:25" end="2008.02.22 23:23:21">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.22 23:23:21" end="2008.02.25 18:32:02">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.02.25 18:32:02" end="2008.02.27 07:54:58">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.02.27 07:54:58" end="2008.03.07 06:31:49">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.03.07 06:31:49" end="2008.03.08 04:04:10">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.08 04:04:10" end="2008.03.11 08:12:33">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.03.11 08:12:33" end="2008.03.11 23:18:07">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.11 23:18:07" end="2008.03.18 12:29:35">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Broken" start="2008.03.18 12:29:35" end="2008.03.19 21:46:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.03.19 21:46:28" end="2008.03.20 17:08:45">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.20 17:08:45" end="2008.03.21 17:05:33">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.03.21 17:05:33" end="2008.03.23 03:11:03">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.23 03:11:03" end="2008.03.25 07:15:31">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.03.25 07:15:31" end="2008.03.26 23:26:09">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.26 23:26:09" end="2008.03.28 03:08:29">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Maintance" start="2008.03.28 03:08:29" end="2008.03.28 21:14:51">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_1" style="Working" start="2008.03.28 21:14:51" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.01 00:00:00" end="2008.02.01 17:48:22">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.02.01 17:48:22" end="2008.02.02 07:26:52">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.02 07:26:52" end="2008.02.03 01:42:13">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.03 01:42:13" end="2008.02.03 16:54:00">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.03 16:54:00" end="2008.02.05 19:20:14">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.05 19:20:14" end="2008.02.07 20:47:49">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.07 20:47:49" end="2008.02.09 15:19:25">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.09 15:19:25" end="2008.02.10 15:08:21">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.10 15:08:21" end="2008.02.12 16:39:54">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.12 16:39:54" end="2008.02.14 00:43:59">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.14 00:43:59" end="2008.02.14 19:30:36">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.02.14 19:30:36" end="2008.02.15 13:25:06">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.15 13:25:06" end="2008.02.16 00:01:06">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.16 00:01:06" end="2008.02.16 21:10:31">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.02.16 21:10:31" end="2008.02.18 02:19:01">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.18 02:19:01" end="2008.02.22 07:12:45">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.02.22 07:12:45" end="2008.02.22 23:20:47">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.22 23:20:47" end="2008.02.26 17:56:20">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.26 17:56:20" end="2008.02.27 15:45:38">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.02.27 15:45:38" end="2008.02.28 04:11:15">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.02.28 04:11:15" end="2008.02.29 10:21:01">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.02.29 10:21:01" end="2008.03.01 08:30:45">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.01 08:30:45" end="2008.03.01 23:24:51">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.01 23:24:51" end="2008.03.02 22:54:11">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.02 22:54:11" end="2008.03.05 15:46:04">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.05 15:46:04" end="2008.03.06 11:21:14">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.06 11:21:14" end="2008.03.09 09:28:34">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.09 09:28:34" end="2008.03.10 04:48:02">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.10 04:48:02" end="2008.03.13 01:29:21">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.13 01:29:21" end="2008.03.14 00:46:07">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.14 00:46:07" end="2008.03.14 18:55:44">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.14 18:55:44" end="2008.03.15 17:09:22">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.15 17:09:22" end="2008.03.16 16:31:05">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.16 16:31:05" end="2008.03.18 03:41:21">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.18 03:41:21" end="2008.03.20 03:57:34">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.20 03:57:34" end="2008.03.20 20:59:15">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.20 20:59:15" end="2008.03.25 09:24:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.03.25 09:24:59" end="2008.03.25 19:44:32">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.25 19:44:32" end="2008.03.26 09:18:25">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Broken" start="2008.03.26 09:18:25" end="2008.03.27 08:09:35">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.27 08:09:35" end="2008.03.28 02:46:04">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Maintance" start="2008.03.28 02:46:04" end="2008.03.28 16:06:24">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_2" style="Working" start="2008.03.28 16:06:24" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.02.01 00:00:00" end="2008.02.01 23:57:18">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.02.01 23:57:18" end="2008.02.02 22:59:48">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.02.02 22:59:48" end="2008.02.03 13:41:32">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.03 13:41:32" end="2008.02.16 23:12:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.02.16 23:12:27" end="2008.02.19 07:43:10">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.19 07:43:10" end="2008.02.22 01:59:37">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.02.22 01:59:37" end="2008.02.22 12:17:24">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.22 12:17:24" end="2008.02.23 15:05:05">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.02.23 15:05:05" end="2008.02.24 08:46:02">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.24 08:46:02" end="2008.02.25 02:17:15">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.02.25 02:17:15" end="2008.02.25 18:21:47">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.25 18:21:47" end="2008.02.26 15:14:11">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.02.26 15:14:11" end="2008.02.27 10:38:41">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.02.27 10:38:41" end="2008.03.01 04:29:43">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.01 04:29:43" end="2008.03.01 20:12:44">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.01 20:12:44" end="2008.03.02 14:32:02">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.02 14:32:02" end="2008.03.03 17:21:10">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.03 17:21:10" end="2008.03.04 15:58:37">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.04 15:58:37" end="2008.03.07 10:04:18">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.07 10:04:18" end="2008.03.07 20:47:57">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.07 20:47:57" end="2008.03.12 00:33:28">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.12 00:33:28" end="2008.03.12 21:33:31">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.12 21:33:31" end="2008.03.13 20:38:21">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.13 20:38:21" end="2008.03.15 11:18:02">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.15 11:18:02" end="2008.03.17 01:06:52">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.17 01:06:52" end="2008.03.17 13:23:13">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.17 13:23:13" end="2008.03.20 05:37:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.20 05:37:27" end="2008.03.20 17:03:57">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.20 17:03:57" end="2008.03.27 12:49:32">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.27 12:49:32" end="2008.03.28 00:23:05">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.28 00:23:05" end="2008.03.29 04:10:53">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.29 04:10:53" end="2008.03.29 17:29:20">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Broken" start="2008.03.29 17:29:20" end="2008.03.30 17:14:52">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Maintance" start="2008.03.30 17:14:52" end="2008.03.31 07:05:42">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_3" style="Working" start="2008.03.31 07:05:42" end="2008.03.31 23:59:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.01 00:00:00" end="2008.02.01 23:36:36">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.02.01 23:36:36" end="2008.02.02 20:27:40">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.02 20:27:40" end="2008.02.05 13:21:34">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.02.05 13:21:34" end="2008.02.07 23:41:11">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.07 23:41:11" end="2008.02.08 23:24:20">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.02.08 23:24:20" end="2008.02.09 22:12:10">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.09 22:12:10" end="2008.02.12 17:12:11">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.02.12 17:12:11" end="2008.02.13 10:53:51">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.13 10:53:51" end="2008.02.14 03:40:09">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.02.14 03:40:09" end="2008.02.14 14:17:21">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.14 14:17:21" end="2008.02.18 12:33:41">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.02.18 12:33:41" end="2008.02.19 01:44:16">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.19 01:44:16" end="2008.02.24 13:51:41">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.02.24 13:51:41" end="2008.02.25 04:49:27">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.02.25 04:49:27" end="2008.02.29 11:34:26">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.02.29 11:34:26" end="2008.03.01 00:50:48">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.01 00:50:48" end="2008.03.05 02:24:54">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.03.05 02:24:54" end="2008.03.07 13:12:36">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.07 13:12:36" end="2008.03.08 10:46:17">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.03.08 10:46:17" end="2008.03.08 21:42:06">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.08 21:42:06" end="2008.03.10 03:13:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.03.10 03:13:24" end="2008.03.10 15:08:39">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.10 15:08:39" end="2008.03.16 17:46:29">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.03.16 17:46:29" end="2008.03.17 05:45:22">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.17 05:45:22" end="2008.03.20 09:20:03">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.03.20 09:20:03" end="2008.03.21 07:10:25">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.21 07:10:25" end="2008.03.24 20:09:37">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Maintance" start="2008.03.24 20:09:37" end="2008.03.25 08:26:33">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.25 08:26:33" end="2008.03.26 17:54:13">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Broken" start="2008.03.26 17:54:13" end="2008.03.27 07:02:27">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_4" style="Working" start="2008.03.27 07:02:27" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.01 00:00:00" end="2008.02.01 16:47:31">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.02.01 16:47:31" end="2008.02.02 11:37:11">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.02 11:37:11" end="2008.02.06 19:46:05">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.02.06 19:46:05" end="2008.02.07 11:03:50">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.07 11:03:50" end="2008.02.10 00:56:52">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.02.10 00:56:52" end="2008.02.10 15:01:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.10 15:01:28" end="2008.02.20 11:30:26">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.02.20 11:30:26" end="2008.02.21 07:21:18">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.21 07:21:18" end="2008.02.21 21:13:01">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.02.21 21:13:01" end="2008.02.22 10:45:04">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.22 10:45:04" end="2008.02.24 18:58:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.02.24 18:58:55" end="2008.02.26 18:04:04">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.26 18:04:04" end="2008.02.28 19:59:30">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.02.28 19:59:30" end="2008.02.29 09:03:07">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.02.29 09:03:07" end="2008.03.04 04:54:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.04 04:54:00" end="2008.03.04 23:26:53">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.04 23:26:53" end="2008.03.05 18:15:04">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.05 18:15:04" end="2008.03.06 23:41:20">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.06 23:41:20" end="2008.03.09 02:59:12">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.09 02:59:12" end="2008.03.10 08:10:18">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.10 08:10:18" end="2008.03.10 21:06:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.03.10 21:06:24" end="2008.03.11 11:08:20">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.11 11:08:20" end="2008.03.13 08:13:45">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.03.13 08:13:45" end="2008.03.13 21:39:46">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.13 21:39:46" end="2008.03.15 06:21:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.03.15 06:21:55" end="2008.03.15 16:35:07">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.15 16:35:07" end="2008.03.18 04:35:37">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.18 04:35:37" end="2008.03.20 07:59:52">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.20 07:59:52" end="2008.03.20 19:47:38">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.20 19:47:38" end="2008.03.22 03:23:42">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.22 03:23:42" end="2008.03.22 19:44:14">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.22 19:44:14" end="2008.03.23 17:50:06">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.23 17:50:06" end="2008.03.24 10:44:53">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Broken" start="2008.03.24 10:44:53" end="2008.03.25 06:02:49">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.25 06:02:49" end="2008.03.26 17:54:32">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.26 17:54:32" end="2008.03.29 15:23:26">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Maintance" start="2008.03.29 15:23:26" end="2008.03.31 11:28:19">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_5" style="Working" start="2008.03.31 11:28:19" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.01 00:00:00" end="2008.02.02 05:42:06">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.02.02 05:42:06" end="2008.02.02 23:21:33">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.02 23:21:33" end="2008.02.05 05:56:25">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.05 05:56:25" end="2008.02.07 14:05:47">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.07 14:05:47" end="2008.02.08 13:34:33">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.08 13:34:33" end="2008.02.09 06:57:07">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.09 06:57:07" end="2008.02.10 14:11:23">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.10 14:11:23" end="2008.02.11 01:53:42">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.11 01:53:42" end="2008.02.12 01:52:54">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.12 01:52:54" end="2008.02.12 22:09:44">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.12 22:09:44" end="2008.02.17 15:50:46">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.02.17 15:50:46" end="2008.02.18 15:15:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.18 15:15:28" end="2008.02.19 11:05:59">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.19 11:05:59" end="2008.02.21 00:18:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.21 00:18:27" end="2008.02.21 11:02:45">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.21 11:02:45" end="2008.02.25 06:28:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.02.25 06:28:59" end="2008.02.25 21:51:42">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.25 21:51:42" end="2008.02.27 07:04:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.02.27 07:04:24" end="2008.02.28 03:05:41">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.02.28 03:05:41" end="2008.02.28 23:37:29">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.02.28 23:37:29" end="2008.03.06 11:49:33">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.03.06 11:49:33" end="2008.03.07 06:06:53">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.07 06:06:53" end="2008.03.08 04:13:46">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.03.08 04:13:46" end="2008.03.08 23:52:23">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.08 23:52:23" end="2008.03.12 07:16:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.03.12 07:16:59" end="2008.03.13 01:30:18">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.13 01:30:18" end="2008.03.21 15:38:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.03.21 15:38:55" end="2008.03.22 13:44:44">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.22 13:44:44" end="2008.03.23 07:48:50">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.03.23 07:48:50" end="2008.03.24 19:30:59">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Maintance" start="2008.03.24 19:30:59" end="2008.03.25 13:32:12">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.25 13:32:12" end="2008.03.26 01:13:03">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Broken" start="2008.03.26 01:13:03" end="2008.03.26 17:04:45">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_6" style="Working" start="2008.03.26 17:04:45" end="2008.03.31 23:59:59">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.01 00:00:00" end="2008.02.01 18:19:17">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.01 18:19:17" end="2008.02.02 16:40:51">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.02 16:40:51" end="2008.02.04 02:11:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.02.04 02:11:24" end="2008.02.04 21:56:42">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.04 21:56:42" end="2008.02.05 17:17:17">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.02.05 17:17:17" end="2008.02.07 07:38:27">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.07 07:38:27" end="2008.02.09 17:43:51">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.02.09 17:43:51" end="2008.02.10 05:56:32">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.10 05:56:32" end="2008.02.12 18:47:03">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.12 18:47:03" end="2008.02.13 18:32:37">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.13 18:32:37" end="2008.02.14 10:41:02">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.14 10:41:02" end="2008.02.15 12:53:46">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.15 12:53:46" end="2008.02.20 03:22:32">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.02.20 03:22:32" end="2008.02.20 18:45:19">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.20 18:45:19" end="2008.02.24 06:30:43">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.24 06:30:43" end="2008.02.24 17:22:07">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.24 17:22:07" end="2008.02.25 16:21:43">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.25 16:21:43" end="2008.02.26 11:23:10">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.26 11:23:10" end="2008.02.27 05:55:15">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.02.27 05:55:15" end="2008.02.27 15:58:33">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.02.27 15:58:33" end="2008.02.28 09:22:39">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.02.28 09:22:39" end="2008.03.18 23:28:26">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.03.18 23:28:26" end="2008.03.19 21:19:04">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.03.19 21:19:04" end="2008.03.20 15:45:14">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.03.20 15:45:14" end="2008.03.25 10:38:41">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.03.25 10:38:41" end="2008.03.26 09:43:27">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.03.26 09:43:27" end="2008.03.28 16:26:47">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.03.28 16:26:47" end="2008.03.29 03:15:19">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.03.29 03:15:19" end="2008.03.29 17:39:37">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Maintance" start="2008.03.29 17:39:37" end="2008.03.30 10:14:00">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Working" start="2008.03.30 10:14:00" end="2008.03.31 09:17:34">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_7" style="Broken" start="2008.03.31 09:17:34" end="2008.03.31 23:59:59">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.01 00:00:00" end="2008.02.01 20:42:06">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.02.01 20:42:06" end="2008.02.03 03:07:47">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.03 03:07:47" end="2008.02.05 05:49:10">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.02.05 05:49:10" end="2008.02.05 20:58:48">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.02.05 20:58:48" end="2008.02.06 17:24:49">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.06 17:24:49" end="2008.02.07 09:14:30">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.02.07 09:14:30" end="2008.02.07 23:37:44">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.07 23:37:44" end="2008.02.08 11:52:14">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.02.08 11:52:14" end="2008.02.11 17:00:57">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.11 17:00:57" end="2008.02.25 08:07:47">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.02.25 08:07:47" end="2008.02.26 07:47:11">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.26 07:47:11" end="2008.02.26 19:29:26">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.02.26 19:29:26" end="2008.02.27 12:53:41">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.27 12:53:41" end="2008.02.29 00:37:15">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.02.29 00:37:15" end="2008.02.29 14:33:30">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.02.29 14:33:30" end="2008.03.05 07:06:38">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.05 07:06:38" end="2008.03.06 02:12:44">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.06 02:12:44" end="2008.03.07 13:07:50">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.03.07 13:07:50" end="2008.03.08 11:08:39">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.08 11:08:39" end="2008.03.10 01:32:44">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.03.10 01:32:44" end="2008.03.10 23:14:58">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.10 23:14:58" end="2008.03.11 18:00:28">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.11 18:00:28" end="2008.03.14 01:00:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.14 01:00:27" end="2008.03.14 18:41:43">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.03.14 18:41:43" end="2008.03.15 05:26:25">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.15 05:26:25" end="2008.03.20 03:11:13">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Broken" start="2008.03.20 03:11:13" end="2008.03.20 15:54:39">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.20 15:54:39" end="2008.03.22 22:21:29">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.22 22:21:29" end="2008.03.23 10:21:59">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.23 10:21:59" end="2008.03.25 19:07:45">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.25 19:07:45" end="2008.03.26 15:57:02">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.26 15:57:02" end="2008.03.27 15:51:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.27 15:51:55" end="2008.03.28 06:43:23">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Working" start="2008.03.28 06:43:23" end="2008.03.31 17:33:43">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_8" style="Maintance" start="2008.03.31 17:33:43" end="2008.03.31 23:59:59">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.01 00:00:00" end="2008.02.01 13:47:09">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.01 13:47:09" end="2008.02.02 02:48:20">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.02 02:48:20" end="2008.02.02 13:39:30">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.02 13:39:30" end="2008.02.03 00:17:14">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.03 00:17:14" end="2008.02.04 07:11:27">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.04 07:11:27" end="2008.02.05 17:15:12">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.05 17:15:12" end="2008.02.06 13:31:08">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.06 13:31:08" end="2008.02.07 08:14:06">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.07 08:14:06" end="2008.02.08 00:02:46">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.08 00:02:46" end="2008.02.08 18:50:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.08 18:50:27" end="2008.02.09 13:06:56">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.09 13:06:56" end="2008.02.10 12:07:32">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.10 12:07:32" end="2008.02.11 04:13:47">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.11 04:13:47" end="2008.02.13 12:20:53">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.13 12:20:53" end="2008.02.14 21:03:16">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.14 21:03:16" end="2008.02.19 12:48:42">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.19 12:48:42" end="2008.02.20 06:37:33">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.02.20 06:37:33" end="2008.02.21 02:45:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.21 02:45:28" end="2008.02.22 10:07:23">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.22 10:07:23" end="2008.02.23 05:40:54">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.23 05:40:54" end="2008.02.27 00:14:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.02.27 00:14:24" end="2008.02.27 21:22:06">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.02.27 21:22:06" end="2008.03.03 23:37:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.03 23:37:55" end="2008.03.04 23:10:40">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.03.04 23:10:40" end="2008.03.05 16:25:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.05 16:25:28" end="2008.03.07 09:50:49">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.07 09:50:49" end="2008.03.08 00:25:33">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.08 00:25:33" end="2008.03.10 10:03:46">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.10 10:03:46" end="2008.03.11 21:48:29">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.11 21:48:29" end="2008.03.13 20:08:34">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.13 20:08:34" end="2008.03.14 15:45:15">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.14 15:45:15" end="2008.03.16 17:34:07">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.16 17:34:07" end="2008.03.17 06:23:34">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.17 06:23:34" end="2008.03.18 16:02:38">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Broken" start="2008.03.18 16:02:38" end="2008.03.19 03:35:25">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.19 03:35:25" end="2008.03.20 03:16:12">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.20 03:16:12" end="2008.03.20 15:18:24">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.20 15:18:24" end="2008.03.21 16:03:42">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.21 16:03:42" end="2008.03.24 05:19:56">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.24 05:19:56" end="2008.03.24 18:49:34">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.24 18:49:34" end="2008.03.27 12:43:52">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.27 12:43:52" end="2008.03.28 03:23:10">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.28 03:23:10" end="2008.03.28 22:41:11">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Maintance" start="2008.03.28 22:41:11" end="2008.03.29 16:05:12">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_9" style="Working" start="2008.03.29 16:05:12" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.01 00:00:00" end="2008.02.01 17:31:23">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.01 17:31:23" end="2008.02.04 12:37:50">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.04 12:37:50" end="2008.02.05 12:23:52">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.05 12:23:52" end="2008.02.05 22:48:56">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.05 22:48:56" end="2008.02.06 14:50:05">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.06 14:50:05" end="2008.02.07 08:19:03">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.07 08:19:03" end="2008.02.09 02:54:14">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.09 02:54:14" end="2008.02.09 21:42:51">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.09 21:42:51" end="2008.02.10 14:44:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.10 14:44:27" end="2008.02.11 02:18:45">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.11 02:18:45" end="2008.02.11 17:45:35">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.11 17:45:35" end="2008.02.12 09:52:26">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.12 09:52:26" end="2008.02.13 03:39:22">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.13 03:39:22" end="2008.02.13 17:28:42">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.13 17:28:42" end="2008.02.14 13:21:24">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.14 13:21:24" end="2008.02.15 12:53:40">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.15 12:53:40" end="2008.02.16 03:34:28">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.16 03:34:28" end="2008.02.17 00:07:36">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.17 00:07:36" end="2008.02.17 11:29:30">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.17 11:29:30" end="2008.02.18 00:14:44">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.18 00:14:44" end="2008.02.18 10:45:09">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.18 10:45:09" end="2008.02.21 01:22:38">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.21 01:22:38" end="2008.02.21 13:53:08">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.21 13:53:08" end="2008.02.24 03:19:11">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.02.24 03:19:11" end="2008.02.24 20:20:41">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.02.24 20:20:41" end="2008.02.29 08:18:43">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.02.29 08:18:43" end="2008.03.01 03:27:29">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.01 03:27:29" end="2008.03.02 11:13:32">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.02 11:13:32" end="2008.03.03 23:11:41">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.03 23:11:41" end="2008.03.04 12:19:38">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.03.04 12:19:38" end="2008.03.05 00:56:17">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.05 00:56:17" end="2008.03.09 01:28:53">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.09 01:28:53" end="2008.03.09 14:12:59">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.09 14:12:59" end="2008.03.11 03:47:55">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.11 03:47:55" end="2008.03.11 19:37:22">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.11 19:37:22" end="2008.03.14 02:40:06">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.14 02:40:06" end="2008.03.14 13:24:50">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.14 13:24:50" end="2008.03.16 01:50:15">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.16 01:50:15" end="2008.03.16 13:47:27">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.16 13:47:27" end="2008.03.17 09:23:22">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.17 09:23:22" end="2008.03.17 21:29:56">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.17 21:29:56" end="2008.03.18 19:52:36">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.18 19:52:36" end="2008.03.19 10:38:18">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.19 10:38:18" end="2008.03.19 20:48:17">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.19 20:48:17" end="2008.03.21 03:22:09">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.21 03:22:09" end="2008.03.24 20:58:06">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.03.24 20:58:06" end="2008.03.25 20:10:27">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.25 20:10:27" end="2008.03.26 14:24:50">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.26 14:24:50" end="2008.03.27 05:45:49">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.03.27 05:45:49" end="2008.03.27 23:00:14">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.27 23:00:14" end="2008.03.29 05:00:27">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Broken" start="2008.03.29 05:00:27" end="2008.03.30 01:16:59">
+                <attributes>
+                    <attribute name="Status">Broken</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.30 01:16:59" end="2008.03.31 08:28:41">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Maintance" start="2008.03.31 08:28:41" end="2008.03.31 18:48:18">
+                <attributes>
+                    <attribute name="Status">Maintance</attribute>
+                </attributes>
+            </period>
+            <period resource_id="server_10" style="Working" start="2008.03.31 18:48:18" end="2008.04.01 00:00:00">
+                <attributes>
+                    <attribute name="Status">Working</attribute>
+                </attributes>
+            </period>
+        </periods>
+    </resource_chart>
+</anygantt>

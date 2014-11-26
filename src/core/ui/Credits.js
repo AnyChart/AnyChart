@@ -7,7 +7,7 @@ goog.require('goog.userAgent');
 
 /**
  * Define class Credits.<br/>
- * <b>Note:</b> Use method {@link anychart.elements.credits} to create instance of this class.<br/>
+ * <b>Note:</b> Use method {@link anychart.ui.credits} to create instance of this class.<br/>
  * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
  * <a href="http://www.anychart.com/buy/">Buy page</a>.
  * @constructor

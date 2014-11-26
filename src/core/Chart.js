@@ -701,7 +701,7 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
  * @example <t>lineChart</t>
  * chart.line([1, 4, 2, 9]);
  * chart.credits(
- *   anychart.elements.credits().enabled(true).text('Click me!')
+ *   anychart.ui.credits().enabled(true).text('Click me!')
  * );
  * @param {(anychart.core.ui.Credits|Object|boolean)=} opt_value
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.

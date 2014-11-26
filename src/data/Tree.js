@@ -88,7 +88,7 @@ anychart.data.Tree.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED | 
 
 /** @inheritDoc */
 anychart.data.Tree.prototype.dispatchSignal = function(value) {
-  if (!!(value & anychart.Signal.DATA_CHANGED))
+  if (!this.suspendedDispatching && !!(value & anychart.Signal.DATA_CHANGED))
     this.traverserToArrayCache_ = null;
   goog.base(this, 'dispatchSignal', value);
 };
@@ -109,11 +109,14 @@ anychart.data.Tree.prototype.getTraverser = function() {
  * @private
  */
 anychart.data.Tree.prototype.fillAsTree_ = function(data) {
+  this.suspendSignalsDispatching();
   for (var i = 0, l = data.length; i < l; i++) {
     var newRoot = this.createRoot(data[i]);
     this.roots_.push(newRoot);
     this.indexBranch_(newRoot);
   }
+  if (data.length) this.dispatchSignal(anychart.Signal.DATA_CHANGED); //if data is changed.
+  this.resumeSignalsDispatching(true);
 };
 
 
@@ -151,6 +154,8 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
   var uitems = []; //List of tree data items synchronized with uids.
   var tdis = []; //List of tree data items overall.
 
+  this.suspendSignalsDispatching();
+
   //First passage. Going through raw data array.
   for (i = 0, l = data.length; i < l; i++) {
     obj = data[i];
@@ -179,7 +184,6 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
       }
     }
   }
-
 
   //Second passage. Building trees.
   for (i = 0; i < tdis.length; i++) {
@@ -221,6 +225,8 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     }
   }
 
+  if (tdis.length) this.dispatchSignal(anychart.Signal.DATA_CHANGED); //if data is changed.
+  this.resumeSignalsDispatching(true);
 
 };
 
@@ -498,7 +504,7 @@ anychart.data.Tree.prototype.searchItems = function(soughtField, valueOrEvaluato
 /**
  * Adds a new root element.
  * @param {Object} child - Child object.
- * @return {anychart.data.Tree} - Itself for method chaining.
+ * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
 anychart.data.Tree.prototype.addChild = function(child) {
   return this.addChildAt(child, this.numChildren());
@@ -507,9 +513,9 @@ anychart.data.Tree.prototype.addChild = function(child) {
 
 /**
  * Inserts a new root element into a specified position.
- * @param {Object} child - Child object.
+ * @param {(Object|anychart.data.Tree.DataItem)} child - Child object.
  * @param {number} index - Position.
- * @return {anychart.data.Tree} - Itself for method chaining.
+ * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
 anychart.data.Tree.prototype.addChildAt = function(child, index) {
   this.suspendSignalsDispatching();
@@ -534,7 +540,7 @@ anychart.data.Tree.prototype.addChildAt = function(child, index) {
   this.resumeSignalsDispatching(true); //Signals must be sent.
   if (oldTree) oldTree.resumeSignalsDispatching(true); //As well as here.
 
-  return this;
+  return child;
 };
 
 
@@ -605,7 +611,7 @@ anychart.data.Tree.prototype.removeChildAt = function(index) {
   var result = null;
   if (index >= 0 && index <= this.roots_.length) {
     result = goog.array.splice(this.roots_, index, 1)[0];
-    this.removeFromIndex(result, undefined, true);
+    this.removeFromIndex(result, void 0, true);
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
   return result;
@@ -850,7 +856,7 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
 
   index = goog.math.clamp(index, 0, this.numChildren());
   goog.array.insertAt(this.children_, child, index);
-  this.tree_.addToIndex(child, undefined, true);
+  this.tree_.addToIndex(child, void 0, true);
 
   child.tree(this.tree_); //Sets a new tree for all subtree. All signals are suspended.
 
@@ -861,7 +867,7 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
   this.tree_.resumeSignalsDispatching(true); //Signals must be sent.
   if (oldTree) oldTree.resumeSignalsDispatching(true); //As well as here.
 
-  return this;
+  return child;
 };
 
 
@@ -936,7 +942,7 @@ anychart.data.Tree.DataItem.prototype.removeChildAt = function(index) {
   var result = null;
   if (index >= 0 && index <= this.children_.length) {
     result = goog.array.splice(this.children_, index, 1)[0];
-    this.tree_.removeFromIndex(result, undefined, true);
+    this.tree_.removeFromIndex(result, void 0, true);
     result.setParent_(null);
   }
   return result;
@@ -954,7 +960,7 @@ anychart.data.Tree.DataItem.prototype.removeChildren = function() {
     for (var i = 0; i < l; i++) {
       var child = this.children_[i];
       child.setParent_(null);
-      this.tree_.removeFromIndex(child, undefined, true);
+      this.tree_.removeFromIndex(child, void 0, true);
     }
     this.resumeSignals_(false);
     this.children_.length = 0;
@@ -976,14 +982,17 @@ anychart.data.Tree.DataItem.prototype.indexOfChild = function(child) {
 
 /**
  * Current item will be removed from parent's children and becomes an orphan.
+ * If child is a root element, it will be removed from tree.
  * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
 anychart.data.Tree.DataItem.prototype.remove = function() {
   if (this.parent_) {
-    this.parent_.suspendSignals_();
     this.parent_.removeChild(this);
-    this.parent_.resumeSignals_(false);
-    this.setParent_(null);
+  } else {
+    var indexInRoots = this.tree_.indexOfChild(this);
+    if (indexInRoots >= 0) { //Is root element.
+      this.tree_.removeChildAt(indexInRoots);
+    }
   }
   return this;
 };
@@ -1015,6 +1024,26 @@ anychart.data.Tree.DataItem.prototype.treeInternal_ = function(newTree) {
   for (var i = 0, l = this.numChildren(); i < l; i++) {
     this.children_[i].treeInternal_(newTree);
   }
+};
+
+
+/**
+ * Clone DataItem.
+ * @param {anychart.data.Tree} tree
+ * @return {anychart.data.Tree.DataItem}
+ */
+anychart.data.Tree.DataItem.prototype.clone = function(tree) {
+  var copy = /** @type {Object} */(anychart.utils.recursiveClone(this.data_));
+  delete copy[anychart.data.Tree.DataItem.CHILDREN];
+  delete copy[anychart.data.Tree.DataItem.PARENT];
+
+  var clone = new anychart.data.Tree.DataItem(tree, copy);
+
+  for (var i = 0, len = this.numChildren(); i < len; i++) {
+    var child = this.getChildAt(i);
+    clone.addChild(child.clone(tree));
+  }
+  return clone;
 };
 
 

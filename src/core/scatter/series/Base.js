@@ -1265,7 +1265,7 @@ anychart.core.scatter.series.Base.prototype.onScaleSignal_ = function(event) {
  *    [3.4, 17],
  *    [1.2, 20]
  * ]);
- * var tooltipSettings = anychart.elements.tooltip();
+ * var tooltipSettings = anychart.ui.tooltip();
  * tooltipSettings
  *     .background()
  *     .stroke('2 #cc8800').fill('grey 0.5');
