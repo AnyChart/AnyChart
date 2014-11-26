@@ -29,9 +29,11 @@ anychart.scatter = function(var_args) {
   chart.yAxis();
 
   chart.grid(0)
+      .oddFill('#F9F9F9')
+      .evenFill('#FFFFFF')
       .layout(anychart.enums.Layout.HORIZONTAL);
 
-  chart.minorGrid()
+  chart.minorGrid(0)
       .evenFill('none')
       .oddFill('none')
       .stroke('black 0.1')
@@ -40,6 +42,12 @@ anychart.scatter = function(var_args) {
   chart.grid(1)
       .evenFill('none')
       .oddFill('none')
+      .layout(anychart.enums.Layout.VERTICAL);
+
+  chart.minorGrid(1)
+      .evenFill('none')
+      .oddFill('none')
+      .stroke('black 0.1')
       .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
