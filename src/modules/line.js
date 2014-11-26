@@ -61,3 +61,4 @@ anychart.lineChart = anychart.line;
 //exports
 goog.exportSymbol('anychart.line', anychart.line);
 goog.exportSymbol('anychart.lineChart', anychart.lineChart);
+goog.exportSymbol('anychart.cartesian.series.line', anychart.core.cartesian.series.line);//doc|ex

@@ -116,6 +116,5 @@ anychart.core.cartesian.series.line = function(data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian.series.line', anychart.core.cartesian.series.line);//doc|ex
 anychart.core.cartesian.series.Line.prototype['stroke'] = anychart.core.cartesian.series.Line.prototype.stroke;//inherited
 anychart.core.cartesian.series.Line.prototype['hoverStroke'] = anychart.core.cartesian.series.Line.prototype.hoverStroke;//inherited
