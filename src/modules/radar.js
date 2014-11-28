@@ -22,23 +22,33 @@ anychart.radar = function(var_args) {
 
   chart.title().text('Chart Title');
 
-  chart.xAxis();
-  chart.yAxis();
+  chart.xAxis().stroke('#C0C0C0');
+  chart.xAxis().ticks().stroke('#333333');
+  chart.xAxis().labels().fontFamily('Tahoma').fontSize('11');
+
+
+  chart.yAxis().stroke('#333333');
 
   chart.grid(0)
+      .stroke('#C0C0C0')
+      .oddFill('white')
+      .evenFill('Rgb(250,250,250)')
       .layout(anychart.enums.RadialGridLayout.CIRCUIT);
 
   chart.minorGrid()
       .enabled(false)
       .evenFill('none')
       .oddFill('none')
-      .stroke('black 0.1')
+      .stroke('#333333')
       .layout(anychart.enums.RadialGridLayout.CIRCUIT);
 
   chart.grid(1)
-      .evenFill('none')
-      .oddFill('none')
+      .stroke('#DDDDDD')
+      .oddFill(null)
+      .evenFill(null)
       .layout(anychart.enums.RadialGridLayout.RADIAL);
+
+  chart.background().fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
 
   return chart;
 };

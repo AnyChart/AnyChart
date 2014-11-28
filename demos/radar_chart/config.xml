@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<anychart>
+    <charts>
+        <chart plot_type="Radar">
+            <data>
+                <series name="Day (max)" type="Area" color="#267bb6" style="idGeneralAreaStyle">
+                    <tooltip enabled="true" style="idTooltipStyle" />
+                    <marker enabled="true" />
+                    <point name="January" y="8.1" />
+                    <point name="February" y="8.4" />
+                    <point name="March" y="11.4" />
+                    <point name="April" y="14.2" />
+                    <point name="May" y="17.9" />
+                    <point name="June" y="21.1" />
+                    <point name="July" y="23.5" />
+                    <point name="August" y="23.2" />
+                    <point name="September" y="19.9" />
+                    <point name="October" y="15.6" />
+                    <point name="November" y="11.2" />
+                    <point name="December" y="8.3" />
+                </series>
+                <series name="Night (min)" type="Area" color="#779122" style="idGeneralAreaStyle">
+                    <tooltip enabled="true" style="idTooltipStyle" />
+                    <marker enabled="true" />
+                    <point name="January" y="2.3" />
+                    <point name="February" y="2.1" />
+                    <point name="March" y="3.9" />
+                    <point name="April" y="5.5" />
+                    <point name="May" y="8.7" />
+                    <point name="June" y="11.7" />
+                    <point name="July" y="13.9" />
+                    <point name="August" y="13.7" />
+                    <point name="September" y="11.4" />
+                    <point name="October" y="8.4" />
+                    <point name="November" y="4.9" />
+                    <point name="December" y="2.7" />
+                </series>
+            </data>
+            <chart_settings>
+                <title enabled="true">
+                    <text><![CDATA[Average temperature in London]]></text>
+                </title>
+                <axes>
+                    <y_axis>
+                        <scale minimum="0" maximum_offset="0" />
+                        <labels show_last_label="true">
+                            <font bold="true" />
+                        </labels>
+                        <minor_tickmark enabled="true" outside="false" pixel_hinting="true" size="2" />
+                        <major_grid interlaced="true" />
+                    </y_axis>
+                    <x_axis>
+                        <labels padding="5" enabled="true">
+                            <font bold="false" />
+                        </labels>
+                    </x_axis>
+                </axes>
+                <legend enabled="true">
+                    <title enabled="false" />
+                </legend>
+            </chart_settings>
+            <data_plot_settings>
+                <radar display_data_mode="UnderAxes" drawing_style="Circle">
+                </radar>
+            </data_plot_settings>
+            <styles>
+                <area_style name="idGeneralAreaStyle">
+                    <fill opacity="0.5" />
+                    <line thickness="2" />
+                    <hatch_fill enabled="true" type="Diagonal" thickness="4" color="#FFFFFF" opacity="0.3" pattern_size="5" />
+                </area_style>
+                <tooltip_style name="idTooltipStyle">
+                    <font render_as_html="true" />
+                    <format><![CDATA[<b><font face="Tahoma" size="12" color="{%Color}">{%SeriesName}</font></b><br/><font face="Tahoma" size="11">{%Name}: {%Value}{numDecimals:2,trailingZeros:false} C°</font>]]></format>
+                    <background>
+                        <inside_margin left="5" top="2" right="5" bottom="2" />
+                        <corners type="Rounded" all="3" />
+                        <border type="Solid" color="#333333" thickness="1" />
+                    </background>
+                </tooltip_style>
+            </styles>
+        </chart>
+    </charts>
+</anychart>
