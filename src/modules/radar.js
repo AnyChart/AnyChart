@@ -44,8 +44,8 @@ anychart.radar = function(var_args) {
 
   chart.grid(1)
       .stroke('#DDDDDD')
-      .oddFill(null)
-      .evenFill(null)
+      .oddFill('none')
+      .evenFill('none')
       .layout(anychart.enums.RadialGridLayout.RADIAL);
 
   chart.background().fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
