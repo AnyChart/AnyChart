@@ -367,7 +367,7 @@ anychart.core.VisualBase.prototype.parentBounds = function(opt_boundsOrLeft, opt
     return this;
   }
   if (this.parentBounds_)
-    return this.parentBounds_;
+    return this.parentBounds_.clone();
   var stage;
   if (this.container_ && (stage = this.container_.getStage()))
     return stage.getBounds();

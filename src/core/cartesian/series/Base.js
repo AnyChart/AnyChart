@@ -2392,6 +2392,12 @@ anychart.core.cartesian.series.Base.prototype.getLegendIconType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.getEnableChangeSignals = function() {
+  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
+};
+
+
 /**
  * @inheritDoc
  */
