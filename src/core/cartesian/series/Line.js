@@ -21,7 +21,7 @@ anychart.core.cartesian.series.Line = function(data, opt_csvSettings) {
   // Define reference fields for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.referenceValuesSupportStack = false;
 
 };
 goog.inherits(anychart.core.cartesian.series.Line, anychart.core.cartesian.series.ContinuousBase);

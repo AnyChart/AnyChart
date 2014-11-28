@@ -21,7 +21,7 @@ anychart.core.cartesian.series.StepLine = function(data, opt_csvSettings) {
   // Define reference fields of a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.core.cartesian.series.StepLine, anychart.core.cartesian.series.ContinuousBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.STEP_LINE] = anychart.core.cartesian.series.StepLine;
