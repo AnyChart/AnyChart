@@ -336,7 +336,8 @@ def __build_project(modules):
                __get_output_file_arg(output_file) + \
                ['--output_wrapper "(function(){%output%})()"',
                '--property_renaming_report %s' % output_file + '_prop_out.txt',
-               '--variable_renaming_report %s' % output_file + '_var_out.txt']
+               '--variable_renaming_report %s' % output_file + '_var_out.txt',
+               '--create_source_map %s' % output_file + '_sourcemap.json']
 
     __call_compiler(commands)
 
