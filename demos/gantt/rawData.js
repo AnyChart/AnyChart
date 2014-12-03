@@ -22,7 +22,9 @@ var rawData = [
     'parent': '2',
     'progressValue': '75%',
     'actualStart': Date.UTC(2000, 1, 24, 16, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 1, 25, 12, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 1, 25, 12, 0, 0, 0),
+    'connectTo': '4',
+    'connectorType': 'finishFinish'
   },
   {
     'id': '4',
@@ -30,7 +32,9 @@ var rawData = [
     'parent': '2',
     'progressValue': '0%',
     'actualStart': Date.UTC(2000, 1, 25, 16, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 1, 26, 1, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 1, 26, 1, 0, 0, 0),
+    'connectTo': '7',
+    'connectorType': 'startStart'
   },
   {
     'id': '5',
@@ -62,7 +66,9 @@ var rawData = [
     'parent': '6',
     'progressValue': '60%',
     'actualStart': Date.UTC(2000, 2, 1, 0, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 2, 8, 0, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 2, 8, 0, 0, 0, 0),
+    'connectTo': '9',
+    'connectorType': 'startFinish'
   },
   {
     'id': '9',
@@ -70,7 +76,8 @@ var rawData = [
     'parent': '6',
     'progressValue': '0%',
     'actualStart': Date.UTC(2000, 2, 8, 16, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 2, 10, 1, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 2, 10, 1, 0, 0, 0),
+    'connectTo': '10'
   },
   {
     'id': '10',
@@ -111,7 +118,8 @@ var rawData = [
     'parent': '11',
     'progressValue': '0%',
     'actualStart': Date.UTC(2000, 2, 16, 16, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 2, 17, 1, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 2, 17, 1, 0, 0, 0),
+    'connectTo': '17'
   },
   {
     'id': '15',
@@ -144,7 +152,8 @@ var rawData = [
     'parent': '16',
     'progressValue': '0%',
     'actualStart': Date.UTC(2000, 2, 17, 16, 0, 0 , 0),
-    'actualEnd': Date.UTC(2000, 2, 18, 1, 0, 0, 0)
+    'actualEnd': Date.UTC(2000, 2, 18, 1, 0, 0, 0),
+    'connectTo': '23'
   },
   {
     'id': '19',

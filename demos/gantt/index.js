@@ -33,6 +33,7 @@ anychart.onDocumentReady(function() {
   chart.container(stage);
   chart.bounds(0, 0, '100%', '100%');
   chart.data(data);
+  chart.splitterPosition(350);
 
   var dataGrid = chart.getDataGrid();
   var timeline = chart.getTimeline();

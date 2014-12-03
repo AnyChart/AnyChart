@@ -37,10 +37,27 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
   /**
    * The map of periods.
    * Contains link to the period by its id.
+   * Used for connector draw purposes.
    * @type {Object}
    * @private
    */
   this.periodsMap_ = {};
+
+  /**
+   * Visible items map.
+   * Contains link to the visible data items by its id.
+   * Used for connector draw purposes.
+   * @type {Object}
+   * @private
+   */
+  this.visibleItemsMap_ = {};
+
+  /**
+   * The map of connectors.
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.connectorsData_ = [];
 
   /**
    * Tree data.
@@ -160,6 +177,7 @@ goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
  * @return {number} - Data item height.
  */
 anychart.core.gantt.Controller.getItemHeight = function(item) {
+  if (!item) debugger;
   return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.ui.DataGrid.DEFAULT_ROW_HEIGHT;
 };
 
@@ -248,21 +266,6 @@ anychart.core.gantt.Controller.prototype.linearizeData_ = function() {
         .meta('depth', fullPassageTraverser.getDepth())
         .meta('index', linearIndex++);
 
-    if (this.isResourceChart_) {
-      this.periodsMap_ = {};
-      var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
-      if (goog.isArray(periods)) {
-        //Working with raw array.
-        for (var i = 0, l = periods.length; i < l; i++) {
-          var period = periods[i];
-          var periodId = period[anychart.enums.GanttDataFields.ID];
-          if (!this.periodsMap_[periodId]) this.periodsMap_[periodId] = period;
-          //This extends dates range.
-          this.checkDate_(period[anychart.enums.GanttDataFields.START]);
-          this.checkDate_(period[anychart.enums.GanttDataFields.END]);
-        }
-      }
-    }
 
     if (item.numChildren() && goog.isDef(item.get(anychart.enums.GanttDataFields.COLLAPSED)))
       item.meta(anychart.enums.GanttDataFields.COLLAPSED, item.get(anychart.enums.GanttDataFields.COLLAPSED));
@@ -299,6 +302,9 @@ anychart.core.gantt.Controller.prototype.checkDate_ = function(date) {
 anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   this.visibleData_.length = 0;
   this.heightCache_.length = 0;
+  this.connectorsData_.length = 0; //Resetting connectors map.
+  this.periodsMap_ = {};
+  this.visibleItemsMap_ = {};
 
   var item;
   var height = 0;
@@ -308,6 +314,52 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
     this.visibleData_.push(item);
     height += (anychart.core.gantt.Controller.getItemHeight(item) + anychart.core.ui.DataGrid.ROW_SPACE);
     this.heightCache_.push(height);
+
+    var itemId = item.get(anychart.enums.GanttDataFields.ID);
+    var visItem = {'item': item, 'index': this.heightCache_.length - 1};
+    if (itemId && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
+
+    if (this.isResourceChart_) {
+      var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
+      if (goog.isArray(periods)) {
+        //Working with raw array.
+        for (var i = 0, l = periods.length; i < l; i++) {
+          var period = periods[i];
+          var periodId = period[anychart.enums.GanttDataFields.ID];
+          var periodItem = {'period': period, 'index': this.heightCache_.length - 1};
+
+          /*
+            We must store an index of data item to determine the vertical coordinate of connector.
+            Period itself is stored to access its fields.
+           */
+          if (!this.periodsMap_[periodId]) this.periodsMap_[periodId] = periodItem;
+
+          //Building connectors map for resource chart.
+          if (period[anychart.enums.GanttDataFields.CONNECT_TO]) {
+            //We put here a link to the period if it is already in the map or ID of destination period.
+            var to = this.periodsMap_[period[anychart.enums.GanttDataFields.CONNECT_TO]] || period[anychart.enums.GanttDataFields.CONNECT_TO];
+            var type = period[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+            var connectorsMapItem = {'from': period, 'to': to};
+            if (type) connectorsMapItem['type'] = type;
+            this.connectorsData_.push(connectorsMapItem);
+          }
+
+          //This extends dates range.
+          this.checkDate_(period[anychart.enums.GanttDataFields.START]);
+          this.checkDate_(period[anychart.enums.GanttDataFields.END]);
+        }
+      }
+    } else {
+      //Building connectors map for project chart.
+      var connectTo = item.get(anychart.enums.GanttDataFields.CONNECT_TO);
+      if (connectTo) {
+        var itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+        var connType = item.get(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+        var taskMapItem = {'from': visItem, 'to': itemConnectTo};
+        if (connType) taskMapItem['type'] = connType;
+        this.connectorsData_.push(taskMapItem);
+      }
+    }
   }
 
   return this;
@@ -416,6 +468,33 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
  */
 anychart.core.gantt.Controller.prototype.getPeriodsMap = function() {
   return this.periodsMap_;
+};
+
+
+/**
+ * Gets visible items map.
+ * @return {Object} - Map that contains related tree dta items by its id.
+ */
+anychart.core.gantt.Controller.prototype.getVisibleItemsMap = function() {
+  return this.visibleItemsMap_;
+};
+
+
+/**
+ * Gets connectors data.
+ * @return {Array.<Object>} - Connectors data.
+ */
+anychart.core.gantt.Controller.prototype.getConnectorsData = function() {
+  return this.connectorsData_;
+};
+
+
+/**
+ * Gets height cache.
+ * @return {Array.<number>} - Height cache.
+ */
+anychart.core.gantt.Controller.prototype.getHeightCache = function() {
+  return this.heightCache_;
 };
 
 

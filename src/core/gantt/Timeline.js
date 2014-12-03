@@ -8,6 +8,8 @@ goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.scales.GanttDateTime');
 
+goog.require('goog.array');
+
 
 
 /**
@@ -255,6 +257,22 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
 
 
   /**
+   * Connector arrow fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.connectorFill_ = acgraph.vector.normalizeFill('#000090');
+
+
+  /**
+   * Connector line stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.connectorStroke_ = acgraph.vector.normalizeStroke('#000090');
+
+
+  /**
    * Date time scale.
    * @type {anychart.scales.GanttDateTime}
    * @private
@@ -302,35 +320,63 @@ anychart.core.gantt.Timeline.DEFAULT_HEADER_HEIGHT = 70;
  * Base path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.BASE_Z_INDEX = 1;
+anychart.core.gantt.Timeline.BASE_Z_INDEX = 10;
 
 
 /**
  * Baseline path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 2;
+anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 20;
 
 
 /**
  * Progress path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 3;
+anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 30;
 
 
 /**
  * labels factory z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.LABEL_Z_INDEX = 4;
+anychart.core.gantt.Timeline.LABEL_Z_INDEX = 40;
 
 
 /**
  * Marker factory z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.MARKER_Z_INDEX = 5;
+anychart.core.gantt.Timeline.MARKER_Z_INDEX = 50;
+
+
+/**
+ * Connector z-index.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.CONNECTOR_Z_INDEX = 60;
+
+
+/**
+ * Connector arrow z-index.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.ARROW_Z_INDEX = 70;
+
+
+/**
+ * Arrow margin.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.ARROW_MARGIN = 5;
+
+
+/**
+ * Arrow size.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.ARROW_SIZE = 4;
 
 
 /**
@@ -344,7 +390,7 @@ anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION = 0.7;
  * This constant means that bar will have height = PARENT_HEIGHT_REDUCTION * this.height;
  * @type {number}
  */
-anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION = 0.5;
+anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION = 0.4;
 
 
 /**
@@ -569,7 +615,7 @@ anychart.core.gantt.Timeline.prototype.getDataLayer_ = function() {
     this.dataLayer_ = new anychart.core.utils.TypedLayer(function() {
       return acgraph.path();
     }, function(child) {
-      (/** @type {acgraph.vector.Path} */ (child)).clear();
+      (/** @type {acgraph.vector.Path} */ (child)).fill(null).stroke(null).clear();
     });
     this.registerDisposable(this.dataLayer_);
   }
@@ -690,60 +736,8 @@ anychart.core.gantt.Timeline.prototype.drawTimelineElements_ = function() {
   this.getLabelsFactory_().draw();
   this.getMarkersFactory_().draw();
 
+  this.drawConnectors_();
 };
-
-
-///**
-// * Draws a single bar with its markers and labels.
-// * Do not forget to call labelsFactory.draw() and markersFactory.draw() after all bars are added.
-// * @param {anychart.math.Rect} bounds - Bounds of bar.
-// * @param {Object=} opt_startMarker - Raw start marker settings.
-// * @param {Object=} opt_endMarker - Raw end marker settings.
-// * @param {Object=} opt_label - Raw label settings.
-// * @param {number=} opt_zIndex - Z-index of bar.
-// * @return {!acgraph.vector.Element} - Bar itself. Use it to color the bar.
-// * @private
-// */
-//anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, opt_startMarker, opt_endMarker, opt_label, opt_zIndex) {
-//  opt_zIndex = opt_zIndex || anychart.core.gantt.Timeline.BASE_Z_INDEX;
-//  var bar = this.getDataLayer_().genNextChild();
-//
-//  bar
-//      .zIndex(opt_zIndex)
-//      .moveTo(bounds.left, bounds.top)
-//      .lineTo(bounds.left + bounds.width, bounds.top)
-//      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
-//      .lineTo(bounds.left, bounds.top + bounds.height)
-//      .close();
-//
-//  if (opt_label) {
-//    var position = opt_label['position'] || this.getLabelsFactory_().position();
-//    position = anychart.enums.normalizeAnchor(position);
-//    var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-//    var textValue = opt_label['value'] || ''; //TODO (A.Kudryavtsev): Тут неясно. Для LF текст берется из провайдера. В гантах надо задавать текст в данных.
-//    var formatProvider = {'value': textValue};
-//    var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
-//    label.deserialize(opt_label);
-//  }
-//
-//  if (opt_startMarker) {
-//    var startMarker = this.getMarkersFactory_()
-//        .add({value: {x: bounds.left, y: bounds.top}});
-//    startMarker
-//        .size(bounds.height / 2)
-//        .deserialize(opt_startMarker);
-//  }
-//
-//  if (opt_endMarker) {
-//    var endMarker = this.getMarkersFactory_()
-//        .add({value: {x: bounds.left + bounds.width, y: bounds.top}});
-//    endMarker
-//        .size(bounds.height / 2)
-//        .deserialize(opt_endMarker);
-//  }
-//
-//  return bar;
-//};
 
 
 /**
@@ -881,8 +875,9 @@ anychart.core.gantt.Timeline.prototype.drawProjectTimeline_ = function() {
     var itemHeight = anychart.core.gantt.Controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
+    var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
     var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
-    if (goog.isDefAndNotNull(actualEnd)) {
+    if (goog.isDefAndNotNull(actualEnd) && (actualEnd != actualStart)) {
       var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
       var baselineEnd = item.get(anychart.enums.GanttDataFields.BASELINE_END);
 
@@ -1076,6 +1071,408 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
     }
 
   }
+};
+
+
+/**
+ * Draws connectors.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
+  var connectorsData = this.controller_.getConnectorsData();
+  var headerHeight = this.header_.getPixelBounds().height;
+  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
+
+  var l = connectorsData.length;
+  var connData, connType;
+
+  var map = this.isResourceChart_ ? this.controller_.getPeriodsMap() : this.controller_.getVisibleItemsMap();
+  while (l--) {
+    connData = connectorsData[l];
+    var to = connData['to'];
+    if (goog.isString(to)) to = map[to]; //destination becomes an object instead of string.
+
+    if (to) {
+      connData['to'] = to; //Replacing a string record with link to object for further connectors draw cycles.
+      var from = connData['from'];
+      connType = connData['type'];
+
+      //Here 'to' is {'item':period, 'index':index} or {'period':period, 'index':index}. 'from' is as well.
+      var fromIndex = from['index'];
+      var toIndex = to['index'];
+
+      var heightCache = this.controller_.getHeightCache();
+
+      //relativeHeight in this case is height of rows hidden over the top line of visible area (this.pixelBoundsCache_)
+      var relativeHeight = this.startIndex_ ? heightCache[this.startIndex_ - 1] : 0;
+      relativeHeight += this.verticalOffset_;
+
+      var startItem = this.visibleItems_[fromIndex];
+      var endItem = this.visibleItems_[toIndex];
+
+      //Lines below turn heights got from controller to Y-coordinates on screen.
+      var relativeFromTop = fromIndex ? heightCache[fromIndex - 1] : 0;
+      var relativeToTop = toIndex ? heightCache[toIndex - 1] : 0;
+      var actualFromTop = (relativeFromTop - relativeHeight) + totalTop;
+      var actualToTop = (relativeToTop - relativeHeight) + totalTop;
+      var fromRowHeight = anychart.core.gantt.Controller.getItemHeight(startItem);
+      var toRowHeight = anychart.core.gantt.Controller.getItemHeight(endItem);
+
+      var fromStartTimestamp = this.isResourceChart_ ?
+          from['period'][anychart.enums.GanttDataFields.ACTUAL_START] :
+          from['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
+
+      var fromEndTimestamp = this.isResourceChart_ ?
+          from['period'][anychart.enums.GanttDataFields.ACTUAL_END] :
+          from['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
+
+      var toStartTimestamp = this.isResourceChart_ ?
+          to['period'][anychart.enums.GanttDataFields.ACTUAL_START] :
+          to['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
+
+      var toEndTimestamp = this.isResourceChart_ ?
+          to['period'][anychart.enums.GanttDataFields.ACTUAL_END] :
+          to['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
+
+      fromEndTimestamp = fromEndTimestamp || fromStartTimestamp; //Milestone.
+      toEndTimestamp = toEndTimestamp || fromStartTimestamp; //Milestone.
+
+      var fromMilestoneHalfWidth = 0;
+      var toMilestoneHalfWidth = 0;
+      if (!fromEndTimestamp || fromStartTimestamp == fromEndTimestamp) {
+        fromEndTimestamp = fromStartTimestamp;
+        fromMilestoneHalfWidth = fromRowHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2;
+      }
+
+      if (!toEndTimestamp || toStartTimestamp == toEndTimestamp) {
+        toEndTimestamp = toStartTimestamp;
+        toMilestoneHalfWidth = toRowHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2;
+      }
+
+      var fromLeft = this.scale_.timestampToRatio(fromStartTimestamp) * this.pixelBoundsCache_.width +
+          this.pixelBoundsCache_.left - fromMilestoneHalfWidth;
+      var fromRight = this.scale_.timestampToRatio(fromEndTimestamp) * this.pixelBoundsCache_.width +
+          this.pixelBoundsCache_.left + fromMilestoneHalfWidth;
+      var toLeft = this.scale_.timestampToRatio(toStartTimestamp) * this.pixelBoundsCache_.width +
+          this.pixelBoundsCache_.left - toMilestoneHalfWidth;
+      var toRight = this.scale_.timestampToRatio(toEndTimestamp) * this.pixelBoundsCache_.width +
+          this.pixelBoundsCache_.left + toMilestoneHalfWidth;
+
+      var fill, stroke, connSettings;
+
+      connSettings = this.isResourceChart_ ?
+          from['period'][anychart.enums.GanttDataFields.CONNECTOR] :
+          from['item'].get(anychart.enums.GanttDataFields.CONNECTOR);
+
+      fill = (connSettings && connSettings[anychart.enums.GanttDataFields.FILL]) ?
+          acgraph.vector.normalizeFill(connSettings[anychart.enums.GanttDataFields.FILL]) :
+          this.connectorFill_;
+
+      stroke = (connSettings && connSettings[anychart.enums.GanttDataFields.STROKE]) ?
+          acgraph.vector.normalizeStroke(connSettings[anychart.enums.GanttDataFields.FILL]) :
+          this.connectorStroke_;
+
+      this.drawConnector_(
+          new anychart.math.Rect(fromLeft, actualFromTop, (fromRight - fromLeft), fromRowHeight),
+          new anychart.math.Rect(toLeft, actualToTop, (toRight - toLeft), toRowHeight),
+          connType, /** @type {acgraph.vector.Fill} */ (fill), /** @type {acgraph.vector.Stroke} */ (stroke));
+
+    } else {
+      /*
+        Destination is not found. We don't need this connector record anymore.
+        Destination can be not found in two cases:
+          1) Wrong incoming data.
+          2) Destination is currently hidden by collapsed parent.
+       In both cases we do not need this connectors record at all.
+      */
+      goog.array.splice(connectorsData, l, 1);
+    }
+  }
+};
+
+
+/**
+ * Draws a single connector.
+ * @param {anychart.math.Rect} fromBounds - Bounds of start item (see illustration).
+ * @param {anychart.math.Rect} toBounds - Bounds of end item (see illustration).
+ * @param {anychart.enums.ConnectorType} connType - Connection type.
+ * @param {acgraph.vector.Fill} fill - Fill settings.
+ * @param {acgraph.vector.Stroke} stroke - Stroke settings.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.drawConnector_ = function(fromBounds, toBounds, connType, fill, stroke) {
+  /*
+    Bounds in this case are not bounds of bar.
+    Bounds are an area of whole row to simplify the calculations of connectors:
+
+    +--------------------------------------+
+    | This is an area in row above the bar |
+    +--------------------------------------+
+    |\\\\\\\\\ This is a bar itself \\\\\\\|        <- this is an incoming bounds.
+    +--------------------------------------+
+    | This is an area in row below the bar |
+    +--------------------------------------+
+
+   */
+
+
+  var fromLeft, fromTop, toLeft, toTop, orientation;
+  var am = anychart.core.gantt.Timeline.ARROW_MARGIN;
+  var as = anychart.core.gantt.Timeline.ARROW_SIZE;
+  var path = null;
+  var arrow = null;
+  var segmentLeft0, segmentLeft1; //Util variables, temporary segment X-coordinate storage.
+  var segmentTop0; //Util variable, temporary segment Y-coordinate storage.
+  var aboveSequence = true; //If 'from' bar is above the 'to' bar.
+
+  switch ((connType + '').toLowerCase()) {
+    case anychart.enums.ConnectorType.FINISH_FINISH:
+      fromLeft = this.halfPixel(fromBounds.left + fromBounds.width);
+      fromTop = this.halfPixel(fromBounds.top + fromBounds.height / 2);
+      toLeft = this.halfPixel(toBounds.left + toBounds.width);
+      toTop = this.halfPixel(toBounds.top + toBounds.height / 2);
+      orientation = anychart.enums.Orientation.LEFT;
+
+      if (fromBounds.top == toBounds.top) { //Same line
+        path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+        if (fromLeft > toLeft) orientation = anychart.enums.Orientation.RIGHT;
+      } else {
+        segmentLeft0 = Math.max(fromLeft + as + am, toLeft + as + am);
+        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+      }
+      arrow = this.drawArrow_(toLeft, toTop, orientation);
+      break;
+
+    case anychart.enums.ConnectorType.START_FINISH:
+      fromLeft = this.halfPixel(fromBounds.left);
+      fromTop = this.halfPixel(fromBounds.top + fromBounds.height / 2);
+      toLeft = this.halfPixel(toBounds.left + toBounds.width);
+      toTop = this.halfPixel(toBounds.top + toBounds.height / 2);
+      orientation = anychart.enums.Orientation.LEFT;
+
+      if (fromLeft - am - am - as > toLeft) {
+        segmentLeft0 = toLeft + am + as;
+        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+      } else {
+        aboveSequence = toBounds.top >= fromBounds.top;
+
+        segmentLeft0 = this.halfPixel(fromLeft - am);
+        segmentLeft1 = this.halfPixel(toLeft + am + as);
+        segmentTop0 = this.halfPixel(aboveSequence ? toBounds.top : toBounds.top + toBounds.height);
+
+        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
+        path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
+        path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, toTop, path);
+        path = this.drawSegment_(segmentLeft1, toTop, toLeft, toTop, path);
+
+      }
+
+      //TODO (A.Kudryavtsev): Test this behaviour carefully.
+      arrow = this.drawArrow_(toLeft, toTop, orientation);
+
+      break;
+
+    case anychart.enums.ConnectorType.START_START:
+      fromLeft = this.halfPixel(fromBounds.left);
+      fromTop = this.halfPixel(fromBounds.top + fromBounds.height / 2);
+      toLeft = this.halfPixel(toBounds.left);
+      toTop = this.halfPixel(toBounds.top + toBounds.height / 2);
+      orientation = anychart.enums.Orientation.RIGHT;
+
+      if (fromBounds.top == toBounds.top) { //Same line
+        path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+        if (fromLeft > toLeft) orientation = anychart.enums.Orientation.LEFT;
+      } else {
+        segmentLeft0 = Math.min(fromLeft - as - am, toLeft - as - am);
+        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+      }
+      arrow = this.drawArrow_(toLeft, toTop, orientation);
+
+      break;
+
+    default: //anychart.enums.ConnectorType.FINISH_START:
+      fromLeft = this.halfPixel(fromBounds.left + fromBounds.width);
+      fromTop = this.halfPixel(fromBounds.top + fromBounds.height / 2);
+      toLeft = this.halfPixel(toBounds.left);
+      var extraEndY;
+
+      if (toLeft >= fromLeft) {
+        toLeft = this.halfPixel(Math.min(toLeft + am, toBounds.left + toBounds.width / 2));
+        if (toBounds.top > fromBounds.top) {
+          extraEndY = this.halfPixel(toBounds.top);
+          path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
+          path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
+          arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.BOTTOM);
+        } else if (toBounds.top < fromBounds.top) {
+          extraEndY = this.halfPixel(toBounds.top + toBounds.height);
+          path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
+          path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
+          arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.TOP);
+        } else { //Same line
+          toLeft = this.halfPixel(toBounds.left);
+          toTop = this.halfPixel(toBounds.top + toBounds.height / 2);
+          path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+          arrow = this.drawArrow_(toLeft, toTop, anychart.enums.Orientation.RIGHT);
+        }
+
+      } else { //if toLeft < fromLeft
+        extraEndY = this.halfPixel(toBounds.top + toBounds.height / 2);
+        segmentTop0 = this.halfPixel((toBounds.top > fromBounds.top) ? toBounds.top : (toBounds.top + toBounds.height));
+        segmentLeft0 = this.halfPixel(fromLeft + am);
+        segmentLeft1 = this.halfPixel(toLeft - am - as);
+
+        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
+        path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
+        path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, extraEndY, path);
+        path = this.drawSegment_(segmentLeft1, extraEndY, toLeft, extraEndY, path);
+
+        arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.RIGHT);
+      }
+  }
+
+  if (path) path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
+  if (arrow) arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
+};
+
+
+/**
+ * Draws a segment of connector.
+ * @param {number} fromLeft - Start left coordinate.
+ * @param {number} fromTop - Start top coordinate.
+ * @param {number} toLeft - End left coordinate.
+ * @param {number} toTop - End top coordinate.
+ * @param {acgraph.vector.Path} path - Path to be drawn.
+ * @return {acgraph.vector.Path} - If the segment is drawn, return a path for connector.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.drawSegment_ = function(fromLeft, fromTop, toLeft, toTop, path) {
+  /*
+    Here we should know that connector basically can be drawn maximum in 5 segments:
+
+                         +---------------+
+                         |               | 1
+                         |               +---+
+                         |               |   |
+                         +---------------+   | 2
+                                             |
+            +--------------- 3 --------------+
+            |
+          4 |     +-------------+
+            |     |             |
+            +---> +             |
+              5   |             |
+                  +-------------+
+
+
+    Path will be drawn anyway in case:
+    1) We draw a segment only if it is visible.
+    2) If a segment becomes visible, it means that even if one of the next segments becomes invisible, we should not lose
+    the sequence of segments to avoid appearance of diagonal connectors.
+   */
+
+  if (path) {
+    path.lineTo(toLeft, toTop);
+  } else {
+    var left = Math.min(fromLeft, toLeft);
+    var right = Math.max(fromLeft, toLeft);
+    var top = Math.min(fromTop, toTop);
+    var bottom = Math.max(fromTop, toTop);
+
+    if (left < (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width) &&
+        right > this.pixelBoundsCache_.left &&
+        top < (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height) &&
+        bottom > this.pixelBoundsCache_.top) { //Segment or the part of it is visible.
+
+      path = /** @type {acgraph.vector.Path} */ (this.getDataLayer_().genNextChild());
+
+      path
+          .zIndex(anychart.core.gantt.Timeline.CONNECTOR_Z_INDEX)
+          .moveTo(fromLeft, fromTop)
+          .lineTo(toLeft, toTop);
+    }
+  }
+
+  return path;
+};
+
+
+/**
+ * Draws an arrow.
+ * @param {number} left - Left coordinate.
+ * @param {number} top - Top coordinate.
+ * @param {anychart.enums.Orientation} orientation - Arrow direction.
+ * @private
+ * @return {acgraph.vector.Path} - Arrow path or null if path is not drawn.
+ */
+anychart.core.gantt.Timeline.prototype.drawArrow_ = function(left, top, orientation) {
+  var path = null;
+
+  /*
+    TODO (A.Kudryavtsev): Change this algorithm like this:
+    Now we can't see the part of an arrow. We must be able to see it. It means that we have to pre-calclate bounds of
+    arrow to define if it crosses the visible area.
+   */
+  if (left >= this.pixelBoundsCache_.left &&
+      left <= this.pixelBoundsCache_.left + this.pixelBoundsCache_.width &&
+      top >= this.pixelBoundsCache_.top &&
+      top <= this.pixelBoundsCache_.top + this.pixelBoundsCache_.height) { //Is in visible area.
+
+    var as = anychart.core.gantt.Timeline.ARROW_SIZE;
+    var left1 = 0;
+    var top1 = 0;
+    var left2 = 0;
+    var top2 = 0;
+
+    switch (orientation) {
+      case anychart.enums.Orientation.LEFT:
+        left = left + 1;
+        left1 = left + as;
+        top1 = top - as;
+        left2 = left1;
+        top2 = top + as;
+        break;
+      case anychart.enums.Orientation.TOP:
+        top = top + 1;
+        left1 = left - as;
+        top1 = top + as;
+        left2 = left + as;
+        top2 = top1;
+        break;
+      case anychart.enums.Orientation.RIGHT:
+        left = left - 1;
+        left1 = left - as;
+        top1 = top - as;
+        left2 = left1;
+        top2 = top + as;
+        break;
+      case anychart.enums.Orientation.BOTTOM:
+        top = top - 1;
+        left1 = left - as;
+        top1 = top - as;
+        left2 = left + as;
+        top2 = top1;
+        break;
+    }
+
+    path = /** @type {acgraph.vector.Path} */ (this.dataLayer_.genNextChild());
+    path
+        .zIndex(anychart.core.gantt.Timeline.ARROW_Z_INDEX)
+        .moveTo(this.halfPixel(left), this.halfPixel(top))
+        .lineTo(this.halfPixel(left1), this.halfPixel(top1))
+        .lineTo(this.halfPixel(left2), this.halfPixel(top2))
+        .close();
+
+  }
+
+  return path;
 };
 
 

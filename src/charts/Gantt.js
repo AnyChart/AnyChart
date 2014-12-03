@@ -75,6 +75,14 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.splitter_ = null;
 
   /**
+   * Splitter position. Percent or pixel value of splitter position.
+   * Pixel value in this case is actually a width of data grid.
+   * @type {(string|number)}
+   * @private
+   */
+  this.splitterPosition_ = '30%';
+
+  /**
    * Default header height.
    * @type {(number|string)}
    * @private
@@ -409,6 +417,23 @@ anychart.charts.Gantt.prototype.collapseTask = function(taskId) {
 
 
 /**
+ * Gets/sets splitter position.
+ * @param {(string|number)=} opt_value - Pixel or percent value. Actually sets a width of data grid.
+ * @return {(anychart.charts.Gantt|number|string)} - Current value or itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.splitterPosition = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.splitterPosition_ != opt_value) {
+      this.splitterPosition_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.splitterPosition_;
+};
+
+
+/**
  * Getter/setter for splitter.
  * TODO (A.Kudryavtsev): Turn it to getter for a while?
  * @param {(null|string|Object|anychart.core.ui.Splitter)=} opt_value - Value to be set.
@@ -428,7 +453,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_
         .suspendSignalsDispatching()
         .layout(anychart.enums.Layout.VERTICAL)
-        .position('30%')
+        .position(this.splitterPosition_)
         .dragPreviewFill('#000 0.3')
         .fill({
           'keys': ['0 #9ccae3', '0.5 #a9dbf6', '1 #e3f4fc'],
@@ -441,6 +466,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       var b1 = ths.splitter().getLeftBounds();
       var b2 = ths.splitter().getRightBounds();
+
       anychart.core.Base.suspendSignalsDispatching(ths.getDataGrid(), ths.getTimeline());
       ths.getDataGrid().bounds().set(b1);
       ths.getTimeline().bounds().set(b2);
@@ -457,7 +483,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.DataGrid) {
+    if (opt_value instanceof anychart.core.ui.Splitter) {
       this.splitter_.deserialize(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
       this.splitter_.deserialize(opt_value);
@@ -504,6 +530,10 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
         (bounds.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 2),
         (bounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
     ); //This must automatically set bounds for TL and DG.
+
+    var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
+    var dgRatio = dgWidth / bounds.width;
+    this.splitter().position(dgRatio);
 
     var tlBounds = this.splitter().getRightBounds();
 
@@ -603,6 +633,7 @@ anychart.charts.Gantt.prototype['collapseAll'] = anychart.charts.Gantt.prototype
 anychart.charts.Gantt.prototype['expandAll'] = anychart.charts.Gantt.prototype.expandAll;
 anychart.charts.Gantt.prototype['expandTask'] = anychart.charts.Gantt.prototype.expandTask;
 anychart.charts.Gantt.prototype['collapseTask'] = anychart.charts.Gantt.prototype.collapseTask;
+anychart.charts.Gantt.prototype['splitterPosition'] = anychart.charts.Gantt.prototype.splitterPosition;
 
 
 
