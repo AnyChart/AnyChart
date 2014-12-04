@@ -442,11 +442,8 @@ anychart.core.grids.Polar.prototype.drawInterlaceRadial = function(angle, sweep,
 
     var element = layer.genNextChild();
 
-    element.moveTo(x, y);
-    element.lineTo(this.cx_, this.cy_);
-    element.lineTo(prevX, prevY);
     element.circularArc(this.cx_, this.cy_, this.radius_, this.radius_, angle, -sweep);
-
+    element.lineTo(this.cx_, this.cy_);
     element.close();
   }
 };
@@ -579,14 +576,26 @@ anychart.core.grids.Polar.prototype.draw = function() {
       var prevRatio = NaN;
       for (i = 0; i < ticksArrLen; i++) {
         var tickVal = ticksArray[i];
-        if (goog.isArray(tickVal)) tickVal = tickVal[0];
-        var ratio = yScale.transform(tickVal);
+        var leftTick, rightTick;
+        if (goog.isArray(tickVal)) {
+          leftTick = tickVal[0];
+          rightTick = tickVal[1];
+        } else
+          leftTick = rightTick = tickVal;
+
+
+        var ratio = yScale.transform(leftTick);
         layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
         drawInterlace.call(this, ratio, prevRatio, layer);
 
         if (i == ticksArrLen - 1) {
-          if (this.drawLastLine_) drawLine.call(this, ratio);
+          if (isOrdinal) {
+            drawLine.call(this, ratio);
+            if (this.drawLastLine_) drawLine.call(this, yScale.transform(rightTick, 1));
+          } else {
+            if (this.drawLastLine_) drawLine.call(this, ratio);
+          }
         } else if (i != 0) {
           drawLine.call(this, ratio);
         }

@@ -122,6 +122,12 @@ anychart.core.polar.series.Line.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.polar.series.Line.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
+};
+
+
 /**
  * @inheritDoc
  */

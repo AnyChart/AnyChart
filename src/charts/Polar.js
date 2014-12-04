@@ -288,6 +288,7 @@ anychart.charts.Polar.prototype.grid = function(opt_indexOrValue, opt_value) {
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Polar();
+    grid.drawLastLine(false);
     grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -330,6 +331,7 @@ anychart.charts.Polar.prototype.minorGrid = function(opt_indexOrValue, opt_value
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Polar();
+    grid.drawLastLine(false);
     grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
     grid.isMinor(true);
     this.minorGrids_[index] = grid;

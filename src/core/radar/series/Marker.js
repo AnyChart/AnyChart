@@ -498,6 +498,15 @@ anychart.core.radar.series.Marker.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.radar.series.Marker.prototype.getLegendIconType = function() {
+  var markerDrawer = anychart.enums.getMarkerDrawer(this.type());
+  return function(path, size) {
+    return markerDrawer(path, size / 2, size / 2, size / 2);
+  };
+};
+
+
 /**
  * @inheritDoc
  */

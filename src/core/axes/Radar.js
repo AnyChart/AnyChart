@@ -407,146 +407,149 @@ anychart.core.axes.Radar.prototype.calculateAxisBounds_ = function() {
       var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
 
       if (scale) {
-        var delta;
-        var i;
-        var scaleTicksArr = scale.ticks().get();
-        var ticksArrLen = scaleTicksArr.length;
+        var delta = 0;
+        if (this.enabled()) {
+          var i;
+          var scaleTicksArr = scale.ticks().get();
+          var ticksArrLen = scaleTicksArr.length;
 
-        var startAngle = goog.math.standardAngle(this.startAngle() - 90);
-        var angle;
+          var startAngle = goog.math.standardAngle(this.startAngle() - 90);
+          var angle;
 
-        var leftExtreme = NaN;
-        var topExtreme = NaN;
-        var rightExtreme = NaN;
-        var bottomExtreme = NaN;
+          var leftExtreme = NaN;
+          var topExtreme = NaN;
+          var rightExtreme = NaN;
+          var bottomExtreme = NaN;
 
-        var leftExtremeLabelIndex = NaN;
-        var topExtremeLabelIndex = NaN;
-        var rightExtremeLabelIndex = NaN;
-        var bottomExtremeLabelIndex = NaN;
+          var leftExtremeLabelIndex = NaN;
+          var topExtremeLabelIndex = NaN;
+          var rightExtremeLabelIndex = NaN;
+          var bottomExtremeLabelIndex = NaN;
 
-        var leftExtremeAngle = NaN;
-        var topExtremeAngle = NaN;
-        var rightExtremeAngle = NaN;
-        var bottomExtremeAngle = NaN;
+          var leftExtremeAngle = NaN;
+          var topExtremeAngle = NaN;
+          var rightExtremeAngle = NaN;
+          var bottomExtremeAngle = NaN;
 
-        this.dropBoundsCache_();
-        this.criticalTickLength_ = NaN;
-        var tickVal, ratio;
-
-        for (i = 0; i < ticksArrLen; i++) {
-          var x, y, x1, y1, lineThickness, angleRad, radius, tickLen;
-          tickVal = scaleTicksArr[i];
-          ratio = scale.transform(tickVal);
-          angle = goog.math.standardAngle(startAngle + ratio * 360);
-          angleRad = angle * Math.PI / 180;
-          if (this.labels().enabled()) {
-            var labelBounds = this.getLabelBounds_(i);
-
-            x = labelBounds.getLeft();
-            y = labelBounds.getTop();
-            x1 = labelBounds.getRight();
-            y1 = labelBounds.getBottom();
-          } else if (this.ticks().enabled()) {
-            lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-            tickLen = this.ticks().enabled() ? this.ticks().length() : 0;
-            radius = this.radius_ + tickLen + lineThickness / 2;
-            x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
-            y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
-          } else {
-            lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-            radius = this.radius_ + lineThickness / 2;
-            x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
-            y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
-          }
-
-          if (isNaN(leftExtreme) || x < leftExtreme) {
-            leftExtreme = x;
-            leftExtremeLabelIndex = i;
-            leftExtremeAngle = angle;
-          }
-          if (isNaN(topExtreme) || y < topExtreme) {
-            topExtreme = y;
-            topExtremeLabelIndex = i;
-            topExtremeAngle = angle;
-          }
-          if (isNaN(rightExtreme) || x1 > rightExtreme) {
-            rightExtreme = x1;
-            rightExtremeLabelIndex = i;
-            rightExtremeAngle = angle;
-          }
-          if (isNaN(bottomExtreme) || y1 > bottomExtreme) {
-            bottomExtreme = y1;
-            bottomExtremeLabelIndex = i;
-            bottomExtremeAngle = angle;
-          }
-        }
-
-        var leftDelta = 0;
-        var topDelta = 0;
-        var rightDelta = 0;
-        var bottomDelta = 0;
-
-        leftExtreme = Math.round(leftExtreme);
-        topExtreme = Math.round(topExtreme);
-        rightExtreme = Math.round(rightExtreme);
-        bottomExtreme = Math.round(bottomExtreme);
-
-        var a;
-        if (leftExtreme < parentBounds.getLeft()) {
-          a = leftExtremeAngle < 180 ?
-              Math.sin((leftExtremeAngle - 90) * Math.PI / 180) :
-              Math.cos((leftExtremeAngle - 180) * Math.PI / 180);
-          leftDelta = Math.round((parentBounds.getLeft() - leftExtreme) / a);
-        }
-        if (topExtreme < parentBounds.getTop()) {
-          a = topExtremeAngle < 270 ?
-              Math.sin((topExtremeAngle - 180) * Math.PI / 180) :
-              Math.cos((topExtremeAngle - 270) * Math.PI / 180);
-          topDelta = Math.round((parentBounds.getTop() - topExtreme) / a);
-        }
-        if (rightExtreme > parentBounds.getRight()) {
-          a = rightExtremeAngle < 360 ?
-              Math.sin((rightExtremeAngle - 270) * Math.PI / 180) :
-              Math.cos(rightExtremeAngle * Math.PI / 180);
-          rightDelta = Math.round((rightExtreme - parentBounds.getRight()) / a);
-        }
-        if (bottomExtreme > parentBounds.getBottom()) {
-          a = bottomExtremeAngle < 90 ?
-              Math.sin(bottomExtremeAngle * Math.PI / 180) :
-              Math.cos((bottomExtremeAngle - 90) * Math.PI / 180);
-          bottomDelta = Math.round((bottomExtreme - parentBounds.getBottom()) / a);
-        }
-
-        delta = Math.max(leftDelta, topDelta, rightDelta, bottomDelta);
-
-        if (delta > 0) {
-          this.radius_ -= delta;
-          if (this.radius_ < 0) {
-            this.radius_ = 0;
-            var labelSize = 0;
-            if (this.labels().enabled()) {
-              var extremeLabelIndex = NaN, isHorizontal;
-              if (delta == leftDelta) {
-                extremeLabelIndex = leftExtremeLabelIndex;
-                isHorizontal = true;
-              } else if (delta == topDelta) {
-                extremeLabelIndex = topExtremeLabelIndex;
-                isHorizontal = false;
-              } else if (delta == rightDelta) {
-                extremeLabelIndex = rightExtremeLabelIndex;
-                isHorizontal = true;
-              } else if (delta == bottomDelta) {
-                extremeLabelIndex = bottomExtremeLabelIndex;
-                isHorizontal = false;
-              }
-              var extremeLabelBounds = this.getLabelBounds_(extremeLabelIndex);
-              labelSize = isHorizontal ? extremeLabelBounds.width : extremeLabelBounds.height;
-            }
-            lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-            this.criticalTickLength_ = Math.min(parentBounds.width, parentBounds.height) / 2 - labelSize - lineThickness;
-          }
           this.dropBoundsCache_();
+          this.criticalTickLength_ = NaN;
+          var tickVal, ratio;
+
+          for (i = 0; i < ticksArrLen; i++) {
+            var x, y, x1, y1, lineThickness, angleRad, radius, tickLen;
+            tickVal = scaleTicksArr[i];
+            ratio = scale.transform(tickVal);
+            angle = goog.math.standardAngle(startAngle + ratio * 360);
+            angleRad = angle * Math.PI / 180;
+            if (this.labels().enabled()) {
+              var labelBounds = this.getLabelBounds_(i);
+
+              x = labelBounds.getLeft();
+              y = labelBounds.getTop();
+              x1 = labelBounds.getRight();
+              y1 = labelBounds.getBottom();
+            } else if (this.ticks().enabled()) {
+              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              tickLen = this.ticks().enabled() ? this.ticks().length() : 0;
+              radius = this.radius_ + tickLen + lineThickness / 2;
+              x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
+              y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
+            } else {
+              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              radius = this.radius_ + lineThickness / 2;
+              x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
+              y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
+            }
+
+            if (isNaN(leftExtreme) || x < leftExtreme) {
+              leftExtreme = x;
+              leftExtremeLabelIndex = i;
+              leftExtremeAngle = angle;
+            }
+            if (isNaN(topExtreme) || y < topExtreme) {
+              topExtreme = y;
+              topExtremeLabelIndex = i;
+              topExtremeAngle = angle;
+            }
+            if (isNaN(rightExtreme) || x1 > rightExtreme) {
+              rightExtreme = x1;
+              rightExtremeLabelIndex = i;
+              rightExtremeAngle = angle;
+            }
+            if (isNaN(bottomExtreme) || y1 > bottomExtreme) {
+              bottomExtreme = y1;
+              bottomExtremeLabelIndex = i;
+              bottomExtremeAngle = angle;
+            }
+          }
+
+
+          var leftDelta = 0;
+          var topDelta = 0;
+          var rightDelta = 0;
+          var bottomDelta = 0;
+
+          leftExtreme = Math.round(leftExtreme);
+          topExtreme = Math.round(topExtreme);
+          rightExtreme = Math.round(rightExtreme);
+          bottomExtreme = Math.round(bottomExtreme);
+
+          var a;
+          if (leftExtreme < parentBounds.getLeft()) {
+            a = leftExtremeAngle < 180 ?
+                Math.sin((leftExtremeAngle - 90) * Math.PI / 180) :
+                Math.cos((leftExtremeAngle - 180) * Math.PI / 180);
+            leftDelta = Math.round((parentBounds.getLeft() - leftExtreme) / a);
+          }
+          if (topExtreme < parentBounds.getTop()) {
+            a = topExtremeAngle < 270 ?
+                Math.sin((topExtremeAngle - 180) * Math.PI / 180) :
+                Math.cos((topExtremeAngle - 270) * Math.PI / 180);
+            topDelta = Math.round((parentBounds.getTop() - topExtreme) / a);
+          }
+          if (rightExtreme > parentBounds.getRight()) {
+            a = rightExtremeAngle < 360 ?
+                Math.sin((rightExtremeAngle - 270) * Math.PI / 180) :
+                Math.cos(rightExtremeAngle * Math.PI / 180);
+            rightDelta = Math.round((rightExtreme - parentBounds.getRight()) / a);
+          }
+          if (bottomExtreme > parentBounds.getBottom()) {
+            a = bottomExtremeAngle < 90 ?
+                Math.sin(bottomExtremeAngle * Math.PI / 180) :
+                Math.cos((bottomExtremeAngle - 90) * Math.PI / 180);
+            bottomDelta = Math.round((bottomExtreme - parentBounds.getBottom()) / a);
+          }
+
+          delta = Math.max(leftDelta, topDelta, rightDelta, bottomDelta);
+
+          if (delta > 0) {
+            this.radius_ -= delta;
+            if (this.radius_ < 0) {
+              this.radius_ = 0;
+              var labelSize = 0;
+              if (this.labels().enabled()) {
+                var extremeLabelIndex = NaN, isHorizontal;
+                if (delta == leftDelta) {
+                  extremeLabelIndex = leftExtremeLabelIndex;
+                  isHorizontal = true;
+                } else if (delta == topDelta) {
+                  extremeLabelIndex = topExtremeLabelIndex;
+                  isHorizontal = false;
+                } else if (delta == rightDelta) {
+                  extremeLabelIndex = rightExtremeLabelIndex;
+                  isHorizontal = true;
+                } else if (delta == bottomDelta) {
+                  extremeLabelIndex = bottomExtremeLabelIndex;
+                  isHorizontal = false;
+                }
+                var extremeLabelBounds = this.getLabelBounds_(extremeLabelIndex);
+                labelSize = isHorizontal ? extremeLabelBounds.width : extremeLabelBounds.height;
+              }
+              lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+              this.criticalTickLength_ = Math.min(parentBounds.width, parentBounds.height) / 2 - labelSize - lineThickness;
+            }
+            this.dropBoundsCache_();
+          }
         }
 
         var outerRadius = this.radius_ + delta;

@@ -2184,10 +2184,10 @@ anychart.core.radar.series.Base.prototype.getType = goog.abstractMethod;
 
 /**
  * Gets legend icon type for the series.
- * @return {anychart.enums.LegendItemIconType}
+ * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
  */
 anychart.core.radar.series.Base.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(this.getType());
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SQUARE);
 };
 
 

@@ -493,8 +493,9 @@ anychart.onDocumentLoad(function() {
   chart.title(null);
   chart.background().enabled(true);
 
+  chart.grid(0).oddFill('white').stroke('5 green').drawLastLine(false);
   chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('white');
+
 
   chart.palette(['blue .3', 'red .3', '#44F24A .9']);
   var series1 = chart.line(data3).closed(false).connectMissingPoints(false);

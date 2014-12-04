@@ -121,6 +121,12 @@ anychart.core.radar.series.Line.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.radar.series.Line.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
+};
+
+
 /**
  * @inheritDoc
  */

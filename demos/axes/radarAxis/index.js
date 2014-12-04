@@ -83,8 +83,11 @@ function load() {
   axis1.labels().rotation(0);
   axis1.stroke(stroke);
 
-  axis1.minorLabels().enabled(true);
-  axis1.minorTicks().enabled(true);
+  axis1.labels().enabled(true);
+  axis1.ticks().enabled(true);
+
+  //axis1.minorLabels().enabled(true);
+  //axis1.minorTicks().enabled(true);
 
   (drawer = function() {
     axis1.draw();
