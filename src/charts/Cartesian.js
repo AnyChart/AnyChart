@@ -745,7 +745,6 @@ anychart.charts.Cartesian.prototype.yAxis = function(opt_indexOrValue, opt_value
   var axis = this.yAxes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Linear();
-    axis.staggerMode(false);
     axis.orientation(this.barChartMode ? anychart.enums.Orientation.BOTTOM : anychart.enums.Orientation.LEFT);
     axis.zIndex(anychart.charts.Cartesian.ZINDEX_AXIS);
     axis.title().text('Y-Axis');
