@@ -27,7 +27,8 @@ var rawData = [
           'type': 'star5',
           'fill': 'red',
           'stroke': 'blue'
-        }
+        },
+        'connectTo': 'p12'
       },
       {
         'id': 'p12',
@@ -51,7 +52,8 @@ var rawData = [
           'type': 'star5',
           'fill': 'red',
           'stroke': 'blue'
-        }
+        },
+        'connectTo': 'p21'
       }
     ]
   },
@@ -76,7 +78,9 @@ var rawData = [
         'endMarker': {
           'type': 'star5',
           'stroke': 'red'
-        }
+        },
+        'connectTo': 'p3',
+        'connectorType': 'startStart'
       }
     ]
   },

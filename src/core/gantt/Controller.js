@@ -177,7 +177,6 @@ goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
  * @return {number} - Data item height.
  */
 anychart.core.gantt.Controller.getItemHeight = function(item) {
-  if (!item) debugger;
   return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.ui.DataGrid.DEFAULT_ROW_HEIGHT;
 };
 
@@ -339,7 +338,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             //We put here a link to the period if it is already in the map or ID of destination period.
             var to = this.periodsMap_[period[anychart.enums.GanttDataFields.CONNECT_TO]] || period[anychart.enums.GanttDataFields.CONNECT_TO];
             var type = period[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
-            var connectorsMapItem = {'from': period, 'to': to};
+            var connectorsMapItem = {'from': periodItem, 'to': to};
             if (type) connectorsMapItem['type'] = type;
             this.connectorsData_.push(connectorsMapItem);
           }
@@ -738,22 +737,21 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
 anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
   pxOffset = Math.max(pxOffset, 0);
   var totalHeight = this.heightCache_[this.heightCache_.length - 1];
-  if (pxOffset) {
-    this.suspendSignalsDispatching();
-    if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
-      this.endIndex(this.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
-    } else {
-      var itemIndex = this.getIndexByHeight_(pxOffset);
-      var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
-      var verticalOffset = itemIndex - previousHeight;
-      this
-          .verticalOffset(verticalOffset)
-          .startIndex(itemIndex);
-    }
+  this.suspendSignalsDispatching();
 
-    this.resumeSignalsDispatching(false);
-    this.run();
+  if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
+    this.endIndex(this.heightCache_.length - 1);
+  } else {
+    var itemIndex = this.getIndexByHeight_(pxOffset);
+    var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
+    var verticalOffset = pxOffset - previousHeight;
+    this
+        .verticalOffset(verticalOffset)
+        .startIndex(itemIndex);
   }
+  this.resumeSignalsDispatching(false);
+  this.run();
+
   return this;
 };
 

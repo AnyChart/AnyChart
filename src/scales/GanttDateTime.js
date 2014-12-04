@@ -735,7 +735,6 @@ anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
         interval = Math.max(this.totalMin_ - this.min_, msInterval);
       }
 
-
       this.setRange(this.min_ + interval, this.max_ + interval);
     } else {
       anychart.utils.error(anychart.enums.ErrorCode.SCALE_DATE_RANGE_NOT_SET);

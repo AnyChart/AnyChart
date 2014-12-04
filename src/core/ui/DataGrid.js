@@ -9,6 +9,9 @@ goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
+goog.require('goog.events');
+goog.require('goog.events.MouseWheelHandler');
+
 
 
 /**
@@ -803,6 +806,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
 
     column.title().text(columnTitle);
     column.title().height(this.titleHeight_);
+    column.title().width(columnWidth);
 
     var columnsCount = 0; //Calculating how many columns are currently visible.
     for (var i = 0, l = this.columns_.length; i < l; i++) {
@@ -1490,9 +1494,8 @@ anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
     this.title_
         .container(this.getTitleLayer_())
         .margin(0)
-        .padding(0, 0, 0, 5)
         .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-        .align(anychart.enums.Align.LEFT)
+        .hAlign(acgraph.vector.Text.HAlign.CENTER)
         .vAlign(acgraph.vector.Text.VAlign.MIDDLE);
     this.title_.resumeSignalsDispatching(false);
 
@@ -1649,6 +1652,52 @@ anychart.core.ui.DataGrid.Column.prototype.remove = function() {
 
 
 /**
+ * Initializes mouse wheel scrolling and mouse drag scrolling.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
+ */
+anychart.core.ui.DataGrid.prototype.initMouseFeatures = function() {
+  var mwh = new goog.events.MouseWheelHandler(this.getBase_().domElement());
+  var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
+  goog.events.listen(mwh, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+  var ths = this;
+
+  goog.events.listen(window, 'unload', function(e) {
+    goog.events.unlisten(mwh, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+  });
+};
+
+
+/**
+ * Mouse wheel default handler.
+ * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.mouseWheelHandler_ = function(e) {
+  this.scroll(e.deltaX, e.deltaY);
+  e.preventDefault();
+};
+
+
+/**
+ * Performs scroll to pixel offsets.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) horizontal scrolling of data grid is not available.
+ *
+ * @param {number} horizontalPixelOffset - Horizontal pixel offset.
+ * @param {number} verticalPixelOffset - Vertical pixel offset.
+ */
+anychart.core.ui.DataGrid.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset) {
+  anychart.core.Base.suspendSignalsDispatching(this, this.controller_);
+
+  var heightCache = this.controller_.getHeightCache();
+  var totalVerticalStartOffset = this.startIndex_ ? heightCache[this.startIndex_ - 1] : 0;
+  totalVerticalStartOffset += (this.verticalOffset_ + verticalPixelOffset);
+  this.controller_.scrollTo(totalVerticalStartOffset);
+
+  anychart.core.Base.resumeSignalsDispatchingTrue(this, this.controller_);
+};
+
+
+/**
  * Calculates actual column bounds.
  * @return {anychart.math.Rect}
  */
@@ -1720,6 +1769,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
       this.title_.parentBounds(this.pixelBoundsCache_);
       this.title_.height(titleHeight);
+      this.title_.width(this.pixelBoundsCache_.width);
       this.invalidate(anychart.ConsistencyState.TITLE);
 
       var data = this.dataGrid_.getVisibleItems();

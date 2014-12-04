@@ -12,7 +12,7 @@ anychart.onDocumentReady(function() {
 
   scale.setRange(min, max);
 
-  header = anychart.core.gantt.TimelineHeader();
+  header = new anychart.core.gantt.TimelineHeader();
   header.container(stage);
   header.scale(scale);
   header.bounds().set(0, 30, '60%', 60);

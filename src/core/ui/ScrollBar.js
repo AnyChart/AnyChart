@@ -712,7 +712,7 @@ anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo = function(value, opt_even
  * Performs the pixel step scroll.
  * NOTE: Negative step-parameter value is backward, positive one is forward.
  * NOTE 2: If the visible bounds are not set, nothing will be done.
- * @param {number=} opt_step - Ratio scroll step value.
+ * @param {number=} opt_step - Pixel scroll step value.
  * @param {string=} opt_eventSource - Event source. Additional information to be attached to event object. Used
  *  for advanced events manipulations.
  * @return {anychart.core.ui.ScrollBar} - Itself for chaining.

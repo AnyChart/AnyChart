@@ -105,6 +105,15 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.horizontalScrollBar_ = this.getTimeline().getScrollBar();
   this.registerDisposable(this.horizontalScrollBar_);
 
+
+  /**
+   * If chart is rendered first time.
+   * This flag is used to add mouse wheel event handlers.
+   * @type {boolean}
+   * @private
+   */
+  this.initialRendering_ = true;
+
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.Chart);
 
@@ -580,6 +589,25 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 };
 
 
+/** @override */
+anychart.charts.Gantt.prototype.draw = function() {
+  /*
+    This method is used to add mouse wheel handler.
+    Current implementation (03 Dec 2014) of mouse wheel handler in closure library
+    requires an Element as parameter. Element as element appears on render event only.
+    That's why we need to add handler right after first rendering.
+   */
+  goog.base(this, 'draw');
+
+  if (this.initialRendering_) {
+    this.initialRendering_ = false;
+    this.dg_.initMouseFeatures();
+    this.tl_.initMouseFeatures();
+  }
+  return this;
+};
+
+
 /**
  * Constructor function for gantt project chart.
  * @return {!anychart.charts.Gantt}
@@ -617,6 +645,7 @@ anychart.ganttResource = function() {
 //exports
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
+anychart.charts.Gantt.prototype['draw'] = anychart.charts.Gantt.prototype.draw;
 anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
 anychart.charts.Gantt.prototype['getDataGrid'] = anychart.charts.Gantt.prototype.getDataGrid;
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;

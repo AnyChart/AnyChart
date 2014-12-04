@@ -9,6 +9,8 @@ goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.scales.GanttDateTime');
 
 goog.require('goog.array');
+goog.require('goog.events');
+goog.require('goog.events.MouseWheelHandler');
 
 
 
@@ -1119,19 +1121,19 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
       var toRowHeight = anychart.core.gantt.Controller.getItemHeight(endItem);
 
       var fromStartTimestamp = this.isResourceChart_ ?
-          from['period'][anychart.enums.GanttDataFields.ACTUAL_START] :
+          from['period'][anychart.enums.GanttDataFields.START] :
           from['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
 
       var fromEndTimestamp = this.isResourceChart_ ?
-          from['period'][anychart.enums.GanttDataFields.ACTUAL_END] :
+          from['period'][anychart.enums.GanttDataFields.END] :
           from['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
 
       var toStartTimestamp = this.isResourceChart_ ?
-          to['period'][anychart.enums.GanttDataFields.ACTUAL_START] :
+          to['period'][anychart.enums.GanttDataFields.START] :
           to['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
 
       var toEndTimestamp = this.isResourceChart_ ?
-          to['period'][anychart.enums.GanttDataFields.ACTUAL_END] :
+          to['period'][anychart.enums.GanttDataFields.END] :
           to['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
 
       fromEndTimestamp = fromEndTimestamp || fromStartTimestamp; //Milestone.
@@ -1626,12 +1628,37 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.drawTimelineElements_();
     }
 
-
     if (manualSuspend) stage.resume();
-
   }
 
   return this;
+};
+
+
+/**
+ * Initializes mouse wheel scrolling and mouse drag scrolling.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
+ */
+anychart.core.gantt.Timeline.prototype.initMouseFeatures = function() {
+  var mwh = new goog.events.MouseWheelHandler(this.getBase_().domElement());
+  var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
+  goog.events.listen(mwh, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+  var ths = this;
+
+  goog.events.listen(window, 'unload', function(e) {
+    goog.events.unlisten(mwh, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+  });
+};
+
+
+/**
+ * Mouse wheel default handler.
+ * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.mouseWheelHandler_ = function(e) {
+  this.scroll(e.deltaX, e.deltaY);
+  e.preventDefault();
 };
 
 
@@ -1659,6 +1686,26 @@ anychart.core.gantt.Timeline.prototype.getScrollBar = function() {
     });
   }
   return this.horizontalScrollBar_;
+};
+
+
+/**
+ * Performs scroll to pixel offsets.
+ * @param {number} horizontalPixelOffset - Horizontal pixel offset.
+ * @param {number} verticalPixelOffset - Vertical pixel offset.
+ */
+anychart.core.gantt.Timeline.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset) {
+  anychart.core.Base.suspendSignalsDispatching(this, this.scale_, this.controller_);
+
+  var heightCache = this.controller_.getHeightCache();
+  var totalVerticalStartOffset = this.startIndex_ ? heightCache[this.startIndex_ - 1] : 0;
+  totalVerticalStartOffset += (this.verticalOffset_ + verticalPixelOffset);
+  this.controller_.scrollTo(totalVerticalStartOffset);
+
+  var ratio = horizontalPixelOffset / this.pixelBoundsCache_.width;
+  this.scale_.ratioScroll(ratio);
+
+  anychart.core.Base.resumeSignalsDispatchingTrue(this, this.scale_, this.controller_);
 };
 
 
