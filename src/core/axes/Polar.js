@@ -1063,11 +1063,6 @@ anychart.core.axes.Polar.prototype.getLabelBounds_ = function(index, isMajor) {
   bounds.left += offset.x;
   bounds.top += offset.y;
 
-  var pref = isMajor ? 'mj' : 'mi';
-  var name =  index + 'lbl' + pref;
-  if (!this[name]) this[name] = this.container().rect();
-  this[name].setBounds(bounds);
-
   return boundsCache[index] = bounds;
 };
 
