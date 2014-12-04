@@ -78,9 +78,10 @@ anychart.onDocumentLoad(function() {
 
   chart = anychart.radar()
       .container('container')
-      .startAngle(90);
+      .startAngle(0);
 
   chart.yScale().stackMode(anychart.enums.ScaleStackMode.VALUE);
+  chart.xScale().inverted(true);
 
   chart.palette(['blue .5', 'yellow .5', 'green .5', 'red .5']);
   chart.yAxis().enabled(true);
