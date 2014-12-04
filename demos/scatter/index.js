@@ -1,5 +1,5 @@
 anychart.onDocumentLoad(function() {
-  var chart = anychart.scatter();
+  var chart = anychart.scatterChart();
   chart.title().text('Sample Scatter Graph');
 
   chart.xScale().minimum(1.5).maximum(5.5).ticks().interval(1);
@@ -8,6 +8,8 @@ anychart.onDocumentLoad(function() {
   chart.yAxis(0).title().text('Waiting time between eruptions (Min)');
   chart.xAxis(0).title().text('Eruption duration (Min)');
   chart.xAxis(0).drawFirstLabel(false).drawLastLabel(false);
+
+  chart.legend().enabled(true);
 
   chart.grid(0)
     .oddFill('#F9F9F9')

@@ -103,6 +103,20 @@ anychart.charts.Scatter = function() {
    * @private
    */
   this.series_ = [];
+
+  // Add handler to listen legend item click for legend and enable/disable series.
+  var legend = /** @type {anychart.core.ui.Legend} */ (this.legend());
+  legend.listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
+    // function that enables or disables series by index of clicked legend item
+
+    var scatterChart = /** @type {anychart.charts.Scatter} */ (this);
+    var index = event['index'];
+    var series = scatterChart.getSeries(index);
+    if (series) {
+      series.enabled(!series.enabled());
+    }
+
+  }, false, this);
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.Chart);
 

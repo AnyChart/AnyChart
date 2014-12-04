@@ -111,24 +111,6 @@ anychart.core.scatter.series.Bubble.prototype.selfMaximumBubbleValue_ = NaN;
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
-anychart.core.scatter.series.Bubble.prototype.fill_ = (function() {
-  return this['sourceColor'];
-});
-
-
-/**
- * @type {(acgraph.vector.Fill|Function|null)}
- * @private
- */
-anychart.core.scatter.series.Bubble.prototype.hoverFill_ = (function() {
-  return anychart.color.lighten(this['sourceColor']);
-});
-
-
-/**
- * @type {(acgraph.vector.Fill|Function|null)}
- * @private
- */
 anychart.core.scatter.series.Bubble.prototype.negativeFill_ = (function() {
   return anychart.color.darken(
       anychart.color.darken(
@@ -148,24 +130,6 @@ anychart.core.scatter.series.Bubble.prototype.hoverNegativeFill_ = (function() {
               anychart.color.darken(
                   this['sourceColor']))));
 });
-
-
-/**
- * Hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
- * @private
- */
-anychart.core.scatter.series.Bubble.prototype.hatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
-
-
-/**
- * Hover hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
- * @private
- */
-anychart.core.scatter.series.Bubble.prototype.hoverHatchFill_;
 
 
 /**
@@ -801,173 +765,7 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
 
 
 /**
- * Getter for current series fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill('green');
- * @example <c>Linear gradient fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['green', 'yellow']);
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill('green', 0.4);
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], 45, true, 0.5);
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.area([1, 4, 7, 1]).fill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.scatter.series.Base|Function} .
- */
-anychart.core.scatter.series.Bubble.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * Getter for current series fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill('green');
- * @example <c>Linear gradient fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['green', 'yellow']);
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill('green', 0.4);
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], 45, true, 0.5);
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.area([1, 4, 7, 1]).hoverFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.scatter.series.Base|Function} .
- */
-anychart.core.scatter.series.Bubble.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    return this;
-  }
-  return this.hoverFill_;
-};
-
-
-/**
- * Getter for current series fill color.
+ * Getter for current series negative fill color.
  * @return {!acgraph.vector.Fill} Current fill color.
  *//**
  * Sets fill settings using an object or a string.<br/>
@@ -1096,7 +894,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
 
 
 /**
- * Getter for current series fill color.
+ * Getter for current series negative hover fill color.
  * @return {!acgraph.vector.Fill} Current fill color.
  *//**
  * Sets fill settings using an object or a string.<br/>
@@ -1240,88 +1038,6 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeFill = function(ho
               normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
-};
-
-
-/**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.scatter.series.Base|Function|boolean} Hatch fill.
- */
-anychart.core.scatter.series.Bubble.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * Getter for current hover hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
- *//**
- * Setter for hover hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hoverHatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.scatter.series.Base|Function|boolean} Hatch fill.
- */
-anychart.core.scatter.series.Bubble.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hoverHatchFill_)
-      this.hoverHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.hoverHatchFill_;
 };
 
 

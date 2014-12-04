@@ -577,8 +577,6 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
         var rightExtremeAngle = NaN;
         var bottomExtremeAngle = NaN;
 
-        var overlapp
-
         var scaleTicksArr = scale.ticks().get();
         var ticksArrLen = scaleTicksArr.length - 1;
 

@@ -286,18 +286,6 @@ anychart.core.scatter.series.Line.prototype.getMarkerFill = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.getLegendIconFill = function() {
-  return null;
-};
-
-
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.getLegendIconHatchFill = function() {
-  return null;
-};
-
-
 /**
  * @inheritDoc
  */
