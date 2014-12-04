@@ -1134,19 +1134,6 @@ anychart.core.ui.MarkersFactory.prototype.draw = function() {
 };
 
 
-/**
- * Disposing.
- */
-anychart.core.ui.MarkersFactory.prototype.disposeInternal = function() {
-  if (this.layer_) this.layer_.dispose();
-  this.layer_ = null;
-  this.positionFormatter_ = null;
-  this.measureMarkerElement_ = null;
-
-  goog.base(this, 'disposeInternal');
-};
-
-
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.remove = function() {
   this.layer_.remove();

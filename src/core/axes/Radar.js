@@ -350,6 +350,7 @@ anychart.core.axes.Radar.prototype.scale = function(opt_value) {
  */
 anychart.core.axes.Radar.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dropBoundsCache_();
     this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
@@ -411,9 +412,8 @@ anychart.core.axes.Radar.prototype.calculateAxisBounds_ = function() {
         var scaleTicksArr = scale.ticks().get();
         var ticksArrLen = scaleTicksArr.length;
 
-        this.sweep_ = 360 / ticksArrLen;
-
-        var angle = goog.math.standardAngle(this.startAngle() - 90);
+        var startAngle = goog.math.standardAngle(this.startAngle() - 90);
+        var angle;
 
         var leftExtreme = NaN;
         var topExtreme = NaN;
@@ -432,9 +432,14 @@ anychart.core.axes.Radar.prototype.calculateAxisBounds_ = function() {
 
         this.dropBoundsCache_();
         this.criticalTickLength_ = NaN;
+        var tickVal, ratio;
 
         for (i = 0; i < ticksArrLen; i++) {
           var x, y, x1, y1, lineThickness, angleRad, radius, tickLen;
+          tickVal = scaleTicksArr[i];
+          ratio = scale.transform(tickVal);
+          angle = goog.math.standardAngle(startAngle + ratio * 360);
+          angleRad = angle * Math.PI / 180;
           if (this.labels().enabled()) {
             var labelBounds = this.getLabelBounds_(i);
 
@@ -444,14 +449,12 @@ anychart.core.axes.Radar.prototype.calculateAxisBounds_ = function() {
             y1 = labelBounds.getBottom();
           } else if (this.ticks().enabled()) {
             lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-            angleRad = angle * Math.PI / 180;
             tickLen = this.ticks().enabled() ? this.ticks().length() : 0;
             radius = this.radius_ + tickLen + lineThickness / 2;
             x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
             y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
           } else {
             lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-            angleRad = angle * Math.PI / 180;
             radius = this.radius_ + lineThickness / 2;
             x = x1 = Math.round(this.cx_ + radius * Math.cos(angleRad));
             y = y1 = Math.round(this.cy_ + radius * Math.sin(angleRad));
@@ -477,8 +480,6 @@ anychart.core.axes.Radar.prototype.calculateAxisBounds_ = function() {
             bottomExtremeLabelIndex = i;
             bottomExtremeAngle = angle;
           }
-
-          angle = goog.math.standardAngle(angle + this.sweep_);
         }
 
         var leftDelta = 0;
@@ -647,8 +648,9 @@ anychart.core.axes.Radar.prototype.getLabelBounds_ = function(index) {
   var scaleTicks = scale.ticks();
 
   var value = scaleTicks.get()[index];
+  var ratio = scale.transform(value, 0);
 
-  var angle = goog.math.standardAngle(this.startAngle() - 90 + index * this.sweep_);
+  var angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
   var angleRad = angle * Math.PI / 180;
   var tickLen = ticks.enabled() ? isNaN(this.criticalTickLength_) ? this.ticks().length() : this.criticalTickLength_ : 0;
   var radius = this.radius_ + tickLen + lineThickness / 2;
@@ -829,12 +831,16 @@ anychart.core.axes.Radar.prototype.draw = function() {
     var i;
     var scaleTicksArr = scale.ticks().get();
     var ticksArrLen = scaleTicksArr.length;
-    var angle = goog.math.standardAngle(this.startAngle() - 90);
+    var startAngle = goog.math.standardAngle(this.startAngle() - 90);
     var tickLen = this.ticks().enabled() ? isNaN(this.criticalTickLength_) ? this.ticks().length() : this.criticalTickLength_ : 0;
     var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
+    var angle, angleRad, tickVal, ratio;
 
     for (i = 0; i < ticksArrLen; i++) {
-      var angleRad = angle * Math.PI / 180;
+      tickVal = scaleTicksArr[i];
+      ratio = scale.transform(tickVal);
+      angle = goog.math.standardAngle(startAngle + ratio * 360);
+      angleRad = angle * Math.PI / 180;
 
       if (lineDrawer) {
         var x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
@@ -873,8 +879,6 @@ anychart.core.axes.Radar.prototype.draw = function() {
           labelsDrawer.call(this, i, x1Ticks + offset.x, y1Ticks + offset.y);
         }
       }
-
-      angle = goog.math.standardAngle(angle + this.sweep_);
     }
     if (i != 0) this.line_.close();
     this.labels().draw();

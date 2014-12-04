@@ -577,12 +577,14 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
         var rightExtremeAngle = NaN;
         var bottomExtremeAngle = NaN;
 
+        var overlapp
+
         var scaleTicksArr = scale.ticks().get();
         var ticksArrLen = scaleTicksArr.length - 1;
 
         for (i = 0; i < ticksArrLen; i++) {
           value = scaleTicksArr[i];
-          ratio = scale.transform(value, .5);
+          ratio = scale.transform(value);
           angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
           angleRad = angle * Math.PI / 180;
 
@@ -649,7 +651,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
           if (this.minorLabels().enabled() || this.minorTicks().enabled()) {
             for (i = 0; i < minorTicksArrLen; i++) {
               value = scaleMinorTicksArr[i];
-              ratio = scale.transform(value, .5);
+              ratio = scale.transform(value);
               angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
               angleRad = angle * Math.PI / 180;
 
@@ -1045,7 +1047,7 @@ anychart.core.axes.Polar.prototype.getLabelBounds_ = function(index, isMajor) {
   var scaleTicks = isMajor ? scale.ticks() : scale.minorTicks();
 
   var value = scaleTicks.get()[index];
-  var ratio = scale.transform(value, .5);
+  var ratio = scale.transform(value);
 
   var angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
   var angleRad = angle * Math.PI / 180;

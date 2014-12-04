@@ -60,21 +60,22 @@ function load() {
   scale.maximum(360).minimum(0);
   scale.ticks().interval(15);
 
-//  scale = anychart.scales.ordinal();
-//  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'];
+  //scale = anychart.scales.ordinal();
+  //var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'];
 //  var values = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'];
 //  var values = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December December December' ];
 //  scale.values(values);
 //  scale.ticks().interval(1);
+//  scale.inverted(true);
 
-  parentBounds = new acgraph.math.Rect(0,0,553,720);
+  parentBounds = new acgraph.math.Rect(250,0,553,720);
   boundsRect = stage.rect();
   stroke = {color: 'red', thickness: 1, opacity: .3};
 
   remainingBounds = stage.rect().stroke('green');
 
   axis1 = anychart.axes.polar();
-  axis1.startAngle(0);
+  axis1.startAngle(190);
   axis1.scale(scale);
   axis1.container(stage);
   axis1.parentBounds(parentBounds);

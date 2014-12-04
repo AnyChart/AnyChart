@@ -256,7 +256,7 @@ anychart.core.axes.Linear.prototype.overlapMode_ = anychart.enums.LabelsOverlapM
  * @type {boolean}
  * @private
  */
-anychart.core.axes.Linear.prototype.staggerMode_ = true;
+anychart.core.axes.Linear.prototype.staggerMode_ = false;
 
 
 /**

@@ -97,8 +97,8 @@ function minorTickSet(value) {
 
 var scale;
 function load() {
-//  scale = new anychart.scales.Ordinal();
-//  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
+  scale = new anychart.scales.Ordinal();
+  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
 //  var values =
 //      [
 //        'January',
@@ -114,10 +114,11 @@ function load() {
 //        'November',
 //        'December'
 //      ];
-//  scale.values(values);
+  scale.values(values);
+  scale.inverted(true);
 //  scale.ticks().interval(1);
 
-  scale = new anychart.scales.Linear();
+  //scale = new anychart.scales.Linear();
 //  var ticks = ["0", "25", "50", "75", "100"];
 //  var minorTicks = [0, "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
 //  scale.ticks().set(ticks);
