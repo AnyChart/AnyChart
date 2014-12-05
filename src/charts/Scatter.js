@@ -1582,24 +1582,28 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
 
           if (orientation == anychart.enums.Orientation.TOP) {
             axis.padding().top(topOffset);
+            axis.padding().bottom(0);
             remainingBounds = axis.getRemainingBounds();
             topOffset = contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.topAxisPadding_))
               this.topAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.BOTTOM) {
             axis.padding().bottom(bottomOffset);
+            axis.padding().top(0);
             remainingBounds = axis.getRemainingBounds();
             bottomOffset = contentAreaBounds.height - remainingBounds.height;
             if (isNaN(this.bottomAxisPadding_))
               this.bottomAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.LEFT) {
             axis.padding().left(leftOffset);
+            axis.padding().right(0);
             remainingBounds = axis.getRemainingBounds();
             leftOffset = contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.leftAxisPadding_))
               this.leftAxisPadding_ = axisStrokeThickness;
           } else if (orientation == anychart.enums.Orientation.RIGHT) {
             axis.padding().right(rightOffset);
+            axis.padding().left(0);
             remainingBounds = axis.getRemainingBounds();
             rightOffset = contentAreaBounds.width - remainingBounds.width;
             if (isNaN(this.rightAxisPadding_))

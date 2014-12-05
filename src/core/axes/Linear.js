@@ -832,7 +832,7 @@ anychart.core.axes.Linear.prototype.getPixelBounds_ = function() {
     var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
     if (parentBounds) {
-      var parentLength;
+      var parentLength, parentSize;
 
       parentBounds.top = Math.round(parentBounds.top);
       parentBounds.left = Math.round(parentBounds.left);
@@ -842,46 +842,50 @@ anychart.core.axes.Linear.prototype.getPixelBounds_ = function() {
       var padding = this.padding();
       var length;
 
-      if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) {
-        parentLength = parentBounds.width;
-        length = parentLength - padding.left() - padding.right();
-      } else {
+      if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
         parentLength = parentBounds.height;
-        length = parentLength - padding.top() - padding.bottom();
+        parentSize = parentBounds.width;
+        length = padding.tightenHeight(parentLength);
+      } else {
+        parentLength = parentBounds.width;
+        parentSize = parentBounds.height;
+        length = padding.tightenWidth(parentLength);
       }
 
-      var size;
-      if (this.width_) {
-        size = anychart.utils.normalizeSize(this.width_, parentLength);
-      } else {
-        size = this.getSize_(parentBounds, length);
-      }
+      var size = this.width_ ?
+          anychart.utils.normalizeSize(this.width_, parentSize) :
+          this.getSize_(parentBounds, length);
 
       var x, y;
+
+      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.top()), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.right()), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.bottom()), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.left()), parentBounds.width);
 
       var width, height;
       switch (this.orientation()) {
         case anychart.enums.Orientation.TOP:
-          y = parentBounds.top + padding.top();
-          x = parentBounds.left + padding.left();
+          y = parentBounds.top + topPad;
+          x = parentBounds.left + leftPad;
           height = size;
           width = length;
           break;
         case anychart.enums.Orientation.RIGHT:
-          y = parentBounds.top + padding.top();
-          x = parentBounds.left + parentBounds.width - padding.left() - size - padding.right();
+          y = parentBounds.top + topPad;
+          x = parentBounds.left + parentBounds.width - leftPad - size - rightPad;
           height = length;
           width = size;
           break;
         case anychart.enums.Orientation.BOTTOM:
-          y = parentBounds.top + parentBounds.height - padding.top() - size - padding.bottom();
-          x = parentBounds.left + padding.left();
+          y = parentBounds.top + parentBounds.height - topPad - size - bottomPad;
+          x = parentBounds.left + leftPad;
           height = size;
           width = length;
           break;
         case anychart.enums.Orientation.LEFT:
-          y = parentBounds.top + padding.top();
-          x = parentBounds.left + padding.left();
+          y = parentBounds.top + topPad;
+          x = parentBounds.left + leftPad;
           height = length;
           width = size;
           break;
@@ -1279,7 +1283,6 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
 
   var line = this.line_;
   line.stroke(this.stroke_);
-  var lineThickness = line.stroke()['thickness'] ? parseFloat(line.stroke()['thickness']) : 1;
 
   if (title.enabled()) {
     if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
@@ -1384,21 +1387,23 @@ anychart.core.axes.Linear.prototype.getRemainingBounds = function() {
     var remainingBounds = parentBounds.clone();
     var axisBounds = this.getPixelBounds_();
     var padding = this.padding();
+    var widenHeight = padding.widenHeight(axisBounds.height);
+    var widenWidth = padding.widenWidth(axisBounds.width);
 
     switch (this.orientation()) {
       case anychart.enums.Orientation.TOP:
-        remainingBounds.height -= axisBounds.height + padding.top() + padding.bottom();
-        remainingBounds.top += axisBounds.height + padding.top() + padding.bottom();
+        remainingBounds.height -= widenHeight;
+        remainingBounds.top += widenHeight;
         break;
       case anychart.enums.Orientation.RIGHT:
-        remainingBounds.width -= axisBounds.width + padding.left() + padding.right();
+        remainingBounds.width -= widenWidth;
         break;
       case anychart.enums.Orientation.BOTTOM:
-        remainingBounds.height -= axisBounds.height + padding.top() + padding.bottom();
+        remainingBounds.height -= widenHeight;
         break;
       case anychart.enums.Orientation.LEFT:
-        remainingBounds.width -= axisBounds.width + padding.left() + padding.right();
-        remainingBounds.left += axisBounds.width + padding.left() + padding.right();
+        remainingBounds.width -= widenWidth;
+        remainingBounds.left += widenWidth;
         break;
     }
 
