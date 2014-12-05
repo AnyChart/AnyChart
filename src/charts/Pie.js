@@ -2526,7 +2526,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   if (droppedLabels) droppedLabels.length = 0;
   for (i = 0, len = rightDomains.length; i < len; i++) {
     domain = rightDomains[i];
-    if (domain.droppedLabels) {
+    if (domain && domain.droppedLabels) {
       if (!droppedLabels) droppedLabels = [];
       droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
     }
@@ -2602,17 +2602,19 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   var connectorPath;
   for (i = 0, len = leftDomains.length; i < len; i++) {
     domain = leftDomains[i];
-    domain.applyPositions();
+    if (domain) {
+      domain.applyPositions();
 
-    for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
-      label = domain.labels[k];
-      if (label && label.enabled() != false) {
-        index = label.getIndex();
+      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
+        label = domain.labels[k];
+        if (label && label.enabled() != false) {
+          index = label.getIndex();
 
-        if (!this.drawnConnectors_[index]) {
-          this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
-          connectorPath.stroke(this.connectorStroke_);
-          this.drawConnectorLine(label, connectorPath);
+          if (!this.drawnConnectors_[index]) {
+            this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            connectorPath.stroke(this.connectorStroke_);
+            this.drawConnectorLine(label, connectorPath);
+          }
         }
       }
     }
@@ -2622,17 +2624,19 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
   for (i = 0, len = rightDomains.length; i < len; i++) {
     domain = rightDomains[i];
-    domain.applyPositions();
+    if (domain) {
+      domain.applyPositions();
 
-    for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
-      label = domain.labels[k];
-      if (label && label.enabled() != false) {
-        index = label.getIndex();
+      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
+        label = domain.labels[k];
+        if (label && label.enabled() != false) {
+          index = label.getIndex();
 
-        if (!this.drawnConnectors_[index]) {
-          this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
-          connectorPath.stroke(this.connectorStroke_);
-          this.drawConnectorLine(label, connectorPath);
+          if (!this.drawnConnectors_[index]) {
+            this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            connectorPath.stroke(this.connectorStroke_);
+            this.drawConnectorLine(label, connectorPath);
+          }
         }
       }
     }
