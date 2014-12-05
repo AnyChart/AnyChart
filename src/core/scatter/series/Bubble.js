@@ -1197,7 +1197,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   json['minimumSize'] = this.minimumSize();
   json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();
-
   if (goog.isFunction(this.negativeFill())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1207,7 +1206,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
   }
-
   if (goog.isFunction(this.hoverNegativeFill())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1217,7 +1215,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['hoverNegativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeFill()));
   }
-
   if (goog.isFunction(this.negativeStroke())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1227,7 +1224,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['negativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.negativeStroke()));
   }
-
   if (goog.isFunction(this.hoverNegativeStroke())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1237,7 +1233,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['hoverNegativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverNegativeStroke()));
   }
-
   if (goog.isFunction(this.negativeHatchFill())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1247,7 +1242,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
   }
-
   if (goog.isFunction(this.hoverNegativeHatchFill())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1257,7 +1251,6 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
   } else {
     json['hoverNegativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeHatchFill()));
   }
-
   return json;
 };
 
@@ -1265,25 +1258,17 @@ anychart.core.scatter.series.Bubble.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Bubble.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
+anychart.core.scatter.series.Bubble.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.minimumSize(config['minimumSize']);
   this.maximumSize(config['maximumSize']);
   this.displayNegative(config['displayNegative']);
-
   this.negativeFill(config['negativeFill']);
   this.hoverNegativeFill(config['hoverNegativeFill']);
   this.negativeStroke(config['negativeStroke']);
   this.hoverNegativeStroke(config['hoverNegativeStroke']);
   this.negativeHatchFill(config['negativeHatchFill']);
   this.hoverNegativeHatchFill(config['hoverNegativeHatchFill']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
 };
 
 
@@ -1302,10 +1287,10 @@ anychart.core.scatter.series.Bubble.prototype.restoreDefaults = function() {
 };
 
 
+//anychart.core.scatter.series.Bubble.prototype['hoverSeries'] = anychart.core.scatter.series.Bubble.prototype.hoverSeries;//inherited
+//anychart.core.scatter.series.Bubble.prototype['hoverPoint'] = anychart.core.scatter.series.Bubble.prototype.hoverPoint;//inherited
+//anychart.core.scatter.series.Bubble.prototype['unhover'] = anychart.core.scatter.series.Bubble.prototype.unhover;//inherited
 //exports
-anychart.core.scatter.series.Bubble.prototype['hoverSeries'] = anychart.core.scatter.series.Bubble.prototype.hoverSeries;//inherited
-anychart.core.scatter.series.Bubble.prototype['hoverPoint'] = anychart.core.scatter.series.Bubble.prototype.hoverPoint;//inherited
-anychart.core.scatter.series.Bubble.prototype['unhover'] = anychart.core.scatter.series.Bubble.prototype.unhover;//inherited
 anychart.core.scatter.series.Bubble.prototype['minimumSize'] = anychart.core.scatter.series.Bubble.prototype.minimumSize;
 anychart.core.scatter.series.Bubble.prototype['maximumSize'] = anychart.core.scatter.series.Bubble.prototype.maximumSize;
 anychart.core.scatter.series.Bubble.prototype['displayNegative'] = anychart.core.scatter.series.Bubble.prototype.displayNegative;

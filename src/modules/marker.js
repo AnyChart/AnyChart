@@ -17,6 +17,8 @@ goog.require('anychart.modules.base');
 anychart.marker = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.MARKER);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);
   }
@@ -44,6 +46,9 @@ anychart.marker = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.MARKER] = anychart.marker;
 
 
 /**

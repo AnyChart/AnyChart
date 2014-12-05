@@ -20,9 +20,9 @@ goog.inherits(anychart.core.cartesian.series.WidthBased, anychart.core.cartesian
 
 /**
  * @private
- * @type {(number|string)}
+ * @type {(number|string|null)}
  */
-anychart.core.cartesian.series.WidthBased.prototype.barWidth_;
+anychart.core.cartesian.series.WidthBased.prototype.barWidth_ = null;
 
 
 /**
@@ -45,7 +45,7 @@ anychart.core.cartesian.series.WidthBased.prototype.autoBarWidth_ = '90%';
  * @return {anychart.core.cartesian.series.WidthBased} {@link anychart.core.cartesian.series.WidthBased} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|string)=} opt_value Point width pixel value.
+ * @param {(number|string|null)=} opt_value Point width pixel value.
  * @return {string|number|anychart.core.cartesian.series.WidthBased} Bar width pixel value or Bar instance for chaining call.
  */
 anychart.core.cartesian.series.WidthBased.prototype.pointWidth = function(opt_value) {
@@ -53,7 +53,7 @@ anychart.core.cartesian.series.WidthBased.prototype.pointWidth = function(opt_va
     this.barWidth_ = opt_value;
     return this;
   } else {
-    return goog.isDef(this.barWidth_) ? this.barWidth_ : this.autoBarWidth_;
+    return goog.isDefAndNotNull(this.barWidth_) ? this.barWidth_ : this.autoBarWidth_;
   }
 };
 
@@ -87,7 +87,7 @@ anychart.core.cartesian.series.WidthBased.prototype.getPointWidth = function() {
  */
 anychart.core.cartesian.series.WidthBased.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['pointWidth'] = this.pointWidth();
+  json['pointWidth'] = this.barWidth_ || null;
   return json;
 };
 
@@ -95,9 +95,9 @@ anychart.core.cartesian.series.WidthBased.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.WidthBased.prototype.deserialize = function(config) {
+anychart.core.cartesian.series.WidthBased.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.pointWidth(config['pointWidth']);
-  return goog.base(this, 'deserialize', config);
 };
 
 

@@ -830,14 +830,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.ui.DataGrid.Column) {
-      //TODO Check related DG.
-      column.deserialize(value.serialize());
-    } else if (goog.isObject(value)) {
-      column.deserialize(value);
-    } else if (anychart.utils.isNone(value)) {
-      column.enabled(false);
-    }
+    column.setup(value);
     return this;
   } else {
     if (newColumn) this.invalidate(anychart.ConsistencyState.GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -1153,7 +1146,7 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.DataGrid.prototype.deserialize = function(json) {
+anychart.core.ui.DataGrid.prototype.setupByJSON = function(json) {
   this.suspendSignalsDispatching();
 
   this.isStandalone_ = json['isStandalone'];
@@ -1174,7 +1167,7 @@ anychart.core.ui.DataGrid.prototype.deserialize = function(json) {
   }
 
   this.resumeSignalsDispatching(true);
-  return goog.base(this, 'deserialize', json);
+  return goog.base(this, 'setupByJSON', json);
 };
 
 
@@ -1423,9 +1416,9 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
   if (goog.isDef(opt_value)) {
     var redraw = true;
     if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labelsFactory_.deserialize(opt_value.serialize());
+      this.labelsFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
-      this.labelsFactory_.deserialize(opt_value);
+      this.labelsFactory_.setup(opt_value);
     } else if (anychart.utils.isNone(opt_value)) {
       this.labelsFactory_.enabled(false);
     } else {
@@ -1506,13 +1499,7 @@ anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
 
   if (goog.isDef(opt_value)) {
     this.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Title) {
-      this.title_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.title_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.title_.enabled(false);
-    }
+    this.title_.setup(opt_value);
     this.title_.container(this.getTitleLayer_());
     this.resumeSignalsDispatching(true);
     return this;
@@ -1882,7 +1869,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.DataGrid.Column.prototype.deserialize = function(json) {
+anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
   this.suspendSignalsDispatching();
 
   this
@@ -1894,7 +1881,7 @@ anychart.core.ui.DataGrid.Column.prototype.deserialize = function(json) {
       .title(json['title']);
 
   this.resumeSignalsDispatching(true);
-  return goog.base(this, 'deserialize', json);
+  return goog.base(this, 'setupByJSON', json);
 };
 
 

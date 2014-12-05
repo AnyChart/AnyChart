@@ -318,7 +318,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.unhover = function() {
  */
 anychart.core.cartesian.series.ContinuousBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['connectMissing'] = this.connectMissing;
+  json['connectMissingPoints'] = this.connectMissingPoints();
   return json;
 };
 
@@ -326,12 +326,9 @@ anychart.core.cartesian.series.ContinuousBase.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.ContinuousBase.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
-  this.connectMissingPoints(config['connectMissing']);
-  this.resumeSignalsDispatching(false);
-  return this;
+anychart.core.cartesian.series.ContinuousBase.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.connectMissingPoints(config['connectMissingPoints']);
 };
 
 
@@ -351,10 +348,10 @@ anychart.core.cartesian.series.ContinuousBase.prototype.restoreDefaults = functi
 };
 
 
+//anychart.core.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing;//inherited
+//anychart.core.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.core.cartesian.series.ContinuousBase.prototype.drawMissing;//inherited
+//anychart.core.cartesian.series.ContinuousBase.prototype['hoverSeries'] = anychart.core.cartesian.series.ContinuousBase.prototype.hoverSeries;//inherited
+//anychart.core.cartesian.series.ContinuousBase.prototype['hoverPoint'] = anychart.core.cartesian.series.ContinuousBase.prototype.hoverPoint;//inherited
+//anychart.core.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.core.cartesian.series.ContinuousBase.prototype.unhover;//inherited
 //exports
-anychart.core.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing;//inherited
-anychart.core.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.core.cartesian.series.ContinuousBase.prototype.drawMissing;//inherited
-anychart.core.cartesian.series.ContinuousBase.prototype['hoverSeries'] = anychart.core.cartesian.series.ContinuousBase.prototype.hoverSeries;//inherited
-anychart.core.cartesian.series.ContinuousBase.prototype['hoverPoint'] = anychart.core.cartesian.series.ContinuousBase.prototype.hoverPoint;//inherited
-anychart.core.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.core.cartesian.series.ContinuousBase.prototype.unhover;//inherited
 anychart.core.cartesian.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.cartesian.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex

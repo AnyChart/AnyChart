@@ -24,3 +24,6 @@ anychart.ui.background = function() {
 
 //exports
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
+anychart.ui.Background.prototype['draw'] = anychart.ui.Background.prototype.draw;
+anychart.ui.Background.prototype['parentBounds'] = anychart.ui.Background.prototype.parentBounds;
+anychart.ui.Background.prototype['container'] = anychart.ui.Background.prototype.container;

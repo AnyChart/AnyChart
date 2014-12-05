@@ -536,15 +536,12 @@ anychart.core.cartesian.series.OHLC.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.OHLC.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.cartesian.series.OHLC.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.risingStroke(config['risingStroke']);
   this.hoverRisingStroke(config['hoverRisingStroke']);
   this.fallingStroke(config['fallingStroke']);
   this.hoverFallingStroke(config['hoverFallingStroke']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 

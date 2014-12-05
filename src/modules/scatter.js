@@ -53,6 +53,9 @@ anychart.scatter = function(var_args) {
   return chart;
 };
 
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.SCATTER] = anychart.scatter;
+
 //exports
 goog.exportSymbol('anychart.scatter', anychart.scatter);
 goog.exportSymbol('anychart.scatterChart', anychart.scatter);

@@ -167,18 +167,38 @@ anychart.palettes.DistinctColors.prototype.restoreDefaults = function(opt_doNotD
 };
 
 
-/**
- * Copies type and colors settings from the passed palette to itself.
- * @param {anychart.palettes.DistinctColors} palette Color palette to copy settings from.
- * @return {!anychart.palettes.DistinctColors} Returns itself for chaining.
- */
-anychart.palettes.DistinctColors.prototype.cloneFrom = function(palette) {
-  if (goog.isDefAndNotNull(palette)) {
-    this.colors_ = palette.colors_;
-  } else {
-    this.colors_ = [];
+/** @inheritDoc */
+anychart.palettes.DistinctColors.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['type'] = 'distinct';
+  var res = [];
+  for (var i = 0; i < this.colors_.length; i++) {
+    res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.colors_[i])));
   }
-  return this;
+  json['colors'] = res;
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.colors(args[0]);
+    return true;
+  }
+  if (args[0] instanceof anychart.palettes.DistinctColors) {
+    this.colors(args[0].colors());
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
+/** @inheritDoc */
+anychart.palettes.DistinctColors.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.colors(config['colors']);
 };
 
 

@@ -135,14 +135,6 @@ anychart.core.cartesian.series.RangeStepArea.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeStepArea.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.RangeStepArea.prototype['fill'] = anychart.core.cartesian.series.RangeStepArea.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeStepArea.prototype['hoverFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.hoverFill;//inherited

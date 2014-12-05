@@ -558,18 +558,20 @@ anychart.core.polar.series.Marker.prototype.restoreDefaults = function() {
 /**
  * @inheritDoc
  */
-anychart.core.polar.series.Marker.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.polar.series.Marker.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.type(config['type']);
   this.hoverType(config['hoverType']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
+//anychart.core.polar.series.Marker.prototype['startDrawing'] = anychart.core.polar.series.Marker.prototype.startDrawing;
+//anychart.core.polar.series.Marker.prototype['finalizeDrawing'] = anychart.core.polar.series.Marker.prototype.finalizeDrawing;
+//anychart.core.polar.series.Marker.prototype['hoverSeries'] = anychart.core.polar.series.Marker.prototype.hoverSeries;
+//anychart.core.polar.series.Marker.prototype['hoverPoint'] = anychart.core.polar.series.Marker.prototype.hoverPoint;
+//anychart.core.polar.series.Marker.prototype['unhover'] = anychart.core.polar.series.Marker.prototype.unhover;
 //exports
 anychart.core.polar.series.Marker.prototype['stroke'] = anychart.core.polar.series.Marker.prototype.stroke;
 anychart.core.polar.series.Marker.prototype['hoverStroke'] = anychart.core.polar.series.Marker.prototype.hoverStroke;
@@ -579,10 +581,5 @@ anychart.core.polar.series.Marker.prototype['size'] = anychart.core.polar.series
 anychart.core.polar.series.Marker.prototype['hoverSize'] = anychart.core.polar.series.Marker.prototype.hoverSize;
 anychart.core.polar.series.Marker.prototype['type'] = anychart.core.polar.series.Marker.prototype.type;
 anychart.core.polar.series.Marker.prototype['hoverType'] = anychart.core.polar.series.Marker.prototype.hoverType;
-anychart.core.polar.series.Marker.prototype['startDrawing'] = anychart.core.polar.series.Marker.prototype.startDrawing;
-anychart.core.polar.series.Marker.prototype['finalizeDrawing'] = anychart.core.polar.series.Marker.prototype.finalizeDrawing;
-anychart.core.polar.series.Marker.prototype['hoverSeries'] = anychart.core.polar.series.Marker.prototype.hoverSeries;
-anychart.core.polar.series.Marker.prototype['hoverPoint'] = anychart.core.polar.series.Marker.prototype.hoverPoint;
-anychart.core.polar.series.Marker.prototype['unhover'] = anychart.core.polar.series.Marker.prototype.unhover;
 anychart.core.polar.series.Marker.prototype['hatchFill'] = anychart.core.polar.series.Marker.prototype.hatchFill;
 anychart.core.polar.series.Marker.prototype['hoverHatchFill'] = anychart.core.polar.series.Marker.prototype.hoverHatchFill;

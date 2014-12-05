@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.Linear');
 
+goog.require('anychart.enums');
 goog.require('anychart.scales.ScatterBase');
 goog.require('anychart.scales.ScatterTicks');
 
@@ -42,6 +43,12 @@ anychart.scales.Linear = function() {
 goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
 
 
+/** @inheritDoc */
+anychart.scales.Linear.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.LINEAR;
+};
+
+
 /**
  * Getter for set of scale ticks in terms of data values.
  * @return {!anychart.scales.ScatterTicks} Current ticks.
@@ -63,7 +70,7 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
     this.ticksObj = this.createTicks();
   }
   if (goog.isDef(opt_value)) {
-    this.ticksObj.set(opt_value);
+    this.ticksObj.setup(opt_value);
     return this;
   }
   return this.ticksObj;
@@ -94,7 +101,7 @@ anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
     this.minorTicksObj.resumeSignalsDispatching(false);
   }
   if (goog.isDef(opt_value)) {
-    this.minorTicksObj.set(opt_value);
+    this.minorTicksObj.setup(opt_value);
     return this;
   }
   return this.minorTicksObj;
@@ -107,7 +114,7 @@ anychart.scales.Linear.prototype.calculate = function() {
 
   goog.base(this, 'calculate');
 
-  var setupResult = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto, this.logBaseVal);
+  var setupResult = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto, this.logBaseVal);
 
   if (this.minimumModeAuto)
     this.min = setupResult[0]; // new min
@@ -152,22 +159,20 @@ anychart.scales.Linear.prototype.createTicks = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Linear.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['ticks'] = this.ticks().serialize();
-  data['minorTicks'] = this.minorTicks().serialize();
-  data['type'] = 'linear';
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['ticks'] = this.ticks().serialize();
+  json['minorTicks'] = this.minorTicks().serialize();
+  json['stackMode'] = this.stackMode();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.Linear.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
-  this.ticks().deserialize(value['ticks']);
-  this.minorTicks().deserialize(value['minorTicks']);
-  this.resumeSignalsDispatching(true);
-  return this;
+anychart.scales.Linear.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
+  this.stackMode(config['stackMode']);
 };
 
 

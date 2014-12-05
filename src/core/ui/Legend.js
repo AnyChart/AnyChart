@@ -100,25 +100,24 @@ anychart.core.ui.Legend = function() {
     .padding(7)
     .margin(5);
 
-  var bg = new anychart.core.ui.Background()
-    .enabled(true)
-    .fill(/** @type {acgraph.vector.LinearGradientFill} */({
+  this.background()
+      .enabled(true)
+      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
         'keys': [
           '0 rgb(255,255,255) 1',
           '0.5 rgb(243,243,243) 1',
           '1 rgb(255,255,255) 1'],
         'angle': '90'
       }))
-    .stroke({
+      .stroke({
         'keys': [
           '0 rgb(221,221,221) 1',
           '1 rgb(208,208,208) 1'
         ],
         'angle': '90'
       })
-    .corners(5);
-  this.background(/** @type {anychart.core.ui.Background} */ (bg))
-    .zIndex(0);
+      .corners(5)
+      .zIndex(0);
   //
   this.title()
     .enabled(true)
@@ -340,11 +339,7 @@ anychart.core.ui.Legend.prototype.margin = function(opt_spaceOrTopOrTopAndBottom
     this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.margin_.set.apply(this.margin_, arguments);
-    }
+    this.margin_.setup.apply(this.margin_, arguments);
     return this;
   }
   return this.margin_;
@@ -380,11 +375,7 @@ anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.padding_.set.apply(this.padding_, arguments);
-    }
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -411,16 +402,7 @@ anychart.core.ui.Legend.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Background) {
-      this.background_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.background_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.background_.enabled(false);
-    }
-    this.background_.resumeSignalsDispatching(false);
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.background_.setup(opt_value);
     return this;
   } else {
     return this.background_;
@@ -461,18 +443,7 @@ anychart.core.ui.Legend.prototype.title = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.title_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Title) {
-      this.title_.deserialize(opt_value.serialize());
-    } else if (goog.isString(opt_value)) {
-      this.title_.text(opt_value);
-    } else if (goog.isObject(opt_value)) {
-      this.title_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.title_.enabled(false);
-    }
-    this.title_.resumeSignalsDispatching(true);
-    this.invalidate(anychart.ConsistencyState.TITLE, anychart.Signal.NEEDS_REDRAW);
+    this.title_.setup(opt_value);
     return this;
   } else {
     return this.title_;
@@ -511,8 +482,8 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {*=} opt_value Separator setting.
- * @return {(*|anychart.core.ui.Legend)} Separator setting or self for method chaining.
+ * @param {(Object|string|null|anychart.core.ui.Separator)=} opt_value Separator setting.
+ * @return {(Object|string|null|anychart.core.ui.Separator|anychart.core.ui.Legend)} Separator setting or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.titleSeparator = function(opt_value) {
   if (!this.titleSeparator_) {
@@ -522,14 +493,7 @@ anychart.core.ui.Legend.prototype.titleSeparator = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Separator) {
-      this.titleSeparator_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.titleSeparator_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.titleSeparator_.enabled(false);
-    }
-    this.invalidate(anychart.ConsistencyState.TITLE, anychart.Signal.NEEDS_REDRAW);
+    this.titleSeparator_.setup(opt_value);
     return this;
   } else {
     return this.titleSeparator_;
@@ -579,13 +543,7 @@ anychart.core.ui.Legend.prototype.paginator = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Paginator) {
-      this.paginator_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.paginator_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.paginator_.enabled(false);
-    }
+    this.paginator_.setup(opt_value);
     return this;
   } else {
     return this.paginator_;
@@ -626,13 +584,7 @@ anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Tooltip) {
-      this.tooltip_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.tooltip_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.tooltip_.enabled(false);
-    }
+    this.tooltip_.setup(opt_value);
     return this;
   } else {
     return this.tooltip_;
@@ -863,7 +815,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function() {
     var provider; // legend item provider object
     for (var i = 0; i < this.itemsProvider_.length; i++) {
       provider = this.itemsProvider_[i];
-      item = new anychart.core.ui.LegendItem();
+      item = this.createItem();
 
       item.iconType(provider['iconType'] ? provider['iconType'] : anychart.enums.LegendItemIconType.SQUARE);
       item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
@@ -891,6 +843,15 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function() {
     this.legendItemsMeta_ = null;
   }
   this.invalidate(anychart.ConsistencyState.BOUNDS);
+};
+
+
+/**
+ * @protected
+ * @return {anychart.core.ui.LegendItem}
+ */
+anychart.core.ui.Legend.prototype.createItem = function() {
+  return new anychart.core.ui.LegendItem();
 };
 
 
@@ -1548,59 +1509,44 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.ui.Legend.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
-  json['position'] = this.position();
-  json['align'] = this.align();
-  json['itemsSpacing'] = this.itemsSpacing();
-  json['iconTextSpacing'] = this.iconTextSpacing();
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['itemsLayout'] = this.itemsLayout();
-
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
   json['title'] = this.title().serialize();
   json['titleSeparator'] = this.titleSeparator().serialize();
   json['paginator'] = this.paginator().serialize();
-
+  json['tooltip'] = this.tooltip().serialize();
+  json['itemsLayout'] = this.itemsLayout();
+  json['itemsSpacing'] = this.itemsSpacing();
+  json['iconTextSpacing'] = this.iconTextSpacing();
+  json['width'] = this.width();
+  json['height'] = this.height();
+  json['position'] = this.position();
+  json['align'] = this.align();
   return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Legend.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.position(config['position']);
-  this.align(config['align']);
-  this.itemsSpacing(config['itemsSpacing']);
-  this.iconTextSpacing(config['iconTextSpacing']);
-  this.width(config['config']);
-  this.height(config['config']);
-  this.itemsLayout(config['itemsLayout']);
-
-  this.textSettings(config);
-
-  if (config['margin']) this.margin().deserialize(config['margin']);
-  if (config['padding']) this.padding().deserialize(config['padding']);
+/** @inheritDoc */
+anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.margin(config['margin']);
+  this.padding(config['padding']);
   this.background(config['background']);
   this.title(config['title']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+  this.tooltip(config['tooltip']);
+  this.itemsLayout(config['itemsLayout']);
+  this.itemsSpacing(config['itemsSpacing']);
+  this.iconTextSpacing(config['iconTextSpacing']);
+  this.width(config['width']);
+  this.height(config['height']);
+  this.position(config['position']);
+  this.align(config['align']);
 };
 
 
@@ -1623,7 +1569,6 @@ anychart.core.ui.Legend.LegendItemProvider;
 
 //exports
 anychart.core.ui.Legend.prototype['itemsLayout'] = anychart.core.ui.Legend.prototype.itemsLayout;
-anychart.core.ui.Legend.prototype['itemsProvider'] = anychart.core.ui.Legend.prototype.itemsProvider;
 anychart.core.ui.Legend.prototype['itemsSpacing'] = anychart.core.ui.Legend.prototype.itemsSpacing;
 anychart.core.ui.Legend.prototype['iconTextSpacing'] = anychart.core.ui.Legend.prototype.iconTextSpacing;
 anychart.core.ui.Legend.prototype['margin'] = anychart.core.ui.Legend.prototype.margin;
@@ -1638,4 +1583,3 @@ anychart.core.ui.Legend.prototype['height'] = anychart.core.ui.Legend.prototype.
 anychart.core.ui.Legend.prototype['position'] = anychart.core.ui.Legend.prototype.position;
 anychart.core.ui.Legend.prototype['align'] = anychart.core.ui.Legend.prototype.align;
 anychart.core.ui.Legend.prototype['getRemainingBounds'] = anychart.core.ui.Legend.prototype.getRemainingBounds;
-anychart.core.ui.Legend.prototype['draw'] = anychart.core.ui.Legend.prototype.draw;

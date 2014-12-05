@@ -307,9 +307,9 @@ anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
 
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.minorLabels_.deserialize(opt_value.serialize());
+      this.minorLabels_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
-      this.minorLabels_.deserialize(opt_value);
+      this.minorLabels_.setup(opt_value);
     } else if (anychart.utils.isNone(opt_value)) {
       this.minorLabels_.enabled(false);
     }
@@ -333,15 +333,7 @@ anychart.core.axes.Polar.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labels_.enabled(false);
-    }
-
-    this.dropBoundsCache_();
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -359,11 +351,11 @@ anychart.core.axes.Polar.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
-    this.dropBoundsCache_();
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.LABELS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
+  this.dropBoundsCache_();
 
   this.invalidate(state, signal);
 };
@@ -381,17 +373,7 @@ anychart.core.axes.Polar.prototype.minorTicks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.minorTicks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.RadialTicks) {
-      this.minorTicks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorTicks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorTicks_.enabled(false);
-    }
-    this.minorTicks_.resumeSignalsDispatching(true);
-    this.dropBoundsCache_();
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.minorTicks_.setup(opt_value);
     return this;
   }
   return this.minorTicks_;
@@ -410,18 +392,7 @@ anychart.core.axes.Polar.prototype.ticks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.ticks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.RadialTicks) {
-      this.ticks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.ticks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.ticks_.enabled(false);
-    }
-    this.ticks_.resumeSignalsDispatching(true);
-    this.dropBoundsCache_();
-    this.invalidate(anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.ticks_.setup(opt_value);
     return this;
   }
   return this.ticks_;
@@ -439,11 +410,12 @@ anychart.core.axes.Polar.prototype.ticksInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
-    this.dropBoundsCache_();
-  } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.TICKS;
-    signal = anychart.Signal.NEEDS_REDRAW;
   }
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.TICKS | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  this.dropBoundsCache_();
   this.invalidate(state, signal);
 };
 
@@ -1402,42 +1374,32 @@ anychart.core.axes.Polar.prototype.remove = function() {
 };
 
 
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.Polar.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-
-  data['labels'] = this.labels().serialize();
-  data['minorLabels'] = this.minorLabels().serialize();
-  data['ticks'] = this.ticks().serialize();
-  data['minorTicks'] = this.minorTicks().serialize();
-
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  data['name'] = this.name();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['labels'] = this.labels().serialize();
+  json['minorLabels'] = this.minorLabels().serialize();
+  json['ticks'] = this.ticks().serialize();
+  json['minorTicks'] = this.minorTicks().serialize();
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  json['name'] = this.name();
+  //json['startAngle'] = this.startAngle();
+  json['overlapMode'] = this.overlapMode();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.Polar.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.labels(value['labels']);
-  this.minorLabels(value['minorLabels']);
-  this.ticks(value['ticks']);
-  this.minorTicks(value['minorTicks']);
-
-  this.name(value['name']);
-  this.stroke(value['stroke']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.Polar.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.labels(config['labels']);
+  this.minorLabels(config['minorLabels']);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
+  this.name(config['name']);
+  //this.startAngle(config['startAngle']);
+  this.stroke(config['stroke']);
+  this.overlapMode(config['overlapMode']);
 };
 
 
@@ -1463,15 +1425,14 @@ anychart.core.axes.Polar.prototype.disposeInternal = function() {
 };
 
 
+//anychart.core.axes.Polar.prototype['startAngle'] = anychart.core.axes.Polar.prototype.startAngle;
 //exports
 anychart.core.axes.Polar.prototype['name'] = anychart.core.axes.Polar.prototype.name;
-anychart.core.axes.Polar.prototype['startAngle'] = anychart.core.axes.Polar.prototype.startAngle;
 anychart.core.axes.Polar.prototype['labels'] = anychart.core.axes.Polar.prototype.labels;
 anychart.core.axes.Polar.prototype['minorLabels'] = anychart.core.axes.Polar.prototype.minorLabels;
 anychart.core.axes.Polar.prototype['ticks'] = anychart.core.axes.Polar.prototype.ticks;
 anychart.core.axes.Polar.prototype['minorTicks'] = anychart.core.axes.Polar.prototype.minorTicks;
 anychart.core.axes.Polar.prototype['stroke'] = anychart.core.axes.Polar.prototype.stroke;
 anychart.core.axes.Polar.prototype['scale'] = anychart.core.axes.Polar.prototype.scale;
-anychart.core.axes.Polar.prototype['getRemainingBounds'] = anychart.core.axes.Polar.prototype.getRemainingBounds;
-anychart.core.axes.Polar.prototype['draw'] = anychart.core.axes.Polar.prototype.draw;
 anychart.core.axes.Polar.prototype['overlapMode'] = anychart.core.axes.Polar.prototype.overlapMode;
+anychart.core.axes.Polar.prototype['getRemainingBounds'] = anychart.core.axes.Polar.prototype.getRemainingBounds;

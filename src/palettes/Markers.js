@@ -79,7 +79,7 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
     }
     if (goog.isArray(opt_markers)) {
       this.markers_ = goog.array.map(opt_markers, function(marker) {
-        return marker.toLowerCase();
+        return ('' + marker).toLowerCase();
       });
     }
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -100,14 +100,27 @@ anychart.palettes.Markers.prototype.serialize = function() {
 };
 
 
+/** @inheritDoc */
+anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.markers(args[0]);
+    return true;
+  }
+  if (args[0] instanceof anychart.palettes.Markers) {
+    this.markers(args[0].markers());
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
 /**
  * @inheritDoc
  */
-anychart.palettes.Markers.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
+anychart.palettes.Markers.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.markers(config['markers']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 

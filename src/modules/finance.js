@@ -25,6 +25,8 @@ goog.require('anychart.modules.base');
 anychart.financial = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.CANDLESTICK);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.candlestick(arguments[i]);
   }
@@ -61,6 +63,9 @@ anychart.financial = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.FINANCIAL] = anychart.financial;
 
 
 /**

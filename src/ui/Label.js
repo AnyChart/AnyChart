@@ -24,3 +24,6 @@ anychart.ui.label = function() {
 
 //exports
 goog.exportSymbol('anychart.ui.label', anychart.ui.label);
+anychart.ui.Label.prototype['draw'] = anychart.ui.Label.prototype.draw;
+anychart.ui.Label.prototype['parentBounds'] = anychart.ui.Label.prototype.parentBounds;
+anychart.ui.Label.prototype['container'] = anychart.ui.Label.prototype.container;

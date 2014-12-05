@@ -178,7 +178,7 @@ anychart.core.cartesian.series.DiscreteBase.prototype.unhover = function() {
 };
 
 
+//anychart.core.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries;//inherited
+//anychart.core.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint;//inherited
+//anychart.core.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.core.cartesian.series.DiscreteBase.prototype.unhover;//inherited
 //exports
-anychart.core.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries;//inherited
-anychart.core.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint;//inherited
-anychart.core.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.core.cartesian.series.DiscreteBase.prototype.unhover;//inherited

@@ -45,6 +45,9 @@ anychart.polar = function(var_args) {
   return chart;
 };
 
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.POLAR] = anychart.polar;
+
 //exports
 goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.polarChart', anychart.polar);

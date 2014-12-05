@@ -738,39 +738,30 @@ anychart.core.grids.Radar.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.grids.Radar.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['stroke'] = this.stroke();
-  data['layout'] = this.layout();
-  data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
-  data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
-  data['drawLastLine'] = this.drawLastLine();
-  data['isMinor'] = this.isMinor();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['isMinor'] = this.isMinor();
+  json['layout'] = this.layout();
+  json['drawLastLine'] = this.drawLastLine();
+  //json['startAngle'] = this.startAngle();
+  json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
+  json['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.evenFill()));
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.grids.Radar.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['layout'])) this.layout(value['layout']);
-  if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
-  if (goog.isDef(value['evenFill'])) this.evenFill(value['evenFill']);
-  if (goog.isDef(value['drawLastLine'])) this.drawLastLine(value['drawLastLine']);
-  if (goog.isDef(value['isMinor'])) this.isMinor(value['isMinor']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.grids.Radar.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.isMinor(config['isMinor']);
+  this.layout(config['layout']);
+  this.drawLastLine(config['drawLastLine']);
+  //this.startAngle(config['startAngle']);
+  this.oddFill(config['oddFill']);
+  this.evenFill(config['evenFill']);
+  this.stroke(config['stroke']);
 };
 
 
@@ -784,6 +775,7 @@ anychart.core.grids.Radar.prototype.disposeInternal = function() {
 };
 
 
+//anychart.core.grids.Radar.prototype['startAngle'] = anychart.core.grids.Radar.prototype.startAngle;
 //exports
 anychart.core.grids.Radar.prototype['isMinor'] = anychart.core.grids.Radar.prototype.isMinor;
 anychart.core.grids.Radar.prototype['oddFill'] = anychart.core.grids.Radar.prototype.oddFill;
@@ -794,5 +786,3 @@ anychart.core.grids.Radar.prototype['yScale'] = anychart.core.grids.Radar.protot
 anychart.core.grids.Radar.prototype['xScale'] = anychart.core.grids.Radar.prototype.xScale;
 anychart.core.grids.Radar.prototype['stroke'] = anychart.core.grids.Radar.prototype.stroke;
 anychart.core.grids.Radar.prototype['drawLastLine'] = anychart.core.grids.Radar.prototype.drawLastLine;
-anychart.core.grids.Radar.prototype['draw'] = anychart.core.grids.Radar.prototype.draw;
-anychart.core.grids.Radar.prototype['startAngle'] = anychart.core.grids.Radar.prototype.startAngle;

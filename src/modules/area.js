@@ -22,6 +22,8 @@ goog.require('anychart.modules.base');
 anychart.area = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.AREA);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.area(arguments[i]);
   }
@@ -47,6 +49,9 @@ anychart.area = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.AREA] = anychart.area;
 
 
 /**

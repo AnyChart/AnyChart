@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.DateTime');
 
+goog.require('anychart.enums');
 goog.require('anychart.scales.DateTimeTicks');
 goog.require('anychart.scales.ScatterBase');
 
@@ -38,6 +39,12 @@ anychart.scales.DateTime.prototype.isMissing = function(value) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.DateTime.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.DATE_TIME;
+};
+
+
 /**
  * Getter for set of scale ticks in terms of data values.
  * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
@@ -69,7 +76,7 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
     this.ticksObj.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
-    this.ticksObj.set(opt_value);
+    this.ticksObj.setup(opt_value);
     return this;
   }
   return this.ticksObj;
@@ -107,7 +114,7 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
     this.minorTicksObj.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
-    this.minorTicksObj.set(opt_value);
+    this.minorTicksObj.setup(opt_value);
     return this;
   }
   return this.minorTicksObj;
@@ -141,7 +148,7 @@ anychart.scales.DateTime.prototype.calculate = function() {
 
   goog.base(this, 'calculate');
 
-  var newRange = this.ticks().setup(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
+  var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
   this.minorTicks().setupAsMinor(this.min, this.max, newRange[0], newRange[1]);
   // adjusting range AFTER minors calc to avoid range selection change
   if (this.minimumModeAuto)
@@ -172,29 +179,20 @@ anychart.scales.DateTime.prototype.ticksInvalidated_ = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['ticks'] = this.ticks().serialize();
-  data['minorTicks'] = this.minorTicks().serialize();
-  data['type'] = 'datetime';
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['ticks'] = this.ticks().serialize();
+  json['minorTicks'] = this.minorTicks().serialize();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.DateTime.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
-  this.ticks().deserialize(value['ticks']);
-  this.minorTicks().deserialize(value['minorTicks']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.scales.DateTime.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
 };
 
 
@@ -226,4 +224,4 @@ goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);//doc|ex
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;//doc|ex
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
 anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited
-anychart.scales.DateTime.prototype['extendDataRange)'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited
+anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited

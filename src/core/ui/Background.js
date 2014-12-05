@@ -547,30 +547,34 @@ anychart.core.ui.Background.prototype.remove = function() {
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['corners'] = this.corners();
   json['cornerType'] = this.cornerType();
-
+  json['corners'] = this.corners();
   return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
+anychart.core.ui.Background.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isString(args[0])) {
+    this.fill(args[0]);
+    this.stroke(null);
+    this.enabled(true);
+    return true;
+  }
+  return anychart.core.VisualBaseWithBounds.prototype.setupSpecial.apply(this, arguments);
+};
 
-  goog.base(this, 'deserialize', config);
 
+/** @inheritDoc */
+anychart.core.ui.Background.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
-  this.corners(config['corners']);
   this.cornerType(config['cornerType']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+  this.corners(config['corners']);
 };
 
 
@@ -579,4 +583,3 @@ anychart.core.ui.Background.prototype['fill'] = anychart.core.ui.Background.prot
 anychart.core.ui.Background.prototype['stroke'] = anychart.core.ui.Background.prototype.stroke;//in docs/final
 anychart.core.ui.Background.prototype['cornerType'] = anychart.core.ui.Background.prototype.cornerType;//in docs/final
 anychart.core.ui.Background.prototype['corners'] = anychart.core.ui.Background.prototype.corners;//in docs/final
-anychart.core.ui.Background.prototype['draw'] = anychart.core.ui.Background.prototype.draw;//in docs/final

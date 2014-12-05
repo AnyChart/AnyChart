@@ -488,18 +488,12 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = functio
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.highStroke(config['highStroke']);
   this.hoverHighStroke(config['hoverHighStroke']);
   this.lowStroke(config['lowStroke']);
   this.hoverLowStroke(config['hoverLowStroke']);
-
-  this.resumeSignalsDispatching(false);
-  return this;
 };
 
 

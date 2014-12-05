@@ -161,7 +161,7 @@ anychart.color.serialize = function(color) {
   } else if (goog.isObject(color)) {
     result = /** @type {Object} */(anychart.utils.recursiveClone(color));
   } else {
-    result = color || 'none';
+    result = String(color || 'none');
   }
   return result;
 };

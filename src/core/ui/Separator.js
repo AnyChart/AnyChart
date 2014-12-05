@@ -191,7 +191,7 @@ anychart.core.ui.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBot
     this.margin_.listenSignals(this.marginInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.margin_.set.apply(this.margin_, arguments);
+    this.margin_.setup.apply(this.margin_, arguments);
     return this;
   }
   return this.margin_;
@@ -554,42 +554,33 @@ anychart.core.ui.Separator.prototype.restoreDefaults = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.ui.Separator.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['width'] = this.width();
   json['height'] = this.height();
   json['orientation'] = this.orientation();
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  if (this.margin()) json['margin'] = this.margin().serialize();
+  json['margin'] = this.margin().serialize();
+  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Separator.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.width(config['width']);
   this.height(config['height']);
+  this.margin(config['margin']);
   this.orientation(config['orientation']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
-  if (config['margin']) this.margin().deserialize(config['margin']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
 };
 
 
+//anychart.core.ui.Separator.prototype['drawer'] = anychart.core.ui.Separator.prototype.drawer;
+//anychart.core.ui.Separator.prototype['draw'] = anychart.core.ui.Separator.prototype.draw;
 //exports
 anychart.core.ui.Separator.prototype['width'] = anychart.core.ui.Separator.prototype.width;
 anychart.core.ui.Separator.prototype['height'] = anychart.core.ui.Separator.prototype.height;
@@ -597,6 +588,4 @@ anychart.core.ui.Separator.prototype['margin'] = anychart.core.ui.Separator.prot
 anychart.core.ui.Separator.prototype['orientation'] = anychart.core.ui.Separator.prototype.orientation;
 anychart.core.ui.Separator.prototype['fill'] = anychart.core.ui.Separator.prototype.fill;
 anychart.core.ui.Separator.prototype['stroke'] = anychart.core.ui.Separator.prototype.stroke;
-anychart.core.ui.Separator.prototype['drawer'] = anychart.core.ui.Separator.prototype.drawer;
-anychart.core.ui.Separator.prototype['draw'] = anychart.core.ui.Separator.prototype.draw;
 anychart.core.ui.Separator.prototype['getRemainingBounds'] = anychart.core.ui.Separator.prototype.getRemainingBounds;

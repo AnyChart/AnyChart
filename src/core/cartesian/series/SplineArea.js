@@ -166,16 +166,8 @@ anychart.core.cartesian.series.SplineArea.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.SplineArea.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
+//anychart.core.cartesian.series.SplineArea.prototype['startDrawing'] = anychart.core.cartesian.series.SplineArea.prototype.startDrawing;//inherited
 //exports
-anychart.core.cartesian.series.SplineArea.prototype['startDrawing'] = anychart.core.cartesian.series.SplineArea.prototype.startDrawing;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['fill'] = anychart.core.cartesian.series.SplineArea.prototype.fill;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['hoverFill'] = anychart.core.cartesian.series.SplineArea.prototype.hoverFill;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['stroke'] = anychart.core.cartesian.series.SplineArea.prototype.stroke;//inherited

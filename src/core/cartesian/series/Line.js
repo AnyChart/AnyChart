@@ -95,8 +95,8 @@ anychart.core.cartesian.series.Line.prototype.getLegendIconType = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.Line.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+anychart.core.cartesian.series.Line.prototype.setupByJSON = function(config) {
+  return goog.base(this, 'setupByJSON', config);
 };
 
 
@@ -118,3 +118,11 @@ anychart.core.cartesian.series.line = function(data, opt_csvSettings) {
 //exports
 anychart.core.cartesian.series.Line.prototype['stroke'] = anychart.core.cartesian.series.Line.prototype.stroke;//inherited
 anychart.core.cartesian.series.Line.prototype['hoverStroke'] = anychart.core.cartesian.series.Line.prototype.hoverStroke;//inherited
+//only for standalone and deprecated
+anychart.core.cartesian.series.Line.prototype['draw'] = anychart.core.cartesian.series.Line.prototype.draw;//doc|ex
+anychart.core.cartesian.series.Line.prototype['drawPoint'] = anychart.core.cartesian.series.Line.prototype.drawPoint;//doc|need-ex
+anychart.core.cartesian.series.Line.prototype['drawMissing'] = anychart.core.cartesian.series.Line.prototype.drawMissing;//doc|need-ex
+anychart.core.cartesian.series.Line.prototype['startDrawing'] = anychart.core.cartesian.series.Line.prototype.startDrawing;//doc|need-ex
+anychart.core.cartesian.series.Line.prototype['finalizeDrawing'] = anychart.core.cartesian.series.Line.prototype.finalizeDrawing;//doc|need-ex
+anychart.core.cartesian.series.Line.prototype['getIterator'] = anychart.core.cartesian.series.Line.prototype.getIterator;//doc|need-ex
+anychart.core.cartesian.series.Line.prototype['getResetIterator'] = anychart.core.cartesian.series.Line.prototype.getResetIterator;//doc|need-ex

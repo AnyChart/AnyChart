@@ -121,14 +121,6 @@ anychart.core.cartesian.series.RangeColumn.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeColumn.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.RangeColumn.prototype['fill'] = anychart.core.cartesian.series.RangeColumn.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.core.cartesian.series.RangeColumn.prototype.hoverFill;//inherited

@@ -177,15 +177,7 @@ anychart.core.axisMarkers.Text.prototype.axesLinesSpace = function(opt_spaceOrTo
   }
 
   if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+    this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
     return this;
   } else {
     return this.axesLinesSpace_;
@@ -587,53 +579,6 @@ anychart.core.axisMarkers.Text.prototype.remove = function() {
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
-anychart.core.axisMarkers.Text.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['layout'] = this.layout();
-  data['rotation'] = this.rotation();
-  data['align'] = this.align();
-  data['anchor'] = this.anchor();
-  data['value'] = this.value();
-  data['offsetX'] = this.offsetX();
-  data['offsetY'] = this.offsetY();
-  data['text'] = this.text();
-  data['width'] = this.width();
-  data['height'] = this.height();
-  return data;
-};
-
-
-/** @inheritDoc */
-anychart.core.axisMarkers.Text.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.textSettings(value);
-
-  this.layout(value['layout']);
-  this.rotation(value['rotation']);
-  this.align(value['align']);
-  this.anchor(value['anchor']);
-  this.value(value['value']);
-  this.offsetX(value['offsetX']);
-  this.offsetY(value['offsetY']);
-  this.text(value['text']);
-  this.width(value['width']);
-  this.height(value['height']);
-
-  this.resumeSignalsDispatching(true);
-  return this;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
 //  Elements creation.
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -661,6 +606,39 @@ anychart.core.axisMarkers.Text.prototype.disposeInternal = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.axisMarkers.Text.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['value'] = this.value();
+  json['anchor'] = this.anchor();
+  json['align'] = this.align();
+  json['layout'] = this.layout();
+  json['rotation'] = this.rotation();
+  json['offsetX'] = this.offsetX();
+  json['offsetY'] = this.offsetY();
+  json['text'] = this.text();
+  json['height'] = this.height();
+  json['width'] = this.width();
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.Text.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.value(config['value']);
+  this.anchor(config['anchor']);
+  this.align(config['align']);
+  this.layout(config['layout']);
+  this.rotation(config['rotation']);
+  this.offsetX(config['offsetX']);
+  this.offsetY(config['offsetY']);
+  this.text(config['text']);
+  this.height(config['height']);
+  this.width(config['width']);
+};
+
+
 //exports
 anychart.core.axisMarkers.Text.prototype['value'] = anychart.core.axisMarkers.Text.prototype.value;
 anychart.core.axisMarkers.Text.prototype['scale'] = anychart.core.axisMarkers.Text.prototype.scale;
@@ -673,5 +651,4 @@ anychart.core.axisMarkers.Text.prototype['offsetY'] = anychart.core.axisMarkers.
 anychart.core.axisMarkers.Text.prototype['text'] = anychart.core.axisMarkers.Text.prototype.text;
 anychart.core.axisMarkers.Text.prototype['height'] = anychart.core.axisMarkers.Text.prototype.height;
 anychart.core.axisMarkers.Text.prototype['width'] = anychart.core.axisMarkers.Text.prototype.width;
-anychart.core.axisMarkers.Text.prototype['draw'] = anychart.core.axisMarkers.Text.prototype.draw;
 anychart.core.axisMarkers.Text.prototype['isHorizontal'] = anychart.core.axisMarkers.Text.prototype.isHorizontal;

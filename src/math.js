@@ -277,11 +277,11 @@ anychart.math.Rect.prototype.serialize = function() {
 
 
 /**
- * Creates the rect and deserializes it from the config.
+ * Creates the rect and setups it from the config.
  * @param {Object} config
  * @return {anychart.math.Rect} Deserialized rect.
  */
-anychart.math.Rect.deserialize = function(config) {
+anychart.math.Rect.fromJSON = function(config) {
   return new anychart.math.Rect(
       +config['left'] || 0,
       +config['top'] || 0,

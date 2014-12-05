@@ -458,31 +458,22 @@ anychart.core.axes.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineB
 };
 
 
-/**
- * Ticks serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.Ticks.prototype.serialize = function() {
-  var data = {};
-  data['length'] = this.length();
-  data['position'] = this.position();
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  json['length'] = this.length();
+  json['position'] = this.position();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.Ticks.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  this.length(value['length']);
-  this.position(value['position']);
-  this.stroke(value['stroke']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.Ticks.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.length(config['length']);
+  this.stroke(config['stroke']);
+  this.position(config['position']);
 };
 
 

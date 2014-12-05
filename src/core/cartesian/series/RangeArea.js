@@ -110,14 +110,6 @@ anychart.core.cartesian.series.RangeArea.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeArea.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.RangeArea.prototype['fill'] = anychart.core.cartesian.series.RangeArea.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeArea.prototype['hoverFill'] = anychart.core.cartesian.series.RangeArea.prototype.hoverFill;//inherited

@@ -218,15 +218,7 @@ anychart.core.axes.Radar.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labels_.enabled(false);
-    }
-
-    this.dropBoundsCache_();
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -266,17 +258,7 @@ anychart.core.axes.Radar.prototype.ticks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.ticks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.RadialTicks) {
-      this.ticks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.ticks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.ticks_.enabled(false);
-    }
-    this.ticks_.resumeSignalsDispatching(true);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.ticks_.setup(opt_value);
     return this;
   }
   return this.ticks_;
@@ -295,7 +277,7 @@ anychart.core.axes.Radar.prototype.ticksInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.TICKS;
+    state = anychart.ConsistencyState.TICKS | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.invalidate(state, signal);
@@ -902,38 +884,26 @@ anychart.core.axes.Radar.prototype.remove = function() {
 };
 
 
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.Radar.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-
-  data['labels'] = this.labels().serialize();
-  data['ticks'] = this.ticks().serialize();
-
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  data['name'] = this.name();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['labels'] = this.labels().serialize();
+  json['ticks'] = this.ticks().serialize();
+  json['name'] = this.name();
+  //json['startAngle'] = this.startAngle();
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.Radar.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.labels(value['labels']);
-  this.ticks(value['ticks']);
-
-  this.name(value['name']);
-  this.stroke(value['stroke']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.Radar.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.name(config['name']);
+  //this.startAngle(config['startAngle']);
+  this.labels(config['labels']);
+  this.ticks(config['ticks']);
+  this.stroke(config['stroke']);
 };
 
 
@@ -957,14 +927,11 @@ anychart.core.axes.Radar.prototype.disposeInternal = function() {
 };
 
 
+//anychart.core.axes.Radar.prototype['startAngle'] = anychart.core.axes.Radar.prototype.startAngle;
 //exports
 anychart.core.axes.Radar.prototype['name'] = anychart.core.axes.Radar.prototype.name;
-anychart.core.axes.Radar.prototype['startAngle'] = anychart.core.axes.Radar.prototype.startAngle;
 anychart.core.axes.Radar.prototype['labels'] = anychart.core.axes.Radar.prototype.labels;
 anychart.core.axes.Radar.prototype['ticks'] = anychart.core.axes.Radar.prototype.ticks;
 anychart.core.axes.Radar.prototype['stroke'] = anychart.core.axes.Radar.prototype.stroke;
 anychart.core.axes.Radar.prototype['scale'] = anychart.core.axes.Radar.prototype.scale;
 anychart.core.axes.Radar.prototype['getRemainingBounds'] = anychart.core.axes.Radar.prototype.getRemainingBounds;
-anychart.core.axes.Radar.prototype['draw'] = anychart.core.axes.Radar.prototype.draw;
-
-

@@ -24,3 +24,7 @@ anychart.grids.radar = function() {
 
 //exports
 goog.exportSymbol('anychart.grids.radar', anychart.grids.radar);
+anychart.grids.Radar.prototype['draw'] = anychart.grids.Radar.prototype.draw;
+anychart.grids.Radar.prototype['parentBounds'] = anychart.grids.Radar.prototype.parentBounds;
+anychart.grids.Radar.prototype['container'] = anychart.grids.Radar.prototype.container;
+anychart.grids.Radar.prototype['startAngle'] = anychart.grids.Radar.prototype.startAngle;

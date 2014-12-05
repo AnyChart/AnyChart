@@ -570,12 +570,9 @@ anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.Text.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
   json['fontSize'] = this.fontSize();
   json['fontFamily'] = this.fontFamily();
   json['fontColor'] = this.fontColor();
@@ -595,8 +592,34 @@ anychart.core.Text.prototype.serialize = function() {
   json['selectable'] = this.selectable();
   json['disablePointerEvents'] = this.disablePointerEvents();
   json['useHtml'] = this.useHtml();
-
+  json['textSettings'] = this.textSettings();
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.Text.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.fontSize(config['fontSize']);
+  this.fontFamily(config['fontFamily']);
+  this.fontColor(config['fontColor']);
+  this.fontOpacity(config['fontOpacity']);
+  this.fontDecoration(config['fontDecoration']);
+  this.fontStyle(config['fontStyle']);
+  this.fontVariant(config['fontVariant']);
+  this.fontWeight(config['fontWeight']);
+  this.letterSpacing(config['letterSpacing']);
+  this.textDirection(config['textDirection']);
+  this.lineHeight(config['lineHeight']);
+  this.textIndent(config['textIndent']);
+  this.vAlign(config['vAlign']);
+  this.hAlign(config['hAlign']);
+  this.textWrap(config['textWrap']);
+  this.textOverflow(config['textOverflow']);
+  this.selectable(config['selectable']);
+  this.disablePointerEvents(config['disablePointerEvents']);
+  this.useHtml(config['useHtml']);
+  this.textSettings(config['textSettings']);
 };
 
 

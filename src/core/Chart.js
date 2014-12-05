@@ -216,15 +216,7 @@ anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, op
   }
 
   if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.margin_.set.apply(this.margin_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Space) {
-      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.margin_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+    this.margin_.setup.apply(this.margin_, arguments);
     return this;
   } else {
     return this.margin_;
@@ -354,15 +346,7 @@ anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, o
   }
 
   if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.padding_.set.apply(this.padding_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.padding_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   } else {
     return this.padding_;
@@ -422,17 +406,7 @@ anychart.core.Chart.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Background) {
-      this.background_.deserialize(opt_value.serialize());
-      if (this.background_.zIndex() == 0) this.background_.zIndex(anychart.core.Chart.ZINDEX_BACKGROUND);
-    } else if (goog.isObject(opt_value)) {
-      this.background_.deserialize(opt_value);
-      if (this.background_.zIndex() == 0) this.background_.zIndex(anychart.core.Chart.ZINDEX_BACKGROUND);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.background_.enabled(false);
-    }
-    this.background_.resumeSignalsDispatching(true);
+    this.background_.setup(opt_value);
     return this;
   }
   return this.background_;
@@ -486,17 +460,7 @@ anychart.core.Chart.prototype.title = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Title) {
-      this.title_.deserialize(opt_value.serialize());
-      if (this.title_.zIndex() == 0) this.title_.zIndex(anychart.core.Chart.ZINDEX_TITLE);
-    } else if (goog.isObject(opt_value)) {
-      this.title_.deserialize(opt_value);
-      if (this.title_.zIndex() == 0) this.title_.zIndex(anychart.core.Chart.ZINDEX_TITLE);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.title_.enabled(false);
-    }
-    this.resumeSignalsDispatching(true);
+    this.title_.setup(opt_value);
     return this;
   } else {
     return this.title_;
@@ -561,15 +525,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Legend) {
-      this.legend_.deserialize(opt_value.serialize());
-      if (this.legend_.zIndex() == 0) this.legend_.zIndex(anychart.core.Chart.ZINDEX_LEGEND);
-    } else if (goog.isObject(opt_value)) {
-      this.legend_.deserialize(opt_value);
-      if (this.legend_.zIndex() == 0) this.legend_.zIndex(anychart.core.Chart.ZINDEX_LEGEND);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.legend_.enabled(false);
-    }
+    this.legend_.setup(opt_value);
     return this;
   } else {
     return this.legend_;
@@ -662,15 +618,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.ui.Label) {
-      label.deserialize(value.serialize());
-      if (label.zIndex() == 0) label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
-    } else if (goog.isObject(value)) {
-      label.deserialize(value);
-      if (label.zIndex() == 0) label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
-    } else if (anychart.utils.isNone(value)) {
-      label.enabled(false);
-    }
+    label.setup(value);
     return this;
   } else {
     return label;
@@ -707,7 +655,7 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.Credits|Object|boolean)=} opt_value
+ * @param {(Object|boolean)=} opt_value
  * @return {!(anychart.core.Chart|anychart.core.ui.Credits)} Chart credits or itself for chaining call.
  */
 anychart.core.Chart.prototype.credits = function(opt_value) {
@@ -718,15 +666,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Credits) {
-      this.credits_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.credits_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.credits_.enabled(false);
-    } else {
-      this.credits_.enabled(!!opt_value);
-    }
+    this.credits_.setup(opt_value);
     return this;
   } else {
     return this.credits_;
@@ -1022,47 +962,42 @@ anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.Chart.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  var margin = config['margin'];
-  var padding = config['padding'];
-  var background = config['background'];
-  var title = config['title'];
-  var legend = config['legend'];
-
-  this.margin(margin);
-  this.padding(padding);
-  this.background(background);
-  this.title(title);
-  this.legend(legend);
-  this.credits(config['credits']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+/** @inheritDoc */
+anychart.core.Chart.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['title'] = this.title().serialize();
+  json['background'] = this.background().serialize();
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['legend'] = this.legend().serialize();
+  json['credits'] = this.credits().serialize();
+  var labels = [];
+  for (var i = 0; i < this.chartLabels_.length; i++) {
+    labels.push(this.chartLabels_[i].serialize());
+  }
+  json['chartLabels'] = labels;
+  return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.Chart.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+/** @inheritDoc */
+anychart.core.Chart.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.title(config['title']);
+  this.background(config['background']);
+  this.margin(config['margin']);
+  this.padding(config['padding']);
+  this.legend(config['legend']);
+  this.credits(config['credits']);
 
-  json['margin'] = this.margin().serialize();
-  json['padding'] = this.padding().serialize();
-  json['background'] = this.background().serialize();
-  json['title'] = this.title().serialize();
-  json['legend'] = this.legend().serialize();
-  json['credits'] = this.credits().serialize();
+  var labels = config['chartLabels'];
+  if (goog.isArray(labels)) {
+    for (var i = 0; i < labels.length; i++)
+      this.label(labels[i]);
+  }
 
-  return json;
+  if (goog.isString(config['container']))
+    this.container(config['container']);
 };
 
 
@@ -1147,6 +1082,7 @@ anychart.core.Chart.prototype['padding'] = anychart.core.Chart.prototype.padding
 anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//doc|ex
 anychart.core.Chart.prototype['label'] = anychart.core.Chart.prototype.label;//doc|ex
 anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//doc|ex
+anychart.core.Chart.prototype['container'] = anychart.core.Chart.prototype.container;//doc
 anychart.core.Chart.prototype['draw'] = anychart.core.Chart.prototype.draw;//doc
 anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;//|need-ex
 anychart.core.Chart.prototype['toXml'] = anychart.core.Chart.prototype.toXml;//|need-ex

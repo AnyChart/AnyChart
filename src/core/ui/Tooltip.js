@@ -456,59 +456,47 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.serialize = function() {
-  this.maybeCreateTooltipItem_();
   var json = goog.base(this, 'serialize');
-  var itemJson = this.item_.serialize();
-  goog.object.extend(json, itemJson);
-
-  json['allowLeaveScreen'] = this.allowLeaveScreen();
-  json['isFloating'] = this.isFloating();
-  json['content'] = this.content().serialize();
   json['title'] = this.title().serialize();
-
-  if (goog.isFunction(this.titleFormatter_)) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Tooltip titleFormatter']
-    );
-  }
-
-  if (goog.isFunction(this.contentFormatter_)) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Tooltip contentFormatter']
-    );
-  }
+  json['separator'] = this.separator().serialize();
+  json['content'] = this.content().serialize();
+  json['background'] = this.background().serialize();
+  json['padding'] = this.padding().serialize();
+  json['allowLeaveScreen'] = this.allowLeaveScreen();
+  json['offsetX'] = this.offsetX();
+  json['offsetY'] = this.offsetY();
+  json['anchor'] = this.anchor();
+  json['hideDelay'] = this.hideDelay();
+  json['enabled'] = this.enabled();
   return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Tooltip.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.maybeCreateTooltipItem_();
-  this.item_.deserialize(config);
-  this.contentFormatter_ = config['contentFormatter'] || this.contentFormatter_;
-  this.titleFormatter_ = config['titleFormatter'] || this.titleFormatter_;
-  this.isFloating(config['isFloating']);
+anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.allowLeaveScreen(config['allowLeaveScreen']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+  this.title(config['title']);
+  this.separator(config['separator']);
+  this.content(config['content']);
+  this.background(config['background']);
+  this.padding(config['padding']);
+  this.offsetX(config['offsetX']);
+  this.offsetY(config['offsetY']);
+  this.anchor(config['anchor']);
+  this.hideDelay(config['hideDelay']);
+  this.enabled(config['enabled']);
 };
 
 
+//anychart.core.ui.Tooltip.prototype['show'] = anychart.core.ui.Tooltip.prototype.show;
+//anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
+//anychart.core.ui.Tooltip.prototype['redraw'] = anychart.core.ui.Tooltip.prototype.redraw;
 //exports
 anychart.core.ui.Tooltip.prototype['titleFormatter'] = anychart.core.ui.Tooltip.prototype.titleFormatter;
 anychart.core.ui.Tooltip.prototype['contentFormatter'] = anychart.core.ui.Tooltip.prototype.contentFormatter;
-anychart.core.ui.Tooltip.prototype['allowLeaveScreen'] = anychart.core.ui.Tooltip.prototype.allowLeaveScreen;
 anychart.core.ui.Tooltip.prototype['isFloating'] = anychart.core.ui.Tooltip.prototype.isFloating;
+anychart.core.ui.Tooltip.prototype['allowLeaveScreen'] = anychart.core.ui.Tooltip.prototype.allowLeaveScreen;
 anychart.core.ui.Tooltip.prototype['title'] = anychart.core.ui.Tooltip.prototype.title;
 anychart.core.ui.Tooltip.prototype['separator'] = anychart.core.ui.Tooltip.prototype.separator;
 anychart.core.ui.Tooltip.prototype['content'] = anychart.core.ui.Tooltip.prototype.content;
@@ -518,7 +506,4 @@ anychart.core.ui.Tooltip.prototype['offsetX'] = anychart.core.ui.Tooltip.prototy
 anychart.core.ui.Tooltip.prototype['offsetY'] = anychart.core.ui.Tooltip.prototype.offsetY;
 anychart.core.ui.Tooltip.prototype['anchor'] = anychart.core.ui.Tooltip.prototype.anchor;
 anychart.core.ui.Tooltip.prototype['hideDelay'] = anychart.core.ui.Tooltip.prototype.hideDelay;
-anychart.core.ui.Tooltip.prototype['show'] = anychart.core.ui.Tooltip.prototype.show;
-anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
-anychart.core.ui.Tooltip.prototype['redraw'] = anychart.core.ui.Tooltip.prototype.redraw;
 anychart.core.ui.Tooltip.prototype['enabled'] = anychart.core.ui.Tooltip.prototype.enabled;

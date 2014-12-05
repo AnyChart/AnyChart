@@ -557,18 +557,20 @@ anychart.core.radar.series.Marker.prototype.restoreDefaults = function() {
 /**
  * @inheritDoc
  */
-anychart.core.radar.series.Marker.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.radar.series.Marker.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.type(config['type']);
   this.hoverType(config['hoverType']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
+//anychart.core.radar.series.Marker.prototype['startDrawing'] = anychart.core.radar.series.Marker.prototype.startDrawing;
+//anychart.core.radar.series.Marker.prototype['finalizeDrawing'] = anychart.core.radar.series.Marker.prototype.finalizeDrawing;
+//anychart.core.radar.series.Marker.prototype['hoverSeries'] = anychart.core.radar.series.Marker.prototype.hoverSeries;
+//anychart.core.radar.series.Marker.prototype['hoverPoint'] = anychart.core.radar.series.Marker.prototype.hoverPoint;
+//anychart.core.radar.series.Marker.prototype['unhover'] = anychart.core.radar.series.Marker.prototype.unhover;
 //exports
 anychart.core.radar.series.Marker.prototype['stroke'] = anychart.core.radar.series.Marker.prototype.stroke;
 anychart.core.radar.series.Marker.prototype['hoverStroke'] = anychart.core.radar.series.Marker.prototype.hoverStroke;
@@ -578,10 +580,5 @@ anychart.core.radar.series.Marker.prototype['size'] = anychart.core.radar.series
 anychart.core.radar.series.Marker.prototype['hoverSize'] = anychart.core.radar.series.Marker.prototype.hoverSize;
 anychart.core.radar.series.Marker.prototype['type'] = anychart.core.radar.series.Marker.prototype.type;
 anychart.core.radar.series.Marker.prototype['hoverType'] = anychart.core.radar.series.Marker.prototype.hoverType;
-anychart.core.radar.series.Marker.prototype['startDrawing'] = anychart.core.radar.series.Marker.prototype.startDrawing;
-anychart.core.radar.series.Marker.prototype['finalizeDrawing'] = anychart.core.radar.series.Marker.prototype.finalizeDrawing;
-anychart.core.radar.series.Marker.prototype['hoverSeries'] = anychart.core.radar.series.Marker.prototype.hoverSeries;
-anychart.core.radar.series.Marker.prototype['hoverPoint'] = anychart.core.radar.series.Marker.prototype.hoverPoint;
-anychart.core.radar.series.Marker.prototype['unhover'] = anychart.core.radar.series.Marker.prototype.unhover;
 anychart.core.radar.series.Marker.prototype['hatchFill'] = anychart.core.radar.series.Marker.prototype.hatchFill;
 anychart.core.radar.series.Marker.prototype['hoverHatchFill'] = anychart.core.radar.series.Marker.prototype.hoverHatchFill;

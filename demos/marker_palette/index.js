@@ -24,5 +24,5 @@ function load() {
   console.log(palette.markerAt(3, 'myShinyMarker').markers());
 
   // deserialization of palette
-  console.log(palette.deserialize({markers: ['maRkEr1', 'huAuahG']}).markers());
+  console.log(palette.setup({markers: ['maRkEr1', 'huAuahG']}).markers());
 }

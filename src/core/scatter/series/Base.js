@@ -477,16 +477,8 @@ anychart.core.scatter.series.Base.prototype.axesLinesSpace = function(opt_spaceO
     this.registerDisposable(this.axesLinesSpace_);
   }
 
-  if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
     return this;
   } else {
     return this.axesLinesSpace_;
@@ -1321,13 +1313,7 @@ anychart.core.scatter.series.Base.prototype.tooltip = function(opt_value) {
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Tooltip) {
-      this.tooltip_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.tooltip_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.tooltip_.enabled(false);
-    }
+    this.tooltip_.setup(opt_value);
     return this;
   } else {
     return this.tooltip_;
@@ -1386,13 +1372,7 @@ anychart.core.scatter.series.Base.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labels_.enabled(false);
-    }
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -1411,13 +1391,7 @@ anychart.core.scatter.series.Base.prototype.hoverLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.hoverLabels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.hoverLabels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.hoverLabels_.enabled(false);
-    }
+    this.hoverLabels_.setup(opt_value);
     return this;
   }
   return this.hoverLabels_;
@@ -1571,7 +1545,6 @@ anychart.core.scatter.series.Base.prototype.calculateStatistics = function() {
  * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
- * @deprecated Use fill (or stroke in case of line-type series) to set the series color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -2186,79 +2159,81 @@ anychart.core.scatter.series.Base.prototype.getLegendIconHatchFill = function() 
  */
 anychart.core.scatter.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['data'] = this.data().serialize();
-  json['name'] = this.name();
   json['seriesType'] = this.getType();
-
-  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_ || this.autoColor_ || 'blue'));
-
-  if (this.fill && goog.isFunction(this.fill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series fill']
-    );
-  } else {
-    if (this.fill)
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  }
-
-  if (this.hoverFill && goog.isFunction(this.hoverFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverFill']
-    );
-  } else {
-    if (this.hoverFill)
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-  }
-
-  if (goog.isFunction(this.stroke())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series stroke']
-    );
-  } else {
-    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  }
-
-  if (goog.isFunction(this.hoverStroke())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverStroke']
-    );
-  } else {
-    json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-  }
-
-  if (this.hatchFill && goog.isFunction(this.hatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hatchFill']
-    );
-  } else {
-    if (this.hatchFill)
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-  }
-
-  if (this.hoverHatchFill && goog.isFunction(this.hoverHatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Series hoverHatchFill']
-    );
-  } else {
-    if (this.hoverHatchFill)
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverHatchFill()));
-  }
-
-  json['tooltip'] = this.tooltip().serialize();
+  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+  json['name'] = this.name();
+  json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
+  json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
+  json['tooltip'] = this.tooltip().serialize();
+  if (goog.isFunction(this['fill'])) {
+    if (goog.isFunction(this.fill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series fill']
+      );
+    } else {
+      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+    }
+  }
+  if (goog.isFunction(this['hoverFill'])) {
+    if (goog.isFunction(this.hoverFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverFill']
+      );
+    } else {
+      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+    }
+  }
+  if (goog.isFunction(this['stroke'])) {
+    if (goog.isFunction(this.stroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series stroke']
+      );
+    } else {
+      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+    }
+  }
+  if (goog.isFunction(this['hoverStroke'])) {
+    if (goog.isFunction(this.hoverStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverStroke']
+      );
+    } else {
+      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+    }
+  }
+  if (goog.isFunction(this['hatchFill'])) {
+    if (goog.isFunction(this.hatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hatchFill']
+      );
+    } else {
+      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+    }
+  }
+  if (goog.isFunction(this['hoverHatchFill'])) {
+    if (goog.isFunction(this.hoverHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverHatchFill']
+      );
+    } else {
+      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.hoverHatchFill()));
+    }
+  }
   return json;
 };
 
@@ -2266,31 +2241,28 @@ anychart.core.scatter.series.Base.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Base.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.data(config['data']);
-  this.name(config['name']);
-  this.setAutoColor(config['color']);
-  if (this.fill)
+anychart.core.scatter.series.Base.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
-  if (this.hoverFill)
+  if (goog.isFunction(this['hoverFill']))
     this.hoverFill(config['hoverFill']);
-  this.stroke(config['stroke']);
-  this.hoverStroke(config['hoverStroke']);
-  if (this.hatchFill)
+  if (goog.isFunction(this['stroke']))
+    this.stroke(config['stroke']);
+  if (goog.isFunction(this['hoverStroke']))
+    this.hoverStroke(config['hoverStroke']);
+  if (goog.isFunction(this['hatchFill']))
     this.hatchFill(config['hatchFill']);
-  if (this.hoverHatchFill)
+  if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
-  this.tooltip(config['tooltip']);
+  this.color(config['color']);
+  this.name(config['name']);
+  this.meta(config['meta']);
+  this.data(config['data']);
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
-
-  this.resumeSignalsDispatching(false);
-
-  return this;
+  this.tooltip(config['tooltip']);
+  this.clip(config['clip']);
 };
 
 
@@ -2395,18 +2367,19 @@ anychart.core.scatter.series.Base.BrowserEvent.prototype.copyFrom = function(e, 
 };
 
 
+//anychart.core.scatter.series.Base.prototype['drawPoint'] = anychart.core.scatter.series.Base.prototype.drawPoint;//doc|need-ex
+//anychart.core.scatter.series.Base.prototype['startDrawing'] = anychart.core.scatter.series.Base.prototype.startDrawing;//doc|need-ex
+//anychart.core.scatter.series.Base.prototype['finalizeDrawing'] = anychart.core.scatter.series.Base.prototype.finalizeDrawing;//doc|need-ex
+//anychart.core.scatter.series.Base.prototype['getIterator'] = anychart.core.scatter.series.Base.prototype.getIterator;//doc|need-ex
+//anychart.core.scatter.series.Base.prototype['getResetIterator'] = anychart.core.scatter.series.Base.prototype.getResetIterator;//doc|need-ex
 //exports
 anychart.core.scatter.series.Base.prototype['clip'] = anychart.core.scatter.series.Base.prototype.clip;//doc|ex
 anychart.core.scatter.series.Base.prototype['color'] = anychart.core.scatter.series.Base.prototype.color;//doc|ex
 anychart.core.scatter.series.Base.prototype['name'] = anychart.core.scatter.series.Base.prototype.name;//doc|ex
 anychart.core.scatter.series.Base.prototype['meta'] = anychart.core.scatter.series.Base.prototype.meta;//doc|ex
 anychart.core.scatter.series.Base.prototype['data'] = anychart.core.scatter.series.Base.prototype.data;//doc
-anychart.core.scatter.series.Base.prototype['drawPoint'] = anychart.core.scatter.series.Base.prototype.drawPoint;//doc|need-ex
-anychart.core.scatter.series.Base.prototype['startDrawing'] = anychart.core.scatter.series.Base.prototype.startDrawing;//doc|need-ex
-anychart.core.scatter.series.Base.prototype['finalizeDrawing'] = anychart.core.scatter.series.Base.prototype.finalizeDrawing;//doc|need-ex
 anychart.core.scatter.series.Base.prototype['labels'] = anychart.core.scatter.series.Base.prototype.labels;//doc|ex
+anychart.core.scatter.series.Base.prototype['hoverLabels'] = anychart.core.scatter.series.Base.prototype.hoverLabels;//doc|ex
 anychart.core.scatter.series.Base.prototype['tooltip'] = anychart.core.scatter.series.Base.prototype.tooltip;//doc|ex
-anychart.core.scatter.series.Base.prototype['getIterator'] = anychart.core.scatter.series.Base.prototype.getIterator;//doc|need-ex
-anychart.core.scatter.series.Base.prototype['getResetIterator'] = anychart.core.scatter.series.Base.prototype.getResetIterator;//doc|need-ex
 anychart.core.scatter.series.Base.prototype['xScale'] = anychart.core.scatter.series.Base.prototype.xScale;//doc|ex
 anychart.core.scatter.series.Base.prototype['yScale'] = anychart.core.scatter.series.Base.prototype.yScale;//doc|ex

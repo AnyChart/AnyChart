@@ -83,7 +83,7 @@ anychart.core.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, op
     this.bounds_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_boundsOrX)) {
-    this.bounds_.set.apply(this.bounds_, arguments);
+    this.bounds_.setup.apply(this.bounds_, arguments);
     return this;
   }
   return this.bounds_;
@@ -266,12 +266,15 @@ anychart.core.VisualBaseWithBounds.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.VisualBaseWithBounds.prototype.deserialize = function(config) {
-  goog.base(this, 'deserialize', config);
+anychart.core.VisualBaseWithBounds.prototype.setupSpecial = function(var_args) {
+  return anychart.core.VisualBase.prototype.setupSpecial.apply(this, arguments);
+};
 
-  this.bounds().deserialize(config['bounds'] || {});
 
-  return this;
+/** @inheritDoc */
+anychart.core.VisualBaseWithBounds.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.bounds(config['bounds']);
 };
 
 

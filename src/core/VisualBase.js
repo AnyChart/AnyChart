@@ -360,7 +360,7 @@ anychart.core.VisualBase.prototype.parentBounds = function(opt_boundsOrLeft, opt
         this.parentBounds_.width = width;
         this.parentBounds_.height = height;
       } else {
-        this.parentBounds_ = new anychart.math.Rect(left, top, width, height);
+        this.parentBounds_ = anychart.math.rect(left, top, width, height);
       }
       this.invalidateParentBounds();
     }
@@ -381,36 +381,6 @@ anychart.core.VisualBase.prototype.parentBounds = function(opt_boundsOrLeft, opt
  */
 anychart.core.VisualBase.prototype.invalidateParentBounds = function() {
   this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  JSON.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @inheritDoc
- */
-anychart.core.VisualBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['enabled'] = this.enabled();
-  if (goog.isDef(this.zIndex_))
-    json['zIndex'] = this.zIndex_;
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.VisualBase.prototype.deserialize = function(config) {
-  if ('enabled' in config)
-    this.enabled(config['enabled']);
-  if ('zIndex' in config)
-    this.zIndex(config['zIndex']);
-
-  return goog.base(this, 'deserialize', config);
 };
 
 
@@ -563,13 +533,45 @@ anychart.core.VisualBase.prototype.toSVG = function() {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  JSON.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.VisualBase.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['enabled'] = this.enabled();
+  if (goog.isDef(this.zIndex_))
+    json['zIndex'] = this.zIndex();
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.VisualBase.prototype.setupSpecial = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    this.enabled(!!arg0);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+};
+
+
+/** @inheritDoc */
+anychart.core.VisualBase.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.enabled('enabled' in config ? config['enabled'] : true);
+  this.zIndex(config['zIndex']);
+};
+
+
 //exports
-anychart.core.VisualBase.prototype['container'] = anychart.core.VisualBase.prototype.container;//doc|ex
 anychart.core.VisualBase.prototype['zIndex'] = anychart.core.VisualBase.prototype.zIndex;//in docs/final
 anychart.core.VisualBase.prototype['enabled'] = anychart.core.VisualBase.prototype.enabled;//doc|ex
 anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//doc|ex
 anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//doc|ex
 anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//doc|ex
-anychart.core.VisualBase.prototype['parentBounds'] = anychart.core.VisualBase.prototype.parentBounds;
 anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;
 anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;

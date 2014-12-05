@@ -40,6 +40,9 @@ anychart.pie = function(opt_data) {
 };
 
 
+anychart.chartTypesMap[anychart.enums.ChartTypes.PIE] = anychart.pie;
+
+
 /**
  * Default line chart.<br/>
  * <b>Note:</b> Contains predefined settings for legend and tooltip.

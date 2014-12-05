@@ -173,11 +173,11 @@ anychart.palettes.RangeColors.prototype.colorAt = function(index, opt_color) {
  */
 anychart.palettes.RangeColors.prototype.processColorRange_ = function() {
   if (this.colors_ && this.count_ != 0) {
-    if (isNaN(this.count_)) this.count_ = this.colors_.length;
     var gradientKeys = [];
     var colors = goog.isArray(this.colors_) ? this.colors_ : this.colors_.keys;
+    if (!goog.isArray(colors) || colors.length == 0) return;
+    if (isNaN(this.count_)) this.count_ = colors.length;
 
-    if (colors.length == 0) return;
 
     var offsetStep = 1 / (colors.length - 1), color;
     for (var i = 0; i < colors.length; i++) {
@@ -295,22 +295,42 @@ anychart.palettes.RangeColors.prototype.restoreDefaults = function(opt_doNotDisp
 };
 
 
-/**
- * Copies settings from the passed palette to itself.
- * @param {anychart.palettes.RangeColors} palette Color palette to copy settings from.
- * @return {!anychart.palettes.RangeColors} Returns itself for method chaining.
- */
-anychart.palettes.RangeColors.prototype.cloneFrom = function(palette) {
-  if (goog.isDefAndNotNull(palette)) {
-    this.colors_ = palette.colors_;
-    this.count_ = palette.count_;
-    this.colorPalette_ = palette.colorPalette_;
-  } else {
-    this.colors_ = [];
-    this.count_ = 0;
-    this.colorPalette_ = [];
+/** @inheritDoc */
+anychart.palettes.RangeColors.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['type'] = 'range';
+  var res = [];
+  for (var i = 0; i < this.colors_.length; i++) {
+    res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.colors_[i])));
   }
-  return this;
+  json['colors'] = res;
+  json['count'] = this.count_;
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (args[0] instanceof anychart.palettes.RangeColors) {
+    this.colors(args[0].colors());
+    this.count(args[0].count());
+    return true;
+  }
+  if (goog.isArray(args[0])) {
+    this.colors(args[0]);
+    this.count(args[0].length);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
+/** @inheritDoc */
+anychart.palettes.RangeColors.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.colors(config['colors']);
+  this.count(config['count']);
 };
 
 

@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.Ordinal');
 
+goog.require('anychart.enums');
 goog.require('anychart.scales.Base');
 goog.require('anychart.scales.OrdinalTicks');
 goog.require('goog.array');
@@ -76,6 +77,12 @@ goog.inherits(anychart.scales.Ordinal, anychart.scales.Base);
 anychart.scales.Ordinal.ValuesMapNode;
 
 
+/** @inheritDoc */
+anychart.scales.Ordinal.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.ORDINAL;
+};
+
+
 /**
  * Default comparator for discrete values searcher.
  * @param {anychart.scales.Ordinal.ValuesMapNode} a First value.
@@ -137,7 +144,7 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {
-    this.ticks_.set(opt_value);
+    this.ticks_.setup(opt_value);
     return this;
   }
   return this.ticks_;
@@ -420,22 +427,20 @@ anychart.scales.Ordinal.prototype.ticksInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['values'] = this.autoDomain_ ? null : this.values();
-  data['ticks'] = this.ticks().serialize();
-  data['type'] = 'ordinal';
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['values'] = this.autoDomain_ ? null : this.values();
+  json['names'] = this.names_;
+  json['ticks'] = this.ticks().serialize();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.Ordinal.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
-  this.values(value['values']);
-  this.ticks().deserialize(value['ticks']);
-  this.resumeSignalsDispatching(true);
-  return this;
+anychart.scales.Ordinal.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.values(config['values']);
+  this.ticks(config['ticks']);
+  this.names(config['names']);
 };
 
 

@@ -806,7 +806,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
       var textValue = rawLabel['value'] || ''; //TODO (A.Kudryavtsev): Тут неясно. Для LF текст берется из провайдера. В гантах надо задавать текст в данных.
       var formatProvider = {'value': textValue};
       var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
-      label.deserialize(rawLabel);
+      label.setup(rawLabel);
     }
 
     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
@@ -814,7 +814,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
       var startMarker = this.getMarkersFactory_().add({value: {x: bounds.left, y: bounds.top}});
       startMarker
           .size(bounds.height / 2)
-          .deserialize(rawStartMarker);
+          .setup(rawStartMarker);
     }
 
     var rawEndMarker = settings[anychart.enums.GanttDataFields.END_MARKER];
@@ -822,7 +822,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
       var endMarker = this.getMarkersFactory_().add({value: {x: bounds.left + bounds.width, y: bounds.top}});
       endMarker
           .size(bounds.height / 2)
-          .deserialize(rawEndMarker);
+          .setup(rawEndMarker);
     }
 
     var fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
@@ -1064,7 +1064,7 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
         var textValue = rawLabel['value'] || ''; //TODO (A.Kudryavtsev): Тут неясно. Для LF текст берется из провайдера. В гантах надо задавать текст в данных.
         var formatProvider = {'value': textValue};
         var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
-        label.deserialize(rawLabel);
+        label.setup(rawLabel);
       }
 
       milestone.fill(fill).stroke(stroke);

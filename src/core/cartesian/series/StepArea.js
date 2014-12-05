@@ -162,16 +162,8 @@ anychart.core.cartesian.series.StepArea.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.StepArea.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
+//anychart.core.cartesian.series.StepArea.prototype['startDrawing'] = anychart.core.cartesian.series.StepArea.prototype.startDrawing;//inherited
 //exports
-anychart.core.cartesian.series.StepArea.prototype['startDrawing'] = anychart.core.cartesian.series.StepArea.prototype.startDrawing;//inherited
 anychart.core.cartesian.series.StepArea.prototype['fill'] = anychart.core.cartesian.series.StepArea.prototype.fill;//inherited
 anychart.core.cartesian.series.StepArea.prototype['hoverFill'] = anychart.core.cartesian.series.StepArea.prototype.hoverFill;//inherited
 anychart.core.cartesian.series.StepArea.prototype['stroke'] = anychart.core.cartesian.series.StepArea.prototype.stroke;//inherited

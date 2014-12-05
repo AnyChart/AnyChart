@@ -133,13 +133,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.MarkersFactory) {
-      this.markers_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.markers_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.markers_.enabled(false);
-    }
+    this.markers_.setup(opt_value);
     return this;
   }
   return this.markers_;
@@ -176,13 +170,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.MarkersFactory) {
-      this.hoverMarkers_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.hoverMarkers_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.hoverMarkers_.enabled(false);
-    }
+    this.hoverMarkers_.setup(opt_value);
     return this;
   }
   return this.hoverMarkers_;
@@ -329,13 +317,10 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.serialize = function() 
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.markers(config['markers']);
   this.hoverMarkers(config['hoverMarkers']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
@@ -387,9 +372,9 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = funct
 };
 
 
+//anychart.core.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing;//inherited
+//anychart.core.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint;//inherited
+//anychart.core.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//inherited
 //exports
-anychart.core.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing;//inherited
-anychart.core.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint;//inherited
-anychart.core.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//inherited
 anychart.core.cartesian.series.BaseWithMarkers.prototype['markers'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.markers;//doc|ex
 anychart.core.cartesian.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers;//doc|ex

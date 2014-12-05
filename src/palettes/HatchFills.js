@@ -76,7 +76,7 @@ anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills) {
     }
     if (goog.isArray(opt_hatchFills)) {
       this.hatchFills_ = goog.array.map(opt_hatchFills, function(hatchFill) {
-        return acgraph.vector.normalizeHatchFill.apply(null, hatchFill);
+        return acgraph.vector.normalizeHatchFill.call(null, hatchFill);
       });
     }
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -92,19 +92,36 @@ anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills) {
  */
 anychart.palettes.HatchFills.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['markers'] = this.hatchFills();
+  var res = [];
+  for (var i = 0; i < this.hatchFills_.length; i++) {
+    res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.hatchFills_[i])));
+  }
+  json['hatchFills'] = res;
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.palettes.HatchFills.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.hatchFills(args[0]);
+    return true;
+  }
+  if (args[0] instanceof anychart.palettes.HatchFills) {
+    this.hatchFills(args[0].hatchFills());
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
 };
 
 
 /**
  * @inheritDoc
  */
-anychart.palettes.HatchFills.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
+anychart.palettes.HatchFills.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.hatchFills(config['hatchFills']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
@@ -121,5 +138,3 @@ anychart.palettes.hatchFills = function() {
 goog.exportSymbol('anychart.palettes.hatchFills', anychart.palettes.hatchFills);
 anychart.palettes.HatchFills.prototype['hatchFillAt'] = anychart.palettes.HatchFills.prototype.hatchFillAt;
 anychart.palettes.HatchFills.prototype['hatchFills'] = anychart.palettes.HatchFills.prototype.hatchFills;
-anychart.palettes.HatchFills.prototype['serialize'] = anychart.palettes.HatchFills.prototype.serialize;
-anychart.palettes.HatchFills.prototype['deserialize'] = anychart.palettes.HatchFills.prototype.deserialize;

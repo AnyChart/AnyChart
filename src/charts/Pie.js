@@ -92,14 +92,6 @@ anychart.charts.Pie = function(opt_data) {
   this.hatchFillPalette_ = null;
 
   /**
-   * Pie chart default palette type.
-   * Internal use only.
-   * @private
-   * @type {string}
-   */
-  this.paletteType_;
-
-  /**
    * Original view for the chart data.
    * @type {anychart.data.View}
    * @private
@@ -232,13 +224,6 @@ anychart.charts.Pie = function(opt_data) {
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.charts.Pie, anychart.core.Chart);
-
-
-/**
- * @type {string}
- */
-anychart.charts.Pie.CHART_TYPE = 'pie';
-anychart.chartTypesMap[anychart.charts.Pie.CHART_TYPE] = anychart.charts.Pie;
 
 
 /**
@@ -465,46 +450,45 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
  * @return {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.palette = function(opt_value) {
-  if (!this.palette_) {
-    this.palette_ = new anychart.palettes.DistinctColors();
-    this.palette_.listenSignals(this.paletteInvalidated_, this);
-    this.paletteType_ = 'distinct';
+  if (opt_value instanceof anychart.palettes.RangeColors) {
+    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+    return this;
+  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
+    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
   }
+
+  if (!this.palette_)
+    this.setupPalette_(anychart.palettes.DistinctColors);
 
   if (goog.isDef(opt_value)) {
-    if (goog.isArray(opt_value)) {
-      this.palette_.colors(opt_value);
-    } else if (goog.isNull(opt_value)) {
-      this.palette_.cloneFrom(opt_value);
-    } else {
-      if (!(opt_value instanceof anychart.palettes.RangeColors || opt_value instanceof anychart.palettes.DistinctColors)) {
-        return this.palette_;
-      }
-      var isDistinct = !!(opt_value instanceof anychart.palettes.DistinctColors);
-
-      if ((isDistinct && this.paletteType_ == 'distinct') || (!isDistinct && this.paletteType_ == 'range')) {
-        this.palette_.cloneFrom(opt_value);
-      } else {
-        goog.dispose(this.palette_);
-        var cls;
-        if (isDistinct) {
-          this.paletteType_ = 'distinct';
-          cls = anychart.palettes.DistinctColors;
-        } else {
-          this.paletteType_ = 'range';
-          cls = anychart.palettes.RangeColors;
-        }
-
-        this.palette_ = new cls();
-        this.palette_.cloneFrom(opt_value);
-        this.palette_.listenSignals(this.paletteInvalidated_, this);
-        this.registerDisposable(this.palette_);
-      }
-    }
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    this.palette_.setup(opt_value);
     return this;
   }
-  return this.palette_;
+
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.charts.Pie.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (this.palette_ instanceof cls) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    this.registerDisposable(this.palette_);
+  }
 };
 
 
@@ -523,13 +507,7 @@ anychart.charts.Pie.prototype.hatchFillPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.HatchFills) {
-      this.hatchFillPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.hatchFillPalette_.deserialize(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.hatchFillPalette_.hatchFills(opt_value);
-    }
+    this.hatchFillPalette_.setup(opt_value);
     return this;
   } else {
     return this.hatchFillPalette_;
@@ -863,10 +841,8 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
     this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
-  if (goog.isDef(opt_value) && (opt_value instanceof anychart.core.ui.LabelsFactory || goog.isNull(opt_value))) {
-    this.labels_.deserialize(opt_value ? opt_value.serialize() : {});
-    if (this.labels_.zIndex() == 0) this.labels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+  if (goog.isDef(opt_value)) {
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -908,15 +884,7 @@ anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.hoverLabels_.deserialize(opt_value.serialize());
-      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
-    } else if (goog.isObject(opt_value)) {
-      this.hoverLabels_.deserialize(opt_value);
-      if (this.hoverLabels_.zIndex() == 0) this.hoverLabels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.hoverLabels_.enabled(false);
-    }
+    this.hoverLabels_.setup(opt_value);
     return this;
   }
   return this.hoverLabels_;
@@ -2212,13 +2180,7 @@ anychart.charts.Pie.prototype.tooltip = function(opt_value) {
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Tooltip) {
-      this.tooltip_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.tooltip_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.tooltip_.enabled(false);
-    }
+    this.tooltip_.setup(opt_value);
     return this;
   } else {
     return this.tooltip_;
@@ -2753,100 +2715,144 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.charts.Pie.prototype.serialize = function() {
-  var json = {};
+  var json = goog.base(this, 'serialize');
+  json['type'] = anychart.enums.ChartTypes.PIE;
+  json['data'] = this.data().serialize();
+  json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['palette'] = this.palette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['tooltip'] = this.tooltip().serialize();
 
-  var chart = goog.base(this, 'serialize');
-  chart['type'] = anychart.charts.Pie.CHART_TYPE;
+  json['sort'] = this.sort();
+  json['radius'] = this.radius();
+  json['innerRadius'] = this.innerRadius();
+  json['startAngle'] = this.startAngle();
+  json['explode'] = this.explode();
+  json['outsideLabelsSpace'] = this.outsideLabelsSpace();
+  json['connectorLength'] = this.connectorLength();
+  json['outsideLabelsCriticalAngle'] = this.outsideLabelsCriticalAngle();
 
-  var fill = this.fill();
-  var stroke = this.stroke();
-  var hoverFill = this.hoverFill();
-  var hoverStroke = this.hoverStroke();
-  var data = this.data();
-
-  chart['radius'] = this.radius();
-  chart['innerRadius'] = this.innerRadius();
-  chart['explode'] = this.explode();
-  chart['startAngle'] = this.startAngle();
-  chart['sort'] = this.sort();
-
-  if (!goog.isFunction(fill)) chart['fill'] = fill;
-  if (!goog.isFunction(stroke)) chart['stroke'] = stroke;
-  if (!goog.isFunction(hoverFill)) chart['hoverFill'] = hoverFill;
-  if (!goog.isFunction(hoverStroke)) chart['hoverStroke'] = hoverStroke;
-
-  if (goog.isFunction(this.hatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pie Chart hatchFill']
-    );
-  } else {
-    json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+  if (goog.isFunction(this['group'])) {
+    if (goog.isFunction(this.group())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie group']
+      );
+    } else {
+      json['group'] = this.group();
+    }
   }
-
-  if (goog.isFunction(this.hoverHatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Pie Chart hoverHatchFill']
-    );
-  } else {
-    json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverHatchFill()));
+  if (goog.isFunction(this['connectorStroke'])) {
+    if (goog.isFunction(this.connectorStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie connectorStroke']
+      );
+    } else {
+      json['connectorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.connectorStroke()));
+    }
   }
-
-  if (data) chart['data'] = data.serialize();
-
-  chart['labels'] = this.labels().serialize();
-  chart['hoverLabels'] = this.hoverLabels().serialize();
-
-  json['chart'] = chart;
-  return json;
+  if (goog.isFunction(this['fill'])) {
+    if (goog.isFunction(this.fill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie fill']
+      );
+    } else {
+      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+    }
+  }
+  if (goog.isFunction(this['hoverFill'])) {
+    if (goog.isFunction(this.hoverFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie hoverFill']
+      );
+    } else {
+      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+    }
+  }
+  if (goog.isFunction(this['stroke'])) {
+    if (goog.isFunction(this.stroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie stroke']
+      );
+    } else {
+      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+    }
+  }
+  if (goog.isFunction(this['hoverStroke'])) {
+    if (goog.isFunction(this.hoverStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie hoverStroke']
+      );
+    } else {
+      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+    }
+  }
+  if (goog.isFunction(this['hatchFill'])) {
+    if (goog.isFunction(this.hatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie hatchFill']
+      );
+    } else {
+      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+    }
+  }
+  if (goog.isFunction(this['hoverHatchFill'])) {
+    if (goog.isFunction(this.hoverHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie hoverHatchFill']
+      );
+    } else {
+      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.hoverHatchFill()));
+    }
+  }
+  return {'chart': json};
 };
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.deserialize = function(config) {
-  var chart = config['chart'];
-
-  var data = chart['data'];
-  var radius = chart['radius'];
-  var innerRadius = chart['innerRadius'];
-  var explode = chart['explode'];
-  var startAngle = chart['startAngle'];
-  var sort = chart['sort'];
-  var fill = chart['fill'];
-  var stroke = chart['stroke'];
-  var hoverFill = chart['hoverFill'];
-  var hoverStroke = chart['hoverStroke'];
-  var labels = chart['labels'];
-
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', chart);
-
-  this.data(data);
-  this.radius(radius);
-  this.innerRadius(innerRadius);
-  this.explode(explode);
-  this.startAngle(startAngle);
-  this.sort(sort);
-  this.fill(fill);
-  this.stroke(stroke);
-  this.hoverFill(hoverFill);
-  this.hoverStroke(hoverStroke);
+anychart.charts.Pie.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.group(config['group']);
+  this.data(config['data']);
+  this.labels(config['labels']);
+  this.hoverLabels(config['hoverLabels']);
+  this.palette(config['palette']);
+  this.hatchFillPalette(config['hatchFillPalette']);
+  this.tooltip(config['tooltip']);
+  this.sort(config['sort']);
+  this.radius(config['radius']);
+  this.innerRadius(config['innerRadius']);
+  this.startAngle(config['startAngle']);
+  this.explode(config['explode']);
+  this.outsideLabelsSpace(config['outsideLabelsSpace']);
+  this.connectorLength(config['connectorLength']);
+  this.outsideLabelsCriticalAngle(config['outsideLabelsCriticalAngle']);
+  this.connectorStroke(config['connectorStroke']);
+  this.fill(config['fill']);
+  this.stroke(config['stroke']);
+  this.hoverFill(config['hoverFill']);
+  this.hoverStroke(config['hoverStroke']);
   this.hatchFill(config['hatchFill']);
   this.hoverHatchFill(config['hoverHatchFill']);
-  this.labels(labels);
-  this.hoverLabels(config['hoverLabels']);
-
-  this.resumeSignalsDispatching(false);
-
-  return this;
 };
 
 

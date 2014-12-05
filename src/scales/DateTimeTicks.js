@@ -286,7 +286,7 @@ anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, adjust
  * @param {boolean=} opt_canModifyMax If the maximum can be modified.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
-anychart.scales.DateTimeTicks.prototype.setup = function(min, max, opt_canModifyMin, opt_canModifyMax) {
+anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_canModifyMin, opt_canModifyMax) {
   this.autoTicks_ = null;
   var result = [min, max];
   if (!this.explicit_) {
@@ -539,20 +539,32 @@ anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['explicit'] = this.explicit_;
-  data['count'] = this.count_;
-  data['interval'] = this.interval_;
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['explicit'] = this.explicit_;
+  json['count'] = this.count_;
+  json['interval'] = this.interval_ ? this.interval_.toIsoString() : null;
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.DateTimeTicks.prototype.deserialize = function(value) {
-  this.explicit_ = value['explicit'] || null;
-  this.count_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
-  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
-  return goog.base(this, 'deserialize', value);
+anychart.scales.DateTimeTicks.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.set(args[0]);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
+/** @inheritDoc */
+anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.explicit_ = config['explicit'] || null;
+  this.count_ = goog.isNull(config['count']) ? NaN : Math.max(2, Math.ceil(config['count']));
+  this.interval_ = goog.isString(config['interval']) ? goog.date.Interval.fromIsoString(config['interval']) : null;
+  this.autoTicks_ = null;
 };
 
 

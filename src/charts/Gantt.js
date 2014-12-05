@@ -493,9 +493,9 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
 
   if (goog.isDef(opt_value)) {
     if (opt_value instanceof anychart.core.ui.Splitter) {
-      this.splitter_.deserialize(opt_value.serialize());
+      this.splitter_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
-      this.splitter_.deserialize(opt_value);
+      this.splitter_.setup(opt_value);
     } else if (anychart.utils.isNone(opt_value)) {
       this.splitter_.enabled(false); //TODO (A.Kudryavtsev): Exclude this code?
     }

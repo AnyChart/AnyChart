@@ -24,3 +24,6 @@ anychart.axisMarkers.range = function() {
 
 //exports
 goog.exportSymbol('anychart.axisMarkers.range', anychart.axisMarkers.range);
+anychart.axisMarkers.Range.prototype['draw'] = anychart.axisMarkers.Range.prototype.draw;
+anychart.axisMarkers.Range.prototype['parentBounds'] = anychart.axisMarkers.Range.prototype.parentBounds;
+anychart.axisMarkers.Range.prototype['container'] = anychart.axisMarkers.Range.prototype.container;

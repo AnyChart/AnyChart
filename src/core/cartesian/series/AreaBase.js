@@ -85,5 +85,5 @@ anychart.core.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
   return result;
 };
 
+//anychart.core.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.core.cartesian.series.AreaBase.prototype.startDrawing;//inherited
 //exports
-anychart.core.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.core.cartesian.series.AreaBase.prototype.startDrawing;//inherited

@@ -24,3 +24,7 @@ anychart.grids.polar = function() {
 
 //exports
 goog.exportSymbol('anychart.grids.polar', anychart.grids.polar);
+anychart.grids.Polar.prototype['draw'] = anychart.grids.Polar.prototype.draw;
+anychart.grids.Polar.prototype['parentBounds'] = anychart.grids.Polar.prototype.parentBounds;
+anychart.grids.Polar.prototype['container'] = anychart.grids.Polar.prototype.container;
+anychart.grids.Polar.prototype['startAngle'] = anychart.grids.Polar.prototype.startAngle;

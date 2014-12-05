@@ -50,6 +50,12 @@ anychart.scales.Logarithmic.prototype.logBase = function(opt_value) {
 
 
 /** @inheritDoc */
+anychart.scales.Logarithmic.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.LOG;
+};
+
+
+/** @inheritDoc */
 anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
   value = anychart.utils.toNumber(value);
@@ -114,19 +120,16 @@ anychart.scales.Logarithmic.prototype.createTicks = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['logBase'] = this.logBase();
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['logBase'] = this.logBase();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.Logarithmic.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
-  this.logBase(value['logBase']);
-  this.resumeSignalsDispatching(true);
-  return this;
+anychart.scales.Logarithmic.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.logBase(config['logBase']);
 };
 
 

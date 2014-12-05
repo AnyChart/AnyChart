@@ -25,3 +25,7 @@ anychart.axes.radial = function() {
 
 //exports
 goog.exportSymbol('anychart.axes.radial', anychart.axes.radial);
+anychart.axes.Radial.prototype['draw'] = anychart.axes.Radial.prototype.draw;
+anychart.axes.Radial.prototype['parentBounds'] = anychart.axes.Radial.prototype.parentBounds;
+anychart.axes.Radial.prototype['container'] = anychart.axes.Radial.prototype.container;
+anychart.axes.Radial.prototype['startAngle'] = anychart.axes.Radial.prototype.startAngle;

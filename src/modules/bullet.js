@@ -19,6 +19,9 @@ anychart.bullet = function(opt_data) {
 };
 
 
+anychart.chartTypesMap[anychart.enums.ChartTypes.BULLET] = anychart.bullet;
+
+
 /**
  * Creates a bullet chart.
  * @example <t>simple-h100</t>

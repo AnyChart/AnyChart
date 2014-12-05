@@ -206,15 +206,7 @@ anychart.core.ui.TooltipItem.prototype.title = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Title) {
-      this.title_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.title_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.title_.enabled(false);
-    } else if (goog.isString(opt_value)) {
-      this.title_.text(opt_value);
-    }
+    this.title_.setup(opt_value);
     return this;
   } else {
     return this.title_;
@@ -262,13 +254,7 @@ anychart.core.ui.TooltipItem.prototype.separator = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Separator) {
-      this.separator_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.separator_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.separator_.enabled(false);
-    }
+    this.separator_.setup(opt_value);
     return this;
   } else {
     return this.separator_;
@@ -316,15 +302,7 @@ anychart.core.ui.TooltipItem.prototype.content = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Label) {
-      this.label_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.label_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.label_.enabled(false);
-    } else if (goog.isString(opt_value)) {
-      this.label_.text(opt_value);
-    }
+    this.label_.setup(opt_value);
     return this;
   } else {
     return this.label_;
@@ -372,13 +350,7 @@ anychart.core.ui.TooltipItem.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Background) {
-      this.background_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.background_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.background_.enabled(false);
-    }
+    this.background_.setup(opt_value);
     return this;
   } else {
     return this.background_;
@@ -416,13 +388,7 @@ anychart.core.ui.TooltipItem.prototype.padding = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.utils.Padding) {
-      this.padding_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.padding_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.padding_.set(0);
-    }
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   } else {
     return this.padding_;
@@ -888,70 +854,17 @@ anychart.core.ui.TooltipItem.prototype.restoreDefaults = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  JSON.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @inheritDoc
- */
-anychart.core.ui.TooltipItem.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-
-  json['title'] = this.title().serialize();
-  json['separator'] = this.separator().serialize();
-  json['content'] = this.content().serialize();
-  json['background'] = this.background().serialize();
-  json['padding'] = this.padding().serialize();
-
-  json['x'] = this.x();
-  json['y'] = this.y();
-  json['anchor'] = this.anchor();
-  json['visible'] = this.visible();
-  json['hideDelay'] = this.hideDelay();
-
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.TooltipItem.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.title(config['title']);
-  this.content(config['content']);
-  this.separator(config['separator']);
-  this.background(config['background']);
-  this.padding(config['padding']);
-
-  this.x(config['x']);
-  this.y(config['y']);
-  this.anchor(config['anchor']);
-  this.visible(config['visible']);
-  this.hideDelay(config['hideDelay']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
-};
-
-
+//anychart.core.ui.TooltipItem.prototype['title'] = anychart.core.ui.TooltipItem.prototype.title;
+//anychart.core.ui.TooltipItem.prototype['separator'] = anychart.core.ui.TooltipItem.prototype.separator;
+//anychart.core.ui.TooltipItem.prototype['content'] = anychart.core.ui.TooltipItem.prototype.content;
+//anychart.core.ui.TooltipItem.prototype['background'] = anychart.core.ui.TooltipItem.prototype.background;
+//anychart.core.ui.TooltipItem.prototype['padding'] = anychart.core.ui.TooltipItem.prototype.padding;
+//anychart.core.ui.TooltipItem.prototype['x'] = anychart.core.ui.TooltipItem.prototype.x;
+//anychart.core.ui.TooltipItem.prototype['y'] = anychart.core.ui.TooltipItem.prototype.y;
+//anychart.core.ui.TooltipItem.prototype['offsetX'] = anychart.core.ui.TooltipItem.prototype.offsetX;
+//anychart.core.ui.TooltipItem.prototype['offsetY'] = anychart.core.ui.TooltipItem.prototype.offsetY;
+//anychart.core.ui.TooltipItem.prototype['anchor'] = anychart.core.ui.TooltipItem.prototype.anchor;
+//anychart.core.ui.TooltipItem.prototype['visible'] = anychart.core.ui.TooltipItem.prototype.visible;
+//anychart.core.ui.TooltipItem.prototype['hideDelay'] = anychart.core.ui.TooltipItem.prototype.hideDelay;
+//anychart.core.ui.TooltipItem.prototype['draw'] = anychart.core.ui.TooltipItem.prototype.draw;
 //exports
-anychart.core.ui.TooltipItem.prototype['title'] = anychart.core.ui.TooltipItem.prototype.title;
-anychart.core.ui.TooltipItem.prototype['separator'] = anychart.core.ui.TooltipItem.prototype.separator;
-anychart.core.ui.TooltipItem.prototype['content'] = anychart.core.ui.TooltipItem.prototype.content;
-anychart.core.ui.TooltipItem.prototype['background'] = anychart.core.ui.TooltipItem.prototype.background;
-anychart.core.ui.TooltipItem.prototype['padding'] = anychart.core.ui.TooltipItem.prototype.padding;
-anychart.core.ui.TooltipItem.prototype['x'] = anychart.core.ui.TooltipItem.prototype.x;
-anychart.core.ui.TooltipItem.prototype['y'] = anychart.core.ui.TooltipItem.prototype.y;
-anychart.core.ui.TooltipItem.prototype['offsetX'] = anychart.core.ui.TooltipItem.prototype.offsetX;
-anychart.core.ui.TooltipItem.prototype['offsetY'] = anychart.core.ui.TooltipItem.prototype.offsetY;
-anychart.core.ui.TooltipItem.prototype['anchor'] = anychart.core.ui.TooltipItem.prototype.anchor;
-anychart.core.ui.TooltipItem.prototype['visible'] = anychart.core.ui.TooltipItem.prototype.visible;
-anychart.core.ui.TooltipItem.prototype['hideDelay'] = anychart.core.ui.TooltipItem.prototype.hideDelay;
-anychart.core.ui.TooltipItem.prototype['draw'] = anychart.core.ui.TooltipItem.prototype.draw;

@@ -76,13 +76,6 @@ anychart.charts.Bullet.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * @type {string}
- */
-anychart.charts.Bullet.CHART_TYPE = 'bullet';
-anychart.chartTypesMap[anychart.charts.Bullet.CHART_TYPE] = anychart.charts.Bullet;
-
-
-/**
  * Markers z-index.
  * @type {number}
  */
@@ -277,11 +270,14 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
  *//**
  * @ignoreDoc
  * Getter/setter for default bullet chart scale.
- * @param {anychart.scales.Base=} opt_value Scale to set.
+ * @param {(anychart.scales.Base|string)=} opt_value Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Bullet)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Bullet.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      opt_value = anychart.scales.Base.fromString(opt_value, false);
+    }
     if (this.scale_ != opt_value) {
       this.scale_ = opt_value;
       this.invalidate(
@@ -346,15 +342,7 @@ anychart.charts.Bullet.prototype.axis = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.axes.Linear) {
-      this.axis_.deserialize(opt_value.serialize());
-      if (this.axis_.zIndex() == 0) this.axis_.zIndex(anychart.charts.Bullet.ZINDEX_AXIS);
-    } else if (goog.isObject(opt_value)) {
-      this.axis_.deserialize(opt_value);
-      if (this.axis_.zIndex() == 0) this.axis_.zIndex(anychart.charts.Bullet.ZINDEX_AXIS);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.axis_.enabled(false);
-    }
+    this.axis_.setup(opt_value);
     return this;
   } else {
     return this.axis_;
@@ -445,15 +433,7 @@ anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axisMarkers.Range) {
-      range.deserialize(value.serialize());
-      if (range.zIndex() == 0) range.zIndex(anychart.charts.Bullet.ZINDEX_RANGES);
-    } else if (goog.isObject(value)) {
-      range.deserialize(value);
-      if (range.zIndex() == 0) range.zIndex(anychart.charts.Bullet.ZINDEX_RANGES);
-    } else if (anychart.utils.isNone(value)) {
-      range.enabled(false);
-    }
+    range.setup(value);
     return this;
   } else {
     return range;
@@ -500,11 +480,7 @@ anychart.charts.Bullet.prototype.rangePalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.DistinctColors) {
-      this.rangePalette_.cloneFrom(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.rangePalette_.colors(opt_value);
-    }
+    this.rangePalette_.setup(opt_value);
     return this;
   } else {
     return this.rangePalette_;
@@ -553,15 +529,7 @@ anychart.charts.Bullet.prototype.markerPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.Markers) {
-      this.markerPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isArray(opt_value)) {
-      this.markerPalette_.markers(opt_value);
-    } else if (goog.isObject(opt_value)) {
-      this.markerPalette_.deserialize(opt_value);
-    }
-
-    this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.markerPalette_.setup(opt_value);
     return this;
   } else {
     return this.markerPalette_;
@@ -796,6 +764,39 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.stroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')));
 
   return marker;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Bullet.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['type'] = anychart.enums.ChartTypes.BULLET;
+  json['layout'] = this.layout();
+  json['data'] = this.data().serialize();
+  json['rangePalette'] = this.rangePalette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
+  json['scale'] = this.scale().serialize();
+  json['axis'] = this.axis().serialize();
+  var res = [];
+  for (var i = 0; i < this.ranges_.length; i++)
+    res.push(this.ranges_[i].serialize());
+  return {'chart': json};
+};
+
+
+/** @inheritDoc */
+anychart.charts.Bullet.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.data(config['data']);
+  this.layout(config['layout']);
+  this.rangePalette(config['rangePalette']);
+  this.markerPalette(config['markerPalette']);
+  this.scale(config['scale']);
+  this.axis(config['axis']);
+  var ranges = config['ranges'];
+  if (goog.isArray(ranges))
+    for (var i = 0; i < ranges.length; i++)
+      this.range(i, ranges[i]);
 };
 
 

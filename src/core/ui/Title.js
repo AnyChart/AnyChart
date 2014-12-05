@@ -283,15 +283,7 @@ anychart.core.ui.Title.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Background) {
-      this.background_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.background_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.background_.enabled(false);
-    }
-    this.background_.resumeSignalsDispatching(true);
+    this.background_.setup(opt_value);
     return this;
   }
   return this.background_;
@@ -391,7 +383,7 @@ anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom,
     this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.margin_.set.apply(this.margin_, arguments);
+    this.margin_.setup.apply(this.margin_, arguments);
     return this;
   }
   return this.margin_;
@@ -435,7 +427,7 @@ anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.padding_.set.apply(this.padding_, arguments);
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -1017,61 +1009,46 @@ anychart.core.ui.Title.prototype.clear = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.ui.Title.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
-  var align = this.align();
-  var orientation = this.orientation();
-  var width = this.width();
-  var height = this.height();
-  var text = this.text();
-
-  var background = this.background_;
-  var margin = this.margin_;
-  var padding = this.padding_;
-
-  json['align'] = align;
-  json['orientation'] = orientation;
-  json['width'] = width;
-  json['height'] = height;
-  json['text'] = text;
-
-  if (background) json['background'] = background.serialize();
-  if (margin) json['margin'] = margin.serialize();
-  if (padding) json['padding'] = padding.serialize();
-
+  json['margin'] = this.margin().serialize();
+  json['padding'] = this.padding().serialize();
+  json['background'] = this.background().serialize();
+  json['text'] = this.text();
+  json['rotation'] = this.rotation();
+  json['width'] = this.width();
+  json['height'] = this.height();
+  json['align'] = this.align();
+  json['orientation'] = this.orientation();
   return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.Title.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  if ('padding' in config) {
-    this.padding().deserialize(config['padding']);
+anychart.core.ui.Title.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isString(args[0])) {
+    this.text(args[0]);
+    this.enabled(true);
+    return true;
   }
+  return anychart.core.Text.prototype.setupSpecial.apply(this, args);
+};
 
-  if ('margin' in config) {
-    this.margin().deserialize(config['margin']);
-  }
 
+/** @inheritDoc */
+anychart.core.ui.Title.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.margin(config['margin']);
+  this.padding(config['padding']);
   this.background(config['background']);
-  this.textSettings(config);
-  this.align(config['align']);
-  this.orientation(config['orientation']);
+  this.text(config['text']);
+  this.rotation(config['rotation']);
   this.width(config['width']);
   this.height(config['height']);
-  this.text(config['text']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+  this.align(config['align']);
+  this.orientation(config['orientation']);
 };
 
 
@@ -1085,5 +1062,4 @@ anychart.core.ui.Title.prototype['margin'] = anychart.core.ui.Title.prototype.ma
 anychart.core.ui.Title.prototype['padding'] = anychart.core.ui.Title.prototype.padding;//in docs/final
 anychart.core.ui.Title.prototype['align'] = anychart.core.ui.Title.prototype.align;//in docs/final
 anychart.core.ui.Title.prototype['orientation'] = anychart.core.ui.Title.prototype.orientation;//in docs/final
-anychart.core.ui.Title.prototype['draw'] = anychart.core.ui.Title.prototype.draw;//in docs/final
 anychart.core.ui.Title.prototype['getRemainingBounds'] = anychart.core.ui.Title.prototype.getRemainingBounds;//in docs/final

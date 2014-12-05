@@ -115,14 +115,6 @@ anychart.core.cartesian.series.StepLine.prototype.getLegendIconType = function()
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.StepLine.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.StepLine.prototype['stroke'] = anychart.core.cartesian.series.StepLine.prototype.stroke;//inherited
 anychart.core.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.core.cartesian.series.StepLine.prototype.hoverStroke;//inherited

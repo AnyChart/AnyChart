@@ -24,3 +24,6 @@ anychart.axisMarkers.line = function() {
 
 //exports
 goog.exportSymbol('anychart.axisMarkers.line', anychart.axisMarkers.line);
+anychart.axisMarkers.Line.prototype['draw'] = anychart.axisMarkers.Line.prototype.draw;
+anychart.axisMarkers.Line.prototype['parentBounds'] = anychart.axisMarkers.Line.prototype.parentBounds;
+anychart.axisMarkers.Line.prototype['container'] = anychart.axisMarkers.Line.prototype.container;

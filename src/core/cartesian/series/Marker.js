@@ -586,18 +586,20 @@ anychart.core.cartesian.series.Marker.prototype.restoreDefaults = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.Marker.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.cartesian.series.Marker.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.type(config['type']);
   this.hoverType(config['hoverType']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
+//anychart.core.cartesian.series.Marker.prototype['startDrawing'] = anychart.core.cartesian.series.Marker.prototype.startDrawing;//inherited
+//anychart.core.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.core.cartesian.series.Marker.prototype.finalizeDrawing;//inherited
+//anychart.core.cartesian.series.Marker.prototype['hoverSeries'] = anychart.core.cartesian.series.Marker.prototype.hoverSeries;//inherited
+//anychart.core.cartesian.series.Marker.prototype['hoverPoint'] = anychart.core.cartesian.series.Marker.prototype.hoverPoint;//inherited
+//anychart.core.cartesian.series.Marker.prototype['unhover'] = anychart.core.cartesian.series.Marker.prototype.unhover;//inherited
 //exports
 anychart.core.cartesian.series.Marker.prototype['stroke'] = anychart.core.cartesian.series.Marker.prototype.stroke;//inherited
 anychart.core.cartesian.series.Marker.prototype['hoverStroke'] = anychart.core.cartesian.series.Marker.prototype.hoverStroke;//inherited
@@ -607,10 +609,5 @@ anychart.core.cartesian.series.Marker.prototype['size'] = anychart.core.cartesia
 anychart.core.cartesian.series.Marker.prototype['hoverSize'] = anychart.core.cartesian.series.Marker.prototype.hoverSize;//doc|ex
 anychart.core.cartesian.series.Marker.prototype['type'] = anychart.core.cartesian.series.Marker.prototype.type;//doc|ex
 anychart.core.cartesian.series.Marker.prototype['hoverType'] = anychart.core.cartesian.series.Marker.prototype.hoverType;//doc|ex
-anychart.core.cartesian.series.Marker.prototype['startDrawing'] = anychart.core.cartesian.series.Marker.prototype.startDrawing;//inherited
-anychart.core.cartesian.series.Marker.prototype['finalizeDrawing'] = anychart.core.cartesian.series.Marker.prototype.finalizeDrawing;//inherited
-anychart.core.cartesian.series.Marker.prototype['hoverSeries'] = anychart.core.cartesian.series.Marker.prototype.hoverSeries;//inherited
-anychart.core.cartesian.series.Marker.prototype['hoverPoint'] = anychart.core.cartesian.series.Marker.prototype.hoverPoint;//inherited
-anychart.core.cartesian.series.Marker.prototype['unhover'] = anychart.core.cartesian.series.Marker.prototype.unhover;//inherited
 anychart.core.cartesian.series.Marker.prototype['hatchFill'] = anychart.core.cartesian.series.Marker.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.Marker.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Marker.prototype.hoverHatchFill;//inherited

@@ -115,14 +115,6 @@ anychart.core.cartesian.series.Spline.prototype.getLegendIconType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.Spline.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.Spline.prototype['stroke'] = anychart.core.cartesian.series.Spline.prototype.stroke;//inherited
 anychart.core.cartesian.series.Spline.prototype['hoverStroke'] = anychart.core.cartesian.series.Spline.prototype.hoverStroke;//inherited

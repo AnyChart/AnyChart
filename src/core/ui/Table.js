@@ -557,9 +557,9 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var shouldRedraw = true;
     if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labelsFactory_.deserialize(opt_value.serialize());
+      this.labelsFactory_.setup(opt_value.serialize());
     } else if (goog.isObject(opt_value)) {
-      this.labelsFactory_.deserialize(opt_value);
+      this.labelsFactory_.setup(opt_value);
     } else if (anychart.utils.isNone(opt_value)) {
       this.labelsFactory_.enabled(false);
     } else {
@@ -629,16 +629,8 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
     this.registerDisposable(this.cellPadding_);
   }
 
-  if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.cellPadding_.set.apply(this.cellPadding_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.cellPadding_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.cellPadding_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.cellPadding_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    this.cellPadding_.setup.apply(this.cellPadding_, arguments);
     return this;
   } else {
     return this.cellPadding_;
@@ -2753,29 +2745,20 @@ anychart.core.ui.Table.Cell.prototype.padding = function(opt_spaceOrTopOrTopAndB
   if (!this.settings_)
     this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
 
-  var padding;
-  if (this.settings_.padding) {
-    padding = this.settings_.padding;
-  } else {
-    this.settings_.padding = padding = new anychart.core.utils.Padding();
-    padding.listenSignals(this.paddingInvalidated_, this);
-    this.registerDisposable(padding);
+  var makeDefault = goog.isNull(opt_spaceOrTopOrTopAndBottom);
+  if (!makeDefault && !this.settings_.padding) {
+    this.settings_.padding = new anychart.core.utils.Padding();
+    this.registerDisposable(this.settings_.padding);
+    this.settings_.padding.listenSignals(this.paddingInvalidated_, this);
   }
-
-  if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      padding.set.apply(padding, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      padding.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      padding.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      padding.set(opt_spaceOrTopOrTopAndBottom);
-    }
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    if (makeDefault)
+      goog.dispose(this.settings_.padding);
+    else
+      this.settings_.padding.setup.apply(this.settings_.padding, arguments);
     return this;
   }
-
-  return padding;
+  return this.settings_.padding;
 };
 
 

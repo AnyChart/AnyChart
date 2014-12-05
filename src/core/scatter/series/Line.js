@@ -299,8 +299,7 @@ anychart.core.scatter.series.Line.prototype.getType = function() {
  */
 anychart.core.scatter.series.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  // from ContinuousBase
-  json['connectMissing'] = this.connectMissing;
+  json['connectMissingPoints'] = this.connectMissingPoints;
   return json;
 };
 
@@ -308,21 +307,16 @@ anychart.core.scatter.series.Line.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Line.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
-  // from ContinuousBase
-  this.connectMissingPoints(config['connectMissing']);
-  this.resumeSignalsDispatching(false);
-  return this;
+anychart.core.scatter.series.Line.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.connectMissingPoints(config['connectMissingPoints']);
 };
 
-
+//anychart.core.scatter.series.Line.prototype['startDrawing'] = anychart.core.scatter.series.Line.prototype.startDrawing;//inherited
+//anychart.core.scatter.series.Line.prototype['hoverSeries'] = anychart.core.scatter.series.Line.prototype.hoverSeries;//inherited
+//anychart.core.scatter.series.Line.prototype['hoverPoint'] = anychart.core.scatter.series.Line.prototype.hoverPoint;//inherited
+//anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;//inherited
 //exports
-anychart.core.scatter.series.Line.prototype['startDrawing'] = anychart.core.scatter.series.Line.prototype.startDrawing;//inherited
-anychart.core.scatter.series.Line.prototype['hoverSeries'] = anychart.core.scatter.series.Line.prototype.hoverSeries;//inherited
-anychart.core.scatter.series.Line.prototype['hoverPoint'] = anychart.core.scatter.series.Line.prototype.hoverPoint;//inherited
-anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;//inherited
 anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.core.scatter.series.Line.prototype.connectMissingPoints;
 anychart.core.scatter.series.Line.prototype['stroke'] = anychart.core.scatter.series.Line.prototype.stroke;//inherited
 anychart.core.scatter.series.Line.prototype['hoverStroke'] = anychart.core.scatter.series.Line.prototype.hoverStroke;//inherited

@@ -123,7 +123,7 @@ anychart.chartTypesMap = {};
 anychart.createByType = function(type) {
   var cls = anychart.chartTypesMap[type];
   if (cls) {
-    return /** @type {anychart.core.Chart} */(new cls());
+    return /** @type {anychart.core.Chart} */(cls());
   } else {
     throw 'Unknown chart type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
@@ -167,7 +167,9 @@ anychart.fromJson = function(jsonConfig) {
 
 
   var instance = anychart.createByType(chart['type']);
-  instance.deserialize(json);
+  if (instance)
+    instance.setup(chart);
+  return instance;
 };
 
 

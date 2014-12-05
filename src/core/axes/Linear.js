@@ -107,9 +107,24 @@ anychart.core.axes.Linear = function() {
       .fontColor('rgb(34,34,34)')
       .resumeSignalsDispatching(false);
 
-  this.minorLabels()
+  this.minorLabels().background()
       .suspendSignalsDispatching()
-      .background(this.labels().background())
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle': '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle': '90'
+      })
       .resumeSignalsDispatching(false);
 
   this.ticks()
@@ -389,17 +404,7 @@ anychart.core.axes.Linear.prototype.title = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.title_.suspendSignalsDispatching();
-    if (goog.isString(opt_value)) {
-      this.title_.text(opt_value);
-    } else if (opt_value instanceof anychart.core.ui.Title) {
-      this.title_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.title_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.title_.enabled(false);
-    }
-    this.title_.resumeSignalsDispatching(true);
+    this.title_.setup(opt_value);
     return this;
   }
   return this.title_;
@@ -450,15 +455,7 @@ anychart.core.axes.Linear.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labels_.enabled(false);
-    }
-    this.dropStaggeredLabelsCache_();
-    this.dropBoundsCache_();
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -512,14 +509,7 @@ anychart.core.axes.Linear.prototype.minorLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.minorLabels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorLabels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorLabels_.enabled(false);
-    }
-    this.dropBoundsCache_();
+    this.minorLabels_.setup(opt_value);
     return this;
   }
   return this.minorLabels_;
@@ -570,17 +560,7 @@ anychart.core.axes.Linear.prototype.ticks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.ticks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.Ticks) {
-      this.ticks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.ticks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.ticks_.enabled(false);
-    }
-    this.ticks_.resumeSignalsDispatching(true);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.ticks_.setup(opt_value);
     return this;
   }
   return this.ticks_;
@@ -631,15 +611,7 @@ anychart.core.axes.Linear.prototype.minorTicks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.minorTicks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.Ticks) {
-      this.minorTicks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorTicks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorTicks_.enabled(false);
-    }
-    this.minorTicks_.resumeSignalsDispatching(true);
+    this.minorTicks_.setup(opt_value);
     return this;
   }
   return this.minorTicks_;
@@ -817,7 +789,7 @@ anychart.core.axes.Linear.prototype.padding = function(opt_spaceOrTopOrTopAndBot
     this.padding_.listenSignals(this.paddingInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.padding_.set.apply(this.padding_, arguments);
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -2268,62 +2240,46 @@ anychart.core.axes.Linear.prototype.remove = function() {
 };
 
 
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.Linear.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-
-  data['title'] = this.title().serialize();
-  data['labels'] = this.labels().serialize();
-  data['minorLabels'] = this.minorLabels().serialize();
-  data['ticks'] = this.ticks().serialize();
-  data['minorTicks'] = this.minorTicks().serialize();
-  data['padding'] = this.padding().serialize();
-
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  data['name'] = this.name();
-  data['width'] = this.width();
-  data['orientation'] = this.orientation();
-  data['drawFirstLabel'] = this.drawFirstLabel();
-  data['drawLastLabel'] = this.drawLastLabel();
-  data['overlapMode'] = this.overlapMode();
-  data['staggerMode'] = this.staggerMode();
-  data['staggerLines'] = this.staggerLines();
-  data['staggerMaxLines'] = this.staggerMaxLines();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['title'] = this.title().serialize();
+  json['labels'] = this.labels().serialize();
+  json['minorLabels'] = this.minorLabels().serialize();
+  json['ticks'] = this.ticks().serialize();
+  json['minorTicks'] = this.minorTicks().serialize();
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  json['staggerMode'] = this.staggerMode();
+  json['staggerLines'] = this.staggerLines();
+  json['staggerMaxLines'] = this.staggerMaxLines();
+  json['name'] = this.name();
+  json['width'] = this.width();
+  json['orientation'] = this.orientation();
+  json['drawFirstLabel'] = this.drawFirstLabel();
+  json['drawLastLabel'] = this.drawLastLabel();
+  json['overlapMode'] = this.overlapMode();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.Linear.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.title(value['title']);
-  this.labels(value['labels']);
-  this.minorLabels(value['minorLabels']);
-  this.ticks(value['ticks']);
-  this.minorTicks(value['minorTicks']);
-  this.padding(value['padding']);
-
-  this.name(value['name']);
-  this.width(value['width']);
-  this.stroke(value['stroke']);
-  this.orientation(value['orientation']);
-  this.drawFirstLabel(value['drawFirstLabel']);
-  this.drawLastLabel(value['drawLastLabel']);
-  this.overlapMode(value['overlapMode']);
-  this.staggerMode(value['staggerMode']);
-  this.staggerLines(value['staggerLines']);
-  this.staggerMaxLines(value['staggerMaxLines']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.title(config['title']);
+  this.labels(config['labels']);
+  this.minorLabels(config['minorLabels']);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
+  this.staggerMode(config['staggerMode']);
+  this.staggerLines(config['staggerLines']);
+  this.staggerMaxLines(config['staggerMaxLines']);
+  this.name(config['name']);
+  this.stroke(config['stroke']);
+  this.width(config['width']);
+  this.orientation(config['orientation']);
+  this.drawFirstLabel(config['drawFirstLabel']);
+  this.drawLastLabel(config['drawLastLabel']);
+  this.overlapMode(config['overlapMode']);
 };
 
 
@@ -2366,7 +2322,6 @@ anychart.core.axes.Linear.prototype['stroke'] = anychart.core.axes.Linear.protot
 anychart.core.axes.Linear.prototype['orientation'] = anychart.core.axes.Linear.prototype.orientation;//doc|ex
 anychart.core.axes.Linear.prototype['scale'] = anychart.core.axes.Linear.prototype.scale;//doc|ex
 anychart.core.axes.Linear.prototype['width'] = anychart.core.axes.Linear.prototype.width;
-anychart.core.axes.Linear.prototype['padding'] = anychart.core.axes.Linear.prototype.padding;
 anychart.core.axes.Linear.prototype['getRemainingBounds'] = anychart.core.axes.Linear.prototype.getRemainingBounds;//doc|ex
 anychart.core.axes.Linear.prototype['drawFirstLabel'] = anychart.core.axes.Linear.prototype.drawFirstLabel;//doc|ex
 anychart.core.axes.Linear.prototype['drawLastLabel'] = anychart.core.axes.Linear.prototype.drawLastLabel;//doc|ex

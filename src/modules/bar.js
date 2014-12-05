@@ -18,6 +18,8 @@ goog.require('anychart.modules.base');
 anychart.bar = function(var_args) {
   var chart = new anychart.charts.Cartesian(true);
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BAR);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bar(arguments[i]);
   }
@@ -45,6 +47,9 @@ anychart.bar = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.BAR] = anychart.bar;
 
 
 /**

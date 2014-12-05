@@ -122,13 +122,6 @@ goog.inherits(anychart.charts.Scatter, anychart.core.Chart);
 
 
 /**
- * @type {string}
- */
-anychart.charts.Scatter.CHART_TYPE = 'scatter';
-anychart.chartTypesMap[anychart.charts.Scatter.CHART_TYPE] = anychart.charts.Scatter;
-
-
-/**
  * Maximal number of attempts to calculate axes length.
  * @type {number}
  * @private
@@ -256,11 +249,14 @@ anychart.charts.Scatter.prototype.setDefaultScaleForLayoutBasedElements_ = funct
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.scales.ScatterBase=} opt_value X Scale to set.
+ * @param {(string|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.charts.Scatter)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Scatter.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
+    }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
       anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
@@ -299,11 +295,14 @@ anychart.charts.Scatter.prototype.xScale = function(opt_value) {
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.scales.ScatterBase=} opt_value Y Scale to set.
+ * @param {(string|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.charts.Scatter)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Scatter.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
+    }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
       anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
@@ -405,15 +404,7 @@ anychart.charts.Scatter.prototype.grid = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.grids.Linear) {
-      grid.deserialize(value.serialize());
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Scatter.ZINDEX_GRID);
-    } else if (goog.isObject(value)) {
-      grid.deserialize(value);
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Scatter.ZINDEX_GRID);
-    } else if (anychart.utils.isNone(value)) {
-      grid.enabled(false);
-    }
+    grid.setup(value);
     return this;
   } else {
     return grid;
@@ -517,15 +508,7 @@ anychart.charts.Scatter.prototype.minorGrid = function(opt_indexOrValue, opt_val
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.grids.Linear) {
-      grid.deserialize(value.serialize());
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Scatter.ZINDEX_GRID);
-    } else if (goog.isObject(value)) {
-      grid.deserialize(value);
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Scatter.ZINDEX_GRID);
-    } else if (anychart.utils.isNone(value)) {
-      grid.enabled(false);
-    }
+    grid.setup(opt_value);
     return this;
   } else {
     return grid;
@@ -617,15 +600,7 @@ anychart.charts.Scatter.prototype.xAxis = function(opt_indexOrValue, opt_value) 
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axes.Linear) {
-      axis.deserialize(value.serialize());
-      if (axis.zIndex() == 0) axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
-    } else if (goog.isObject(value)) {
-      axis.deserialize(value);
-      if (axis.zIndex() == 0) axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
-    } else if (anychart.utils.isNone(value)) {
-      axis.enabled(false);
-    }
+    axis.setup(value);
     return this;
   } else {
     return axis;
@@ -707,15 +682,7 @@ anychart.charts.Scatter.prototype.yAxis = function(opt_indexOrValue, opt_value) 
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axes.Linear) {
-      axis.deserialize(value.serialize());
-      if (axis.zIndex() == 0) axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
-    } else if (goog.isObject(value)) {
-      axis.deserialize(value);
-      if (axis.zIndex() == 0) axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
-    } else if (anychart.utils.isNone(value)) {
-      axis.enabled(false);
-    }
+    axis.setup(value);
     return this;
   } else {
     return axis;
@@ -746,7 +713,7 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
 /**
  * Getter for chart line marker.
  * @param {(string|number)=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.aixsMarkers.Line} Line marker instance by index.
+ * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
  *//**
  * Setter for chart line marker.
  * @example
@@ -763,7 +730,7 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
  *     .layout('horizontal');
  * chart.lineMarker(lineMarker);
  * chart.container(stage).draw();
- * @param {(anychart.core.aixsMarkers.Line|Object)=} opt_value Chart line marker settings to set.
+ * @param {(anychart.core.axisMarkers.Line|Object)=} opt_value Chart line marker settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * Setter for chart line marker by index.
@@ -781,7 +748,7 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
  * chart.lineMarker(0, null);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Chart line marker index.
- * @param {(anychart.core.aixsMarkers.Line|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
+ * @param {(anychart.core.axisMarkers.Line|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
@@ -812,15 +779,7 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axisMarkers.Line) {
-      lineMarker.deserialize(value.serialize());
-      if (lineMarker.zIndex() == 0) lineMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_LINE_MARKER);
-    } else if (goog.isObject(value)) {
-      lineMarker.deserialize(value);
-      if (lineMarker.zIndex() == 0) lineMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_LINE_MARKER);
-    } else if (anychart.utils.isNone(value)) {
-      lineMarker.enabled(false);
-    }
+    lineMarker.setup(value);
     return this;
   } else {
     return lineMarker;
@@ -831,7 +790,7 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
 /**
  * Getter for chart range marker.
  * @param {(string|number)=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.aixsMarkers.Range} Range marker instance by index.
+ * @return {!anychart.core.axisMarkers.Range} Range marker instance by index.
  *//**
  * Setter for chart range marker.
  * @example
@@ -842,13 +801,13 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
  *    [3, 17],
  *    [1, 20]
  * ]);
- * var rangeMarker = anychart.aixsMarkers.range()
+ * var rangeMarker = anychart.axisMarkers.range()
  *     .from(15.5)
  *     .to(4.5)
  *     .fill('blue .1');
  * chart.rangeMarker(rangeMarker);
  * chart.container(stage).draw();
- * @param {(anychart.core.aixsMarkers.Range|Object)=} opt_value Chart range marker settings to set.
+ * @param {(anychart.core.axisMarkers.Range|Object)=} opt_value Chart range marker settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * Setter for chart range marker by index.
@@ -866,7 +825,7 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
  * chart.rangeMarker(0, null);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Chart range marker index.
- * @param {(anychart.core.aixsMarkers.Range|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
+ * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
@@ -897,15 +856,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axisMarkers.Range) {
-      rangeMarker.deserialize(value.serialize());
-      if (rangeMarker.zIndex() == 0) rangeMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_RANGE_MARKER);
-    } else if (goog.isObject(value)) {
-      rangeMarker.deserialize(value);
-      if (rangeMarker.zIndex() == 0) rangeMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_RANGE_MARKER);
-    } else if (anychart.utils.isNone(value)) {
-      rangeMarker.enabled(false);
-    }
+    rangeMarker.setup(value);
     return this;
   } else {
     return rangeMarker;
@@ -916,7 +867,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
 /**
  * Getter for chart text marker.
  * @param {(string|number)=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.aixsMarkers.Text} text marker instance by index.
+ * @return {!anychart.core.axisMarkers.Text} text marker instance by index.
  *//**
  * Setter for chart text marker.
  * @example
@@ -935,7 +886,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
  * chart.textMarker(txtMarker);
  * chart.lineMarker().value(13.3);
  * chart.container(stage).draw();
- * @param {(anychart.core.aixsMarkers.Text|Object)=} opt_value Chart text marker settings to set.
+ * @param {(anychart.core.axisMarkers.Text|Object)=} opt_value Chart text marker settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * Setter for chart text marker by index.
@@ -953,7 +904,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
  * chart.textMarker(0, null);
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Chart text marker index.
- * @param {(anychart.core.aixsMarkers.Text|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
+ * @param {(anychart.core.axisMarkers.Text|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
@@ -984,15 +935,7 @@ anychart.charts.Scatter.prototype.textMarker = function(opt_indexOrValue, opt_va
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.axisMarkers.Text) {
-      textMarker.deserialize(value.serialize());
-      if (textMarker.zIndex() == 0) textMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_TEXT_MARKER);
-    } else if (goog.isObject(value)) {
-      textMarker.deserialize(value);
-      if (textMarker.zIndex() == 0) textMarker.zIndex(anychart.charts.Scatter.ZINDEX_AXIS_TEXT_MARKER);
-    } else if (anychart.utils.isNone(value)) {
-      textMarker.enabled(false);
-    }
+    textMarker.setup(value);
     return this;
   } else {
     return textMarker;
@@ -1012,7 +955,7 @@ anychart.charts.Scatter.prototype.onMarkersSignal_ = function(event) {
 
 /**
  * Getter for series colors palette.
- * @return {!(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette)} Current palette.
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
  *//**
  * Setter for series colors palette.
  * @example
@@ -1037,7 +980,7 @@ anychart.charts.Scatter.prototype.onMarkersSignal_ = function(event) {
  *    [1.1, 12]
  * ]);
  * chart.container(stage).draw();
- * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -1051,18 +994,15 @@ anychart.charts.Scatter.prototype.palette = function(opt_value) {
   } else if (opt_value instanceof anychart.palettes.DistinctColors) {
     this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
     return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
   }
 
   if (!this.palette_)
     this.setupPalette_(anychart.palettes.DistinctColors);
 
   if (goog.isDef(opt_value)) {
-    if (goog.isArray(opt_value))
-      this.palette_.colors(opt_value);
-    else if (goog.isNull(opt_value))
-      this.palette_.cloneFrom(opt_value);
-    else
-      return this;
+    this.palette_.setup(opt_value);
     return this;
   }
   return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
@@ -1077,12 +1017,12 @@ anychart.charts.Scatter.prototype.palette = function(opt_value) {
 anychart.charts.Scatter.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
   if (this.palette_ instanceof cls) {
     if (opt_cloneFrom)
-      this.palette_.cloneFrom(opt_cloneFrom);
+      this.palette_.setup(opt_cloneFrom);
   } else {
     goog.dispose(this.palette_);
     this.palette_ = new cls();
     if (opt_cloneFrom)
-      this.palette_.cloneFrom(opt_cloneFrom);
+      this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.onPaletteSignal_, this);
     this.registerDisposable(this.palette_);
   }
@@ -1103,7 +1043,7 @@ anychart.charts.Scatter.prototype.onPaletteSignal_ = function(event) {
 
 /**
  * Getter for markers palette settings.
- * @return {anychart.utils.MarkerPalette} Current markers palette.
+ * @return {anychart.palettes.Markers} Current markers palette.
  *//**
  * Setter for markers palette settings.
  * @example
@@ -1128,7 +1068,7 @@ anychart.charts.Scatter.prototype.onPaletteSignal_ = function(event) {
  *    [1.1, 12]
  * ]);
  * chart.container(stage).draw();
- * @param {(anychart.utils.RangeColorPalette|anychart.utils.DistinctColorPalette|Array)=} opt_value Value to set.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -1144,13 +1084,7 @@ anychart.charts.Scatter.prototype.markerPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.Markers) {
-      this.markerPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.markerPalette_.deserialize(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.markerPalette_.markers(opt_value);
-    }
+    this.markerPalette_.setup(opt_value);
     return this;
   } else {
     return this.markerPalette_;
@@ -1172,7 +1106,7 @@ anychart.charts.Scatter.prototype.onMarkerPaletteSignal_ = function(event) {
 
 /**
  * Getter for hatch fill palette settings.
- * @return {anychart.utils.HatchFillPalette} Current markers palette.
+ * @return {anychart.palettes.HatchFills} Current markers palette.
  *//**
  * Setter for hatch fill palette settings.
  * @example
@@ -1216,13 +1150,7 @@ anychart.charts.Scatter.prototype.hatchFillPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.HatchFills) {
-      this.hatchFillPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.hatchFillPalette_.deserialize(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.hatchFillPalette_.hatchFills(opt_value);
-    }
+    this.hatchFillPalette_.setup(opt_value);
     return this;
   } else {
     return this.hatchFillPalette_;
@@ -1352,6 +1280,7 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    instance = null;
   }
 
   return instance;
@@ -1649,7 +1578,7 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
           axis.suspendSignalsDispatching();
           axis.parentBounds(contentAreaBounds);
           orientation = axis.orientation();
-          axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke}} */(axis.stroke()));
+          axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
 
           if (orientation == anychart.enums.Orientation.TOP) {
             axis.padding().top(topOffset);
@@ -1843,6 +1772,326 @@ anychart.charts.Scatter.prototype.drawSeries_ = function() {
     }
 
     series.finalizeDrawing();
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  var i;
+  var scalesIds = {};
+  var scales = [];
+  var scale;
+  var config;
+  var objId;
+
+  scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.xScale())]);
+  json['xScale'] = scales.length - 1;
+  if (this.xScale() != this.yScale()) {
+    scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.yScale())]);
+  }
+  json['yScale'] = scales.length - 1;
+
+  json['type'] = anychart.enums.ChartTypes.SCATTER;
+  json['palette'] = this.palette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+
+  var grids = [];
+  for (i = 0; i < this.grids_.length; i++) {
+    var grid = this.grids_[i];
+    config = grid.serialize();
+    scale = grid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    grids.push(config);
+  }
+  json['grids'] = grids;
+
+  var minorGrids = [];
+  for (i = 0; i < this.minorGrids_.length; i++) {
+    var minorGrid = this.minorGrids_[i];
+    config = minorGrid.serialize();
+    scale = minorGrid.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    minorGrids.push(config);
+  }
+  json['minorGrids'] = minorGrids;
+
+  var xAxes = [];
+  for (i = 0; i < this.xAxes_.length; i++) {
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    xAxes.push(config);
+  }
+  json['xAxes'] = xAxes;
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    yAxes.push(config);
+  }
+  json['yAxes'] = yAxes;
+
+  var lineAxesMarkers = [];
+  for (i = 0; i < this.lineAxesMarkers_.length; i++) {
+    var lineAxesMarker = this.lineAxesMarkers_[i];
+    config = lineAxesMarker.serialize();
+    scale = lineAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    lineAxesMarkers.push(config);
+  }
+  json['lineAxesMarkers'] = lineAxesMarkers;
+
+  var rangeAxesMarkers = [];
+  for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
+    var rangeAxesMarker = this.rangeAxesMarkers_[i];
+    config = rangeAxesMarker.serialize();
+    scale = rangeAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    rangeAxesMarkers.push(config);
+  }
+  json['rangeAxesMarkers'] = rangeAxesMarkers;
+
+  var textAxesMarkers = [];
+  for (i = 0; i < this.textAxesMarkers_.length; i++) {
+    var textAxesMarker = this.textAxesMarkers_[i];
+    config = textAxesMarker.serialize();
+    scale = textAxesMarker.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    textAxesMarkers.push(config);
+  }
+  json['textAxesMarkers'] = textAxesMarkers;
+
+  var series = [];
+  for (i = 0; i < this.series_.length; i++) {
+    var series_ = this.series_[i];
+    config = series_.serialize();
+
+    scale = series_.xScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['xScale'] = scales.length - 1;
+    } else {
+      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+
+    scale = series_.yScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['yScale'] = scales.length - 1;
+    } else {
+      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    series.push(config);
+  }
+  json['series'] = series;
+
+  json['scales'] = scales;
+  return {'chart': json};
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.palette(config['palette']);
+  this.markerPalette(config['markerPalette']);
+  this.hatchFillPalette(config['hatchFillPalette']);
+
+  var i, json, scale;
+  var grids = config['grids'];
+  var minorGrids = config['minorGrids'];
+  var xAxes = config['xAxes'];
+  var yAxes = config['yAxes'];
+  var lineAxesMarkers = config['lineAxesMarkers'];
+  var rangeAxesMarkers = config['rangeAxesMarkers'];
+  var textAxesMarkers = config['textAxesMarkers'];
+  var series = config['series'];
+  var barGroupsPadding = config['barGroupsPadding'];
+  var barsPadding = config['barsPadding'];
+  var scales = config['scales'];
+
+  var scalesInstances = {};
+  if (goog.isArray(scales)) {
+    for (i in scales) {
+      if (!scales.hasOwnProperty(i)) continue;
+      json = scales[i];
+      if (goog.isString(json)) {
+        scale = anychart.scales.ScatterBase.fromString(json, false);
+      } else {
+        scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+        scale.setup(json);
+      }
+      scalesInstances[i] = scale;
+    }
+  }
+
+  json = config['xScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json, true);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.xScale(scale);
+
+  json = config['yScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json, true);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.yScale(scale);
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.grid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(minorGrids)) {
+    for (i = 0; i < minorGrids.length; i++) {
+      json = minorGrids[i];
+      this.minorGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.minorGrid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(xAxes)) {
+    for (i = 0; i < xAxes.length; i++) {
+      json = xAxes[i];
+      this.xAxis(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.xAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(yAxes)) {
+    for (i = 0; i < yAxes.length; i++) {
+      json = yAxes[i];
+      this.yAxis(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.yAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(lineAxesMarkers)) {
+    for (i = 0; i < lineAxesMarkers.length; i++) {
+      json = lineAxesMarkers[i];
+      this.lineMarker(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.lineMarker(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(rangeAxesMarkers)) {
+    for (i = 0; i < rangeAxesMarkers.length; i++) {
+      json = rangeAxesMarkers[i];
+      this.rangeMarker(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(textAxesMarkers)) {
+    for (i = 0; i < textAxesMarkers.length; i++) {
+      json = textAxesMarkers[i];
+      this.textMarker(i, json);
+      if (goog.isObject(json) && 'scale' in json) this.textMarker(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(series)) {
+    for (i = 0; i < series.length; i++) {
+      json = series[i];
+      var seriesType = (json['seriesType'] || anychart.enums.ScatterSeriesTypes.MARKER).toLowerCase();
+      var data = json['data'];
+      var seriesInst = this.createSeriesByType_(seriesType, data);
+      if (seriesInst) {
+        if (seriesType == anychart.enums.ScatterSeriesTypes.LINE)
+          seriesInst.zIndex(anychart.charts.Scatter.ZINDEX_LINE_SERIES);
+        seriesInst.setup(json);
+        if (goog.isObject(json)) {
+          if ('xScale' in json) seriesInst.xScale(scalesInstances[json['xScale']]);
+          if ('yScale' in json) seriesInst.yScale(scalesInstances[json['yScale']]);
+        }
+      }
+    }
   }
 };
 

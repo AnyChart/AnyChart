@@ -1270,47 +1270,6 @@ anychart.core.ui.ScrollBar.prototype.remove = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.ScrollBar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-
-  json['layout'] = this.layout_;
-
-  json['bgFill'] = anychart.color.serialize(this.bgFill_);
-  json['bgStroke'] = anychart.color.serialize(this.bgStroke_);
-  json['sliderFill'] = anychart.color.serialize(this.sliderFill_);
-  json['sliderStroke'] = anychart.color.serialize(this.sliderStroke_);
-
-  json['contentBounds'] = this.contentBounds_ ? this.contentBounds_.serialize() : null;
-  json['visibleBounds'] = this.visibleBounds_ ? this.visibleBounds_.serialize() : null;
-  json['startRatio'] = this.startRatio_;
-  json['endRatio'] = this.endRatio_;
-  json['buttonsVisible'] = this.buttonsVisible_;
-
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.ScrollBar.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
-
-  this.layout(config['layout']);
-  this.backgroundFill(config['bgFill']);
-  this.backgroundStroke(config['bgStroke']);
-  this.sliderFill(config['sliderFill']);
-  this.sliderStroke(config['sliderStroke']);
-  this.contentBounds(config['contentBounds']);
-  this.visibleBounds(config['visibleBounds']);
-  this.setRatio(config['startRatio'], config['endRatio']); //True way for setting the both values. Even though the values must be correct after serialization.
-  this.buttonsVisible(config['buttonsVisible']);
-
-  this.resumeSignalsDispatching(true);
-  return this;
-};
-
-
 /**
  * Dispatches scroll event.
  * Uses detached dispatching for scrolling purposes. TODO (A.Kudryavtsev): Explain why?
@@ -1378,26 +1337,25 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
 anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
 
 
+//goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
+//goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
+//anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
+//anychart.core.ui.ScrollBar.prototype['backgroundStroke'] = anychart.core.ui.ScrollBar.prototype.backgroundStroke;
+//anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
+//anychart.core.ui.ScrollBar.prototype['backgroundFill'] = anychart.core.ui.ScrollBar.prototype.backgroundFill;
+//anychart.core.ui.ScrollBar.prototype['sliderStroke'] = anychart.core.ui.ScrollBar.prototype.sliderStroke;
+//anychart.core.ui.ScrollBar.prototype['sliderFill'] = anychart.core.ui.ScrollBar.prototype.sliderFill;
+//anychart.core.ui.ScrollBar.prototype['contentBounds'] = anychart.core.ui.ScrollBar.prototype.contentBounds;
+//anychart.core.ui.ScrollBar.prototype['visibleBounds'] = anychart.core.ui.ScrollBar.prototype.visibleBounds;
+//anychart.core.ui.ScrollBar.prototype['startRatio'] = anychart.core.ui.ScrollBar.prototype.startRatio;
+//anychart.core.ui.ScrollBar.prototype['endRatio'] = anychart.core.ui.ScrollBar.prototype.endRatio;
+//anychart.core.ui.ScrollBar.prototype['setRatio'] = anychart.core.ui.ScrollBar.prototype.setRatio;
+//anychart.core.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo;
+//anychart.core.ui.ScrollBar.prototype['scrollStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollStartTo;
+//anychart.core.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo;
+//anychart.core.ui.ScrollBar.prototype['scrollEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollEndTo;
+//anychart.core.ui.ScrollBar.prototype['scrollPixel'] = anychart.core.ui.ScrollBar.prototype.scrollPixel;
+//anychart.core.ui.ScrollBar.prototype['scroll'] = anychart.core.ui.ScrollBar.prototype.scroll;
+//anychart.core.ui.ScrollBar.prototype['buttonsVisible'] = anychart.core.ui.ScrollBar.prototype.buttonsVisible;
+//anychart.core.ui.ScrollBar.prototype['draw'] = anychart.core.ui.ScrollBar.prototype.draw;
 //exports
-goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
-goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
-anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
-anychart.core.ui.ScrollBar.prototype['backgroundStroke'] = anychart.core.ui.ScrollBar.prototype.backgroundStroke;
-anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
-anychart.core.ui.ScrollBar.prototype['backgroundFill'] = anychart.core.ui.ScrollBar.prototype.backgroundFill;
-anychart.core.ui.ScrollBar.prototype['sliderStroke'] = anychart.core.ui.ScrollBar.prototype.sliderStroke;
-anychart.core.ui.ScrollBar.prototype['sliderFill'] = anychart.core.ui.ScrollBar.prototype.sliderFill;
-anychart.core.ui.ScrollBar.prototype['contentBounds'] = anychart.core.ui.ScrollBar.prototype.contentBounds;
-anychart.core.ui.ScrollBar.prototype['visibleBounds'] = anychart.core.ui.ScrollBar.prototype.visibleBounds;
-anychart.core.ui.ScrollBar.prototype['startRatio'] = anychart.core.ui.ScrollBar.prototype.startRatio;
-anychart.core.ui.ScrollBar.prototype['endRatio'] = anychart.core.ui.ScrollBar.prototype.endRatio;
-anychart.core.ui.ScrollBar.prototype['setRatio'] = anychart.core.ui.ScrollBar.prototype.setRatio;
-anychart.core.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo;
-anychart.core.ui.ScrollBar.prototype['scrollStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollStartTo;
-anychart.core.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo;
-anychart.core.ui.ScrollBar.prototype['scrollEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollEndTo;
-anychart.core.ui.ScrollBar.prototype['scrollPixel'] = anychart.core.ui.ScrollBar.prototype.scrollPixel;
-anychart.core.ui.ScrollBar.prototype['scroll'] = anychart.core.ui.ScrollBar.prototype.scroll;
-anychart.core.ui.ScrollBar.prototype['buttonsVisible'] = anychart.core.ui.ScrollBar.prototype.buttonsVisible;
-anychart.core.ui.ScrollBar.prototype['draw'] = anychart.core.ui.ScrollBar.prototype.draw;
-

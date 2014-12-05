@@ -21,6 +21,8 @@ goog.require('anychart.modules.base');
 anychart.bubble = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BUBBLE);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bubble(arguments[i]);
   }
@@ -48,6 +50,9 @@ anychart.bubble = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.BUBBLE] = anychart.bubble;
 
 
 /**

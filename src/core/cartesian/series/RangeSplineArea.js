@@ -130,14 +130,6 @@ anychart.core.cartesian.series.RangeSplineArea.prototype.getType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeSplineArea.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.RangeSplineArea.prototype['fill'] = anychart.core.cartesian.series.RangeSplineArea.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeSplineArea.prototype['hoverFill'] = anychart.core.cartesian.series.RangeSplineArea.prototype.hoverFill;//inherited

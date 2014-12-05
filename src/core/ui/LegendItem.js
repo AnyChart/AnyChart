@@ -862,61 +862,6 @@ anychart.core.ui.LegendItem.prototype.applyFillAndStroke_ = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.LegendItem.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-
-  json['x'] = this.x();
-  json['y'] = this.y();
-  if (goog.isFunction(this.iconType_)) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Legend Item iconType']
-    );
-  } else json['iconType'] = this.iconType();
-
-  json['iconFill'] = this.iconFill();
-  json['iconStroke'] = this.iconStroke();
-  json['iconHatchFill'] = this.iconHatchFill();
-  json['iconMarker'] = this.iconMarker();
-  json['iconTextSpacing'] = this.iconTextSpacing();
-  json['maxWidth'] = this.maxWidth();
-  json['maxHeight'] = this.maxHeight();
-  json['text'] = this.text();
-
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.LegendItem.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.x(config['x']);
-  this.y(config['y']);
-  this.iconType(config['iconType']);
-  this.iconFill(config['iconFill']);
-  this.iconStroke(config['iconStroke']);
-  this.iconHatchFill(config['iconHatchFill']);
-  this.iconMarker(config['iconMarker']);
-  this.iconTextSpacing(config['iconTextSpacing']);
-  this.maxWidth(config['maxWidth']);
-  this.maxHeight(config['maxHeight']);
-
-  this.textSettings(config);
-
-  this.resumeSignalsDispatching(true);
-  return this;
-};
-
-
 
 /**
  * Encapsulates browser event for acgraph.
@@ -1001,18 +946,3 @@ anychart.core.ui.LegendItem.BrowserEvent.prototype.copyFrom = function(e, opt_ta
 
 
 //exports
-anychart.core.ui.LegendItem.prototype['x'] = anychart.core.ui.LegendItem.prototype.x;
-anychart.core.ui.LegendItem.prototype['y'] = anychart.core.ui.LegendItem.prototype.y;
-anychart.core.ui.LegendItem.prototype['iconType'] = anychart.core.ui.LegendItem.prototype.iconType;
-anychart.core.ui.LegendItem.prototype['iconFill'] = anychart.core.ui.LegendItem.prototype.iconFill;
-anychart.core.ui.LegendItem.prototype['iconStroke'] = anychart.core.ui.LegendItem.prototype.iconStroke;
-anychart.core.ui.LegendItem.prototype['iconHatchFill'] = anychart.core.ui.LegendItem.prototype.iconHatchFill;
-anychart.core.ui.LegendItem.prototype['iconTextSpacing'] = anychart.core.ui.LegendItem.prototype.iconTextSpacing;
-anychart.core.ui.LegendItem.prototype['maxWidth'] = anychart.core.ui.LegendItem.prototype.maxWidth;
-anychart.core.ui.LegendItem.prototype['maxHeight'] = anychart.core.ui.LegendItem.prototype.maxHeight;
-anychart.core.ui.LegendItem.prototype['text'] = anychart.core.ui.LegendItem.prototype.text;
-anychart.core.ui.LegendItem.prototype['getTextElement'] = anychart.core.ui.LegendItem.prototype.getTextElement;
-anychart.core.ui.LegendItem.prototype['getContentBounds'] = anychart.core.ui.LegendItem.prototype.getContentBounds;
-anychart.core.ui.LegendItem.prototype['getWidth'] = anychart.core.ui.LegendItem.prototype.getWidth;
-anychart.core.ui.LegendItem.prototype['getHeight'] = anychart.core.ui.LegendItem.prototype.getHeight;
-anychart.core.ui.LegendItem.prototype['draw'] = anychart.core.ui.LegendItem.prototype.draw;

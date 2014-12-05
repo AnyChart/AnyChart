@@ -270,18 +270,33 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['explicit'] = this.explicit_;
-  data['interval'] = this.interval();
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['explicit'] = this.explicit_;
+  json['interval'] = this.interval_;
+  json['names'] = this.names_;
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.OrdinalTicks.prototype.deserialize = function(value) {
-  this.explicit_ = value['explicit'] || null;
-  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
-  return goog.base(this, 'deserialize', value);
+anychart.scales.OrdinalTicks.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.set(args[0]);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
+/** @inheritDoc */
+anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.explicit_ = config['explicit'] || null;
+  this.interval_ = goog.isNumber(config['interval']) ? config['interval'] : 1;
+  this.names_ = config['names'] || null;
+  this.autoTicks_ = null;
+  this.autoNames_ = null;
 };
 
 

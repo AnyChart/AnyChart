@@ -29,4 +29,7 @@ anychart.axes.linear = function() {
 
 //exports
 goog.exportSymbol('anychart.axes.linear', anychart.axes.linear);//doc|ex
-anychart.axes.Linear.prototype['draw'] = anychart.axes.Linear.prototype.draw;//doc
+anychart.axes.Linear.prototype['padding'] = anychart.axes.Linear.prototype.padding;
+anychart.axes.Linear.prototype['draw'] = anychart.axes.Linear.prototype.draw;
+anychart.axes.Linear.prototype['parentBounds'] = anychart.axes.Linear.prototype.parentBounds;
+anychart.axes.Linear.prototype['container'] = anychart.axes.Linear.prototype.container;

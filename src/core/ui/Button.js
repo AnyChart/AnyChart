@@ -292,11 +292,7 @@ anychart.core.ui.Button.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.padding_.set.apply(this.padding_, arguments);
-    }
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -895,42 +891,6 @@ anychart.core.ui.Button.prototype.stateSettings = function(opt_value) {
 
 
 /**
- * @inheritDoc
- */
-anychart.core.ui.Button.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['position'] = this.position();
-  json['stateSettings'] = this.stateSettings();
-  json['padding'] = this.padding().serialize();
-
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.Button.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
-  this.width(config['width']);
-  this.height(config['height']);
-  this.position(config['position']);
-  this.stateSettings(config['stateSettings']);
-  this.padding(config['padding']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
-};
-
-
-/**
  * Initializes state settings.
  * Override this method to make own settings.
  * @protected
@@ -988,16 +948,16 @@ anychart.core.ui.Button.prototype.initStateSettings = function() {
 };
 
 
+//anychart.core.ui.Button.prototype['text'] = anychart.core.ui.Button.prototype.text;
+//anychart.core.ui.Button.prototype['padding'] = anychart.core.ui.Button.prototype.padding;
+//anychart.core.ui.Button.prototype['position'] = anychart.core.ui.Button.prototype.position;
+//anychart.core.ui.Button.prototype['width'] = anychart.core.ui.Button.prototype.width;
+//anychart.core.ui.Button.prototype['height'] = anychart.core.ui.Button.prototype.height;
+//anychart.core.ui.Button.prototype['setOnClickListener'] = anychart.core.ui.Button.prototype.setOnClickListener;
+//anychart.core.ui.Button.prototype['normal'] = anychart.core.ui.Button.prototype.normal;
+//anychart.core.ui.Button.prototype['hover'] = anychart.core.ui.Button.prototype.hover;
+//anychart.core.ui.Button.prototype['pushed'] = anychart.core.ui.Button.prototype.pushed;
+//anychart.core.ui.Button.prototype['checked'] = anychart.core.ui.Button.prototype.checked;
+//anychart.core.ui.Button.prototype['disabled'] = anychart.core.ui.Button.prototype.disabled;
+
 //exports
-anychart.core.ui.Button.prototype['text'] = anychart.core.ui.Button.prototype.text;
-anychart.core.ui.Button.prototype['padding'] = anychart.core.ui.Button.prototype.padding;
-anychart.core.ui.Button.prototype['position'] = anychart.core.ui.Button.prototype.position;
-anychart.core.ui.Button.prototype['width'] = anychart.core.ui.Button.prototype.width;
-anychart.core.ui.Button.prototype['height'] = anychart.core.ui.Button.prototype.height;
-anychart.core.ui.Button.prototype['draw'] = anychart.core.ui.Button.prototype.draw;
-anychart.core.ui.Button.prototype['setOnClickListener'] = anychart.core.ui.Button.prototype.setOnClickListener;
-anychart.core.ui.Button.prototype['normal'] = anychart.core.ui.Button.prototype.normal;
-anychart.core.ui.Button.prototype['hover'] = anychart.core.ui.Button.prototype.hover;
-anychart.core.ui.Button.prototype['pushed'] = anychart.core.ui.Button.prototype.pushed;
-anychart.core.ui.Button.prototype['checked'] = anychart.core.ui.Button.prototype.checked;
-anychart.core.ui.Button.prototype['disabled'] = anychart.core.ui.Button.prototype.disabled;

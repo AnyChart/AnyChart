@@ -127,14 +127,8 @@ anychart.core.radar.series.Line.prototype.getLegendIconType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.radar.series.Line.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
+//anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;
+//anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;
 //exports
 anychart.core.radar.series.Line.prototype['stroke'] = anychart.core.radar.series.Line.prototype.stroke;
 anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.series.Line.prototype.hoverStroke;

@@ -204,15 +204,7 @@ anychart.core.grids.Linear.prototype.axesLinesSpace = function(opt_spaceOrTopOrT
   }
 
   if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+    this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
     return this;
   } else {
     return this.axesLinesSpace_;
@@ -649,41 +641,30 @@ anychart.core.grids.Linear.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.grids.Linear.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['stroke'] = this.stroke();
-  data['layout'] = this.layout();
-  data['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.oddFill()));
-  data['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.evenFill()));
-  data['drawFirstLine'] = this.drawFirstLine();
-  data['drawLastLine'] = this.drawLastLine();
-  data['isMinor'] = this.isMinor();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['isMinor'] = this.isMinor();
+  json['layout'] = this.layout();
+  json['drawFirstLine'] = this.drawFirstLine();
+  json['drawLastLine'] = this.drawLastLine();
+  json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
+  json['evenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.evenFill()));
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.grids.Linear.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  if (goog.isDef(value['stroke'])) this.stroke(value['stroke']);
-  if (goog.isDef(value['layout'])) this.layout(value['layout']);
-  if (goog.isDef(value['oddFill'])) this.oddFill(value['oddFill']);
-  if (goog.isDef(value['evenFill'])) this.evenFill(value['evenFill']);
-  if (goog.isDef(value['drawFirstLine'])) this.drawFirstLine(value['drawFirstLine']);
-  if (goog.isDef(value['drawLastLine'])) this.drawLastLine(value['drawLastLine']);
-  if (goog.isDef(value['isMinor'])) this.isMinor(value['isMinor']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.grids.Linear.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.isMinor(config['isMinor']);
+  this.layout(config['layout']);
+  this.drawFirstLine(config['drawFirstLine']);
+  this.drawLastLine(config['drawLastLine']);
+  this.oddFill(config['oddFill']);
+  this.evenFill(config['evenFill']);
+  this.stroke(config['stroke']);
 };
 
 
@@ -707,4 +688,3 @@ anychart.core.grids.Linear.prototype['scale'] = anychart.core.grids.Linear.proto
 anychart.core.grids.Linear.prototype['stroke'] = anychart.core.grids.Linear.prototype.stroke;
 anychart.core.grids.Linear.prototype['drawFirstLine'] = anychart.core.grids.Linear.prototype.drawFirstLine;
 anychart.core.grids.Linear.prototype['drawLastLine'] = anychart.core.grids.Linear.prototype.drawLastLine;
-anychart.core.grids.Linear.prototype['draw'] = anychart.core.grids.Linear.prototype.draw;

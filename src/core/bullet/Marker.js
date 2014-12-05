@@ -569,41 +569,6 @@ anychart.core.bullet.Marker.prototype.remove = function() {
 };
 
 
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
-anychart.core.bullet.Marker.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['type'] = this.type();
-  data['gap'] = this.gap();
-  data['value'] = this.value();
-  data['layout'] = this.layout();
-  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  return data;
-};
-
-
-/** @inheritDoc */
-anychart.core.bullet.Marker.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.type(value['type']);
-  this.gap(value['gap']);
-  this.value(value['value']);
-  this.layout(value['layout']);
-  this.fill(value['fill']);
-  this.stroke(value['stroke']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
-};
-
-
 ///**
 // * Constructor function.
 // * @return {!anychart.core.bullet.Marker}

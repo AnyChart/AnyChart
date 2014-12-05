@@ -390,31 +390,56 @@ anychart.scales.Base.prototype.applyModePercent_ = function(value) {
 //endregion
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Returns scale type.
+ * @return {string}
+ */
+anychart.scales.Base.prototype.getType = goog.abstractMethod;
+
+
 /** @inheritDoc */
 anychart.scales.Base.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['inverted'] = this.inverted();
-  data['stackMode'] = this.stackMode();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['type'] = this.getType();
+  json['inverted'] = this.inverted();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.Base.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
+anychart.scales.Base.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.inverted(config['inverted']);
+};
 
-  goog.base(this, 'deserialize', value);
 
-  this.inverted(value['inverted']);
-  this.stackMode(value['stackMode']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+/**
+ * @param {string} type
+ * @param {?boolean} defaultIsOrdinal True if use Ordinal as default, false - Linear, null - return null by default.
+ * @return {anychart.scales.Base}
+ */
+anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
+  type = (type + '').toLowerCase();
+  switch (type) {
+    case 'log':
+    case 'logarithmic':
+      return anychart.scales.log();
+    case 'lin':
+    case 'linear':
+      return anychart.scales.linear();
+    case 'date':
+    case 'datetime':
+    case 'dt':
+      return anychart.scales.dateTime();
+    case 'ordinal':
+    case 'ord':
+    case 'discrete':
+      return anychart.scales.ordinal();
+    default:
+      return goog.isNull(defaultIsOrdinal) ?
+          null :
+          (!!defaultIsOrdinal ? anychart.scales.ordinal() : anychart.scales.linear());
+  }
 };
 
 

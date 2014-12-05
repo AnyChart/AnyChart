@@ -76,9 +76,24 @@ anychart.core.axes.Radial = function() {
       .fontColor('rgb(34,34,34)')
       .resumeSignalsDispatching(false);
 
-  this.minorLabels()
+  this.minorLabels().background()
       .suspendSignalsDispatching()
-      .background(this.labels().background())
+      .enabled(false)
+      .stroke({
+        'keys': [
+          '0 #DDDDDD 1',
+          '1 #D0D0D0 1'
+        ],
+        'angle': '90'
+      })
+      .fill({
+        'keys': [
+          '0 #FFFFFF 1',
+          '0.5 #F3F3F3 1',
+          '1 #FFFFFF 1'
+        ],
+        'angle': '90'
+      })
       .resumeSignalsDispatching(false);
 
   this.ticks()
@@ -286,14 +301,7 @@ anychart.core.axes.Radial.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labels_.enabled(false);
-    }
-    this.dropBoundsCache_();
+    this.labels_.setup(opt_value);
     return this;
   }
   return this.labels_;
@@ -345,14 +353,7 @@ anychart.core.axes.Radial.prototype.minorLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.minorLabels_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorLabels_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorLabels_.enabled(false);
-    }
-    this.dropBoundsCache_();
+    this.minorLabels_.setup(opt_value);
     return this;
   }
   return this.minorLabels_;
@@ -403,18 +404,7 @@ anychart.core.axes.Radial.prototype.ticks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.ticks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.RadialTicks) {
-      this.ticks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.ticks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.ticks_.enabled(false);
-    }
-    this.ticks_.resumeSignalsDispatching(true);
-    this.dropBoundsCache_();
-    this.invalidate(anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.ticks_.setup(opt_value);
     return this;
   }
   return this.ticks_;
@@ -433,7 +423,7 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.TICKS;
+    state = anychart.ConsistencyState.TICKS | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropBoundsCache_();
@@ -466,16 +456,7 @@ anychart.core.axes.Radial.prototype.minorTicks = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.minorTicks_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.axes.RadialTicks) {
-      this.minorTicks_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorTicks_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorTicks_.enabled(false);
-    }
-    this.minorTicks_.resumeSignalsDispatching(true);
-    this.dropBoundsCache_();
+    this.minorTicks_.setup(opt_value);
     return this;
   }
   return this.minorTicks_;
@@ -1482,50 +1463,36 @@ anychart.core.axes.Radial.prototype.remove = function() {
 };
 
 
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.Radial.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-
-  data['labels'] = this.labels().serialize();
-  data['minorLabels'] = this.minorLabels().serialize();
-  data['ticks'] = this.ticks().serialize();
-  data['minorTicks'] = this.minorTicks().serialize();
-
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-  data['name'] = this.name();
-  data['angle'] = this.startAngle();
-  data['drawFirstLabel'] = this.drawFirstLabel();
-  data['drawLastLabel'] = this.drawLastLabel();
-  data['overlapMode'] = this.overlapMode();
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['labels'] = this.labels().serialize();
+  json['minorLabels'] = this.minorLabels().serialize();
+  json['ticks'] = this.ticks().serialize();
+  json['minorTicks'] = this.minorTicks().serialize();
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  json['name'] = this.name();
+  //json['startAngle'] = this.startAngle();
+  json['drawFirstLabel'] = this.drawFirstLabel();
+  json['drawLastLabel'] = this.drawLastLabel();
+  json['overlapMode'] = this.overlapMode();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.Radial.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.labels(value['labels']);
-  this.minorLabels(value['minorLabels']);
-  this.ticks(value['ticks']);
-  this.minorTicks(value['minorTicks']);
-
-  this.name(value['name']);
-  this.startAngle(value['angle']);
-  this.stroke(value['stroke']);
-  this.drawFirstLabel(value['drawFirstLabel']);
-  this.drawLastLabel(value['drawLastLabel']);
-  this.overlapMode(value['overlapMode']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.Radial.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.labels(config['labels']);
+  this.minorLabels(config['minorLabels']);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
+  this.stroke(config['stroke']);
+  this.name(config['name']);
+  //this.startAngle(config['startAngle']);
+  this.drawFirstLabel(config['drawFirstLabel']);
+  this.drawLastLabel(config['drawLastLabel']);
+  this.overlapMode(config['overlapMode']);
 };
 
 
@@ -1549,6 +1516,7 @@ anychart.core.axes.Radial.prototype.disposeInternal = function() {
 };
 
 
+//anychart.core.axes.Radial.prototype['startAngle'] = anychart.core.axes.Radial.prototype.startAngle;
 //exports
 anychart.core.axes.Radial.prototype['name'] = anychart.core.axes.Radial.prototype.name;
 anychart.core.axes.Radial.prototype['labels'] = anychart.core.axes.Radial.prototype.labels;
@@ -1557,8 +1525,6 @@ anychart.core.axes.Radial.prototype['ticks'] = anychart.core.axes.Radial.prototy
 anychart.core.axes.Radial.prototype['minorTicks'] = anychart.core.axes.Radial.prototype.minorTicks;
 anychart.core.axes.Radial.prototype['stroke'] = anychart.core.axes.Radial.prototype.stroke;
 anychart.core.axes.Radial.prototype['scale'] = anychart.core.axes.Radial.prototype.scale;
-anychart.core.axes.Radial.prototype['startAngle'] = anychart.core.axes.Radial.prototype.startAngle;
 anychart.core.axes.Radial.prototype['drawFirstLabel'] = anychart.core.axes.Radial.prototype.drawFirstLabel;
 anychart.core.axes.Radial.prototype['drawLastLabel'] = anychart.core.axes.Radial.prototype.drawLastLabel;
 anychart.core.axes.Radial.prototype['overlapMode'] = anychart.core.axes.Radial.prototype.overlapMode;
-anychart.core.axes.Radial.prototype['draw'] = anychart.core.axes.Radial.prototype.draw;

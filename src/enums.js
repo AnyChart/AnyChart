@@ -10,6 +10,29 @@ goog.require('acgraph');
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Chart types enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+anychart.enums.ChartTypes = {
+  AREA: 'area',
+  BAR: 'bar',
+  BUBBLE: 'bubble',
+  BULLET: 'bullet',
+  CARTESIAN: 'cartesian',
+  COLUMN: 'column',
+  FINANCIAL: 'financial',
+  GANTT: 'gantt',
+  LINE: 'line',
+  MARKER: 'marker',
+  PIE: 'pie',
+  POLAR: 'polar',
+  RADAR: 'radar',
+  SCATTER: 'scatter'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Anchor
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1203,6 +1226,23 @@ anychart.enums.ScatterSeriesTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Scale types
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all scale types.
+ * @enum {string}
+ */
+anychart.enums.ScaleTypes = {
+  LINEAR: 'linear',
+  LOG: 'log',
+  DATE_TIME: 'dateTime',
+  ORDINAL: 'ordinal'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1483,4 +1523,9 @@ goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAYS);
 goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOURS);
 goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTES);
 goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECONDS);
+
+goog.exportSymbol('anychart.enums.ScaleTypes.LINEAR', anychart.enums.ScaleTypes.LINEAR);
+goog.exportSymbol('anychart.enums.ScaleTypes.LOG', anychart.enums.ScaleTypes.LOG);
+goog.exportSymbol('anychart.enums.ScaleTypes.DATE_TIME', anychart.enums.ScaleTypes.DATE_TIME);
+goog.exportSymbol('anychart.enums.ScaleTypes.ORDINAL', anychart.enums.ScaleTypes.ORDINAL);
 

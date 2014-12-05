@@ -205,6 +205,13 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
     height = opt_xOrRect.height;
     right = null;
     bottom = null;
+  } else if (goog.isArray(opt_xOrRect)) {
+    left = goog.isDef(opt_xOrRect[0]) ? opt_xOrRect[0] : null;
+    top = goog.isDef(opt_xOrRect[1]) ? opt_xOrRect[1] : null;
+    width = goog.isDef(opt_xOrRect[2]) ? opt_xOrRect[2] : null;
+    height = goog.isDef(opt_xOrRect[3]) ? opt_xOrRect[3] : null;
+    right = null;
+    bottom = null;
   } else if (goog.isObject(opt_xOrRect)) {
     left = goog.isDef(opt_xOrRect['left']) ? opt_xOrRect['left'] : null;
     top = goog.isDef(opt_xOrRect['top']) ? opt_xOrRect['top'] : null;
@@ -353,35 +360,32 @@ anychart.core.utils.Bounds.prototype.dependsOnContainerSize = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.utils.Bounds.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
-  json['left'] = this.left();
   json['top'] = this.top();
   json['right'] = this.right();
   json['bottom'] = this.bottom();
+  json['left'] = this.left();
   json['width'] = this.width();
   json['height'] = this.height();
-
   return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.utils.Bounds.prototype.deserialize = function(config) {
-  goog.base(this, 'deserialize', config);
-
-  this.left(config['left']);
-  this.top(config['top']);
-  this.right(config['right']);
-  this.bottom(config['bottom']);
-  this.width(config['width']);
-  this.height(config['height']);
-
+/** @inheritDoc */
+anychart.core.utils.Bounds.prototype.setup = function(var_args) {
+  this.set.apply(this, arguments);
   return this;
 };
+
+
+//ports
+anychart.core.utils.Bounds.prototype['top'] = anychart.core.utils.Bounds.prototype.top;
+anychart.core.utils.Bounds.prototype['right'] = anychart.core.utils.Bounds.prototype.right;
+anychart.core.utils.Bounds.prototype['bottom'] = anychart.core.utils.Bounds.prototype.bottom;
+anychart.core.utils.Bounds.prototype['left'] = anychart.core.utils.Bounds.prototype.left;
+anychart.core.utils.Bounds.prototype['width'] = anychart.core.utils.Bounds.prototype.width;
+anychart.core.utils.Bounds.prototype['height'] = anychart.core.utils.Bounds.prototype.height;
+anychart.core.utils.Bounds.prototype['set'] = anychart.core.utils.Bounds.prototype.set;
+anychart.core.utils.Bounds.prototype['toRect'] = anychart.core.utils.Bounds.prototype.toRect;

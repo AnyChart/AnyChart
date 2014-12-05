@@ -584,18 +584,20 @@ anychart.core.scatter.series.Marker.prototype.restoreDefaults = function() {
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Marker.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', config);
+anychart.core.scatter.series.Marker.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.type(config['type']);
   this.hoverType(config['hoverType']);
-  this.resumeSignalsDispatching(true);
-  return this;
 };
 
 
+//anychart.core.scatter.series.Marker.prototype['startDrawing'] = anychart.core.scatter.series.Marker.prototype.startDrawing;//inherited
+//anychart.core.scatter.series.Marker.prototype['finalizeDrawing'] = anychart.core.scatter.series.Marker.prototype.finalizeDrawing;//inherited
+//anychart.core.scatter.series.Marker.prototype['hoverSeries'] = anychart.core.scatter.series.Marker.prototype.hoverSeries;//inherited
+//anychart.core.scatter.series.Marker.prototype['hoverPoint'] = anychart.core.scatter.series.Marker.prototype.hoverPoint;//inherited
+//anychart.core.scatter.series.Marker.prototype['unhover'] = anychart.core.scatter.series.Marker.prototype.unhover;//inherited
 //exports
 anychart.core.scatter.series.Marker.prototype['stroke'] = anychart.core.scatter.series.Marker.prototype.stroke;//inherited
 anychart.core.scatter.series.Marker.prototype['hoverStroke'] = anychart.core.scatter.series.Marker.prototype.hoverStroke;//inherited
@@ -605,10 +607,5 @@ anychart.core.scatter.series.Marker.prototype['size'] = anychart.core.scatter.se
 anychart.core.scatter.series.Marker.prototype['hoverSize'] = anychart.core.scatter.series.Marker.prototype.hoverSize;
 anychart.core.scatter.series.Marker.prototype['type'] = anychart.core.scatter.series.Marker.prototype.type;
 anychart.core.scatter.series.Marker.prototype['hoverType'] = anychart.core.scatter.series.Marker.prototype.hoverType;
-anychart.core.scatter.series.Marker.prototype['startDrawing'] = anychart.core.scatter.series.Marker.prototype.startDrawing;//inherited
-anychart.core.scatter.series.Marker.prototype['finalizeDrawing'] = anychart.core.scatter.series.Marker.prototype.finalizeDrawing;//inherited
-anychart.core.scatter.series.Marker.prototype['hoverSeries'] = anychart.core.scatter.series.Marker.prototype.hoverSeries;//inherited
-anychart.core.scatter.series.Marker.prototype['hoverPoint'] = anychart.core.scatter.series.Marker.prototype.hoverPoint;//inherited
-anychart.core.scatter.series.Marker.prototype['unhover'] = anychart.core.scatter.series.Marker.prototype.unhover;//inherited
 anychart.core.scatter.series.Marker.prototype['hatchFill'] = anychart.core.scatter.series.Marker.prototype.hatchFill;//inherited
 anychart.core.scatter.series.Marker.prototype['hoverHatchFill'] = anychart.core.scatter.series.Marker.prototype.hoverHatchFill;//inherited

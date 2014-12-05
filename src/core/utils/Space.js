@@ -94,7 +94,16 @@ anychart.core.utils.Space.prototype.left_ = 0;
  */
 anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   var top, right, bottom, left;
-  var argsLen = arguments.length;
+  var argsLen;
+  if (goog.isArray(opt_spaceOrTopOrTopAndBottom)) {
+    var tmp = opt_spaceOrTopOrTopAndBottom;
+    opt_spaceOrTopOrTopAndBottom = tmp[0];
+    opt_rightOrRightAndLeft = tmp[1];
+    opt_bottom = tmp[2];
+    opt_left = tmp[3];
+    argsLen = tmp.length;
+  } else
+    argsLen = arguments.length;
   // else if branches sorted a bit like by usage frequency
   if (argsLen == 0) {
     left = bottom = right = top = 0;
@@ -285,31 +294,26 @@ anychart.core.utils.Space.prototype.widenHeight = function(initialHeight) {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.utils.Space.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
   json['top'] = this.top();
   json['right'] = this.right();
   json['bottom'] = this.bottom();
   json['left'] = this.left();
-
   return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.utils.Space.prototype.deserialize = function(config) {
-  goog.base(this, 'deserialize', config);
-
-  this.left(config['left']);
-  this.top(config['top']);
-  this.right(config['right']);
-  this.bottom(config['bottom']);
-
+/** @inheritDoc */
+anychart.core.utils.Space.prototype.setup = function(var_args) {
+  this.set.apply(this, arguments);
   return this;
 };
+
+
+//exports
+anychart.core.utils.Space.prototype['top'] = anychart.core.utils.Space.prototype.top;
+anychart.core.utils.Space.prototype['right'] = anychart.core.utils.Space.prototype.right;
+anychart.core.utils.Space.prototype['bottom'] = anychart.core.utils.Space.prototype.bottom;
+anychart.core.utils.Space.prototype['left'] = anychart.core.utils.Space.prototype.left;

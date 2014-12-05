@@ -617,12 +617,12 @@ anychart.data.csv.Parser.prototype.disposeInternal = function() {
 // * @inheritDoc
 // * @param {Object} data incoming object.
 // */
-//anychart.data.csv.Parser.prototype.deserialize = function(data) {
+//anychart.data.csv.Parser.prototype.setupByJSON = function(data) {
 //  var d = anychart.utils.deserialization;
 //  if (d.hasProp(data, 'columnsSeparator'))
-//    this.colsSeparator_ = this.deserializeSeparator_(d.getProp(data, 'columnsSeparator'));
+//    this.colsSeparator_ = this.setupSeparator_(d.getProp(data, 'columnsSeparator'));
 //  if (d.hasProp(data, 'rowsSeparator'))
-//    this.rowsSeparator_ = this.deserializeSeparator_(d.getProp(data, 'rowsSeparator'));
+//    this.rowsSeparator_ = this.setupSeparator_(d.getProp(data, 'rowsSeparator'));
 //  if (d.hasProp(data, 'ignoreTrailingSpaces'))
 //    this.ignoreTrailingSpaces_ = d.getBoolProp(data, 'ignoreTrailingSpaces');
 //  if (d.hasProp(data, 'ignoreFirstRow'))
@@ -644,9 +644,9 @@ anychart.data.csv.Parser.prototype.disposeInternal = function() {
 // * Deserializes separator. Returns null if the separator is empty.
 // * @private
 // * @param {*} val incoming object.
-// * @return {string} deserialized separator.
+// * @return {string} setupd separator.
 // */
-//anychart.data.csv.Parser.prototype.deserializeSeparator_ = function(val) {
+//anychart.data.csv.Parser.prototype.setupSeparator_ = function(val) {
 //  var s = '' + val;
 //  var i = 0;
 //  var len = s.length;

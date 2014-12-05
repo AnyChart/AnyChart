@@ -25,3 +25,7 @@ anychart.axes.polar = function() {
 
 //exports
 goog.exportSymbol('anychart.axes.polar', anychart.axes.polar);
+anychart.axes.Polar.prototype['draw'] = anychart.axes.Polar.prototype.draw;
+anychart.axes.Polar.prototype['parentBounds'] = anychart.axes.Polar.prototype.parentBounds;
+anychart.axes.Polar.prototype['container'] = anychart.axes.Polar.prototype.container;
+anychart.axes.Polar.prototype['startAngle'] = anychart.axes.Polar.prototype.startAngle;

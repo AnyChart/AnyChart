@@ -28,3 +28,6 @@ anychart.ui.table = function(opt_rowsCount, opt_colsCount) {
 
 //exports
 goog.exportSymbol('anychart.ui.table', anychart.ui.table);
+anychart.ui.Table.prototype['draw'] = anychart.ui.Table.prototype.draw;
+anychart.ui.Table.prototype['parentBounds'] = anychart.ui.Table.prototype.parentBounds;
+anychart.ui.Table.prototype['container'] = anychart.ui.Table.prototype.container;

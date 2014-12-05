@@ -188,11 +188,7 @@ anychart.core.ui.Paginator.prototype.padding = function(opt_spaceOrTopOrTopAndBo
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.padding_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.padding_.set.apply(this.padding_, arguments);
-    }
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -215,11 +211,7 @@ anychart.core.ui.Paginator.prototype.margin = function(opt_spaceOrTopOrTopAndBot
     this.margin_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.margin_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.margin_.set.apply(this.margin_, arguments);
-    }
+    this.margin_.setup.apply(this.margin_, arguments);
     return this;
   }
   return this.margin_;
@@ -252,16 +244,7 @@ anychart.core.ui.Paginator.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.suspendSignalsDispatching();
-    if (opt_value instanceof anychart.core.ui.Background) {
-      this.background_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.background_.deserialize(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.background_.enabled(false);
-    }
-    this.background_.resumeSignalsDispatching(false);
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.background_.setup(opt_value);
     return this;
   } else {
     return this.background_;
@@ -800,49 +783,31 @@ anychart.core.ui.Paginator.DOWN_ARROW_DRAWER_ = function(path, buttonBounds) {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.ui.Paginator.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-
+  json['background'] = this.background().serialize();
+  json['padding'] = this.padding().serialize();
+  json['margin'] = this.margin().serialize();
   json['orientation'] = this.orientation();
   json['layout'] = this.layout();
-  json['pageCount'] = this.pageCount();
-  json['currentPage'] = this.currentPage();
-
-  json['margin'] = this.margin().serialize();
-  json['padding'] = this.padding().serialize();
-  json['background'] = this.background().serialize();
-
   return json;
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Paginator.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
+/** @inheritDoc */
+anychart.core.ui.Paginator.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.background(config['background']);
+  this.padding(config['padding']);
+  this.margin(config['margin']);
   this.orientation(config['orientation']);
   this.layout(config['layout']);
-  this.pageCount(config['pageCount']);
-  this.currentPage(config['currentPage']);
-
-  this.textSettings(config);
-
-  this.margin(config['margin']);
-  this.padding(config['padding']);
-  this.background(config['background']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
 };
 
+
+//anychart.core.ui.Paginator.prototype['pageCount'] = anychart.core.ui.Paginator.prototype.pageCount;
+//anychart.core.ui.Paginator.prototype['draw'] = anychart.core.ui.Paginator.prototype.draw;
 
 //exports
 anychart.core.ui.Paginator.prototype['background'] = anychart.core.ui.Paginator.prototype.background;
@@ -850,6 +815,4 @@ anychart.core.ui.Paginator.prototype['orientation'] = anychart.core.ui.Paginator
 anychart.core.ui.Paginator.prototype['padding'] = anychart.core.ui.Paginator.prototype.padding;
 anychart.core.ui.Paginator.prototype['margin'] = anychart.core.ui.Paginator.prototype.margin;
 anychart.core.ui.Paginator.prototype['layout'] = anychart.core.ui.Paginator.prototype.layout;
-anychart.core.ui.Paginator.prototype['pageCount'] = anychart.core.ui.Paginator.prototype.pageCount;
 anychart.core.ui.Paginator.prototype['currentPage'] = anychart.core.ui.Paginator.prototype.currentPage;
-anychart.core.ui.Paginator.prototype['draw'] = anychart.core.ui.Paginator.prototype.draw;

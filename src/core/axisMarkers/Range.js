@@ -191,15 +191,7 @@ anychart.core.axisMarkers.Range.prototype.axesLinesSpace = function(opt_spaceOrT
   }
 
   if (arguments.length > 0) {
-    if (arguments.length > 1) {
-      this.axesLinesSpace_.set.apply(this.axesLinesSpace_, arguments);
-    } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Padding) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom.serialize());
-    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-      this.axesLinesSpace_.deserialize(opt_spaceOrTopOrTopAndBottom);
-    } else {
-      this.axesLinesSpace_.set(opt_spaceOrTopOrTopAndBottom);
-    }
+    this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
     return this;
   } else {
     return this.axesLinesSpace_;
@@ -400,40 +392,6 @@ anychart.core.axisMarkers.Range.prototype.remove = function() {
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Axis serialization.
- * @return {Object} Serialized axis data.
- */
-anychart.core.axisMarkers.Range.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-  data['from'] = this.from();
-  data['to'] = this.to();
-  data['layout'] = this.layout();
-  return data;
-};
-
-
-/** @inheritDoc */
-anychart.core.axisMarkers.Range.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', value);
-
-  this.fill(value['fill']);
-  this.from(value['from']);
-  this.to(value['to']);
-  this.layout(value['layout']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
 //  Elements creation.
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -460,11 +418,31 @@ anychart.core.axisMarkers.Range.prototype.disposeInternal = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.axisMarkers.Range.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['from'] = this.from();
+  json['to'] = this.to();
+  json['layout'] = this.layout();
+  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.from(config['from']);
+  this.to(config['to']);
+  this.layout(config['layout']);
+  this.fill(config['fill']);
+};
+
+
 //exports
 anychart.core.axisMarkers.Range.prototype['from'] = anychart.core.axisMarkers.Range.prototype.from;
 anychart.core.axisMarkers.Range.prototype['to'] = anychart.core.axisMarkers.Range.prototype.to;
 anychart.core.axisMarkers.Range.prototype['scale'] = anychart.core.axisMarkers.Range.prototype.scale;
 anychart.core.axisMarkers.Range.prototype['layout'] = anychart.core.axisMarkers.Range.prototype.layout;
 anychart.core.axisMarkers.Range.prototype['fill'] = anychart.core.axisMarkers.Range.prototype.fill;
-anychart.core.axisMarkers.Range.prototype['draw'] = anychart.core.axisMarkers.Range.prototype.draw;
 anychart.core.axisMarkers.Range.prototype['isHorizontal'] = anychart.core.axisMarkers.Range.prototype.isHorizontal;

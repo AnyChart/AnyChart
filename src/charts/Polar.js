@@ -117,13 +117,6 @@ goog.inherits(anychart.charts.Polar, anychart.core.Chart);
 
 
 /**
- * @type {string}
- */
-anychart.charts.Polar.CHART_TYPE = 'radar';
-anychart.chartTypesMap[anychart.charts.Polar.CHART_TYPE] = anychart.charts.Polar;
-
-
-/**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.Chart states.
  * @type {number}
  */
@@ -211,11 +204,14 @@ anychart.charts.Polar.prototype.startAngle = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * @param {anychart.scales.ScatterBase=} opt_value X Scale to set.
+ * @param {(string|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Polar.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
+    }
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
       this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
@@ -231,11 +227,14 @@ anychart.charts.Polar.prototype.xScale = function(opt_value) {
 
 
 /**
- * @param {anychart.scales.Base=} opt_value Y Scale to set.
+ * @param {(string|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Polar.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      opt_value = anychart.scales.Base.fromString(opt_value, false);
+    }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
       this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
@@ -297,15 +296,7 @@ anychart.charts.Polar.prototype.grid = function(opt_indexOrValue, opt_value) {
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.grids.Polar) {
-      grid.deserialize(value.serialize());
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
-    } else if (goog.isObject(value)) {
-      grid.deserialize(value);
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
-    } else if (anychart.utils.isNone(value)) {
-      grid.enabled(false);
-    }
+    grid.setup(value);
     return this;
   } else {
     return grid;
@@ -341,15 +332,7 @@ anychart.charts.Polar.prototype.minorGrid = function(opt_indexOrValue, opt_value
   }
 
   if (goog.isDef(value)) {
-    if (value instanceof anychart.core.grids.Polar) {
-      grid.deserialize(value.serialize());
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
-    } else if (goog.isObject(value)) {
-      grid.deserialize(value);
-      if (grid.zIndex() == 0) grid.zIndex(anychart.charts.Polar.ZINDEX_GRID);
-    } else if (anychart.utils.isNone(value)) {
-      grid.enabled(false);
-    }
+    grid.setup(value);
     return this;
   } else {
     return grid;
@@ -386,15 +369,7 @@ anychart.charts.Polar.prototype.xAxis = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.axes.Polar) {
-      this.xAxis_.deserialize(opt_value.serialize());
-      if (this.xAxis_.zIndex() == 0) this.xAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
-    } else if (goog.isObject(opt_value)) {
-      this.xAxis_.deserialize(opt_value);
-      if (this.xAxis_.zIndex() == 0) this.xAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.xAxis_.enabled(false);
-    }
+    this.xAxis_.setup(opt_value);
     return this;
   } else {
     return this.xAxis_;
@@ -416,15 +391,7 @@ anychart.charts.Polar.prototype.yAxis = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.axes.Radial) {
-      this.yAxis_.deserialize(opt_value.serialize());
-      if (this.yAxis_.zIndex() == 0) this.yAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
-    } else if (goog.isObject(opt_value)) {
-      this.yAxis_.deserialize(opt_value);
-      if (this.yAxis_.zIndex() == 0) this.yAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.yAxis_.enabled(false);
-    }
+    this.yAxis_.setup(opt_value);
     return this;
   } else {
     return this.yAxis_;
@@ -557,6 +524,7 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    instance = null;
   }
 
   return instance;
@@ -638,18 +606,15 @@ anychart.charts.Polar.prototype.palette = function(opt_value) {
   } else if (opt_value instanceof anychart.palettes.DistinctColors) {
     this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
     return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
   }
 
   if (!this.palette_)
     this.setupPalette_(anychart.palettes.DistinctColors);
 
   if (goog.isDef(opt_value)) {
-    if (goog.isArray(opt_value))
-      this.palette_.colors(opt_value);
-    else if (goog.isNull(opt_value))
-      this.palette_.cloneFrom(opt_value);
-    else
-      return this;
+    this.palette_.setup(opt_value);
     return this;
   }
   return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
@@ -669,13 +634,7 @@ anychart.charts.Polar.prototype.markerPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.Markers) {
-      this.markerPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.markerPalette_.deserialize(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.markerPalette_.markers(opt_value);
-    }
+    this.markerPalette_.setup(opt_value);
     return this;
   } else {
     return this.markerPalette_;
@@ -698,13 +657,7 @@ anychart.charts.Polar.prototype.hatchFillPalette = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.palettes.HatchFills) {
-      this.hatchFillPalette_.deserialize(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.hatchFillPalette_.deserialize(opt_value);
-    } else if (goog.isArray(opt_value)) {
-      this.hatchFillPalette_.hatchFills(opt_value);
-    }
+    this.hatchFillPalette_.setup(opt_value);
     return this;
   } else {
     return this.hatchFillPalette_;
@@ -720,12 +673,12 @@ anychart.charts.Polar.prototype.hatchFillPalette = function(opt_value) {
 anychart.charts.Polar.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
   if (this.palette_ instanceof cls) {
     if (opt_cloneFrom)
-      this.palette_.cloneFrom(opt_cloneFrom);
+      this.palette_.setup(opt_cloneFrom);
   } else {
     goog.dispose(this.palette_);
     this.palette_ = new cls();
     if (opt_cloneFrom)
-      this.palette_.cloneFrom(opt_cloneFrom);
+      this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
   }
@@ -1120,81 +1073,9 @@ anychart.charts.Polar.prototype.restoreDefaults = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.charts.Polar.prototype.deserialize = function(config) {
-  var chart = config['chart'];
-
-  if (!chart) return this;
-  goog.base(this, 'deserialize', chart);
-
-  this.suspendSignalsDispatching();
-  var i, json, scale;
-  var grids = chart['grids'];
-  var xAxis = chart['xAxis'];
-  var yAxis = chart['yAxis'];
-  var series = chart['series'];
-  var scales = chart['scales'];
-
-  var scalesInstances = [];
-  for (i = 0; i < scales.length; i++) {
-    var scaleJson = scales[i];
-    var scaleInstance = anychart.scales.createByType(scaleJson['type']);
-    scaleInstance.deserialize(scaleJson);
-    scalesInstances.push(scaleInstance);
-  }
-
-  this.xScale(scalesInstances[chart['xScale']]);
-  chart['yScale'] ?
-      this.yScale(scalesInstances[chart['yScale']]) :
-      this.yScale(scalesInstances[chart['xScale']]);
-
-  if (grids) {
-    for (i = 0; i < grids.length; i++) {
-      json = grids[i];
-      this.grid(json);
-      var grid = this.grid(i);
-
-      if (json['xScale']) grid.xScale(scalesInstances[json['xScale']]);
-      if (json['yScale']) grid.yScale(scalesInstances[json['yScale']]);
-    }
-  }
-
-  if (xAxis) {
-    this.xAxis(xAxis);
-    if (xAxis['scale']) this.xAxis().scale(scalesInstances[xAxis['scale']]);
-  }
-
-  if (yAxis) {
-    this.yAxis(yAxis);
-    if (yAxis['scale']) this.yAxis().scale(scalesInstances[yAxis['scale']]);
-  }
-
-  if (series) {
-    for (i = 0; i < series.length; i++) {
-      var s = series[i];
-      var seriesType = s['seriesType'].toLowerCase();
-      var data = s['data'];
-      var seriesInst = this.createSeriesByType_(seriesType, data);
-      seriesInst.deserialize(s);
-
-      if (s['xScale']) seriesInst.xScale(scalesInstances[s['xScale']]);
-      if (s['yScale']) seriesInst.yScale(scalesInstances[s['yScale']]);
-    }
-  }
-
-  this.resumeSignalsDispatching(true);
-  return this;
-};
-
-
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.charts.Polar.prototype.serialize = function() {
-  var json = {};
-  var chart = goog.base(this, 'serialize');
+  var json = goog.base(this, 'serialize');
   var i;
   var scalesIds = {};
   var scales = [];
@@ -1204,23 +1085,24 @@ anychart.charts.Polar.prototype.serialize = function() {
 
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
-  chart['xScale'] = scales.length - 1;
+  json['xScale'] = scales.length - 1;
   if (this.xScale() != this.yScale()) {
     scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
     scales.push(scalesIds[goog.getUid(this.yScale())]);
-    chart['yScale'] = scales.length - 1;
   }
+  json['yScale'] = scales.length - 1;
 
-  chart['type'] = anychart.charts.Polar.CHART_TYPE;
+  json['type'] = anychart.enums.ChartTypes.POLAR;
+  json['palette'] = this.palette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
     config = grid.serialize();
-
     scale = grid.xScale();
     objId = goog.getUid(scale);
-
     if (!scalesIds[objId]) {
       scalesIds[objId] = scale.serialize();
       scales.push(scalesIds[objId]);
@@ -1240,11 +1122,37 @@ anychart.charts.Polar.prototype.serialize = function() {
     }
     grids.push(config);
   }
-  chart['grids'] = grids;
+  json['grids'] = grids;
 
-  var xAxis = this.xAxis();
-  config = xAxis.serialize();
-  scale = xAxis.scale();
+  var minorGrids = [];
+  for (i = 0; i < this.minorGrids_.length; i++) {
+    var minorGrid = this.minorGrids_[i];
+    config = minorGrid.serialize();
+    scale = minorGrid.xScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['xScale'] = scales.length - 1;
+    } else {
+      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+
+    scale = minorGrid.yScale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['yScale'] = scales.length - 1;
+    } else {
+      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    minorGrids.push(config);
+  }
+  json['minorGrids'] = minorGrids;
+
+  config = this.xAxis_.serialize();
+  scale = this.xAxis_.scale();
   objId = goog.getUid(scale);
   if (!scalesIds[objId]) {
     scalesIds[objId] = scale.serialize();
@@ -1253,11 +1161,10 @@ anychart.charts.Polar.prototype.serialize = function() {
   } else {
     config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
   }
-  chart['xAxis'] = config;
+  json['xAxis'] = config;
 
-  var yAxis = this.yAxis();
-  config = yAxis.serialize();
-  scale = yAxis.scale();
+  config = this.yAxis_.serialize();
+  scale = this.yAxis_.scale();
   objId = goog.getUid(scale);
   if (!scalesIds[objId]) {
     scalesIds[objId] = scale.serialize();
@@ -1266,7 +1173,7 @@ anychart.charts.Polar.prototype.serialize = function() {
   } else {
     config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
   }
-  chart['yAxis'] = yAxis;
+  json['yAxis'] = config;
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {
@@ -1294,13 +1201,127 @@ anychart.charts.Polar.prototype.serialize = function() {
     }
     series.push(config);
   }
+  json['series'] = series;
 
-  chart['series'] = series;
-  chart['scales'] = scales;
+  json['scales'] = scales;
+  return {'chart': json};
+};
 
-  json['chart'] = chart;
 
-  return json;
+/** @inheritDoc */
+anychart.charts.Polar.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.palette(config['palette']);
+  this.markerPalette(config['markerPalette']);
+  this.hatchFillPalette(config['hatchFillPalette']);
+  this.startAngle(config['startAngle']);
+
+  var i, json, scale;
+  var grids = config['grids'];
+  var minorGrids = config['minorGrids'];
+  var lineAxesMarkers = config['lineAxesMarkers'];
+  var rangeAxesMarkers = config['rangeAxesMarkers'];
+  var textAxesMarkers = config['textAxesMarkers'];
+  var series = config['series'];
+  var barGroupsPadding = config['barGroupsPadding'];
+  var barsPadding = config['barsPadding'];
+  var scales = config['scales'];
+
+  var scalesInstances = {};
+  if (goog.isArray(scales)) {
+    for (i in scales) {
+      if (!scales.hasOwnProperty(i)) continue;
+      json = scales[i];
+      if (goog.isString(json)) {
+        scale = anychart.scales.Base.fromString(json, false);
+      } else {
+        scale = anychart.scales.Base.fromString(json['type'], false);
+        scale.setup(json);
+      }
+      scalesInstances[i] = scale;
+    }
+  }
+
+  json = config['xScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json, true);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale instanceof anychart.scales.ScatterBase)
+    this.xScale(scale);
+
+  json = config['yScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.Base.fromString(json, null);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.Base.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.yScale(scale);
+
+  json = config['xAxis'];
+  this.xAxis(json);
+  if (goog.isObject(json) && 'scale' in json) this.xAxis().scale(scalesInstances[json['scale']]);
+
+  json = config['yAxis'];
+  this.yAxis(json);
+  if (goog.isObject(json) && 'scale' in json) this.yAxis().scale(scalesInstances[json['scale']]);
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json)) {
+        if ('xScale' in json) this.grid(i).xScale(scalesInstances[json['xScale']]);
+        if ('yScale' in json) this.grid(i).yScale(scalesInstances[json['yScale']]);
+      }
+    }
+  }
+
+  if (goog.isArray(minorGrids)) {
+    for (i = 0; i < minorGrids.length; i++) {
+      json = minorGrids[i];
+      this.minorGrid(i, json);
+      if (goog.isObject(json)) {
+        if ('xScale' in json) this.minorGrid(i).xScale(scalesInstances[json['xScale']]);
+        if ('yScale' in json) this.minorGrid(i).yScale(scalesInstances[json['yScale']]);
+      }
+    }
+  }
+
+  if (goog.isArray(series)) {
+    for (i = 0; i < series.length; i++) {
+      json = series[i];
+      var seriesType = (json['seriesType'] || anychart.enums.PolarSeriesType.MARKER).toLowerCase();
+      var data = json['data'];
+      var seriesInst = this.createSeriesByType_(seriesType, data);
+      if (seriesInst) {
+        if (seriesType == anychart.enums.PolarSeriesType.LINE)
+          seriesInst.zIndex(anychart.charts.Polar.ZINDEX_LINE_SERIES);
+        seriesInst.setup(json);
+        if (goog.isObject(json)) {
+          if ('xScale' in json) seriesInst.xScale(scalesInstances[json['xScale']]);
+          if ('yScale' in json) seriesInst.yScale(scalesInstances[json['yScale']]);
+        }
+      }
+    }
+  }
 };
 
 
@@ -1317,4 +1338,5 @@ anychart.charts.Polar.prototype['line'] = anychart.charts.Polar.prototype.line;
 anychart.charts.Polar.prototype['marker'] = anychart.charts.Polar.prototype.marker;
 anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.palette;
 anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;
+anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
 anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;

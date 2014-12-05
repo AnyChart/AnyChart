@@ -157,8 +157,8 @@ anychart.core.polar.series.Area.prototype.restoreDefaults = function() {
 /**
  * @inheritDoc
  */
-anychart.core.polar.series.Area.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
+anychart.core.polar.series.Area.prototype.setupByJSON = function(config) {
+  return goog.base(this, 'setupByJSON', config);
 };
 
 

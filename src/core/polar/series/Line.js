@@ -128,15 +128,7 @@ anychart.core.polar.series.Line.prototype.getLegendIconType = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.polar.series.Line.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
+//anychart.core.polar.series.Line.prototype['finalizeDrawing'] = anychart.core.polar.series.Line.prototype.finalizeDrawing;
 //exports
 anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;
 anychart.core.polar.series.Line.prototype['hoverStroke'] = anychart.core.polar.series.Line.prototype.hoverStroke;
-anychart.core.polar.series.Line.prototype['finalizeDrawing'] = anychart.core.polar.series.Line.prototype.finalizeDrawing;

@@ -329,7 +329,11 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
   var range = (this.maximumModeAuto ? this.dataRangeMax : this.max) - (this.minimumModeAuto ? this.dataRangeMin : this.min);
-  if (!range) {
+  if (!isFinite(range)) {
+    this.dataRangeMin = 0;
+    this.dataRangeMax = 1;
+    range = 1;
+  } else if (!range) {
     this.dataRangeMin -= 0.5;
     this.dataRangeMax += 0.5;
     range = 1;
@@ -367,34 +371,48 @@ anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Serialize & Deserialize
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.ScatterBase.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['minimum'] = this.minimumModeAuto ? null : this.minimum();
-  data['maximum'] = this.maximumModeAuto ? null : this.maximum();
-  data['minimumGap'] = this.minimumGap();
-  data['maximumGap'] = this.maximumGap();
-  data['dataRangeMin'] = this.dataRangeMin;
-  data['dataRangeMax'] = this.dataRangeMax;
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['maximum'] = this.maximumModeAuto ? this.max : null;
+  json['minimum'] = this.minimumModeAuto ? this.min : null;
+  json['minimumGap'] = this.minimumGap();
+  json['maximumGap'] = this.maximumGap();
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.ScatterBase.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
+anychart.scales.ScatterBase.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.minimumGap(config['minimumGap']);
+  this.maximumGap(config['maximumGap']);
+  this.minimum(config['minimum']);
+  this.maximum(config['maximum']);
+};
 
-  this.minimum(goog.isNull(value['minimum']) ? NaN : value['minimum']);
-  this.maximum(goog.isNull(value['maximum']) ? NaN : value['maximum']);
 
-  this.minimumGap(value['minimumGap']);
-  this.maximumGap(value['maximumGap']);
-  this.resumeSignalsDispatching(true);
-  return this;
+/**
+ * @param {string} type
+ * @param {boolean=} opt_canReturnNull
+ * @return {anychart.scales.ScatterBase}
+ */
+anychart.scales.ScatterBase.fromString = function(type, opt_canReturnNull) {
+  type = (type + '').toLowerCase();
+  switch (type) {
+    case 'log':
+    case 'logarithmic':
+      return anychart.scales.log();
+    case 'lin':
+    case 'linear':
+      return anychart.scales.linear();
+    case 'date':
+    case 'datetime':
+    case 'dt':
+      return anychart.scales.dateTime();
+    default:
+      return opt_canReturnNull ? null : anychart.scales.linear();
+  }
 };
 
 
@@ -406,4 +424,3 @@ anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.p
 anychart.scales.ScatterBase.prototype['minimumGap'] = anychart.scales.ScatterBase.prototype.minimumGap;//doc|ex
 anychart.scales.ScatterBase.prototype['maximumGap'] = anychart.scales.ScatterBase.prototype.maximumGap;//doc|ex
 anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex
-anychart.scales.ScatterBase.prototype['stackMode'] = anychart.scales.ScatterBase.prototype.stackMode;//inherited

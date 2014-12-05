@@ -231,29 +231,20 @@ anychart.core.axes.RadialTicks.prototype.drawTick = function(x, y, x1, y1) {
 };
 
 
-/**
- * Ticks serialization.
- * @return {Object} Serialized axis data.
- */
+/** @inheritDoc */
 anychart.core.axes.RadialTicks.prototype.serialize = function() {
-  var data = {};
-  data['length'] = this.length();
-  data['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['length'] = this.length();
+  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.core.axes.RadialTicks.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-
-  this.length(value['length']);
-  this.stroke(value['stroke']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
+anychart.core.axes.RadialTicks.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.length(config['length']);
+  this.stroke(config['stroke']);
 };
 
 

@@ -160,6 +160,7 @@ anychart.scales.ScatterTicks.prototype.count = function(opt_valueOrMinValue, opt
       this.interval_ = NaN;
       this.minCount_ = Math.ceil(anychart.utils.toNumber(opt_valueOrMinValue));
       this.maxCount_ = Math.ceil(anychart.utils.toNumber(opt_maxValue));
+      // NaN checks included! DO NOT INVERT
       if (!(this.minCount_ >= 2)) this.minCount_ = 4;
       if (!(this.maxCount_ >= this.minCount_)) this.maxCount_ = this.minCount_;
       this.explicit_ = null;
@@ -296,7 +297,7 @@ anychart.scales.ScatterTicks.prototype.mode = function(opt_value) {
  * @param {number=} opt_logBase Log base value for logarithmic scales. Defaults to 10.
  * @return {!Array} Array of two values: [newMin, newMax].
  */
-anychart.scales.ScatterTicks.prototype.setup = function(min, max, opt_canModifyMin, opt_canModifyMax, opt_logBase) {
+anychart.scales.ScatterTicks.prototype.setupAsMajor = function(min, max, opt_canModifyMin, opt_canModifyMax, opt_logBase) {
   if (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC)
     return this.setupLogarithmic_(min, max, opt_logBase || 10, opt_canModifyMin, opt_canModifyMax);
   else
@@ -602,28 +603,52 @@ anychart.scales.ScatterTicks.prototype.addMinorLogarithmicTicksPortion_ = functi
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.ScatterTicks.prototype.serialize = function() {
-  var data = goog.base(this, 'serialize');
-  data['mode'] = this.mode();
-  data['base'] = this.base();
-  data['explicit'] = this.explicit_;
-  data['minCount'] = this.minCount_;
-  data['maxCount'] = this.maxCount_;
-  data['interval'] = this.interval_;
-  return data;
+  var json = goog.base(this, 'serialize');
+  json['mode'] = this.mode_;
+  json['base'] = this.base_;
+  json['explicit'] = this.explicit_;
+  if (this.minCount_ == this.maxCount_) {
+    json['count'] = this.minCount_;
+  } else {
+    json['minCount'] = this.minCount_;
+    json['maxCount'] = this.maxCount_;
+  }
+  json['interval'] = this.interval_;
+  return json;
 };
 
 
 /** @inheritDoc */
-anychart.scales.ScatterTicks.prototype.deserialize = function(value) {
-  this.suspendSignalsDispatching();
-  goog.base(this, 'deserialize', value);
-  this.mode(value['mode']);
-  this.base(value['base']);
-  this.explicit_ = value['explicit'] || null;
-  //this.minCount_ = goog.isNull(value['count']) ? NaN : Math.max(2, Math.ceil(value['count']));
-  this.interval_ = goog.isNull(value['interval']) ? NaN : value['interval'];
-  this.resumeSignalsDispatching(true);
-  return this;
+anychart.scales.ScatterTicks.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isArray(args[0])) {
+    this.set(args[0]);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+};
+
+
+/** @inheritDoc */
+anychart.scales.ScatterTicks.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.mode(config['mode']);
+  this.base(config['base']);
+  this.explicit_ = config['explicit'] || null;
+  this.minCount_ = config['count'] || config['minCount'] || NaN;
+  this.maxCount_ = config['count'] || config['maxCount'] || NaN;
+  this.interval_ = config['interval'] || NaN;
+  if (this.explicit_) {
+    this.minCount_ = this.maxCount_ = this.interval_ = NaN;
+  } else if (this.interval_) {
+    this.minCount_ = this.maxCount_ = NaN;
+  } else {
+    this.minCount_ = Math.ceil(anychart.utils.toNumber(this.minCount_));
+    this.maxCount_ = Math.ceil(anychart.utils.toNumber(this.maxCount_));
+    // NaN checks included! DO NOT INVERT
+    if (!(this.minCount_ >= 2)) this.minCount_ = 4;
+    if (!(this.maxCount_ >= this.minCount_)) this.maxCount_ = this.minCount_;
+  }
 };
 
 

@@ -19,6 +19,8 @@ goog.require('anychart.modules.base');
 anychart.line = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
+  chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);
   }
@@ -44,6 +46,9 @@ anychart.line = function(var_args) {
 
   return chart;
 };
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.LINE] = anychart.line;
 
 
 /**

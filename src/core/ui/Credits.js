@@ -465,9 +465,7 @@ anychart.core.ui.Credits.prototype.remove = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.ui.Credits.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['text'] = this.text();
@@ -478,16 +476,13 @@ anychart.core.ui.Credits.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.Credits.prototype.deserialize = function(config) {
+/** @inheritDoc */
+anychart.core.ui.Credits.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.text(config['text']);
   this.url(config['url']);
   this.alt(config['alt']);
   this.logoSrc(config['logoSrc']);
-
-  return goog.base(this, 'deserialize', config);
 };
 
 

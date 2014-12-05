@@ -121,14 +121,6 @@ anychart.core.cartesian.series.RangeBar.prototype.calculateStatistics = function
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeBar.prototype.deserialize = function(config) {
-  return goog.base(this, 'deserialize', config);
-};
-
-
 //exports
 anychart.core.cartesian.series.RangeBar.prototype['fill'] = anychart.core.cartesian.series.RangeBar.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeBar.prototype['hoverFill'] = anychart.core.cartesian.series.RangeBar.prototype.hoverFill;//inherited

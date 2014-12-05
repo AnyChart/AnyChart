@@ -1052,24 +1052,16 @@ anychart.core.cartesian.series.Candlestick.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.Candlestick.prototype.deserialize = function(config) {
-  this.suspendSignalsDispatching();
-
-  goog.base(this, 'deserialize', config);
-
+anychart.core.cartesian.series.Candlestick.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
   this.risingFill(config['risingFill']);
   this.hoverRisingFill(config['hoverRisingFill']);
   this.fallingFill(config['fallingFill']);
   this.hoverFallingFill(config['hoverFallingFill']);
-
   this.risingHatchFill(config['risingHatchFill']);
   this.hoverRisingHatchFill(config['hoverRisingHatchFill']);
   this.fallingHatchFill(config['fallingHatchFill']);
   this.hoverFallingHatchFill(config['hoverFallingHatchFill']);
-
-  this.resumeSignalsDispatching(true);
-
-  return this;
 };
 
 

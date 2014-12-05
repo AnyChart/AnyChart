@@ -359,8 +359,8 @@ anychart.core.Base.prototype.resumeSignalsDispatching = function(doDispatchSuspe
 
 
 /**
- * Deserializes element to JSON.
- * @return {Object} Deserialized JSON object of element.
+ * Serializes element to JSON.
+ * @return {Object} Serialized JSON object.
  */
 anychart.core.Base.prototype.serialize = function() {
   return {};
@@ -368,12 +368,45 @@ anychart.core.Base.prototype.serialize = function() {
 
 
 /**
- * Deserializes element from JSON.
- * @param {Object} config Config of an element.
+ * Setups the element using passed configuration value. It can be a JSON object or a special value that setups
+ * instances of descendant classes.
+ * Note: this method only changes element properties if they are supposed to be changed by the config value -
+ * it doesn't reset other properties to their defaults.
+ * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args Arguments to setup the instance.
  * @return {anychart.core.Base} Returns itself for chaining.
  */
-anychart.core.Base.prototype.deserialize = function(config) {
+anychart.core.Base.prototype.setup = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isDef(arg0)) {
+    this.suspendSignalsDispatching();
+    if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
+      if (arg0 instanceof anychart.core.Base)
+        throw 'Instance of object is passed to setter. You should use JSON instead';
+      this.setupByJSON(/** @type {Object} */(arguments[0]));
+    }
+    this.resumeSignalsDispatching(true);
+  }
   return this;
+};
+
+
+/**
+ * Setups current instance using passed JSON object.
+ * @param {Object} json
+ * @protected
+ */
+anychart.core.Base.prototype.setupByJSON = function(json) {
+};
+
+
+/**
+ * Special objects to setup current instance.
+ * @param {...(Object|Array|number|string|undefined|null)} var_args
+ * @return {boolean} If passed values were recognized as special setup values.
+ * @protected
+ */
+anychart.core.Base.prototype.setupSpecial = function(var_args) {
+  return false;
 };
 
 
