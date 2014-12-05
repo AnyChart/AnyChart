@@ -683,9 +683,13 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
 
   if (Aa > Da) Aa -= Math.PI * 2;
   var sweep = Da - Aa;
+  sweep = isNaN(sweep) ? sweep : anychart.math.round(sweep, 4);
   if (sweep == 0) return null;
 
+
   var a90 = Math.PI / 2;
+  a90 = anychart.math.round(a90, 4);
+
   var parts = Math.ceil(sweep / a90);
   var res = [];
   var angleStep, P2x, P2y, P3x, P3y, P4x, P4y;
