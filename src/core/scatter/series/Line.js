@@ -5,9 +5,7 @@ goog.require('anychart.core.scatter.series.BaseWithMarkers');
 
 /**
  * Define Line series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Scatter#line}.
- * @example
- * anychart.core.scatter.series.line([1, 4, 7, 1]).container(stage).draw();
+ * Get instance by methods {@link anychart.charts.Scatter#line}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -129,21 +127,36 @@ anychart.core.scatter.series.Line.prototype.createPositionProvider = function() 
  *//**
  * Setter for connect missing points setting.
  * @example
- * var chart = anychart.scatter();
- * var blueLine = chart.line([
- *    ['A1', 1],
- *    ['A2', 1.6],
- *    ['A3', 'missing'],
- *    ['A4', 1.1],
- *    ['A5', 1.9]
- * ]).connectMissingPoints(false);
- * var redLine = chart.line([
- *    ['A1', 2],
- *    ['A2', 2.6],
- *    ['A3', 'missing'],
- *    ['A4', 2.1],
- *    ['A5', 2.9]
- * ]).connectMissingPoints(true);
+ * chart = anychart.scatter();
+ * chart.line([
+ *   [4.1, 12],
+ *   [2.3, 'missing'],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ])
+ *     .name('Not connect missing')
+ *     .connectMissingPoints(false);
+ * chart.line([
+ *   [4.1, 10],
+ *   [2.3, 'missing'],
+ *   [3.4, 17],
+ *   [1.2, 20]
+ * ])
+ *     .name('Connect missing')
+ *     .connectMissingPoints(true);
+ * chart.line([
+ *   [4.1, 8],
+ *   [2.3, 6],
+ *   [3.4, 15],
+ *   [1.2, 18]
+ * ])
+ *     .name('Without missing')
+ *     .connectMissingPoints(true);
+ *
+ * chart.xAxis().title(null);
+ * chart.yAxis().title(null);
+ * chart.title(null);
+ * chart.legend().enabled(true).itemsLayout('vertical');
  * chart.container(stage).draw();
  * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
  *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
@@ -317,6 +330,6 @@ anychart.core.scatter.series.Line.prototype.setupByJSON = function(config) {
 //anychart.core.scatter.series.Line.prototype['hoverPoint'] = anychart.core.scatter.series.Line.prototype.hoverPoint;//inherited
 //anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;//inherited
 //exports
-anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.core.scatter.series.Line.prototype.connectMissingPoints;
+anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.core.scatter.series.Line.prototype.connectMissingPoints;//doc|ex
 anychart.core.scatter.series.Line.prototype['stroke'] = anychart.core.scatter.series.Line.prototype.stroke;//inherited
 anychart.core.scatter.series.Line.prototype['hoverStroke'] = anychart.core.scatter.series.Line.prototype.hoverStroke;//inherited

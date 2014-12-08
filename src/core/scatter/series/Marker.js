@@ -8,9 +8,7 @@ goog.require('anychart.enums');
 
 /**
  * Define Marker series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Scatter#marker}.
- * @example
- * anychart.core.scatter.series.marker([1, 4, 7, 1]).container(stage).draw();
+ * Get instance by methods {@link anychart.charts.Scatter#marker}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -84,14 +82,22 @@ anychart.core.scatter.series.Marker.prototype.setAutoMarkerType = function(opt_v
  * Setter for marker type settings.
  * @example <c>By Enum value.</c>
  * chart = anychart.scatter();
- * chart.marker([10, 11, 17, 7, 21])
- *    .type('star4')
- *    .hoverType('star6');
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ])
+ *   .type('star4');
  * chart.container(stage).draw();
  * @example <c>By custom function.</c>
  * chart = anychart.scatter();
- * chart.marker([10, 11, 17, 7, 21])
- *    .type(function(path, x, y, size) {
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ]).type(function(path, x, y, size) {
  *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
  *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
  *      path.moveTo(point1.x, point1.y)
@@ -141,15 +147,23 @@ anychart.core.scatter.series.Marker.prototype.type = function(opt_value) {
  *//**
  * Setter for hovered marker type settings.
  * @example <c>By Enum value.</c>
- * anychart.core.scatter.series.marker([10, 11, 17, 7, 21])
- *    .type('star4')
- *    .hoverType('star6')
- *    .container(stage).draw();
+ * chart = anychart.scatter();
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ])
+ *   .hoverType('star4');
+ * chart.container(stage).draw();
  * @example <c>By custom function.</c>
- * anychart.core.scatter.series.marker([10, 11, 17, 7, 21])
- *    .size(20)
- *    .hoverSize(20)
- *    .hoverType(function(path, x, y, size) {
+ * chart = anychart.scatter();
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ]).hoverType(function(path, x, y, size) {
  *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
  *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
  *      path.moveTo(point1.x, point1.y)
@@ -158,8 +172,8 @@ anychart.core.scatter.series.Marker.prototype.type = function(opt_value) {
  *          .moveTo(point1.x, point1.y)
  *          .close();
  *      return path;
- *    })
- *    .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
  *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
@@ -198,9 +212,14 @@ anychart.core.scatter.series.Marker.prototype.hoverType = function(opt_value) {
  *//**
  * Setter for marker size.
  * @example
- * anychart.core.scatter.series.marker([10, 11, 17, 7, 21])
- *     .size(14)
- *     .container(stage).draw();
+ * chart = anychart.scatter();
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ]).size(14)
+ * chart.container(stage).draw();
  * @param {number=} opt_value [10] Value to set.
  * @return {anychart.core.scatter.series.Marker} {@link anychart.core.scatter.series.Marker} class for method chaining.
  *//**
@@ -227,10 +246,16 @@ anychart.core.scatter.series.Marker.prototype.size = function(opt_value) {
  *//**
  * Setter for hovered marker size.
  * @example
- * anychart.core.scatter.series.marker([10, 11, 17, 7, 21])
- *     .size(10)
- *     .hoverSize(20)
- *     .container(stage).draw();
+ * chart = anychart.scatter();
+ * chart.marker([
+ *   [4.1, 12],
+ *   [2.3, 6],
+ *   [3.4, 19],
+ *   [1.2, 22]
+ * ])
+ *   .size(10)
+ *   .hoverSize(20);
+ * chart.container(stage).draw();
  * @param {number=} opt_value [12] Value to set.
  * @return {anychart.core.scatter.series.Marker} {@link anychart.core.scatter.series.Marker} instance for method chaining.
  *//**
@@ -603,9 +628,9 @@ anychart.core.scatter.series.Marker.prototype['stroke'] = anychart.core.scatter.
 anychart.core.scatter.series.Marker.prototype['hoverStroke'] = anychart.core.scatter.series.Marker.prototype.hoverStroke;//inherited
 anychart.core.scatter.series.Marker.prototype['fill'] = anychart.core.scatter.series.Marker.prototype.fill;//inherited
 anychart.core.scatter.series.Marker.prototype['hoverFill'] = anychart.core.scatter.series.Marker.prototype.hoverFill;//inherited
-anychart.core.scatter.series.Marker.prototype['size'] = anychart.core.scatter.series.Marker.prototype.size;
-anychart.core.scatter.series.Marker.prototype['hoverSize'] = anychart.core.scatter.series.Marker.prototype.hoverSize;
-anychart.core.scatter.series.Marker.prototype['type'] = anychart.core.scatter.series.Marker.prototype.type;
-anychart.core.scatter.series.Marker.prototype['hoverType'] = anychart.core.scatter.series.Marker.prototype.hoverType;
+anychart.core.scatter.series.Marker.prototype['size'] = anychart.core.scatter.series.Marker.prototype.size;//doc|ex
+anychart.core.scatter.series.Marker.prototype['hoverSize'] = anychart.core.scatter.series.Marker.prototype.hoverSize;//doc|ex
+anychart.core.scatter.series.Marker.prototype['type'] = anychart.core.scatter.series.Marker.prototype.type;//doc|ex
+anychart.core.scatter.series.Marker.prototype['hoverType'] = anychart.core.scatter.series.Marker.prototype.hoverType;//doc|ex
 anychart.core.scatter.series.Marker.prototype['hatchFill'] = anychart.core.scatter.series.Marker.prototype.hatchFill;//inherited
 anychart.core.scatter.series.Marker.prototype['hoverHatchFill'] = anychart.core.scatter.series.Marker.prototype.hoverHatchFill;//inherited

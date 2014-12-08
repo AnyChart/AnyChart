@@ -604,8 +604,16 @@ anychart.core.scatter.series.Base.prototype.meta = function(opt_object_or_key, o
  *    '21;17;23.1;1\n'+
  *    '10;.4;14;4.4\n',
  *    {'rowsSeparator': '\n', columnsSeparator: ';'})
- * @example <t>lineChart</t>
- * chart.line().data([1,2,3]);
+ * @example
+ * chart = anychart.scatterChart();
+ * chart.marker()
+ *        .data([
+ *           [4.1, 10],
+ *           [2.3, 6],
+ *           [3.4, 17],
+ *           [1.2, 20]
+ *        ]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
  * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
@@ -1169,13 +1177,15 @@ anychart.core.scatter.series.Base.prototype.makeHoverable = function(element, op
  * var secondScale = anychart.scales.log();
  * chart.xAxis(1)
  *     .scale(secondScale)
+ *     .stroke('red')
  *     .orientation('top')
  *     .title('Log axis');
+ * chart.xAxis(0).stroke('blue');
  * chart.marker([
- *    [4.1, 10],
- *    [32.3, 6],
- *    [163.4, 17],
- *    [761.2, 20]
+ *    [4.1, 12],
+ *    [32.3, 14],
+ *    [163.4, 6],
+ *    [761.2, 12]
  * ]).xScale(secondScale);
  * chart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value Value to set.
@@ -1221,7 +1231,8 @@ anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
  * ]);
  * var secondScale = anychart.scales.log();
  * chart.yAxis(1).scale(secondScale);
- * chart.yAxis(1).orientation('right');
+ * chart.yAxis(1).orientation('right').stroke('red');
+ * chart.yAxis(0).stroke('blue');
  * chart.marker([
  *    [4.4, 30],
  *    [2.8, 6],
@@ -1298,7 +1309,7 @@ anychart.core.scatter.series.Base.prototype.onScaleSignal_ = function(event) {
  *     .stroke('2 #cc8800').fill('grey 0.5');
  * series.tooltip(tooltipSettings);
  * chart.container(stage).draw();
- ** @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
+ * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
  * @return {!anychart.core.scatter.series.Base} An instance of the {@link anychart.core.scatter.series.Base} class for method chaining.
  *//**
@@ -1926,12 +1937,19 @@ anychart.core.scatter.series.Base.prototype.hoverHatchFill = function(opt_patter
  * @return {!acgraph.vector.Stroke} Current stroke settings.
  *//**
  * Setter for series stroke by function.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).stroke(
+ * @example
+ * chart = anychart.scatter();
+ * chart.line([
+ *   [4.1, 8],
+ *   [2.3, 6],
+ *   [3.4, 15],
+ *   [1.2, 18]
+ * ]).stroke(
  *      function(){
  *        return '3 '+ this.sourceColor;
  *      }
  * );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -1943,8 +1961,15 @@ anychart.core.scatter.series.Base.prototype.hoverHatchFill = function(opt_patter
  * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).stroke('orange', 3, '5 2', 'round');
+ * @example
+ * chart = anychart.scatter();
+ * chart.line([
+ *   [4.1, 8],
+ *   [2.3, 6],
+ *   [3.4, 15],
+ *   [1.2, 18]
+ * ]).stroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -1983,17 +2008,19 @@ anychart.core.scatter.series.Base.prototype.stroke = function(opt_strokeOrFill, 
  *//**
  * Setter for series stroke by function.<br/>
  * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
- * @example <t>lineChart</t>
- * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke(
+ * @example
+ * chart = anychart.scatter();
+ * chart.line([
+ *   [4.1, 8],
+ *   [2.3, 6],
+ *   [3.4, 15],
+ *   [1.2, 18]
+ * ]).hoverStroke(
  *      function(){
  *        return '5 '+ this.sourceColor;
  *      }
  * );
- * chart.column([1, 4, 7, 1]).hoverStroke(
- *      function(){
- *        return '5 '+ this.sourceColor;
- *      }
- * );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return this.sourceColor;
  * }] Function that looks like <code>function(){
@@ -2006,9 +2033,15 @@ anychart.core.scatter.series.Base.prototype.stroke = function(opt_strokeOrFill, 
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
  * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
- * @example <t>lineChart</t>
- * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke('orange', 3, '5 2', 'round');
- * chart.column([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
+ * @example
+ * chart = anychart.scatter();
+ * chart.line([
+ *   [4.1, 8],
+ *   [2.3, 6],
+ *   [3.4, 15],
+ *   [1.2, 18]
+ * ]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

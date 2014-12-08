@@ -105,19 +105,30 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents
 
 /**
  * Getter for series data markers.
- * @example <t>listingOnly</t>
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.line([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
  * series.markers().size(10);
+ * chart.container(stage).draw();
  * @return {!anychart.core.ui.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example <t>listingOnly</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * series.markers(myMarkers);
- * @example <t>lineChart</t>
- * chart.spline([1, 1.4, 1.2, 2]).markers(null);
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.line([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.markers(null);
+ * chart.container(stage).draw();
  * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
  *//**
@@ -142,19 +153,30 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.markers = function(opt_va
 
 /**
  * Getter for series data markers on hover.
- * @example <t>listingOnly</t>
- * series.hoverMarkers().size(20);
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.line([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
+ * series.hoverMarkers().size(10);
+ * chart.container(stage).draw();
  * @return {!anychart.core.ui.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers on hover.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example <t>listingOnly</t>
+ * @example
+ * chart = anychart.scatterChart();
+ * var series = chart.line([
+ *    [4.1, 10],
+ *    [2.3, 6],
+ *    [3.4, 17],
+ *    [1.2, 20]
+ * ]);
  * series.hoverMarkers(null);
- * @example <t>lineChart</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers(myMarkers);
+ * chart.container(stage).draw();
  * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
  *//**

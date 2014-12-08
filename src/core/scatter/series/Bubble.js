@@ -8,9 +8,7 @@ goog.require('anychart.utils');
 
 /**
  * Define Bubble series type.<br/>
- * <b>Note:</b> Better for use method {@link anychart.charts.Scatter#bubble}.
- * @example
- * anychart.core.scatter.series.bubble([[1, 1, 3], [2, 1, 1]]).container(stage).draw();
+ * Get instance by methods {@link anychart.charts.Scatter#bubble}.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -181,17 +179,15 @@ anychart.core.scatter.series.Bubble.prototype.hoverNegativeStroke_ = (function()
  *//**
  * Setter for minimum bubble size.
  * @example
- * anychart.core.scatter.series.bubble([
- *      [0, 2, 1],
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
  *      [1, 2, 3],
  *      [2, 2, 2],
  *      [3, 2, 1],
  *      ])
- *    .minimumSize(20)
- *    .maximumSize(80)
- *    .markers(null)
- *    .container(stage)
- *    .draw();
+ *    .minimumSize(20);
+ * chart.container(stage).draw();
  * @param {(string|number)=} opt_value ['10%'] Minimum size of the bubble.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -218,17 +214,15 @@ anychart.core.scatter.series.Bubble.prototype.minimumSize = function(opt_value) 
  *//**
  * Setter for maximum bubble size.
  * @example
- * anychart.core.scatter.series.bubble([
- *      [0, 2, 1],
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
  *      [1, 2, 3],
  *      [2, 2, 2],
  *      [3, 2, 1],
  *      ])
- *    .minimumSize(20)
- *    .maximumSize(80)
- *    .markers(null)
- *    .container(stage)
- *    .draw();
+ *    .maximumSize(80);
+ * chart.container(stage).draw();
  * @param {(string|number)=} opt_value ['95%'] Maximum size of the bubble.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -258,16 +252,15 @@ anychart.core.scatter.series.Bubble.prototype.maximumSize = function(opt_value) 
  * See {@link anychart.core.scatter.series.Bubble#negativeFill}, {@link anychart.core.scatter.series.Bubble#negativeStroke},
  *   {@link anychart.core.scatter.series.Bubble#negativeHatchFill}
  * @example
- * anychart.core.scatter.series.bubble([
- *       [1, 2, 3],
- *       [2, 2, 2],
- *       [3, 2, 1],
- *       [4, 2, -1],
- *       [5, 2, -2]])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, -1],
+ *      [1, 2, 3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *     .displayNegative(true)
- *     .markers(null)
- *     .container(stage)
- *     .draw();
+ * chart.container(stage).draw();
  * @param {boolean=} opt_value Whether to display negative value.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -628,15 +621,16 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(hover) {
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
  *  .negativeStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -677,19 +671,20 @@ anychart.core.scatter.series.Bubble.prototype.negativeStroke = function(opt_stro
  * Setter for series stroke by function.<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
  *  .hoverNegativeStroke(
  *      function(){
  *        return '3 '+ this.sourceColor;
  *      }
- *   )
- *  .container(stage).draw();
+ *   );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -703,15 +698,16 @@ anychart.core.scatter.series.Bubble.prototype.negativeStroke = function(opt_stro
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .hoverNegativeStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ *  .hoverNegativeStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -773,15 +769,16 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .negativeFill(['red', 'orange'])
- *  .container(stage).draw();
+ *  .negativeFill(['red', 'orange']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -791,15 +788,16 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @shortDescription Fill as a string or an object.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .negativeFill('green', 0.3)
- *  .container(stage).draw();
+ *  .negativeFill('green', 0.3);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
@@ -809,15 +807,16 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .negativeFill(['black', 'yellow'], 45, true, 0.5)
- *  .container(stage).draw();
+ *  .negativeFill(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -829,15 +828,16 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .negativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- *  .container(stage).draw();
+ *  .negativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
@@ -852,18 +852,19 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
  *  .negativeFill({
  *    src: 'http://static.anychart.com/underwater.jpg',
  *    mode: acgraph.vector.ImageFillMode.STRETCH
- *   })
- *  .container(stage).draw();
+ *   });
+ * chart.container(stage).draw();
  * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -902,15 +903,16 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .hoverNegativeFill(['red', 'orange'])
- *  .container(stage).draw();
+ *  .hoverNegativeFill(['red', 'orange']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -920,15 +922,16 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @shortDescription Fill as a string or an object.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .hoverNegativeFill('green', 0.3)
- *  .container(stage).draw();
+ *  .hoverNegativeFill('green', 0.3);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
@@ -938,15 +941,16 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .hoverNegativeFill(['black', 'yellow'], 45, true, 0.5)
- *  .container(stage).draw();
+ *  .hoverNegativeFill(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -965,7 +969,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  *   [4, 1.9, 3]
  * ])
  *  .displayNegative(true)
- *  .hoverNegativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ *  .hoverNegativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
  *  .container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
@@ -981,18 +985,19 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
  *  .hoverNegativeFill({
  *    src: 'http://static.anychart.com/underwater.jpg',
  *    mode: acgraph.vector.ImageFillMode.STRETCH
- *   })
- *  .container(stage).draw();
+ *   });
+ * chart.container(stage).draw();
  * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
  *//**
@@ -1050,15 +1055,16 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeFill = function(ho
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .negativeHatchFill('diamiond', 'grey', 5, 5)
- *  .container(stage).draw();
+ *  .negativeHatchFill('diamiond', 'grey', 5, 5);
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1099,15 +1105,16 @@ anychart.core.scatter.series.Bubble.prototype.negativeHatchFill = function(opt_p
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
+ * chart = anychart.scatter();
+ * chart.bubble([
+ *      [4, 2, 1],
+ *      [1, 2, -3],
+ *      [2, 2, 2],
+ *      [3, 2, 1],
+ *      ])
  *  .displayNegative(true)
- *  .hoverNegativeHatchFill('diamiond', 'grey', 5, 5)
- *  .container(stage).draw();
+ *  .hoverNegativeHatchFill('diamiond', 'grey', 5, 5);
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1291,13 +1298,13 @@ anychart.core.scatter.series.Bubble.prototype.restoreDefaults = function() {
 //anychart.core.scatter.series.Bubble.prototype['hoverPoint'] = anychart.core.scatter.series.Bubble.prototype.hoverPoint;//inherited
 //anychart.core.scatter.series.Bubble.prototype['unhover'] = anychart.core.scatter.series.Bubble.prototype.unhover;//inherited
 //exports
-anychart.core.scatter.series.Bubble.prototype['minimumSize'] = anychart.core.scatter.series.Bubble.prototype.minimumSize;
-anychart.core.scatter.series.Bubble.prototype['maximumSize'] = anychart.core.scatter.series.Bubble.prototype.maximumSize;
-anychart.core.scatter.series.Bubble.prototype['displayNegative'] = anychart.core.scatter.series.Bubble.prototype.displayNegative;
-anychart.core.scatter.series.Bubble.prototype['negativeFill'] = anychart.core.scatter.series.Bubble.prototype.negativeFill;
-anychart.core.scatter.series.Bubble.prototype['hoverNegativeFill'] = anychart.core.scatter.series.Bubble.prototype.hoverNegativeFill;
-anychart.core.scatter.series.Bubble.prototype['negativeStroke'] = anychart.core.scatter.series.Bubble.prototype.negativeStroke;
-anychart.core.scatter.series.Bubble.prototype['hoverNegativeStroke'] = anychart.core.scatter.series.Bubble.prototype.hoverNegativeStroke;
+anychart.core.scatter.series.Bubble.prototype['minimumSize'] = anychart.core.scatter.series.Bubble.prototype.minimumSize;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['maximumSize'] = anychart.core.scatter.series.Bubble.prototype.maximumSize;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['displayNegative'] = anychart.core.scatter.series.Bubble.prototype.displayNegative;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['negativeFill'] = anychart.core.scatter.series.Bubble.prototype.negativeFill;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['hoverNegativeFill'] = anychart.core.scatter.series.Bubble.prototype.hoverNegativeFill;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['negativeStroke'] = anychart.core.scatter.series.Bubble.prototype.negativeStroke;//doc|ex
+anychart.core.scatter.series.Bubble.prototype['hoverNegativeStroke'] = anychart.core.scatter.series.Bubble.prototype.hoverNegativeStroke;//doc|ex
 anychart.core.scatter.series.Bubble.prototype['negativeHatchFill'] = anychart.core.scatter.series.Bubble.prototype.negativeHatchFill;
 anychart.core.scatter.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.core.scatter.series.Bubble.prototype.hoverNegativeHatchFill;
 anychart.core.scatter.series.Bubble.prototype['fill'] = anychart.core.scatter.series.Bubble.prototype.fill;//inherited
