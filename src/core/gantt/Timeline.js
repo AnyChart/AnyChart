@@ -203,7 +203,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.baselineFill_ = acgraph.vector.normalizeFill(['#3CA0DE', '#3085BC'], -90);
+  this.baselineFill_ = acgraph.vector.normalizeFill(['#E1E1E1', '#A1A1A1'], -90);
 
   /**
    * Base stroke.
@@ -326,17 +326,17 @@ anychart.core.gantt.Timeline.BASE_Z_INDEX = 10;
 
 
 /**
- * Baseline path z-index.
- * @type {number}
- */
-anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 20;
-
-
-/**
  * Progress path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 30;
+anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 20;
+
+
+/**
+ * Baseline path z-index.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 30;
 
 
 /**
@@ -637,7 +637,7 @@ anychart.core.gantt.Timeline.prototype.getLabelsFactory_ = function() {
         .zIndex(anychart.core.gantt.Timeline.LABEL_Z_INDEX)
         .anchor(anychart.enums.Anchor.LEFT_CENTER)
         .position(anychart.enums.Position.RIGHT_CENTER)
-        .padding(3, 10)
+        .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN)
         .container(this.getBase_());
   }
   return this.labelsFactory_;
@@ -753,37 +753,6 @@ anychart.core.gantt.Timeline.prototype.drawTimelineElements_ = function() {
 anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_field) {
   var isTreeDataItem = item instanceof anychart.data.Tree.DataItem; //If item is tree data item. Else: item is period (raw object).
 
-  var zIndex, defaultFill, defaultStroke;
-
-  switch (opt_field) {
-    case anychart.enums.GanttDataFields.BASELINE:
-      zIndex = anychart.core.gantt.Timeline.BASELINE_Z_INDEX;
-      defaultFill = this.baselineFill_;
-      defaultStroke = this.baselineStroke_;
-      break;
-    case anychart.enums.GanttDataFields.PROGRESS:
-      zIndex = anychart.core.gantt.Timeline.PROGRESS_Z_INDEX;
-      defaultFill = this.progressFill_;
-      defaultStroke = this.progressStroke_;
-      break;
-    default:
-      zIndex = anychart.core.gantt.Timeline.BASE_Z_INDEX;
-      var isParent = (isTreeDataItem && item.numChildren());
-      //Milestone is not bar, so it doesn't use drawBar_ method.
-      defaultFill = isParent ? this.parentFill_ : this.baseFill_;
-      defaultStroke = isParent ? this.parentStroke_ : this.baseStroke_;
-  }
-
-  var bar = this.getDataLayer_().genNextChild();
-
-  bar
-      .zIndex(zIndex)
-      .moveTo(bounds.left, bounds.top)
-      .lineTo(bounds.left + bounds.width, bounds.top)
-      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
-      .lineTo(bounds.left, bounds.top + bounds.height)
-      .close();
-
   var settings;
   if (opt_field) {
     settings = isTreeDataItem ? item.get(opt_field) : item[opt_field];
@@ -797,18 +766,84 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
     settings = isTreeDataItem ? null : item;
   }
 
-  if (settings) {
-    var rawLabel = settings[anychart.enums.GanttDataFields.LABEL];
-    if (rawLabel) {
-      var position = rawLabel['position'] || this.getLabelsFactory_().position();
-      position = anychart.enums.normalizeAnchor(position);
-      var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-      var textValue = rawLabel['value'] || ''; //TODO (A.Kudryavtsev): Тут неясно. Для LF текст берется из провайдера. В гантах надо задавать текст в данных.
-      var formatProvider = {'value': textValue};
-      var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
-      label.setup(rawLabel);
+  var isBaseline = false;
+  var isActualBaseline = false;
+  var isParent = false;
+  var isProgress = false;
+
+  var zIndex, defaultFill, defaultStroke;
+
+  switch (opt_field) {
+    case anychart.enums.GanttDataFields.BASELINE:
+      zIndex = anychart.core.gantt.Timeline.BASELINE_Z_INDEX;
+      defaultFill = this.baselineFill_;
+      defaultStroke = this.baselineStroke_;
+      isBaseline = true;
+      break;
+    case anychart.enums.GanttDataFields.PROGRESS:
+      zIndex = anychart.core.gantt.Timeline.PROGRESS_Z_INDEX;
+      defaultFill = this.progressFill_;
+      defaultStroke = this.progressStroke_;
+      isProgress = true;
+      break;
+    default:
+      zIndex = anychart.core.gantt.Timeline.BASE_Z_INDEX;
+      isParent = (isTreeDataItem && item.numChildren());
+      //Milestone is not bar, so it doesn't use drawBar_ method.
+      defaultFill = isParent ? this.parentFill_ : this.baseFill_;
+      defaultStroke = isParent ? this.parentStroke_ : this.baseStroke_;
+
+      //It is not in "case anychart.enums.GanttDataFields.BASELINE:"section because this flag is for label coloring.
+      //Label belongs to "actual" bar, not to "baseline" bar.
+      isActualBaseline = (isTreeDataItem &&
+          item.get(anychart.enums.GanttDataFields.BASELINE_START) &&
+          item.get(anychart.enums.GanttDataFields.BASELINE_END));
+
+  }
+
+  var rawLabel = settings ? settings[anychart.enums.GanttDataFields.LABEL] : void 0;
+  var textValue;
+  if (rawLabel && goog.isDef(rawLabel['value'])) {
+    textValue = rawLabel['value'] + '';
+  } else {
+    textValue = (isTreeDataItem && !isProgress && !isBaseline) ? (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || '') : '';
+  }
+
+  if (textValue) {
+    var position;
+
+    if (rawLabel && rawLabel['position']) {
+      position = rawLabel['position'];
+    } else {
+      position = this.getLabelsFactory_().position();
+      if (isActualBaseline) position = anychart.enums.Position.CENTER;
+      if (isParent) position = anychart.enums.Position.RIGHT_BOTTOM;
     }
 
+    position = anychart.enums.normalizeAnchor(position);
+    var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+    var formatProvider = {'value': textValue};
+    var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+    if (isActualBaseline) {
+      label.fontColor('#fff');
+      label.anchor(anychart.enums.Anchor.CENTER);
+    }
+    if (rawLabel) label.setup(rawLabel);
+  }
+
+  var bar = this.getDataLayer_().genNextChild();
+
+  bar
+      .zIndex(zIndex)
+      .moveTo(bounds.left, bounds.top)
+      .lineTo(bounds.left + bounds.width, bounds.top)
+      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
+      .lineTo(bounds.left, bounds.top + bounds.height)
+      .close();
+
+
+
+  if (settings) {
     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
     if (rawStartMarker) {
       var startMarker = this.getMarkersFactory_().add({value: {x: bounds.left, y: bounds.top}});
@@ -948,6 +983,44 @@ anychart.core.gantt.Timeline.prototype.drawAsPeriods_ = function(dataItem, total
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
+  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
+  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var baselineStart = dataItem.get(anychart.enums.GanttDataFields.BASELINE_START);
+  var baselineEnd = dataItem.get(anychart.enums.GanttDataFields.BASELINE_END);
+  var actualStartRatio = this.scale_.timestampToRatio(actualStart);
+  var actualEndRatio = this.scale_.timestampToRatio(actualEnd);
+  var baselineStartRatio = this.scale_.timestampToRatio(baselineStart);
+  var baselineEndRatio = this.scale_.timestampToRatio(baselineEnd);
+
+  if ((actualEndRatio > 0 && actualStartRatio < 1) || (baselineEndRatio > 0 && baselineStartRatio < 1)) {
+    var b = this.pixelBoundsCache_;
+    var actualLeft = this.halfPixel(b.left + b.width * actualStartRatio);
+    var actualRight = this.halfPixel(b.left + b.width * actualEndRatio);
+    var actualTop = this.halfPixel(totalTop + itemHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION) / 2);
+    var actualHeight = Math.round(itemHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+
+    var baselineLeft = this.halfPixel(b.left + b.width * baselineStartRatio);
+    var baselineRight = this.halfPixel(b.left + b.width * baselineEndRatio);
+    var baselineTop = this.halfPixel(actualTop + actualHeight);
+    var baselineHeight = actualHeight;
+
+    this.drawBar_(new anychart.math.Rect(actualLeft, actualTop, (actualRight - actualLeft), actualHeight),
+        dataItem, anychart.enums.GanttDataFields.ACTUAL);
+
+    this.drawBar_(new anychart.math.Rect(baselineLeft, baselineTop, (baselineRight - baselineLeft), baselineHeight),
+        dataItem, anychart.enums.GanttDataFields.BASELINE);
+
+    var progressHeight = Math.round(actualHeight * anychart.core.gantt.Timeline.PROGRESS_HEIGHT_REDUCTION);
+    var progressTop = this.halfPixel(actualTop + (actualHeight - progressHeight) / 2);
+
+    var progressValue = parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
+    if (progressValue) { //Draw progress.
+      var progressWidth = Math.round(progressValue * (actualRight - actualLeft) / 100);
+      this.drawBar_(new anychart.math.Rect(actualLeft, progressTop, progressWidth, progressHeight), dataItem,
+          anychart.enums.GanttDataFields.PROGRESS);
+    }
+
+  }
 
 };
 
@@ -1046,6 +1119,25 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
         .close();
 
     var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
+
+    var rawLabel = settings ? settings[anychart.enums.GanttDataFields.LABEL] : void 0;
+    var textValue;
+    if (rawLabel && goog.isDef(rawLabel['value'])) {
+      textValue = rawLabel['value'] + '';
+    } else {
+      textValue = dataItem.get(anychart.enums.GanttDataFields.NAME) || '';
+    }
+
+    if (textValue) {
+      var bounds = new acgraph.math.Rect(centerLeft - halfHeight, centerTop - halfHeight, (halfHeight + halfHeight), (halfHeight + halfHeight));
+      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.getLabelsFactory_().position();
+      position = anychart.enums.normalizeAnchor(position);
+      var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+      var formatProvider = {'value': textValue};
+      var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+      if (rawLabel) label.setup(rawLabel);
+    }
+
     if (settings) {
       var fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
           acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
@@ -1054,18 +1146,6 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
       var stroke = goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
           acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
           this.milestoneStroke_;
-
-      var rawLabel = settings[anychart.enums.GanttDataFields.LABEL];
-      if (rawLabel) {
-        var bounds = new acgraph.math.Rect(centerLeft, centerTop, (halfHeight + halfHeight), (halfHeight + halfHeight));
-        var position = rawLabel['position'] || this.getLabelsFactory_().position();
-        position = anychart.enums.normalizeAnchor(position);
-        var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-        var textValue = rawLabel['value'] || ''; //TODO (A.Kudryavtsev): Тут неясно. Для LF текст берется из провайдера. В гантах надо задавать текст в данных.
-        var formatProvider = {'value': textValue};
-        var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
-        label.setup(rawLabel);
-      }
 
       milestone.fill(fill).stroke(stroke);
     } else {
@@ -1136,9 +1216,6 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
           to['period'][anychart.enums.GanttDataFields.END] :
           to['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
 
-      fromEndTimestamp = fromEndTimestamp || fromStartTimestamp; //Milestone.
-      toEndTimestamp = toEndTimestamp || fromStartTimestamp; //Milestone.
-
       var fromMilestoneHalfWidth = 0;
       var toMilestoneHalfWidth = 0;
       if (!fromEndTimestamp || fromStartTimestamp == fromEndTimestamp) {
@@ -1174,10 +1251,29 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
           acgraph.vector.normalizeStroke(connSettings[anychart.enums.GanttDataFields.FILL]) :
           this.connectorStroke_;
 
+
+      if (!this.isResourceChart_) {
+        if (from['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
+            from['item'].get(anychart.enums.GanttDataFields.BASELINE_START)) {
+          fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+        } else if (from['item'].numChildren()) {
+          fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
+        }
+
+        if (to['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
+            to['item'].get(anychart.enums.GanttDataFields.BASELINE_START)) {
+          toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+        } else if (to['item'].numChildren()) {
+          toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
+        }
+      }
+
       this.drawConnector_(
           new anychart.math.Rect(fromLeft, actualFromTop, (fromRight - fromLeft), fromRowHeight),
           new anychart.math.Rect(toLeft, actualToTop, (toRight - toLeft), toRowHeight),
-          connType, /** @type {acgraph.vector.Fill} */ (fill), /** @type {acgraph.vector.Stroke} */ (stroke));
+          connType,
+          /** @type {acgraph.vector.Fill} */ (fill),
+          /** @type {acgraph.vector.Stroke} */ (stroke));
 
     } else {
       /*
@@ -1216,7 +1312,6 @@ anychart.core.gantt.Timeline.prototype.drawConnector_ = function(fromBounds, toB
     +--------------------------------------+
 
    */
-
 
   var fromLeft, fromTop, toLeft, toTop, orientation;
   var am = anychart.core.gantt.Timeline.ARROW_MARGIN;
@@ -1589,8 +1684,14 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
 
       var totalRange = this.scale_.getTotalRange();
       var visibleRange = this.scale_.getRange();
-      var contentBoundsSimulation = new acgraph.math.Rect(totalRange['min'], 0, totalRange['max'] - totalRange['min'], 0);
-      var visibleBoundsSimulation = new acgraph.math.Rect(visibleRange['min'], 0, visibleRange['max'] - visibleRange['min'], 0);
+
+      var totMin = this.scale_.timestampToRatio(totalRange['min']) * this.pixelBoundsCache_.width;
+      var totMax = this.scale_.timestampToRatio(totalRange['max']) * this.pixelBoundsCache_.width;
+      var visibleMin = this.scale_.timestampToRatio(visibleRange['min']) * this.pixelBoundsCache_.width;
+      var visibleMax = this.scale_.timestampToRatio(visibleRange['max']) * this.pixelBoundsCache_.width;
+
+      var contentBoundsSimulation = new acgraph.math.Rect(totMin, 0, totMax - totMin, 0);
+      var visibleBoundsSimulation = new acgraph.math.Rect(visibleMin, 0, visibleMax - visibleMin, 0);
       this.horizontalScrollBar_
           .suspendSignalsDispatching()
           .handlePositionChange(false)

@@ -1407,6 +1407,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
     this.labelsFactory_
         .anchor(anychart.enums.Anchor.LEFT_TOP)
         .vAlign(acgraph.vector.Text.VAlign.MIDDLE)
+        .padding(0, 0, 0, anychart.core.ui.DataGrid.DEFAULT_PADDING)
         .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
         .container(this.getCellsLayer_());
 
@@ -1769,6 +1770,15 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.cellTextSettings().suspendSignalsDispatching();
       this.cellTextSettings().clear();
 
+      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().left()),
+          this.pixelBoundsCache_.width);
+      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().right()),
+          this.pixelBoundsCache_.width);
+      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().top()),
+          this.pixelBoundsCache_.height);
+      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().bottom()),
+          this.pixelBoundsCache_.height);
+
       var counter = -1;
       for (var i = startIndex; i <= endIndex; i++) {
         var item = data[i];
@@ -1776,7 +1786,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
         var height = anychart.core.gantt.Controller.getItemHeight(item);
         var depth = item.meta('depth') || 0;
-        var padding = anychart.core.ui.DataGrid.DEFAULT_PADDING + this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
+        var padding = paddingLeft + this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
         var addButton = 0;
 
         if (this.useButtons_ && item.numChildren()) {
@@ -1799,7 +1809,6 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
               .parentBounds(this.pixelBoundsCache_)
               .position({'x': this.pixelBoundsCache_.left + padding, 'y': top});
 
-
           button.resumeSignalsDispatching(false);
           button.draw();
         }
@@ -1812,7 +1821,8 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         label.suspendSignalsDispatching();
 
         label.height(height);
-        label.padding(0, 0, 0, padding + addButton);
+        label.width(this.pixelBoundsCache_.width);
+        label.padding(paddingTop, paddingRight, paddingBottom, padding + addButton);
 
         this.cellTextSettingsOverrider_(label, item);
         label.resumeSignalsDispatching(false);

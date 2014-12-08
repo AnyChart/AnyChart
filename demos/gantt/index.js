@@ -41,6 +41,9 @@ anychart.onDocumentReady(function() {
   dataGrid.cellEvenFill('#fcfcfc');
   timeline.cellEvenFill('#fcfcfc');
 
+
+  dataGrid.column(0).cellTextSettings().hAlign('center').padding(0, 0, 0, 0);
+
   dataGrid.column(1).width(250);
 
   var actualStartColumn = dataGrid.column(2);
