@@ -74,6 +74,7 @@ anychart.core.axes.Linear = function() {
       .fontFamily('Tahoma')
       .fontSize('11')
       .fontColor('rgb(34,34,34)')
+      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
       .resumeSignalsDispatching(false);
 
   this.labels().background()
@@ -105,6 +106,7 @@ anychart.core.axes.Linear = function() {
       .fontFamily('Tahoma')
       .fontSize('11')
       .fontColor('rgb(34,34,34)')
+      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
       .resumeSignalsDispatching(false);
 
   this.minorLabels().background()
