@@ -464,8 +464,18 @@ anychart.core.axisMarkers.Text.prototype.draw = function() {
     if (isHeightSet) textElement.height(height);
 
     var position = /** @type {acgraph.math.Coordinate}*/(this.getTextPosition_(ratio, shift));
+
+    var angle = anychart.utils.toNumber(this.rotation_);
+    var rotation = isNaN(angle) ?
+        this.isHorizontal() ?
+            0 : -90 :
+            angle;
+
+    var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(rotation), 0, 0);
+    var rotatedBounds = acgraph.math.getBoundsOfRectWithTransform(textElementBounds, transform);
+
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-        new acgraph.math.Rect(0, 0, width, height),
+        anychart.math.rect(0, 0, rotatedBounds.width, rotatedBounds.height),
         anchor);
 
     position.x -= anchorCoordinate.x;
@@ -477,16 +487,10 @@ anychart.core.axisMarkers.Text.prototype.draw = function() {
     anychart.utils.applyOffsetByAnchor(position, anchor, offsetX, offsetY);
     this.applyTextSettings(textElement, true);
 
-    var angle = anychart.utils.toNumber(this.rotation_);
-    var rotation = isNaN(angle) ?
-        this.isHorizontal() ?
-            0 : -90 :
-            angle;
-
     textElement
-        .x(position.x)
-        .y(position.y)
-        .setRotationByAnchor(rotation);
+        .x(position.x + rotatedBounds.width / 2 - width / 2)
+        .y(position.y + rotatedBounds.height / 2 - height / 2)
+        .setRotationByAnchor(rotation, acgraph.vector.Anchor.CENTER);
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -511,7 +515,7 @@ anychart.core.axisMarkers.Text.prototype.draw = function() {
  * Calculates text position using layout and align.
  * @param {number} ratio Scale ratio.
  * @param {number} shift Pixel shift.
- * @return {acgraph.math.Coordinate} text position.
+ * @return {anychart.math.Coordinate} text position.
  * @private
  */
 anychart.core.axisMarkers.Text.prototype.getTextPosition_ = function(ratio, shift) {
@@ -523,23 +527,31 @@ anychart.core.axisMarkers.Text.prototype.getTextPosition_ = function(ratio, shif
     case anychart.enums.Layout.HORIZONTAL:
       y = Math.round(parentBounds.getTop() + parentBounds.height - (ratio * parentBounds.height));
       ratio == 1 ? y -= shift : y += shift;
-      if (this.align_ == anychart.enums.Align.LEFT) {
-        x = parentBounds.getLeft();
-      } else if (this.align_ == anychart.enums.Align.CENTER) {
-        x = parentBounds.getLeft() + parentBounds.width / 2;
-      } else {
-        x = parentBounds.getRight();
+      switch (this.align_) {
+        case anychart.enums.Align.LEFT:
+          x = parentBounds.getLeft();
+          break;
+        case anychart.enums.Align.RIGHT:
+          x = parentBounds.getRight();
+          break;
+        default: // TOP CENTER BOTTOM
+          x = parentBounds.getLeft() + parentBounds.width / 2;
+          break;
       }
       break;
     case anychart.enums.Layout.VERTICAL:
       x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
       ratio == 1 ? x += shift : x -= shift;
-      if (this.align_ == anychart.enums.Align.BOTTOM) {
-        y = parentBounds.getBottom();
-      } else if (this.align_ == anychart.enums.Align.CENTER) {
-        y = parentBounds.getTop() + parentBounds.height / 2;
-      } else {
-        y = parentBounds.getTop();
+      switch (this.align_) {
+        case anychart.enums.Align.TOP:
+          y = parentBounds.getTop();
+          break;
+        case anychart.enums.Align.BOTTOM:
+          y = parentBounds.getBottom();
+          break;
+        default: // LEFT CENTER RIGHT
+          y = parentBounds.getTop() + parentBounds.height / 2;
+          break;
       }
       break;
   }
