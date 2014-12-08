@@ -1407,7 +1407,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
     this.labelsFactory_
         .anchor(anychart.enums.Anchor.LEFT_TOP)
         .vAlign(acgraph.vector.Text.VAlign.MIDDLE)
-        .padding(0, 0, 0, anychart.core.ui.DataGrid.DEFAULT_PADDING)
+        .padding(0, anychart.core.ui.DataGrid.DEFAULT_PADDING)
         .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
         .container(this.getCellsLayer_());
 
