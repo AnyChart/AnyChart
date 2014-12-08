@@ -45,8 +45,12 @@ function orientation(value) {
 }
 
 function scaleLength(value) {
-  axis1.length(parseFloat(value));
-  $('#scaleLength').text(axis1.length());
+  if (axis1.isHorizontal()) {
+    axis1.padding().right(axis1.parentBounds().width - parseFloat(value));
+  } else {
+    axis1.padding().bottom(axis1.parentBounds().width - parseFloat(value));
+  }
+  $('#scaleLength').text(parseFloat(value));
 }
 
 function rotation(value) {
@@ -98,24 +102,23 @@ function minorTickSet(value) {
 var scale;
 function load() {
   scale = new anychart.scales.Ordinal();
-  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
-//  var values =
-//      [
-//        'January',
-//        'February',
-//        'March',
-//        'April',
-//        'May',
-//        'June',
-//        'July',
-//        'August',
-//        'September',
-//        'October',
-//        'November',
-//        'December'
-//      ];
+  //var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
+  var values =
+      [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ];
   scale.values(values);
-  scale.inverted(true);
 //  scale.ticks().interval(1);
 
   //scale = new anychart.scales.Linear();
@@ -140,15 +143,21 @@ function load() {
   axis1.staggerMode(true);
   axis1.ticks().length(25).stroke('2 red');
   axis1.minorTicks().stroke('2 green').length(15);
-  axis1.labels().rotation(0).fontSize(10).enabled(true);
+  axis1.labels()
+      .rotation(0)
+      .fontSize(10)
+      .enabled(true)
+      .textFormatter(function() {
+        return this.value;
+      });
   axis1.minorLabels().rotation(0).enabled(true);
+  axis1.orientation('top');
 
   var container = axis1.container();
 
-  axis1.parentBounds(parentBounds);
+  //axis1.parentBounds();
   axis1.draw();
   axis1.resumeSignalsDispatching(false);
-
 
 
   (drawer = function() {
@@ -210,8 +219,6 @@ function load() {
 
     orientationInput.value = axis1.orientation();
 
-    lengthInput.value = axis1.length();
-    $('#scaleLength').text(axis1.length());
     rotationInput.value = axis1.labels().rotation();
     $('#rotationAngle').text(axis1.labels().rotation());
     tickLengthInput.value = axis1.ticks().length();

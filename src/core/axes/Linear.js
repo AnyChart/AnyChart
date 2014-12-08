@@ -972,13 +972,20 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
             if (nextDrawableLabel == -1 && isLabels) {
               k = i;
               while (nextDrawableLabel == -1 && k < ticksArrLen) {
-                bounds1 = this.getLabelBounds_(k, true, opt_bounds);
+                if ((k == 0 && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
+                  bounds1 = this.getLabelBounds_(k, true, opt_bounds);
+                else
+                  bounds1 = null;
 
                 if (prevDrawableLabel != -1)
                   bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
+                else
+                  bounds2 = null;
 
                 if (k != ticksArrLen - 1 && this.drawLastLabel())
                   bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
+                else
+                  bounds3 = null;
 
                 if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
                     anychart.math.checkRectIntersection(bounds1, bounds3))) {
@@ -1053,10 +1060,15 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
         } else if (scale instanceof anychart.scales.Ordinal) {
           for (i = 0; i < ticksArrLen; i++) {
             if (isLabels) {
-              bounds1 = this.getLabelBounds_(i, true, opt_bounds);
+              if ((i == 0 && this.drawFirstLabel()) || (i == ticksArrLen - 1 && this.drawLastLabel()) || (i != 0 && i != ticksArrLen - 1))
+                bounds1 = this.getLabelBounds_(i, true, opt_bounds);
+              else
+                bounds1 = null;
 
               if (prevDrawableLabel != -1)
                 bounds2 = this.getLabelBounds_(prevDrawableLabel, true, opt_bounds);
+              else
+                bounds2 = null;
 
               if (i != ticksArrLen - 1 && this.drawLastLabel())
                 bounds3 = this.getLabelBounds_(ticksArrLen - 1, true, opt_bounds);
@@ -1267,7 +1279,7 @@ anychart.core.axes.Linear.prototype.calcLabels_ = function(opt_bounds) {
  * @private
  */
 anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
-  var bounds, size, i, delta;
+  var bounds, size, i, delta, len;
   var maxLabelSize = 0;
   var maxMinorLabelSize = 0;
   var ticksLength = 0;
@@ -1313,7 +1325,7 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
 
   var overlappedLabels = this.calcLabels_(tempBounds);
 
-  var ticksArr, minorTicksArr;
+  var ticksArr;
 
   if (isLabels) {
     ticksArr = scale.ticks().get();
@@ -1323,13 +1335,11 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
         maxLabelSize += this.linesSize_[i];
       }
     } else {
-      for (i = 0; i < ticksArr.length; i++) {
+      for (i = 0, len = ticksArr.length; i < len; i++) {
         var drawLabel = goog.isArray(drawLabels) ? drawLabels[i] : drawLabels;
         if (drawLabel) {
-          bounds = labels.measure(this.getLabelsFormatProvider_(i, ticksArr[i]), {'value': {'x': 0, 'y': 0}});
-          size = this.isHorizontal() ?
-              bounds.height - (bounds.top + bounds.height / 2) :
-              bounds.width - (bounds.left + bounds.width / 2);
+          bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, true));
+          size = this.isHorizontal() ? bounds.height : bounds.width;
           if (size > maxLabelSize) maxLabelSize = size;
         }
       }
@@ -1337,15 +1347,12 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
   }
 
   if (isMinorLabels && !this.staggerMode()) {
-    minorTicksArr = scale.minorTicks().get();
     var drawMinorLabels = goog.isObject(overlappedLabels) ? overlappedLabels.minorLabels : !overlappedLabels;
-    for (i = 0; i < drawMinorLabels.length; i++) {
+    for (i = 0, len = drawMinorLabels.length; i < len; i++) {
       var drawMinorLabel = goog.isArray(drawMinorLabels) ? drawMinorLabels[i] : drawMinorLabels;
       if (drawMinorLabel) {
-        bounds = minorLabels.measure(this.getLabelsFormatProvider_(i, minorTicksArr[i]), {'value': {'x': 0, 'y': 0}});
-        size = this.isHorizontal() ?
-            bounds.height - (bounds.top + bounds.height / 2) :
-            bounds.width - (bounds.left + bounds.width / 2);
+        bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, false));
+        size = this.isHorizontal() ? bounds.height : bounds.width;
         if (size > maxMinorLabelSize) maxMinorLabelSize = size;
       }
     }
@@ -1467,23 +1474,19 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, o
     ratio = scale.transform(value, .5);
   }
 
-  var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {'x': 0, 'y': 0}};
-  var labelBounds = labels.measure(formatProvider, positionProvider);
-
   var isEnabled = ticks.enabled();
   var position = ticks.position();
 
   switch (this.orientation()) {
     case anychart.enums.Orientation.TOP:
       x = Math.round(bounds.left + ratio * bounds.width);
-      y = lineBounds.top - lineThickness / 2 - labelBounds.height / 2;
+      y = lineBounds.top - lineThickness / 2;
       if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         y -= ticksLength;
       }
       break;
     case anychart.enums.Orientation.RIGHT:
-      x = lineBounds.left + lineThickness / 2 + labelBounds.width / 2;
+      x = lineBounds.left + lineThickness / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
       if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
@@ -1492,14 +1495,14 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, o
       break;
     case anychart.enums.Orientation.BOTTOM:
       x = Math.round(bounds.left + ratio * bounds.width);
-      y = lineBounds.top + lineThickness / 2 + labelBounds.height / 2;
+      y = lineBounds.top + lineThickness / 2;
 
       if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
         y += ticksLength;
       }
       break;
     case anychart.enums.Orientation.LEFT:
-      x = lineBounds.left - lineThickness / 2 - labelBounds.width / 2;
+      x = lineBounds.left - lineThickness / 2;
       y = Math.round(bounds.top + ratio * bounds.height);
 
       if (position == anychart.enums.SidePosition.OUTSIDE && isEnabled) {
@@ -1507,10 +1510,29 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, o
       }
       break;
   }
-  positionProvider['value']['x'] = x;
-  positionProvider['value']['y'] = y;
 
-  return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider);
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {'value': {'x': x, 'y': y}};
+
+  var labelBounds = labels.measure(formatProvider, positionProvider);
+
+  switch (this.orientation()) {
+    case anychart.enums.Orientation.TOP:
+      labelBounds.top += labelBounds.height / 2;
+      break;
+    case anychart.enums.Orientation.RIGHT:
+      labelBounds.left += labelBounds.width / 2;
+      break;
+    case anychart.enums.Orientation.BOTTOM:
+      labelBounds.top += labelBounds.height / 2;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      labelBounds.left += labelBounds.width / 2;
+      break;
+  }
+
+
+  return boundsCache[index] = labelBounds.toCoordinateBox();
 };
 
 
@@ -1896,9 +1918,7 @@ anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, p
   }
 
   var lineThickness = this.line_.stroke()['thickness'] ? this.line_.stroke()['thickness'] : 1;
-  var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {x: 0, y: 0}};
-  var labelBounds = labels.measure(formatProvider, positionProvider);
+  var labelBounds = anychart.math.Rect.fromCoordinateBox(this.getLabelBounds_(index, isMajor));
   var orientation = this.orientation();
   var staggerSize = 0;
 
@@ -1955,8 +1975,9 @@ anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, p
       break;
   }
 
-  positionProvider['value']['x'] = x;
-  positionProvider['value']['y'] = y;
+  var formatProvider = this.getLabelsFormatProvider_(index, value);
+  var positionProvider = {'value': {x: x, y: y}};
+
   labels.add(formatProvider, positionProvider);
 };
 

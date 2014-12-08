@@ -633,7 +633,7 @@ anychart.core.axes.Radar.prototype.getLabelBounds_ = function(index) {
   var scaleTicks = scale.ticks();
 
   var value = scaleTicks.get()[index];
-  var ratio = scale.transform(value, 0);
+  var ratio = scale.transform(value);
 
   var angle = goog.math.standardAngle(this.startAngle() - 90 + ratio * 360);
   var angleRad = angle * Math.PI / 180;

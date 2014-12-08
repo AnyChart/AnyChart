@@ -735,14 +735,13 @@ anychart.core.ui.LabelsFactory.prototype.draw = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Reaturns label size.
+ * Returns label size.
  * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
  * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
  * @return {anychart.math.Rect} Label bounds.
- * @private
  */
-anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
+anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
   var text;
   var textElementBounds;
   var textWidth;
@@ -755,8 +754,6 @@ anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProvider
   var parentHeight;
   var formatProvider;
   var positionProvider;
-
-  if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
 
   if (!this.measureCustomLabel_) this.measureCustomLabel_ = new anychart.core.ui.LabelsFactory.Label();
   else this.measureCustomLabel_.clear();
@@ -772,10 +769,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProvider
   }
   this.measureCustomLabel_.setSettings(opt_settings);
 
-  text = this.textFormatter_.call(formatProvider, formatProvider);
-  this.measureTextElement_.width(null);
-  this.measureTextElement_.height(null);
-  this.measureTextElement_.text(goog.isDef(text) ? String(text) : null);
+  var isHtml = goog.isDef(this.measureCustomLabel_.useHtml()) ? this.measureCustomLabel_.useHtml() : this.useHtml();
 
   //we should ask text element about bounds only after text format and text settings are applied
 
@@ -792,6 +786,17 @@ anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProvider
   var offsetY = /** @type {number|string} */(this.measureCustomLabel_.offsetY() || this.offsetY());
   var offsetX = /** @type {number|string} */(this.measureCustomLabel_.offsetX() || this.offsetX());
   var anchor = /** @type {string} */(this.measureCustomLabel_.anchor() || this.anchor());
+
+
+  if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
+  text = this.textFormatter_.call(formatProvider, formatProvider);
+  this.measureTextElement_.width(null);
+  this.measureTextElement_.height(null);
+  if (isHtml) {
+    this.measureTextElement_.htmlText(goog.isDef(text) ? String(text) : null);
+  } else {
+    this.measureTextElement_.text(goog.isDef(text) ? String(text) : null);
+  }
 
   this.applyTextSettings(this.measureTextElement_, true);
   this.measureCustomLabel_.applyTextSettings(this.measureTextElement_, false);
@@ -829,6 +834,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProvider
   }
 
   if (goog.isDef(textHeight)) this.measureTextElement_.height(textHeight);
+
   var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
   var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
@@ -859,16 +865,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension_ = function(formatProvider
  */
 anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
   var arr = this.measureWithTransform(formatProviderOrLabel, opt_positionProvider, opt_settings);
-  /** @type {anychart.math.Rect} */
-  var rect = new anychart.math.Rect(0, 0, 0, 0);
-  var outerBounds = new anychart.math.Rect(arr[0], arr[1], 0, 0);
-  for (var i = 2, len = arr.length; i < len; i += 2) {
-    rect.left = arr[i];
-    rect.top = arr[i + 1];
-    outerBounds.boundingRect(rect);
-  }
-
-  return outerBounds;
+  return anychart.math.Rect.fromCoordinateBox(arr);
 };
 
 
@@ -880,7 +877,7 @@ anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabe
  * @return {Array.<number>} Label bounds.
  */
 anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
-  var bounds = this.getDimension_(formatProviderOrLabel, opt_positionProvider, opt_settings);
+  var bounds = this.getDimension(formatProviderOrLabel, opt_positionProvider, opt_settings);
 
   var rotation, anchor;
   if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
