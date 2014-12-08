@@ -89,19 +89,21 @@ anychart.core.radar.series.ContinuousBase.prototype.hasMarkers = function() {
 
 /**
  * Getter for series data markers.
- * @example <t>listingOnly</t>
- * series.markers().size(10);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4])
+ *  .markers()
+ *    .size(10)
+ *    .type('star5');
+ * chart.container(stage).draw();
  * @return {!anychart.core.ui.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example <t>listingOnly</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * series.markers(myMarkers);
- * @example <t>lineChart</t>
- * chart.spline([1, 1.4, 1.2, 2]).markers(null);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).markers(null);
+ * chart.container(stage).draw();
  * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.core.radar.series.ContinuousBase} {@link anychart.core.radar.series.ContinuousBase} instance for method chaining.
  *//**
@@ -126,19 +128,18 @@ anychart.core.radar.series.ContinuousBase.prototype.markers = function(opt_value
 
 /**
  * Getter for series data markers on hover.
- * @example <t>listingOnly</t>
- * series.hoverMarkers().size(20);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverMarkers().size(20);
+ * chart.container(stage).draw();
  * @return {!anychart.core.ui.MarkersFactory} Markers instance.
  *//**
  * Setter for series data markers on hover.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example <t>listingOnly</t>
- * series.hoverMarkers(null);
- * @example <t>lineChart</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers(myMarkers);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverMarkers(null);
+ * chart.container(stage).draw();
  * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
  * @return {!anychart.core.radar.series.ContinuousBase} {@link anychart.core.radar.series.ContinuousBase} instance for method chaining.
  *//**
@@ -318,7 +319,8 @@ anychart.core.radar.series.ContinuousBase.prototype.finalizeHatchFill = goog.nul
  * @return {boolean} Current setting.
  *//**
  * Setter for connect missing points setting.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.radar();
  * var blueLine = chart.line([
  *    ['A1', 1],
  *    ['A2', 1.6],
@@ -333,6 +335,7 @@ anychart.core.radar.series.ContinuousBase.prototype.finalizeHatchFill = goog.nul
  *    ['A4', 2.1],
  *    ['A5', 2.9]
  * ]).connectMissingPoints(true);
+ * chart.container(stage).draw();
  * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
  *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -655,6 +658,6 @@ anychart.core.radar.series.ContinuousBase.prototype.restoreDefaults = function()
 //anychart.core.radar.series.ContinuousBase.prototype['hoverPoint'] = anychart.core.radar.series.ContinuousBase.prototype.hoverPoint;
 //anychart.core.radar.series.ContinuousBase.prototype['unhover'] = anychart.core.radar.series.ContinuousBase.prototype.unhover;
 //exports
-anychart.core.radar.series.ContinuousBase.prototype['markers'] = anychart.core.radar.series.ContinuousBase.prototype.markers;
-anychart.core.radar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers;
-anychart.core.radar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints;
+anychart.core.radar.series.ContinuousBase.prototype['markers'] = anychart.core.radar.series.ContinuousBase.prototype.markers;//doc|ex
+anychart.core.radar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
+anychart.core.radar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex

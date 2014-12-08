@@ -17,17 +17,9 @@ goog.require('anychart.scales');
 
 
 /**
- * Cartesian chart class.<br/>
- * To get the chart use any of these methods:
- *  <ul>
- *      <li>{@link anychart.cartesian}</li>
- *      <li>{@link anychart.area}</li>
- *      <li>{@link anychart.bar}</li>
- *      <li>{@link anychart.column}</li>
- *      <li>{@link anychart.financial}</li>
- *      <li>{@link anychart.line}</li>
- *  </ul>
- * Chart can contain any number of series.
+ * Polar chart class.<br/>
+ * To get the chart use method {@link anychart.polar}.<br/>
+ * Chart can contain any number of series.<br/>
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.core.Chart}
  * @constructor
@@ -181,6 +173,11 @@ anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
 /**
+ * Set chart start angle.
+ * @example
+ * var chart = anychart.polar([1, 1.2, 1.4, 1.6, 1.2]);
+ * chart.startAngle(45);
+ * chart.container(stage).draw();
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.charts.Polar)} .
  */
@@ -204,6 +201,20 @@ anychart.charts.Polar.prototype.startAngle = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for default chart X scale.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([10, 12, 1, 4, 14, 5]);
+ * chart.xScale().inverted(true);
+ * chart.container(stage).draw();
+ * @return {!anychart.scales.ScatterBase} Default chart scale value.
+ *//**
+ * Setter for default chart X scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
+ * @param {anychart.scales.ScatterBase=} opt_value X Scale to set.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
@@ -227,6 +238,20 @@ anychart.charts.Polar.prototype.xScale = function(opt_value) {
 
 
 /**
+ * Getter for default chart Y scale.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([10, 12, 1, 4, 14, 5]);
+ * chart.yScale().inverted(true);
+ * chart.container(stage).draw();
+ * @return {!anychart.scales.ScatterBase} Default chart scale value.
+ *//**
+ * Setter for default chart Y scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
+ * @param {anychart.scales.ScatterBase=} opt_value Y Scale to set.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(string|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
@@ -270,6 +295,37 @@ anychart.charts.Polar.prototype.setDefaultScaleForLayoutBasedElements_ = functio
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for chart grid.
+ * @example
+ * var chart = anychart.polar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .stroke('2 grey');
+ * chart.grid(1)
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .stroke('2 blue .5');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.grids.Polar} Axis instance by index.
+ *//**
+ * Setter for chart grid.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * Setter for chart grid by index.
+ * @example
+ * var chart = anychart.polar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.grid(false);
+ * chart.grid(1, false);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|anychart.core.grids.Polar|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.core.grids.Polar|Object|string|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Polar|anychart.charts.Polar)} Grid instance by index or itself for method chaining.
@@ -305,6 +361,38 @@ anychart.charts.Polar.prototype.grid = function(opt_indexOrValue, opt_value) {
 
 
 /**
+ * Getter for chart minor grid.
+ * @example
+ * var chart = anychart.polar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.minorGrid()
+ *     .enabled(true)
+ *     .stroke('2 grey');
+ * chart.minorGrid(1)
+ *     .enabled(true)
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .stroke('2 blue .5');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.grids.Polar} Axis instance by index.
+ *//**
+ * Setter for chart minor grid.
+ * @example
+ * var chart = anychart.polar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.minorGrid(true);
+ * chart.container(stage).draw();
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * Setter for chart minor grid by index.
+ * @param {(string|number)=} opt_index Chart grid index.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|anychart.core.grids.Polar|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.core.grids.Polar|Object|string|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Polar|anychart.charts.Polar)} Grid instance by index or itself for method chaining.
@@ -356,6 +444,27 @@ anychart.charts.Polar.prototype.onGridSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for chart X-axis.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.xAxis().stroke('green');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.axes.Radar} Axis instance by index.
+ *//**
+ * Setter for chart X-axis by index.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.xAxis(null);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index.
+ * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.core.axes.Polar|Object|string|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Polar|anychart.charts.Polar)} Axis instance by index or itself for method chaining.
  */
@@ -378,6 +487,26 @@ anychart.charts.Polar.prototype.xAxis = function(opt_value) {
 
 
 /**
+ * Getter for chart Y-axis.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.yAxis().stroke('green');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.axes.Radial} Axis instance by index.
+ *//**
+ * Setter for chart Y-axis by index.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.yAxis(null);
+ * chart.container(stage).draw();
+ * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.core.axes.Radial|Object|string|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Radial|anychart.charts.Polar)} Axis instance by index or itself for method chaining.
  */
@@ -427,7 +556,7 @@ anychart.charts.Polar.prototype.onAxisSignal_ = function(event) {
 /**
  * Adds Area series.
  * @example
- * var chart = anychart.cartesian();
+ * var chart = anychart.polar();
  * chart.area([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array)} data Data for the series.
@@ -447,7 +576,7 @@ anychart.charts.Polar.prototype.area = function(data, opt_csvSettings) {
 /**
  * Adds Line series.
  * @example
- * var chart = anychart.cartesian();
+ * var chart = anychart.polar();
  * chart.line([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -468,7 +597,7 @@ anychart.charts.Polar.prototype.line = function(data, opt_csvSettings) {
 /**
  * Adds Marker series.
  * @example
- * var chart = anychart.cartesian();
+ * var chart = anychart.polar();
  * chart.marker([10, 4, 17, 20]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
@@ -540,7 +669,7 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
  *     [3, 4, 1, 2],
  *     [4, 1, 2, 3]
  * ];
- * var chart = anychart.line.apply(this, data);
+ * var chart = anychart.polar.apply(this, data);
  * var series, i=0;
  * while (series = chart.getSeries(i)){
  *     series.markers().type('circle');
@@ -586,8 +715,8 @@ anychart.charts.Polar.prototype.seriesInvalidated_ = function(event) {
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
  *//**
  * Setter for series colors palette.
- * @example <t>lineChart</t>
- * chart = anychart.line();
+ * @example
+ * chart = anychart.polar();
  * chart.palette(['red', 'green', 'blue']);
  * chart.line([1, -4, 5, 7]);
  * chart.line([11, 0, 15, 4]);
@@ -622,6 +751,21 @@ anychart.charts.Polar.prototype.palette = function(opt_value) {
 
 
 /**
+ * Getter markers palette settings.
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
+ *//**
+ * Setter for smarkers palette settings.
+ * @example
+ * chart = anychart.polar();
+ * chart.markerPalette(['star4', 'star5', 'star10']);
+ * chart.line([1, -4, 5, 7]);
+ * chart.line([11, 0, 15, 4]);
+ * chart.line([21, -4, 9, 0]);
+ * chart.container(stage).draw();
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Chart markers palette settings.
  * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.palettes.Markers)=} opt_value Chart marker palette settings to set.
  * @return {anychart.palettes.Markers|anychart.charts.Polar} Return current chart markers palette or itself for chaining call.
@@ -1326,17 +1470,17 @@ anychart.charts.Polar.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.charts.Polar.prototype['xScale'] = anychart.charts.Polar.prototype.xScale;
-anychart.charts.Polar.prototype['yScale'] = anychart.charts.Polar.prototype.yScale;
-anychart.charts.Polar.prototype['grid'] = anychart.charts.Polar.prototype.grid;
-anychart.charts.Polar.prototype['minorGrid'] = anychart.charts.Polar.prototype.minorGrid;
-anychart.charts.Polar.prototype['xAxis'] = anychart.charts.Polar.prototype.xAxis;
-anychart.charts.Polar.prototype['yAxis'] = anychart.charts.Polar.prototype.yAxis;
-anychart.charts.Polar.prototype['getSeries'] = anychart.charts.Polar.prototype.getSeries;
-anychart.charts.Polar.prototype['area'] = anychart.charts.Polar.prototype.area;
-anychart.charts.Polar.prototype['line'] = anychart.charts.Polar.prototype.line;
-anychart.charts.Polar.prototype['marker'] = anychart.charts.Polar.prototype.marker;
-anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.palette;
-anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;
+anychart.charts.Polar.prototype['xScale'] = anychart.charts.Polar.prototype.xScale;//doc|ex
+anychart.charts.Polar.prototype['yScale'] = anychart.charts.Polar.prototype.yScale;//doc|ex
+anychart.charts.Polar.prototype['grid'] = anychart.charts.Polar.prototype.grid;//doc|ex
+anychart.charts.Polar.prototype['minorGrid'] = anychart.charts.Polar.prototype.minorGrid;//doc|ex
+anychart.charts.Polar.prototype['xAxis'] = anychart.charts.Polar.prototype.xAxis;//doc|ex
+anychart.charts.Polar.prototype['yAxis'] = anychart.charts.Polar.prototype.yAxis;//doc|ex
+anychart.charts.Polar.prototype['getSeries'] = anychart.charts.Polar.prototype.getSeries;//doc|ex
+anychart.charts.Polar.prototype['area'] = anychart.charts.Polar.prototype.area;//doc|ex
+anychart.charts.Polar.prototype['line'] = anychart.charts.Polar.prototype.line;//doc|ex
+anychart.charts.Polar.prototype['marker'] = anychart.charts.Polar.prototype.marker;//doc|ex
+anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.palette;//doc|ex
+anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;//doc|ex
 anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
-anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;
+anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex

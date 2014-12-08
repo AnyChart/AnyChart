@@ -130,5 +130,5 @@ anychart.core.polar.series.Line.prototype.getLegendIconType = function() {
 
 //anychart.core.polar.series.Line.prototype['finalizeDrawing'] = anychart.core.polar.series.Line.prototype.finalizeDrawing;
 //exports
-anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;
-anychart.core.polar.series.Line.prototype['hoverStroke'] = anychart.core.polar.series.Line.prototype.hoverStroke;
+anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;//inherited
+anychart.core.polar.series.Line.prototype['hoverStroke'] = anychart.core.polar.series.Line.prototype.hoverStroke;//inherited

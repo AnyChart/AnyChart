@@ -17,17 +17,9 @@ goog.require('anychart.scales');
 
 
 /**
- * Cartesian chart class.<br/>
- * To get the chart use any of these methods:
- *  <ul>
- *      <li>{@link anychart.cartesian}</li>
- *      <li>{@link anychart.area}</li>
- *      <li>{@link anychart.bar}</li>
- *      <li>{@link anychart.column}</li>
- *      <li>{@link anychart.financial}</li>
- *      <li>{@link anychart.line}</li>
- *  </ul>
- * Chart can contain any number of series.
+ * Radar chart class.<br/>
+ * To get the chart use method {@link anychart.radar}.<br/>
+ * Chart can contain any number of series.<br/>
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.core.Chart}
  * @constructor
@@ -221,6 +213,11 @@ anychart.charts.Radar.prototype.seriesOfYScaleMap_;
 
 
 /**
+ * Set chart start angle.
+ * @example
+ * var chart = anychart.radar([1, 1.2, 1.4, 1.6, 1.2]);
+ * chart.startAngle(45);
+ * chart.container(stage).draw();
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.charts.Radar)} .
  */
@@ -244,6 +241,20 @@ anychart.charts.Radar.prototype.startAngle = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for default chart X scale.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([10, 12, 1, 4, 14, 5]);
+ * chart.xScale().inverted(true);
+ * chart.container(stage).draw();
+ * @return {!anychart.scales.Ordinal} Default chart scale value.
+ *//**
+ * Setter for default chart X scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
+ * @param {anychart.scales.Ordinal=} opt_value X Scale to set.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {anychart.scales.Ordinal=} opt_value X Scale to set.
  * @return {!(anychart.scales.Ordinal|anychart.charts.Radar)} Default chart scale value or itself for method chaining.
  */
@@ -264,6 +275,20 @@ anychart.charts.Radar.prototype.xScale = function(opt_value) {
 
 
 /**
+ * Getter for default chart Y scale.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([10, 12, 1, 4, 14, 5]);
+ * chart.yScale().inverted(true);
+ * chart.container(stage).draw();
+ * @return {!anychart.scales.Ordinal} Default chart scale value.
+ *//**
+ * Setter for default chart Y scale.<br/>
+ * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
+ * @param {anychart.scales.Ordinal=} opt_value Y Scale to set.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.scales.Base|string)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Radar)} Default chart scale value or itself for method chaining.
  */
@@ -307,6 +332,37 @@ anychart.charts.Radar.prototype.setDefaultScaleForLayoutBasedElements_ = functio
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for chart grid.
+ * @example
+ * var chart = anychart.radar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.grid()
+ *     .stroke('2 grey');
+ * chart.grid(1)
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .stroke('2 blue .5');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.grids.Radar} Axis instance by index.
+ *//**
+ * Setter for chart grid.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * Setter for chart grid by index.
+ * @example
+ * var chart = anychart.radar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.grid(false);
+ * chart.grid(1, false);
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|anychart.core.grids.Radar|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.core.grids.Radar|Object|string|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Radar|anychart.charts.Radar)} Grid instance by index or itself for method chaining.
@@ -342,6 +398,38 @@ anychart.charts.Radar.prototype.grid = function(opt_indexOrValue, opt_value) {
 
 
 /**
+ * Getter for chart minor grid.
+ * @example
+ * var chart = anychart.radar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.minorGrid()
+ *     .enabled(true)
+ *     .stroke('2 grey');
+ * chart.minorGrid(1)
+ *     .enabled(true)
+ *     .oddFill('none')
+ *     .evenFill('none')
+ *     .stroke('2 blue .5');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.grids.Radar} Axis instance by index.
+ *//**
+ * Setter for chart minor grid.
+ * @example
+ * var chart = anychart.radar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.minorGrid(true);
+ * chart.container(stage).draw();
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * Setter for chart minor grid by index.
+ * @param {(string|number)=} opt_index Chart grid index.
+ * @param {(Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} class for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(number|anychart.core.grids.Radar|Object|string|null)=} opt_indexOrValue Grid settings.
  * @param {(anychart.core.grids.Radar|Object|string|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Radar|anychart.charts.Radar)} Grid instance by index or itself for method chaining.
@@ -393,6 +481,28 @@ anychart.charts.Radar.prototype.onGridSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for chart X-axis.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.xAxis()
+ *    .orientation('right')
+ *    .title().text('my custom sAxis');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.axes.Radar} Axis instance by index.
+ *//**
+ * Setter for chart X-axis by index.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.xAxis(false);
+ * chart.container(stage).draw();
+ * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.core.axes.Radar|Object|string|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Radar|anychart.charts.Radar)} Axis instance by index or itself for method chaining.
  */
@@ -415,6 +525,28 @@ anychart.charts.Radar.prototype.xAxis = function(opt_value) {
 
 
 /**
+ * Getter for chart Y-axis.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.yAxis()
+ *    .orientation('right')
+ *    .title().text('my custom sAxis');
+ * chart.container(stage).draw();
+ * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.axes.Radar} Axis instance by index.
+ *//**
+ * Setter for chart Y-axis by index.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([1, 4, 5, 7, 2]);
+ * chart.yAxis(null);
+ * chart.container(stage).draw();
+ * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * @param {(anychart.core.axes.Radial|Object|string|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Radial|anychart.charts.Radar)} Axis instance by index or itself for method chaining.
  */
@@ -464,8 +596,8 @@ anychart.charts.Radar.prototype.onAxisSignal_ = function(event) {
 /**
  * Adds Area series.
  * @example
- * var chart = anychart.cartesian();
- * chart.area([10, 4, 17, 20]);
+ * var chart = anychart.radar();
+ * chart.area([10, 4, 17, 20, 12]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -484,8 +616,8 @@ anychart.charts.Radar.prototype.area = function(data, opt_csvSettings) {
 /**
  * Adds Line series.
  * @example
- * var chart = anychart.cartesian();
- * chart.line([10, 4, 17, 20]);
+ * var chart = anychart.radar();
+ * chart.line([10, 4, 17, 20, 12]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -505,8 +637,8 @@ anychart.charts.Radar.prototype.line = function(data, opt_csvSettings) {
 /**
  * Adds Marker series.
  * @example
- * var chart = anychart.cartesian();
- * chart.marker([10, 4, 17, 20]);
+ * var chart = anychart.radar();
+ * chart.marker([10, 4, 17, 20, 12]);
  * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -575,9 +707,10 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
  *     [1, 2, 3, 4],
  *     [2, 3, 4, 1],
  *     [3, 4, 1, 2],
- *     [4, 1, 2, 3]
+ *     [4, 1, 2, 3],
+ *     [5, 5, 5, 5]
  * ];
- * var chart = anychart.line.apply(this, data);
+ * var chart = anychart.radar.apply(this, data);
  * var series, i=0;
  * while (series = chart.getSeries(i)){
  *     series.markers().type('circle');
@@ -925,12 +1058,13 @@ anychart.charts.Radar.prototype.makeScaleMaps_ = function() {
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
  *//**
  * Setter for series colors palette.
- * @example <t>lineChart</t>
- * chart = anychart.line();
+ * @example
+ * chart = anychart.radar();
  * chart.palette(['red', 'green', 'blue']);
- * chart.line([1, -4, 5, 7]);
- * chart.line([11, 0, 15, 4]);
- * chart.line([21, -4, 9, 0]);
+ * chart.line([1, -4, 5, 7, 5]);
+ * chart.line([11, 0, 15, 4, 3]);
+ * chart.line([21, -4, 9, 0, 4]);
+ * chart.container(stage).draw();
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
  * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
  *//**
@@ -961,6 +1095,21 @@ anychart.charts.Radar.prototype.palette = function(opt_value) {
 
 
 /**
+ * Getter markers palette settings.
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
+ *//**
+ * Setter for smarkers palette settings.
+ * @example
+ * chart = anychart.radar();
+ * chart.markerPalette(['star4', 'star5', 'star10']);
+ * chart.line([1, -4, 5, 7, 5]);
+ * chart.line([11, 0, 15, 4, 7]);
+ * chart.line([21, -4, 9, 0, 4]);
+ * chart.container(stage).draw();
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
+ * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ *//**
+ * @ignoreDoc
  * Chart markers palette settings.
  * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.palettes.Markers)=} opt_value Chart marker palette settings to set.
  * @return {anychart.palettes.Markers|anychart.charts.Radar} Return current chart markers palette or itself for chaining call.
@@ -1554,16 +1703,16 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.charts.Radar.prototype['xScale'] = anychart.charts.Radar.prototype.xScale;
-anychart.charts.Radar.prototype['yScale'] = anychart.charts.Radar.prototype.yScale;
-anychart.charts.Radar.prototype['grid'] = anychart.charts.Radar.prototype.grid;
-anychart.charts.Radar.prototype['minorGrid'] = anychart.charts.Radar.prototype.minorGrid;
-anychart.charts.Radar.prototype['xAxis'] = anychart.charts.Radar.prototype.xAxis;
-anychart.charts.Radar.prototype['yAxis'] = anychart.charts.Radar.prototype.yAxis;
-anychart.charts.Radar.prototype['getSeries'] = anychart.charts.Radar.prototype.getSeries;
-anychart.charts.Radar.prototype['area'] = anychart.charts.Radar.prototype.area;
-anychart.charts.Radar.prototype['line'] = anychart.charts.Radar.prototype.line;
-anychart.charts.Radar.prototype['marker'] = anychart.charts.Radar.prototype.marker;
-anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.palette;
-anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;
-anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;
+anychart.charts.Radar.prototype['xScale'] = anychart.charts.Radar.prototype.xScale;//doc|ex
+anychart.charts.Radar.prototype['yScale'] = anychart.charts.Radar.prototype.yScale;//doc|ex
+anychart.charts.Radar.prototype['grid'] = anychart.charts.Radar.prototype.grid;//doc|ex
+anychart.charts.Radar.prototype['minorGrid'] = anychart.charts.Radar.prototype.minorGrid;//doc|ex
+anychart.charts.Radar.prototype['xAxis'] = anychart.charts.Radar.prototype.xAxis;//doc|ex
+anychart.charts.Radar.prototype['yAxis'] = anychart.charts.Radar.prototype.yAxis;//doc|ex
+anychart.charts.Radar.prototype['getSeries'] = anychart.charts.Radar.prototype.getSeries;//doc|ex
+anychart.charts.Radar.prototype['area'] = anychart.charts.Radar.prototype.area;//doc|ex
+anychart.charts.Radar.prototype['line'] = anychart.charts.Radar.prototype.line;//doc|ex
+anychart.charts.Radar.prototype['marker'] = anychart.charts.Radar.prototype.marker;//doc|ex
+anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.palette;//doc|ex
+anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;//doc|ex
+anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;//doc|ex

@@ -10,10 +10,13 @@ goog.require('anychart.enums');
 
 
 /**
- * Define Line series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Radar#line} or {@link anychart.core.Chart#lineChart}.
- * @example
- * anychart.core.radar.series.line([1, 4, 7, 1]).container(stage).draw();
+ * Base class for all cartesian series.<br/>
+ * Base class defines common methods, such as those for:
+ * <ul>
+ *   <li>Binding series to a scale: <i>xScale, yScale</i></li>
+ *   <li>Base color settings: <i>color</i></li>
+ * </ul>
+ * You can also obtain <i>getIterator, getResetIterator</i> iterators here
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -442,13 +445,16 @@ anychart.core.radar.series.Base.prototype.statistics = function(opt_name, opt_va
  *//**
  * Setter for series name. <br/>
  * Basically, name of series is used in Legend displaying, but it can be used in tooltips as well.
- * @example <t>lineChart</t>
+ * @example
  * var formatterFunc = function(){ return this.seriesName;};
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill('green');
  * chart.line([1,2,3])
  *     .name('My Custom series name')
  *     .tooltip().contentFormatter(formatterFunc);
  * chart.line([2,3,4])
  *     .tooltip().contentFormatter(formatterFunc);
+ * chart.container(stage).draw();
  * chart.legend().enabled(true);
  * @param {string=} opt_value Value to set.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -493,7 +499,7 @@ anychart.core.radar.series.Base.prototype.index = function(opt_value) {
  * @return {*} Metadata object by key.
  *//**
  * Setter for series meta data.
- * @example <t>lineChart</t>
+ * @example <t>listingOnly</t>
  * chart.line([1,2,3]).meta({
  *     'location': 'QA',
  *     'source': 'http://some-url.dmn',
@@ -503,7 +509,7 @@ anychart.core.radar.series.Base.prototype.index = function(opt_value) {
  * @return {anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
  * Add/Replace meta data for series by key.
- * @example <t>lineChart</t>
+ * @example <t>listingOnly</t>
  * var series = chart.line([1,2,3]);
  * series.meta('location', 'QA');
  * series.meta('source', 'http://some-url.dmn');
@@ -573,8 +579,11 @@ anychart.core.radar.series.Base.prototype.meta = function(opt_object_or_key, opt
  *    '21;17;23.1;1\n'+
  *    '10;.4;14;4.4\n',
  *    {'rowsSeparator': '\n', columnsSeparator: ';'})
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]);
  * chart.line().data([1,2,3]);
+ * chart.container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -1271,22 +1280,6 @@ anychart.core.radar.series.Base.prototype.makeHoverable = function(element, opt_
  * @return {anychart.scales.Base} Current series X Scale.
  *//**
  * Setter for series X scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.ordinal();
- * chart.xAxis(1)
- *     .scale(secondScale)
- *     .orientation('top')
- *     .title('DateTime axis');
- * chart.line([
- *    ['A1', 2],
- *    ['A2', 2.4],
- *    ['A3', 1]
- * ]);
- * chart.line([
- *    ['2014-01-01', 1],
- *    ['2014-01-02', 2],
- *    ['2014-01-03', 3]
- * ]).xScale(secondScale);
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {!anychart.core.radar.series.Base}  {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1316,12 +1309,6 @@ anychart.core.radar.series.Base.prototype.xScale = function(opt_value) {
  * @return {anychart.scales.Base} Current series Y Scale.
  *//**
  * Setter for series Y scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.linear();
- * chart.yAxis(1).scale(secondScale);
- * chart.yAxis(1).orientation('right');
- * chart.line([2, 3, 4]);
- * chart.line([200, 213, 321]).yScale(secondScale);
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {!anychart.core.radar.series.Base}  {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1373,12 +1360,14 @@ anychart.core.radar.series.Base.prototype.scaleInvalidated_ = function(event) {
  * @return {anychart.core.ui.Tooltip} Tooltip instance.
  *//**
  * Setter for series data tooltip.
- * @example <t>lineChart</t>
- * var tooltipSettings = anychart.ui.tooltip();
- * tooltipSettings
+ * @example
+ * chart = anychart.radar();
+ * chart.line([1,2,3])
+ *   .tooltip()
  *     .background()
- *     .stroke('2 #cc8800').fill('grey 0.5');
- * chart.line([1, 2, 1.2, 3.2]).tooltip(tooltipSettings);
+ *       .stroke('2 #cc8800')
+ *       .fill('grey 0.5');
+ * chart.container(stage).draw();
  * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
  * @return {!anychart.core.radar.series.Base} An instance of the {@link anychart.core.radar.series.Base} class for method chaining.
@@ -1420,16 +1409,17 @@ anychart.core.radar.series.Base.prototype.onTooltipSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current series data labels.
+ * @example
+ * chart = anychart.radar();
+ * chart.line([1,2,3])
+ *   .labels()
+ *    .enabled(true)
+ *    .fontColor('white')
+ *    .fontWeight('bold');
+ * chart.container(stage).draw();
  * @return {anychart.core.ui.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
- * @example <t>lineChart</t>
- * var labelSettings = anychart.ui.labelsFactory();
- * labelSettings.enabled(true);
- * labelSettings.fontColor('white');
- * labelSettings.fontWeight('bold');
- * var series = chart.line([1,2,3]);
- * series.labels(labelSettings);
  * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off a label.
  * @return {!anychart.core.radar.series.Base} An instance of the {@link anychart.core.radar.series.Base} class for method chaining.
@@ -1537,18 +1527,24 @@ anychart.core.radar.series.Base.prototype.calculateStatistics = function() {
  * image fill here - stroke doesn't accept image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid color</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green');
- * @example <c>Linear gradient color</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['green', 'yellow']);
+ * @example <c>Solid color</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).color('green');
+ * chart.container(stage).draw();
+ * @example <c>Linear gradient color</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).color(['green', 'yellow']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
  * Color with opacity.<br/>
  * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color('green', 0.4);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).color('green', 0.4);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -1556,8 +1552,10 @@ anychart.core.radar.series.Base.prototype.calculateStatistics = function() {
  * Linear gradient.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['black', 'yellow'], 45, true, 0.5);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).color(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -1567,8 +1565,10 @@ anychart.core.radar.series.Base.prototype.calculateStatistics = function() {
  * Radial gradient.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).color(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).color(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
@@ -1636,8 +1636,8 @@ anychart.core.radar.series.Base.prototype.setAutoHatchFill = function(value) {
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
  * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hatchFill('diamiond', 'grey', 5, 5);
  * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
@@ -1678,8 +1678,8 @@ anychart.core.radar.series.Base.prototype.hatchFill = function(opt_patternFillOr
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
  * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hoverHatchFill('diamiond', 'grey', 5, 5);
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverHatchFill('diamiond', 'grey', 5, 5);
  * chart.container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
@@ -1777,10 +1777,14 @@ anychart.core.radar.series.Base.prototype.normalizeHatchFill = function(hatchFil
  * Sets fill settings using an object or a string.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill('green');
- * @example <c>Linear gradient fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['green', 'yellow']);
+ * @example <c>Solid fill</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill('green');
+ * chart.container(stage).draw();
+ * @example <c>Linear gradient fill</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill(['green', 'yellow']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1788,8 +1792,10 @@ anychart.core.radar.series.Base.prototype.normalizeHatchFill = function(hatchFil
  * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill('green', 0.4);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill('green', 0.4);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -1797,8 +1803,10 @@ anychart.core.radar.series.Base.prototype.normalizeHatchFill = function(hatchFil
  * Linear gradient fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], 45, true, 0.5);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -1808,8 +1816,10 @@ anychart.core.radar.series.Base.prototype.normalizeHatchFill = function(hatchFil
  * Radial gradient fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
@@ -1822,11 +1832,13 @@ anychart.core.radar.series.Base.prototype.normalizeHatchFill = function(hatchFil
  * Image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.area([1, 4, 7, 1]).fill({
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).fill({
  *  src: 'http://static.anychart.com/underwater.jpg',
  *  mode: acgraph.vector.ImageFillMode.STRETCH
  * });
+ * chart.container(stage).draw();
  * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1862,10 +1874,14 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
  * Sets fill settings using an object or a string.
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill('green');
- * @example <c>Linear gradient fill</c><t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['green', 'yellow']);
+ * @example <c>Solid fill</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill('green');
+ * chart.container(stage).draw();
+ * @example <c>Linear gradient fill</c>
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill(['green', 'yellow']);
+ * chart.container(stage).draw();
  * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1873,8 +1889,10 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
  * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
  * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
  * @shortDescription Fill as a string or an object.
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill('green', 0.4);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill('green', 0.4);
+ * chart.container(stage).draw();
  * @param {string} color Color as a string.
  * @param {number=} opt_opacity Color opacity.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
@@ -1882,8 +1900,10 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
  * Linear gradient fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], 45, true, 0.5);
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill(['black', 'yellow'], 45, true, 0.5);
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
  * @param {number=} opt_angle Gradient angle.
  * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
@@ -1893,8 +1913,10 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
  * Radial gradient fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
@@ -1907,11 +1929,13 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
  * Image fill.<br/>
  * Learn more about coloring at:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>lineChart</t>
- * chart.area([1, 4, 7, 1]).hoverFill({
+ * @example
+ * chart = anychart.radar();
+ * chart.area([1, 4, 7, 1, 4]).hoverFill({
  *  src: 'http://static.anychart.com/underwater.jpg',
  *  mode: acgraph.vector.ImageFillMode.STRETCH
  * });
+ * chart.container(stage).draw();
  * @param {!acgraph.vector.Fill} imageSettings Object with settings.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
@@ -1963,12 +1987,14 @@ anychart.core.radar.series.Base.prototype.getFinalFill = function(usePointSettin
  * @return {!acgraph.vector.Stroke} Current stroke settings.
  *//**
  * Setter for series stroke by function.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).stroke(
+ * @example
+ * chart = anychart.radar();
+ * chart.line([1, 4, 7, 1, 4]).stroke(
  *      function(){
  *        return '3 '+ this.sourceColor;
  *      }
  * );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -1980,8 +2006,10 @@ anychart.core.radar.series.Base.prototype.getFinalFill = function(usePointSettin
  * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example <t>lineChart</t>
- * chart.line([1, 4, 7, 1]).stroke('orange', 3, '5 2', 'round');
+ * @example
+ * chart = anychart.radar();
+ * chart.line([1, 4, 7, 1, 4]).stroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -2020,17 +2048,14 @@ anychart.core.radar.series.Base.prototype.stroke = function(opt_strokeOrFill, op
  *//**
  * Setter for series stroke by function.<br/>
  * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.radar();
  * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke(
  *      function(){
  *        return '5 '+ this.sourceColor;
  *      }
  * );
- * chart.column([1, 4, 7, 1]).hoverStroke(
- *      function(){
- *        return '5 '+ this.sourceColor;
- *      }
- * );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return this.sourceColor;
  * }] Function that looks like <code>function(){
@@ -2043,9 +2068,10 @@ anychart.core.radar.series.Base.prototype.stroke = function(opt_strokeOrFill, op
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
  * <b>Note:</b> For all ContiniousBase series (line/spline/area etc) hoverStroke works only with hoverSeries.
- * @example <t>lineChart</t>
+ * @example
+ * chart = anychart.radar();
  * chart.line([1.5, 4.5, 7.5, 1.5]).hoverStroke('orange', 3, '5 2', 'round');
- * chart.column([1, 4, 7, 1]).hoverStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -2391,12 +2417,12 @@ anychart.core.radar.series.Base.BrowserEvent.prototype.copyFrom = function(e, op
 //anychart.core.radar.series.Base.prototype['getIterator'] = anychart.core.radar.series.Base.prototype.getIterator;
 //anychart.core.radar.series.Base.prototype['getResetIterator'] = anychart.core.radar.series.Base.prototype.getResetIterator;
 //exports
-anychart.core.radar.series.Base.prototype['color'] = anychart.core.radar.series.Base.prototype.color;
-anychart.core.radar.series.Base.prototype['name'] = anychart.core.radar.series.Base.prototype.name;
-anychart.core.radar.series.Base.prototype['meta'] = anychart.core.radar.series.Base.prototype.meta;
-anychart.core.radar.series.Base.prototype['data'] = anychart.core.radar.series.Base.prototype.data;
-anychart.core.radar.series.Base.prototype['labels'] = anychart.core.radar.series.Base.prototype.labels;
+anychart.core.radar.series.Base.prototype['color'] = anychart.core.radar.series.Base.prototype.color;//doc|ex
+anychart.core.radar.series.Base.prototype['name'] = anychart.core.radar.series.Base.prototype.name;//doc|ex
+anychart.core.radar.series.Base.prototype['meta'] = anychart.core.radar.series.Base.prototype.meta;//doc|ex
+anychart.core.radar.series.Base.prototype['data'] = anychart.core.radar.series.Base.prototype.data;//doc|ex
+anychart.core.radar.series.Base.prototype['labels'] = anychart.core.radar.series.Base.prototype.labels;//doc|ex
 anychart.core.radar.series.Base.prototype['hoverLabels'] = anychart.core.radar.series.Base.prototype.hoverLabels;
-anychart.core.radar.series.Base.prototype['tooltip'] = anychart.core.radar.series.Base.prototype.tooltip;
-anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;
-anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;
+anychart.core.radar.series.Base.prototype['tooltip'] = anychart.core.radar.series.Base.prototype.tooltip;//doc|ex
+anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
+anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex

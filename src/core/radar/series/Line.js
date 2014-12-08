@@ -8,7 +8,7 @@ goog.require('anychart.core.radar.series.ContinuousBase');
  * Define Line series type.<br/>
  * <b>Note:</b> Better for use methods {@link anychart.charts.Radar#line} or {@link anychart.core.Chart#lineChart}.
  * @example
- * anychart.core.radar.series.line([1, 4, 7, 1]).container(stage).draw();
+ * anychart.core.radar.series.line([1, 4, 7, 1, 4]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -130,7 +130,7 @@ anychart.core.radar.series.Line.prototype.getLegendIconType = function() {
 //anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;
 //anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;
 //exports
-anychart.core.radar.series.Line.prototype['stroke'] = anychart.core.radar.series.Line.prototype.stroke;
-anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.series.Line.prototype.hoverStroke;
-anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;
-anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;
+anychart.core.radar.series.Line.prototype['stroke'] = anychart.core.radar.series.Line.prototype.stroke;//inherited
+anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.series.Line.prototype.hoverStroke;//inherited
+anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;//inherited
+anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;//inherited

@@ -163,10 +163,10 @@ anychart.core.polar.series.Area.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.core.polar.series.Area.prototype['fill'] = anychart.core.polar.series.Area.prototype.fill;
-anychart.core.polar.series.Area.prototype['hoverFill'] = anychart.core.polar.series.Area.prototype.hoverFill;
-anychart.core.polar.series.Area.prototype['stroke'] = anychart.core.polar.series.Area.prototype.stroke;
-anychart.core.polar.series.Area.prototype['hoverStroke'] = anychart.core.polar.series.Area.prototype.hoverStroke;
-anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.series.Area.prototype.hatchFill;
-anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;
-anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;
+anychart.core.polar.series.Area.prototype['fill'] = anychart.core.polar.series.Area.prototype.fill;//inherited
+anychart.core.polar.series.Area.prototype['hoverFill'] = anychart.core.polar.series.Area.prototype.hoverFill;//inherited
+anychart.core.polar.series.Area.prototype['stroke'] = anychart.core.polar.series.Area.prototype.stroke;//inherited
+anychart.core.polar.series.Area.prototype['hoverStroke'] = anychart.core.polar.series.Area.prototype.hoverStroke;//inherited
+anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.series.Area.prototype.hatchFill;//inherited
+anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;//inherited
+anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;//inherited

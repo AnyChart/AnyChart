@@ -8,7 +8,7 @@ goog.require('anychart.core.radar.series.ContinuousBase');
  * Define Area series type.<br/>
  * <b>Note:</b> Better for use methods {@link anychart.charts.Radar#area} or {@link anychart.core.Chart#areaChart}.
  * @example
- * anychart.core.radar.series.area([1, 4, 7, 1]).container(stage).draw();
+ * anychart.core.radar.series.area([1, 4, 7, 1, 4]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -266,9 +266,9 @@ anychart.core.radar.series.Area.prototype.restoreDefaults = function() {
 //anychart.core.radar.series.Area.prototype['startDrawing'] = anychart.core.radar.series.Area.prototype.startDrawing;
 //anychart.core.radar.series.Area.prototype['finalizeDrawing'] = anychart.core.radar.series.Area.prototype.finalizeDrawing;
 //exports
-anychart.core.radar.series.Area.prototype['fill'] = anychart.core.radar.series.Area.prototype.fill;
-anychart.core.radar.series.Area.prototype['hoverFill'] = anychart.core.radar.series.Area.prototype.hoverFill;
-anychart.core.radar.series.Area.prototype['stroke'] = anychart.core.radar.series.Area.prototype.stroke;
-anychart.core.radar.series.Area.prototype['hoverStroke'] = anychart.core.radar.series.Area.prototype.hoverStroke;
-anychart.core.radar.series.Area.prototype['hatchFill'] = anychart.core.radar.series.Area.prototype.hatchFill;
-anychart.core.radar.series.Area.prototype['hoverHatchFill'] = anychart.core.radar.series.Area.prototype.hoverHatchFill;
+anychart.core.radar.series.Area.prototype['fill'] = anychart.core.radar.series.Area.prototype.fill;//inherited
+anychart.core.radar.series.Area.prototype['hoverFill'] = anychart.core.radar.series.Area.prototype.hoverFill;//inherited
+anychart.core.radar.series.Area.prototype['stroke'] = anychart.core.radar.series.Area.prototype.stroke;//inherited
+anychart.core.radar.series.Area.prototype['hoverStroke'] = anychart.core.radar.series.Area.prototype.hoverStroke;//inherited
+anychart.core.radar.series.Area.prototype['hatchFill'] = anychart.core.radar.series.Area.prototype.hatchFill;//inherited
+anychart.core.radar.series.Area.prototype['hoverHatchFill'] = anychart.core.radar.series.Area.prototype.hoverHatchFill;//inherited

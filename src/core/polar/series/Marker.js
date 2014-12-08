@@ -128,14 +128,14 @@ anychart.core.polar.series.Marker.prototype.type = function(opt_value) {
  *//**
  * Setter for hovered marker type settings.
  * @example <c>By Enum value.</c>
- * anychart.core.polar.series.marker([10, 11, 17, 7, 21])
+ * chart = anychart.polar();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .type('star4')
- *    .hoverType('star6')
- *    .container(stage).draw();
+ *    .hoverType('star6');
+ * chart.container(stage).draw();
  * @example <c>By custom function.</c>
- * anychart.core.polar.series.marker([10, 11, 17, 7, 21])
- *    .size(20)
- *    .hoverSize(20)
+ * chart = anychart.polar();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .hoverType(function(path, x, y, size) {
  *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
  *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
@@ -145,8 +145,8 @@ anychart.core.polar.series.Marker.prototype.type = function(opt_value) {
  *          .moveTo(point1.x, point1.y)
  *          .close();
  *      return path;
- *    })
- *    .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
  *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
@@ -185,9 +185,9 @@ anychart.core.polar.series.Marker.prototype.hoverType = function(opt_value) {
  *//**
  * Setter for marker size.
  * @example
- * anychart.core.polar.series.marker([10, 11, 17, 7, 21])
- *     .size(14)
- *     .container(stage).draw();
+ * chart = anychart.polar();
+ * chart.marker([10, 11, 17, 7, 21]).size(14);
+ * chart.container(stage).draw();
  * @param {number=} opt_value [10] Value to set.
  * @return {anychart.core.polar.series.Marker} {@link anychart.core.polar.series.Marker} class for method chaining.
  *//**
@@ -214,10 +214,9 @@ anychart.core.polar.series.Marker.prototype.size = function(opt_value) {
  *//**
  * Setter for hovered marker size.
  * @example
- * anychart.core.polar.series.marker([10, 11, 17, 7, 21])
- *     .size(10)
- *     .hoverSize(20)
- *     .container(stage).draw();
+ * chart = anychart.polar();
+ * chart.marker([10, 11, 17, 7, 21]).hoverSize(14);
+ * chart.container(stage).draw();
  * @param {number=} opt_value [12] Value to set.
  * @return {anychart.core.polar.series.Marker} {@link anychart.core.polar.series.Marker} instance for method chaining.
  *//**
@@ -573,13 +572,13 @@ anychart.core.polar.series.Marker.prototype.setupByJSON = function(config) {
 //anychart.core.polar.series.Marker.prototype['hoverPoint'] = anychart.core.polar.series.Marker.prototype.hoverPoint;
 //anychart.core.polar.series.Marker.prototype['unhover'] = anychart.core.polar.series.Marker.prototype.unhover;
 //exports
-anychart.core.polar.series.Marker.prototype['stroke'] = anychart.core.polar.series.Marker.prototype.stroke;
-anychart.core.polar.series.Marker.prototype['hoverStroke'] = anychart.core.polar.series.Marker.prototype.hoverStroke;
-anychart.core.polar.series.Marker.prototype['fill'] = anychart.core.polar.series.Marker.prototype.fill;
-anychart.core.polar.series.Marker.prototype['hoverFill'] = anychart.core.polar.series.Marker.prototype.hoverFill;
-anychart.core.polar.series.Marker.prototype['size'] = anychart.core.polar.series.Marker.prototype.size;
-anychart.core.polar.series.Marker.prototype['hoverSize'] = anychart.core.polar.series.Marker.prototype.hoverSize;
-anychart.core.polar.series.Marker.prototype['type'] = anychart.core.polar.series.Marker.prototype.type;
-anychart.core.polar.series.Marker.prototype['hoverType'] = anychart.core.polar.series.Marker.prototype.hoverType;
-anychart.core.polar.series.Marker.prototype['hatchFill'] = anychart.core.polar.series.Marker.prototype.hatchFill;
-anychart.core.polar.series.Marker.prototype['hoverHatchFill'] = anychart.core.polar.series.Marker.prototype.hoverHatchFill;
+anychart.core.polar.series.Marker.prototype['stroke'] = anychart.core.polar.series.Marker.prototype.stroke;//inherited
+anychart.core.polar.series.Marker.prototype['hoverStroke'] = anychart.core.polar.series.Marker.prototype.hoverStroke;//inherited
+anychart.core.polar.series.Marker.prototype['fill'] = anychart.core.polar.series.Marker.prototype.fill;//inherited
+anychart.core.polar.series.Marker.prototype['hoverFill'] = anychart.core.polar.series.Marker.prototype.hoverFill;//inherited
+anychart.core.polar.series.Marker.prototype['size'] = anychart.core.polar.series.Marker.prototype.size;//doc|ex
+anychart.core.polar.series.Marker.prototype['hoverSize'] = anychart.core.polar.series.Marker.prototype.hoverSize;//doc|ex
+anychart.core.polar.series.Marker.prototype['type'] = anychart.core.polar.series.Marker.prototype.type;//doc|ex
+anychart.core.polar.series.Marker.prototype['hoverType'] = anychart.core.polar.series.Marker.prototype.hoverType;//doc|ex
+anychart.core.polar.series.Marker.prototype['hatchFill'] = anychart.core.polar.series.Marker.prototype.hatchFill;//inherited
+anychart.core.polar.series.Marker.prototype['hoverHatchFill'] = anychart.core.polar.series.Marker.prototype.hoverHatchFill;//inherited

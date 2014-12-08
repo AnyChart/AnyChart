@@ -10,6 +10,9 @@ goog.require('anychart.modules.base');
 /**
  * Default polar chart.<br/>
  * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.polar([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
  * @return {anychart.charts.Polar} Chart with defaults for marker series.
  */

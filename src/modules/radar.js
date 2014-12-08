@@ -8,8 +8,11 @@ goog.require('anychart.modules.base');
 
 
 /**
- * Default line chart.
- * xAxis, yAxis, grids.
+ * Default radar chart.<br/>
+ * <b>Note:</b> Contains predefined settings for axes and grids.
+ * @example
+ * anychart.radar([1.3, 2, 1.4], [1.1, 1.6, 1.3])
+ *   .container(stage).draw();
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Line chart data.
  * @return {anychart.charts.Radar} Chart with defaults for line series.
  */
