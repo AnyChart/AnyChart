@@ -174,7 +174,7 @@ anychart.core.ui.Paginator.prototype.orientation = function(opt_value) {
 
 /**
  * Paginator padding.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -197,7 +197,7 @@ anychart.core.ui.Paginator.prototype.padding = function(opt_spaceOrTopOrTopAndBo
 
 /**
  * Paginator margin.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -233,7 +233,7 @@ anychart.core.ui.Paginator.prototype.boundsInvalidated_ = function(event) {
 
 /**
  * Paginator background.
- * @param {(anychart.core.ui.Background|Object|string|null)=} opt_value .
+ * @param {(string|Object|null|boolean)=} opt_value .
  * @return {!(anychart.core.ui.Paginator|anychart.core.ui.Background)} .
  */
 anychart.core.ui.Paginator.prototype.background = function(opt_value) {

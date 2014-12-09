@@ -38,7 +38,7 @@ anychart.palettes.HatchFills.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
 /**
  * Setter for the hatchFill at index if the opt_hatchFill set, getter otherwise.
  * @param {number} index Index of hatchFill to get/set.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
  * @param {number=} opt_thickness Thickness.
@@ -66,8 +66,8 @@ anychart.palettes.HatchFills.prototype.hatchFillAt = function(index, opt_pattern
 
 /**
  * Getter/setter for hatchFills list of palette.
- * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.PatternFill>)=} opt_hatchFills .
- * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
+ * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>)=} opt_hatchFills .
+ * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
  */
 anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills) {
   if (goog.isDef(opt_hatchFills)) {

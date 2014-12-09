@@ -252,13 +252,13 @@ anychart.scales.Base.prototype.canBeStacked = false;
  * chart.column([6, 4, 8, 16]);
  * chart.yScale().stackMode('percent');
  * chart.container(stage).draw();
- * @param {anychart.enums.ScaleStackMode=} opt_value ['none'] Value to set.
- * @return {anychart.scales.Base} An instance of {@link anychart.scales.Base} class for method chaining.
+ * @param {(anychart.enums.ScaleStackMode|string)=} opt_value ['none'] Value to set.
+ * @return {!anychart.scales.Base} An instance of {@link anychart.scales.Base} class for method chaining.
  *//**
  * @ignoreDoc
  * Accepts 'none', 'value', 'percent'.
- * @param {anychart.enums.ScaleStackMode=} opt_value Stack mode if used as a setter.
- * @return {anychart.scales.Base|anychart.enums.ScaleStackMode} StackMode or itself for method chaining.
+ * @param {(anychart.enums.ScaleStackMode|string)=} opt_value Stack mode if used as a setter.
+ * @return {!anychart.scales.Base|anychart.enums.ScaleStackMode} StackMode or itself for method chaining.
  */
 anychart.scales.Base.prototype.stackMode = function(opt_value) {
   if (goog.isDef(opt_value)) {

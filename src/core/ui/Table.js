@@ -524,7 +524,7 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for table cell text factory.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.ui.Table} Current table text factory.
+ * @return {!anychart.core.ui.LabelsFactory} Current table text factory.
  *//**
  * You can setup the default text appearance for entire table.
  * These settings apply to cells with content set as string or number. If you want to set text appearance
@@ -539,13 +539,13 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
  * table.cellTextFactory(textSettings);
  * table.container(stage).draw();
  * @shortDescription Setter for table cell text factory.
- * @param {anychart.core.ui.LabelsFactory=} opt_value
- * @return {anychart.core.ui.LabelsFactory|anychart.core.ui.Table}
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!anychart.core.ui.Table}
  *//**
  * @ignoreDoc
  * Getter and setter for table cell text factory.
- * @param {anychart.core.ui.LabelsFactory=} opt_value
- * @return {anychart.core.ui.LabelsFactory|anychart.core.ui.Table}
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ui.Table)}
  */
 anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
   if (!this.labelsFactory_) {
@@ -555,20 +555,9 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
     this.registerDisposable(this.labelsFactory_);
   }
   if (goog.isDef(opt_value)) {
-    var shouldRedraw = true;
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.labelsFactory_.setup(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.labelsFactory_.setup(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.labelsFactory_.enabled(false);
-    } else {
-      shouldRedraw = false;
-    }
-    if (shouldRedraw) {
-      this.shouldRedrawContent = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
+    this.labelsFactory_.setup(opt_value);
+    this.shouldRedrawContent = true;
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.labelsFactory_;
@@ -577,7 +566,7 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
 
 /**
  * Getter for the cell padding settings.
- * @return {anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
+ * @return {!anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
  *//**
  * Setter for the cell paddings in pixels using a single value.<br/>
  * @example <t>listingOnly</t>
@@ -590,10 +579,10 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
  * @example <t>simple-h100</t>
  * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellPadding(10);
+ * table.cellPadding([10, 20]);
  * table.container(stage).draw();
- * @param {(string|number|anychart.core.utils.Space)=} opt_value Value to set.
- * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
+ * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
+ * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
  *//**
  * Setter for the cell paddings in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
@@ -616,11 +605,11 @@ anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
  *//**
  * @ignoreDoc
  * Cell padding settings.
- * @param {(string|number|Object|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.ui.Table|anychart.core.utils.Padding} .
+ * @return {!(anychart.core.ui.Table|anychart.core.utils.Padding)} .
  */
 anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.cellPadding_) {
@@ -717,7 +706,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
@@ -2694,7 +2683,7 @@ anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
 
 /**
  * Getter for current cell padding settings.
- * @return {anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
+ * @return {!anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
  *//**
  * Setter for current cell paddings in pixels using a single value.<br/>
  * @example <t>listingOnly</t>
@@ -2710,8 +2699,8 @@ anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
  * table.cellTextFactory().background().enabled(true);
  * table.getCell(0,0).padding(0);
  * table.container(stage).draw();
- * @param {(string|number|anychart.core.utils.Space)=} opt_value Value to set.
- * @return {anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
+ * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
+ * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
  *//**
  * Setter for current cell paddings in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
@@ -2731,15 +2720,15 @@ anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
+ * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
  *//**
  * @ignoreDoc
  * Cell padding settings.
- * @param {(string|number|Object|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.ui.Table.Cell|anychart.core.utils.Padding} .
+ * @return {!anychart.core.ui.Table.Cell|anychart.core.utils.Padding} .
  */
 anychart.core.ui.Table.Cell.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.settings_)

@@ -129,7 +129,7 @@ anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * @ignoreDoc
  * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get complete object.
- * @param {(Object|string|number|boolean)=} opt_value Setting value if used as a setter.
+ * @param {(string|number|boolean)=} opt_value Setting value if used as a setter.
  * @return {!(anychart.core.Text|Object|string|number|boolean)} A copy of settings or the Text for chaining.
  */
 anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value) {
@@ -592,7 +592,6 @@ anychart.core.Text.prototype.serialize = function() {
   json['selectable'] = this.selectable();
   json['disablePointerEvents'] = this.disablePointerEvents();
   json['useHtml'] = this.useHtml();
-  json['textSettings'] = this.textSettings();
   return json;
 };
 
@@ -619,7 +618,6 @@ anychart.core.Text.prototype.setupByJSON = function(config) {
   this.selectable(config['selectable']);
   this.disablePointerEvents(config['disablePointerEvents']);
   this.useHtml(config['useHtml']);
-  this.textSettings(config['textSettings']);
 };
 
 

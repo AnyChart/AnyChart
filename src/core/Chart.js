@@ -168,9 +168,9 @@ anychart.core.Chart.ZINDEX_TITLE = 80;
  * //content area
  * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('white 1');
  * stage.text(stage.width() / 4, stage.height() / 2 - margins, 'Chart Content Area').fontSize(21);
- * @return {anychart.core.utils.Margin} The current chart margin.
+ * @return {!anychart.core.utils.Margin} The current chart margin.
  *//**
- * Setter for the chart margin in pixels using a single value.<br/>
+ * Setter for the chart margin in pixels using a single complex object.<br/>
  * @example <t>listingOnly</t>
  * // all margins 15px
  * chart.margin(15);
@@ -181,16 +181,18 @@ anychart.core.Chart.ZINDEX_TITLE = 80;
  * @example <t>lineChart</t>
  * chart.margin(35);
  * chart.line([6, 2, 12]);
- * @param {(string|number|anychart.core.utils.Space)=} opt_value Value to set.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
- * Setter for the chart margin in pixels using several numbers.<br/>
+ * Setter for the chart margin in pixels using several simple values.<br/>
  * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
+ * // 1) all 10px
+ * chart.margin(10);
+ * // 2) top and bottom 10px, left and right 15px
  * chart.margin(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
+ * // 3) top 10px, left and right 15px, bottom 5px
  * chart.margin(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * // 4) top 10px, right 15px, bottom 5px, left 12px
  * chart.margin(10, '15px', '5px', 12);
  * @example <t>lineChart</t>
  * chart.margin(10, '15px', '5px', 12);
@@ -199,14 +201,14 @@ anychart.core.Chart.ZINDEX_TITLE = 80;
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|Object|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.Chart|anychart.core.utils.Margin} .
+ * @return {!(anychart.core.Chart|anychart.core.utils.Margin)} .
  */
 anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -298,30 +300,29 @@ anychart.core.Chart.prototype.marginInvalidated_ = function(event) {
  * //content area
  * stage.rect(paddings + margins, paddings + margins, stage.width() - 2 * (paddings + margins), stage.height() - 2 * (paddings + margins)).fill('white 1');
  * stage.text(stage.width() / 4, stage.height() / 2 - paddings, 'Chart Content Area').fontSize(21);
- * @return {anychart.core.utils.Padding} Current chart padding.
+ * @return {!anychart.core.utils.Padding} Current chart padding.
  *//**
  * Setter for the chart paddings in pixels using a single value.<br/>
  * @example <t>listingOnly</t>
- * // all paddings 15px
- * chart.padding(15);
- * // all paddings 15px
- * chart.padding('15px');
- * // top and bottom 5px ,right and left 15px
- * chart.padding(anychart.utils.space(5,15));
+ * chart.padding([5, 15]);
+ * @example <t>listingOnly</t>
+ * chart.padding({left: 10, top: 20, bottom: 30, right: '40%'}});
  * @example <t>lineChart</t>
  * chart.padding(20);
  * chart.line([6, 2, 12]);
- * @param {(string|number|anychart.core.utils.Space)=} opt_value Value to set.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * Setter for the chart paddings in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
+ * // 1) all 10px
+ * chart.padding(10);
+ * // 2) top and bottom 10px, left and right 15px
  * chart.padding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
+ * // 3) top 10px, left and right 15px, bottom 5px
  * chart.padding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * chart.padding(10, '15px', '5px', 12);
+ * // 4) top 10px, right 15%, bottom 5px, left 12px
+ * chart.padding(10, '15%', '5px', 12);
  * @example <t>lineChart</t>
  * chart.padding(10, '15px', '5px', 12);
  * chart.spline([6, 2, 12]);
@@ -329,14 +330,14 @@ anychart.core.Chart.prototype.marginInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|Object|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.Chart|anychart.core.utils.Padding} .
+ * @return {!(anychart.core.Chart|anychart.core.utils.Padding)} .
  */
 anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -374,7 +375,7 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the current chart background.
- * @return {anychart.core.ui.Background} The current chart background.
+ * @return {!anychart.core.ui.Background} The current chart background.
  *//**
  * Setter for the chart background.
  * @example <t>lineChart</t>
@@ -390,11 +391,11 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
  *           angle: -90
  *         });
  * chart.background(background);
- * @param {(anychart.core.ui.Background)=} opt_value Background object to set.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @param {Object=} opt_value Background object to set.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.Background)=} opt_value .
+ * @param {(string|Object|null|boolean)=} opt_value .
  * @return {anychart.core.Chart|anychart.core.ui.Background} .
  */
 anychart.core.Chart.prototype.background = function(opt_value) {
@@ -434,7 +435,7 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart title.
- * @return {anychart.core.ui.Title} The current chart title.
+ * @return {!anychart.core.ui.Title} The current chart title.
  *//**
  * Setter for the chart title.
  * @example <c>Simple string</c><t>lineChart</t>
@@ -444,12 +445,12 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
  *      .fontColor('red')
  *      .text('Red Chart title')
  * );
- * @param {(string|anychart.core.ui.Title)=} opt_value Chart title text or title instance for copy settings from.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
+ * @param {(null|boolean|Object|string)=} opt_value Chart title text or title instance for copy settings from.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
  * @ignoreDoc
- * @param {(null|string|Object|anychart.core.ui.Title)=} opt_value .
- * @return {anychart.core.ui.Title|anychart.core.Chart} .
+ * @param {(null|boolean|Object|string)=} opt_value .
+ * @return {!(anychart.core.ui.Title|anychart.core.Chart)} .
  */
 anychart.core.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -496,7 +497,7 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current chart legend.
- * @return {anychart.core.ui.Legend} An instance of {@link anychart.core.ui.Legend} for method chaining.
+ * @return {!anychart.core.ui.Legend} An instance of {@link anychart.core.ui.Legend} for method chaining.
  *//**
  * Setter for chart legend setting.
  * @example <t>lineChart</t>
@@ -509,11 +510,11 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
  *         .itemsLayout('vertical')
  *         .align('left')
  * );
- * @param {(null|string|Object|anychart.core.ui.Legend)=} opt_value Legend settings.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
  * @ignoreDoc
- * @param {(null|string|Object|anychart.core.ui.Legend)=} opt_value Legend settings.
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
  * @return {!(anychart.core.Chart|anychart.core.ui.Legend)} Chart legend instance of itself for chaining call.
  */
 anychart.core.Chart.prototype.legend = function(opt_value) {
@@ -561,7 +562,7 @@ anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart label.
- * @param {(string|null)=} opt_index [0] Index of instance.
+ * @param {(string|number)=} opt_index [0] Index of instance.
  * @return {!anychart.core.ui.Label} An instance of {@link anychart.core.ui.Label} for method chaining.
  *//**
  * Setter for chart label.
@@ -571,7 +572,7 @@ anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
  *   anychart.ui.label()
  *        .text('custom text')
  * );
- * @param {(anychart.core.ui.Label|Object|string|null)=} opt_value Chart label instance to add by index 0.
+ * @param {(null|boolean|Object|string)=} opt_value Chart label instance to add by index 0.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
  * Setter for chart label.
@@ -588,13 +589,13 @@ anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
  *         .anchor('righttop')
  * );
  * chart.container(stage).draw();
- * @param {(string|null)=} opt_index Index of instance.
- * @param {(anychart.core.ui.Label|Object|string|null)=} opt_value  Chart label instance.
+ * @param {(string|number)=} opt_index Index of instance.
+ * @param {(null|boolean|Object|string)=} opt_value  Chart label instance.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.Label|Object|string|number|null)=} opt_indexOrValue Chart label instance to add.
- * @param {(anychart.core.ui.Label|Object|string|null)=} opt_value Chart label instance.
+ * @param {(null|boolean|Object|string|number)=} opt_indexOrValue Chart label instance to add.
+ * @param {(null|boolean|Object|string)=} opt_value Chart label instance.
  * @return {!(anychart.core.ui.Label|anychart.core.Chart)} Chart label instance or itself for chaining call.
  */
 anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
@@ -643,7 +644,7 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current chart credits settings.
- * @return {anychart.core.ui.Credits} An instance of {@link anychart.core.ui.Credits} class for method chaining.
+ * @return {!anychart.core.ui.Credits} An instance of {@link anychart.core.ui.Credits} class for method chaining.
  *//**
  * Setter for chart credits settings.
  * @example <t>lineChart</t>
@@ -651,11 +652,11 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
  * chart.credits(
  *   anychart.ui.credits().enabled(true).text('Click me!')
  * );
- * @param {(anychart.core.ui.Credits|Object|boolean)=} opt_value
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(Object|boolean)=} opt_value
+ * @param {(Object|boolean|null)=} opt_value
  * @return {!(anychart.core.Chart|anychart.core.ui.Credits)} Chart credits or itself for chaining call.
  */
 anychart.core.Chart.prototype.credits = function(opt_value) {

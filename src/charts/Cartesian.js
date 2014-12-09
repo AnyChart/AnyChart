@@ -298,7 +298,7 @@ anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.scales.Base)=} opt_value X Scale to set.
+ * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Cartesian)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.xScale = function(opt_value) {
@@ -337,7 +337,7 @@ anychart.charts.Cartesian.prototype.xScale = function(opt_value) {
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.scales.Base)=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Cartesian)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.yScale = function(opt_value) {
@@ -430,7 +430,7 @@ anychart.charts.Cartesian.prototype.setDefaultScaleForLayoutBasedElements_ = fun
  *     .evenFill('none')
  *     .layout(anychart.enums.Layout.VERTICAL);
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.grids.Linear} Axis instance by index.
  *//**
  * Setter for chart grid.
@@ -441,7 +441,7 @@ anychart.charts.Cartesian.prototype.setDefaultScaleForLayoutBasedElements_ = fun
  *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.grid(myGrid);
  * chart.container(stage).draw();
- * @param {(anychart.core.grids.Linear|Object)=} opt_value Chart grid settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * Setter for chart grid by index.
@@ -457,14 +457,14 @@ anychart.charts.Cartesian.prototype.setDefaultScaleForLayoutBasedElements_ = fun
  * chart.container(stage).draw();
  * chart.grid(1, null);
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart grid index.
- * @param {(anychart.core.grids.Linear|Object|string|null)=} opt_value Chart grid settings to set.<br/>
+ * @param {number=} opt_index Chart grid index.
+ * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.grids.Linear|Object|string|null)=} opt_indexOrValue Grid settings.
- * @param {(anychart.core.grids.Linear|Object|string|null)=} opt_value Grid settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
+ * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Linear|anychart.charts.Cartesian)} Grid instance by index or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value) {
@@ -513,7 +513,7 @@ anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value)
  *    .evenFill('none')
  *    .layout(anychart.enums.Layout.HORIZONTAL);
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart minor grid index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart minor grid index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.grids.Linear} Axis instance by index.
  *//**
  * Setter for chart minor grid.
@@ -528,7 +528,7 @@ anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value)
  *    .layout(anychart.enums.Layout.HORIZONTAL).isMinor(true);
  * chart.minorGrid(myGrid)
  * chart.container(stage).draw();
- * @param {(anychart.core.grids.Linear|Object)=} opt_value Chart minor grid settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart minor grid settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * Setter for chart minor grid by index.
@@ -548,14 +548,14 @@ anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value)
  * chart.container(stage).draw();
  * chart.minorGrid(0, null);
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart minor grid index.
- * @param {(anychart.core.grids.Linear|Object|string|null)=} opt_value Chart minor grid settings to set.<br/>
+ * @param {number=} opt_index Chart minor grid index.
+ * @param {(Object|boolean|null)=} opt_value Chart minor grid settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.grids.Linear|Object|string|null)=} opt_indexOrValue Minor grid settings.
- * @param {(anychart.core.grids.Linear|Object|string|null)=} opt_value Minor grid settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
+ * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
  * @return {!(anychart.core.grids.Linear|anychart.charts.Cartesian)} Minor grid instance by index or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
@@ -606,7 +606,7 @@ anychart.charts.Cartesian.prototype.onGridSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart X-axis.
- * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axes.Linear} Axis instance by index.
  *//**
  * Setter for chart X-axis.
@@ -618,7 +618,7 @@ anychart.charts.Cartesian.prototype.onGridSignal_ = function(event) {
  *    .title().text('my custom sAxis');
  * chart.xAxis(myAxis);
  * chart.container(stage).draw();
- * @param {(anychart.core.axes.Linear|Object)=} opt_value Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * Setter for chart X-axis by index.
@@ -637,14 +637,14 @@ anychart.charts.Cartesian.prototype.onGridSignal_ = function(event) {
  * chart.xAxis(1, null);
  * chart.xAxis(2, 'None');
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart axis index.
- * @param {(anychart.core.axes.Linear|Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * @param {number=} opt_index Chart axis index.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.axes.Linear|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
- * @param {(anychart.core.axes.Linear|Object|string|null)=} opt_value Chart axis settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Linear|anychart.charts.Cartesian)} Axis instance by index or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value) {
@@ -681,7 +681,7 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
 
 /**
  * Getter for chart Y-axis.
- * @param {(string|number)=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axes.Linear} Axis instance by index.
  *//**
  * Setter for chart Y-axis.
@@ -693,7 +693,7 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
  *    .title().text('my custom Axis');
  * chart.yAxis(myAxis);
  * chart.container(stage).draw();
- * @param {(anychart.core.axes.Linear|Object)=} opt_value Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} class for method chaining.
  *//**
  * Setter for chart Y-axis by index.
@@ -712,14 +712,14 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
  *    .title(null);
  * chart.yAxis(2, 'None');
  * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Chart axis index.
- * @param {(anychart.core.axes.Linear|Object|string|null)=} opt_value Chart axis settings to set.<br/>
+ * @param {number=} opt_index Chart axis index.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.axes.Linear|Object|string|null)=} opt_indexOrValue Chart axis settings to set.
- * @param {(anychart.core.axes.Linear|Object|string|null)=} opt_value Chart axis settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Linear|anychart.charts.Cartesian)} Axis instance by index or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.yAxis = function(opt_indexOrValue, opt_value) {
@@ -781,7 +781,7 @@ anychart.charts.Cartesian.prototype.onAxisSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart line marker.
- * @param {(string|number)=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
  *//**
  * Setter for chart line marker.
@@ -792,7 +792,7 @@ anychart.charts.Cartesian.prototype.onAxisSignal_ = function(event) {
  *     .stroke('2 red')
  *     .layout('horizontal');
  * chart.lineMarker(lineMarker);
- * @param {(anychart.core.axisMarkers.Line|Object)=} opt_value Chart line marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * Setter for chart line marker by index.
@@ -802,14 +802,14 @@ anychart.charts.Cartesian.prototype.onAxisSignal_ = function(event) {
  * chart.lineMarker(1).value(2).stroke('green');
  * //turn off first marker
  * chart.lineMarker(0, null);
- * @param {(string|number)=} opt_index Chart line marker index.
- * @param {(anychart.core.axisMarkers.Line|Object|string|null)=} opt_value Chart line marker settings to set.<br/>
+ * @param {number=} opt_index Chart line marker index.
+ * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.axisMarkers.Line|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
- * @param {(anychart.core.axisMarkers.Line|Object|string|null)=} opt_value Chart line marker settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Line|anychart.charts.Cartesian)} Line marker instance by index or itself for method chaining.
  */
 anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_value) {
@@ -844,7 +844,7 @@ anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_
 
 /**
  * Getter for chart range marker.
- * @param {(string|number)=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axisMarkers.Range} Range marker instance by index.
  *//**
  * Setter for chart range marker.
@@ -865,14 +865,14 @@ anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_
  * chart.rangeMarker(1).from(-5).to(2).fill('green 0.2');
  * // turn off red marker.
  * chart.rangeMarker(0, null);
- * @param {(string|number)=} opt_index Chart range marker index.
- * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Chart range marker settings to set.<br/>
+ * @param {number=} opt_index Chart range marker index.
+ * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable to disable marker.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.axisMarkers.Range|Object|string|null)=} opt_indexOrValue Chart range marker settings to set.
- * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Chart range marker settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart range marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.
  * @return {!(anychart.core.axisMarkers.Range|anychart.charts.Cartesian)} Range marker instance by index or itself for chaining call.
  */
 anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt_value) {
@@ -907,7 +907,7 @@ anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt
 
 /**
  * Getter for chart text marker.
- * @param {(string|number)=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
+ * @param {number=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axisMarkers.Text} Text marker instance by index.
  *//**
  * Setter for chart text marker.
@@ -920,7 +920,7 @@ anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt
  *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
  * chart.textMarker(txtMarker);
  * chart.lineMarker().value(3.3);
- * @param {(anychart.core.axisMarkers.Text|Object)=} opt_value Chart text marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * Setter for chart text marker by index.
@@ -930,14 +930,14 @@ anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt
  * chart.textMarker(1).value(2).text('Marker 1');
  * // turn off first marker
  * chart.textMarker(0, null);
- * @param {(string|number)=} opt_index Chart text marker index.
- * @param {(anychart.core.axisMarkers.Text|Object|string|null)=} opt_value Chart text marker settings to set.<br/>
+ * @param {number=} opt_index Chart text marker index.
+ * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.<br/>
  * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|anychart.core.axisMarkers.Text|Object|string|null)=} opt_indexOrValue Chart line marker settings to set.
- * @param {(anychart.core.axisMarkers.Text|Object|string|null)=} opt_value Chart line marker settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Text|anychart.charts.Cartesian)} Line marker instance by index or itself for chaining call.
  */
 anychart.charts.Cartesian.prototype.textMarker = function(opt_indexOrValue, opt_value) {
@@ -2022,11 +2022,11 @@ anychart.charts.Cartesian.prototype.calcBubbleSizes_ = function() {
  * chart.line([1, -4, 5, 7]);
  * chart.line([11, 0, 15, 4]);
  * chart.line([21, -4, 9, 0]);
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Value to set.
  * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value .
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Cartesian)} .
  */
 anychart.charts.Cartesian.prototype.palette = function(opt_value) {
@@ -2038,9 +2038,7 @@ anychart.charts.Cartesian.prototype.palette = function(opt_value) {
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
-  }
-
-  if (!this.palette_)
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
     this.setupPalette_(anychart.palettes.DistinctColors);
 
   if (goog.isDef(opt_value)) {
@@ -2053,8 +2051,8 @@ anychart.charts.Cartesian.prototype.palette = function(opt_value) {
 
 /**
  * Chart markers palette settings.
- * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.palettes.Markers)=} opt_value Chart marker palette settings to set.
- * @return {anychart.palettes.Markers|anychart.charts.Cartesian} Return current chart markers palette or itself for chaining call.
+ * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Chart marker palette settings to set.
+ * @return {!(anychart.palettes.Markers|anychart.charts.Cartesian)} Return current chart markers palette or itself for chaining call.
  */
 anychart.charts.Cartesian.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
@@ -2076,7 +2074,7 @@ anychart.charts.Cartesian.prototype.markerPalette = function(opt_value) {
  * Chart hatch fill palette settings.
  * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.palettes.HatchFills)=} opt_value Chart
  * hatch fill palette settings to set.
- * @return {anychart.palettes.HatchFills|anychart.charts.Cartesian} Return current chart hatch fill palette or itself
+ * @return {!(anychart.palettes.HatchFills|anychart.charts.Cartesian)} Return current chart hatch fill palette or itself
  * for chaining call.
  */
 anychart.charts.Cartesian.prototype.hatchFillPalette = function(opt_value) {

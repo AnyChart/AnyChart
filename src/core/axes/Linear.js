@@ -200,7 +200,7 @@ anychart.core.axes.Linear.prototype.name_ = 'axis';
 
 
 /**
- * @type {string|anychart.core.ui.Title}
+ * @type {anychart.core.ui.Title}
  * @private
  */
 anychart.core.axes.Linear.prototype.title_ = null;
@@ -242,14 +242,14 @@ anychart.core.axes.Linear.prototype.stroke_ = 'none';
 
 
 /**
- * @type {string|anychart.enums.Orientation}
+ * @type {anychart.enums.Orientation}
  * @private
  */
 anychart.core.axes.Linear.prototype.orientation_;
 
 
 /**
- * @type {string|anychart.enums.Orientation}
+ * @type {anychart.enums.Orientation}
  * @private
  */
 anychart.core.axes.Linear.prototype.defaultOrientation_ = anychart.enums.Orientation.TOP;
@@ -356,47 +356,19 @@ anychart.core.axes.Linear.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * Getter for axis name.
- * @return {string} Axis name.
- *//**
- * Setter for axis name.
- * @example <t>simple-h100</t>
- * anychart.axes.linear()
- *    .name('New title for my axis')
- *    .scale(anychart.scales.linear())
- *    .container(stage).draw();
- * @param {string=} opt_value Name.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {string=} opt_value Name.
- * @return {string|anychart.core.axes.Linear} Axis name or itself for method chaining.
- */
-anychart.core.axes.Linear.prototype.name = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.name_ != opt_value)
-      this.name_ = opt_value;
-    return this;
-  } else {
-    return this.name_;
-  }
-};
-
-
-/**
  * Getter for the axis title.
- * @return {string|anychart.core.ui.Title} Axis title.
+ * @return {!anychart.core.ui.Title} Axis title.
  *//**
  * Setter for the axis title.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.xAxis().title('New title for my axis')
- * @param {(string|anychart.core.ui.Title)=} opt_value Value to set.
+ * @param {(null|boolean|Object|string)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.core.ui.Title)=} opt_value Axis title.
- * @return {string|anychart.core.ui.Title|anychart.core.axes.Linear} Axis title or itself for method chaining.
+ * @param {(null|boolean|Object|string)=} opt_value Axis title.
+ * @return {!(anychart.core.ui.Title|anychart.core.axes.Linear)} Axis title or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -434,7 +406,7 @@ anychart.core.axes.Linear.prototype.titleInvalidated_ = function(event) {
 
 /**
  * Getter for axis labels.
- * @return {anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
+ * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
  * @example <t>lineChart</t>
@@ -442,12 +414,12 @@ anychart.core.axes.Linear.prototype.titleInvalidated_ = function(event) {
  * var labels = anychart.ui.labelsFactory();
  * labels.fontSize(14).rotation(-90);
  * chart.xAxis().labels(labels);
- * @param {anychart.core.ui.LabelsFactory=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Linear} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Linear)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -487,7 +459,7 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis minor labels.
- * @return {anychart.core.ui.LabelsFactory} Axis labels.
+ * @return {!anychart.core.ui.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
  * @example <t>lineChart</t>
@@ -495,12 +467,12 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
  * var labels = anychart.ui.labelsFactory();
  * labels.enabled(true).fontSize(6).rotation(-45);
  * chart.yAxis().labels(labels);
- * @param {anychart.core.ui.LabelsFactory=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Linear} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Linear)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
@@ -540,19 +512,19 @@ anychart.core.axes.Linear.prototype.minorLabelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis ticks.
- * @return {anychart.core.axes.Ticks} Axis ticks.
+ * @return {!anychart.core.axes.Ticks} Axis ticks.
  *//**
  * Setter for axis ticks.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.yAxis().ticks().stroke('5 blue').length(5);
  * chart.xAxis().ticks(chart.yAxis().ticks());
- * @param {anychart.core.axes.Ticks=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.axes.Ticks=} opt_value Axis ticks.
- * @return {anychart.core.axes.Ticks|anychart.core.axes.Linear} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.Ticks|anychart.core.axes.Linear)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
@@ -590,7 +562,7 @@ anychart.core.axes.Linear.prototype.ticksInvalidated_ = function(event) {
 
 /**
  * Getter for minor axis ticks.
- * @return {anychart.core.axes.Ticks} Axis ticks.
+ * @return {!anychart.core.axes.Ticks} Axis ticks.
  *//**
  * Setter for minor axis ticks.
  * @example <t>lineChart</t>
@@ -598,12 +570,12 @@ anychart.core.axes.Linear.prototype.ticksInvalidated_ = function(event) {
  * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
  * chart.xScale(anychart.scales.linear());
  * chart.xAxis().minorTicks(chart.yAxis().minorTicks());
- * @param {anychart.core.axes.Ticks=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.axes.Ticks=} opt_value Axis ticks.
- * @return {anychart.core.axes.Ticks|anychart.core.axes.Linear} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.Ticks|anychart.core.axes.Linear)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
@@ -641,7 +613,7 @@ anychart.core.axes.Linear.prototype.minorTicksInvalidated_ = function(event) {
 
 /**
  * Getter for axis line stroke.
- * @return {string|acgraph.vector.Stroke} Axis line stroke settings.
+ * @return {acgraph.vector.Stroke} Axis line stroke settings.
  *//**
  * Setter for axis line stroke by one value.<br/>
  * Learn more about stroke settings:
@@ -649,20 +621,25 @@ anychart.core.axes.Linear.prototype.minorTicksInvalidated_ = function(event) {
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.yAxis().stroke('3 darkgreen 0.8');
- * @param {(string|acgraph.vector.Stroke)=} opt_value Value to set.
+ * @param {(acgraph.vector.Stroke)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
- * @return {string|acgraph.vector.Stroke|anychart.core.axes.Linear} Axis line stroke or itself for method chaining.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!(anychart.core.axes.Linear|acgraph.vector.Stroke)} .
  */
-anychart.core.axes.Linear.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
+anychart.core.axes.Linear.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != opt_strokeOrFill) {
       var thicknessOld = goog.isObject(this.stroke_) ? this.stroke_['thickness'] || 1 : 1;
-      var thicknessNew = goog.isObject(opt_value) ? opt_value['thickness'] || 1 : 1;
-      this.stroke_ = opt_value;
+      var thicknessNew = goog.isObject(opt_strokeOrFill) ? opt_strokeOrFill['thickness'] || 1 : 1;
+      this.stroke_ = opt_strokeOrFill;
       if (thicknessNew == thicknessOld)
         this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
       else
@@ -677,7 +654,7 @@ anychart.core.axes.Linear.prototype.stroke = function(opt_value) {
 
 /**
  * Getter for axis orientation.
- * @return {string|anychart.enums.Orientation} Axis orientation.
+ * @return {anychart.enums.Orientation} Axis orientation.
  *//**
  * Setter for axis orientation.
  * @example <t>lineChart</t>
@@ -688,7 +665,7 @@ anychart.core.axes.Linear.prototype.stroke = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(string|anychart.enums.Orientation)=} opt_value Axis orientation.
- * @return {string|anychart.enums.Orientation|anychart.core.axes.Linear} Axis orientation or itself for method chaining.
+ * @return {anychart.enums.Orientation|!anychart.core.axes.Linear} Axis orientation or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -729,7 +706,7 @@ anychart.core.axes.Linear.prototype.setDefaultOrientation = function(value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.axes.Linear} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.axes.Linear} Axis scale or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -760,7 +737,6 @@ anychart.core.axes.Linear.prototype.scaleInvalidated_ = function(event) {
 
 
 /**
- * @ignoreDoc
  * @param {?(number|string)=} opt_value .
  * @return {anychart.core.axes.Linear|number|string|null} .
  */
@@ -777,12 +753,11 @@ anychart.core.axes.Linear.prototype.width = function(opt_value) {
 
 
 /**
- * @ignoreDoc
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.axes.Linear|anychart.core.utils.Padding} .
+ * @return {!(anychart.core.axes.Linear|anychart.core.utils.Padding)} .
  */
 anychart.core.axes.Linear.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -1387,7 +1362,7 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
  *       .enabled(true)
  *       .fill('blue 0.2')
  * label.container(stage).draw();
- * @return {anychart.math.Rect} Parent bounds without the space used by the title.
+ * @return {!anychart.math.Rect} Parent bounds without the space used by the title.
  */
 anychart.core.axes.Linear.prototype.getRemainingBounds = function() {
   var parentBounds = this.parentBounds();
@@ -1418,25 +1393,6 @@ anychart.core.axes.Linear.prototype.getRemainingBounds = function() {
 
     return remainingBounds;
   } else return new anychart.math.Rect(0, 0, 0, 0);
-};
-
-
-/**
- * Returns half-pixel shift direction. In order to make the display of elements sharp
- * we use half-pixel shift, when element size/position doesn't calculate into integer number of pixels.
- * For example, line of 1px width can occupy two pixels (half of one, and half of another) - it will not look sharp.
- * But we can move this line 0.5px to left or rigth, it will occupy 1 whole pixel and look sharp.
- * In case of moving ticks: if all ticks are moved in one direction - the last tick will be visible off,
- * we avoid this by moving half of the pixels to left, and another half - to right.
- * This function gives us a sign that defines the shift direction.
- * @param {number} index Element index.
- * @param {number} count Number of elements.
- * @param {number} value Shift value.
- * @return {number} Transformed shift value.
- * @private
- */
-anychart.core.axes.Linear.prototype.getPixelShift_ = function(index, count, value) {
-  return (index < count / 2) ? value : -value;
 };
 
 
@@ -1551,7 +1507,7 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, o
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.drawFirstLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1581,7 +1537,7 @@ anychart.core.axes.Linear.prototype.drawFirstLabel = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value Drawing flag.
- * @return {boolean|anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1600,7 +1556,7 @@ anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
 
 /**
  * Getter for overlap mode for labels.
- * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
+ * @return {anychart.enums.LabelsOverlapMode} OverlapMode flag.
  *//**
  * Setter for overlap mode for labels.
  * @example <t>lineChart</t>
@@ -1621,7 +1577,7 @@ anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
- * @return {anychart.enums.LabelsOverlapMode|string|anychart.core.axes.Linear} Drawing flag or itself for method chaining.
+ * @return {anychart.enums.LabelsOverlapMode|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1657,11 +1613,11 @@ anychart.core.axes.Linear.prototype.overlapMode = function(opt_value) {
  * chart.xAxis().staggerMode(true);
  * chart.line(data);
  * @param {boolean=} opt_value [true] On/off stagger mode.
- * @return {anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
+ * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value On/off.
- * @return {boolean|anychart.core.axes.Linear} .
+ * @return {boolean|!anychart.core.axes.Linear} .
  */
 anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1696,12 +1652,12 @@ anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
  * ];
  * chart.xAxis().staggerLines(4);
  * chart.line(data);
- * @param {(number|null)=} opt_value [null] Count of stager lines.
- * @return {anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
+ * @param {?number=} opt_value [null] Count of stager lines.
+ * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|null)=} opt_value On/off.
- * @return {null|number|anychart.core.axes.Linear} .
+ * @param {(number|null)=} opt_value Fixed/auto.
+ * @return {null|number|!anychart.core.axes.Linear} .
  */
 anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1755,11 +1711,11 @@ anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
  * rightChart.bounds(anychart.math.rect('51%',0,'50%','100%'));
  * rightChart.container(stage).draw();
  * @param {(number|null)=} opt_value [2] Limits the number of lines to be used when drawing labels. If we need less – we use less, but never – more.
- * @return {anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
+ * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(number|null)=} opt_value .
- * @return {null|number|anychart.core.axes.Linear} .
+ * @return {null|number|!anychart.core.axes.Linear} .
  */
 anychart.core.axes.Linear.prototype.staggerMaxLines = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1855,7 +1811,6 @@ anychart.core.axes.Linear.prototype.drawLeftLine_ = function(pixelShift) {
  * @private
  */
 anychart.core.axes.Linear.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var axisName = this.name();
   var scale = this.scale();
 
   var labelText, labelValue;
@@ -1882,7 +1837,6 @@ anychart.core.axes.Linear.prototype.getLabelsFormatProvider_ = function(index, v
     'index': index,
     'value': labelText,
     'tickValue': labelValue,
-    'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
@@ -2280,7 +2234,6 @@ anychart.core.axes.Linear.prototype.serialize = function() {
   json['staggerMode'] = this.staggerMode();
   json['staggerLines'] = this.staggerLines();
   json['staggerMaxLines'] = this.staggerMaxLines();
-  json['name'] = this.name();
   json['width'] = this.width();
   json['orientation'] = this.orientation();
   json['drawFirstLabel'] = this.drawFirstLabel();
@@ -2301,7 +2254,6 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
   this.staggerMode(config['staggerMode']);
   this.staggerLines(config['staggerLines']);
   this.staggerMaxLines(config['staggerMaxLines']);
-  this.name(config['name']);
   this.stroke(config['stroke']);
   this.width(config['width']);
   this.orientation(config['orientation']);
@@ -2341,7 +2293,6 @@ anychart.core.axes.Linear.prototype['staggerMode'] = anychart.core.axes.Linear.p
 anychart.core.axes.Linear.prototype['staggerLines'] = anychart.core.axes.Linear.prototype.staggerLines;//doc|ex
 anychart.core.axes.Linear.prototype['staggerMaxLines'] = anychart.core.axes.Linear.prototype.staggerMaxLines;//doc|ex
 anychart.core.axes.Linear.prototype['title'] = anychart.core.axes.Linear.prototype.title;//doc|ex
-anychart.core.axes.Linear.prototype['name'] = anychart.core.axes.Linear.prototype.name;
 anychart.core.axes.Linear.prototype['labels'] = anychart.core.axes.Linear.prototype.labels;//doc|ex
 anychart.core.axes.Linear.prototype['minorLabels'] = anychart.core.axes.Linear.prototype.minorLabels;//doc|ex
 anychart.core.axes.Linear.prototype['ticks'] = anychart.core.axes.Linear.prototype.ticks;//doc|ex

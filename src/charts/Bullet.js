@@ -266,11 +266,11 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
  * bulletChart.scale(customScale);
  * bulletChart.container(stage).draw();
  * @param {anychart.scales.Base=} opt_value Scale to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
- * Getter/setter for default bullet chart scale.
- * @param {(anychart.scales.Base|string)=} opt_value Scale to set.
+ * Also accepts 'log', 'linear', 'dateTime' and 'ordinal' strings.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Bullet)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Bullet.prototype.scale = function(opt_value) {
@@ -316,13 +316,13 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
  *    .title(null);
  * bulletChart.axis(customAxis);
  * bulletChart.container(stage).draw();
- * @param {anychart.core.axes.Linear=} opt_value Scale to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Scale to set.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
  * Getter/setter for bullet chart axis.
- * @param {anychart.core.axes.Linear=} opt_value
- * @return {(anychart.core.axes.Linear|anychart.charts.Bullet)}
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.axes.Linear|anychart.charts.Bullet)}
  */
 anychart.charts.Bullet.prototype.axis = function(opt_value) {
   if (!this.axis_) {
@@ -385,8 +385,8 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
  *     .layout('vertical')
  * );
  * bulletChart.container(stage).draw();
- * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Value to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * Setter for bullet chart ranges settings.
  * @example <t>simple-h100</t>
@@ -403,13 +403,13 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
  * );
  * bulletChart.container(stage).draw();
  * @param {number=} opt_index [0] Index of range.
- * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Value to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
  * Getter/setter for bullet chart ranges.
- * @param {(number|anychart.core.axisMarkers.Range|Object|string|null)=} opt_indexOrValue Chart range settings to set.
- * @param {(anychart.core.axisMarkers.Range|Object|string|null)=} opt_value Chart range settings to set.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart range settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart range settings to set.
  * @return {!(anychart.core.axisMarkers.Range|anychart.charts.Bullet)} Range instance by index or itself for method chaining.
  */
 anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
@@ -464,11 +464,11 @@ anychart.charts.Bullet.prototype.onRangeSignal_ = function(event) {
  * bulletChart.range(3).from(15).to(20);
  * bulletChart.rangePalette(['#333', '#777', '#aaa', '#eee']);
  * bulletChart.container(stage).draw();
- * @param {(anychart.palettes.DistinctColors|Array)=} opt_value Value to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @param {(anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Value to set.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.palettes.DistinctColors|Array)=} opt_value .
+ * @param {(anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.DistinctColors|anychart.charts.Bullet)} .
  */
 anychart.charts.Bullet.prototype.rangePalette = function(opt_value) {
@@ -502,7 +502,7 @@ anychart.charts.Bullet.prototype.onRangePaletteSignal_ = function(event) {
 
 /**
  * Getter for markers palette settings.
- * @return {anychart.palettes.Markers} Current palette.
+ * @return {!anychart.palettes.Markers} Current palette.
  *//**
  * Setter for markers palette settings.<br/>
  * <b>Note:</b> Markers sets in data().
@@ -514,10 +514,10 @@ anychart.charts.Bullet.prototype.onRangePaletteSignal_ = function(event) {
  * bulletChart.markerPalette(['line', 'line', 'x', 'bar']);
  * bulletChart.container(stage).draw();
  * @param {(Array.<anychart.enums.MarkerType>|Object|anychart.palettes.Markers)=} opt_value Value to set.
- * @return {anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
+ * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.palettes.Markers|Array)=} opt_value .
+ * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value .
  * @return {!(anychart.palettes.Markers|anychart.charts.Bullet)} .
  */
 anychart.charts.Bullet.prototype.markerPalette = function(opt_value) {

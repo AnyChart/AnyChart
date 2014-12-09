@@ -220,7 +220,7 @@ anychart.core.bullet.Marker.prototype.isHorizontal = function() {
 /**
  * Getter/setter for bullet marker scale.
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {(anychart.scales.Base|anychart.core.bullet.Marker)}
+ * @return {(anychart.scales.Base|!anychart.core.bullet.Marker)}
  */
 anychart.core.bullet.Marker.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {

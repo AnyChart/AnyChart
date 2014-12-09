@@ -53,7 +53,7 @@ anychart.core.VisualBase.prototype.autoZIndex_ = 0;
 
 /**
  * Whether element is enabled or not.
- * @type {boolean}
+ * @type {?boolean}
  * @private
  */
 anychart.core.VisualBase.prototype.enabled_ = true;
@@ -107,11 +107,11 @@ anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @example <t>lineChart</t>
  * chart.line([4, 2, 8]);
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value The value to set.
- * @return {anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
+ * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
- * @return {(acgraph.vector.ILayer|anychart.core.VisualBase)} .
+ * @return {(acgraph.vector.ILayer|!anychart.core.VisualBase)} .
  */
 anychart.core.VisualBase.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -219,11 +219,13 @@ anychart.core.VisualBase.prototype.setAutoZIndex = function(value) {
  * // there are no second series.
  * var redLine = chart.line([11, 11.6, 11.2, 12.1]).enabled(false);
  * @param {boolean=} opt_value Value to set.
- * @return {anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
+ * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
  *//**
+ * We should not add possible null value of the param and result to the public doc. It is needed for compiler because
+ * of overrides.
  * @ignoreDoc
- * @param {boolean=} opt_value Value to set.
- * @return {anychart.core.VisualBase|boolean} .
+ * @param {?boolean=} opt_value Value to set.
+ * @return {!anychart.core.VisualBase|boolean|null} .
  */
 anychart.core.VisualBase.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -314,7 +316,7 @@ anychart.core.VisualBase.prototype.remove = goog.nullFunction;
 /**
  * Gets or sets bounds that would be used in case of percent size calculations. Expects pixel values only.
  * As a getter falls back to stage bounds.
- * @param {(anychart.math.Rect|number)=} opt_boundsOrLeft
+ * @param {(anychart.math.Rect|{left:number,top:number,width:number,height:number}|number|null)=} opt_boundsOrLeft
  * @param {number=} opt_top
  * @param {number=} opt_width
  * @param {number=} opt_height

@@ -153,7 +153,7 @@ anychart.core.ui.Tooltip.prototype.isFloating = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip title.
- * @param {(anychart.core.ui.Title|Object|string|null)=} opt_value Tooltip settings.
+ * @param {(null|boolean|Object|string)=} opt_value Tooltip settings.
  * @return {!(anychart.core.ui.Title|anychart.core.ui.Tooltip)} Title instance or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
@@ -170,7 +170,7 @@ anychart.core.ui.Tooltip.prototype.title = function(opt_value) {
 
 /**
  * Tooltip title separator.
- * @param {(anychart.core.ui.Separator|Object|string|null)=} opt_value Tooltip separator settings.
+ * @param {(Object|boolean|null)=} opt_value Tooltip separator settings.
  * @return {!(anychart.core.ui.Separator|anychart.core.ui.Tooltip)} Separator instance or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
@@ -187,7 +187,7 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
 
 /**
  * Tooltip content.
- * @param {(anychart.core.ui.Label|Object|string|null)=} opt_value Content settings.
+ * @param {(Object|boolean|null|string)=} opt_value Content settings.
  * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} Labels instance or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
@@ -204,7 +204,7 @@ anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
 
 /**
  * Tooltip background.
- * @param {(anychart.core.ui.Background|Object|string|null)=} opt_value Tooltip background settings.
+ * @param {(string|Object|null|boolean)=} opt_value Tooltip background settings.
  * @return {!(anychart.core.ui.Background|anychart.core.ui.Tooltip)} Background instance or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
@@ -221,13 +221,13 @@ anychart.core.ui.Tooltip.prototype.background = function(opt_value) {
 
 /**
  * Tooltip padding.
- * @param {(anychart.core.utils.Padding|Object|string|null)=} opt_value Tooltip padding settings.
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Tooltip padding settings.
  * @return {!(anychart.core.utils.Padding|anychart.core.ui.Tooltip)} Padding instance or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.padding = function(opt_value) {
   this.maybeCreateTooltipItem_();
   if (goog.isDef(opt_value)) {
-    this.item_.padding(opt_value);
+    this.item_.padding.apply(this.item_, arguments);
     return this;
   } else {
     return /** @type {!anychart.core.utils.Padding}*/ (this.item_.padding());

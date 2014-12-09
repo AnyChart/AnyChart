@@ -1269,7 +1269,7 @@ anychart.core.polar.series.Base.prototype.makeHoverable = function(element, opt_
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {(anychart.scales.Base|anychart.core.polar.series.Base)} Series X Scale or itself for chaining call.
+ * @return {(anychart.scales.Base|!anychart.core.polar.series.Base)} Series X Scale or itself for chaining call.
  */
 anychart.core.polar.series.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1298,7 +1298,7 @@ anychart.core.polar.series.Base.prototype.xScale = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {(anychart.scales.Base|anychart.core.polar.series.Base)} Series Y Scale or itself for chaining call.
+ * @return {(anychart.scales.Base|!anychart.core.polar.series.Base)} Series Y Scale or itself for chaining call.
  */
 anychart.core.polar.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1349,15 +1349,14 @@ anychart.core.polar.series.Base.prototype.scaleInvalidated_ = function(event) {
  *       .stroke('2 #cc8800')
  *       .fill('grey 0.5');
  * chart.container(stage).draw();
- * @return {anychart.core.ui.Tooltip} Tooltip instance.
+ * @return {!anychart.core.ui.Tooltip} Tooltip instance.
  *//**
  * Setter for series data tooltip.
- * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
- * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!anychart.core.polar.series.Base} An instance of the {@link anychart.core.polar.series.Base} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!(anychart.core.polar.series.Base|anychart.core.ui.Tooltip)} Tooltip instance or itself for chaining call.
  */
 anychart.core.polar.series.Base.prototype.tooltip = function(opt_value) {
@@ -1401,15 +1400,14 @@ anychart.core.polar.series.Base.prototype.onTooltipSignal_ = function(event) {
  *    .fontColor('white')
  *    .fontWeight('bold');
  * chart.container(stage).draw();
- * @return {anychart.core.ui.LabelsFactory} Labels instance.
+ * @return {!anychart.core.ui.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
- * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
- * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off a label.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * @return {!anychart.core.polar.series.Base} An instance of the {@link anychart.core.polar.series.Base} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.polar.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.core.polar.series.Base.prototype.labels = function(opt_value) {
@@ -1429,7 +1427,7 @@ anychart.core.polar.series.Base.prototype.labels = function(opt_value) {
 
 /**
  * Gets or sets series hover data labels.
- * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value Series data labels settings.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.polar.series.Base)} Labels instance or itself for chaining call.
  */
 anychart.core.polar.series.Base.prototype.hoverLabels = function(opt_value) {

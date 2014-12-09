@@ -129,12 +129,12 @@ anychart.scales.Ordinal.prototype.isMissing = function(value) {
  *  ['B4', 1.9]
  * ]);
  * chart.xScale().ticks([0,2,4,6]);
- * @param {!Array=} opt_value An array of indexes of ticks values.
+ * @param {(Object|Array)=} opt_value An array of indexes of ticks values.
  * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
  *//**
  * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Ordinal|anychart.scales.OrdinalTicks)} Ticks or itself for chaining.
  */
 anychart.scales.Ordinal.prototype.ticks = function(opt_value) {

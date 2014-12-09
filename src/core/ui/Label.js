@@ -203,11 +203,11 @@ anychart.core.ui.Label.prototype.text = function(opt_value) {
  *      .padding(10)
  *      .container(stage)
  *      .draw();
- * @param {anychart.core.ui.Background=} opt_value Value to set.
+ * @param {(string|Object|null|boolean)=} opt_value Value to set.
  * @return {!anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.Background=} opt_value Background object to set.
+ * @param {(string|Object|null|boolean)=} opt_value Background object to set.
  * @return {!(anychart.core.ui.Label|anychart.core.ui.Background)} Returns the background or itself for method chaining.
  */
 anychart.core.ui.Label.prototype.background = function(opt_value) {
@@ -241,11 +241,11 @@ anychart.core.ui.Label.prototype.backgroundInvalidated_ = function(event) {
 /**
  * Getter for current label padding.<br/>
  * See how paddings work at {@link anychart.core.Chart#padding}.
- * @return {anychart.core.utils.Padding} Current label padding.
+ * @return {!anychart.core.utils.Padding} Current label padding.
  *//**
  * Setter for label padding in pixels by one value.<br/>
- * @param {(string|number|anychart.core.utils.Space)=} opt_value [null] Value to set.
- * @return {anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
+ * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value [null] Value to set.
+ * @return {!anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
  *//**
  * Setter for label padding in pixels.<br/>
  * @example <t>listingOnly</t>
@@ -259,10 +259,10 @@ anychart.core.ui.Label.prototype.backgroundInvalidated_ = function(event) {
  * @param {(string|number)=} opt_value2 Right or right-left space.
  * @param {(string|number)=} opt_value3 Bottom space.
  * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
+ * @return {!anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .

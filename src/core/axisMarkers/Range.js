@@ -135,7 +135,7 @@ anychart.core.axisMarkers.Range.prototype.setDefaultLayout = function(value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.axisMarkers.Range} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.axisMarkers.Range} Axis scale or itself for method chaining.
  */
 anychart.core.axisMarkers.Range.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {

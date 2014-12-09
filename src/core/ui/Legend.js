@@ -325,7 +325,7 @@ anychart.core.ui.Legend.prototype.iconTextSpacing = function(opt_value) {
 
 /**
  * Legend margin setting.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -361,7 +361,7 @@ anychart.core.ui.Legend.prototype.boundsInvalidated_ = function(event) {
 
 /**
  * Legend padding setting.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -387,11 +387,11 @@ anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
  * @return {!anychart.core.ui.Background} Background or self for method chaining.
  *//**
  * Setter for legend background.
- * @param {anychart.core.ui.Background=} opt_value Background setting.
+ * @param {(string|Object|null|boolean)=} opt_value Background setting.
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.Background=} opt_value Background setting.
+ * @param {(string|Object|null|boolean)=} opt_value Background setting.
  * @return {!(anychart.core.ui.Legend|anychart.core.ui.Background)} Background or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.background = function(opt_value) {
@@ -424,16 +424,16 @@ anychart.core.ui.Legend.prototype.backgroundInvalidated_ = function(event) {
 
 /**
  * Getter for legend title.
- * @return {anychart.core.ui.Title} Title settings.
+ * @return {!anychart.core.ui.Title} Title settings.
  *//**
  * Setter for legend title.<br/>
  * <b>Note:</b> to turn title off you have to send null or 'none'.
- * @param {(string|null|anychart.core.ui.Title)=} opt_value Value to set.
+ * @param {(null|boolean|Object|string)=} opt_value Value to set.
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|null|anychart.core.ui.Title)=} opt_value Title to set.
- * @return {(anychart.core.ui.Title|anychart.core.ui.Legend)} Title or self for method chaining.
+ * @param {(null|boolean|Object|string)=} opt_value Title to set.
+ * @return {!(anychart.core.ui.Title|anychart.core.ui.Legend)} Title or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.title = function(opt_value) {
   if (!this.title_) {
@@ -474,16 +474,16 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
 
 /**
  * Getter for title separator setting.
- * @return {anychart.core.ui.Separator} Current settings.
+ * @return {!anychart.core.ui.Separator} Current settings.
  *//**
  * Setter for title separator setting.<br/>
  * <b>Note:</b> To turn off titleSeparatoryou have to send null or 'none'.
- * @param {(Object|string|null|anychart.core.ui.Separator)=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(Object|string|null|anychart.core.ui.Separator)=} opt_value Separator setting.
- * @return {(Object|string|null|anychart.core.ui.Separator|anychart.core.ui.Legend)} Separator setting or self for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Separator setting.
+ * @return {!(anychart.core.ui.Separator|anychart.core.ui.Legend)} Separator setting or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.titleSeparator = function(opt_value) {
   if (!this.titleSeparator_) {
@@ -524,16 +524,16 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
 
 /**
  * Getter for paginator setting.
- * @return {anychart.core.ui.Separator} Current settings.
+ * @return {!anychart.core.ui.Paginator} Current settings.
  *//**
  * Setter for paginator setting.<br/>
  * <b>Note:</b> To turn Paginator off you need to send null or 'none'.
- * @param {(Object|anychart.core.ui.Paginator|string|null)=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {*=} opt_value Paginator to set.
- * @return {(*|anychart.core.ui.Legend)} Paginator or self for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Paginator to set.
+ * @return {!(anychart.core.ui.Paginator|anychart.core.ui.Legend)} Paginator or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.paginator = function(opt_value) {
   if (!this.paginator_) {
@@ -574,7 +574,7 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
 
 /**
  * Legend tooltip.
- * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!(anychart.core.ui.Legend|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
  */
 anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {

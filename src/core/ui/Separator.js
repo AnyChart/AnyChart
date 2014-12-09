@@ -178,11 +178,11 @@ anychart.core.ui.Separator.prototype.height = function(opt_value) {
 
 /**
  * Margin of the separator
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.ui.Separator|anychart.core.utils.Margin} .
+ * @return {!(anychart.core.ui.Separator|anychart.core.utils.Margin)} .
  */
 anychart.core.ui.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {

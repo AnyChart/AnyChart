@@ -193,23 +193,8 @@ anychart.core.axes.Radar.prototype.labelsBounds_ = null;
 
 
 /**
- * @param {string=} opt_value Name.
- * @return {string|anychart.core.axes.Radar} Axis name or itself for method chaining.
- */
-anychart.core.axes.Radar.prototype.name = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.name_ != opt_value)
-      this.name_ = opt_value;
-    return this;
-  } else {
-    return this.name_;
-  }
-};
-
-
-/**
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Radar} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radar)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Radar.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -248,8 +233,8 @@ anychart.core.axes.Radar.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * @param {anychart.core.axes.RadialTicks=} opt_value Axis ticks.
- * @return {anychart.core.axes.RadialTicks|anychart.core.axes.Radar} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Radar)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Radar.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
@@ -286,16 +271,21 @@ anychart.core.axes.Radar.prototype.ticksInvalidated_ = function(event) {
 
 
 /**
- * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
- * @return {string|acgraph.vector.Stroke|anychart.core.axes.Radar} Axis line stroke or itself for method chaining.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.axes.Radar|acgraph.vector.Stroke|Function} .
  */
-anychart.core.axes.Radar.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
+anychart.core.axes.Radar.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != opt_strokeOrFill) {
       var thicknessOld = goog.isObject(this.stroke_) ? this.stroke_['thickness'] || 1 : 1;
-      var thicknessNew = goog.isObject(opt_value) ? opt_value['thickness'] || 1 : 1;
-      this.stroke_ = opt_value;
+      var thicknessNew = goog.isObject(opt_strokeOrFill) ? opt_strokeOrFill['thickness'] || 1 : 1;
+      this.stroke_ = opt_strokeOrFill;
       if (thicknessNew == thicknessOld)
         this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
       else
@@ -310,7 +300,7 @@ anychart.core.axes.Radar.prototype.stroke = function(opt_value) {
 
 /**
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.axes.Radar} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.axes.Radar} Axis scale or itself for method chaining.
  */
 anychart.core.axes.Radar.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -677,7 +667,6 @@ anychart.core.axes.Radar.prototype.drawLine_ = function(index, x, y) {
  * @private
  */
 anychart.core.axes.Radar.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var axisName = this.name();
   var scale = this.scale();
 
   var labelText, labelValue;
@@ -690,7 +679,6 @@ anychart.core.axes.Radar.prototype.getLabelsFormatProvider_ = function(index, va
     'index': index,
     'value': labelText,
     'tickValue': labelValue,
-    'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
@@ -890,7 +878,6 @@ anychart.core.axes.Radar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['labels'] = this.labels().serialize();
   json['ticks'] = this.ticks().serialize();
-  json['name'] = this.name();
   //json['startAngle'] = this.startAngle();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
@@ -900,7 +887,6 @@ anychart.core.axes.Radar.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.axes.Radar.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.name(config['name']);
   //this.startAngle(config['startAngle']);
   this.labels(config['labels']);
   this.ticks(config['ticks']);
@@ -930,7 +916,6 @@ anychart.core.axes.Radar.prototype.disposeInternal = function() {
 
 //anychart.core.axes.Radar.prototype['startAngle'] = anychart.core.axes.Radar.prototype.startAngle;
 //exports
-anychart.core.axes.Radar.prototype['name'] = anychart.core.axes.Radar.prototype.name;
 anychart.core.axes.Radar.prototype['labels'] = anychart.core.axes.Radar.prototype.labels;
 anychart.core.axes.Radar.prototype['ticks'] = anychart.core.axes.Radar.prototype.ticks;
 anychart.core.axes.Radar.prototype['stroke'] = anychart.core.axes.Radar.prototype.stroke;

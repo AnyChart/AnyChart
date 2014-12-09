@@ -129,11 +129,11 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents
  * ]);
  * series.markers(null);
  * chart.container(stage).draw();
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.scatter.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.core.scatter.series.BaseWithMarkers.prototype.markers = function(opt_value) {
@@ -177,11 +177,11 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.markers = function(opt_va
  * ]);
  * series.hoverMarkers(null);
  * chart.container(stage).draw();
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.scatter.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.core.scatter.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_value) {

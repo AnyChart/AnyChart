@@ -115,11 +115,11 @@ anychart.core.polar.series.ContinuousBase.prototype.hasMarkers = function() {
  * chart = anychart.polar();
  * chart.area([1, 4, 7, 4]).markers(null);
  * chart.container(stage).draw();
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.polar.series.ContinuousBase} {@link anychart.core.polar.series.ContinuousBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.polar.series.ContinuousBase)} Markers instance or itself for chaining call.
  */
 anychart.core.polar.series.ContinuousBase.prototype.markers = function(opt_value) {
@@ -154,11 +154,11 @@ anychart.core.polar.series.ContinuousBase.prototype.markers = function(opt_value
  * chart = anychart.polar();
  * chart.area([1, 4, 7, 4]).hoverMarkers(null);
  * chart.container(stage).draw();
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.polar.series.ContinuousBase} {@link anychart.core.polar.series.ContinuousBase} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.polar.series.ContinuousBase)} Markers instance or itself for chaining call.
  */
 anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers = function(opt_value) {

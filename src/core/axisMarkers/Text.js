@@ -121,7 +121,7 @@ anychart.core.axisMarkers.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.axisMarkers.Text} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.axisMarkers.Text} Axis scale or itself for method chaining.
  */
 anychart.core.axisMarkers.Text.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {

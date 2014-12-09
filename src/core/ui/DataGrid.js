@@ -1476,8 +1476,8 @@ anychart.core.ui.DataGrid.Column.prototype.useButtons = function(opt_value) {
 
 /**
  * Gets/sets column title.
- * @param {anychart.core.ui.Title=} opt_value - Value to be set.
- * @return {(anychart.core.ui.Title|anychart.core.ui.DataGrid.Column)} - Current value or itself for method chaining.
+ * @param {(null|boolean|Object|string)=} opt_value - Value to be set.
+ * @return {!(anychart.core.ui.Title|anychart.core.ui.DataGrid.Column)} - Current value or itself for method chaining.
  */
 anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
   if (!this.title_) {

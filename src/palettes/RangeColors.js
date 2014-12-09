@@ -312,14 +312,14 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
   var args = arguments;
-  if (args[0] instanceof anychart.palettes.RangeColors) {
-    this.colors(args[0].colors());
-    this.count(args[0].count());
-    return true;
-  }
   if (goog.isArray(args[0])) {
     this.colors(args[0]);
     this.count(args[0].length);
+    return true;
+  }
+  if (args[0] instanceof anychart.palettes.RangeColors) {
+    this.colors(args[0].colors());
+    this.count(args[0].count());
     return true;
   }
   return anychart.core.Base.prototype.setupSpecial.apply(this, args);

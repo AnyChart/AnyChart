@@ -1243,6 +1243,22 @@ anychart.enums.ScaleTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Scatter scale types
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all scale types.
+ * @enum {string}
+ */
+anychart.enums.ScatterScaleTypes = {
+  LINEAR: 'linear',
+  LOG: 'log',
+  DATE_TIME: 'dateTime'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1528,4 +1544,8 @@ goog.exportSymbol('anychart.enums.ScaleTypes.LINEAR', anychart.enums.ScaleTypes.
 goog.exportSymbol('anychart.enums.ScaleTypes.LOG', anychart.enums.ScaleTypes.LOG);
 goog.exportSymbol('anychart.enums.ScaleTypes.DATE_TIME', anychart.enums.ScaleTypes.DATE_TIME);
 goog.exportSymbol('anychart.enums.ScaleTypes.ORDINAL', anychart.enums.ScaleTypes.ORDINAL);
+
+goog.exportSymbol('anychart.enums.ScatterScaleTypes.LINEAR', anychart.enums.ScatterScaleTypes.LINEAR);
+goog.exportSymbol('anychart.enums.ScatterScaleTypes.LOG', anychart.enums.ScatterScaleTypes.LOG);
+goog.exportSymbol('anychart.enums.ScatterScaleTypes.DATE_TIME', anychart.enums.ScatterScaleTypes.DATE_TIME);
 

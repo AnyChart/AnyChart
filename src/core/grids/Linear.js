@@ -147,7 +147,7 @@ anychart.core.grids.Linear.prototype.layout = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.grids.Linear} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.grids.Linear} Axis scale or itself for method chaining.
  */
 anychart.core.grids.Linear.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {

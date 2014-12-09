@@ -118,11 +118,11 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEven
  * series.markers(myMarkers);
  * @example <t>lineChart</t>
  * chart.spline([1, 1.4, 1.2, 2]).markers(null);
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.cartesian.series.BaseWithMarkers} {@link anychart.core.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value) {
@@ -155,11 +155,11 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_
  *       .size(10)
  *       .type('star5');
  * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers(myMarkers);
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.cartesian.series.BaseWithMarkers} {@link anychart.core.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.MarkersFactory|Object|string|null)=} opt_value Series data markers settings.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_value) {

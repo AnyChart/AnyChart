@@ -150,7 +150,7 @@ anychart.core.grids.Radar.prototype.layout = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.grids.Radar} Axis yScale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.grids.Radar} Axis yScale or itself for method chaining.
  */
 anychart.core.grids.Radar.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -198,7 +198,7 @@ anychart.core.grids.Radar.prototype.yScaleInvalidated_ = function(event) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Ordinal=} opt_value Scale.
- * @return {anychart.scales.Ordinal|anychart.core.grids.Radar} Axis xScale or itself for method chaining.
+ * @return {anychart.scales.Ordinal|!anychart.core.grids.Radar} Axis xScale or itself for method chaining.
  */
 anychart.core.grids.Radar.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {

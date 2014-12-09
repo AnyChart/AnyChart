@@ -70,7 +70,7 @@ anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|string|null|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_boundsOrX .
+ * @param {(number|string|null|Array.<number|string>|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_boundsOrX .
  * @param {(number|string|null)=} opt_y .
  * @param {(number|string|null)=} opt_width .
  * @param {(number|string|null)=} opt_height .
@@ -236,7 +236,7 @@ anychart.core.VisualBaseWithBounds.prototype.height = function(opt_value) {
 
 /**
  * Returns pixel bounds of the element due to parent bounds and self bounds settings.
- * @return {(!anychart.math.Rect)} .
+ * @return {!anychart.math.Rect} .
  */
 anychart.core.VisualBaseWithBounds.prototype.getPixelBounds = function() {
   return this.bounds().toRect(/** @type {anychart.math.Rect} */(this.parentBounds()));
@@ -275,6 +275,12 @@ anychart.core.VisualBaseWithBounds.prototype.setupSpecial = function(var_args) {
 anychart.core.VisualBaseWithBounds.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.bounds(config['bounds']);
+  this.left(config['left']);
+  this.top(config['top']);
+  this.width(config['width']);
+  this.height(config['height']);
+  this.right(config['right']);
+  this.bottom(config['bottom']);
 };
 
 

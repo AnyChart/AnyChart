@@ -194,7 +194,7 @@ anychart.core.ui.TooltipItem.prototype.SUPPORTED_CONSISTENCY_STATES =
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip item title.
- * @param {(anychart.core.ui.Title|Object|string|null)=} opt_value Tooltip settings.
+ * @param {(null|boolean|Object|string)=} opt_value Tooltip settings.
  * @return {!(anychart.core.ui.Title|anychart.core.ui.TooltipItem)} Title instance or itself for method chaining.
  */
 anychart.core.ui.TooltipItem.prototype.title = function(opt_value) {
@@ -242,7 +242,7 @@ anychart.core.ui.TooltipItem.prototype.onTitleSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip item title separator.
- * @param {(anychart.core.ui.Separator|Object|string|null)=} opt_value Separator settings.
+ * @param {(Object|boolean|null)=} opt_value Separator settings.
  * @return {!(anychart.core.ui.Separator|anychart.core.ui.TooltipItem)} Separator instance or itself for method chaining.
  */
 anychart.core.ui.TooltipItem.prototype.separator = function(opt_value) {
@@ -290,7 +290,7 @@ anychart.core.ui.TooltipItem.prototype.onSeparatorSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip item content.
- * @param {(anychart.core.ui.Label|Object|string|null)=} opt_value Content settings.
+ * @param {(Object|boolean|null|string)=} opt_value Content settings.
  * @return {!(anychart.core.ui.Label|anychart.core.ui.TooltipItem)} Labels instance or itself for method chaining.
  */
 anychart.core.ui.TooltipItem.prototype.content = function(opt_value) {
@@ -338,7 +338,7 @@ anychart.core.ui.TooltipItem.prototype.onContentSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip item background.
- * @param {(anychart.core.ui.Background|Object|string|null)=} opt_value Tooltip item background settings.
+ * @param {(string|Object|null|boolean)=} opt_value Tooltip item background settings.
  * @return {!(anychart.core.ui.Background|anychart.core.ui.TooltipItem)} Background instance or itself for method chaining.
  */
 anychart.core.ui.TooltipItem.prototype.background = function(opt_value) {
@@ -377,7 +377,7 @@ anychart.core.ui.TooltipItem.prototype.backgroundInvalidated_ = function(event) 
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Tooltip item padding.
- * @param {(anychart.core.utils.Padding|Object|string|null)=} opt_value Tooltip item padding settings.
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Tooltip item padding settings.
  * @return {!(anychart.core.utils.Padding|anychart.core.ui.TooltipItem)} Padding instance or itself for method chaining.
  */
 anychart.core.ui.TooltipItem.prototype.padding = function(opt_value) {

@@ -263,21 +263,6 @@ anychart.core.axes.Polar.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * @param {string=} opt_value Name.
- * @return {string|anychart.core.axes.Polar} Axis name or itself for method chaining.
- */
-anychart.core.axes.Polar.prototype.name = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.name_ != opt_value)
-      this.name_ = opt_value;
-    return this;
-  } else {
-    return this.name_;
-  }
-};
-
-
-/**
  * @ignoreDoc
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|string|anychart.core.axes.Polar} Drawing flag or itself for method chaining.
@@ -297,8 +282,8 @@ anychart.core.axes.Polar.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Polar} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
@@ -308,15 +293,7 @@ anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
-      this.minorLabels_.setup(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.minorLabels_.setup(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.minorLabels_.enabled(false);
-    }
-
-    this.dropBoundsCache_();
+    this.minorLabels_.setup(opt_value);
     return this;
   }
   return this.minorLabels_;
@@ -324,8 +301,8 @@ anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
 
 
 /**
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Polar} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -364,8 +341,8 @@ anychart.core.axes.Polar.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * @param {anychart.core.axes.RadialTicks=} opt_value Axis ticks.
- * @return {anychart.core.axes.RadialTicks|anychart.core.axes.Polar} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Polar)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
@@ -383,8 +360,8 @@ anychart.core.axes.Polar.prototype.minorTicks = function(opt_value) {
 
 
 /**
- * @param {anychart.core.axes.RadialTicks=} opt_value Axis ticks.
- * @return {anychart.core.axes.RadialTicks|anychart.core.axes.Polar} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Polar)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
@@ -423,16 +400,22 @@ anychart.core.axes.Polar.prototype.ticksInvalidated_ = function(event) {
 
 
 /**
- * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
- * @return {string|acgraph.vector.Stroke|anychart.core.axes.Polar} Axis line stroke or itself for method chaining.
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.axes.Polar|acgraph.vector.Stroke|Function} .
  */
-anychart.core.axes.Polar.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
+anychart.core.axes.Polar.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != opt_strokeOrFill) {
       var thicknessOld = goog.isObject(this.stroke_) ? this.stroke_['thickness'] || 1 : 1;
-      var thicknessNew = goog.isObject(opt_value) ? opt_value['thickness'] || 1 : 1;
-      this.stroke_ = opt_value;
+      var thicknessNew = goog.isObject(opt_strokeOrFill) ? opt_strokeOrFill['thickness'] || 1 : 1;
+      this.stroke_ = opt_strokeOrFill;
       if (thicknessNew == thicknessOld)
         this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
       else {
@@ -449,7 +432,7 @@ anychart.core.axes.Polar.prototype.stroke = function(opt_value) {
 
 /**
  * @param {anychart.scales.ScatterBase=} opt_value Scale.
- * @return {anychart.scales.ScatterBase|anychart.core.axes.Polar} Axis scale or itself for method chaining.
+ * @return {anychart.scales.ScatterBase|!anychart.core.axes.Polar} Axis scale or itself for method chaining.
  */
 anychart.core.axes.Polar.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1039,7 +1022,6 @@ anychart.core.axes.Polar.prototype.getLabelBounds_ = function(index, isMajor) {
  * @private
  */
 anychart.core.axes.Polar.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var axisName = this.name();
   var scale = this.scale();
 
   var labelText, labelValue;
@@ -1063,7 +1045,6 @@ anychart.core.axes.Polar.prototype.getLabelsFormatProvider_ = function(index, va
     'index': index,
     'value': labelText,
     'tickValue': labelValue,
-    'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
@@ -1384,7 +1365,6 @@ anychart.core.axes.Polar.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['name'] = this.name();
   //json['startAngle'] = this.startAngle();
   json['overlapMode'] = this.overlapMode();
   return json;
@@ -1398,7 +1378,6 @@ anychart.core.axes.Polar.prototype.setupByJSON = function(config) {
   this.minorLabels(config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
-  this.name(config['name']);
   //this.startAngle(config['startAngle']);
   this.stroke(config['stroke']);
   this.overlapMode(config['overlapMode']);
@@ -1429,7 +1408,6 @@ anychart.core.axes.Polar.prototype.disposeInternal = function() {
 
 //anychart.core.axes.Polar.prototype['startAngle'] = anychart.core.axes.Polar.prototype.startAngle;
 //exports
-anychart.core.axes.Polar.prototype['name'] = anychart.core.axes.Polar.prototype.name;
 anychart.core.axes.Polar.prototype['labels'] = anychart.core.axes.Polar.prototype.labels;
 anychart.core.axes.Polar.prototype['minorLabels'] = anychart.core.axes.Polar.prototype.minorLabels;
 anychart.core.axes.Polar.prototype['ticks'] = anychart.core.axes.Polar.prototype.ticks;

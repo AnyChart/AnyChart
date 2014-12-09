@@ -63,7 +63,7 @@ anychart.palettes.DistinctColors.prototype.SUPPORTED_SIGNALS = anychart.Signal.N
  * @ignoreDoc
  * @param {number} index .
  * @param {acgraph.vector.Fill=} opt_color .
- * @return {acgraph.vector.Fill|anychart.palettes.DistinctColors} .
+ * @return {acgraph.vector.Fill|!anychart.palettes.DistinctColors} .
  */
 anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) {
   if (!this.colors_) this.colors_ = [];
@@ -101,7 +101,7 @@ anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) 
  *//**
  * @ignoreDoc
  * @param {Array.<acgraph.vector.Fill>=} opt_value .
- * @return {Array.<acgraph.vector.Fill>|anychart.palettes.DistinctColors} .
+ * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
  */
 anychart.palettes.DistinctColors.prototype.colors = function(opt_value) {
   if (goog.isDef(opt_value)) {

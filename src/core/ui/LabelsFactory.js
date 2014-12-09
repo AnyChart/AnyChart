@@ -222,11 +222,11 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * if (!element.enabled())
  *    element.enabled(true);
  * @param {(null|boolean)=} opt_value Value to set.
- * @return {anychart.LabelsFactory} An instance of {@link anychart.core.VisualBase} class for method chaining.
+ * @return {!anychart.LabelsFactory} An instance of {@link anychart.core.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(null|boolean)=} opt_value Value to set.
- * @return {anychart.core.ui.LabelsFactory|boolean|null} .
+ * @param {?boolean=} opt_value Value to set.
+ * @return {!anychart.core.ui.LabelsFactory|boolean|null} .
  */
 anychart.core.ui.LabelsFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -249,7 +249,7 @@ anychart.core.ui.LabelsFactory.prototype.enabled = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Gets or sets the labels background settings.
- * @param {(anychart.core.ui.Background|Object|null)=} opt_value Background object to set.
+ * @param {(string|Object|null|boolean)=} opt_value Background object to set.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ui.Background)} Returns the background or itself for chaining.
  */
 anychart.core.ui.LabelsFactory.prototype.background = function(opt_value) {
@@ -285,7 +285,7 @@ anychart.core.ui.LabelsFactory.prototype.backgroundInvalidated_ = function(event
 
 /**
  * Labels padding.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -1284,7 +1284,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.currentLabelsFactory = function(o
 
 /**
  * Gets or sets the Label background settings.
- * @param {anychart.core.ui.Background=} opt_value Background object to set.
+ * @param {(string|Object|null|boolean)=} opt_value Background object to set.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.core.ui.Background)} Returns background or itself for chaining.
  */
 anychart.core.ui.LabelsFactory.Label.prototype.background = function(opt_value) {
@@ -1320,7 +1320,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.backgroundInvalidated_ = function
 
 /**
  * Getter for current label padding.<br/>
- * @param {(string|number|anychart.core.utils.Space|null)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .

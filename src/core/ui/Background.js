@@ -14,18 +14,10 @@ goog.require('goog.array');
  * or used separately.<br/>
  * Background has a fill, a border and corner shape settings.<br/>
  * <b>Note:</b> Always specify display bounds if you use Background separately.
- * @example <t>simple-h100</t>
- * anychart.ui.background()
- *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
- *   .container(stage).draw();
- * @param {anychart.enums.BackgroundCornersType=} opt_cornerType [anychart.enums.BackgroundCornersType.ROUND] Type
- *  of the background corners.
- * @param {...(number|string)} var_args Radii set, much like {@link anychart.core.ui.Background#corners} but
- *  without an array.
  * @extends {anychart.core.VisualBaseWithBounds}
  * @constructor
  */
-anychart.core.ui.Background = function(opt_cornerType, var_args) {
+anychart.core.ui.Background = function() {
   this.suspendSignalsDispatching();
   goog.base(this);
 
@@ -37,16 +29,16 @@ anychart.core.ui.Background = function(opt_cornerType, var_args) {
   this.rect_ = null;
 
   /**
-   * @type {anychart.enums.BackgroundCornersType|string}
+   * @type {anychart.enums.BackgroundCornersType}
    * @private
    */
-  this.cornerType_ = opt_cornerType || anychart.enums.BackgroundCornersType.ROUND;
+  this.cornerType_ = anychart.enums.BackgroundCornersType.ROUND;
 
   /**
    * @type {!Array}
    * @private
    */
-  this.corners_ = goog.array.slice(arguments, 1, 5);
+  this.corners_ = [];
 
   /**
    * Fill settings.
@@ -110,14 +102,14 @@ anychart.core.ui.Background.normalizeCornerType = function(type, opt_default) {
 
 /**
  * Getter for current corner radius.
- * @return {(number|string|Array.<number>)} Current corner settings.
+ * @return {Array.<number>} Current corner settings.
  *//** topLeft, topRight, bottomRight, bottomLeft
  * Setter for corner's radius by one value.
  * @example <c>One for all.</c><t>simple-h100</t>
  * anychart.ui.background()
  *   .cornerType(anychart.enums.BackgroundCornersType.CUT)
  *   .corners(10) // same .corners('10px')
- *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds(10, 10, stage.width() - 20, stage.height() - 20)
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @example <c>One for all.</c><t>simple-h100</t>
  * anychart.ui.background()
@@ -125,7 +117,7 @@ anychart.core.ui.Background.normalizeCornerType = function(type, opt_default) {
  *   .corners([5, 7, 12, 7])
  *    // same .corners('5 7 12 7')
  *    // same .corners('5px 7px 12px 7px')
- *   .bounds( anychart.math.rect(10, 10, stage.width()-20, stage.height() - 20) )
+ *   .bounds(10, 10, stage.width() - 20, stage.height() - 20)
  *   .stroke('#000 2').fill('none').container(stage).draw();
  * @param {(number|string|Array.<number>)=} opt_value ['0px'] Value to set.<br/><b>Note:</b> If array has less than 4 elements
  *  (or string provide less than 4 values), the first value is set for all four corners.
@@ -145,8 +137,8 @@ anychart.core.ui.Background.normalizeCornerType = function(type, opt_default) {
  * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|string|Array.<number>)=} opt_value .
- * @return {(Array.<number>|!anychart.core.ui.Background)} .
+ * @param {(number|string|Array.<number|string>)=} opt_value .
+ * @return {(Array.<number|string>|!anychart.core.ui.Background)} .
  */
 anychart.core.ui.Background.prototype.corners = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -184,12 +176,13 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(anychart.enums.BackgroundCornersType|string)=} opt_value Corner type.
- * @return {anychart.enums.BackgroundCornersType|string|anychart.core.ui.Background} Corners type or self for method chaining.
+ * @return {anychart.enums.BackgroundCornersType|!anychart.core.ui.Background} Corners type or self for method chaining.
  */
 anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.core.ui.Background.normalizeCornerType(opt_value);
     if (opt_value != this.cornerType_) {
-      this.cornerType_ = anychart.core.ui.Background.normalizeCornerType(opt_value);
+      this.cornerType_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -416,7 +409,7 @@ anychart.core.ui.Background.prototype.fill = function(opt_fillOrColorOrKeys, opt
  *   .bounds( anychart.math.rect(30, 1.3*stage.height()/2, stage.width()-60, stage.height()/2 - 50) )
  *   .fill('none').container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)} value ['#000'] Fill formatted as '[thickness ]color[ opacity]'.
- * @return {anychart.core.ui.Background} {@link anychart.core.ui.Background} class for method chaining.
+ * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} class for method chaining.
  *//**
  * Sets stroke settings.<br/>
  * <b>Note:</b> When stroke properties are set both by complex stroke object properties and by stroke() method params,
@@ -448,7 +441,7 @@ anychart.core.ui.Background.prototype.fill = function(opt_fillOrColorOrKeys, opt
  * dashpattern: '5 3 2' is equivalent to dashpattern: '5 3 2 5 3 2'.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
+ * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .

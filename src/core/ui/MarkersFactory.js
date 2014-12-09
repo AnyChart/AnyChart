@@ -261,11 +261,11 @@ anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  * if (!element.enabled())
  *    element.enabled(true);
  * @param {(null|boolean)=} opt_value Value to set.
- * @return {anychart.MarkersFactory} {@link anychart.core.VisualBase} class for method chaining.
+ * @return {!anychart.MarkersFactory} {@link anychart.core.VisualBase} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(null|boolean)=} opt_value Value to set.
- * @return {anychart.core.ui.MarkersFactory|boolean|null} .
+ * @return {!anychart.core.ui.MarkersFactory|boolean|null} .
  */
 anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -510,7 +510,7 @@ anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
  * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @param {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.core.ui.MarkersFactory|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
  */
 anychart.core.ui.MarkersFactory.prototype.type = function(opt_value) {
@@ -1119,6 +1119,18 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.setupSpecial = function() {
+  var arg0 = arguments[0];
+  if (goog.isString(arg0)) {
+    this.type(arg0);
+    this.enabled(true);
+    return true;
+  }
+  return anychart.core.VisualBase.prototype.setupSpecial.apply(this, arguments);
 };
 
 
@@ -1747,7 +1759,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.resetSettings = function() {
  * Sets settings.
  * @param {Object=} opt_settings1 Settings1.
  * @param {Object=} opt_settings2 Settings2.
- * @return {anychart.core.ui.MarkersFactory.Marker} Returns self for chaining.
+ * @return {!anychart.core.ui.MarkersFactory.Marker} Returns self for chaining.
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.setSettings = function(opt_settings1, opt_settings2) {
   if (goog.isDef(opt_settings1)) {
@@ -1809,7 +1821,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
       this.superSettingsObj['enabled'],
       parentMarkersFactory.enabled(),
       currentMarkersFactory.enabled(),
-      currentMarkersFactory.enabled());
+      !goog.isNull(currentMarkersFactory.enabled()));
   if (goog.isNull(enabled)) enabled = true;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||

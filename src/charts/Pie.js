@@ -413,7 +413,7 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
 
 /**
  * Getter for the current pie palette.
- * @return {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Color palette instance.
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Color palette instance.
  *//**
  * Setter for a pie palette.
  * @example
@@ -442,12 +442,12 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
  *              .count(data.length)
  *      )
  *     .draw();
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value Color palette instance.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Color palette instance.
+ * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Array)=} opt_value .
- * @return {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Pie)} .
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.palette = function(opt_value) {
   if (opt_value instanceof anychart.palettes.RangeColors) {
@@ -458,9 +458,7 @@ anychart.charts.Pie.prototype.palette = function(opt_value) {
     return this;
   } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
     this.setupPalette_(anychart.palettes.RangeColors);
-  }
-
-  if (!this.palette_)
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
     this.setupPalette_(anychart.palettes.DistinctColors);
 
   if (goog.isDef(opt_value)) {
@@ -496,7 +494,7 @@ anychart.charts.Pie.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
  * Chart hatch fill palette settings.
  * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.palettes.HatchFills)=} opt_value Chart
  * hatch fill palette settings to set.
- * @return {anychart.palettes.HatchFills|anychart.charts.Pie} Return current chart hatch fill palette or itself
+ * @return {!(anychart.palettes.HatchFills|anychart.charts.Pie)} Return current chart hatch fill palette or itself
  * for chaining call.
  */
 anychart.charts.Pie.prototype.hatchFillPalette = function(opt_value) {
@@ -798,7 +796,7 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
  * Getter for the current pie labels.<br/>
  * It is used to access to the current (default too) settings of the labels.<br>
  * <b>Note:</b> Default labels will appear when this getter is called for the first time.
- * @return {anychart.core.ui.LabelsFactory} An instance of {@link anychart.core.ui.LabelsFactory} class for method chaining.
+ * @return {!anychart.core.ui.LabelsFactory} An instance of {@link anychart.core.ui.LabelsFactory} class for method chaining.
  *//**
  * Setter for the pie labels.<br/>
  * <b>Note:</b> positioing is done using {@link anychart.core.ui.LabelsFactory#positionFormatter} method
@@ -818,12 +816,12 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
  *      .fontColor('red');
  *  chart.labels(labels);
  *  chart.container(stage).draw();
- * @param {anychart.core.ui.LabelsFactory=} opt_value [] LabelsFactory instance.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
+ * @param {(Object|boolean|null)=} opt_value [] LabelsFactory instance.
+ * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.LabelsFactory=} opt_value .
- * @return {(anychart.core.ui.LabelsFactory|anychart.charts.Pie)} .
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -869,11 +867,11 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
  *      .fontColor('red');
  *  chart.hoverLabels(labels);
  *  chart.container(stage).draw();
- * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value pie hover data labels settings.
+ * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
  * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(anychart.core.ui.LabelsFactory|Object|string|null)=} opt_value pie hover data labels settings.
+ * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.Pie)} Labels instance or itself for chaining call.
  */
 anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
@@ -2166,11 +2164,11 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function() {
  *     .title()
  *         .enabled(true);
  * chart.container(stage).draw();
- * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
+ * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(null|string|Object|anychart.core.ui.Tooltip)=} opt_value Tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!(anychart.charts.Pie|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
  */
 anychart.charts.Pie.prototype.tooltip = function(opt_value) {

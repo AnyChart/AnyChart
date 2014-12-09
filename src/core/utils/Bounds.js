@@ -96,19 +96,26 @@ anychart.core.utils.Bounds.prototype.height_ = null;
 
 /**
  * Normalizes all info stored in this object and returns a standard Rect of it.
- * @param {(number|anychart.math.Rect)=} opt_parentLeftOrRect Optional parent left coord to shift bounds if parent in shifted.
+ * @param {(number|anychart.math.Rect|{left:number,top:number,width:number,height:number})=} opt_parentLeftOrRect Optional parent left coord to shift bounds if parent in shifted.
  * @param {number=} opt_parentTop Optional parent top coord to shift bounds if parent in shifted.
  * @param {number=} opt_parentWidth Optional parent width to support percent cases.
  * @param {number=} opt_parentHeight Optional parent height to support percent cases.
  * @return {!anychart.math.Rect} Normalized rect.
  */
 anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt_parentTop, opt_parentWidth, opt_parentHeight) {
+  var parentBounds;
   if (opt_parentLeftOrRect instanceof anychart.math.Rect) {
-    var parentBounds = /** @type {anychart.math.Rect} */(opt_parentLeftOrRect);
-    opt_parentLeftOrRect = +parentBounds.left;
-    opt_parentTop = +parentBounds.top;
-    opt_parentWidth = +parentBounds.width;
-    opt_parentHeight = +parentBounds.height;
+    parentBounds = /** @type {anychart.math.Rect} */(opt_parentLeftOrRect);
+    opt_parentLeftOrRect = anychart.utils.toNumber(parentBounds.left);
+    opt_parentTop = anychart.utils.toNumber(parentBounds.top);
+    opt_parentWidth = anychart.utils.toNumber(parentBounds.width);
+    opt_parentHeight = anychart.utils.toNumber(parentBounds.height);
+  } else if (goog.isObject(opt_parentLeftOrRect)) {
+    parentBounds = /** @type {Object} */(opt_parentLeftOrRect);
+    opt_parentLeftOrRect = anychart.utils.toNumber(parentBounds['left']);
+    opt_parentTop = anychart.utils.toNumber(parentBounds['top']);
+    opt_parentWidth = anychart.utils.toNumber(parentBounds['width']);
+    opt_parentHeight = anychart.utils.toNumber(parentBounds['height']);
   } else {
     opt_parentLeftOrRect = anychart.utils.toNumber(opt_parentLeftOrRect);
     opt_parentTop = anychart.utils.toNumber(opt_parentTop);
@@ -182,7 +189,7 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
 /**
  * Resets all values of the object by passed values.
  * Note: 'right' and 'bottom' have priority over 'width' and 'height'.
- * @param {(number|string|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds|null)=} opt_xOrRect X-coordinate or
+ * @param {(number|string|Array.<number|string|null>|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds|null)=} opt_xOrRect X-coordinate or
  *    the rect as object.
  * @param {(number|string|null)=} opt_y Y-coordinate.
  * @param {(number|string|null)=} opt_width Width.

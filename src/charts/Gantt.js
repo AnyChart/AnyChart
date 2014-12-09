@@ -445,7 +445,7 @@ anychart.charts.Gantt.prototype.splitterPosition = function(opt_value) {
 /**
  * Getter/setter for splitter.
  * TODO (A.Kudryavtsev): Turn it to getter for a while?
- * @param {(null|string|Object|anychart.core.ui.Splitter)=} opt_value - Value to be set.
+ * @param {(Object|boolean|null)=} opt_value - Value to be set.
  * @return {(anychart.charts.Gantt|anychart.core.ui.Splitter)} - Current value or itself for method chaining.
  */
 anychart.charts.Gantt.prototype.splitter = function(opt_value) {
@@ -492,13 +492,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.core.ui.Splitter) {
-      this.splitter_.setup(opt_value.serialize());
-    } else if (goog.isObject(opt_value)) {
-      this.splitter_.setup(opt_value);
-    } else if (anychart.utils.isNone(opt_value)) {
-      this.splitter_.enabled(false); //TODO (A.Kudryavtsev): Exclude this code?
-    }
+    this.splitter_.setup(opt_value);
     return this;
   } else {
     return this.splitter_;

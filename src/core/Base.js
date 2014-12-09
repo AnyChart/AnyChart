@@ -184,7 +184,7 @@ anychart.Signal = {
 
 
 /**
- * Class implementins all the work with consistency states.
+ * Class implements all the work with consistency states.
  * invalidate() and markConsistent() are used to change states.
  * isConsistent() and hasInvalidationState() are used to check states.
  * @constructor
@@ -270,7 +270,7 @@ anychart.core.Base.prototype.unlistenSignals = function(listener, opt_scope) {
  * Sets consistency state to an element {@link anychart.ConsistencyState}.
  * @param {anychart.ConsistencyState|number} state State(s) to be set.
  * @param {(anychart.Signal|number)=} opt_signal Signal(s) to be sent to listener, if states have been set.
- * @return {number} Actually modified consistensy states.
+ * @return {number} Actually modified consistency states.
  */
 anychart.core.Base.prototype.invalidate = function(state, opt_signal) {
   state &= this.SUPPORTED_CONSISTENCY_STATES;
@@ -360,7 +360,7 @@ anychart.core.Base.prototype.resumeSignalsDispatching = function(doDispatchSuspe
 
 /**
  * Serializes element to JSON.
- * @return {Object} Serialized JSON object.
+ * @return {!Object} Serialized JSON object.
  */
 anychart.core.Base.prototype.serialize = function() {
   return {};
@@ -382,7 +382,7 @@ anychart.core.Base.prototype.setup = function(var_args) {
     if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
       if (arg0 instanceof anychart.core.Base)
         throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {Object} */(arguments[0]));
+      this.setupByJSON(/** @type {!Object} */(arguments[0]));
     }
     this.resumeSignalsDispatching(true);
   }
@@ -392,7 +392,7 @@ anychart.core.Base.prototype.setup = function(var_args) {
 
 /**
  * Setups current instance using passed JSON object.
- * @param {Object} json
+ * @param {!Object} json
  * @protected
  */
 anychart.core.Base.prototype.setupByJSON = function(json) {
@@ -401,7 +401,7 @@ anychart.core.Base.prototype.setupByJSON = function(json) {
 
 /**
  * Special objects to setup current instance.
- * @param {...(Object|Array|number|string|undefined|null)} var_args
+ * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
  * @return {boolean} If passed values were recognized as special setup values.
  * @protected
  */

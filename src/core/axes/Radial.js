@@ -250,36 +250,8 @@ anychart.core.axes.Radial.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * Getter for axis name.
- * @return {string} Axis name.
- *//**
- * Setter for axis name.
- * @example <t>simple-h100</t>
- * anychart.axes.linear()
- *    .name('New title for my axis')
- *    .scale(anychart.scales.linear())
- *    .container(stage).draw();
- * @param {string=} opt_value Name.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {string=} opt_value Name.
- * @return {string|anychart.core.axes.Radial} Axis name or itself for method chaining.
- */
-anychart.core.axes.Radial.prototype.name = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.name_ != opt_value)
-      this.name_ = opt_value;
-    return this;
-  } else {
-    return this.name_;
-  }
-};
-
-
-/**
  * Getter for axis labels.
- * @return {anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
+ * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
  * @example <t>lineChart</t>
@@ -287,12 +259,12 @@ anychart.core.axes.Radial.prototype.name = function(opt_value) {
  * var labels = anychart.ui.labelsFactory();
  * labels.fontSize(14).rotation(-90);
  * chart.xAxis().labels(labels);
- * @param {anychart.core.ui.LabelsFactory=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Radial} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radial)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Radial.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -331,7 +303,7 @@ anychart.core.axes.Radial.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis minor labels.
- * @return {anychart.core.ui.LabelsFactory} Axis labels.
+ * @return {!anychart.core.ui.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
  * @example <t>lineChart</t>
@@ -339,12 +311,12 @@ anychart.core.axes.Radial.prototype.labelsInvalidated_ = function(event) {
  * var labels = anychart.ui.labelsFactory();
  * labels.enabled(true).fontSize(6).rotation(-45);
  * chart.yAxis().labels(labels);
- * @param {anychart.core.ui.LabelsFactory=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.LabelsFactory=} opt_value Axis labels.
- * @return {anychart.core.ui.LabelsFactory|anychart.core.axes.Radial} Axis labels of itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis labels.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radial)} Axis labels of itself for method chaining.
  */
 anychart.core.axes.Radial.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
@@ -383,19 +355,19 @@ anychart.core.axes.Radial.prototype.minorLabelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis ticks.
- * @return {anychart.core.axes.RadialTicks} Axis ticks.
+ * @return {!anychart.core.axes.RadialTicks} Axis ticks.
  *//**
  * Setter for axis ticks.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.yAxis().ticks().stroke('5 blue').length(5);
  * chart.xAxis().ticks(chart.yAxis().ticks());
- * @param {anychart.core.axes.RadialTicks=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.axes.RadialTicks=} opt_value Axis ticks.
- * @return {anychart.core.axes.RadialTicks|anychart.core.axes.Radial} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Radial)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Radial.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
@@ -434,7 +406,7 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
 
 /**
  * Getter for minor axis ticks.
- * @return {anychart.core.axes.RadialTicks} Axis ticks.
+ * @return {!anychart.core.axes.RadialTicks} Axis ticks.
  *//**
  * Setter for minor axis ticks.
  * @example <t>lineChart</t>
@@ -442,12 +414,12 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
  * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
  * chart.xScale(anychart.scales.linear());
  * chart.xAxis().minorTicks(chart.yAxis().minorTicks());
- * @param {anychart.core.axes.RadialTicks=} opt_value Value to set.
+ * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.axes.RadialTicks=} opt_value Axis ticks.
- * @return {anychart.core.axes.RadialTicks|anychart.core.axes.Radial} Axis ticks or itself for method chaining.
+ * @param {(Object|boolean|null)=} opt_value Axis ticks.
+ * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Radial)} Axis ticks or itself for method chaining.
  */
 anychart.core.axes.Radial.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
@@ -486,7 +458,7 @@ anychart.core.axes.Radial.prototype.minorTicksInvalidated_ = function(event) {
 
 /**
  * Getter for axis line stroke.
- * @return {string|acgraph.vector.Stroke} Axis line stroke settings.
+ * @return {acgraph.vector.Stroke} Axis line stroke settings.
  *//**
  * Setter for axis line stroke by one value.<br/>
  * Learn more about stroke settings:
@@ -494,20 +466,25 @@ anychart.core.axes.Radial.prototype.minorTicksInvalidated_ = function(event) {
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.yAxis().stroke('3 darkgreen 0.8');
- * @param {(string|acgraph.vector.Stroke)=} opt_value Value to set.
+ * @param {(acgraph.vector.Stroke)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|acgraph.vector.Stroke)=} opt_value Stroke.
- * @return {string|acgraph.vector.Stroke|anychart.core.axes.Radial} Axis line stroke or itself for method chaining.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.axes.Radial|acgraph.vector.Stroke|Function} .
  */
-anychart.core.axes.Radial.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
+anychart.core.axes.Radial.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != opt_strokeOrFill) {
       var thicknessOld = goog.isObject(this.stroke_) ? this.stroke_['thickness'] || 1 : 1;
-      var thicknessNew = goog.isObject(opt_value) ? opt_value['thickness'] || 1 : 1;
-      this.stroke_ = opt_value;
+      var thicknessNew = goog.isObject(opt_strokeOrFill) ? opt_strokeOrFill['thickness'] || 1 : 1;
+      this.stroke_ = opt_strokeOrFill;
       if (thicknessNew == thicknessOld)
         this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
       else {
@@ -537,7 +514,7 @@ anychart.core.axes.Radial.prototype.stroke = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.axes.Radial} Axis scale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.axes.Radial} Axis scale or itself for method chaining.
  */
 anychart.core.axes.Radial.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1196,7 +1173,6 @@ anychart.core.axes.Radial.prototype.drawLabel_ = function(index, isMajor) {
  * @private
  */
 anychart.core.axes.Radial.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var axisName = this.name();
   var scale = this.scale();
 
   var labelText, labelValue;
@@ -1223,7 +1199,6 @@ anychart.core.axes.Radial.prototype.getLabelsFormatProvider_ = function(index, v
     'index': index,
     'value': labelText,
     'tickValue': labelValue,
-    'axisName': axisName,
     'max': scale.max ? scale.max : null,
     'min': scale.min ? scale.min : null,
     'scale': scale
@@ -1472,7 +1447,6 @@ anychart.core.axes.Radial.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  json['name'] = this.name();
   //json['startAngle'] = this.startAngle();
   json['drawFirstLabel'] = this.drawFirstLabel();
   json['drawLastLabel'] = this.drawLastLabel();
@@ -1489,7 +1463,6 @@ anychart.core.axes.Radial.prototype.setupByJSON = function(config) {
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stroke(config['stroke']);
-  this.name(config['name']);
   //this.startAngle(config['startAngle']);
   this.drawFirstLabel(config['drawFirstLabel']);
   this.drawLastLabel(config['drawLastLabel']);
@@ -1519,7 +1492,6 @@ anychart.core.axes.Radial.prototype.disposeInternal = function() {
 
 //anychart.core.axes.Radial.prototype['startAngle'] = anychart.core.axes.Radial.prototype.startAngle;
 //exports
-anychart.core.axes.Radial.prototype['name'] = anychart.core.axes.Radial.prototype.name;
 anychart.core.axes.Radial.prototype['labels'] = anychart.core.axes.Radial.prototype.labels;
 anychart.core.axes.Radial.prototype['minorLabels'] = anychart.core.axes.Radial.prototype.minorLabels;
 anychart.core.axes.Radial.prototype['ticks'] = anychart.core.axes.Radial.prototype.ticks;

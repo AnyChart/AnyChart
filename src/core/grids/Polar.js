@@ -150,7 +150,7 @@ anychart.core.grids.Polar.prototype.layout = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.grids.Polar} Axis yScale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.grids.Polar} Axis yScale or itself for method chaining.
  */
 anychart.core.grids.Polar.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -198,7 +198,7 @@ anychart.core.grids.Polar.prototype.yScaleInvalidated_ = function(event) {
  *//**
  * @ignoreDoc
  * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|anychart.core.grids.Polar} Axis xScale or itself for method chaining.
+ * @return {anychart.scales.Base|!anychart.core.grids.Polar} Axis xScale or itself for method chaining.
  */
 anychart.core.grids.Polar.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {

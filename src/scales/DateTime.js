@@ -61,12 +61,12 @@ anychart.scales.DateTime.prototype.getType = function() {
  * ]);
  * chart.xScale().ticks([1188172800000, 1188432000000, 1188604800000]);
  * chart.container(stage).draw();
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {Array=} opt_value An array of ticks to set.
  * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
  *//**
  * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
  */
 anychart.scales.DateTime.prototype.ticks = function(opt_value) {
@@ -89,7 +89,8 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
  *//**
  * Setter for set of scale ticks in terms of data values.
  * @example
- * var chart = anychanychart.financial* chart.ohlc([
+ * var chart = anychart.financial();
+ * chart.ohlc([
  *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
  *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
  *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
@@ -99,12 +100,12 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
  * chart.xScale().ticks().interval('P3D');
  * chart.xScale().minorTicks([1188172800000, 1188432000000, 1188604800000]);
  * chart.container(stage).draw();
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
  *//**
  * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
  */
 anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {

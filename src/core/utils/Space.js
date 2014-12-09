@@ -8,8 +8,8 @@ goog.require('anychart.utils');
 /**
  * Stores space info for 4 sides. Can accept numbers and strings as side spaces.
  * For initializing values meaning see set() method.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom
+ *    Space object or top or top and bottom space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
@@ -81,16 +81,17 @@ anychart.core.utils.Space.prototype.left_ = 0;
  *    right and left spaces are 50
  * 4) set(25):
  *    all four spaces are 25
+ * Also can accept arrays (applied, like it is an apply) and objects with 'left', 'top', 'right' and 'bottom' fields.
  *
  * NOTE: set():
  *    all four spaces are 0
  *
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {anychart.core.utils.Space} Returns itself for chaining.
+ * @return {!anychart.core.utils.Space} Returns itself for chaining.
  */
 anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   var top, right, bottom, left;
@@ -107,11 +108,11 @@ anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom,
   // else if branches sorted a bit like by usage frequency
   if (argsLen == 0) {
     left = bottom = right = top = 0;
-  } else if (opt_spaceOrTopOrTopAndBottom instanceof anychart.core.utils.Space) {
-    top = opt_spaceOrTopOrTopAndBottom.top_;
-    right = opt_spaceOrTopOrTopAndBottom.right_;
-    bottom = opt_spaceOrTopOrTopAndBottom.bottom_;
-    left = opt_spaceOrTopOrTopAndBottom.left_;
+  } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+    top = opt_spaceOrTopOrTopAndBottom['top'] || 0;
+    right = opt_spaceOrTopOrTopAndBottom['right'] || 0;
+    bottom = opt_spaceOrTopOrTopAndBottom['bottom'] || 0;
+    left = opt_spaceOrTopOrTopAndBottom['left'] || 0;
   } else if (argsLen == 1) {
     left = bottom = right = top = opt_spaceOrTopOrTopAndBottom || 0;
   } else if (argsLen == 2) {
@@ -317,3 +318,4 @@ anychart.core.utils.Space.prototype['top'] = anychart.core.utils.Space.prototype
 anychart.core.utils.Space.prototype['right'] = anychart.core.utils.Space.prototype.right;
 anychart.core.utils.Space.prototype['bottom'] = anychart.core.utils.Space.prototype.bottom;
 anychart.core.utils.Space.prototype['left'] = anychart.core.utils.Space.prototype.left;
+anychart.core.utils.Space.prototype['set'] = anychart.core.utils.Space.prototype.set;

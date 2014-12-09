@@ -268,11 +268,11 @@ anychart.core.ui.Title.prototype.text = function(opt_value) {
  *     .background( myTitleBackground )
  *     .container(stage)
  *     .draw();
- * @param {anychart.core.ui.Background=} opt_value [null] Value to set.
+ * @param {(string|Object|null|boolean)=} opt_value [null] Value to set.
  * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {anychart.core.ui.Background=} opt_value .
+ * @param {(string|Object|null|boolean)=} opt_value .
  * @return {!(anychart.core.ui.Title|anychart.core.ui.Background)} .
  */
 anychart.core.ui.Title.prototype.background = function(opt_value) {
@@ -349,32 +349,34 @@ anychart.core.ui.Title.prototype.height = function(opt_value) {
 /**
  * Getter for the current title margin.<br/>
  * Learn more about margins at {@link anychart.core.Chart#margin}.
- * @return {anychart.core.utils.Margin} The current title margin.
+ * @return {!anychart.core.utils.Margin} The current title margin.
  *//**
- * Setter for the title margin in pixels using one value.<br/>
- * @param {(string|number|anychart.core.utils.Space)=} opt_allValues Value to set.
- * @return {anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
+ * Setter for the title margin in pixels using one complex value.<br/>
+ * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_allValues Value to set.
+ * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
  *//**
  * Setter for the title margin in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
+ * // 1) all 10px
+ * title.margin(10);
+ * // 2) top and bottom 10px, left and right 15px
  * title.margin(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
+ * // 3) top 10px, left and right 15px, bottom 5px
  * title.margin(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * // 4) top 10px, right 15px, bottom 5px, left 12px
  * title.margin(10, '15px', '5px', 12);
  * @param {(string|number)=} opt_value1 [0] Top or top-bottom space.
  * @param {(string|number)=} opt_value2 [0] Right or right-left space.
  * @param {(string|number)=} opt_value3 [10] Bottom space.
  * @param {(string|number)=} opt_value4 [0] Left space.
- * @return {anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
+ * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.ui.Title|anychart.core.utils.Margin} .
+ * @return {!(anychart.core.ui.Title|anychart.core.utils.Margin)} .
  */
 anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.margin_) {
@@ -393,11 +395,11 @@ anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom,
 /**
  * Getter for the current title padding.<br/>
  * Learn more about paddings at {@link anychart.core.Chart#padding}.
- * @return {anychart.core.utils.Padding} The current title padding.
+ * @return {!anychart.core.utils.Padding} The current title padding.
  *//**
  * Setter for the title padding in pixels using single value.<br/>
  * @param {(string|number|anychart.core.utils.Space)=} opt_value [null] Value to set.
- * @return {anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
+ * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
  *//**
  * Setter for the title padding in pixels using several numbers.<br/>
  * @example <t>listingOnly</t>
@@ -414,11 +416,11 @@ anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom,
  * @return {anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
  * @param {(string|number)=} opt_left .
- * @return {anychart.core.ui.Title|anychart.core.utils.Padding} .
+ * @return {!(anychart.core.ui.Title|anychart.core.utils.Padding)} .
  */
 anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {

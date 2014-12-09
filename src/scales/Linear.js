@@ -57,12 +57,12 @@ anychart.scales.Linear.prototype.getType = function() {
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.2, 1.9]);
  * chart.yScale().ticks([-1, 1, 3, 5]);
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!anychart.scales.Linear} An instance of {@link anychart.scales.Linear} class for method chaining.
  *//**
  * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.ticks = function(opt_value) {
@@ -85,12 +85,12 @@ anychart.scales.Linear.prototype.ticks = function(opt_value) {
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.2, 1.9]);
  * chart.yScale().minorTicks([1.1, 1.15, 1.2, 1.3]);
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!anychart.scales.Linear} An instance of {@link anychart.scales.Linear} class for method chaining.
  *//**
  * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
- * @param {!Array=} opt_value An array of ticks to set.
+ * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Linear|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
 anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
