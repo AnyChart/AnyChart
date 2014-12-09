@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>jQuery UI Sortable - Portlets</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+
+
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../src/deps.js"></script>
+  <script>
+    goog.require('anychart.modules.anychart');
+  </script>
+  <meta charset="utf-8">
+  <script src="index.js"></script>
+
+
+
+  <style>
+    body {
+      min-width: 100%;
+    }
+
+    .column {
+      width: 33%;
+      float: left;
+      padding-bottom: 100px;
+    }
+
+    .portlet {
+      margin: 0 1em 1em 0;
+      padding: 0.3em;
+    }
+
+    .portlet-header {
+      padding: 0.2em 0.3em;
+      margin-bottom: 0.5em;
+      position: relative;
+    }
+
+    .portlet-toggle {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      margin-top: -8px;
+    }
+
+    .portlet-content {
+      padding: 0.4em;
+    }
+
+    .portlet-placeholder {
+      border: 1px dotted black;
+      margin: 0 1em 1em 0;
+      height: 50px;
+    }
+
+    #container {
+      width: 100%;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+<input type="button" value="Try to fix" onclick="TryToFix();"/>
+<hr/>
+<div class="column">
+  <div class="portlet">
+    <div class="portlet-header">Feeds</div>
+    <div class="portlet-content" id="container"></div>
+  </div>
+  <div class="portlet">
+    <div class="portlet-header">News</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+</div>
+<div class="column">
+  <div class="portlet">
+    <div class="portlet-header">Shopping</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+</div>
+<div class="column">
+  <div class="portlet">
+    <div class="portlet-header">Links</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+  <div class="portlet">
+    <div class="portlet-header">Images</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+</div>
+</body>
+</html>

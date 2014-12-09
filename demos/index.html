@@ -1,26 +1,60 @@
-<!doctype html>
 <html>
 <head>
   <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
   <script src="../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../src/deps.js"></script>
   <meta charset="utf-8">
+
+  <script>
+    goog.require('anychart.modules.anychart');
+  </script>
   <style>
     html, body, #container {
       width: 100%;
       height: 100%;
       margin: 0;
-      padding: 0;
     }
   </style>
-  <script>
-    goog.require('anychart.modules.anychart');
-  </script>
-  <script src="index.js"></script>
 </head>
 <body>
-<div id="container"></div>
+<input type="button" onclick="removeContainer()" value="remove container">
+<input type="button" onclick="resize(1)" value="increase">
+<input type="button" onclick="resize(-1)" value="decrease">
+<input type="text" id="step" value="20"/>px
+<div id="wrapper">
+  <div id="container"  style="width: 400px; height: 220px; border: 1px solid #000000"></div>
+</div>
+<div id="wrapper1">
+
+</div>
+
+<div id="status"></div>
 </body>
+<script>
+  var chart;
+  anychart.onDocumentLoad(function() {
+    chart = anychart.line([1,3,4]);
+    chart.container('container').draw();
+
+  });
+
+  function removeContainer() {
+    var wrp = document.getElementById('wrapper');
+    var container = document.getElementById('container');
+    wrp.removeChild(container);
+    var wrp1 = document.getElementById('wrapper1');
+    wrp1.appendChild(container);
+  }
+
+  var width = 400;
+  var height = 220;
+  function resize(val){
+    width += val*document.getElementById('step').value;
+    height += val*document.getElementById('step').value;
+    document.getElementById('container').style.width = width;
+    document.getElementById('container').style.height = height;
+  }
+</script>
 </html>
 
 
