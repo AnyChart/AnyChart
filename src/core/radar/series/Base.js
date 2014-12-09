@@ -10,23 +10,23 @@ goog.require('anychart.enums');
 
 
 /**
- * Base class for all cartesian series.<br/>
+ * Base class for all radar series.<br/>
  * Base class defines common methods, such as those for:
  * <ul>
  *   <li>Binding series to a scale: <i>xScale, yScale</i></li>
  *   <li>Base color settings: <i>color</i></li>
  * </ul>
  * You can also obtain <i>getIterator, getResetIterator</i> iterators here
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  */
-anychart.core.radar.series.Base = function(data, opt_csvSettings) {
+anychart.core.radar.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
   goog.base(this);
-  this.data(data, opt_csvSettings);
+  this.data(opt_data || null, opt_csvSettings);
 
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
@@ -584,12 +584,12 @@ anychart.core.radar.series.Base.prototype.meta = function(opt_object_or_key, opt
  * chart.area([1, 4, 7, 1, 4]);
  * chart.line().data([1,2,3]);
  * chart.container(stage).draw();
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.core.radar.series.Base|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
@@ -2300,7 +2300,8 @@ anychart.core.radar.series.Base.prototype.setupByJSON = function(config) {
   this.color(config['color']);
   this.name(config['name']);
   this.meta(config['meta']);
-  this.data(config['data']);
+  if ('data' in config)
+    this.data(config['data'] || null);
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
   this.tooltip(config['tooltip']);

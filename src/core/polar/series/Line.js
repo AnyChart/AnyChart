@@ -9,14 +9,14 @@ goog.require('anychart.core.polar.series.ContinuousBase');
  * <b>Note:</b> Better for use methods {@link anychart.charts.Polar#line} or {@link anychart.core.Chart#lineChart}.
  * @example
  * anychart.core.polar.series.line([1, 4, 7, 1]).container(stage).draw();
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.polar.series.ContinuousBase}
  */
-anychart.core.polar.series.Line = function(data, opt_csvSettings) {
-  goog.base(this, data, opt_csvSettings);
+anychart.core.polar.series.Line = function(opt_data, opt_csvSettings) {
+  goog.base(this, opt_data, opt_csvSettings);
 };
 goog.inherits(anychart.core.polar.series.Line, anychart.core.polar.series.ContinuousBase);
 anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.LINE] = anychart.core.polar.series.Line;

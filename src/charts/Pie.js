@@ -195,7 +195,7 @@ anychart.charts.Pie = function(opt_data) {
       .fontSize(13)
       .padding(1);
   (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
-  this.data(opt_data);
+  this.data(opt_data || null);
   this.legend().enabled(true);
 
   this.outsideLabelsSpace('30%');
@@ -337,7 +337,7 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
  */
 anychart.charts.Pie.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.parentView_ != opt_value) {
+    if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
       goog.dispose(this.parentViewToDispose_);
       /**
        * @type {anychart.data.View}

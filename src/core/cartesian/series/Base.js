@@ -17,16 +17,16 @@ goog.require('anychart.enums');
  *   <li>Base color settings: <i>color</i></li>
  * </ul>
  * You can also obtain <i>getIterator, getResetIterator</i> iterators here.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Series data.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Series data.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  */
-anychart.core.cartesian.series.Base = function(data, opt_csvSettings) {
+anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
   goog.base(this);
-  this.data(data, opt_csvSettings);
+  this.data(opt_data || null, opt_csvSettings);
 
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   tooltip.suspendSignalsDispatching();
@@ -648,12 +648,12 @@ anychart.core.cartesian.series.Base.prototype.meta = function(opt_object_or_key,
  *    {'rowsSeparator': '\n', columnsSeparator: ';'})
  * @example <t>lineChart</t>
  * chart.line().data([1,2,3]);
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
  * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.core.cartesian.series.Base|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
@@ -2476,7 +2476,8 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
   this.xPointPosition(config['xPointPosition']);
   this.name(config['name']);
   this.meta(config['meta']);
-  this.data(config['data']);
+  if ('data' in config)
+    this.data(config['data'] || null);
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
   this.tooltip(config['tooltip']);

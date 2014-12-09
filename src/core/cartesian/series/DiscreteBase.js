@@ -6,14 +6,14 @@ goog.require('anychart.core.cartesian.series.BaseWithMarkers');
 
 /**
  * A base for all series with discrete points, like bars, sticks, columns, ohlc, etc.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.cartesian.series.BaseWithMarkers}
  */
-anychart.core.cartesian.series.DiscreteBase = function(data, opt_csvSettings) {
-  goog.base(this, data, opt_csvSettings);
+anychart.core.cartesian.series.DiscreteBase = function(opt_data, opt_csvSettings) {
+  goog.base(this, opt_data, opt_csvSettings);
   this.markers().position(anychart.enums.Position.CENTER_TOP);
   this.labels().position(anychart.enums.Position.CENTER_TOP);
 };

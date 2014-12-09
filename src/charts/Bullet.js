@@ -46,7 +46,7 @@ anychart.charts.Bullet = function(opt_data) {
    */
   this.layout_ = anychart.enums.Layout.HORIZONTAL;
 
-  this.data(opt_data);
+  this.data(opt_data || null);
 
 
   //default settings

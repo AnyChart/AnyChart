@@ -6,14 +6,14 @@ goog.require('anychart.core.scatter.series.BaseWithMarkers');
 /**
  * Define Line series type.<br/>
  * Get instance by methods {@link anychart.charts.Scatter#line}.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.scatter.series.BaseWithMarkers}
  */
-anychart.core.scatter.series.Line = function(data, opt_csvSettings) {
-  goog.base(this, data, opt_csvSettings);
+anychart.core.scatter.series.Line = function(opt_data, opt_csvSettings) {
+  goog.base(this, opt_data, opt_csvSettings);
 
   // --- ContinuousBase ---
 

@@ -8,14 +8,14 @@ goog.require('anychart.enums');
 
 /**
  * A base for all series except marker series.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.cartesian.series.Base}
  */
-anychart.core.cartesian.series.BaseWithMarkers = function(data, opt_csvSettings) {
-  goog.base(this, data, opt_csvSettings);
+anychart.core.cartesian.series.BaseWithMarkers = function(opt_data, opt_csvSettings) {
+  goog.base(this, opt_data, opt_csvSettings);
 
   this.markers().listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
   this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
