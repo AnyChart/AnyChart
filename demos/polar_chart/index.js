@@ -498,11 +498,11 @@ anychart.onDocumentLoad(function() {
 
 
   chart.palette(['blue .3', 'red .3', '#44F24A .9']);
-  var series1 = chart.line(data3).closed(false).connectMissingPoints(false);
+  var series1 = chart.line().closed(false).connectMissingPoints(false);
   series1.markers();
   series1.stroke('3 blue');
 
-  var series2 = chart.area(data4).closed(false).connectMissingPoints(false);
+  var series2 = chart.area().closed(false).connectMissingPoints(false);
   series2.stroke('3 red');
 
   //var series3 = chart.marker(data3);

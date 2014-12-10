@@ -503,7 +503,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
     this.oddFillElement().clear();
     this.lineElement().clear();
 
-    var fill, isOrdinal, ticks, ticksArray, ticksArrLen;
+    var isOrdinal, ticks, ticksArray, ticksArrLen;
     /** @type {anychart.core.utils.TypedLayer} */
     var layer;
 
@@ -512,7 +512,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
     this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
     this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
 
-    var angle = goog.math.standardAngle(this.startAngle() - 90);
+    var startAngle = this.startAngle() - 90;
     this.evenFillElement().clip(parentBounds);
     this.oddFillElement().clip(parentBounds);
     this.lineElement().clip(parentBounds);
@@ -527,12 +527,14 @@ anychart.core.grids.Polar.prototype.draw = function() {
       ticksArrLen = ticksArray.length - 1;
 
       var sweep = 360 / ticksArrLen;
-      var angleRad, x, y, prevX = NaN, prevY = NaN;
+      var angleRad, x, y, prevX = NaN, prevY = NaN, xRatio, angle;
 
       var lineThickness = this.stroke()['thickness'] ? this.stroke()['thickness'] : 1;
       var xPixelShift, yPixelShift;
       for (i = 0; i < ticksArrLen; i++) {
-        angleRad = angle * Math.PI / 180;
+        xRatio = xScale.transform(ticksArray[i]);
+        angle = goog.math.standardAngle(startAngle + 360 * xRatio);
+        angleRad = goog.math.toRadians(angle);
 
         xPixelShift = 0;
         yPixelShift = 0;
@@ -558,11 +560,11 @@ anychart.core.grids.Polar.prototype.draw = function() {
 
         prevX = x;
         prevY = y;
-        angle = goog.math.standardAngle(angle + sweep);
       }
 
       //draw last line on ordinal
       layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
+      angle = goog.math.standardAngle(startAngle);
       angleRad = angle * Math.PI / 180;
       x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
       y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
@@ -583,11 +585,21 @@ anychart.core.grids.Polar.prototype.draw = function() {
         } else
           leftTick = rightTick = tickVal;
 
-
         var ratio = yScale.transform(leftTick);
+
         layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
-        drawInterlace.call(this, ratio, prevRatio, layer);
+        if (i == ticksArrLen - 1) {
+          if (isOrdinal) {
+            drawInterlace.call(this, ratio, prevRatio, layer);
+            layer = i % 2 == 0 ? this.oddFillElement_ : this.evenFillElement_;
+            drawInterlace.call(this, yScale.transform(rightTick, 1), ratio, layer);
+          } else {
+            drawInterlace.call(this, ratio, prevRatio, layer);
+          }
+        } else {
+          drawInterlace.call(this, ratio, prevRatio, layer);
+        }
 
         if (i == ticksArrLen - 1) {
           if (isOrdinal) {

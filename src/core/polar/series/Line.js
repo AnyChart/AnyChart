@@ -78,7 +78,11 @@ anychart.core.polar.series.Line.prototype.drawSubsequentPoint = function() {
 /** @inheritDoc */
 anychart.core.polar.series.Line.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.firstPointIsMissing && this.closed()) {
+    if (!this.firstPointIsMissing &&
+        this.closed() &&
+        goog.isDefAndNotNull(this.prevValuePointCoords) &&
+        goog.isDefAndNotNull(this.firstValuePointCoords)) {
+
       var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords);
 
       if (!valuePoint) {
