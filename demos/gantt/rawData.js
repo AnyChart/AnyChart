@@ -15,7 +15,10 @@ var rawData = [
     'progressValue': '25%',
     'actualStart': Date.UTC(2000, 1, 24, 0, 0, 0, 0),
     'actualEnd': Date.UTC(2000, 2, 2, 0, 0, 0, 0),
-    'rowHeight': 30
+    'rowHeight': 30,
+    'baselineStart': Date.UTC(2000, 1, 27, 12, 0, 0, 0),
+    'baselineEnd': Date.UTC(2000, 2, 2, 14, 0, 0, 0)
+
   },
   {
     'id': '3',

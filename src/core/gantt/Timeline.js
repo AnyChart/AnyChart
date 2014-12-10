@@ -286,6 +286,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.header_ = new anychart.core.gantt.TimelineHeader();
   this.header_.suspendSignalsDispatching();
   this.header_.scale(this.scale_);
+  this.header_.zIndex(anychart.core.gantt.Timeline.HEADER_Z_INDEX);
   this.header_.resumeSignalsDispatching(false);
   this.registerDisposable(this.header_);
 
@@ -319,24 +320,24 @@ anychart.core.gantt.Timeline.DEFAULT_HEADER_HEIGHT = 70;
 
 
 /**
+ * Baseline path z-index.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 10;
+
+
+/**
  * Base path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.BASE_Z_INDEX = 10;
+anychart.core.gantt.Timeline.BASE_Z_INDEX = 20;
 
 
 /**
  * Progress path z-index.
  * @type {number}
  */
-anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 20;
-
-
-/**
- * Baseline path z-index.
- * @type {number}
- */
-anychart.core.gantt.Timeline.BASELINE_Z_INDEX = 30;
+anychart.core.gantt.Timeline.PROGRESS_Z_INDEX = 30;
 
 
 /**
@@ -365,6 +366,13 @@ anychart.core.gantt.Timeline.CONNECTOR_Z_INDEX = 60;
  * @type {number}
  */
 anychart.core.gantt.Timeline.ARROW_Z_INDEX = 70;
+
+
+/**
+ * Timeline header z-index.
+ * @type {number}
+ */
+anychart.core.gantt.Timeline.HEADER_Z_INDEX = 80;
 
 
 /**
@@ -637,8 +645,7 @@ anychart.core.gantt.Timeline.prototype.getLabelsFactory_ = function() {
         .zIndex(anychart.core.gantt.Timeline.LABEL_Z_INDEX)
         .anchor(anychart.enums.Anchor.LEFT_CENTER)
         .position(anychart.enums.Position.RIGHT_CENTER)
-        .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN)
-        .container(this.getBase_());
+        .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN);
   }
   return this.labelsFactory_;
 };
@@ -653,7 +660,6 @@ anychart.core.gantt.Timeline.prototype.getMarkersFactory_ = function() {
   if (!this.markersFactory_) {
     this.markersFactory_ = new anychart.core.ui.MarkersFactory();
     this.markersFactory_
-        .container(this.getBase_())
         .anchor(anychart.enums.Anchor.CENTER_TOP)
         .zIndex(anychart.core.gantt.Timeline.MARKER_Z_INDEX)
         .enabled(true)
@@ -816,8 +822,11 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
       position = rawLabel['position'];
     } else {
       position = this.getLabelsFactory_().position();
-      if (isActualBaseline) position = anychart.enums.Position.CENTER;
-      if (isParent) position = anychart.enums.Position.RIGHT_BOTTOM;
+      if (isActualBaseline) {
+        position = anychart.enums.Position.CENTER;
+      } else if (isParent) {
+        position = anychart.enums.Position.RIGHT_BOTTOM;
+      }
     }
 
     position = anychart.enums.normalizeAnchor(position);
@@ -833,13 +842,29 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
 
   var bar = this.getDataLayer_().genNextChild();
 
+  var w = bounds.left + bounds.width;
+  var h = bounds.top + bounds.height;
+  var h2 = bounds.top + bounds.height * 1.4;
+
   bar
       .zIndex(zIndex)
       .moveTo(bounds.left, bounds.top)
-      .lineTo(bounds.left + bounds.width, bounds.top)
-      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
-      .lineTo(bounds.left, bounds.top + bounds.height)
-      .close();
+      .lineTo(w, bounds.top);
+  if (isParent) {
+    bar
+        .lineTo(w, h2)
+        .lineTo(w - 1, h2)
+        .lineTo(w - 1, h)
+        .lineTo(bounds.left + 1, h)
+        .lineTo(bounds.left + 1, h2)
+        .lineTo(bounds.left, h2);
+
+  } else {
+    bar
+        .lineTo(w, h)
+        .lineTo(bounds.left, h);
+  }
+  bar.close();
 
 
 
@@ -1643,6 +1668,9 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer_()))
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getSeparationLayer_()))
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDataLayer_()));
+
+      this.getMarkersFactory_().container(this.getBase_());
+      this.getLabelsFactory_().container(this.getBase_());
 
       this.header_.container(this.getBase_());
 

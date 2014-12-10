@@ -229,6 +229,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+      this.getBase_().zIndex(/** @type {number} */ (this.zIndex()));
       this.markConsistent(anychart.ConsistencyState.Z_INDEX);
     }
 

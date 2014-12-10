@@ -1481,7 +1481,6 @@ anychart.core.ui.DataGrid.Column.prototype.useButtons = function(opt_value) {
  */
 anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
   if (!this.title_) {
-    var ths = this;
     this.title_ = new anychart.core.ui.Title();
 
     this.title_.suspendSignalsDispatching();
