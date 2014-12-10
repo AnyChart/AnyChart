@@ -96,7 +96,7 @@ anychart.palettes.HatchFills.prototype.serialize = function() {
   for (var i = 0; i < this.hatchFills_.length; i++) {
     res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.hatchFills_[i])));
   }
-  json['hatchFills'] = res;
+  json['items'] = res;
   return json;
 };
 
@@ -121,7 +121,7 @@ anychart.palettes.HatchFills.prototype.setupSpecial = function(var_args) {
  */
 anychart.palettes.HatchFills.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.hatchFills(config['hatchFills']);
+  this.hatchFills(config['items']);
 };
 
 

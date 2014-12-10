@@ -793,9 +793,9 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   if (isHtml) {
-    this.measureTextElement_.htmlText(goog.isDef(text) ? String(text) : null);
+    this.measureTextElement_.htmlText(goog.isDefAndNotNull(text) ? String(text) : null);
   } else {
-    this.measureTextElement_.text(goog.isDef(text) ? String(text) : null);
+    this.measureTextElement_.text(goog.isDefAndNotNull(text) ? String(text) : null);
   }
 
   this.applyTextSettings(this.measureTextElement_, true);

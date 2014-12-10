@@ -176,6 +176,7 @@ anychart.core.ui.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @return {!anychart.core.ui.Label|string} .
  */
 anychart.core.ui.Label.prototype.text = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = goog.string.makeSafe(opt_value);
   return /** @type {!anychart.core.ui.Label|string} */(this.textSettings('text', opt_value));
 };
 

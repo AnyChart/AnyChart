@@ -1,6 +1,5 @@
-var chart;
 anychart.onDocumentLoad(function() {
-  var data4 = [
+  var data = [
     [0, 0],
     [1, 0.0785],
     [2, 0.1568],
@@ -364,29 +363,30 @@ anychart.onDocumentLoad(function() {
     [360, 0]
   ];
 
-  chart = anychart.polar()
-      .container('container')
-      .startAngle(0);
+  //create polar chart
+  chart = anychart.polar();
 
+  //set container id for the chart
+  chart.container('container');
+
+  //set chart yScale settings
   chart.yScale().stackMode(anychart.enums.ScaleStackMode.VALUE);
   chart.yScale().ticks().interval(.2);
+
+  //set chart xScale settings
   chart.xScale().maximum(360);
   chart.xScale().ticks().interval(15);
 
-  var background = chart.background().enabled(true);
-  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
-
-  chart.yAxis().minorTicks().enabled(false);
+  //set xAxis formatting settings
   chart.xAxis().labels().textFormatter(function() {return this['value'] + '°'});
 
-  chart.title(null);
-  chart.background().enabled(true);
+  //disable chart title
+  chart.title(false);
 
-  chart.grid(1).oddFill(null).evenFill(null);
-  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
-
-  var series1 = chart.line(data4).stroke('3 rgb(29, 139, 209)');
+  //create series line series
+  var series1 = chart.line(data).stroke('3 rgb(29, 139, 209)');
   series1.markers().enabled(false);
 
+  //initiate chart drawing
   chart.draw();
 });

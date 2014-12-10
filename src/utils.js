@@ -531,16 +531,55 @@ anychart.utils.xml2json = function(xml) {
   switch (node.nodeType) {
     case anychart.utils.XmlNodeType_.ELEMENT_NODE:
       var result = {};
-      var i;
+      var resultIsArray = false;
+      var multiProp = {};
+      var i, name, len, onlyText = true;
 
-      var len = (node.attributes == null) ? 0 : node.attributes.length;
-      var onlyText = !len;
+      len = node.childNodes.length;
+      var textValue = '';
+      // collecting subnodes
+      for (i = 0; i < len; i++) {
+        var childNode = node.childNodes[i];
+        var subnode = anychart.utils.xml2json(childNode);
+        var subNodeName = childNode.nodeName;
+        if (subNodeName.charAt(0) == '#') {
+          textValue += subnode;
+        } else if (subNodeName == '__element') {
+          if (!resultIsArray) {
+            result = [];
+            resultIsArray = true;
+          }
+          onlyText = false;
+          result[subnode['index']] = subnode['value'];
+        } else if (!goog.isNull(subnode) && !resultIsArray) {
+          onlyText = false;
+          var names;
+          name = anychart.utils.toCamelCase(subNodeName);
+          if (names = anychart.utils.getArrayPropName_(name)) {
+            var element = subnode[names[1]];
+            if (!goog.isArray(element))
+              element = [element];
+            result[names[0]] = element;
+          } else if (name in result) {
+            if (multiProp[name]) {
+              result[name].push(subnode);
+            } else {
+              result[name] = [result[name], subnode];
+              multiProp[name] = true;
+            }
+          } else {
+            result[name] = subnode;
+          }
+        }
+      }
 
+      len = (node.attributes == null) ? 0 : node.attributes.length;
       // collecting attributes
       for (i = 0; i < len; i++) {
         /** @type {Attr} */
         var attr = node.attributes[i];
-        if (!(attr.nodeName in result)) {
+        name = anychart.utils.toCamelCase(attr.nodeName);
+        if (!(name in result)) {
           var val = attr.nodeValue;
           if (!isNaN(+val))
             result[attr.nodeName] = +val;
@@ -552,32 +591,7 @@ anychart.utils.xml2json = function(xml) {
             result[attr.nodeName] = null;
           else
             result[attr.nodeName] = val;
-        }
-      }
-
-      len = node.childNodes.length;
-      var textValue = '';
-      // collecting subnodes
-      for (i = 0; i < len; i++) {
-        var childNode = node.childNodes[i];
-        var subnode = anychart.utils.xml2json(childNode);
-        var subNodeName = childNode.nodeName;
-        if (subNodeName.charAt(0) == '#') {
-          textValue += subnode;
-        } else if (!goog.isNull(subnode)) {
           onlyText = false;
-          var names;
-          if (names = anychart.utils.getArrayPropName_(subNodeName)) {
-            result[names[0]] = subnode[names[1]];
-          } else if (subNodeName in result) {
-            if (goog.isArray(result[subNodeName])) {
-              result[subNodeName].push(subnode);
-            } else {
-              result[subNodeName] = [result[subNodeName], subnode];
-            }
-          } else {
-            result[subNodeName] = subnode;
-          }
         }
       }
 
@@ -608,7 +622,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   }
   /** @type {Document} */
   var result = goog.dom.xml.createDocument();
-  var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'xml', result);
+  var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root)
     result.appendChild(root);
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -633,12 +647,19 @@ anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#_(),. -]*$/;
  */
 anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
   if (goog.isNull(json)) return null;
+  rootNodeName = anychart.utils.toXmlCase(rootNodeName);
   var root = doc.createElement(rootNodeName);
+  var i, j;
   if (goog.isString(json) || goog.isNumber(json)) {
-    root.appendChild(doc.createCDATASection(String(json)));
+    root.appendChild(doc.createCDATASection(goog.string.escapeString(String(json))));
+  } else if (goog.isArray(json)) {
+    for (i = 0; i < json.length; i++) {
+      if (goog.isDef(json[i])) {
+        root.appendChild(anychart.utils.json2xml_({'index': i, 'value': json[i]}, '__element', doc));
+      }
+    }
   } else {
-    var j;
-    for (var i in json) {
+    for (i in json) {
       if (json.hasOwnProperty(i)) {
         var child = json[i];
         if (goog.isArray(child)) {
@@ -659,7 +680,7 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
           if (goog.isObject(child) || !anychart.utils.ACCEPTED_BY_ATTRIBUTE_.test(child)) {
             root.appendChild(anychart.utils.json2xml_(child, i, doc));
           } else {
-            root.setAttribute(i, child);
+            root.setAttribute(anychart.utils.toXmlCase(i), child);
           }
         }
       }
@@ -678,11 +699,33 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
 anychart.utils.getNodeNames_ = function(arrayPropName) {
   switch (arrayPropName) {
     case 'series':
-      return ['seriesList', 'series'];
+      return ['series_list', 'series'];
     case 'keys':
       return ['keys', 'key'];
     case 'data':
       return ['data', 'point'];
+    case 'lineAxesMarkers':
+      return ['line_axes_markers', 'line_axes_marker'];
+    case 'rangeAxesMarkers':
+      return ['range_axes_markers', 'range_axes_marker'];
+    case 'textAxesMarkers':
+      return ['text_axes_markers', 'text_axes_marker'];
+    case 'grids':
+      return ['grids', 'grid'];
+    case 'minorGrids':
+      return ['minor_grids', 'grid'];
+    case 'xAxes':
+      return ['x_axes', 'axis'];
+    case 'yAxes':
+      return ['y_axes', 'axis'];
+    case 'scales':
+      return ['scales', 'scale'];
+    case 'explicit':
+      return ['explicit', 'tick'];
+    case 'values':
+      return ['values', 'value'];
+    case 'names':
+      return ['names', 'name'];
   }
   return null;
 };
@@ -696,14 +739,62 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
  */
 anychart.utils.getArrayPropName_ = function(nodeName) {
   switch (nodeName) {
-    case 'seriesList':
+    case 'series_list':
       return ['series', 'series'];
     case 'keys':
       return ['keys', 'key'];
     case 'data':
       return ['data', 'point'];
+    case 'line_axes_markers':
+      return ['lineAxesMarkers', 'lineAxesMarker'];
+    case 'range_axes_markers':
+      return ['rangeAxesMarkers', 'rangeAxesMarker'];
+    case 'text_axes_markers':
+      return ['textAxesMarkers', 'textAxesMarker'];
+    case 'grids':
+      return ['grids', 'grid'];
+    case 'minor_grids':
+      return ['minorGrids', 'grid'];
+    case 'x_axes':
+      return ['xAxes', 'axis'];
+    case 'y_axes':
+      return ['yAxes', 'axis'];
+    case 'scales':
+      return ['scales', 'scale'];
+    case 'explicit':
+      return ['explicit', 'tick'];
+    case 'values':
+      return ['values', 'value'];
+    case 'names':
+      return ['names', 'name'];
   }
   return null;
+};
+
+
+/**
+ * Converts a string from selector-case to camelCase (e.g. from
+ * "multi-part-string" to "multiPartString"), useful for converting
+ * CSS selectors and HTML dataset keys to their equivalent JS properties.
+ * @param {string} str The string in selector-case form.
+ * @return {string} The string in camelCase form.
+ */
+anychart.utils.toCamelCase = function(str) {
+  return String(str).replace(/_([a-z])/g, function(all, match) {
+    return match.toUpperCase();
+  });
+};
+
+
+/**
+ * Converts a string from camelCase to selector-case (e.g. from
+ * "multiPartString" to "multi-part-string"), useful for converting JS
+ * style and dataset properties to equivalent CSS selectors and HTML keys.
+ * @param {string} str The string in camelCase form.
+ * @return {string} The string in selector-case form.
+ */
+anychart.utils.toXmlCase = function(str) {
+  return String(str).replace(/([A-Z])/g, '_$1').toLowerCase();
 };
 
 

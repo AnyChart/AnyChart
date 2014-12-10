@@ -233,6 +233,7 @@ anychart.core.ui.Title.prototype.transformation_ = null;
  * @return {!anychart.core.ui.Title|string} .
  */
 anychart.core.ui.Title.prototype.text = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = goog.string.makeSafe(opt_value);
   return /** @type {!anychart.core.ui.Title|string} */(this.textSettings('text', opt_value));
 };
 

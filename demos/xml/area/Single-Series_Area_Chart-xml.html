@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <!--Compiled JS-->
+  <script src="../../../out/anychart.min.js"></script>
+
+  <!--Non Compiled JS-->
+  <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
+  <!--<script src="../../../src/deps.js"></script>-->
+  <!--<script>-->
+    <!--goog.require('anychart.modules.anychart');-->
+  <!--</script>-->
+  <script>
+    anychart.onDocumentReady(function() {
+      var xml = '<xml>'+
+                  '<chart type="area" container="container" title="Area Chart">'+
+                      '<yScale minimum="0"/>'+
+                      '<xAxes>'+
+                          '<axis>'+
+                              '<title>'+
+                                  '<margin bottom="10"/>'+
+                                  '<padding right="5"/>'+
+                              '</title>'+
+                          '</axis>'+
+                      '</xAxes>'+
+                      '<seriesList>'+
+                          '<series>'+
+                              '<data>'+
+                                  '<point x="P1" value="162"/>'+
+                                  '<point x="P2" value="134"/>'+
+                                  '<point x="P3" value="116"/>'+
+                                  '<point x="P4" value="122"/>'+
+                                  '<point x="P5" value="178"/>'+
+                                  '<point x="P6" value="144"/>'+
+                                  '<point x="P7" value="125"/>'+
+                                  '<point x="P8" value="176"/>'+
+                                  '<point x="P9" value="156"/>'+
+                                  '<point x="P10" value="195"/>'+
+                                  '<point x="P11" value="135"/>'+
+                                  '<point x="P12" value="176"/>'+
+                                  '<point x="P13" value="167"/>'+
+                                  '<point x="P14" value="142"/>'+
+                                  '<point x="P15" value="117"/>'+
+                                  '<point x="P16" value="113"/>'+
+                                  '<point x="P17" value="132"/>'+
+                                  '<point x="P18" value="146"/>'+
+                                  '<point x="P19" value="169"/>'+
+                                  '<point x="P20" value="184"/>'+
+                              '</data>'+
+                              '<fill color="#1D8BD1" opacity="0.2"/>'+
+                              '<stroke color="#1D8BD1" thickness="2"/>'+
+                              '<markers enabled="true" fill="#1D8BD1"/>'+
+                              '<hoverMarkers enabled="true"/>'+
+                          '</series>'+
+                      '</seriesList>'+
+                  '</chart>'+
+              '</xml>';
+      var chart = anychart.fromXml(xml);
+      chart.draw();
+    });
+  </script>
+</head>
+<body>
+<div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
+</body>
+</html>

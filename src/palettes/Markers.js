@@ -95,7 +95,7 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
  */
 anychart.palettes.Markers.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['markers'] = this.markers();
+  json['items'] = this.markers();
   return json;
 };
 
@@ -120,7 +120,7 @@ anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
  */
 anychart.palettes.Markers.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.markers(config['markers']);
+  this.markers(config['items']);
 };
 
 

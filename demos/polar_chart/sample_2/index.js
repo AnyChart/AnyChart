@@ -1,6 +1,5 @@
-var chart;
 anychart.onDocumentLoad(function() {
-  var data4 = [
+  var data = [
     [0, 0],
     [10, 1],
     [20, 2],
@@ -14,29 +13,32 @@ anychart.onDocumentLoad(function() {
     [100, 10]
   ];
 
-  chart = anychart.polar()
-      .container('container')
-      .startAngle(0);
+  //create polar chart
+  chart = anychart.polar();
 
+  //set container id for the chart
+  chart.container('container');
+
+  //set chart yScale settings
   chart.yScale().ticks().interval(2);
+
+  //set chart xScale settings
   chart.xScale().maximum(100);
   chart.xScale().ticks().interval(10);
-  chart.yAxis().minorTicks().enabled(false);
+
+  //set xAxis labels settings
   chart.xAxis().labels()
       .textFormatter(function() {return this['value'] + '.00'})
       .fontWeight('bold');
 
-  chart.title(null);
+  //disable chart title
+  chart.title(false);
 
-  var background = chart.background().enabled(true);
-  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)'], 90);
-
-  chart.grid(0).oddFill('rgb(255, 255, 255)').evenFill('rgb(250, 250, 250)');
-  chart.grid(1).oddFill(null).evenFill(null);
-
-  var series1 = chart.line(data4).closed(false);
+  //create line series
+  var series1 = chart.line(data).closed(false);
   series1.markers().size(3).fill({keys: ['#8BC9F0', '#1D8BD1'], cx: 0.4, cy: 0.4});
   series1.stroke('3 rgb(29, 139, 209)');
 
+  //initiate chart drawing
   chart.draw();
 });

@@ -303,7 +303,7 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
   for (var i = 0; i < this.colors_.length; i++) {
     res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.colors_[i])));
   }
-  json['colors'] = res;
+  json['items'] = res;
   json['count'] = this.count_;
   return json;
 };
@@ -329,7 +329,7 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
 /** @inheritDoc */
 anychart.palettes.RangeColors.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.colors(config['colors']);
+  this.colors(config['items']);
   this.count(config['count']);
 };
 
