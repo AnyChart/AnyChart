@@ -796,6 +796,19 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
  * Getter for the current pie labels.<br/>
  * It is used to access to the current (default too) settings of the labels.<br>
  * <b>Note:</b> Default labels will appear when this getter is called for the first time.
+ * @example
+ *  var data = [
+ *    {name: 'Point 1', value: 10},
+ *    {name: 'Point 2', value: 7},
+ *    {name: 'Point 3', value: 20},
+ *    {name: 'Point 4', value: 14}
+ *  ];
+ *  var chart = anychart.pie(data);
+ *  chart.labels()
+ *      .position('outside')
+ *      .fontSize(10)
+ *      .fontColor('red');
+ *  chart.container(stage).draw();
  * @return {!anychart.core.ui.LabelsFactory} An instance of {@link anychart.core.ui.LabelsFactory} class for method chaining.
  *//**
  * Setter for the pie labels.<br/>
@@ -809,12 +822,7 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
  *    {name: 'Point 4', value: 14}
  *  ];
  *  var chart = anychart.pie(data);
- *  var labels = anychart.ui.labelsFactory();
- *  labels
- *      .position('outside')
- *      .fontSize(10)
- *      .fontColor('red');
- *  chart.labels(labels);
+ *  chart.labels(true);
  *  chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value [] LabelsFactory instance.
  * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
@@ -849,6 +857,19 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
 
 /**
  * Getter for series hover data labels.
+ * @example
+ *  var data = [
+ *    {name: 'Point 1', value: 10},
+ *    {name: 'Point 2', value: 7},
+ *    {name: 'Point 3', value: 20},
+ *    {name: 'Point 4', value: 14}
+ *  ];
+ *  var chart = anychart.pie(data);
+ *  chart.hoverLabels()
+ *      .fontSize(10)
+ *      .fontStyle('italic')
+ *      .fontColor('red');
+ *  chart.container(stage).draw();
  * @return {!anychart.core.ui.LabelsFactory} Current labels instance.
  *//**
  * Setter for series hover data labels.
@@ -860,12 +881,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
  *    {name: 'Point 4', value: 14}
  *  ];
  *  var chart = anychart.pie(data);
- *  var labels = anychart.ui.labelsFactory();
- *  labels
- *      .fontSize(10)
- *      .fontStyle('italic')
- *      .fontColor('red');
- *  chart.hoverLabels(labels);
+ *  chart.hoverLabels(false);
  *  chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
  * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
@@ -2152,9 +2168,6 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for tolltip settings.
- * @return {!anychart.core.ui.Tooltip} An instance of {@link anychart.core.ui.Tooltip} class for method chaining.
- *//**
- * Setter for tolltip settings.
  * @example
  * var chart = anychart.pie([10, 14, 8, 12]);
  * chart.tooltip()
@@ -2163,6 +2176,13 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function() {
  *     })
  *     .title()
  *         .enabled(true);
+ * chart.container(stage).draw();
+ * @return {!anychart.core.ui.Tooltip} An instance of {@link anychart.core.ui.Tooltip} class for method chaining.
+ *//**
+ * Setter for tolltip settings.
+ * @example
+ * var chart = anychart.pie([10, 14, 8, 12]);
+ * chart.tooltip(false);
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.

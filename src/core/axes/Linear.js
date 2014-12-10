@@ -362,7 +362,8 @@ anychart.core.axes.Linear.prototype.minorLabelsBounds_ = null;
  * Setter for the axis title.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().title('New title for my axis')
+ * chart.xAxis().title('New title for my axis');
+ * chart.yAxis().title(null);
  * @param {(null|boolean|Object|string)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
@@ -406,14 +407,15 @@ anychart.core.axes.Linear.prototype.titleInvalidated_ = function(event) {
 
 /**
  * Getter for axis labels.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.xAxis().labels().fontSize(14).rotation(-90);
  * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var labels = anychart.ui.labelsFactory();
- * labels.fontSize(14).rotation(-90);
- * chart.xAxis().labels(labels);
+ * chart.xAxis().labels(false);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
@@ -459,14 +461,15 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis minor labels.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.xAxis().minorLabels().fontSize(14).rotation(-90);
  * @return {!anychart.core.ui.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var labels = anychart.ui.labelsFactory();
- * labels.enabled(true).fontSize(6).rotation(-45);
- * chart.yAxis().labels(labels);
+ * chart.xAxis().minorLabels(null);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
@@ -512,13 +515,15 @@ anychart.core.axes.Linear.prototype.minorLabelsInvalidated_ = function(event) {
 
 /**
  * Getter for axis ticks.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().ticks().stroke('5 blue').length(5);
  * @return {!anychart.core.axes.Ticks} Axis ticks.
  *//**
  * Setter for axis ticks.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().ticks().stroke('5 blue').length(5);
- * chart.xAxis().ticks(chart.yAxis().ticks());
+ * chart.xAxis().ticks(false);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
@@ -562,14 +567,15 @@ anychart.core.axes.Linear.prototype.ticksInvalidated_ = function(event) {
 
 /**
  * Getter for minor axis ticks.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
  * @return {!anychart.core.axes.Ticks} Axis ticks.
  *//**
  * Setter for minor axis ticks.
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
- * chart.xScale(anychart.scales.linear());
- * chart.xAxis().minorTicks(chart.yAxis().minorTicks());
+ * chart.yAxis().minorTicks(false);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
@@ -612,17 +618,38 @@ anychart.core.axes.Linear.prototype.minorTicksInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis line stroke.
- * @return {acgraph.vector.Stroke} Axis line stroke settings.
+ * Getter for axis line stroke settings.
+ * @return {!acgraph.vector.Stroke} Axis line stroke settings.
  *//**
- * Setter for axis line stroke by one value.<br/>
+ * Setter for series stroke by function.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().stroke(
+ *      function(){
+ *        return '3 '+ this.sourceColor;
+ *      }
+ * );
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
+ *//**
+ * Setter for stroke settings.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().stroke('3 darkgreen 0.8');
- * @param {(acgraph.vector.Stroke)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
+ * chart.yAxis().stroke('orange', 3, '5 2', 'round');
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
@@ -693,6 +720,9 @@ anychart.core.axes.Linear.prototype.setDefaultOrientation = function(value) {
 
 /**
  * Getter for axis scale.
+ * @example <t>lineChart</t>
+ * chart.spline([1.1, 1.6, 1.4, 1.9]);
+ * chart.yAxis().scale().minimum(0.5);
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.

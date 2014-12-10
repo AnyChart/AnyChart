@@ -375,11 +375,9 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the current chart background.
- * @return {!anychart.core.ui.Background} The current chart background.
- *//**
- * Setter for the chart background.
  * @example <t>lineChart</t>
- * var background = anychart.ui.background()
+ * chart.line([1.1, 1.4, 1.2, 1.6]);
+ * chart.background(background)
  *    .stroke('2 rgb(36,102,177)')
  *    .corners(10)
  *    .fill({
@@ -390,7 +388,12 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
  *           ],
  *           angle: -90
  *         });
- * chart.background(background);
+ * @return {!anychart.core.ui.Background} The current chart background.
+ *//**
+ * Setter for the chart background.
+ * @example <t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.6]);
+ * chart.background(null);
  * @param {Object=} opt_value Background object to set.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**
@@ -435,16 +438,19 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart title.
+ * @example <c>Title instance</c><t>lineChart</t>
+ * chart.title()
+ *      .fontColor('red')
+ *      .text('Red Chart title');
  * @return {!anychart.core.ui.Title} The current chart title.
  *//**
  * Setter for the chart title.
  * @example <c>Simple string</c><t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.6]);
  * chart.title().text('Conqueror of Naxxramas');
- * @example <c>Title instance</c><t>lineChart</t>
- * chart.title(anychart.ui.title()
- *      .fontColor('red')
- *      .text('Red Chart title')
- * );
+ * @example <c>Disabling title</c><t>lineChart</t>
+ * chart.line([1.1, 1.4, 1.2, 1.6]);
+ * chart.title(false);
  * @param {(null|boolean|Object|string)=} opt_value Chart title text or title instance for copy settings from.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
@@ -497,19 +503,21 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current chart legend.
+ * @example <t>lineChart</t>
+ * chart.line([-2, 11, 2, 4]);
+ * chart.line([7, 10, 2, 0]);
+ * chart.legend()
+ *         .position('right')
+ *         .title(null)
+ *         .itemsLayout('vertical')
+ *         .align('left');
  * @return {!anychart.core.ui.Legend} An instance of {@link anychart.core.ui.Legend} for method chaining.
  *//**
  * Setter for chart legend setting.
  * @example <t>lineChart</t>
  * chart.line([-2, 11, 2, 4]);
  * chart.line([7, 10, 2, 0]);
- * chart.legend(
- *     anychart.ui.legend()
- *         .position('right')
- *         .title(null)
- *         .itemsLayout('vertical')
- *         .align('left')
- * );
+ * chart.legend(true);
  * @param {(Object|boolean|null)=} opt_value Legend settings.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
@@ -562,32 +570,24 @@ anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for chart label.
+ * @example <t>lineChart</t>
+ * chart.line([1, 2, 1.3, 2.9]);
+ * chart.label().text('custom text');
  * @param {(string|number)=} opt_index [0] Index of instance.
  * @return {!anychart.core.ui.Label} An instance of {@link anychart.core.ui.Label} for method chaining.
  *//**
  * Setter for chart label.
  * @example <t>lineChart</t>
  * chart.line([1, 2, 1.3, 2.9]);
- * chart.label(
- *   anychart.ui.label()
- *        .text('custom text')
- * );
+ * chart.label({text: 'custom text});
  * @param {(null|boolean|Object|string)=} opt_value Chart label instance to add by index 0.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**
  * Setter for chart label.
  * @example <t>lineChart</t>
  * chart.line([1, 2, 1.3, 2.9]);
- * chart.label(0,
- *     anychart.ui.label().text('Left chart label')
- * );
- * chart.label(1,
- *     anychart.ui.label()
- *         .text('Right chart label')
- *         .position('centertop')
- *         .position('righttop')
- *         .anchor('righttop')
- * );
+ * chart.label(0, {text: 'text'});
+ * chart.label(1, {position: 'righttop', text: 'another text'});
  * chart.container(stage).draw();
  * @param {(string|number)=} opt_index Index of instance.
  * @param {(null|boolean|Object|string)=} opt_value  Chart label instance.
@@ -644,14 +644,15 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current chart credits settings.
+ * @example <t>lineChart</t>
+ * chart.line([1, 4, 2, 9]);
+ * chart.credits().text('Click me!');
  * @return {!anychart.core.ui.Credits} An instance of {@link anychart.core.ui.Credits} class for method chaining.
  *//**
  * Setter for chart credits settings.
  * @example <t>lineChart</t>
  * chart.line([1, 4, 2, 9]);
- * chart.credits(
- *   anychart.ui.credits().enabled(true).text('Click me!')
- * );
+ * chart.credits(null);
  * @param {(Object|boolean|null)=} opt_value
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  *//**

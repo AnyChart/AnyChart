@@ -211,7 +211,12 @@ anychart.charts.Polar.prototype.startAngle = function(opt_value) {
  *//**
  * Setter for default chart X scale.<br/>
  * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @param {anychart.scales.ScatterBase=} opt_value X Scale to set.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([{x: 12, y: 12}, {x: 92, y: 92}]);
+ * chart.xScale('log');
+ * chart.container(stage).draw();
+ * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -248,7 +253,12 @@ anychart.charts.Polar.prototype.xScale = function(opt_value) {
  *//**
  * Setter for default chart Y scale.<br/>
  * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @param {anychart.scales.ScatterBase=} opt_value Y Scale to set.
+ * @example
+ * var chart = anychart.polar();
+ * chart.line([100, 12, 1, 44, 14, 95]);
+ * chart.yScale().inverted(true);
+ * chart.container(stage).draw();
+ * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
  * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
  *//**
  * @ignoreDoc

@@ -111,11 +111,6 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEven
  *//**
  * Setter for series data markers.<br/>
  * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example <t>listingOnly</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * series.markers(myMarkers);
  * @example <t>lineChart</t>
  * chart.spline([1, 1.4, 1.2, 2]).markers(null);
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
@@ -151,10 +146,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_
  * @example <t>listingOnly</t>
  * series.hoverMarkers(null);
  * @example <t>lineChart</t>
- * var myMarkers = anychart.ui.markersFactory()
- *       .size(10)
- *       .type('star5');
- * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers(myMarkers);
+ * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers({size: 10, type: 'star5';});
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!anychart.core.cartesian.series.BaseWithMarkers} {@link anychart.core.cartesian.series.BaseWithMarkers} instance for method chaining.
  *//**

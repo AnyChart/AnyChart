@@ -1352,6 +1352,10 @@ anychart.core.polar.series.Base.prototype.scaleInvalidated_ = function(event) {
  * @return {!anychart.core.ui.Tooltip} Tooltip instance.
  *//**
  * Setter for series data tooltip.
+ * @example
+ * chart = anychart.polar();
+ * chart.area([1, 4, 7, 1]).tooltip(null);
+ * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!anychart.core.polar.series.Base} An instance of the {@link anychart.core.polar.series.Base} class for method chaining.
  *//**
@@ -1403,6 +1407,10 @@ anychart.core.polar.series.Base.prototype.onTooltipSignal_ = function(event) {
  * @return {!anychart.core.ui.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
+ * @example
+ * chart = anychart.polar();
+ * chart.area([1, 4, 7, 1]).labels(true);
+ * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * @return {!anychart.core.polar.series.Base} An instance of the {@link anychart.core.polar.series.Base} class for method chaining.
  *//**

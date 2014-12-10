@@ -211,7 +211,7 @@ anychart.scales.DateTime.prototype.setupByJSON = function(config) {
  *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
  *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
  * ]);
- * chart.xScale(anychart.scales.dateTime());
+ * chart.xScale('dateTime');
  * chart.container(stage).draw();
  * @return {anychart.scales.DateTime} DateTime scale.
  */

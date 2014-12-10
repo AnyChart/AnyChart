@@ -254,11 +254,6 @@ anychart.core.axes.Radial.prototype.minorLabelsBounds_ = null;
  * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
  *//**
  * Setter for axis labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var labels = anychart.ui.labelsFactory();
- * labels.fontSize(14).rotation(-90);
- * chart.xAxis().labels(labels);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
@@ -306,11 +301,6 @@ anychart.core.axes.Radial.prototype.labelsInvalidated_ = function(event) {
  * @return {!anychart.core.ui.LabelsFactory} Axis labels.
  *//**
  * Setter for axis minor labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var labels = anychart.ui.labelsFactory();
- * labels.enabled(true).fontSize(6).rotation(-45);
- * chart.yAxis().labels(labels);
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
@@ -358,10 +348,6 @@ anychart.core.axes.Radial.prototype.minorLabelsInvalidated_ = function(event) {
  * @return {!anychart.core.axes.RadialTicks} Axis ticks.
  *//**
  * Setter for axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().ticks().stroke('5 blue').length(5);
- * chart.xAxis().ticks(chart.yAxis().ticks());
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
@@ -409,11 +395,6 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
  * @return {!anychart.core.axes.RadialTicks} Axis ticks.
  *//**
  * Setter for minor axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
- * chart.xScale(anychart.scales.linear());
- * chart.xAxis().minorTicks(chart.yAxis().minorTicks());
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
@@ -463,9 +444,6 @@ anychart.core.axes.Radial.prototype.minorTicksInvalidated_ = function(event) {
  * Setter for axis line stroke by one value.<br/>
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().stroke('3 darkgreen 0.8');
  * @param {(acgraph.vector.Stroke)=} opt_value Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**
@@ -993,19 +971,6 @@ anychart.core.axes.Radial.prototype.drawLastLabel = function(opt_value) {
  * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
  *//**
  * Setter for overlap mode for labels.
- * @example <t>lineChart</t>
- * var data = [
- *     ['2002 January', 1],
- *     ['2002 Febrary', 2],
- *     ['2002 March', 4],
- *     ['2002 April', 3],
- *     ['2002 May', 2],
- *     ['2002 June', 4],
- *     ['2002 Jule', 5],
- *     ['2002 August', 1]
- * ];
- * chart.xAxis().staggerMode(false).overlapMode(true);
- * chart.line(data);
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [anychart.enums.LabelsOverlapMode.NO_OVERLAP] Value to set.
  * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
  *//**

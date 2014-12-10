@@ -1565,15 +1565,15 @@ anychart.core.cartesian.series.Base.prototype.scaleInvalidated_ = function(event
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current series data tooltip.
+ * @example <t>lineChart</t>
+ * chart.line([1, 2, 1.2, 3.2]).tooltip()
+ *     .background()
+ *       .stroke('2 #cc8800').fill('grey 0.5');
  * @return {!anychart.core.ui.Tooltip} Tooltip instance.
  *//**
  * Setter for series data tooltip.
  * @example <t>lineChart</t>
- * var tooltipSettings = anychart.ui.tooltip();
- * tooltipSettings
- *     .background()
- *     .stroke('2 #cc8800').fill('grey 0.5');
- * chart.line([1, 2, 1.2, 3.2]).tooltip(tooltipSettings);
+ * chart.line([1, 2, 1.2, 3.2]).tooltip(false);
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!anychart.core.cartesian.series.Base} An instance of the {@link anychart.core.cartesian.series.Base} class for method chaining.
  *//**
@@ -1614,16 +1614,15 @@ anychart.core.cartesian.series.Base.prototype.onTooltipSignal_ = function(event)
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current series data labels.
+ * @example <t>lineChart</t>
+ * chart.line([1,2,3]).labels()
+ *    .fontColor('white')
+ *    .fontWeight('bold');
  * @return {!anychart.core.ui.LabelsFactory} Labels instance.
  *//**
  * Setter for series data labels.
  * @example <t>lineChart</t>
- * var labelSettings = anychart.ui.labelsFactory();
- * labelSettings.enabled(true);
- * labelSettings.fontColor('white');
- * labelSettings.fontWeight('bold');
- * var series = chart.line([1,2,3]);
- * series.labels(labelSettings);
+ * chart.line([1,2,3]).labels(true);
  * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * @return {!anychart.core.cartesian.series.Base} An instance of the {@link anychart.core.cartesian.series.Base} class for method chaining.
  *//**

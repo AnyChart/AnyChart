@@ -281,11 +281,16 @@ anychart.charts.Radar.prototype.xScale = function(opt_value) {
  * chart.line([10, 12, 1, 4, 14, 5]);
  * chart.yScale().inverted(true);
  * chart.container(stage).draw();
- * @return {!anychart.scales.Ordinal} Default chart scale value.
+ * @return {!anychart.scales.Base} Default chart scale value.
  *//**
  * Setter for default chart Y scale.<br/>
  * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @param {anychart.scales.Ordinal=} opt_value Y Scale to set.
+ * @example
+ * var chart = anychart.radar();
+ * chart.line([100, 12, 1, 4, 14, 95]);
+ * chart.yScale('log');
+ * chart.container(stage).draw();
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes)=} opt_value Y Scale to set.
  * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -347,6 +352,11 @@ anychart.charts.Radar.prototype.setDefaultScaleForLayoutBasedElements_ = functio
  * @return {!anychart.core.grids.Radar} Axis instance by index.
  *//**
  * Setter for chart grid.
+ * @example
+ * var chart = anychart.radar();
+ * chart.area([1, 4, 5, 7, 2]);
+ * chart.grid(false);
+ * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
  * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
  *//**

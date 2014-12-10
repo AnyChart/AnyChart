@@ -231,6 +231,15 @@ anychart.charts.Scatter.prototype.setDefaultScaleForLayoutBasedElements_ = funct
 
 /**
  * Getter for default chart X scale.
+ * @example
+ * var chart = anychart.scatterChart([
+ *   {x: 2, y: 21},
+ *   {x: 14, y: 24},
+ *   {x: 89, y: 23},
+ *   {x: 489, y: 18}
+ * ]);
+ * chart.xScale().inverted(true);
+ * chart.container(stage).draw();
  * @return {!anychart.scales.ScatterBase} Default chart scale value.
  *//**
  * Setter for default chart X scale.<br/>
@@ -243,9 +252,9 @@ anychart.charts.Scatter.prototype.setDefaultScaleForLayoutBasedElements_ = funct
  *   {x: 89, y: 23},
  *   {x: 489, y: 18}
  * ]);
- * chart.xScale(anychart.scales.log());
+ * chart.xScale('log');
  * chart.container(stage).draw();
- * @param {anychart.scales.ScatterBase=} opt_value X Scale to set.
+ * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -277,6 +286,15 @@ anychart.charts.Scatter.prototype.xScale = function(opt_value) {
 
 /**
  * Getter for default chart Y scale.
+ * @example
+ * var chart = anychart.scatterChart([
+ *   {x: 21, y: 2},
+ *   {x: 24, y: 14},
+ *   {x: 23, y: 89},
+ *   {x: 18, y: 489}
+ * ]);
+ * chart.yScale().inverted(true);
+ * chart.container(stage).draw();
  * @return {!anychart.scales.ScatterBase} Default chart scale value.
  *//**
  * Setter for default chart Y scale.<br/>
@@ -289,9 +307,9 @@ anychart.charts.Scatter.prototype.xScale = function(opt_value) {
  *   {x: 23, y: 89},
  *   {x: 18, y: 489}
  * ]);
- * chart.yScale(anychart.scales.log());
+ * chart.yScale('log');
  * chart.container(stage).draw();
- * @param {anychart.scales.ScatterBase=} opt_value Y Scale to set.
+ * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
  *//**
  * @ignoreDoc
@@ -330,9 +348,9 @@ anychart.charts.Scatter.prototype.yScale = function(opt_value) {
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * chart.grid()
+ * chart.grid(0)
  *     .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid()
+ * chart.grid(1)
  *     .oddFill('none')
  *     .evenFill('none')
  *     .layout(anychart.enums.Layout.VERTICAL);
@@ -348,9 +366,7 @@ anychart.charts.Scatter.prototype.yScale = function(opt_value) {
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * var myGrid = anychart.grids.linear()
- *    .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid(myGrid);
+ * chart.grid(false);
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -421,9 +437,9 @@ anychart.charts.Scatter.prototype.grid = function(opt_indexOrValue, opt_value) {
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * chart.grid()
+ * chart.grid(0)
  *     .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid()
+ * chart.grid(1)
  *     .oddFill('none')
  *     .evenFill('none')
  *     .layout(anychart.enums.Layout.VERTICAL);
@@ -443,13 +459,8 @@ anychart.charts.Scatter.prototype.grid = function(opt_indexOrValue, opt_value) {
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * var myGrid = anychart.grids.linear()
- *    .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid(myGrid);
- * myGrid.oddFill('none')
- *    .evenFill('none')
- *    .layout(anychart.enums.Layout.HORIZONTAL).isMinor(true);
- * chart.minorGrid(myGrid)
+ * chart.grid(false);
+ * chart.minorGrid(true)
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart minor grid settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -528,6 +539,17 @@ anychart.charts.Scatter.prototype.onGridSignal_ = function(event) {
 
 /**
  * Getter for chart X-axis.
+ * @example
+ * var chart = anychart.scatterChart(
+ *     [{x: 2.1, y:1}, {x: 3.1, y: 2}, {x: 4.0, y: 3}],
+ *     [{x: 2.3, y:2}, {x: 3.4, y: 3}, {x: 4.3, y: 4}],
+ *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
+ *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
+ * );
+ * chart.xAxis()
+ *    .orientation('right')
+ *    .title().text('my custom sAxis');
+ * chart.container(stage).draw();
  * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axes.Linear} Axis instance by index.
  *//**
@@ -539,10 +561,7 @@ anychart.charts.Scatter.prototype.onGridSignal_ = function(event) {
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * var myAxis = anychart.ui.axis()
- *    .orientation('right')
- *    .title().text('my custom sAxis');
- * chart.xAxis(myAxis);
+ * chart.xAxis({orientation:'top'});
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -609,6 +628,17 @@ anychart.charts.Scatter.prototype.xAxis = function(opt_indexOrValue, opt_value) 
 
 /**
  * Getter for chart Y-axis.
+ * @example
+ * var chart = anychart.scatterChart(
+ *     [{x: 2.1, y:1}, {x: 3.1, y: 2}, {x: 4.0, y: 3}],
+ *     [{x: 2.3, y:2}, {x: 3.4, y: 3}, {x: 4.3, y: 4}],
+ *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
+ *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
+ * );
+ * chart.yAxis()
+ *    .orientation('right')
+ *    .title().text('my custom sAxis');
+ * chart.container(stage).draw();
  * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axes.Linear} Axis instance by index.
  *//**
@@ -620,10 +650,7 @@ anychart.charts.Scatter.prototype.xAxis = function(opt_indexOrValue, opt_value) 
  *     [{x: 2.1, y:3}, {x: 3.1, y: 4}, {x: 4.2, y: 1}],
  *     [{x: 2.4, y:4}, {x: 3.7, y: 1}, {x: 4.0, y: 2}]
  * );
- * var myAxis = anychart.ui.axis()
- *    .orientation('right')
- *    .title().text('my custom sAxis');
- * chart.yAxis(myAxis);
+ * chart.yAxis({orientation: 'right'});
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -710,23 +737,29 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
 
 /**
  * Getter for chart line marker.
- * @param {number=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
- *//**
- * Setter for chart line marker.
  * @example
- * var chart = anychart.scatterChart();
+ * var chart = anychart.scatter();
  * chart.line([
  *    [4, 10],
  *    [2, 6],
  *    [3, 17],
  *    [1, 20]
  * ]);
- * var lineMarker = anychart.axisMarkers.line()
- *     .value(15.5)
- *     .stroke('2 red')
- *     .layout('horizontal');
- * chart.lineMarker(lineMarker);
+ * chart.lineMarker().value(12).stroke('green');
+ * chart.container(stage).draw();
+ * @param {number=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
+ * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
+ *//**
+ * Setter for chart line marker.
+ * @example
+ * var chart = anychart.scatter();
+ * chart.line([
+ *    [4, 10],
+ *    [2, 6],
+ *    [3, 17],
+ *    [1, 20]
+ * ]);
+ * chart.lineMarker({value: 12.5});
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -787,6 +820,17 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
 
 /**
  * Getter for chart range marker.
+ * @example
+ * var chart = anychart.scatterChart();
+ * chart.line([
+ *    [4, 10],
+ *    [2, 6],
+ *    [3, 17],
+ *    [1, 20]
+ * ]);
+ * chart.rangeMarker(0).from(5).to(12).fill('orange 0.2');
+ * chart.rangeMarker(1).from(12).to(18).fill('green 0.2');
+ * chart.container(stage).draw();
  * @param {number=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axisMarkers.Range} Range marker instance by index.
  *//**
@@ -799,11 +843,11 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
  *    [3, 17],
  *    [1, 20]
  * ]);
- * var rangeMarker = anychart.axisMarkers.range()
- *     .from(15.5)
- *     .to(4.5)
- *     .fill('blue .1');
- * chart.rangeMarker(rangeMarker);
+ * chart.rangeMarker({
+ *   from: 15.5,
+ *   to: 4.5,
+ *   fill: 'blue .1'
+ * });
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.
  * @return {!anychart.scatter.Chart} {@link anychart.scatter.Chart} instance for method chaining.
@@ -864,6 +908,17 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
 
 /**
  * Getter for chart text marker.
+ * @example
+ * var chart = anychart.scatterChart();
+ * chart.line([
+ *    [4, 10],
+ *    [2, 6],
+ *    [3, 17],
+ *    [1, 20]
+ * ]);
+ * chart.textMarker(0).value(16).text('Marker 0');
+ * chart.textMarker(1).value(12).text('Marker 1');
+ * chart.container(stage).draw();
  * @param {number=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
  * @return {!anychart.core.axisMarkers.Text} text marker instance by index.
  *//**
@@ -876,12 +931,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
  *    [3, 17],
  *    [1, 20]
  * ]);
- * var txtMarker = anychart.axisMarkers.text()
- *     .text('Marker')
- *     .value(13.3)
- *     .align(anychart.enums.Align.LEFT)
- *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
- * chart.textMarker(txtMarker);
+ * chart.textMarker({value: 13.3, text: 'Marker'});
  * chart.lineMarker().value(13.3);
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.

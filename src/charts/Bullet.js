@@ -254,6 +254,12 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
 
 /**
  * Getter for default bullet chart scale settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet([17]);
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * bulletChart.scale().minimum(10).maximum(15);
+ * bulletChart.container(stage).draw();
  * @return {!anychart.scales.Base} {@link anychart.scales.Base} instance for method chaining.
  *//**
  * Setter for default bullet chart scale settings.
@@ -261,15 +267,13 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
  * var bulletChart = anychart.bullet([17]);
  * bulletChart.range().from(0).to(10);
  * bulletChart.range(1).from(10).to(20);
- * var customScale = anychart.scales.linear();
- * customScale.minimum(10).maximum(15);
- * bulletChart.scale(customScale);
+ * bulletChart.scale('linear');
  * bulletChart.container(stage).draw();
- * @param {anychart.scales.Base=} opt_value Scale to set.
+ * @param {(anychart.scales.Base|anychart.enums.ScaleTypes)=} opt_value Scale to set or Sclae type.<br/>
+ *  Also accepts 'log', 'linear', 'dateTime' and 'ordinal' strings.
  * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
  *//**
  * @ignoreDoc
- * Also accepts 'log', 'linear', 'dateTime' and 'ordinal' strings.
  * @param {(anychart.scales.Base|anychart.enums.ScaleTypes)=} opt_value Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Bullet)} Default chart scale value or itself for method chaining.
  */
@@ -303,6 +307,15 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
 
 /**
  * Getter for default bullet chart axis settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet([17]);
+ * bulletChart.range().from(0).to(10);
+ * bulletChart.range(1).from(10).to(20);
+ * bulletChart.axis()
+ *    .orientation('top')
+ *    .stroke('red')
+ *    .title(null);
+ * bulletChart.container(stage).draw();
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * Setter for default bullet chart axis settings.
@@ -310,11 +323,7 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
  * var bulletChart = anychart.bullet([17]);
  * bulletChart.range().from(0).to(10);
  * bulletChart.range(1).from(10).to(20);
- * var customAxis = anychart.axes.linear()
- *    .orientation('top')
- *    .stroke('red')
- *    .title(null);
- * bulletChart.axis(customAxis);
+ * bulletChart.axis(null);
  * bulletChart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Scale to set.
  * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
@@ -372,18 +381,29 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
 
 /**
  * Getter for bullet chart ranges settings.
+ * @example <t>simple-h100</t>
+ * var bulletChart = anychart.bullet([17]);
+ * bulletChart.range(0)
+ *    .from(0).to(10)
+ *    .fill('red 0.2')
+ *    .layout('vertical');
+ * bulletChart.range(1)
+ *    .from(10).to(20)
+ *    .fill('yellow 0.2')
+ *    .layout('vertical');
+ * bulletChart.container(stage).draw();
  * @param {number=} opt_index [0] Chart range index.
  * @return {!anychart.core.axisMarkers.Range} {@link anychart.core.axisMarkers.Range} instance for method chaining.
  *//**
  * Setter for bullet chart first range settings.
  * @example <t>simple-h100</t>
  * var bulletChart = anychart.bullet([17]);
- * bulletChart.range(
- *   anychart.axisMarkers.range()
- *     .from(0).to(15)
- *     .fill('green 0.2')
- *     .layout('vertical')
- * );
+ * bulletChart.range({
+ *    from: 0,
+ *    to: 15,
+ *    fill: 'green 0.2',
+ *    layout: 'vertical'
+ * });
  * bulletChart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Value to set.
  * @return {!anychart.charts.Bullet} {@link anychart.charts.Bullet} instance for method chaining.
@@ -391,16 +411,18 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
  * Setter for bullet chart ranges settings.
  * @example <t>simple-h100</t>
  * var bulletChart = anychart.bullet([17]);
- * bulletChart.range(0, anychart.axisMarkers.range()
- *    .from(0).to(10)
- *    .fill('red 0.2')
- *    .layout('vertical')
- * );
- * bulletChart.range(1, anychart.axisMarkers.range()
- *    .from(10).to(20)
- *    .fill('yellow 0.2')
- *    .layout('vertical')
- * );
+ * bulletChart.range(0, {
+ *    from: 0,
+ *    to: 15,
+ *    fill: 'green 0.2',
+ *    layout: 'vertical'
+ * });
+ * bulletChart.range(1, {
+ *    from: 15,
+ *    to: 25,
+ *    fill: 'blue 0.2',
+ *    layout: 'vertical'
+ * });
  * bulletChart.container(stage).draw();
  * @param {number=} opt_index [0] Index of range.
  * @param {(Object|boolean|null)=} opt_value Value to set.
