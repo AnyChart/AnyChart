@@ -122,14 +122,7 @@ var rawData = [
     'progressValue': '68%',
     'baselineStart': Date.UTC(2010, 0, 30, 8),
     'baselineEnd': Date.UTC(2010, 2, 11, 18),
-    'rowHeight': 35,
-    'progress': {
-      'endMarker': {
-        'type': 'star5',
-        'fill': 'yellow',
-        'stroke': 'blue'
-      }
-    }
+    'rowHeight': 35
   },
 
   {
@@ -317,14 +310,7 @@ var rawData = [
     'progressValue': '82%',
     'baselineStart': Date.UTC(2010, 4, 3, 8),
     'baselineEnd': Date.UTC(2010, 5, 14, 15),
-    'rowHeight': 35,
-    'progress': {
-      'endMarker': {
-        'type': 'star5',
-        'fill': 'yellow',
-        'stroke': 'blue'
-      }
-    }
+    'rowHeight': 35
   },
 
   {
