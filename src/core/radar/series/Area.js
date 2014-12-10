@@ -196,13 +196,15 @@ anychart.core.radar.series.Area.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.connectMissing || !this.firstPointIsMissing) {
 
-      this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
-      this.strokePath.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
+      if (goog.isDefAndNotNull(this.firstDrawnPoint)) {
+        this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
+        this.strokePath.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
 
-      if (this.firstMissings) goog.array.extend(this.zeroesStack, this.firstMissings);
+        if (this.firstMissings) goog.array.extend(this.zeroesStack, this.firstMissings);
 
-      if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE)
-        this.zeroesStack.push(this.firstDrawnZeroPoint.x, this.firstDrawnZeroPoint.y, false);
+        if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE)
+          this.zeroesStack.push(this.firstDrawnZeroPoint.x, this.firstDrawnZeroPoint.y, false);
+      }
     }
   }
 

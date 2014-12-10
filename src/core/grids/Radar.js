@@ -362,32 +362,33 @@ anychart.core.grids.Radar.prototype.isMinor = function(opt_value) {
 anychart.core.grids.Radar.prototype.drawLineCircuit = function(ratio) {
   var xScaleTicks = this.xScale().ticks().get();
   var xScaleTicksCount = xScaleTicks.length;
-  var radius = this.radius_ * ratio;
+  if (xScaleTicksCount != 0) {
+    var radius = this.radius_ * ratio;
 
-  var sweep = 360 / xScaleTicksCount;
-  var angle = goog.math.standardAngle(this.startAngle() - 90);
+    var startAngle = this.startAngle() - 90;
 
-  var x, y, angleRad;
-  for (var i = 0; i < xScaleTicksCount; i++) {
+    var x, y, angleRad, xRatio, angle;
+    for (var i = 0; i < xScaleTicksCount; i++) {
+      xRatio = this.xScale().transform(xScaleTicks[i]);
+      angle = goog.math.standardAngle(startAngle + 360 * xRatio);
+      angleRad = goog.math.toRadians(angle);
+
+      x = Math.round(this.cx_ + radius * Math.cos(angleRad));
+      y = Math.round(this.cy_ + radius * Math.sin(angleRad));
+
+      if (i == 0)
+        this.lineElement_.moveTo(x, y);
+      else
+        this.lineElement_.lineTo(x, y);
+
+    }
+    angle = goog.math.standardAngle(startAngle);
     angleRad = goog.math.toRadians(angle);
-
     x = Math.round(this.cx_ + radius * Math.cos(angleRad));
     y = Math.round(this.cy_ + radius * Math.sin(angleRad));
 
-    if (i == 0)
-      this.lineElement_.moveTo(x, y);
-    else
-      this.lineElement_.lineTo(x, y);
-
-    angle += sweep;
+    this.lineElement_.lineTo(x, y);
   }
-
-  angleRad = goog.math.toRadians(angle);
-
-  x = Math.round(this.cx_ + radius * Math.cos(angleRad));
-  y = Math.round(this.cy_ + radius * Math.sin(angleRad));
-
-  this.lineElement_.lineTo(x, y);
 };
 
 
@@ -431,52 +432,50 @@ anychart.core.grids.Radar.prototype.drawInterlaceCircuit = function(ratio, prevR
     var xScaleTicks = this.xScale().ticks().get();
     var xScaleTicksCount = xScaleTicks.length;
 
-    var x, y, angleRad, i, radius;
-    var sweep = 360 / xScaleTicksCount;
-    var angle = goog.math.standardAngle(this.startAngle() - 90);
-    var element = layer.genNextChild();
+    if (xScaleTicksCount != 0) {
+      var x, y, angleRad, i, radius, angle, xRatio;
+      var startAngle = this.startAngle() - 90;
+      var element = layer.genNextChild();
 
+      radius = this.radius_ * ratio;
+      for (i = 0; i < xScaleTicksCount; i++) {
+        xRatio = this.xScale().transform(xScaleTicks[i]);
+        angle = goog.math.standardAngle(startAngle + 360 * xRatio);
+        angleRad = goog.math.toRadians(angle);
 
-    radius = this.radius_ * ratio;
-    for (i = 0; i < xScaleTicksCount; i++) {
+        x = Math.round(this.cx_ + radius * Math.cos(angleRad));
+        y = Math.round(this.cy_ + radius * Math.sin(angleRad));
+
+        if (i == 0)
+          element.moveTo(x, y);
+        else
+          element.lineTo(x, y);
+      }
+      angle = goog.math.standardAngle(startAngle);
       angleRad = goog.math.toRadians(angle);
-
       x = Math.round(this.cx_ + radius * Math.cos(angleRad));
       y = Math.round(this.cy_ + radius * Math.sin(angleRad));
+      element.lineTo(x, y);
 
-      if (i == 0)
-        element.moveTo(x, y);
-      else
-        element.lineTo(x, y);
 
-      angle += sweep;
-    }
-    angleRad = goog.math.toRadians(angle);
-    x = Math.round(this.cx_ + radius * Math.cos(angleRad));
-    y = Math.round(this.cy_ + radius * Math.sin(angleRad));
-    element.lineTo(x, y);
-
-    angle = goog.math.standardAngle(this.startAngle() - 90) + sweep * 6;
-    radius = this.radius_ * prevRatio;
-    for (i = xScaleTicksCount; i > 0; i--) {
-      angleRad = goog.math.toRadians(angle);
-
+      radius = this.radius_ * prevRatio;
       x = Math.round(this.cx_ + radius * Math.cos(angleRad));
       y = Math.round(this.cy_ + radius * Math.sin(angleRad));
+      element.lineTo(x, y);
 
-      if (i == 0)
-        element.lineTo(x, y);
-      else
-        element.lineTo(x, y);
+      for (i = xScaleTicksCount - 1; i >= 0; i--) {
+        xRatio = this.xScale().transform(xScaleTicks[i]);
+        angle = goog.math.standardAngle(startAngle + 360 * xRatio);
+        angleRad = goog.math.toRadians(angle);
 
-      angle -= sweep;
+        x = Math.round(this.cx_ + radius * Math.cos(angleRad));
+        y = Math.round(this.cy_ + radius * Math.sin(angleRad));
+
+        element.lineTo(x, y);
+      }
+
+      element.close();
     }
-    angleRad = goog.math.toRadians(angle);
-    x = Math.round(this.cx_ + radius * Math.cos(angleRad));
-    y = Math.round(this.cy_ + radius * Math.sin(angleRad));
-    element.lineTo(x, y);
-
-    element.close();
   }
 };
 
@@ -557,7 +556,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
     this.oddFillElement().clear();
     this.lineElement().clear();
 
-    var fill, isOrdinal, ticks, ticksArray, ticksArrLen;
+    var isOrdinal, ticks, ticksArray, ticksArrLen;
     /** @type {anychart.core.utils.TypedLayer} */
     var layer;
 
@@ -566,26 +565,26 @@ anychart.core.grids.Radar.prototype.draw = function() {
     this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
     this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
 
-    var angle = goog.math.standardAngle(this.startAngle() - 90);
     this.evenFillElement().clip(parentBounds);
     this.oddFillElement().clip(parentBounds);
     this.lineElement().clip(parentBounds);
 
     var drawLine = layout[0];
     var drawInterlace = layout[1];
-    var i;
+    var i, ratio;
+    var startAngle = this.startAngle() - 90;
 
     if (this.isRadial()) {
       ticks = xScale.ticks();
       ticksArray = ticks.get();
       ticksArrLen = ticksArray.length;
 
-      var sweep = 360 / ticksArrLen;
-      var angleRad, x, y, prevX = NaN, prevY = NaN;
-
+      var angleRad, x, y, prevX = NaN, prevY = NaN, angle;
       var lineThickness = this.stroke()['thickness'] ? this.stroke()['thickness'] : 1;
       var xPixelShift, yPixelShift;
       for (i = 0; i < ticksArrLen; i++) {
+        ratio = xScale.transform(ticksArray[i]);
+        angle = goog.math.standardAngle(startAngle + 360 * ratio);
         angleRad = angle * Math.PI / 180;
 
         xPixelShift = 0;
@@ -614,11 +613,11 @@ anychart.core.grids.Radar.prototype.draw = function() {
 
         prevX = x;
         prevY = y;
-        angle = goog.math.standardAngle(angle + sweep);
       }
 
       //draw last line on ordinal
       layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
+      angle = goog.math.standardAngle(startAngle);
       angleRad = angle * Math.PI / 180;
       x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
       y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
@@ -632,14 +631,36 @@ anychart.core.grids.Radar.prototype.draw = function() {
       var prevRatio = NaN;
       for (i = 0; i < ticksArrLen; i++) {
         var tickVal = ticksArray[i];
-        if (goog.isArray(tickVal)) tickVal = tickVal[0];
-        var ratio = yScale.transform(tickVal);
+        var leftTick, rightTick;
+        if (goog.isArray(tickVal)) {
+          leftTick = tickVal[0];
+          rightTick = tickVal[1];
+        } else
+          leftTick = rightTick = tickVal;
+
+        ratio = yScale.transform(leftTick);
+
         layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
-        drawInterlace.call(this, ratio, prevRatio, layer);
+        if (i == ticksArrLen - 1) {
+          if (isOrdinal) {
+            drawInterlace.call(this, ratio, prevRatio, layer);
+            layer = i % 2 == 0 ? this.oddFillElement_ : this.evenFillElement_;
+            drawInterlace.call(this, yScale.transform(rightTick, 1), ratio, layer);
+          } else {
+            drawInterlace.call(this, ratio, prevRatio, layer);
+          }
+        } else {
+          drawInterlace.call(this, ratio, prevRatio, layer);
+        }
 
         if (i == ticksArrLen - 1) {
-          if (this.drawLastLine_) drawLine.call(this, ratio);
+          if (isOrdinal) {
+            drawLine.call(this, ratio);
+            if (this.drawLastLine_) drawLine.call(this, yScale.transform(rightTick, 1));
+          } else {
+            if (this.drawLastLine_) drawLine.call(this, ratio);
+          }
         } else if (i != 0) {
           drawLine.call(this, ratio);
         }

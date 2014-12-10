@@ -91,7 +91,11 @@ anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function() {
 /** @inheritDoc */
 anychart.core.polar.series.Area.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.firstPointIsMissing && this.closed()) {
+    if (!this.firstPointIsMissing &&
+        this.closed() &&
+        goog.isDefAndNotNull(this.prevValuePointCoords) &&
+        goog.isDefAndNotNull(this.firstValuePointCoords)) {
+
       var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords);
       if (!valuePoint) {
         this.path.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);

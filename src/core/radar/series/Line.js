@@ -84,8 +84,10 @@ anychart.core.radar.series.Line.prototype.drawSubsequentPoint = function() {
 /** @inheritDoc */
 anychart.core.radar.series.Line.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.connectMissing || (!this.firstPointIsMissing && !this.prevPointIsMissing))
-      this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
+    if (this.connectMissing || (!this.firstPointIsMissing && !this.prevPointIsMissing)) {
+      if (goog.isDefAndNotNull(this.firstDrawnPoint))
+        this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
+    }
   }
   goog.base(this, 'finalizeDrawing');
 };
