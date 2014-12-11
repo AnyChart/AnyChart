@@ -151,7 +151,7 @@
           "properties": {
             "items": {
               "type": "array",
-              "items": {"$ref": "#/definitions/acgraph.vector.HatchFillSet"}
+              "items": {"$ref": "#/definitions/hatchFillSet"}
             }
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
