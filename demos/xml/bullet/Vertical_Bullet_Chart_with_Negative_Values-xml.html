@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+    <!--Compiled JS-->
+    <!--<script src="../../../out/anychart.min.js"></script>-->
+
+    <!--Non Compiled JS-->
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.modules.anychart');
+    </script>
+    <script>
+        anychart.onDocumentReady(function() {
+            var stage = anychart.graphics.create('container');
+            var xml1 = '<?xml version="1.0" encoding="utf-8"?>' +
+                            '<xml>' +
+                                '<chart type="bullet" layout="vertical" title="false">' +
+                                    '<bounds left="0" top="0">' +
+                                        '<height><![CDATA[100%]]></height>' +
+                                        '<width><![CDATA[20%]]></width>' +
+                                    '</bounds>' +
+                                    '<ranges from="-15" to="-5"/>' +
+                                    '<ranges from="-5" to="5"/>' +
+                                    '<ranges from="5" to="15"/>' +
+                                    '<data>' +
+                                        '<point value="4" fill="black"/>' +
+                                        '<point value="0" type="line"/>' +
+                                    '</data>' +
+                                '</chart>' +
+                            '</xml>';
+
+            var chart1 = anychart.fromXml(xml1);
+            chart1.container(stage).draw();
+
+            var xml2 = '<?xml version="1.0" encoding="utf-8"?>' +
+                            '<xml>' +
+                                '<chart type="bullet" layout="vertical" title="false">' +
+                                    '<bounds top="0">' +
+                                        '<left><![CDATA[20%]]></left>' +
+                                        '<height><![CDATA[100%]]></height>' +
+                                        '<width><![CDATA[20%]]></width>' +
+                                    '</bounds>' +
+                                    '<ranges from="-15" to="-5"/>' +
+                                    '<ranges from="-5" to="5"/>' +
+                                    '<ranges from="5" to="15"/>' +
+                                    '<data>' +
+                                        '<point value="-7" fill="black"/>' +
+                                        '<point value="0" type="line"/>' +
+                                    '</data>' +
+                                '</chart>' +
+                            '</xml>';
+
+            var chart2 = anychart.fromXml(xml2);
+            chart2.container(stage).draw();
+
+            var xml3 = '<?xml version="1.0" encoding="utf-8"?>' +
+                            '<xml>' +
+                                '<chart type="bullet" layout="vertical" title="false">' +
+                                    '<bounds top="0">' +
+                                        '<left><![CDATA[40%]]></left>' +
+                                        '<height><![CDATA[100%]]></height>' +
+                                        '<width><![CDATA[20%]]></width>' +
+                                    '</bounds>' +
+                                    '<ranges from="-15" to="-5"/>' +
+                                    '<ranges from="-5" to="5"/>' +
+                                    '<ranges from="5" to="15"/>' +
+                                    '<data>' +
+                                        '<point value="-2" fill="black"/>' +
+                                        '<point value="0" type="line"/>' +
+                                    '</data>' +
+                                '</chart>' +
+                            '</xml>';
+
+            var chart3 = anychart.fromXml(xml3);
+            chart3.container(stage).draw();
+
+            var xml4 = '<?xml version="1.0" encoding="utf-8"?>' +
+                            '<xml>' +
+                                '<chart type="bullet" layout="vertical" title="false">' +
+                                    '<bounds top="0">' +
+                                        '<left><![CDATA[60%]]></left>' +
+                                        '<height><![CDATA[100%]]></height>' +
+                                        '<width><![CDATA[20%]]></width>' +
+                                    '</bounds>' +
+                                    '<ranges from="-15" to="-5"/>' +
+                                    '<ranges from="-5" to="5"/>' +
+                                    '<ranges from="5" to="15"/>' +
+                                    '<data>' +
+                                        '<point value="7" fill="black"/>' +
+                                        '<point value="0" type="line"/>' +
+                                    '</data>' +
+                                '</chart>' +
+                            '</xml>';
+
+            var chart4 = anychart.fromXml(xml4);
+            chart4.container(stage).draw();
+
+            var xml5 = '<?xml version="1.0" encoding="utf-8"?>' +
+                            '<xml>' +
+                                '<chart type="bullet" layout="vertical" title="false">' +
+                                    '<bounds top="0">' +
+                                        '<left><![CDATA[80%]]></left>' +
+                                        '<height><![CDATA[100%]]></height>' +
+                                        '<width><![CDATA[20%]]></width>' +
+                                    '</bounds>' +
+                                    '<ranges from="-15" to="-5"/>' +
+                                    '<ranges from="-5" to="5"/>' +
+                                    '<ranges from="5" to="15"/>' +
+                                    '<data>' +
+                                        '<point value="13" fill="black"/>' +
+                                        '<point value="0" type="line"/>' +
+                                    '</data>' +
+                                '</chart>' +
+                            '</xml>';
+
+            var chart5 = anychart.fromXml(xml5);
+            chart5.container(stage).draw();
+        });
+    </script>
+</head>
+<body>
+<div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
+</body>
+</html>
