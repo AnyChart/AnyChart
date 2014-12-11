@@ -1736,7 +1736,7 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
   // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
   if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return false;
-  var exploded = !!iterator.meta('exploded');
+  var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
 
   var slice, hatchSlice;
   if (opt_update) {
@@ -2042,6 +2042,9 @@ anychart.charts.Pie.prototype.unhover = function() {
  */
 anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
   var iterator = this.getIterator();
+  // if only 1 point in Pie forbid to explode it
+  if (iterator.getRowsCount() == 1)
+    return;
   if (goog.isDef(opt_explode)) {
     iterator.meta('exploded', opt_explode);
   } else {
@@ -2391,7 +2394,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     var index = iterator.getIndex();
     var start = /** @type {number} */ (iterator.meta('start'));
     var sweep = /** @type {number} */ (iterator.meta('sweep'));
-    var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
+    var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !(iterator.getRowsCount() == 1);
     var angle = (start + sweep / 2) * Math.PI / 180;
     var angleDeg = goog.math.standardAngle(goog.math.toDegrees(angle));
 
@@ -2720,9 +2723,10 @@ anychart.charts.Pie.prototype.updateConnector_ = function(label, show) {
 anychart.charts.Pie.prototype.createPositionProvider = function() {
   var outside = this.isOutsideLabels_();
   var iterator = this.getIterator();
+  var singlePoint = (iterator.getRowsCount() == 1);
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
-  var exploded = /** @type {boolean} */ (iterator.meta('exploded'));
+  var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !singlePoint;
   var angle = (start + sweep / 2) * Math.PI / 180;
   var dR;
   if (outside)
@@ -2731,8 +2735,8 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
     dR = (this.radiusValue_ + this.innerRadiusValue_) / 2 + (exploded ? this.explodeValue_ : 0);
   var connector = /** @type {number} */ (iterator.meta('connector'));
 
-  var x = this.cx_ + dR * Math.cos(angle);
-  var y = this.cy_ + dR * Math.sin(angle);
+  var x = this.cx_ + ((!singlePoint || outside) ? dR * Math.cos(angle) : 0);
+  var y = this.cy_ + ((!singlePoint || outside) ? dR * Math.sin(angle) : 0);
   return {'value': {'x': x + (outside ? goog.isDef(connector) ? connector : 0 : 0), 'y': y}};
 };
 

@@ -30,7 +30,7 @@ function load() {
     5
   ];
 
-  chart = anychart.pie.chart(dataWithMissing)
+  chart = anychart.pie(dataWithMissing)
       .container('container')
       .innerRadius('33%')
       .startAngle(0)
