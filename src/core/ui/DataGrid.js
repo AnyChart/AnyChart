@@ -194,7 +194,7 @@ anychart.core.ui.DataGrid = function() {
   this.titleFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
 
   this.column(0).textFormatter(function(item) {
-    return goog.isDefAndNotNull(item.meta('index')) ? item.meta('index') + '' : '';
+    return goog.isDefAndNotNull(item.meta('index')) ? (item.meta('index') + 1) + '' : '';
   });
 
   this
