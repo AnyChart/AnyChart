@@ -1243,6 +1243,7 @@ anychart.charts.Polar.prototype.serialize = function() {
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['startAngle'] = this.startAngle();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -1259,15 +1260,17 @@ anychart.charts.Polar.prototype.serialize = function() {
     }
 
     scale = grid.yScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['yScale'] = scales.length - 1;
-    } else {
-      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['yScale'] = scales.length - 1;
+      } else {
+        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+      grids.push(config);
     }
-    grids.push(config);
   }
   json['grids'] = grids;
 

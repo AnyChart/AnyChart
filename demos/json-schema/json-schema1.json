@@ -1,25 +1,26 @@
 {
   "type": "object",
   "properties": {
-    "chart": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/base"
-        }
-      ]
+    "scales": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/definitions/linear"}
+        ]
+      }
     }
   },
   "definitions": {
-    "base": {
+    "linear": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
-        "zIndex": {
-          "type": "number"
-        }
+        "type": {"enum": ["linear"]}
+      }
+    },
+    "ordinal": {
+      "type": "object",
+      "properties": {
+        "type": {"enum": ["ordinal"]}
       }
     }
   }

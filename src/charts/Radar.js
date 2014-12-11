@@ -1481,6 +1481,7 @@ anychart.charts.Radar.prototype.serialize = function() {
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['startAngle'] = this.startAngle();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
