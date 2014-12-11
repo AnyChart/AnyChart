@@ -509,15 +509,16 @@ anychart.core.ui.LabelsFactory.prototype.height = function(opt_value) {
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['background'] = this.background().serialize();
-  json['padding'] = this.padding().serialize();
-  json['position'] = this.position();
-  json['anchor'] = this.anchor();
-  json['offsetX'] = this.offsetX();
-  json['offsetY'] = this.offsetY();
-  json['rotation'] = this.rotation();
-  json['width'] = this.width();
-  json['height'] = this.height();
+  if (goog.isNull(json['enabled'])) delete json['enabled'];
+  if (goog.isDef(this.background())) json['background'] = this.background().serialize();
+  if (goog.isDef(this.padding())) json['padding'] = this.padding().serialize();
+  if (goog.isDef(this.position())) json['position'] = this.position();
+  if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
+  if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
+  if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
+  if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
+  if (goog.isDef(this.width())) json['width'] = this.width();
+  if (goog.isDef(this.height())) json['height'] = this.height();
   return json;
 };
 
@@ -1930,16 +1931,15 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['background'] = this.settingsObj.background ? this.background().serialize() : null;
-  json['padding'] = this.settingsObj.padding ? this.padding().serialize() : null;
-  json['position'] = this.position();
-  json['anchor'] = this.anchor();
-  json['offsetX'] = this.offsetX();
-  json['offsetY'] = this.offsetY();
-  json['rotation'] = this.rotation();
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['rotation'] = this.rotation();
+  if (goog.isDef(this.background().serialize())) json['background'] = this.background().serialize();
+  if (goog.isDef(this.padding().serialize())) json['padding'] = this.padding().serialize();
+  if (goog.isDef(this.position())) json['position'] = this.position();
+  if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
+  if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
+  if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
+  if (goog.isDef(this.width())) json['width'] = this.width();
+  if (goog.isDef(this.height())) json['height'] = this.height();
+  if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
   return json;
 };
 
@@ -1956,7 +1956,6 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
   this.rotation(config['rotation']);
   this.width(config['width']);
   this.height(config['height']);
-  this.rotation(config['rotation']);
 };
 
 

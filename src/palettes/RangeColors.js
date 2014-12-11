@@ -304,7 +304,7 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
     res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.colors_[i])));
   }
   json['items'] = res;
-  json['count'] = this.count_;
+  if (!isNaN(this.count_)) json['count'] = this.count_;
   return json;
 };
 

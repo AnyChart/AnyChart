@@ -2780,13 +2780,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var grid = this.grids_[i];
     config = grid.serialize();
     scale = grid.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     grids.push(config);
   }
@@ -2797,13 +2799,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var minorGrid = this.minorGrids_[i];
     config = minorGrid.serialize();
     scale = minorGrid.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     minorGrids.push(config);
   }
@@ -2814,13 +2818,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var xAxis = this.xAxes_[i];
     config = xAxis.serialize();
     scale = xAxis.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     xAxes.push(config);
   }
@@ -2831,13 +2837,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var yAxis = this.yAxes_[i];
     config = yAxis.serialize();
     scale = yAxis.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     yAxes.push(config);
   }
@@ -2848,13 +2856,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var lineAxesMarker = this.lineAxesMarkers_[i];
     config = lineAxesMarker.serialize();
     scale = lineAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     lineAxesMarkers.push(config);
   }
@@ -2865,13 +2875,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var rangeAxesMarker = this.rangeAxesMarkers_[i];
     config = rangeAxesMarker.serialize();
     scale = rangeAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     rangeAxesMarkers.push(config);
   }
@@ -2882,13 +2894,15 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     var textAxesMarker = this.textAxesMarkers_[i];
     config = textAxesMarker.serialize();
     scale = textAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     textAxesMarkers.push(config);
   }
@@ -2898,25 +2912,28 @@ anychart.charts.Cartesian.prototype.serialize = function() {
   for (i = 0; i < this.series_.length; i++) {
     var series_ = this.series_[i];
     config = series_.serialize();
-
     scale = series_.xScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['xScale'] = scales.length - 1;
-    } else {
-      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['xScale'] = scales.length - 1;
+      } else {
+        config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
 
     scale = series_.yScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['yScale'] = scales.length - 1;
-    } else {
-      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['yScale'] = scales.length - 1;
+      } else {
+        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     series.push(config);
   }

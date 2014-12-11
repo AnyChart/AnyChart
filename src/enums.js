@@ -753,11 +753,11 @@ anychart.enums.LabelsOverlapMode = {
   /**
    * Forbids labels overlapping.
    */
-  NO_OVERLAP: 'nooverlap',
+  NO_OVERLAP: 'noOverlap',
   /**
    * Allows labels to overlap.
    */
-  ALLOW_OVERLAP: 'allowoverlap'
+  ALLOW_OVERLAP: 'allowOverlap'
 };
 
 

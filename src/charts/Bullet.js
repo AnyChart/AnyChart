@@ -802,6 +802,7 @@ anychart.charts.Bullet.prototype.serialize = function() {
   var res = [];
   for (var i = 0; i < this.ranges_.length; i++)
     res.push(this.ranges_[i].serialize());
+  json['ranges'] = res;
   return {'chart': json};
 };
 
