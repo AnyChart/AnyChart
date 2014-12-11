@@ -26,29 +26,14 @@ $(document).ready(function() {
     ['P16', '133.08']
   ];
 
-  var chart = anychart.polar();
-  chart.container('container');
-  chart.title().text('Bar Chart');
-
-  chart.area(data);
-  //chart.bar(data);
-  //chart.bubble(data);
-  //chart.candlestick(data);
-  //chart.column(data);
-  //chart.line(data);
-  //chart.marker(data);
-  //chart.ohlc(data);
-  //chart.rangeArea(data);
-  //chart.rangeBar(data);
-  //chart.rangeColumn(data);
-  //chart.rangeSplineArea(data);
-  //chart.rangeStepArea(data);
-  //chart.spline(data);
-  //chart.splineArea(data);
-  //chart.stepArea(data);
-  //chart.stepLine(data);
-
-  chart.draw();
+  var chart = anychart.bar();
+  chart.bar([
+    ['A1' , 3],
+    ['A2' , 5],
+    ['A3' , 0],
+    ['A4' , 4.1],
+    ['A5' , 9.5]
+  ]);
   var config = chart.toJson();
 
 
@@ -77,41 +62,41 @@ $(document).ready(function() {
   };
 
 
-  //$('#json').html(JSON.stringify(config, undefined, 4));
-  //
-  //jsonEditor = ace.edit("json");
-  //jsonEditor.setTheme("ace/theme/monokai");
-  //jsonEditor.getSession().setMode("ace/mode/json");
-  //
-  //$.getJSON("json-schema.json", function(data) {
-  //  schema = JSON.stringify(data, undefined, 4);
-  //  $('#schema').html(schema);
-  //
-  //  schemaEditor = ace.edit("schema");
-  //  schemaEditor.setTheme("ace/theme/monokai");
-  //  schemaEditor.getSession().setMode("ace/mode/json");
-  //
-  //  validate();
-  //});
+  $('#json').html(JSON.stringify(config, undefined, 4));
 
+  jsonEditor = ace.edit("json");
+  jsonEditor.setTheme("ace/theme/monokai");
+  jsonEditor.getSession().setMode("ace/mode/json");
 
-  $.getJSON("config1.json", function(data) {
-    json = JSON.stringify(data, undefined, 4);
-    $('#json').html(json);
+  $.getJSON("json-schema.json", function(data) {
+    schema = JSON.stringify(data, undefined, 4);
+    $('#schema').html(schema);
 
-    jsonEditor = ace.edit("json");
-    jsonEditor.setTheme("ace/theme/monokai");
-    jsonEditor.getSession().setMode("ace/mode/json");
+    schemaEditor = ace.edit("schema");
+    schemaEditor.setTheme("ace/theme/monokai");
+    schemaEditor.getSession().setMode("ace/mode/json");
 
-    $.getJSON("json-schema.json", function(data) {
-      schema = JSON.stringify(data, undefined, 4);
-      $('#schema').html(schema);
-
-      schemaEditor = ace.edit("schema");
-      schemaEditor.setTheme("ace/theme/monokai");
-      schemaEditor.getSession().setMode("ace/mode/json");
-
-      validate();
-    });
+    validate();
   });
+
+
+  //$.getJSON("config1.json", function(data) {
+  //  json = JSON.stringify(data, undefined, 4);
+  //  $('#json').html(json);
+  //
+  //  jsonEditor = ace.edit("json");
+  //  jsonEditor.setTheme("ace/theme/monokai");
+  //  jsonEditor.getSession().setMode("ace/mode/json");
+  //
+  //  $.getJSON("json-schema.json", function(data) {
+  //    schema = JSON.stringify(data, undefined, 4);
+  //    $('#schema').html(schema);
+  //
+  //    schemaEditor = ace.edit("schema");
+  //    schemaEditor.setTheme("ace/theme/monokai");
+  //    schemaEditor.getSession().setMode("ace/mode/json");
+  //
+  //    validate();
+  //  });
+  //});
 });
