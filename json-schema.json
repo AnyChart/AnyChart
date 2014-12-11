@@ -259,7 +259,7 @@
           "properties": {
             "items": {
               "type": "array",
-              "items": {"$ref": "#/definitions/acgraph.vector.HatchFillSet"}
+              "items": {"$ref": "#/definitions/hatchFillSet"}
             }
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
@@ -369,7 +369,7 @@
           "properties": {
             "items": {
               "type": "array",
-              "items": {"$ref": "#/definitions/acgraph.vector.HatchFillSet"}
+              "items": {"$ref": "#/definitions/hatchFillSet"}
             }
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
@@ -495,7 +495,7 @@
           "properties": {
             "items": {
               "type": "array",
-              "items": {"$ref": "#/definitions/acgraph.vector.HatchFillSet"}
+              "items": {"$ref": "#/definitions/hatchFillSet"}
             }
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
@@ -577,7 +577,7 @@
           "properties": {
             "items": {
               "type": "array",
-              "items": {"$ref": "#/definitions/acgraph.vector.HatchFillSet"}
+              "items": {"$ref": "#/definitions/hatchFillSet"}
             }
           },
           "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
@@ -2454,7 +2454,7 @@
     "hatchFill": {
       "type": ["object"],
       "properties": {
-        "type": {"enums": ["hatchFill"]},
+        "type": {"enum": ["hatchFill"]},
         "hatchType": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
         "color": {
           "type": "string"
