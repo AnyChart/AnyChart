@@ -338,7 +338,8 @@ anychart.core.ui.Credits.prototype.draw = function() {
 
     // image not loaded - should draw logo by framework
     goog.events.listen(imageLoader, goog.net.EventType.ERROR, function() {
-      this.drawLogo_();
+      if (this.enabled())
+        this.drawLogo_();
     }, false, this);
 
     // all work is done
