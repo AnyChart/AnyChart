@@ -164,7 +164,6 @@ anychart.color.serialize = function(color) {
   } else {
     result = String(color || 'none');
   }
-  console.log(result);
   return result;
 };
 
