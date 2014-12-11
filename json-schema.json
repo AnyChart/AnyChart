@@ -2290,7 +2290,7 @@
     "anychart.enums.LabelsOverlapMode": {
       "enum": [
         "noOverlap",
-        "overlap"
+        "allowOverlap"
       ]
     },
     "anychart.enums.SidePosition": {
