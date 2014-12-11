@@ -272,7 +272,7 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 anychart.scales.OrdinalTicks.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['explicit'] = this.explicit_;
-  json['interval'] = this.interval_;
+  if (!isNaN(this.interval_)) json['interval'] = this.interval_;
   json['names'] = this.names_;
   return json;
 };
