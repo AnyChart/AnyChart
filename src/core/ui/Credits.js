@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Credits');
 goog.require('anychart.core.VisualBase');
 goog.require('goog.dom');
+goog.require('goog.net.ImageLoader');
 goog.require('goog.userAgent');
 
 
@@ -54,7 +55,7 @@ goog.inherits(anychart.core.ui.Credits, anychart.core.VisualBase);
 
 
 /** @inheritDoc */
-anychart.core.ui.Credits.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REDRAW;
+anychart.core.ui.Credits.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
 /**
@@ -234,11 +235,11 @@ anychart.core.ui.Credits.prototype.invalidateParentBounds = function() {
 
 /**
  * Draws svg logo.
- * @param {Element} element Container for logo.
  * @private
  */
-anychart.core.ui.Credits.prototype.drawLogo_ = function(element) {
-  var stage = acgraph.create(element, '12px', '100%');
+anychart.core.ui.Credits.prototype.drawLogo_ = function() {
+  var stage = acgraph.create(this.domElement_, '12px', '100%');
+  acgraph.getRenderer().setAttribute_(stage.domElement(), 'class', anychart.core.ui.Credits.CssClass_.LOGO);
   var borderPath = stage.path();
   var columnPath = stage.path();
 
@@ -325,16 +326,29 @@ anychart.core.ui.Credits.prototype.draw = function() {
       'title': valid ? this.alt_ : 'AnyChart.com',
       'target': '_blank'
     });
-    this.domElement_.innerHTML = this.getHTMLString_(valid);
-    // get image dom element to check for an error
-    var img = goog.dom.getElementByClass('anychart-credits-logo', this.domElement_);
-    var self = this;
-    img.onerror = function(e) {
-      // draws logo instead of loading image
-      self.drawLogo_(self.domElement_);
-      // remove <img /> element
-      goog.dom.removeNode(img);
-    };
+
+    // create span with text
+    this.domElement_.innerHTML = this.getHTMLString_(valid, false);
+
+    var imageLoader = new goog.net.ImageLoader();
+    goog.events.listen(imageLoader, goog.events.EventType.LOAD, function() {
+      // append image
+      this.domElement_.innerHTML += this.getHTMLString_(valid, true);
+    }, false, this);
+
+    // image not loaded - should draw logo by framework
+    goog.events.listen(imageLoader, goog.net.EventType.ERROR, function() {
+      this.drawLogo_();
+    }, false, this);
+
+    // all work is done
+    goog.events.listen(imageLoader, goog.net.EventType.COMPLETE, function() {
+      goog.dispose(imageLoader);
+    }, false, this);
+
+    imageLoader.addImage('logo', 'http://static.anychart.com/logo.png');
+    imageLoader.start();
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -393,12 +407,15 @@ anychart.core.ui.Credits.prototype.getRemainingBounds = function() {
 
 /**
  * @param {boolean} valid Is license key valid.
+ * @param {boolean} appendImage Whether ro return string with image tag.
  * @return {string}
  * @private
  */
-anychart.core.ui.Credits.prototype.getHTMLString_ = function(valid) {
-  return '<span class="' + anychart.core.ui.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>' +
-      '<img class="' + anychart.core.ui.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">';
+anychart.core.ui.Credits.prototype.getHTMLString_ = function(valid, appendImage) {
+  if (appendImage) {
+    return '<img class="' + anychart.core.ui.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">';
+  }
+  return '<span class="' + anychart.core.ui.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>';
 };
 
 

@@ -682,7 +682,16 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
  * @private
  */
 anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.CREDITS, anychart.Signal.NEEDS_REDRAW);
+  var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.CREDITS;
+  }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+  }
+  // If there are no signals – state == 0 and nothing will happen.
+  this.invalidate(state, signal);
 };
 
 
