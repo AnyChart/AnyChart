@@ -91,7 +91,7 @@ anychart.onDocumentReady(function() {
 
   dataGrid.container(stage);
 
-  splitter = anychart.ui.splitter();
+  splitter = new anychart.core.ui.Splitter();
 
   splitter
       .bounds(10, 10, '90%', '90%')
@@ -111,7 +111,7 @@ anychart.onDocumentReady(function() {
       .data(tree)
       .cellBorder({thickness: 2, color: '#999'})
       .startIndex(0)
-      .verticalOffset(39)
+//      .verticalOffset(39)
       .titleHeight(25);
 
   var valueColumn = dataGrid.column(10);
