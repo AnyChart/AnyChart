@@ -26,7 +26,13 @@ $(document).ready(function() {
     ['P16', '133.08']
   ];
 
-  var chart = anychart.bar();
+
+
+  var stage = acgraph.create('container');
+  anychart.licenseKey(null);
+  stage.suspend();
+
+  var chart = anychart.barChart();
   chart.bar([
     ['A1' , 3],
     ['A2' , 5],
@@ -34,8 +40,9 @@ $(document).ready(function() {
     ['A4' , 4.1],
     ['A5' , 9.5]
   ]);
+  chart.container(stage).draw();
+  stage.resume();
   var config = chart.toJson();
-
 
 
   validate = function() {
