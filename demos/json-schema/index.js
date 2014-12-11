@@ -75,7 +75,7 @@ $(document).ready(function() {
   jsonEditor.setTheme("ace/theme/monokai");
   jsonEditor.getSession().setMode("ace/mode/json");
 
-  $.getJSON("json-schema.json", function(data) {
+  $.getJSON("../../json-schema.json", function(data) {
     schema = JSON.stringify(data, undefined, 4);
     $('#schema').html(schema);
 

@@ -2454,7 +2454,8 @@
     "hatchFill": {
       "type": ["object"],
       "properties": {
-        "type": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
+        "type": {"enums": ["hatchFill"]},
+        "hatchType": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
         "color": {
           "type": "string"
         },
