@@ -311,7 +311,9 @@ def __compile_project():
 
 
 def __build_project_sources(modules):
-    output_file = os.path.join(OUT_PATH, 'anychart.js')
+    file_name = 'anychart.js'
+    file_name = __apply_specific_file_name_rule(file_name, modules)
+    output_file = os.path.join(OUT_PATH, file_name)
     print "Compile source file for modules modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s" % (', '.join(modules), output_file, __get_version(True), str(arguments['develop']))
     commands = __get_default_compiler_args() + \
                __get_not_optimized_compiler_args() + \
@@ -325,6 +327,7 @@ def __build_project_sources(modules):
 def __build_project(modules):
     dev_postfix = '.dev' if __is_develop() else ''
     file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
+    file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
     print output_file
     print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s" % (', '.join(modules), output_file, __get_version(True), str(arguments['develop']))
@@ -340,6 +343,14 @@ def __build_project(modules):
                '--create_source_map %s' % output_file + '_sourcemap.json']
 
     __call_compiler(commands)
+
+
+def __apply_specific_file_name_rule(file_name, modules):
+    if modules == ['anychart_bundle']:
+        file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
+    elif modules == ['charts']:
+        file_name = file_name.replace('charts', 'anychart')
+    return file_name
 
 
 def __call_compiler(commands):
@@ -506,12 +517,12 @@ def __build_js_doc():
         shutil.rmtree(docs_out_path)
         os.mkdir(docs_out_path)
         os.mkdir(os.path.join(docs_out_path, 'scripts'))
-        prodJS = 'anychart.min.js';
-        devJS = 'anychart.dev.min.js';
-        if not os.path.exists(os.path.join(OUT_PATH, prodJS)):
-            shutil.copy(os.path.join(OUT_PATH, devJS),  os.path.join(docs_out_path, 'scripts', prodJS))
+        prod_js = 'anychart.min.js'
+        dev_js = 'anychart.dev.min.js'
+        if not os.path.exists(os.path.join(OUT_PATH, prod_js)):
+            shutil.copy(os.path.join(OUT_PATH, dev_js),  os.path.join(docs_out_path, 'scripts', prod_js))
         else:
-            shutil.copy(os.path.join(OUT_PATH, prodJS),  os.path.join(docs_out_path, 'scripts', prodJS))
+            shutil.copy(os.path.join(OUT_PATH, prod_js),  os.path.join(docs_out_path, 'scripts', prod_js))
 
     p = subprocess.Popen(
         ['git', 'tag'],
