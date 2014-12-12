@@ -333,12 +333,13 @@ anychart.core.ui.Credits.prototype.draw = function() {
     var imageLoader = new goog.net.ImageLoader();
     goog.events.listen(imageLoader, goog.events.EventType.LOAD, function() {
       // append image
-      this.domElement_.innerHTML += this.getHTMLString_(valid, true);
+      if (!this.isDisposed())
+        this.domElement_.innerHTML += this.getHTMLString_(valid, true);
     }, false, this);
 
     // image not loaded - should draw logo by framework
     goog.events.listen(imageLoader, goog.net.EventType.ERROR, function() {
-      if (this.enabled())
+      if (this.enabled() && !this.isDisposed())
         this.drawLogo_();
     }, false, this);
 
@@ -508,7 +509,6 @@ anychart.core.ui.Credits.prototype.setupByJSON = function(config) {
 anychart.core.ui.Credits.prototype.disposeInternal = function() {
   goog.dom.removeNode(this.divElement_);
   this.divElement_ = null;
-  this.enabled(false);
 
   goog.base(this, 'disposeInternal');
 };

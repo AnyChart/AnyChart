@@ -1,6 +1,7 @@
 var chart, s1;
 anychart.onDocumentReady(function() {
 
+  anychart.licenseKey('Irina-d43a427a-1985961f');
   var dataSet = anychart.data.set([
     ['P1' , '322', '242', '162'],
     ['P2' , '324', '254', '90'],
@@ -22,4 +23,6 @@ anychart.onDocumentReady(function() {
 
   chart.legend().enabled(true);
   chart.draw();
+  chart.credits(null);
+  //chart.dispose();
 });
