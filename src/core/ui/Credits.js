@@ -508,7 +508,7 @@ anychart.core.ui.Credits.prototype.setupByJSON = function(config) {
 anychart.core.ui.Credits.prototype.disposeInternal = function() {
   goog.dom.removeNode(this.divElement_);
   this.divElement_ = null;
-  this.enabled_ = false;
+  this.enabled(false);
 
   goog.base(this, 'disposeInternal');
 };
