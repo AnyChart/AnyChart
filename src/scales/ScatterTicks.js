@@ -608,12 +608,12 @@ anychart.scales.ScatterTicks.prototype.serialize = function() {
   json['base'] = this.base_;
   json['explicit'] = this.explicit_;
   if (this.minCount_ == this.maxCount_) {
-    json['count'] = this.minCount_;
+    if (!isNaN(this.minCount_)) json['count'] = this.minCount_;
   } else {
-    json['minCount'] = this.minCount_;
-    json['maxCount'] = this.maxCount_;
+    if (!isNaN(this.minCount_)) json['minCount'] = this.minCount_;
+    if (!isNaN(this.maxCount_)) json['maxCount'] = this.maxCount_;
   }
-  json['interval'] = this.interval_;
+  if (!isNaN(this.interval_)) json['interval'] = this.interval_;
   return json;
 };
 

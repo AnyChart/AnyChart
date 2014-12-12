@@ -150,12 +150,13 @@ anychart.color.serialize = function(color) {
   var result;
   if (color instanceof acgraph.vector.HatchFill) {
     result = {
-      'type': 'hatchFill',
-      'hatchType': color['type'],
-      'color': color['color'],
-      'thickness': color['thickness'],
-      'size': color['size']
+      'type': 'hatchFill'
     };
+    if (goog.isDef(color['hatchType'])) result['hatchType'] = color['type'];
+    if (goog.isDef(color['color'])) result['color'] = color['color'];
+    if (goog.isDef(color['thickness'])) result['thickness'] = color['thickness'];
+    if (goog.isDef(color['size'])) result['size'] = color['size'];
+
   } else if (color instanceof acgraph.vector.PatternFill) {
     result = color.serialize();
   } else if (goog.isObject(color)) {

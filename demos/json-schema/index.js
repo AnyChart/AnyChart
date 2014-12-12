@@ -61,7 +61,24 @@ $(document).ready(function() {
     //  dataType: "json"
     //});
 
-    var validResp = tv4.validateMultiple(JSON.parse(json), JSON.parse(schema));
+    //var validResp = tv4.validateMultiple(JSON.parse(json), JSON.parse(schema));
+    var c = config;
+    var c1 = JSON.parse(JSON.stringify(config));
+
+    console.log(goog.object.findKey(c, function(value) {
+      var regexp = /^[.].+/;
+      if (goog.isNumber(value)) {
+        return regexp.test(String(value));
+      }
+      return true;
+    }));
+    console.log(c);
+    console.log(c1);
+
+
+
+
+    var validResp = tv4.validateMultiple(config, JSON.parse(schema));
 
 
     resultEditor.setValue(JSON.stringify(validResp, undefined, 4), 1);
