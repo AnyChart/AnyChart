@@ -7,7 +7,7 @@
     <!--Non Compiled JS-->
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
-    <script>goog.require('anychart.modules.anychart');</script>
+    <script>goog.require("anychart.modules.anychart");</script>
     <script>
         anychart.onDocumentReady(function() {
             var json = {
@@ -75,7 +75,7 @@
                 }
             };
             var chart = anychart.fromJson(json);
-            chart.container('container');
+            chart.container("container");
             chart.draw();
         });
     </script>

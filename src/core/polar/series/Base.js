@@ -57,7 +57,7 @@ goog.inherits(anychart.core.polar.series.Base, anychart.core.VisualBaseWithBound
 
 /**
  * Map of series constructors by type.
- * @type {Object.<anychart.enums.PolarSeriesType, Function>}
+ * @type {Object.<string, Function>}
  */
 anychart.core.polar.series.Base.SeriesTypesMap = {};
 

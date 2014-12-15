@@ -2,14 +2,14 @@
 <html>
 <head>
   <!--Compiled JS-->
-  <script src="../../../out/anychart.min.js"></script>
+  <!--<script src="../../../out/anychart.min.js"></script>-->
 
   <!--Non Compiled JS-->
-  <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
-  <!--<script src="../../../src/deps.js"></script>-->
-  <!--<script>-->
-  <!--goog.require('anychart.modules.anychart');-->
-  <!--</script>-->
+  <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../../src/deps.js"></script>
+  <script>
+  goog.require("anychart.modules.anychart");
+  </script>
   <script>
     anychart.onDocumentReady(function() {
       var json = {
@@ -59,7 +59,7 @@
               "name": "Day (max)",
               "fill": {
                 "color": "rgb(38, 123, 182)",
-                "opacity": .5
+                "opacity": 0.5
               },
               "stroke": {
                 "thickness": 2,
@@ -71,27 +71,24 @@
                 "size": 3
               },
               "hatchFill": {
-                "type": "backwarddiagonal",
-                "fill": {
-                  "color": "#fff",
-                  "opacity": .5
-                },
+                "type": "backwardDiagonal",
+                "color": "#fff 0.5",
                 "thickness": 2,
                 "size": 5
               },
               "data": [
-                ['January', 8.1],
-                ['February', 8.4],
-                ['March', 11.4],
-                ['April', 14.2],
-                ['May', 17.9],
-                ['June', 21.1],
-                ['July', 23.5],
-                ['August', 23.2],
-                ['September', 19.9],
-                ['October', 15.6],
-                ['November', 11.2],
-                ['December', 8.3]
+                ["January", 8.1],
+                ["February", 8.4],
+                ["March", 11.4],
+                ["April", 14.2],
+                ["May", 17.9],
+                ["June", 21.1],
+                ["July", 23.5],
+                ["August", 23.2],
+                ["September", 19.9],
+                ["October", 15.6],
+                ["November", 11.2],
+                ["December", 8.3]
               ]
             },
             {
@@ -99,7 +96,7 @@
               "name": "Night (min)",
               "fill": {
                 "color": "rgb(119, 145, 34)",
-                "opacity": .5
+                "opacity": 0.5
               },
               "stroke": {
                 "thickness": 2,
@@ -111,27 +108,24 @@
                 "size": 2
               },
               "hatchFill": {
-                "type": "backwarddiagonal",
-                "fill": {
-                  "color": "#fff",
-                  "opacity": .5
-                },
+                "type": "backwardDiagonal",
+                "color": "#fff 0.5",
                 "thickness": 2,
                 "size": 5
               },
               "data": [
-                ['January', 2.3],
-                ['February', 2.1],
-                ['March', 3.9],
-                ['April', 5.5],
-                ['May', 8.7],
-                ['June', 11.7],
-                ['July', 13.9],
-                ['August', 13.7],
-                ['September', 11.4],
-                ['October', 8.4],
-                ['November', 4.9],
-                ['December', 2.7]
+                ["January", 2.3],
+                ["February", 2.1],
+                ["March", 3.9],
+                ["April", 5.5],
+                ["May", 8.7],
+                ["June", 11.7],
+                ["July", 13.9],
+                ["August", 13.7],
+                ["September", 11.4],
+                ["October", 8.4],
+                ["November", 4.9],
+                ["December", 2.7]
               ]
             }
           ]
@@ -141,7 +135,7 @@
 
       //create point data labels formation function
       var labelFormattingFunction = function() {
-        return this.x + ': ' + this.value.toFixed(2)
+        return this.x + ": " + this.value.toFixed(2)
       };
 
       chart.getSeries(0).tooltip().contentFormatter(labelFormattingFunction);

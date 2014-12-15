@@ -2,27 +2,30 @@
 <html>
 <head>
   <!--Compiled JS-->
-  <script src="../../../out/anychart.min.js"></script>
+  <!--<script src="../../../out/anychart.min.js"></script>-->
 
   <!--Non Compiled JS-->
-  <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
-  <!--<script src="../../../src/deps.js"></script>-->
-  <!--<script>-->
-  <!--goog.require('anychart.modules.anychart');-->
-  <!--</script>-->
+  <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../../src/deps.js"></script>
+  <script>
+  goog.require('anychart.modules.anychart');
+  </script>
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
-                  '<chart type="radar" container="container" title="Average temperature in London" startAngle="0">'+
-                      '<yScale minimum="0" maximumGap="0">'+
+      var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
+                  '<chart type="radar" container="container" title="Average temperature in London" start_angle="0">'+
+                      '<y_scale minimum="0" maximum_gap="0">'+
                           '<ticks interval="5"/>'+
-                      '</yScale>'+
-                      '<yAxis>'+
-                          '<labels fontWeight="bold"/>'+
-                      '</yAxis>'+
-                      '<xAxis>'+
-                          '<labels padding="5"/>'+
-                      '</xAxis>'+
+                      '</y_scale>'+
+                      '<y_axis>'+
+                          '<labels font_weight="bold"/>'+
+                      '</y_axis>'+
+                      '<x_axis>'+
+                          '<labels>'+
+                            '<padding left="5" top="5" right="5" bottom="5" />'+
+                          '</labels>'+
+                      '</x_axis>'+
                       '<background>'+
                           '<fill angle="90">'+
                               '<keys>'+
@@ -32,16 +35,14 @@
                               '</keys>'+
                           '</fill>'+
                       '</background>'+
-                      '<legend align="top" position="right" itemsLayout="vertical" enabled="true"/>'+
+                      '<legend align="top" position="right" items_layout="vertical" enabled="true"/>'+
                       '<padding bottom="40"/>'+
-                      '<seriesList>'+
-                          '<series seriesType="area" name="Day (max)">'+
+                      '<series_list>'+
+                          '<series series_type="area" name="Day (max)">'+
                               '<fill color="rgb(38, 123, 182)" opacity="0.5"/>'+
                               '<stroke thickness="2" color="rgb(26, 85, 127)"/>'+
                               '<markers enabled="true" fill="rgb(110, 178, 224)" size="3"/>'+
-                              '<hatchFill type="backwarddiagonal" thickness="2" size="5">'+
-                                  '<fill color="#fff" opacity="0.5"/>'+
-                              '</hatchFill>'+
+                              '<hatch_fill type="backwardDiagonal" thickness="2" size="5" color="#fff 0.5" />'+
                               '<data>'+
                                   '<point x="January" value="8.1"/>'+
                                   '<point x="February" value="8.4"/>'+
@@ -57,13 +58,11 @@
                                   '<point x="December" value="8.3"/>'+
                               '</data>'+
                           '</series>'+
-                          '<series seriesType="area" name="Night (min)">'+
+                          '<series series_type="area" name="Night (min)">'+
                               '<fill color="rgb(119, 145, 34)" opacity="0.5"/>'+
                               '<stroke thickness="2" color="rgb(89, 109, 25)"/>'+
                               '<markers enabled="true" fill="rgb(194, 220, 108)" size="2"/>'+
-                              '<hatchFill type="backwarddiagonal" thickness="2" size="5">'+
-                                  '<fill color="#fff" opacity="0.5"/>'+
-                              '</hatchFill>'+
+                              '<hatch_fill type="backwardDiagonal" thickness="2" size="5" color="#fff 0.5" />'+
                               '<data>'+
                                   '<point x="January" value="2.3"/>'+
                                   '<point x="February" value="2.1"/>'+
@@ -79,9 +78,9 @@
                                   '<point x="December" value="2.7"/>'+
                               '</data>'+
                           '</series>'+
-                      '</seriesList>'+
+                      '</series_list>'+
                   '</chart>'+
-                  '</xml>';
+                '</anychart>';
       var chart = anychart.fromXml(xml);
 
       //create point data labels formation function

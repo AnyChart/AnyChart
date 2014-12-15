@@ -12,9 +12,9 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="line" title="Line Chart with Dashed Style" container="container">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<stroke color="#1D8BD1" dash="5 3 2"/>' +
                                         '<data>' +
@@ -66,9 +66,9 @@
                                             '<point x="Dec" value="71"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

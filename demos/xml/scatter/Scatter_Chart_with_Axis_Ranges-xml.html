@@ -10,21 +10,22 @@
     <script>goog.require('anychart.modules.anychart');</script>
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                    '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                         '<chart type="scatter" container="container">'+
-                            '<title><![CDATA[Scatter Chart: Marker Series with Axis Ranges]]></title>'+
-                            '<xScale minimumGap="0" maximumGap="0">'+
+                            '<title text="Scatter Chart: Marker Series with Axis Ranges" />'+
+                            '<x_scale minimum_gap="0" maximum_gap="0">'+
                                 '<ticks interval="250"/>'+
-                            '</xScale>'+
-                            '<yAxes>'+
+                            '</x_scale>'+
+                            '<y_axes>'+
                                 '<axis title="Values"/>'+
-                            '</yAxes>'+
-                            '<xAxes>'+
+                            '</y_axes>'+
+                            '<x_axes>'+
                                 '<axis title="false"/>'+
-                            '</xAxes>'+
+                            '</x_axes>'+
                             '<padding bottom="50"/>'+
-                            '<seriesList>'+
-                                '<series size="6" hoverSize="8">'+
+                            '<series_list>'+
+                                '<series size="6" hover_size="8">'+
                                     '<data>'+
                                         '<point x="1732.8871544450521" value="-80.75603982433677"/>'+
                                         '<point x="1359.810951165855" value="297.2723776474595"/>'+
@@ -53,7 +54,7 @@
                                         '<point x="736.7067560553551" value="-414.1982044093311"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series size="6" hoverSize="8">'+
+                                '<series size="6" hover_size="8">'+
                                     '<data>'+
                                         '<point x="1546.589955687523" value="282.97513956204057"/>'+
                                         '<point x="650.068512186408" value="-129.5293727889657"/>'+
@@ -82,7 +83,7 @@
                                         '<point x="1718.982090242207" value="83.44200439751148"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series size="6" hoverSize="8">'+
+                                '<series size="6" hover_size="8">'+
                                     '<data>'+
                                         '<point x="742.7253536880016" value="479.4877045787871"/>'+
                                         '<point x="1730.0641294568777" value="-240.9555669873953"/>'+
@@ -111,7 +112,7 @@
                                         '<point x="814.3314002081752" value="-484.1634132899344"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series size="6" hoverSize="8">'+
+                                '<series size="6" hover_size="8">'+
                                     '<data>'+
                                         '<point x="772.9451237246394" value="-407.76275377720594"/>'+
                                         '<point x="502.4238293990493" value="-342.1307345852256"/>'+
@@ -140,21 +141,19 @@
                                         '<point x="346.93830739706755" value="150.88692586869"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
-                            '<rangeAxesMarkers>'+
-                                '<rangeAxesMarker fill="green 0.2" from="0" to="500" layout="vertical"/>'+
-                                '<rangeAxesMarker fill="gold 0.2" from="500" to="1500" layout="vertical"/>'+
-                                '<rangeAxesMarker fill="red 0.2" from="1500" to="2000" layout="vertical"/>'+
-                            '</rangeAxesMarkers>'+
-                            '<textAxesMarkers>'+
-                                '<textAxesMarker value="250" align="bottom" rotation="0" offsetY="50" layout="vertical" text="Low (0-500)"/>'+
-                                '<textAxesMarker value="1000" align="bottom" rotation="0" offsetY="50" layout="vertical"'+
-                                                'text="Average (500-1500)"/>'+
-                                '<textAxesMarker value="1750" align="bottom" rotation="0" offsetY="50" layout="vertical"'+
-                                                'text="High (1500-2000)"/>'+
-                            '</textAxesMarkers>'+
+                            '</series_list>'+
+                            '<range_axes_markers>'+
+                                '<range_axes_marker fill="green 0.2" from="0" to="500" layout="vertical"/>'+
+                                '<range_axes_marker fill="gold 0.2" from="500" to="1500" layout="vertical"/>'+
+                                '<range_axes_marker fill="red 0.2" from="1500" to="2000" layout="vertical"/>'+
+                            '</range_axes_markers>'+
+                            '<text_axes_markers>'+
+                                '<text_axes_marker value="250" align="bottom" rotation="0" offset_y="50" layout="vertical" text="Low (0-500)"/>'+
+                                '<text_axes_marker value="1000" align="bottom" rotation="0" offset_y="50" layout="vertical" text="Average (500-1500)"/>'+
+                                '<text_axes_marker value="1750" align="bottom" rotation="0" offset_y="50" layout="vertical" text="High (1500-2000)"/>'+
+                            '</text_axes_markers>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

@@ -8,7 +8,7 @@
   <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
   <!--<script src="../../../src/deps.js"></script>-->
   <!--<script>-->
-  <!--goog.require('anychart.modules.anychart');-->
+  <!--goog.require("anychart.modules.anychart");-->
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
@@ -23,7 +23,7 @@
             "minimum": -.2,
             "maximum": 1,
             "ticks": {
-              "interval": .2
+              "interval": 0.2
             }
           },
           "legend": {
@@ -62,42 +62,42 @@
               "seriesType": "line",
               "name": "USA",
               "data": [
-                ['GDP', 1],
-                ['GDP Real Growth Rate', 0.3666666666666667],
-                ['Infant Mortality', 0.06578947368421052],
-                ['Life Expectancy', 0.9576093653727663],
-                ['Population', 0.22638827767366515],
-                ['Area', 0.5390698290165805],
-                ['Density', 0.02995156531259858],
-                ['Population Growth Rate', 0.3087248322147651]
+                ["GDP", 1],
+                ["GDP Real Growth Rate", 0.3666666666666667],
+                ["Infant Mortality", 0.06578947368421052],
+                ["Life Expectancy", 0.9576093653727663],
+                ["Population", 0.22638827767366515],
+                ["Area", 0.5390698290165805],
+                ["Density", 0.02995156531259858],
+                ["Population Growth Rate", 0.3087248322147651]
               ]
             },
             {
               "seriesType": "line",
               "name": "Russia",
               "data": [
-                ['GDP', 0.11982978723404256],
-                ['GDP Real Growth Rate', 0.5583333333333333],
-                ['Infant Mortality', 0.15576923076923077],
-                ['Life Expectancy', 0.8268638324091188],
-                ['Population', 0.10979008847837246],
-                ['Area', 1],
-                ['Density', 0.00783120233080335],
-                ['Population Growth Rate', -0.12416107382550336]
+                ["GDP", 0.11982978723404256],
+                ["GDP Real Growth Rate", 0.5583333333333333],
+                ["Infant Mortality", 0.15576923076923077],
+                ["Life Expectancy", 0.8268638324091188],
+                ["Population", 0.10979008847837246],
+                ["Area", 1],
+                ["Density", 0.00783120233080335],
+                ["Population Growth Rate", -0.12416107382550336]
               ]
             },
             {
               "seriesType": "line",
               "name": "China",
               "data": [
-                ['GDP', 0.6180425531914894],
-                ['GDP Real Growth Rate', 0.7583333333333333],
-                ['Infant Mortality', 0.24473684210526317],
-                ['Life Expectancy', 0.8905730129390017],
-                ['Population', 1],
-                ['Area', 0.5487479259581779],
-                ['Density', 0.1299664111937944],
-                ['Population Growth Rate', 0.1946308724832214]
+                ["GDP", 0.6180425531914894],
+                ["GDP Real Growth Rate", 0.7583333333333333],
+                ["Infant Mortality", 0.24473684210526317],
+                ["Life Expectancy", 0.8905730129390017],
+                ["Population", 1],
+                ["Area", 0.5487479259581779],
+                ["Density", 0.1299664111937944],
+                ["Population Growth Rate", 0.1946308724832214]
               ]
             }
           ]
@@ -107,7 +107,7 @@
 
       //create point data labels formation function
       var labelFormattingFunction = function() {
-        return this.x + ': ' + this.value.toFixed(2)
+        return this.x + ": " + this.value.toFixed(2)
       };
 
       chart.getSeries(0).tooltip().contentFormatter(labelFormattingFunction);

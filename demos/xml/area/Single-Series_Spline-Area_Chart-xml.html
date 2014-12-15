@@ -12,19 +12,19 @@
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
+      var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                   '<chart type="area" container="container" title="Spline-Area Chart">'+
-                      '<yScale minimum="0"/>'+
-                      '<xAxes>'+
+                      '<y_scale minimum="0"/>'+
+                      '<x_axes>'+
                           '<axis>'+
                               '<title>'+
                                   '<margin bottom="20"/>'+
                                   '<padding right="15"/>'+
                               '</title>'+
                           '</axis>'+
-                      '</xAxes>'+
-                      '<seriesList>'+
-                          '<series seriesType="splinearea">'+
+                      '</x_axes>'+
+                      '<series_list>'+
+                          '<series series_type="splineArea">'+
                               '<data>'+
                                   '<point x="P1" value="1042"/>'+
                                   '<point x="P2" value="2210"/>'+
@@ -42,11 +42,11 @@
                                   '<point x="P14" value="1296"/>'+
                               '</data>'+
                               '<markers enabled="true"/>'+
-                              '<hoverMarkers enabled="true"/>'+
+                              '<hover_markers enabled="true"/>'+
                           '</series>'+
-                      '</seriesList>'+
+                      '</series_list>'+
                   '</chart>'+
-              '</xml>';
+              '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.draw();
     });

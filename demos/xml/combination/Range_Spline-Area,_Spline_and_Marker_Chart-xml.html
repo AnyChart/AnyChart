@@ -12,16 +12,16 @@
     </script>
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
+            var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                         '<chart type="column" title="Combination of Range Spline-Area, Spline and Marker Chart" container="container">'+
-                            '<yScale minimum="-3" maximum="7">'+
+                            '<y_scale minimum="-3" maximum="7">'+
                                 '<ticks interval="1"/>'+
-                            '</yScale>'+
-                            '<xScale>'+
+                            '</y_scale>'+
+                            '<x_scale>'+
                                 '<ticks interval="5"/>'+
-                            '</xScale>'+
-                            '<seriesList>'+
-                                '<series seriesType="rangeSplineArea" fill="#1D8BD1 0.8">'+
+                            '</x_scale>'+
+                            '<series_list>'+
+                                '<series series_type="rangeSplineArea" fill="#1D8BD1 0.8">'+
                                     '<data>'+
                                         '<point x="1" low="-0.489863522578899" high="0.848138677816903"/>'+
                                         '<point x="2" low="-0.385774774190865" high="0.779071607989758"/>'+
@@ -100,7 +100,7 @@
                                         '<point x="75" low="3.9432032257054" high="4.94316527477613"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="marker" size="2" hoverSize="5">'+
+                                '<series series_type="marker" size="2" hover_size="5">'+
                                     '<data>'+
                                         '<point x="1" value="0.559142254786167"/>'+
                                         '<point x="2" value="0.592110810844279"/>'+
@@ -179,7 +179,7 @@
                                         '<point x="75" value="5.15369204112966"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="spline" color="gold">'+
+                                '<series series_type="spline" color="gold">'+
                                     '<data>'+
                                         '<point x="1" value="1.15073035819645"/>'+
                                         '<point x="2" value="0.742753777067528"/>'+
@@ -258,9 +258,9 @@
                                         '<point x="75" value="5.53350321274879"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

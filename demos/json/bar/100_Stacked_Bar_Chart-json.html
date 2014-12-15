@@ -8,7 +8,7 @@
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
     <script>
-        goog.require('anychart.modules.anychart');
+        goog.require("anychart.modules.anychart");
     </script>
     <script>
         var chart;
@@ -87,7 +87,7 @@
             };
             chart = anychart.fromJson(json);
             chart.yAxis(0).labels().textFormatter(function() {
-                return this.value + '%';
+                return this.value + "%";
             });
             chart.draw();
         });

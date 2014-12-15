@@ -629,7 +629,12 @@ anychart.charts.Polar.prototype.marker = function(data, opt_csvSettings) {
  * @return {anychart.core.polar.series.Base}
  */
 anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
-  var ctl = anychart.core.polar.series.Base.SeriesTypesMap[/** @type {anychart.enums.PolarSeriesType} */(type)];
+  var ctl;
+  type = ('' + type).toLowerCase();
+  for (var i in anychart.core.polar.series.Base.SeriesTypesMap) {
+    if (i.toLowerCase() == type)
+      ctl = anychart.core.polar.series.Base.SeriesTypesMap[i];
+  }
   var instance;
 
   if (ctl) {
@@ -1370,12 +1375,7 @@ anychart.charts.Polar.prototype.setupByJSON = function(config) {
   var i, json, scale;
   var grids = config['grids'];
   var minorGrids = config['minorGrids'];
-  var lineAxesMarkers = config['lineAxesMarkers'];
-  var rangeAxesMarkers = config['rangeAxesMarkers'];
-  var textAxesMarkers = config['textAxesMarkers'];
   var series = config['series'];
-  var barGroupsPadding = config['barGroupsPadding'];
-  var barsPadding = config['barsPadding'];
   var scales = config['scales'];
 
   var scalesInstances = {};

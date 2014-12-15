@@ -12,15 +12,18 @@
     <!--</script>-->
     <script>
         anychart.onDocumentReady(function() {
-            var xml ='<xml version="1.0" encoding="utf-8">'+
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                         '<chart type="area" container="container" title="Area Chart with Negative Values">'+
-                            '<xAxis>'+
-                                '<title>'+
-                                    '<margin bottom="20"/>'+
-                                    '<padding right="15"/>'+
-                                '</title>'+
-                            '</xAxis>'+
-                            '<seriesList>'+
+                            '<x_axes>'+
+                                '<axis>' +
+                                    '<title>'+
+                                        '<margin bottom="20"/>'+
+                                        '<padding right="15"/>'+
+                                    '</title>'+
+                                '</axis>' +
+                            '</x_axes>'+
+                            '<series_list>'+
                                 '<series color="#EEEE25">'+
                                     '<data>'+
                                         '<point x="P1" value="322"/>'+
@@ -93,9 +96,9 @@
                                         '<point x="P20" value="-184"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             //using fill function we can create a pretty gradient for the series
             //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
             var fillFunction = function() {

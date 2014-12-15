@@ -12,22 +12,25 @@
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
-                  '<chart type="radar" container="container" startAngle="0">'+
-                      '<title><![CDATA[WoW base stats comparison radar chart: Shaman vs Warrior vs Priest]]></title>'+
-                      '<yScale minimum="0" maximumGap="0">'+
+      var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
+                    '<chart type="radar" container="container" start_angle="0">'+
+                      '<title text="WoW base stats comparison radar chart: Shaman vs Warrior vs Priest" />'+
+                      '<y_scale minimum="0" maximum_gap="0">'+
                           '<ticks interval="50"/>'+
-                      '</yScale>'+
-                      '<xAxis>'+
-                          '<labels fontWeight="bold" padding="5"/>'+
-                      '</xAxis>'+
-                      '<legend align="top" position="right" itemsLayout="vertical" enabled="true"/>'+
+                      '</y_scale>'+
+                      '<x_axis>'+
+                          '<labels font_weight="bold">'+
+                               '<padding left="5" top="5" right="5" bottom="5" />'+
+                          '</labels>'+
+                      '</x_axis>'+
+                      '<legend align="top" position="right" items_layout="vertical" enabled="true"/>'+
                       '<grids>'+
-                          '<grid oodFill="white" evenFill="white" stroke="rgb(221,221,221)"/>'+
+                          '<grid odd_fill="white" even_fill="white" stroke="rgb(221,221,221)"/>'+
                           '<grid stroke="rgb(192,192,192)"/>'+
                       '</grids>'+
-                      '<seriesList>'+
-                          '<series seriesType="line" name="Shaman">'+
+                      '<series_list>'+
+                          '<series series_type="line" name="Shaman">'+
                               '<markers enabled="true" size="3"/>'+
                               '<data>'+
                                   '<point x="Strength" value="136"/>'+
@@ -37,7 +40,7 @@
                                   '<point x="Spirit" value="158"/>'+
                               '</data>'+
                           '</series>'+
-                          '<series seriesType="line" name="Warrior">'+
+                          '<series series_type="line" name="Warrior">'+
                               '<markers enabled="true" size="2"/>'+
                               '<data>'+
                                   '<point x="Strength" value="199"/>'+
@@ -47,7 +50,7 @@
                                   '<point x="Spirit" value="64"/>'+
                               '</data>'+
                           '</series>'+
-                          '<series seriesType="line" name="Priest">'+
+                          '<series series_type="line" name="Priest">'+
                               '<markers enabled="true" size="3"/>'+
                               '<data>'+
                                   '<point x="Strength" value="43"/>'+
@@ -57,9 +60,9 @@
                                   '<point x="Spirit" value="196"/>'+
                               '</data>'+
                           '</series>'+
-                      '</seriesList>'+
-                  '</chart>'+
-              '</xml>';
+                      '</series_list>'+
+                    '</chart>'+
+                '</anychart>';
       var chart = anychart.fromXml(xml);
 
       //create point data labels formation function

@@ -13,10 +13,9 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
-                            '<chart type="pie" title="ACME Corp. apparel sales through different retail channels" container="container">' +
-                                '<innerRadius><![CDATA[40%]]></innerRadius>' +
-                                '<labels position="outside" fontColor="black"/>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
+                            '<chart type="pie" title="ACME Corp. apparel sales through different retail channels" container="container" inner_radius="40%">' +
+                                '<labels position="outside" font_color="black"/>' +
                                 '<data>' +
                                     '<point x="Department Stores" value="6371664"/>' +
                                     '<point x="Discount Stores" value="7216301"/>' +
@@ -27,7 +26,7 @@
                                     '<point x="All other outlets" value="900000"/>' +
                                 '</data>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

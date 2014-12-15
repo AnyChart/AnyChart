@@ -13,17 +13,19 @@
   <script>
     anychart.onDocumentReady(function() {
       var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                  '<xml>' +
+                  '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                       '<chart type="polar" container="container" title="false">' +
-                          '<yScale stackMode="value">' +
+                          '<y_scale stack_mode="value">' +
                               '<ticks interval="2"/>' +
-                          '</yScale>' +
-                          '<xScale maximum="100">' +
+                          '</y_scale>' +
+                          '<x_scale maximum="100">' +
                               '<ticks interval="10"/>' +
-                          '</xScale>' +
-                          '<xAxis fontWeight="bold"/>' +
-                          '<seriesList>' +
-                              '<series seriesType="line" closed="false">' +
+                          '</x_scale>' +
+                          '<x_axis>' +
+                            '<labels font_weight="bold"/>' +
+                          '</x_axis>' +
+                          '<series_list>' +
+                              '<series series_type="line" closed="false">' +
                                   '<data>' +
                                       '<point x="0" value="0"/>' +
                                       '<point x="10" value="1"/>' +
@@ -47,9 +49,9 @@
                                       '</fill>' +
                                   '</markers>' +
                               '</series>' +
-                          '</seriesList>' +
+                          '</series_list>' +
                       '</chart>' +
-                  '</xml>';
+                  '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.xAxis().labels().textFormatter(function() {return this['value'] + '.00'});
       chart.draw();

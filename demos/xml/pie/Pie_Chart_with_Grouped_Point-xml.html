@@ -13,7 +13,7 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="pie" title="Pie Chart" container="container">' +
                                 '<data>' +
                                     '<point x="Product A" value="1222"/>' +
@@ -27,7 +27,7 @@
                                     '<point x="Product I" value="420"/>' +
                                 '</data>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.group(function(value) {
                 return (value >= 1000);

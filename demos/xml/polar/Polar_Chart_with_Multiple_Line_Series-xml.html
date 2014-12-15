@@ -13,17 +13,17 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="polar" title="false" container="container">' +
-                                '<yScale minimum="-1" maximum="1.5">' +
+                                '<y_scale minimum="-1" maximum="1.5">' +
                                     '<ticks interval="0.5"/>' +
-                                '</yScale>' +
-                                '<xScale maximum="360">' +
+                                '</y_scale>' +
+                                '<x_scale maximum="360">' +
                                     '<ticks interval="15"/>' +
-                                '</xScale>' +
-                                '<legend position="right" align="top" itemsLayout="vertical"/>' +
-                                '<seriesList>' +
-                                    '<series name="SINE" seriesType="line" fill="3 rgb(29, 139, 209)" markers="false">' +
+                                '</x_scale>' +
+                                '<legend position="right" align="top" items_layout="vertical"/>' +
+                                '<series_list>' +
+                                    '<series name="SINE" series_type="line" fill="3 rgb(29, 139, 209)" markers="false">' +
                                         '<data>' +
                                             '<point x="0" value="0"/>' +
                                             '<point x="1" value="0.017452406"/>' +
@@ -388,7 +388,7 @@
                                             '<point x="360" value="-2.4503E-16"/>' +
                                         '</data>' +
                                     '</series>' +
-                                    '<series name="COSINE" seriesType="line" fill="3 rgb(241, 104, 60)" markers="false">' +
+                                    '<series name="COSINE" series_type="line" fill="3 rgb(241, 104, 60)" markers="false">' +
                                         '<data>' +
                                             '<point x="1" value="0.999847695"/>' +
                                             '<point x="2" value="0.999390827"/>' +
@@ -752,9 +752,9 @@
                                             '<point x="360" value="1"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.xAxis().labels().textFormatter(function() {
                 return this['value'] + '°'

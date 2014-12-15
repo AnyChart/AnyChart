@@ -308,7 +308,8 @@ anychart.core.utils.Space.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.setup = function(var_args) {
-  this.set.apply(this, arguments);
+  if (goog.isDef(arguments[0]))
+    this.set.apply(this, arguments);
   return this;
 };
 

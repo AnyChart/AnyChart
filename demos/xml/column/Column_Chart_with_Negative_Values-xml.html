@@ -14,16 +14,16 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="column" title="Column Chart with Negative Values" container="container">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="128.14"/>' +
                                             '<point x="P2" value="112.61"/>' +
                                             '<point x="P3" value="-123.21"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -31,7 +31,7 @@
                                             '<point x="P2" value="104.19"/>' +
                                             '<point x="P3" value="135.12"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -39,7 +39,7 @@
                                             '<point x="P2" value="61.34"/>' +
                                             '<point x="P3" value="-34.17"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -47,11 +47,11 @@
                                             '<point x="P2" value="-87.12"/>' +
                                             '<point x="P3" value="54.32"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

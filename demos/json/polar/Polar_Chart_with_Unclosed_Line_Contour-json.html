@@ -8,7 +8,7 @@
   <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../../../src/deps.js"></script>
   <script>
-    goog.require('anychart.modules.anychart');
+    goog.require("anychart.modules.anychart");
   </script>
   <script>
     anychart.onDocumentReady(function() {
@@ -31,7 +31,9 @@
             }
           },
           "xAxis": {
-            "fontWeight": "bold"
+            "labels": {
+              "fontWeight": "bold"
+            }
           },
           "series": [{
             "seriesType": "line",
@@ -55,13 +57,13 @@
             },
             "markers": {
               "size": 3,
-              "fill": {keys: ['#8BC9F0', '#1D8BD1'], cx: 0.4, cy: 0.4}
+              "fill": {keys: ["#8BC9F0", "#1D8BD1"], cx: 0.4, cy: 0.4}
             }
           }]
         }
       };
       var chart = anychart.fromJson(json);
-      chart.xAxis().labels().textFormatter(function() {return this['value'] + '.00'});
+      chart.xAxis().labels().textFormatter(function() {return this["value"] + ".00"});
       chart.draw();
     });
   </script>

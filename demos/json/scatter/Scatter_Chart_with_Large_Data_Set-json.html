@@ -7,7 +7,7 @@
     <!--Non Compiled JS-->
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
-    <script>goog.require('anychart.modules.anychart');</script>
+    <script>goog.require("anychart.modules.anychart");</script>
     <script>
         anychart.onDocumentReady(function() {
             var json = {
@@ -3367,9 +3367,9 @@
             };
             var chart = anychart.fromJson(json);
             var markerSeries = chart.getSeries(0);
-            markerSeries.tooltip().content().hAlign('start');
+            markerSeries.tooltip().content().hAlign("start");
             markerSeries.tooltip().contentFormatter(function() {
-                return 'Waiting time: ' + this['value'] + ' min.\nDuration: ' + this['x'] + ' min.';
+                return "Waiting time: " + this["value"] + " min.\nDuration: " + this["x"] + " min.";
             });
             chart.draw();
         });

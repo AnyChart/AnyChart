@@ -217,7 +217,7 @@ anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, op
     this.registerDisposable(this.margin_);
   }
 
-  if (arguments.length > 0) {
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.margin_.setup.apply(this.margin_, arguments);
     return this;
   } else {
@@ -346,7 +346,7 @@ anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, o
     this.registerDisposable(this.padding_);
   }
 
-  if (arguments.length > 0) {
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.padding_.setup.apply(this.padding_, arguments);
     return this;
   } else {
@@ -986,7 +986,10 @@ anychart.core.Chart.prototype.serialize = function() {
   for (var i = 0; i < this.chartLabels_.length; i++) {
     labels.push(this.chartLabels_[i].serialize());
   }
+  // from VisualBase
   json['chartLabels'] = labels;
+  // from VisualBaseWithBounds
+  json['bounds'] = this.bounds().serialize();
   return json;
 };
 
@@ -1007,8 +1010,18 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
       this.label(labels[i]);
   }
 
+  // from VisualBase
   if (goog.isString(config['container']))
-    this.container(config['container']);
+    this.container(config['container'])
+
+  // from VisualBaseWithBounds
+  this.bounds(config['bounds']);
+  this.left(config['left']);
+  this.top(config['top']);
+  this.width(config['width']);
+  this.height(config['height']);
+  this.right(config['right']);
+  this.bottom(config['bottom']);
 };
 
 

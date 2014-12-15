@@ -14,10 +14,10 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="line" title="Spline Chart" container="container">' +
-                                '<seriesList>' +
-                                    '<series seriesType="spline">' +
+                                '<series_list>' +
+                                    '<series series_type="spline">' +
                                         '<data>' +
                                             '<point x="P1" value="10"/>' +
                                             '<point x="P2" value="12"/>' +
@@ -52,7 +52,7 @@
                                             '<point x="P31" value="45"/>' +
                                         '</data>' +
                                     '</series>' +
-                                    '<series seriesType="spline">' +
+                                    '<series series_type="spline">' +
                                         '<data>' +
                                             '<point x="P1" value="30"/>' +
                                             '<point x="P2" value="32"/>' +
@@ -87,9 +87,9 @@
                                             '<point x="P31" value="35"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

@@ -724,20 +724,23 @@ anychart.core.ui.Label.prototype.maxFontSize = function(opt_value) {
  *     .height('100%')
  *     .parentBounds(rect.getBounds())
  *     .container(stage).draw();
- * @param {(boolean|Array.<boolean, boolean>)=} opt_bothOrByWidth If only one param is set,
+ * @param {(boolean|Array.<boolean, boolean>|{width:boolean,height:boolean})=} opt_bothOrByWidth If only one param is set,
  *   its value goes for another too (see source code).
  * @param {boolean=} opt_byHeight Is font needs to be adjusted by height.
  * @return {!anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(boolean|Array.<boolean, boolean>)=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
+ * @param {(boolean|Array.<boolean, boolean>|{width:boolean,height:boolean})=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
  * @param {boolean=} opt_adjustByHeight Is font needs to be adjusted by height.
- * @return {(Array.<boolean, boolean>|anychart.core.ui.Label)} adjustFontSite setting or self for method chaining.
+ * @return {({width:boolean,height:boolean}|anychart.core.ui.Label)} adjustFontSite setting or self for method chaining.
  */
 anychart.core.ui.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustByWidth, opt_adjustByHeight) {
   // if values are set as an array ( [true, true] [true, false] [false, true] [false, false] ) rather than a set of two arguments, simply expand their
   if (goog.isArray(opt_adjustOrAdjustByWidth)) {
     return this.adjustFontSize.apply(this, opt_adjustOrAdjustByWidth);
+  } else if (goog.isObject(opt_adjustOrAdjustByWidth)) {
+    this.adjustFontSize(opt_adjustOrAdjustByWidth['width'], opt_adjustOrAdjustByWidth['height']);
+    return this;
   }
   var stateToInvalidate = 0;
   // if 2 params are set
@@ -760,7 +763,7 @@ anychart.core.ui.Label.prototype.adjustFontSize = function(opt_adjustOrAdjustByW
     }
     return this;
   }
-  return [this.adjustByWidth_, this.adjustByHeight_];
+  return {'width': this.adjustByWidth_, 'height': this.adjustByHeight_};
 };
 
 

@@ -14,9 +14,9 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="bar" container="container" title="100% Stacked Bar Chart">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="297"/>' +
@@ -25,7 +25,7 @@
                                             '<point x="P4" value="142"/>' +
                                             '<point x="P5" value="228"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -35,7 +35,7 @@
                                             '<point x="P4" value="186"/>' +
                                             '<point x="P5" value="145"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -45,7 +45,7 @@
                                             '<point x="P4" value="242"/>' +
                                             '<point x="P5" value="267"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -55,12 +55,12 @@
                                             '<point x="P4" value="249"/>' +
                                             '<point x="P5" value="297"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" enabled="true"/>' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" enabled="true"/>' +
                                     '</series>' +
-                                '</seriesList>' +
-                                '<yScale type="linear" stackMode="percent"/>' +
+                                '</series_list>' +
+                                '<y_scale type="linear" stack_mode="percent"/>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.yAxis(0).labels().textFormatter(function() {
                 return this.value + '%';

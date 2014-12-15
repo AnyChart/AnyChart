@@ -255,35 +255,6 @@ anychart.core.VisualBaseWithBounds.prototype.boundsInvalidated_ = function(event
 };
 
 
-/** @inheritDoc */
-anychart.core.VisualBaseWithBounds.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-
-  json['bounds'] = this.bounds().serialize();
-
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.VisualBaseWithBounds.prototype.setupSpecial = function(var_args) {
-  return anychart.core.VisualBase.prototype.setupSpecial.apply(this, arguments);
-};
-
-
-/** @inheritDoc */
-anychart.core.VisualBaseWithBounds.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
-  this.bounds(config['bounds']);
-  this.left(config['left']);
-  this.top(config['top']);
-  this.width(config['width']);
-  this.height(config['height']);
-  this.right(config['right']);
-  this.bottom(config['bottom']);
-};
-
-
 //exports
 anychart.core.VisualBaseWithBounds.prototype['bounds'] = anychart.core.VisualBaseWithBounds.prototype.bounds;//doc|ex
 anychart.core.VisualBaseWithBounds.prototype['top'] = anychart.core.VisualBaseWithBounds.prototype.top;//doc|ex

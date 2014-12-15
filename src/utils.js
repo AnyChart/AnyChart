@@ -582,15 +582,15 @@ anychart.utils.xml2json = function(xml) {
         if (!(name in result)) {
           var val = attr.nodeValue;
           if (!isNaN(+val))
-            result[attr.nodeName] = +val;
+            result[name] = +val;
           else if (val == 'true')
-            result[attr.nodeName] = true;
+            result[name] = true;
           else if (val == 'false')
-            result[attr.nodeName] = false;
+            result[name] = false;
           else if (val == 'null')
-            result[attr.nodeName] = null;
+            result[name] = null;
           else
-            result[attr.nodeName] = val;
+            result[name] = val;
           onlyText = false;
         }
       }
@@ -623,8 +623,11 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   /** @type {Document} */
   var result = goog.dom.xml.createDocument();
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
-  if (root)
+  if (root) {
+    if (!opt_rootNodeName)
+      root.setAttribute('xmlns', 'http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd');
     result.appendChild(root);
+  }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
 };
 
@@ -634,7 +637,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
  * @type {RegExp}
  * @private
  */
-anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#_(),. -]*$/;
+anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#:%_(),. -]*$/;
 
 
 /**
@@ -726,6 +729,12 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['values', 'value'];
     case 'names':
       return ['names', 'name'];
+    case 'ranges':
+      return ['ranges', 'range'];
+    case 'chartLabels':
+      return ['chart_labels', 'label'];
+    case 'items':
+      return ['items', 'item'];
   }
   return null;
 };
@@ -739,25 +748,25 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
  */
 anychart.utils.getArrayPropName_ = function(nodeName) {
   switch (nodeName) {
-    case 'series_list':
+    case 'seriesList':
       return ['series', 'series'];
     case 'keys':
       return ['keys', 'key'];
     case 'data':
       return ['data', 'point'];
-    case 'line_axes_markers':
+    case 'lineAxesMarkers':
       return ['lineAxesMarkers', 'lineAxesMarker'];
-    case 'range_axes_markers':
+    case 'rangeAxesMarkers':
       return ['rangeAxesMarkers', 'rangeAxesMarker'];
-    case 'text_axes_markers':
+    case 'textAxesMarkers':
       return ['textAxesMarkers', 'textAxesMarker'];
     case 'grids':
       return ['grids', 'grid'];
-    case 'minor_grids':
+    case 'minorGrids':
       return ['minorGrids', 'grid'];
-    case 'x_axes':
+    case 'xAxes':
       return ['xAxes', 'axis'];
-    case 'y_axes':
+    case 'yAxes':
       return ['yAxes', 'axis'];
     case 'scales':
       return ['scales', 'scale'];
@@ -767,6 +776,12 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['values', 'value'];
     case 'names':
       return ['names', 'name'];
+    case 'ranges':
+      return ['ranges', 'range'];
+    case 'chartLabels':
+      return ['chartLabels', 'label'];
+    case 'items':
+      return ['items', 'item'];
   }
   return null;
 };

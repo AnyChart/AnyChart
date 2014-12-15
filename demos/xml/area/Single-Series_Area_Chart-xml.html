@@ -12,18 +12,18 @@
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
+      var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                   '<chart type="area" container="container" title="Area Chart">'+
-                      '<yScale minimum="0"/>'+
-                      '<xAxes>'+
+                      '<y_scale minimum="0"/>'+
+                      '<x_axes>'+
                           '<axis>'+
                               '<title>'+
                                   '<margin bottom="10"/>'+
                                   '<padding right="5"/>'+
                               '</title>'+
                           '</axis>'+
-                      '</xAxes>'+
-                      '<seriesList>'+
+                      '</x_axes>'+
+                      '<series_list>'+
                           '<series>'+
                               '<data>'+
                                   '<point x="P1" value="162"/>'+
@@ -50,11 +50,11 @@
                               '<fill color="#1D8BD1" opacity="0.2"/>'+
                               '<stroke color="#1D8BD1" thickness="2"/>'+
                               '<markers enabled="true" fill="#1D8BD1"/>'+
-                              '<hoverMarkers enabled="true"/>'+
+                              '<hover_markers enabled="true"/>'+
                           '</series>'+
-                      '</seriesList>'+
+                      '</series_list>'+
                   '</chart>'+
-              '</xml>';
+              '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.draw();
     });

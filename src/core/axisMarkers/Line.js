@@ -162,7 +162,7 @@ anychart.core.axisMarkers.Line.prototype.axesLinesSpace = function(opt_spaceOrTo
     this.registerDisposable(this.axesLinesSpace_);
   }
 
-  if (arguments.length > 0) {
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
     this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
     return this;
   } else {

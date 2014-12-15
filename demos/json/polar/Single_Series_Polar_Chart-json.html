@@ -8,7 +8,7 @@
   <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../../../src/deps.js"></script>
   <script>
-  goog.require('anychart.modules.anychart');
+  goog.require("anychart.modules.anychart");
   </script>
   <script>
     anychart.onDocumentReady(function() {
@@ -21,7 +21,7 @@
           "yScale": {
             "stackMode": "value",
             "ticks": {
-              "interval": .2
+              "interval":0.2
             }
           },
           "xScale": {
@@ -404,7 +404,7 @@
         }
       };
       var chart = anychart.fromJson(json);
-      chart.xAxis().labels().textFormatter(function() {return this['value'] + String.fromCharCode(176)});
+      chart.xAxis().labels().textFormatter(function() {return this["value"] + String.fromCharCode(176)});
       chart.draw();
     });
   </script>

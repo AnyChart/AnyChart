@@ -10,19 +10,20 @@
     <script>goog.require('anychart.modules.anychart');</script>
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                    '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                         '<chart type="scatter" container="container">'+
-                            '<title><![CDATA[Scatter Plot: Marker Chart with Large Data-Set]]></title>'+
-                            '<xScale minimumGap="0" maximumGap="0"/>'+
-                            '<yScale minimumGap="0" maximumGap="0"/>'+
-                            '<yAxes>'+
+                            '<title text="Scatter Plot: Marker Chart with Large Data-Set"/>'+
+                            '<x_scale minimum_gap="0" maximum_gap="0"/>'+
+                            '<y_scale minimum_gap="0" maximum_gap="0"/>'+
+                            '<y_axes>'+
                                 '<axis title="Argument"/>'+
-                            '</yAxes>'+
-                            '<xAxes>'+
+                            '</y_axes>'+
+                            '<x_axes>'+
                                 '<axis title="Value"/>'+
-                            '</xAxes>'+
-                            '<seriesList>'+
-                                '<series seriesType="marker" size="3" hoverSize="5" stroke="none" hoverFill="gold">'+
+                            '</x_axes>'+
+                            '<series_list>'+
+                                '<series series_type="marker" size="3" hover_size="5" stroke="none" hover_fill="gold">'+
                                     '<data>'+
                                         '<point x="-803" value="-279"/>'+
                                         '<point x="-1035" value="-248"/>'+
@@ -3361,9 +3362,9 @@
                                         '<point x="1325" value="1326"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             var chart = anychart.fromXml(xml);
             var markerSeries = chart.getSeries(0);
             markerSeries.tooltip().content().hAlign('start');

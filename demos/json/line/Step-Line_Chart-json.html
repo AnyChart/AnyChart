@@ -8,7 +8,7 @@
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
     <script>
-        goog.require('anychart.modules.anychart');
+        goog.require("anychart.modules.anychart");
     </script>
     <script>
         anychart.onDocumentReady(function() {
@@ -17,7 +17,7 @@
                     "type": "line",
                     "title": "Step Line Chart",
                     "series": [{
-                        "seriesType": "stepline",
+                        "seriesType": "stepLine",
                         "data": [
                             {"x": "P1", "value":  "51"},
                             {"x": "P2", "value":  "91"},
@@ -33,7 +33,7 @@
                             {"x": "P12", "value": "56"}
                         ]
                     }, {
-                        "seriesType": "stepline",
+                        "seriesType": "stepLine",
                         "data": [
                             {"x": "P1", "value":  "125"},
                             {"x": "P2", "value":  "132"},
@@ -52,7 +52,7 @@
                 }
             };
             var chart = anychart.fromJson(json);
-            chart.container('container');
+            chart.container("container");
             chart.draw();
         });
     </script>

@@ -12,15 +12,15 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="line" title="Debt-To-Income Ratios 1986-2006" container="container">' +
-                                '<yScale minimum="20" maximum="65">' +
+                                '<y_scale minimum="20" maximum="65">' +
                                     '<ticks interval="5"/>' +
-                                '</yScale>' +
-                                '<yAxes>' +
+                                '</y_scale>' +
+                                '<y_axes>' +
                                     '<axis title="Debt-To-Income Ratios"/>' +
-                                '</yAxes>' +
-                                '<seriesList>' +
+                                '</y_axes>' +
+                                '<series_list>' +
                                     '<series markers="false">' +
                                         '<data>' +
                                             '<point x="1986" value="41"/>' +
@@ -96,29 +96,29 @@
                                             '<point x="2006" value="48"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
-                                '<rangeAxesMarkers>' +
-                                    '<rangeAxesMarker fill="#D9CDFF 0.7" from="20" to="28"/>' +
-                                    '<rangeAxesMarker fill="#CBFFCF 0.7" from="28" to="38"/>' +
-                                    '<rangeAxesMarker fill="#FFFFCD 0.7" from="38" to="48"/>' +
-                                    '<rangeAxesMarker fill="#FFCCCB 0.7" from="48" to="65"/>' +
-                                '</rangeAxesMarkers>' +
-                                '<textAxesMarkers>' +
-                                    '<textAxesMarker fontWeight="bold" align="center" anchor="leftCenter" value="24" offsetX="10">' +
+                                '</series_list>' +
+                                '<range_axes_markers>' +
+                                    '<range_axes_marker fill="#D9CDFF 0.7" from="20" to="28"/>' +
+                                    '<range_axes_marker fill="#CBFFCF 0.7" from="28" to="38"/>' +
+                                    '<range_axes_marker fill="#FFFFCD 0.7" from="38" to="48"/>' +
+                                    '<range_axes_marker fill="#FFCCCB 0.7" from="48" to="65"/>' +
+                                '</range_axes_markers>' +
+                                '<text_axes_markers>' +
+                                    '<text_axes_marker font_weight="bold" align="center" anchor="leftCenter" value="24" offset_x="10">' +
                                         '<text><![CDATA[Below 28% - Buy! Buy! Buy!]]></text>' +
-                                    '</textAxesMarker>' +
-                                    '<textAxesMarker fontWeight="bold" align="right" value="33" offsetX="-80">' +
+                                    '</text_axes_marker>' +
+                                    '<text_axes_marker font_weight="bold" align="right" value="33" offset_x="-80">' +
                                         '<text><![CDATA[28%-38%\nMarginally affordable with\nfixed-rate mortgages.]]></text>' +
-                                    '</textAxesMarker>' +
-                                    '<textAxesMarker fontWeight="bold" align="center" value="44" offsetX="20">' +
+                                    '</text_axes_marker>' +
+                                    '<text_axes_marker font_weight="bold" align="center" value="44" offset_x="20">' +
                                         '<text><![CDATA[38%-48%\nNot affordable with fixed.\nInterest-only becomes common.]]></text>' +
-                                    '</textAxesMarker>' +
-                                    '<textAxesMarker fontWeight="bold" align="center" value="56">' +
+                                    '</text_axes_marker>' +
+                                    '<text_axes_marker font_weight="bold" align="center" value="56">' +
                                         '<text><![CDATA[48% or greater\nNot affordable with fixed or interest only.\nNegative amortization only option.]]></text>' +
-                                    '</textAxesMarker>' +
-                                '</textAxesMarkers>' +
+                                    '</text_axes_marker>' +
+                                '</text_axes_markers>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

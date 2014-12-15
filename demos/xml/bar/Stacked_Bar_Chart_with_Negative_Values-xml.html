@@ -14,10 +14,10 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="bar" title="Stacked Bar Chart With Negative Values" container="container">' +
-                                '<yScale stackMode="value" />' +
-                                '<seriesList>' +
+                                '<y_scale stack_mode="value" />' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="297"/>' +
@@ -26,7 +26,7 @@
                                             '<point x="P4" value="142"/>' +
                                             '<point x="P5" value="228"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" />' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -36,7 +36,7 @@
                                             '<point x="P4" value="186"/>' +
                                             '<point x="P5" value="145"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" />' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -46,7 +46,7 @@
                                             '<point x="P4" value="-242"/>' +
                                             '<point x="P5" value="-267"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" />' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -56,11 +56,11 @@
                                             '<point x="P4" value="-249"/>' +
                                             '<point x="P5" value="-297"/>' +
                                         '</data>' +
-                                        '<labels fontColor="white" fontWeight="bold" position="center" anchor="center" />' +
+                                        '<labels font_color="white" font_weight="bold" position="center" anchor="center" />' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

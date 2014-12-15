@@ -8,7 +8,7 @@
   <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
   <!--<script src="../../../src/deps.js"></script>-->
   <!--<script>-->
-    <!--goog.require('anychart.modules.anychart');-->
+    <!--goog.require("anychart.modules.anychart");-->
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
@@ -103,7 +103,7 @@
 
 
       //using fill function we can create a pretty gradient for the series
-      //note that we using series sourceColor here, which can be configured separately for each series by 'color' method
+      //note that we using series sourceColor here, which can be configured separately for each series by "color" method
       var fillFunction = function() {
         return {
           keys: [
@@ -120,7 +120,7 @@
 
       //set yAxis labels formatting, force it to add % to values
       chart.yAxis().labels().textFormatter(function(info) {
-        return info.value + '%';
+        return info.value + "%";
       });
 
       chart.draw();
