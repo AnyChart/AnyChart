@@ -12,6 +12,8 @@ import time
 import re
 import argparse
 import shlex
+import gzip
+
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
@@ -323,6 +325,9 @@ def __build_project_sources(modules):
                __get_output_file_arg(output_file)
     __call_compiler(commands)
 
+    if arguments['gzip']:
+        __gzip(output_file)
+
 
 def __build_project(modules):
     dev_postfix = '.dev' if __is_develop() else ''
@@ -343,6 +348,9 @@ def __build_project(modules):
                '--create_source_map %s' % output_file + '_sourcemap.json']
 
     __call_compiler(commands)
+
+    if arguments['gzip']:
+        __gzip(output_file)
 
 
 def __apply_specific_file_name_rule(file_name, modules):
@@ -377,6 +385,13 @@ def __get_modules_list():
         if f.endswith('.js'):
             result.append(f[:-3])
     return result
+
+def __gzip(output_file):
+    f_in = open(output_file, 'rb')
+    f_out = gzip.open(output_file + '.gz', 'wb')
+    f_out.writelines(f_in)
+    f_out.close()
+    f_in.close()
 
 
 #=======================================================================================================================
@@ -706,6 +721,8 @@ def __exec_main_script():
 
     compile_parser.add_argument('-d', '--develop', action='store_true',
                                 help='Include developers tools into build.')
+    compile_parser.add_argument('-gz', '--gzip', action='store_true',
+                                help='Create gzip copy of output file.')
 
     # create the parser for the "compile_each" command
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
