@@ -21,7 +21,7 @@ anychart.core.ui.Credits = function() {
    * @type {?string}
    * @private
    */
-  this.text_ = null;
+  this.text_ = 'AnyChart';
 
   /**
    * @type {string}
@@ -126,7 +126,7 @@ anychart.core.ui.Credits.prototype.text = function(opt_value) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
-    return this.text_ || 'AnyChart';
+    return this.text_;
   }
 };
 
@@ -492,6 +492,18 @@ anychart.core.ui.Credits.prototype.serialize = function() {
   json['alt'] = this.alt();
   json['logoSrc'] = this.logoSrc();
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Credits.prototype.setupSpecial = function(var_args) {
+  var args = arguments;
+  if (goog.isString(args[0])) {
+    this.text(args[0]);
+    this.enabled(true);
+    return true;
+  }
+  return anychart.core.VisualBase.prototype.setupSpecial.apply(this, args);
 };
 
 

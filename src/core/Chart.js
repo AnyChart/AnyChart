@@ -1012,7 +1012,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
 
   // from VisualBase
   if (goog.isString(config['container']))
-    this.container(config['container'])
+    this.container(config['container']);
 
   // from VisualBaseWithBounds
   this.bounds(config['bounds']);
