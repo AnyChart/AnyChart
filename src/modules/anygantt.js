@@ -1,4 +1,4 @@
-goog.provide('anychart.modules.gantt');
+goog.provide('anychart.modules.anygantt');
 
 goog.require('anychart.charts.Gantt');
 goog.require('anychart.core.ui.ScrollBar');
