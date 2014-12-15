@@ -1345,7 +1345,7 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
       for (i = 0, len = ticksArr.length; i < len; i++) {
         var drawLabel = goog.isArray(drawLabels) ? drawLabels[i] : drawLabels;
         if (drawLabel) {
-          bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, true));
+          bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, true, tempBounds));
           size = this.isHorizontal() ? bounds.height : bounds.width;
           if (size > maxLabelSize) maxLabelSize = size;
         }
@@ -1358,7 +1358,7 @@ anychart.core.axes.Linear.prototype.getSize_ = function(parentBounds, length) {
     for (i = 0, len = drawMinorLabels.length; i < len; i++) {
       var drawMinorLabel = goog.isArray(drawMinorLabels) ? drawMinorLabels[i] : drawMinorLabels;
       if (drawMinorLabel) {
-        bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, false));
+        bounds = goog.math.Rect.fromCoordinateBox(this.getLabelBounds_(i, false, tempBounds));
         size = this.isHorizontal() ? bounds.height : bounds.width;
         if (size > maxMinorLabelSize) maxMinorLabelSize = size;
       }
