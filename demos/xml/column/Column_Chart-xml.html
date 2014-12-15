@@ -14,9 +14,9 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="column" container="container" title="Column Chart">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="128.14"/>' +
@@ -37,10 +37,10 @@
                                             '<point x="P16" value="133.08"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
-                                '<yScale minimum="0"/>' +
+                                '</series_list>' +
+                                '<y_scale minimum="0"/>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

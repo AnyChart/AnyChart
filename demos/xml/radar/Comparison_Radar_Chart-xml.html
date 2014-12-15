@@ -12,26 +12,29 @@
     <!--</script>-->
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
-                        '<chart type="radar" container="container" title="Comparison Chart" startAngle="0">'+
-                            '<yScale minimum="-0.2" maximum="1">'+
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                    '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
+                        '<chart type="radar" container="container" title="Comparison Chart" start_angle="0">'+
+                            '<y_scale minimum="-0.2" maximum="1">'+
                                 '<ticks interval="0.2"/>'+
-                            '</yScale>'+
+                            '</y_scale>'+
                             '<legend enabled="true">'+
                                 '<margin top="20"/>'+
                             '</legend>'+
                             '<grids>'+
-                                '<grid oodFill="white" evenFill="white" stroke="rgb(221,221,221)"/>'+
+                                '<grid odd_fill="white" even_fill="white" stroke="rgb(221,221,221)"/>'+
                                 '<grid stroke="rgb(192,192,192)"/>'+
                             '</grids>'+
                             '<padding bottom="50"/>'+
-                            '<chartLabels anchor="centerBottom" position="centerBottom" fontWeight="normal" fontSize="11" fontFamily="tahoma" fontColor="rgb(35,35,35)" offsetY="15">'+
-                                '<text>'+
-                                    '<![CDATA[This chart compares countries by using specific indicators.\nFor each indicator, the value 1 is assigned to the country that has the highest value.\nOther countries have their value computed as a proportion of the country with the highest value.]]>' +
-                                '</text>'+
-                            '</chartLabels>'+
-                            '<seriesList>'+
-                                '<series seriesType="line" name="USA">'+
+                            '<chart_labels>' +
+                                '<label anchor="centerBottom" position="centerBottom" font_weight="normal" font_size="11" font_family="tahoma" font_color="rgb(35,35,35)" offset_y="15">'+
+                                    '<text>'+
+                                        '<![CDATA[This chart compares countries by using specific indicators.\nFor each indicator, the value 1 is assigned to the country that has the highest value.\nOther countries have their value computed as a proportion of the country with the highest value.]]>' +
+                                    '</text>'+
+                                '</label>' +
+                            '</chart_labels>'+
+                            '<series_list>'+
+                                '<series series_type="line" name="USA">'+
                                     '<data>'+
                                         '<point x="GDP" y="1"/>'+
                                         '<point x="GDP Real Growth Rate" y="0.3666666666666667"/>'+
@@ -43,7 +46,7 @@
                                         '<point x="Population Growth Rate" y="0.3087248322147651"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="line" name="Russia">'+
+                                '<series series_type="line" name="Russia">'+
                                     '<data>'+
                                         '<point x="GDP" y="0.11982978723404256"/>'+
                                         '<point x="GDP Real Growth Rate" y="0.5583333333333333"/>'+
@@ -55,7 +58,7 @@
                                         '<point x="Population Growth Rate" y="-0.12416107382550336"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="line" name="China">'+
+                                '<series series_type="line" name="China">'+
                                     '<data>'+
                                         '<point x="GDP" y="0.6180425531914894"/>'+
                                         '<point x="GDP Real Growth Rate" y="0.7583333333333333"/>'+
@@ -67,9 +70,9 @@
                                         '<point x="Population Growth Rate" y="0.1946308724832214"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             var chart = anychart.fromXml(xml);
 
             //create point data labels formation function

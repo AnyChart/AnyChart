@@ -13,15 +13,15 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
-                            '<chart type="bubble" title="Multi-Series Bubble Chart" xScale="ordinal" container="container">' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
+                            '<chart type="bubble" title="Multi-Series Bubble Chart" x_scale="ordinal" container="container">' +
                                 '<grids>' +
-                                    '<grid evenFill="none" oddFill="none" layout="vertical"/>' +
+                                    '<grid even_fill="none" odd_fill="none" layout="vertical"/>' +
                                 '</grids>' +
-                                '<minorGrids>' +
-                                    '<grid evenFill="none" oddFill="none" stroke="black 0.075" layout="vertical"/>' +
-                                '</minorGrids>' +
-                                '<seriesList>' +
+                                '<minor_grids>' +
+                                    '<grid even_fill="none" odd_fill="none" stroke="black 0.075" layout="vertical"/>' +
+                                '</minor_grids>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="142" size="7"/>' +
@@ -58,9 +58,9 @@
                                             '<point x="P5" value="17" size="4"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

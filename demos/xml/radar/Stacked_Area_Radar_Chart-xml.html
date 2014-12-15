@@ -12,15 +12,18 @@
     </script>
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                           '<chart type="radar" title="Products Sales by Year (2007-2011) (Stacked)" container="container">'+
-                              '<yScale stackMode="value"/>'+
-                              '<xAxis>'+
-                                  '<labels fontWeight="bold" padding="5"/>'+
-                              '</xAxis>'+
-                              '<legend align="top" position="right" itemsLayout="vertical"/>'+
-                              '<seriesList>'+
-                                  '<series seriesType="area" name="Product A" fill="rgb(29, 139, 209) .6" stroke="rgb(19, 93, 140)">'+
+                              '<y_scale stack_mode="value"/>'+
+                              '<x_axis>'+
+                                  '<labels font_weight="bold">'+
+                                    '<padding left="5" top="5" right="5" bottom="5"/>'+
+                                  '</labels>'+
+                              '</x_axis>'+
+                              '<legend align="top" position="right" items_layout="vertical"/>'+
+                              '<series_list>'+
+                                  '<series series_type="area" name="Product A" fill="rgb(29, 139, 209) .6" stroke="rgb(19, 93, 140)">'+
                                       '<markers size="3"/>'+
                                       '<data>'+
                                           '<point x="2007" value="1368763"/>'+
@@ -30,7 +33,7 @@
                                           '<point x="2011" value="1582987"/>'+
                                       '</data>'+
                                   '</series>'+
-                                  '<series seriesType="area" name="Product B" fill="rgb(241, 104, 60) .6" stroke="rgb(164, 48, 11)">'+
+                                  '<series series_type="area" name="Product B" fill="rgb(241, 104, 60) .6" stroke="rgb(164, 48, 11)">'+
                                       '<markers size="3"/>'+
                                       '<data>'+
                                           '<point x="2007" value="1991297"/>'+
@@ -40,7 +43,7 @@
                                           '<point x="2011" value="649853"/>'+
                                       '</data>'+
                                   '</series>'+
-                                  '<series seriesType="area" name="Product C" fill="rgb(42, 214, 42) .6" stroke="rgb(26, 139, 26)">'+
+                                  '<series series_type="area" name="Product C" fill="rgb(42, 214, 42) .6" stroke="rgb(26, 139, 26)">'+
                                       '<markers size="3"/>'+
                                       '<data>'+
                                           '<point x="2007" value="431097"/>'+
@@ -50,9 +53,9 @@
                                           '<point x="2011" value="1961085"/>'+
                                       '</data>'+
                                   '</series>'+
-                              '</seriesList>'+
+                              '</series_list>'+
                           '</chart>'+
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.yAxis().labels().textFormatter(function() {
                 return this.value / 1000000 + 'M'

@@ -57,7 +57,7 @@ goog.inherits(anychart.core.cartesian.series.Base, anychart.core.VisualBaseWithB
 
 /**
  * Map of series constructors by type.
- * @type {Object.<anychart.enums.CartesianSeriesType, Function>}
+ * @type {Object.<string, Function>}
  */
 anychart.core.cartesian.series.Base.SeriesTypesMap = {};
 

@@ -92,7 +92,7 @@ goog.inherits(anychart.core.scatter.series.Base, anychart.core.VisualBaseWithBou
 
 /**
  * Map of series constructors by type.
- * @type {Object.<anychart.enums.ScatterSeriesTypes, Function>}
+ * @type {Object.<string, Function>}
  */
 anychart.core.scatter.series.Base.SeriesTypesMap = {};
 

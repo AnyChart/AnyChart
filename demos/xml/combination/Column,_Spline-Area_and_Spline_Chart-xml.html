@@ -11,19 +11,20 @@
         goog.require('anychart.modules.anychart');
     </script>
     <script>
+        var chart;
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
+            var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                         '<chart container="container" type="column" title="Combination of Column, Spline-Area and Spline Chart">'+
                             '<scales>'+
                                 '<scale/>'+
                             '</scales>'+
-                            '<yScale minimum="0"/>'+
-                            '<yAxes>'+
+                            '<y_scale minimum="0"/>'+
+                            '<y_axes>'+
                                 '<axis/>'+ //default axis
                                 '<axis title="Secondary Y-Axis" orientation="right" scale="0"/>'+
-                            '</yAxes>'+
-                            '<seriesList>'+
-                                '<series seriesType="spline" yScale="0">'+
+                            '</y_axes>'+
+                            '<series_list>'+
+                                '<series series_type="spline" y_scale="0">'+
                                     '<data>'+
                                         '<point x="P1" value="174"/>'+
                                         '<point x="P2" value="197"/>'+
@@ -37,7 +38,7 @@
                                         '<point x="P10" value="322"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="column">'+
+                                '<series series_type="column">'+
                                     '<data>'+
                                         '<point x="P1" value="5854"/>'+
                                         '<point x="P2" value="4171"/>'+
@@ -51,7 +52,7 @@
                                         '<point x="P10" value="1628"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="splineArea" fill="#2AD62A 0.7" hoverFill="#2AD62A 0.7">'+
+                                '<series series_type="splineArea" fill="#2AD62A 0.7" hover_fill="#2AD62A 0.7">'+
                                     '<data>'+
                                         '<point x="P1" value="3242"/>'+
                                         '<point x="P2" value="3171"/>'+
@@ -65,10 +66,10 @@
                                         '<point x="P10" value="928"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
-            var chart = anychart.fromXml(xml);
+                    '</anychart>';
+            chart = anychart.fromXml(xml);
             chart.draw();
         });
     </script>

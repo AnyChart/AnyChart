@@ -8,7 +8,7 @@
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
     <script>
-        goog.require('anychart.modules.anychart');
+        goog.require("anychart.modules.anychart");
     </script>
     <script>
         anychart.onDocumentReady(function() {
@@ -17,13 +17,8 @@
                     "type": "pie",
                     "title": "Pie Chart",
                     "legend": {
-                        "title": {
-                            "text": "Products Sales",
-                            "enabled": true
-                        },
-                        "titleSeparator": {
-                            "enabled": true
-                        }
+                        "title": "Products Sales",
+                        "titleSeparator": true
                     },
                     "data": [
                         {"x": "Product A", "value": 1222},

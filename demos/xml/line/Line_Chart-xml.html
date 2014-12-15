@@ -14,9 +14,9 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="line" title="Line Chart" container="container">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="3.6"/>' +
@@ -101,9 +101,9 @@
                                             '<point x="P24" value="8.9"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

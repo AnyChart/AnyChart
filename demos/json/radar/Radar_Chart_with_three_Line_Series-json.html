@@ -8,7 +8,7 @@
   <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
   <!--<script src="../../../src/deps.js"></script>-->
   <!--<script>-->
-  <!--goog.require('anychart.modules.anychart');-->
+  <!--goog.require("anychart.modules.anychart");-->
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
@@ -59,11 +59,11 @@
                 "size": 3
               },
               "data": [
-                ['Strength', 136],
-                ['Agility', 79],
-                ['Stamina', 149],
-                ['Intellect', 135],
-                ['Spirit', 158]
+                ["Strength", 136],
+                ["Agility", 79],
+                ["Stamina", 149],
+                ["Intellect", 135],
+                ["Spirit", 158]
               ]
             },
             {
@@ -74,11 +74,11 @@
                 "size": 2
               },
               "data": [
-                ['Strength', 199],
-                ['Agility', 125],
-                ['Stamina', 173],
-                ['Intellect', 33],
-                ['Spirit', 64]
+                ["Strength", 199],
+                ["Agility", 125],
+                ["Stamina", 173],
+                ["Intellect", 33],
+                ["Spirit", 64]
               ]
             },
             {
@@ -89,11 +89,11 @@
                 "size": 3
               },
               "data": [
-                ['Strength', 43],
-                ['Agility', 56],
-                ['Stamina', 101],
-                ['Intellect', 202],
-                ['Spirit', 196]
+                ["Strength", 43],
+                ["Agility", 56],
+                ["Stamina", 101],
+                ["Intellect", 202],
+                ["Spirit", 196]
               ]
             }
           ]
@@ -103,7 +103,7 @@
 
       //create point data labels formation function
       var labelFormattingFunction = function() {
-        return this.x + ': ' + this.value.toFixed(2)
+        return this.x + ": " + this.value.toFixed(2)
       };
 
       chart.getSeries(0).tooltip().contentFormatter(labelFormattingFunction);

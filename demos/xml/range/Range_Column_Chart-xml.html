@@ -12,31 +12,32 @@
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
-                  '<chart type="column" container="container" title="Range Column Chart">'+
-                      '<seriesList>'+
-                          '<series seriesType="rangeColumn">'+
+      var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
+                    '<chart type="column" container="container" title="Range Column Chart">'+
+                      '<series_list>'+
+                          '<series series_type="rangeColumn">'+
                               '<data>'+
-                                  '<point low="182" high="1122"/>'+
-                                  '<point low="284" high="1152"/>'+
-                                  '<point low="255" high="1139"/>'+
-                                  '<point low="412" high="1142"/>'+
-                                  '<point low="376" high="1112"/>'+
-                                  '<point low="482" high="1122"/>'+
-                                  '<point low="384" high="1152"/>'+
-                                  '<point low="500" high="1139"/>'+
-                                  '<point low="382" high="1142"/>'+
-                                  '<point low="488" high="1112"/>'+
-                                  '<point low="482" high="1122"/>'+
-                                  '<point low="440" high="1152"/>'+
-                                  '<point low="299" high="1139"/>'+
-                                  '<point low="382" high="1142"/>'+
-                                  '<point low="488" high="1112"/>'+
+                                  '<point low="12" high="122"/>'+
+                                  '<point low="24" high="152"/>'+
+                                  '<point low="25" high="139"/>'+
+                                  '<point low="42" high="142"/>'+
+                                  '<point low="36" high="112"/>'+
+                                  '<point low="42" high="122"/>'+
+                                  '<point low="34" high="152"/>'+
+                                  '<point low="50" high="139"/>'+
+                                  '<point low="32" high="142"/>'+
+                                  '<point low="48" high="112"/>'+
+                                  '<point low="42" high="122"/>'+
+                                  '<point low="40" high="152"/>'+
+                                  '<point low="29" high="139"/>'+
+                                  '<point low="32" high="142"/>'+
+                                  '<point low="48" high="112"/>'+
                               '</data>'+
                           '</series>'+
-                      '</seriesList>'+
-                  '</chart>'+
-              '</xml>';
+                      '</series_list>'+
+                    '</chart>'+
+                '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.draw();
     });

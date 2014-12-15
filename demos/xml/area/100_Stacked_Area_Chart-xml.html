@@ -2,28 +2,31 @@
 <html>
 <head>
     <!--Compiled JS-->
-    <script src="../../../out/anychart.min.js"></script>
+    <!--<script src="../../../out/anychart.min.js"></script>-->
 
     <!--Non Compiled JS-->
-    <!--<script src="../../../contrib/closure-library/closure/goog/base.js"></script>-->
-    <!--<script src="../../../src/deps.js"></script>-->
-    <!--<script>-->
-    <!--goog.require('anychart.modules.anychart');-->
-    <!--</script>-->
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+    goog.require('anychart.modules.anychart');
+    </script>
     <script>
         anychart.onDocumentReady(function() {
-            var xml = '<xml version="1.0" encoding="utf-8">' +
+            var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                         '<chart type="area" container="container" title="100% Stacked Area Chart">' +
-                            '<yScale stackMode="percent" maximum="100">' +
+                            '<y_scale stack_mode="percent">' +
                                 '<ticks interval="10"/>' +
-                            '</yScale>' +
-                            '<xAxis>' +
-                                '<title>' +
-                                    '<margin bottom="20"/>' +
-                                    '<padding right="15"/>' +
-                                '</title>' +
-                            '</xAxis>' +
-                            '<seriesList>' +
+                            '</y_scale>' +
+                            '<x_axes>' +
+                                '<axis>' +
+                                    '<title>' +
+                                        '<margin bottom="20"/>' +
+                                        '<padding right="15"/>' +
+                                    '</title>' +
+                                '</axis>' +
+                            '</x_axes>' +
+                            '<series_list>' +
                                 '<series>' +
                                     '<data>' +
                                         '<point x="P1" value="162"/>' +
@@ -47,7 +50,7 @@
                                         '<point x="P20" value="184"/>' +
                                     '</data>' +
                                     '<markers enabled="true" type="circle" size="3"/>' +
-                                    '<hoverMarkers enabled="true" type="circle" size="3"/>' +
+                                    '<hover_markers enabled="true" type="circle" size="3"/>' +
                                 '</series>' +
                                 '<series>' +
                                     '<data>' +
@@ -72,7 +75,7 @@
                                         '<point x="P20" value="144"/>' +
                                     '</data>' +
                                     '<markers enabled="true" type="circle" size="3"/>' +
-                                    '<hoverMarkers enabled="true" type="circle" size="3"/>' +
+                                    '<hover_markers enabled="true" type="circle" size="3"/>' +
                                 '</series>' +
                                 '<series color="#EEEE25">' +
                                     '<data>' +
@@ -97,9 +100,9 @@
                                         '<point x="P20" value="134"/>' +
                                     '</data>' +
                                 '</series>' +
-                            '</seriesList>' +
+                            '</series_list>' +
                         '</chart>' +
-                    '</xml>';
+                    '</anychart>';
 
             //using fill function we can create a pretty gradient for the series
             //note that we using series sourceColor here, which can be configured separately for each series by 'color' method

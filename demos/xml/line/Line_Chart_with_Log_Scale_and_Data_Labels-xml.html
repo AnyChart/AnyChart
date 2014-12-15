@@ -12,10 +12,10 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="line" title="Line chart with Logarithmic Y-Axis and Data Labels" container="container">' +
-                                '<yScale type="log" minimum="1"/>' +
-                                '<seriesList>' +
+                                '<y_scale type="log" minimum="1"/>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="112.61"/>' +
@@ -34,11 +34,11 @@
                                             '<point x="P14" value="54.32"/>' +
                                             '<point x="P15" value="33.08"/>' +
                                         '</data>' +
+                                        '<labels anchor="centerBottom" font_weight="bold"/>' +
                                     '</series>' +
-                                '</seriesList>' +
-                                '<labels anchor="bottom" fontWeight="bold"/>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

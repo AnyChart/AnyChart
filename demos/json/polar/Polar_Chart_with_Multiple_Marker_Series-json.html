@@ -8,7 +8,7 @@
     <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../../src/deps.js"></script>
     <script>
-        goog.require('anychart.modules.anychart');
+        goog.require("anychart.modules.anychart");
     </script>
     <script>
         anychart.onDocumentReady(function() {
@@ -28,9 +28,9 @@
                         "ticks": {"interval": 15}
                     },
                     "legend": {
-                        position: 'right',
-                        align: 'left',
-                        itemsLayout: 'vertical'
+                        position: "right",
+                        align: "left",
+                        itemsLayout: "vertical"
                     },
                     "series": [{
                         "type": "star5",
@@ -66,7 +66,7 @@
                             [360, 3]
                         ]
                     }, {
-                        "type": "rect",
+                        "type": "square",
                         "name": "Signal B",
                         "size": "4",
                         "hoverSize": "8",
@@ -136,7 +136,7 @@
             };
             var chart = anychart.fromJson(json);
             chart.xAxis().labels().textFormatter(function() {
-                return this['value'] + '°';
+                return this["value"] + "°";
             });
             chart.draw();
         });

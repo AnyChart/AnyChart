@@ -57,7 +57,7 @@ goog.inherits(anychart.core.radar.series.Base, anychart.core.VisualBaseWithBound
 
 /**
  * Map of series constructors by type.
- * @type {Object.<anychart.enums.RadarSeriesType, Function>}
+ * @type {Object.<string, Function>}
  */
 anychart.core.radar.series.Base.SeriesTypesMap = {};
 

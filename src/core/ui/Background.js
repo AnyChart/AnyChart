@@ -38,7 +38,7 @@ anychart.core.ui.Background = function() {
    * @type {!Array}
    * @private
    */
-  this.corners_ = [];
+  this.corners_ = [0];
 
   /**
    * Fill settings.
@@ -145,6 +145,13 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
     var val;
     if (goog.isArray(opt_value)) {
       val = opt_value;
+    } else if (goog.isObject(opt_value)) {
+      val = [
+        anychart.utils.toNumber(opt_value['leftTop']) || 0,
+        anychart.utils.toNumber(opt_value['rightTop']) || 0,
+        anychart.utils.toNumber(opt_value['rightBottom']) || 0,
+        anychart.utils.toNumber(opt_value['leftBottom']) || 0
+      ];
     } else {
       val = goog.array.slice(arguments, 0);
     }
@@ -543,7 +550,18 @@ anychart.core.ui.Background.prototype.serialize = function() {
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   json['cornerType'] = this.cornerType();
-  json['corners'] = this.corners();
+  var corners = /** @type {Array} */(this.corners());
+  if (corners.length >= 4) {
+    corners = {
+      'leftTop': corners[0],
+      'rightTop': corners[1],
+      'rightBottom': corners[2],
+      'leftBottom': corners[3]
+    };
+  } else {
+    corners = corners[0];
+  }
+  json['corners'] = corners;
   return json;
 };
 

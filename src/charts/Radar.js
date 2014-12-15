@@ -670,7 +670,12 @@ anychart.charts.Radar.prototype.marker = function(data, opt_csvSettings) {
  * @return {anychart.core.radar.series.Base}
  */
 anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
-  var ctl = anychart.core.radar.series.Base.SeriesTypesMap[/** @type {anychart.enums.RadarSeriesType} */(type)];
+  var ctl;
+  type = ('' + type).toLowerCase();
+  for (var i in anychart.core.radar.series.Base.SeriesTypesMap) {
+    if (i.toLowerCase() == type)
+      ctl = anychart.core.radar.series.Base.SeriesTypesMap[i];
+  }
   var instance;
 
   if (ctl) {
@@ -1606,12 +1611,7 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
   var i, json, scale;
   var grids = config['grids'];
   var minorGrids = config['minorGrids'];
-  var lineAxesMarkers = config['lineAxesMarkers'];
-  var rangeAxesMarkers = config['rangeAxesMarkers'];
-  var textAxesMarkers = config['textAxesMarkers'];
   var series = config['series'];
-  var barGroupsPadding = config['barGroupsPadding'];
-  var barsPadding = config['barsPadding'];
   var scales = config['scales'];
 
   var scalesInstances = {};

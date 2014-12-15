@@ -380,8 +380,8 @@ anychart.core.Base.prototype.setup = function(var_args) {
   if (goog.isDef(arg0)) {
     this.suspendSignalsDispatching();
     if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
-      if (arg0 instanceof anychart.core.Base)
-        throw 'Instance of object is passed to setter. You should use JSON instead';
+      //if (arg0 instanceof anychart.core.Base)
+      //  throw 'Instance of object is passed to setter. You should use JSON instead';
       this.setupByJSON(/** @type {!Object} */(arguments[0]));
     }
     this.resumeSignalsDispatching(true);

@@ -1931,8 +1931,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  if (goog.isDef(this.background().serialize())) json['background'] = this.background().serialize();
-  if (goog.isDef(this.padding().serialize())) json['padding'] = this.padding().serialize();
+  if (goog.isDef(this.settingsObj.background)) json['background'] = this.background().serialize();
+  if (goog.isDef(this.settingsObj.padding)) json['padding'] = this.padding().serialize();
   if (goog.isDef(this.position())) json['position'] = this.position();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
   if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();

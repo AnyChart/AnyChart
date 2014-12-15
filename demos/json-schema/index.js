@@ -32,7 +32,7 @@ $(document).ready(function() {
   anychart.licenseKey(null);
   stage.suspend();
 
-  var chart = anychart.barChart();
+  var chart = anychart.bar();
   chart.bar([
     ['A1' , 3],
     ['A2' , 5],
@@ -62,21 +62,6 @@ $(document).ready(function() {
     //});
 
     //var validResp = tv4.validateMultiple(JSON.parse(json), JSON.parse(schema));
-    var c = config;
-    var c1 = JSON.parse(JSON.stringify(config));
-
-    console.log(goog.object.findKey(c, function(value) {
-      var regexp = /^[.].+/;
-      if (goog.isNumber(value)) {
-        return regexp.test(String(value));
-      }
-      return true;
-    }));
-    console.log(c);
-    console.log(c1);
-
-
-
 
     var validResp = tv4.validateMultiple(config, JSON.parse(schema));
 

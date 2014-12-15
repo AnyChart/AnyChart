@@ -382,7 +382,8 @@ anychart.core.utils.Bounds.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.utils.Bounds.prototype.setup = function(var_args) {
-  this.set.apply(this, arguments);
+  if (goog.isDef(arguments[0]))
+    this.set.apply(this, arguments);
   return this;
 };
 

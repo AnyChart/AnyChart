@@ -13,23 +13,23 @@
     <script>
 
         anychart.onDocumentReady(function() {
-            var xml = '<xml>'+
-                        '<chart container="container" type="column" title="Pareto Chart of Late Arrivals by Reported Cause" yScale="defaultScale">'+
+            var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
+                        '<chart container="container" type="column" title="Pareto Chart of Late Arrivals by Reported Cause" y_scale="0">'+
                             '<scales>'+
                                 '<scale type="linear" minimum="0" maximum="184.8">'+
                                     '<ticks interval="16.8"/>'+
-                                    '<minorTicks interval="8.4"/>'+
+                                    '<minor_ticks interval="8.4"/>'+
                                 '</scale>'+
                                 '<scale type="linear" minimum="0" maximum="110">'+
                                     '<ticks interval="10"/>'+
                                 '</scale>'+
                             '</scales>'+
-                            '<yAxes>'+
+                            '<y_axes>'+
                                 '<axis/>'+
                                 '<axis title="Secondary Y-Axis" orientation="right" scale="1"/>'+
-                            '</yAxes>'+
-                            '<seriesList>'+
-                                '<series seriesType="column" yScale="1">'+
+                            '</y_axes>'+
+                            '<series_list>'+
+                                '<series series_type="column" y_scale="1">'+
                                     '<data>'+
                                         '<point x="Traffic" value="56"/>'+
                                         '<point x="Child Care" value="44.8"/>'+
@@ -39,7 +39,7 @@
                                         '<point x="Emergency" value="6.6"/>'+
                                     '</data>'+
                                 '</series>'+
-                                '<series seriesType="line" yScale="1">'+
+                                '<series series_type="line" y_scale="1">'+
                                     '<data>'+
                                         '<point x="Traffic" value="0"/>'+
                                         '<point x="Child Care" value="35"/>'+
@@ -49,9 +49,9 @@
                                         '<point x="Emergency" value="100"/>'+
                                     '</data>'+
                                 '</series>'+
-                            '</seriesList>'+
+                            '</series_list>'+
                         '</chart>'+
-                    '</xml>';
+                    '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.yAxis(1).labels().textFormatter(function(info) {
                 return info.value + '%';

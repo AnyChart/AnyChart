@@ -14,9 +14,9 @@
         var chart;
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="bar" title="Multi-Series Bar Chart" container="container">' +
-                                '<seriesList>' +
+                                '<series_list>' +
                                     '<series>' +
                                         '<data>' +
                                             '<point x="P1" value="128.14"/>' +
@@ -24,7 +24,7 @@
                                             '<point x="P3" value="163.21"/>' +
                                             '<point x="P4" value="229.98"/>' +
                                         '</data>' +
-                                        '<labels fontWeight="bold" position="rightcenter" anchor="leftCenter" />' +
+                                        '<labels font_weight="bold" position="rightCenter" anchor="leftCenter" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -33,7 +33,7 @@
                                             '<point x="P3" value="150.67"/>' +
                                             '<point x="P4" value="120.43"/>' +
                                         '</data>' +
-                                        '<labels fontWeight="bold" position="rightcenter" anchor="leftCenter" />' +
+                                        '<labels font_weight="bold" position="rightCenter" anchor="leftCenter" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -42,7 +42,7 @@
                                             '<point x="P3" value="34.17"/>' +
                                             '<point x="P4" value="45.72"/>' +
                                         '</data>' +
-                                        '<labels fontWeight="bold" position="rightcenter" anchor="leftCenter" />' +
+                                        '<labels font_weight="bold" position="rightCenter" anchor="leftCenter" />' +
                                     '</series>' +
                                     '<series>' +
                                         '<data>' +
@@ -51,11 +51,11 @@
                                             '<point x="P3" value="54.32"/>' +
                                             '<point x="P4" value="33.08"/>' +
                                         '</data>' +
-                                        '<labels fontWeight="bold" position="rightcenter" anchor="leftCenter" />' +
+                                        '<labels font_weight="bold" position="rightCenter" anchor="leftCenter" />' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             chart = anychart.fromXml(xml);
             chart.draw();
         });

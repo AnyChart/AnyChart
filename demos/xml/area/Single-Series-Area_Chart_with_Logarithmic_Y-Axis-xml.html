@@ -10,22 +10,23 @@
   <!--<script>goog.require('anychart.modules.anychart');</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml version="1.0" encoding="utf-8">'+
+      var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+          '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                   '<chart type="area" container="container" title="Area Chart with Logarithmic Y-Axis and Data Labels">'+
-                      '<yScale type="log" minimum="1" maximumGap="0.2">'+
+                      '<y_scale type="log" minimum="1" maximum_gap="0.2">'+
                           '<ticks count="6"/>'+
-                          '<minorTicks mode="logariphmic"/>'+
-                      '</yScale>'+
-                      '<xAxes>'+
+                          '<minor_ticks mode="logarithmic"/>'+
+                      '</y_scale>'+
+                      '<x_axes>'+
                           '<axis>'+
                             '<title>'+
                                 '<margin bottom="20"/>'+
                                 '<padding right="15"/>'+
                             '</title>'+
                           '</axis>'+
-                      '</xAxes>'+
-                      '<seriesList>'+
-                          '<series markers="true" hoverMarkers="true">'+
+                      '</x_axes>'+
+                      '<series_list>'+
+                          '<series markers="true" hover_markers="true">'+
                               '<data>'+
                                   '<point x="P1" value="112.61"/>'+
                                   '<point x="P2" value="163.21"/>'+
@@ -44,11 +45,11 @@
                                   '<point x="P15" value="33.08"/>'+
                               '</data>'+
                               '<fill color="#1D8BD1" opacity="0.2"/>'+
-                              '<labels enabled="true" fontWeight="bold"/>'+
+                              '<labels enabled="true" font_weight="bold"/>'+
                           '</series>'+
-                      '</seriesList>'+
+                      '</series_list>'+
                   '</chart>'+
-              '</xml>';
+              '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.draw();
     });

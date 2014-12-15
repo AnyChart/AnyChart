@@ -12,20 +12,20 @@
   </script>
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
+      var xml = '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                   '<chart container="container" type="column" title="Combination of Stacked Column and Line Chart (Dual Y-Axis)">'+
                       '<scales>'+
                           '<scale minimum="0" maximum="100">'+
                               '<ticks interval="10"/>'+
                           '</scale>'+
                       '</scales>'+
-                      '<yScale stackMode="value"/>'+
-                      '<yAxes>'+
+                      '<y_scale stack_mode="value"/>'+
+                      '<y_axes>'+
                           '<axis/>'+
                           '<axis title="Secondary Y-Axis" orientation="right" scale="0"/>'+
-                      '</yAxes>'+
-                      '<seriesList>'+
-                          '<series seriesType="line" yScale="0">'+
+                      '</y_axes>'+
+                      '<series_list>'+
+                          '<series series_type="line" y_scale="0">'+
                               '<data>'+
                                   '<point x="P1" value="96.5"/>'+
                                   '<point x="P2" value="77.1"/>'+
@@ -89,9 +89,9 @@
                                   '<point x="P12" value="1691"/>'+
                               '</data>'+
                           '</series>'+
-                      '</seriesList>'+
+                      '</series_list>'+
                   '</chart>'+
-              '</xml>';
+              '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.yAxis(1).labels().textFormatter(function(info) {
         return info.value + '%';

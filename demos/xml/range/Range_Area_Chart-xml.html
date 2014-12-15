@@ -12,10 +12,11 @@
   <!--</script>-->
   <script>
     anychart.onDocumentReady(function() {
-      var xml = '<xml>'+
+      var xml = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">'+
                     '<chart type="area" container="container" title="Range Area Chart">'+
-                        '<seriesList>'+
-                            '<series seriesType="rangeArea">'+
+                        '<series_list>'+
+                            '<series series_type="rangeArea">'+
                                 '<data>'+
                                     '<point low="182" high="1122"/>'+
                                     '<point low="284" high="1152"/>'+
@@ -34,9 +35,9 @@
                                     '<point low="488" high="1112"/>'+
                                 '</data>'+
                             '</series>'+
-                        '</seriesList>'+
+                        '</series_list>'+
                     '</chart>'+
-                '</xml>';
+                '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.draw();
     });

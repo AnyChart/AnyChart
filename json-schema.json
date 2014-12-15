@@ -1618,7 +1618,13 @@
       "properties": {
         "cornerType": {"$ref": "#/definitions/anychart.enums.BackgroundCornersType"},
         "corners": {
-          "type": "array",
+          "type": ["array", "object", "number"],
+          "properties": {
+            "leftTop": {"type": "number"},
+            "rightTop": {"type": "number"},
+            "rightBottom": {"type": "number"},
+            "leftBottom": {"type": "number"}
+          },
           "items": {
             "type": [
               "string",
@@ -1638,8 +1644,17 @@
         "adjustFontSize": {
           "type": [
             "boolean",
+            "object",
             "array"
           ],
+          "properties": {
+            "width": {
+              "type": "boolean"
+            },
+            "height": {
+              "type": "boolean"
+            }
+          },
           "items": {
             "type": "boolean"
           }
@@ -2304,25 +2319,25 @@
     },
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
-        "backwarddiagonal",
-        "forwarddiagonal",
+        "backwardDiagonal",
+        "forwardDiagonal",
         "horizontal",
         "vertical",
-        "dashedbackwarddiagonal",
+        "dashedBackwardDiagonal",
         "grid",
-        "dashedforwarddiagonal",
-        "dashedhorizontal",
-        "dashedvertical",
-        "diagonalcross",
-        "diagonalbrick",
+        "dashedForwardDiagonal",
+        "dashedHorizontal",
+        "dashedVertical",
+        "diagonalCross",
+        "diagonalBrick",
         "divot",
-        "horizontalbrick",
-        "verticalbrick",
-        "checkerboard",
+        "horizontalBrick",
+        "verticalBrick",
+        "checkerBoard",
         "confetti",
         "plaid",
-        "soliddiamond",
-        "zigzag",
+        "solidDiamond",
+        "zigZag",
         "weave",
         "percent05",
         "percent10",
@@ -2439,7 +2454,6 @@
         {"$ref": "#/definitions/linearGradientFill"},
         {"$ref": "#/definitions/radialGradientFill"},
         {"$ref": "#/definitions/solidFill"},
-        {"$ref": "#/definitions/pattern"},
         {"$ref": "#/definitions/hatchFill"}
       ]
     },
@@ -2454,8 +2468,7 @@
     "hatchFill": {
       "type": ["object"],
       "properties": {
-        "type": {"enum": ["hatchFill"]},
-        "hatchType": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
+        "type": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
         "color": {
           "type": "string"
         },
@@ -2469,21 +2482,11 @@
     },
     "hatchFillSet": {
       "oneOf": [
-        {"type": ["null", "string", "boolean"]},
-        {"$ref": "#/definitions/pattern"},
+        {"enum": ["none"]},
+        {"$ref": "#/definitions/disable"},
+        {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
         {"$ref": "#/definitions/hatchFill"}
       ]
-    },
-    "pattern": {
-      "type": "object",
-      "properties": {
-        "children": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/primitive"}
-        },
-        "bounds": {"$ref": "#/definitions/anychart.math.Rect"},
-        "type": {"enum": ["pattern"]}
-      }
     },
     "solidFill": {
       "type": [

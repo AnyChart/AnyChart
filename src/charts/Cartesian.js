@@ -1417,7 +1417,12 @@ anychart.charts.Cartesian.prototype.stepArea = function(data, opt_csvSettings) {
  * @return {anychart.core.cartesian.series.Base}
  */
 anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
-  var ctl = anychart.core.cartesian.series.Base.SeriesTypesMap[/** @type {anychart.enums.CartesianSeriesType} */(type)];
+  var ctl;
+  type = ('' + type).toLowerCase();
+  for (var i in anychart.core.cartesian.series.Base.SeriesTypesMap) {
+    if (i.toLowerCase() == type)
+      ctl = anychart.core.cartesian.series.Base.SeriesTypesMap[i];
+  }
   var instance;
 
   if (ctl) {
@@ -2617,8 +2622,6 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
   var rangeAxesMarkers = config['rangeAxesMarkers'];
   var textAxesMarkers = config['textAxesMarkers'];
   var series = config['series'];
-  var barGroupsPadding = config['barGroupsPadding'];
-  var barsPadding = config['barsPadding'];
   var scales = config['scales'];
 
   var scalesInstances = {};

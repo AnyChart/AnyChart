@@ -8,7 +8,7 @@
   <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
   <script src="../../../src/deps.js"></script>
   <script>
-    goog.require('anychart.modules.anychart');
+    goog.require("anychart.modules.anychart");
   </script>
   <script>
     anychart.onDocumentReady(function() {
@@ -34,7 +34,7 @@
               //no custom settings for first yAxis
             },
             {
-              "title": 'Secondary Y-Axis',
+              "title": "Secondary Y-Axis",
               "orientation": "right",
               "scale": "customScale_1"
             }
@@ -107,7 +107,7 @@
       };
       var chart = anychart.fromJson(json);
       chart.yAxis(1).labels().textFormatter(function(info) {
-        return info.value + '%';
+        return info.value + "%";
       });
       chart.draw();
     });

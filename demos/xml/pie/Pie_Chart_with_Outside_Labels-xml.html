@@ -13,10 +13,10 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="pie" title="Pie Chart" container="container">' +
-                                '<legend title="Products Sales" titleSeparator="true" />' +
-                                '<labels position="outside" fontColor="black"/>' +
+                                '<legend title="Products Sales" title_separator="true" />' +
+                                '<labels position="outside" font_color="black"/>' +
                                 '<data>' +
                                     '<point x="Product A" value="1222"/>' +
                                     '<point x="Product B" value="2431"/>' +
@@ -25,7 +25,7 @@
                                     '<point x="Product E" value="8813"/>' +
                                 '</data>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.draw();
         });

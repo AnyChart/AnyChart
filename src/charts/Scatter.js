@@ -1302,7 +1302,12 @@ anychart.charts.Scatter.prototype.marker = function(data, opt_csvSettings) {
  * @return {anychart.core.scatter.series.Base}
  */
 anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
-  var ctl = anychart.core.scatter.series.Base.SeriesTypesMap[/** @type {anychart.enums.ScatterSeriesTypes} */(type)];
+  var ctl;
+  type = ('' + type).toLowerCase();
+  for (var i in anychart.core.scatter.series.Base.SeriesTypesMap) {
+    if (i.toLowerCase() == type)
+      ctl = anychart.core.scatter.series.Base.SeriesTypesMap[i];
+  }
   var instance;
 
   if (ctl) {
@@ -2019,8 +2024,6 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   var rangeAxesMarkers = config['rangeAxesMarkers'];
   var textAxesMarkers = config['textAxesMarkers'];
   var series = config['series'];
-  var barGroupsPadding = config['barGroupsPadding'];
-  var barsPadding = config['barsPadding'];
   var scales = config['scales'];
 
   var scalesInstances = {};

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <script src="xmllint.js"></script>
+    <script src="xml-schema.js"></script>
+    <script src="test.js"></script>
+    <script>
+        function onload() {
+            //create an object
+            var Module = {
+                xml: getXml(),
+                schema: getSchema(),
+                arguments: ["--noout", "--schema", "file.xsd", "file.xml"]
+            };
+
+            //and call function
+            var xmllint = validateXML(Module);
+            document.getElementById('result').innerHTML = xmllint;
+        }
+    </script>
+</head>
+<body onload="onload()">
+<textarea id="result" style="width: 500px; height: 800px;">
+
+</textarea>
+</body>
+</html>

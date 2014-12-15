@@ -13,17 +13,17 @@
     <script>
         anychart.onDocumentReady(function() {
             var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                        '<xml>' +
+                        '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                             '<chart type="polar" container="container" title="false">' +
-                                '<yScale minimum="0" maximum="16">' +
+                                '<y_scale minimum="0" maximum="16">' +
                                     '<ticks interval="2"/>' +
-                                '</yScale>' +
-                                '<xScale maximum="360">' +
+                                '</y_scale>' +
+                                '<x_scale maximum="360">' +
                                     '<ticks interval="15"/>' +
-                                '</xScale>' +
-                                '<legend position="right" align="left" itemsLayout="vertical"/>' +
-                                '<seriesList>' +
-                                    '<series type="star5" name="Signal A" size="4" hoverSize="8" stroke="rgb(19, 93, 140)" fill="rgb(105, 184, 234)">' +
+                                '</x_scale>' +
+                                '<legend position="right" align="left" items_layout="vertical"/>' +
+                                '<series_list>' +
+                                    '<series type="star5" name="Signal A" size="4" hover_size="8" stroke="rgb(19, 93, 140)" fill="rgb(105, 184, 234)">' +
                                         '<data>' +
                                             '<point x="15" value="9"/>' +
                                             '<point x="30" value="7"/>' +
@@ -51,7 +51,7 @@
                                             '<point x="360" value="3"/>' +
                                         '</data>' +
                                     '</series>' +
-                                    '<series type="rect" name="Signal B" size="4" hoverSize="8" stroke="rgb(164, 48, 11)" fill="rgb(245, 146, 115)">' +
+                                    '<series type="square" name="Signal B" size="4" hover_size="8" stroke="rgb(164, 48, 11)" fill="rgb(245, 146, 115)">' +
                                         '<data>' +
                                             '<point x="14.29" value="10.7"/>' +
                                             '<point x="42.96" value="8.75"/>' +
@@ -79,7 +79,7 @@
                                             '<point x="3.5" value="6.99"/>' +
                                         '</data>' +
                                     '</series>' +
-                                    '<series type="diamond" name="Signal C" size="4" hoverSize="8" stroke="rgb(26, 139, 26)" fill="rgb(116, 228, 116)">' +
+                                    '<series type="diamond" name="Signal C" size="4" hover_size="8" stroke="rgb(26, 139, 26)" fill="rgb(116, 228, 116)">' +
                                         '<data>' +
                                             '<point x="8.589" value="13.44"/>' +
                                             '<point x="10.59" value="9.12"/>' +
@@ -107,9 +107,9 @@
                                             '<point x="3.5" value="5.47"/>' +
                                         '</data>' +
                                     '</series>' +
-                                '</seriesList>' +
+                                '</series_list>' +
                             '</chart>' +
-                        '</xml>';
+                        '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.xAxis().labels().textFormatter(function() {
                 return this['value'] + '°';

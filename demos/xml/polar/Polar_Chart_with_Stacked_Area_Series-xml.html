@@ -13,17 +13,16 @@
   <script>
     anychart.onDocumentReady(function() {
       var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                  '<xml>' +
+                  '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                       '<chart type="polar" container="container" title="false">' +
-                          '<yScale stackMode="value">' +
+                          '<y_scale stack_mode="value">' +
                               '<ticks interval="10"/>' +
-                          '</yScale>' +
-                          '<xScale maximum="360">' +
+                          '</y_scale>' +
+                          '<x_scale maximum="360">' +
                               '<ticks interval="15"/>' +
-                          '</xScale>' +
-                          '<xAxis fontWeight="bold"/>' +
-                          '<seriesList>' +
-                              '<series seriesType="area" name="Series A">' +
+                          '</x_scale>' +
+                          '<series_list>' +
+                              '<series series_type="area" name="Series A">' +
                                   '<data>' +
                                       '<point x="0" value="14.582"/>' +
                                       '<point x="2" value="15.24"/>' +
@@ -209,7 +208,7 @@
                                   '<stroke color="rgb(19, 93, 140)" thickness="2"/>' +
                                   '<fill color="rgb(29, 139, 209)" opacity="0.3"/>' +
                               '</series>' +
-                              '<series seriesType="area" name="Series B">' +
+                              '<series series_type="area" name="Series B">' +
                                   '<data>' +
                                       '<point x="0" value="-14.582"/>' +
                                       '<point x="2" value="-15.24"/>' +
@@ -395,10 +394,10 @@
                                   '<stroke color="rgb(164, 48, 11)" thickness="2"/>' +
                                   '<fill color="rgb(241, 104, 60)" opacity="0.3"/>' +
                               '</series>' +
-                          '</seriesList>' +
-                          '<legend position="right" align="left" itemsLayout="vertical"/>' +
+                          '</series_list>' +
+                          '<legend position="right" align="left" items_layout="vertical"/>' +
                       '</chart>' +
-                  '</xml>';
+                  '</anychart>';
       var chart = anychart.fromXml(xml);
       chart.xAxis().labels().textFormatter(function() {return this['value'] + String.fromCharCode(176)});
       chart.draw();

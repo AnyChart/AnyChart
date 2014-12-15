@@ -14,155 +14,156 @@
         anychart.onDocumentReady(function() {
             var stage = anychart.graphics.create('container');
             var xml1 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0" left="0">' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="0" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#c06a6a]]></items>' +
-                                        '<items><![CDATA[#d39797]]></items>' +
-                                        '<items><![CDATA[#e0b6b6]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#c06a6a]]></item>' +
+                                            '<item><![CDATA[#d39797]]></item>' +
+                                            '<item><![CDATA[#e0b6b6]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="6" fill="black"/>' +
                                         '<point value="11" fill="brown"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
             var chart1 = anychart.fromXml(xml1);
             chart1.container(stage).draw();
 
             var xml2 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0">' +
-                                        '<left><![CDATA[16.7%]]></left>' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="16.7%" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#c06a6a]]></items>' +
-                                        '<items><![CDATA[#d39797]]></items>' +
-                                        '<items><![CDATA[#e0b6b6]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#c06a6a]]></item>' +
+                                            '<item><![CDATA[#d39797]]></item>' +
+                                            '<item><![CDATA[#e0b6b6]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="7" fill="black"/>' +
                                         '<point value="11" fill="brown"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
 
             var chart2 = anychart.fromXml(xml2);
             chart2.container(stage).draw();
 
             var xml3 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0">' +
-                                        '<left><![CDATA[33.3%]]></left>' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="33.3%" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#ffd382]]></items>' +
-                                        '<items><![CDATA[#ffe0a8]]></items>' +
-                                        '<items><![CDATA[#ffe9c2]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#ffd382]]></item>' +
+                                            '<item><![CDATA[#ffe0a8]]></item>' +
+                                            '<item><![CDATA[#ffe9c2]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="3" fill="black"/>' +
                                         '<point value="11" fill="orange"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
 
             var chart3 = anychart.fromXml(xml3);
             chart3.container(stage).draw();
 
             var xml4 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0">' +
-                                        '<left><![CDATA[50%]]></left>' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="50%" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#ffd382]]></items>' +
-                                        '<items><![CDATA[#ffe0a8]]></items>' +
-                                        '<items><![CDATA[#ffe9c2]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#ffd382]]></item>' +
+                                            '<item><![CDATA[#ffe0a8]]></item>' +
+                                            '<item><![CDATA[#ffe9c2]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="9" fill="black"/>' +
                                         '<point value="11" fill="orange"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
 
             var chart4 = anychart.fromXml(xml4);
             chart4.container(stage).draw();
 
             var xml5 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0">' +
-                                        '<left><![CDATA[66.7%]]></left>' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="66.7%" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#82c182]]></items>' +
-                                        '<items><![CDATA[#a8d4a8]]></items>' +
-                                        '<items><![CDATA[#c2e1c2]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#82c182]]></item>' +
+                                            '<item><![CDATA[#a8d4a8]]></item>' +
+                                            '<item><![CDATA[#c2e1c2]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="2" fill="black"/>' +
                                         '<point value="11" fill="green"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
 
             var chart5 = anychart.fromXml(xml5);
             chart5.container(stage).draw();
 
             var xml6 = '<?xml version="1.0" encoding="utf-8"?>' +
-                            '<xml>' +
+                            '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                                 '<chart type="bullet" title="false" layout="vertical" axis="false">' +
-                                    '<bounds top="0">' +
-                                        '<left><![CDATA[83.3%]]></left>' +
-                                        '<height><![CDATA[100%]]></height>' +
-                                        '<width><![CDATA[16.7%]]></width>' +
-                                    '</bounds>' +
+                                    '<bounds top="0" left="83.3%" height="100%" width="16.7%" />' +
                                     '<rangePalette type="distinct">' +
-                                        '<items><![CDATA[#82c182]]></items>' +
-                                        '<items><![CDATA[#a8d4a8]]></items>' +
-                                        '<items><![CDATA[#c2e1c2]]></items>' +
+                                        '<items>' +
+                                            '<item><![CDATA[#82c182]]></item>' +
+                                            '<item><![CDATA[#a8d4a8]]></item>' +
+                                            '<item><![CDATA[#c2e1c2]]></item>' +
+                                        '</items>' +
                                     '</rangePalette>' +
-                                    '<ranges from="0" to="5"/>' +
-                                    '<ranges from="5" to="10"/>' +
-                                    '<ranges from="10" to="15"/>' +
+                                    '<ranges>' +
+                                        '<range from="0" to="5"/>' +
+                                        '<range from="5" to="10"/>' +
+                                        '<range from="10" to="15"/>' +
+                                    '</ranges>' +
                                     '<data>' +
                                         '<point value="13" fill="black"/>' +
                                         '<point value="11" fill="green"/>' +
                                     '</data>' +
                                 '</chart>' +
-                            '</xml>';
+                            '</anychart>';
 
             var chart6 = anychart.fromXml(xml6);
             chart6.container(stage).draw();

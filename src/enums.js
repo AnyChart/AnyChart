@@ -1106,15 +1106,15 @@ anychart.enums.CartesianSeriesType = {
   LINE: 'line',
   MARKER: 'marker',
   OHLC: 'ohlc',
-  RANGE_AREA: 'rangearea',
-  RANGE_BAR: 'rangebar',
-  RANGE_COLUMN: 'rangecolumn',
-  RANGE_SPLINE_AREA: 'rangesplinearea',
-  RANGE_STEP_AREA: 'rangesteparea',
+  RANGE_AREA: 'rangeArea',
+  RANGE_BAR: 'rangeBar',
+  RANGE_COLUMN: 'rangeColumn',
+  RANGE_SPLINE_AREA: 'rangeSplineArea',
+  RANGE_STEP_AREA: 'rangeStepArea',
   SPLINE: 'spline',
-  SPLINE_AREA: 'splinearea',
-  STEP_AREA: 'steparea',
-  STEP_LINE: 'stepline'
+  SPLINE_AREA: 'splineArea',
+  STEP_AREA: 'stepArea',
+  STEP_LINE: 'stepLine'
 };
 
 

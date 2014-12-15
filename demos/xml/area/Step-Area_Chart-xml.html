@@ -14,10 +14,10 @@
     var chart;
     anychart.onDocumentReady(function() {
       var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                  '<xml>' +
+                  '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                       '<chart type="area" container="container" title="Step-Area Chart">' +
-                          '<seriesList>' +
-                              '<series seriesType="stepArea">' +
+                          '<series_list>' +
+                              '<series series_type="stepArea">' +
                                   '<data>' +
                                       '<point x="P1" value="125"/>' +
                                       '<point x="P2" value="132"/>' +
@@ -33,7 +33,7 @@
                                       '<point x="P12" value="91"/>' +
                                   '</data>' +
                               '</series>' +
-                              '<series seriesType="stepArea">' +
+                              '<series series_type="stepArea">' +
                                   '<data>' +
                                       '<point x="P1" value="51"/>' +
                                       '<point x="P2" value="91"/>' +
@@ -49,9 +49,9 @@
                                       '<point x="P12" value="56"/>' +
                                   '</data>' +
                               '</series>' +
-                          '</seriesList>' +
+                          '</series_list>' +
                       '</chart>' +
-                  '</xml>';
+                  '</anychart>';
       chart = anychart.fromXml(xml);
       chart.draw();
     });

@@ -13,10 +13,10 @@
   <script>
     anychart.onDocumentReady(function() {
       var xml = '<?xml version="1.0" encoding="utf-8"?>' +
-                  '<xml>' +
+                  '<anychart xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd">' +
                       '<chart type="area" container="container" title="Stacked Area Chart">' +
-                          '<yScale stackMode="value"/>' +
-                          '<seriesList>' +
+                          '<y_scale stack_mode="value"/>' +
+                          '<series_list>' +
                               '<series>' +
                                   '<data>' +
                                       '<point x="P1" value="42"/>' +
@@ -73,9 +73,9 @@
                                       '<point x="P10" value="42"/>' +
                                   '</data>' +
                               '</series>' +
-                          '</seriesList>' +
+                          '</series_list>' +
                       '</chart>' +
-                  '</xml>';
+                  '</anychart>';
 
       var fillFunction = function() {
         return {
