@@ -7,9 +7,7 @@ goog.require('anychart.core.cartesian.series.SplineDrawer');
 
 /**
  * Define RangeSplineArea series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Cartesian#rangeSplineArea}.
- * @example
- * anychart.core.cartesian.series.rangeSplineArea([['A1', 1, 4],['A2', 3, 5],['A3', 2, 3]]).container(stage).draw();
+ * <b>Note:</b> Use method {@link anychart.charts.Cartesian#rangeSplineArea} to get this series.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

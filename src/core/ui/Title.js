@@ -252,21 +252,21 @@ anychart.core.ui.Title.prototype.text = function(opt_value) {
  *//**
  * Setter for the title background.
  * @example <t>simple-h100</t>
- * var myTitleBackground = anychart.ui.background()
- *         .stroke('1 rgb(36,102,177) 0.4')
- *         .corners(2)
- *         .fill({
+ * anychart.ui.title()
+ *     .text('Title text')
+ *     .padding(5)
+ *     .background({
+ *        fill: {
  *           keys: [
  *             "rgb(255,255,255) 1",
  *             "rgb(223,223,223) 1",
  *             "rgb(255,255,255) 1"
  *           ],
  *           angle: -90
- *         });
- * anychart.ui.title()
- *     .text('Title text')
- *     .padding(5)
- *     .background( myTitleBackground )
+ *         },
+ *         corners: 2,
+ *         stroke: '1 rgb(36,102,177) 0.4'
+ *     })
  *     .container(stage)
  *     .draw();
  * @param {(string|Object|null|boolean)=} opt_value [null] Value to set.

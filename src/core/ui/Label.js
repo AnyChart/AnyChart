@@ -193,17 +193,16 @@ anychart.core.ui.Label.prototype.text = function(opt_value) {
  *//**
  * Setter for Label background settings.
  * @example <t>simple-h100</t>
- * var bg = anychart.ui.background();
- * bg.fill(['rgb(255,250,250)', 'rgb(205,250,250)', 'rgb(255,250,250)']);
- * bg.stroke('1 lightgrey');
- * bg.cornerType('round').corners(10);
- * anychart.ui.label()
+ * var label = anychart.ui.label()
  *      .text('Label backgruond sample')
  *      .fontSize(12)
- *      .background(bg)
- *      .padding(10)
- *      .container(stage)
- *      .draw();
+ *      .padding(10);
+ * label.background()
+ *          .fill(['rgb(255,250,250)', 'rgb(205,250,250)', 'rgb(255,250,250)'])
+ *          .stroke('1 lightgrey')
+ *          .cornerType('round')
+ *          .corners(10);
+ * label.container(stage).draw();
  * @param {(string|Object|null|boolean)=} opt_value Value to set.
  * @return {!anychart.core.ui.Label} {@link anychart.core.ui.Label} instance for method chaining.
  *//**

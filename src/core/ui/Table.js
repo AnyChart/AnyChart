@@ -439,13 +439,10 @@ anychart.core.ui.Table.prototype.getCell = function(row, col) {
  *   [1.3, 2.4, 1.7, 1.9]
  * ];
  * var pie = anychart.pie(dataSet).legend(null);
- * var palette = pie.palette().colors();
  * var table = anychart.ui.table();
  * table.contents([
- *     [pie, anychart.core.cartesian.series.line(dataSet[0]).color(palette[0])],
- *     [null, anychart.core.cartesian.series.line(dataSet[1]).color(palette[1])],
- *     [null, anychart.core.cartesian.series.line(dataSet[2]).color(palette[2])],
- *     [null, anychart.core.cartesian.series.line(dataSet[3]).color(palette[3])]
+ *     [pie, anychart.line(dataSet[0]).title(null).xAxis(null)],
+ *     [null, anychart.area(dataSet[1]).title(null).xAxis(null)]
  * ]);
  * table.getCell(0,0).rowSpan(4);
  * table.container(stage).draw();
@@ -532,11 +529,10 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
  * @example <t>simple-h100</t>
  * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * var textSettings = anychart.ui.labelsFactory();
- * textSettings.fontColor('blue');
- * textSettings.fontWeight('bold');
- * textSettings.fontSize(13);
- * table.cellTextFactory(textSettings);
+ * table.cellTextFactory()
+ *   .fontColor('blue')
+ *   .fontWeight('bold')
+ *   .fontSize(13);
  * table.container(stage).draw();
  * @shortDescription Setter for table cell text factory.
  * @param {(Object|boolean|null)=} opt_value

@@ -421,15 +421,15 @@ anychart.core.VisualBase.prototype.getExportData = function() {
  * Saves the current visual state into PNG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
- * chart.top(50);
- * var button = new anychart.ui.button();
- * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
- * .text('Save image')
- * .padding(10)
- * .setOnClickListener(function(){
+ * chart.label()
+ *   .background(true)
+ *   .text('Save image')
+ *   .fontColor('#fff')
+ *   .padding(5)
+ *   .offsetX(5)
+ *   .listen('click', function(){
  *      chart.saveAsPNG();
- *  })
- * .container(stage).draw();
+ *   });
  */
 anychart.core.VisualBase.prototype.saveAsPNG = function() {
   var data = this.getExportData();
@@ -446,15 +446,15 @@ anychart.core.VisualBase.prototype.saveAsPNG = function() {
  * Saves the current visual state into JPEG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
- * chart.top(50);
- * var button = new anychart.ui.button();
- * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
- * .text('Save image')
- * .padding(10)
- * .setOnClickListener(function(){
+ * chart.label()
+ *   .background(true)
+ *   .text('Save image')
+ *   .fontColor('#fff')
+ *   .padding(5)
+ *   .offsetX(5)
+ *   .listen('click', function(){
  *      chart.saveAsJPG();
- *  })
- * .container(stage).draw();
+ *   });
  */
 anychart.core.VisualBase.prototype.saveAsJPG = function() {
   var data = this.getExportData();
@@ -470,15 +470,15 @@ anychart.core.VisualBase.prototype.saveAsJPG = function() {
  * Saves the current visual state into PDF file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
- * chart.top(50);
- * var button = new anychart.ui.button();
- * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
- * .text('Save image')
- * .padding(10)
- * .setOnClickListener(function(){
+ * chart.label()
+ *   .background(true)
+ *   .text('Save image')
+ *   .fontColor('#fff')
+ *   .padding(5)
+ *   .offsetX(5)
+ *   .listen('click', function(){
  *      chart.saveAsPDF();
- *  })
- * .container(stage).draw();
+ *   });
  */
 anychart.core.VisualBase.prototype.saveAsPDF = function() {
   var data = this.getExportData();
@@ -494,15 +494,15 @@ anychart.core.VisualBase.prototype.saveAsPDF = function() {
  * Saves the current visual state into SVG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
- * chart.top(50);
- * var button = new anychart.ui.button();
- * button.parentBounds( anychart.math.rect(120, 0, 100, 49) )
- * .text('Save image')
- * .padding(10)
- * .setOnClickListener(function(){
+ * chart.label()
+ *   .background(true)
+ *   .text('Save image')
+ *   .fontColor('#fff')
+ *   .padding(5)
+ *   .offsetX(5)
+ *   .listen('click', function(){
  *      chart.saveAsSVG();
- *  })
- * .container(stage).draw();
+ *   });
  */
 anychart.core.VisualBase.prototype.saveAsSVG = function() {
   var data = this.getExportData();
@@ -575,5 +575,5 @@ anychart.core.VisualBase.prototype['enabled'] = anychart.core.VisualBase.prototy
 anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//doc|ex
 anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//doc|ex
 anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//doc|ex
-anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;
+anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;//doc|ex
 anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;

@@ -9,7 +9,7 @@ goog.require('goog.color');
 /**
  * Gradient palette.
  * @example <t>simple-h100</t>
- * var palette = anychart.utils.rangeColorPalette()
+ * var palette = anychart.palettes.rangeColors()
  *     .colors(['red', 'yellow'])
  *     .count(9);
  * for (var i = 1; i < 10; i++) {
@@ -73,7 +73,7 @@ anychart.palettes.RangeColors.prototype.colorPalette_;
  *//**
  * Setter for color palette colors list.
  * @example <t>listingOnly</t>
- * var palette = anychart.utils.rangeColorPalette()
+ * var palette = anychart.palettes.rangeColors()
  *      .colors(['red', 'yellow'])
  *      .count(10);
  * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
@@ -132,7 +132,7 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
  *//**
  * Setter for color palette colors from list by index.
  * @example <t>simple-h100</t>
- * var palette = anychart.utils.rangeColorPalette()
+ * var palette = anychart.palettes.rangeColors()
  *     .colors(['red', 'yellow'])
  *     .count(9);
  * palette.colorAt(4, 'blue');

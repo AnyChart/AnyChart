@@ -720,17 +720,9 @@ anychart.core.axes.Linear.prototype.setDefaultOrientation = function(value) {
 
 /**
  * Getter for axis scale.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().scale().minimum(0.5);
  * @return {anychart.scales.Base} Axis scale.
  *//**
  * Setter for axis scale.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var scale = anychart.scales.ordinal();
- * scale.values(['A1', 'A2', 'A3', 'B1', 'B2']);
- * chart.yAxis(1).orientation('right').scale(scale);
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**

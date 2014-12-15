@@ -682,7 +682,7 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
  * var chart = anychart.polar.apply(this, data);
  * var series, i=0;
  * while (series = chart.getSeries(i)){
- *     series.markers().type('circle');
+ *     series.type('circle');
  *     i++;
  * }
  * chart.container(stage).draw();

@@ -377,7 +377,7 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
  * Getter for the current chart background.
  * @example <t>lineChart</t>
  * chart.line([1.1, 1.4, 1.2, 1.6]);
- * chart.background(background)
+ * chart.background()
  *    .stroke('2 rgb(36,102,177)')
  *    .corners(10)
  *    .fill({
@@ -579,7 +579,7 @@ anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
  * Setter for chart label.
  * @example <t>lineChart</t>
  * chart.line([1, 2, 1.3, 2.9]);
- * chart.label({text: 'custom text});
+ * chart.label({text: 'custom text'});
  * @param {(null|boolean|Object|string)=} opt_value Chart label instance to add by index 0.
  * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
  *//**

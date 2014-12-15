@@ -495,9 +495,7 @@ anychart.charts.Radar.prototype.onGridSignal_ = function(event) {
  * @example
  * var chart = anychart.radar();
  * chart.line([1, 4, 5, 7, 2]);
- * chart.xAxis()
- *    .orientation('right')
- *    .title().text('my custom sAxis');
+ * chart.xAxis().stroke('red');
  * chart.container(stage).draw();
  * @return {!anychart.core.axes.Radar} Axis instance by index.
  *//**
@@ -537,9 +535,7 @@ anychart.charts.Radar.prototype.xAxis = function(opt_value) {
  * @example
  * var chart = anychart.radar();
  * chart.line([1, 4, 5, 7, 2]);
- * chart.yAxis()
- *    .orientation('right')
- *    .title().text('my custom sAxis');
+ * chart.yAxis().stroke('red');
  * chart.container(stage).draw();
  * @return {!anychart.core.axes.Radar} Axis instance by index.
  *//**

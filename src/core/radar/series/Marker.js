@@ -8,9 +8,7 @@ goog.require('anychart.enums');
 
 /**
  * Define Marker series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Radar#marker}.
- * @example
- * anychart.core.radar.series.marker([1, 4, 7, 1, 4]).container(stage).draw();
+ * <b>Note:</b> Better for use method {@link anychart.charts.Radar#marker}.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

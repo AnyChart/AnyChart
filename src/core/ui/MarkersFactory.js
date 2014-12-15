@@ -337,44 +337,6 @@ anychart.core.ui.MarkersFactory.prototype.positionFormatter = function(opt_value
  * @return {string} Markers position settings.
  *//**
  * Setter for position settings of all markers.
- * @example
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 10, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 50, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .position('center')
- *     .container(stage);
- * // sets custom positions
- * MMarker
- *     .positionAt(0, 'leftTop')
- *     .positionAt(3, 'rightbottom');
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left,
- *     y: barBounds.top
- *   };
- *   // calculate position
- *   switch (MMarker.positionAt(i) || MMarker.position()) {
- *     case 'center':
- *       positionProvider.x += barBounds.width / 2;
- *       positionProvider.y += barBounds.height / 2;
- *       break;
- *     case 'rightbottom':
- *       positionProvider.x += barBounds.width;
- *       positionProvider.y += barBounds.height;
- *       break;
- *   }
- *   MMarker.draw(positionProvider);
- * }
  * @param {string=} opt_value [{@link anychart.enums.Position}.CENTER] Value to set.
  * @return {anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
  *//**
@@ -417,10 +379,6 @@ anychart.core.ui.MarkersFactory.prototype.position = function(opt_value) {
  *     .fill('blue')
  *     .anchor(anychart.enums.Anchor.RIGHT_BOTTOM)
  *     .container(stage);
- * // sets custom anchor
- * MMarker
- *     .anchorAt(0, anychart.enums.Anchor.LEFT_TOP)
- *     .anchorAt(3, anychart.enums.Anchor.RIGHT_TOP);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -473,21 +431,6 @@ anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
  * var MMarker = anychart.ui.markersFactory()
  *     .type('star4')
  *     .container(stage);
- * // sets custom positions
- * MMarker
- *     .typeAt(0, 'circle')
- *     .typeAt(3, function(path, x, y, size) {
- *       var point1 = {x: x + 1.7 * size, y: y + 0.6 * size};
- *       var point2 = {x: x, y: y + size / 2};
- *       path.moveTo(point1.x, point1.y)
- *           .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
- *           .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
- *           .moveTo(point1.x, point1.y)
- *           .close();
- *       path.rotate(16);
- *       path.setPosition(x, y).translate(-size, -size);
- *       return path;
- *     });
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -556,10 +499,6 @@ anychart.core.ui.MarkersFactory.prototype.setAutoType = function(value) {
  * var MMarker = anychart.ui.markersFactory()
  *     .size(15)
  *     .container(stage);
- * // sets custom positions
- * MMarker
- *     .sizeAt(0, 5)
- *     .sizeAt(3, 10);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -610,9 +549,6 @@ anychart.core.ui.MarkersFactory.prototype.size = function(opt_value) {
  *     .fill('blue')
  *     .offsetX(15)
  *     .container(stage);
- * // sets custom anchor
- * MMarker
- *     .offsetXAt(0, -5);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -665,9 +601,6 @@ anychart.core.ui.MarkersFactory.prototype.offsetX = function(opt_value) {
  *     .fill('blue')
  *     .offsetY(15)
  *     .container(stage);
- * // sets custom anchor
- * MMarker
- *     .offsetYAt(0, -5);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -722,9 +655,6 @@ anychart.core.ui.MarkersFactory.prototype.offsetY = function(opt_value) {
  *     .fill('green')
  *     .size('14')
  *     .container(stage);
- * // sets custom anchor
- * MMarker
- *     .fillAt(0, ['red', 'orange']);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();
@@ -794,9 +724,6 @@ anychart.core.ui.MarkersFactory.prototype.setAutoFill = function(value) {
  *     .stroke('4px green .5')
  *     .size('14')
  *     .container(stage);
- * // sets custom anchor
- * MMarker
- *     .strokeAt(0, ['red', 'orange']);
  * // connecting markers and objects
  * for (i in bars) {
  *   var barBounds = bars[i].getBounds();

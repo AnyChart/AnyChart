@@ -9,7 +9,7 @@ goog.require('goog.array');
 /**
  * Color palette class.
  * @example <t>simple-h100</t>
- * var palette = anychart.utils.distinctColorPalette()
+ * var palette = anychart.palettes.distinctColors()
  *     .colors(['red', 'yellow', 'brown', 'green']);
  * for (var i = 1; i < 10; i++) {
  *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
@@ -48,7 +48,7 @@ anychart.palettes.DistinctColors.prototype.SUPPORTED_SIGNALS = anychart.Signal.N
  *//**
  * Setter for color palette colors from list by index.
  * @example <t>simple-h100</t>
- * var palette = anychart.utils.distinctColorPalette()
+ * var palette = anychart.palettes.distinctColors()
  *     .colors(['red', 'yellow', 'brown', 'green']);
  * palette.colorAt(2, 'white');
  * for (var i = 1; i < 10; i++) {
@@ -88,7 +88,7 @@ anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) 
  *//**
  * Setter for color palette colors list.
  * @example <t>simple-h100</t>
- * var palette = anychart.utils.distinctColorPalette()
+ * var palette = anychart.palettes.distinctColors()
  *      .colors(['#00F', 'red', ['orange', 'red'], '#00C', '#00B', '#00A', '#009', '#008']);
  * var len = palette.colors().length-1;
  * for (var i = 1; i <= len; i++) {

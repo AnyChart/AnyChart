@@ -10,25 +10,18 @@ function load() {
 
   //   chart = anychart.line();
 
- var chart = anychart.scatterChart();
-  chart.hatchFillPalette(['percent50', 'diagonalBrick', 'zigzag']);
- chart.marker([
-    [4.1, 10],
-    [2.3, 6],
-    [3.4, 17],
-    [1.2, 20]
- ]);
- chart.marker([
-    [4.4, 20],
-    [2.3, 11],
-    [3.1, 22],
-    [1.6, 5]
- ]);
- chart.marker([
-    [4.8, 1],
-    [2.6, 16],
-    [3.9, 7],
-    [1.1, 12]
- ]);
-  chart.container(stage).draw();
+  var layer = acgraph.layer();
+  stage.width(600);
+  var text = stage.text(0,0,'Click to resume').fontSize(14);
+  text.x(20).y(10);
+  var rect = stage.rect(0, 0, 100, 100).fill('white .01').stroke(null);
+  anychart.graphics.events.listen(rect, anychart.graphics.events.EventType.CLICK, function(){
+    stage.resume();
+    text.text(null);
+    rect.fill('none');
+  });
+  stage.suspend();
+  stage.text(10, 10, 'new text line');
+  stage.circle(stage.width()/2, stage.height()/2, 50).fill('red 0.2').stroke('2 blue');
+  layer.parent(stage);
 }

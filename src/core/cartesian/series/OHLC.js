@@ -7,7 +7,7 @@ goog.require('anychart.core.utils.TypedLayer');
 
 /**
  * Define OHLC series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Cartesian#ohlc}.
+ * <b>Note:</b> Use method {@link anychart.charts.Cartesian#ohlc} to get this series.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -160,7 +160,8 @@ anychart.core.cartesian.series.OHLC.prototype.createPositionProvider = function(
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
@@ -168,8 +169,8 @@ anychart.core.cartesian.series.OHLC.prototype.createPositionProvider = function(
  *  .risingStroke(
  *    function(){
  *      return '3 '+ this.sourceColor;
- *    })
- *  .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -182,13 +183,14 @@ anychart.core.cartesian.series.OHLC.prototype.createPositionProvider = function(
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
  *  ])
- *  .risingStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ *  .risingStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -227,7 +229,8 @@ anychart.core.cartesian.series.OHLC.prototype.risingStroke = function(opt_stroke
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
@@ -235,8 +238,8 @@ anychart.core.cartesian.series.OHLC.prototype.risingStroke = function(opt_stroke
  *  .hoverRisingStroke(
  *    function(){
  *      return '3 '+ this.sourceColor;
- *    })
- *  .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -249,13 +252,14 @@ anychart.core.cartesian.series.OHLC.prototype.risingStroke = function(opt_stroke
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
  *  ])
- *  .hoverRisingStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ *  .hoverRisingStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -313,7 +317,8 @@ anychart.core.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(ho
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
@@ -321,8 +326,8 @@ anychart.core.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(ho
  *  .fallingStroke(
  *    function(){
  *      return '3 '+ this.sourceColor;
- *    })
- *  .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -335,13 +340,14 @@ anychart.core.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(ho
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
  *  ])
- *  .fallingStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ *  .fallingStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -380,7 +386,8 @@ anychart.core.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strok
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
@@ -388,8 +395,8 @@ anychart.core.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strok
  *  .hoverFallingStroke(
  *    function(){
  *      return '3 '+ this.sourceColor;
- *    })
- *  .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -402,13 +409,14 @@ anychart.core.cartesian.series.OHLC.prototype.fallingStroke = function(opt_strok
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.ohlc([
+ * chart = anychart.cartesian();
+ * chart.ohlc([
  *   [0, 2, 4, 1, 3],
  *   [1, 3, 5, 1, 2],
  *   [2, 2, 5, 1, 4]
  *  ])
- *  .hoverFallingStroke('orange', 3, '5 2', 'round')
- *  .container(stage).draw();
+ *  .hoverFallingStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
