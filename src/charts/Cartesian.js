@@ -862,7 +862,7 @@ anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_
  * Getter for chart range marker.
  * @example <t>lineChart</t>
  * chart.line([1, -4, 5, 7, 7]);
- * chart.rangeMarker(rangeMarker)
+ * chart.rangeMarker()
  *     .from(2.5)
  *     .to(5.5)
  *     .fill('blue .1');

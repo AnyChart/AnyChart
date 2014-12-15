@@ -8,9 +8,7 @@ goog.require('anychart.enums');
 
 /**
  * Define Marker series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Cartesian#marker}.
- * @example
- * anychart.core.cartesian.series.marker([1, 4, 7, 1]).container(stage).draw();
+ * <b>Note:</b> Use method {@link anychart.charts.Cartesian#marker} to get this series.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -144,12 +142,14 @@ anychart.core.cartesian.series.Marker.prototype.setAutoMarkerType = function(opt
  *//**
  * Setter for hovered marker type settings.
  * @example <c>By Enum value.</c>
- * anychart.core.cartesian.series.marker([10, 11, 17, 7, 21])
+ * chart = anychart.cartesian();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .type('star4')
- *    .hoverType('star6')
- *    .container(stage).draw();
+ *    .hoverType('star6');
+ * chart.container(stage).draw();
  * @example <c>By custom function.</c>
- * anychart.core.cartesian.series.marker([10, 11, 17, 7, 21])
+ * chart = anychart.cartesian();
+ * chart.marker([10, 11, 17, 7, 21])
  *    .size(20)
  *    .hoverSize(20)
  *    .hoverType(function(path, x, y, size) {
@@ -161,8 +161,8 @@ anychart.core.cartesian.series.Marker.prototype.setAutoMarkerType = function(opt
  *          .moveTo(point1.x, point1.y)
  *          .close();
  *      return path;
- *    })
- *    .container(stage).draw();
+ *    });
+ * chart.container(stage).draw();
  * @param {(string|anychart.enums.MarkerType|
  *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
  *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
@@ -201,9 +201,9 @@ anychart.core.cartesian.series.Marker.prototype.hoverType = function(opt_value) 
  *//**
  * Setter for marker size.
  * @example
- * anychart.core.cartesian.series.marker([10, 11, 17, 7, 21])
- *     .size(14)
- *     .container(stage).draw();
+ * chart = anychart.cartesian();
+ * chart.marker([10, 11, 17, 7, 21]).size(14);
+ * chart.container(stage).draw();
  * @param {number=} opt_value [10] Value to set.
  * @return {anychart.core.cartesian.series.Marker} {@link anychart.core.cartesian.series.Marker} class for method chaining.
  *//**
@@ -230,10 +230,11 @@ anychart.core.cartesian.series.Marker.prototype.size = function(opt_value) {
  *//**
  * Setter for hovered marker size.
  * @example
- * anychart.core.cartesian.series.marker([10, 11, 17, 7, 21])
+ * chart = anychart.cartesian();
+ * chart.marker([10, 11, 17, 7, 21])
  *     .size(10)
- *     .hoverSize(20)
- *     .container(stage).draw();
+ *     .hoverSize(20);
+ * chart.container(stage).draw();
  * @param {number=} opt_value [12] Value to set.
  * @return {anychart.core.cartesian.series.Marker} {@link anychart.core.cartesian.series.Marker} instance for method chaining.
  *//**

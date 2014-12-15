@@ -15,11 +15,7 @@ goog.require('anychart.palettes.RangeColors');
 
 /**
  * Pie (Donut) Chart Class.<br/>
- * <b>Note:</b> Use these methods to get an instance of this class:
- *  <ul>
- *      <li>{@link anychart.pie.chart}</li>
- *      <li>{@link anychart.pie}</li>
- *  </ul>
+ * <b>Note:</b> Use method {@link anychart.pie} to get an instance of this class:
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @extends {anychart.core.Chart}
  * @constructor
@@ -417,7 +413,7 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
  *//**
  * Setter for a pie palette.
  * @example
- *  var data = [20, 7, 10, 14, 8, 14, 7, 12];
+ *  var data = [7, 7, 7, 7, 7, 7, 7];
  *  anychart.pie(data)
  *     .labels(null)
  *     .legend(null)
@@ -437,7 +433,7 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
  *     .container(stage)
  *     .bounds('66%',0,'33%', '100%')
  *     .palette(
- *          anychart.utils.rangeColorPalette()
+ *          anychart.palettes.rangeColors()
  *              .colors(['red', 'yellow'])
  *              .count(data.length)
  *      )
@@ -575,7 +571,7 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
  *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie.chart(data);
+ *  var chart = anychart.pie(data);
  *  chart.stroke('2 white');
  *  chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
@@ -623,7 +619,7 @@ anychart.charts.Pie.prototype.stroke = function(opt_strokeOrFill, opt_thickness,
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
  * @example
  *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie.chart(data);
+ *  var chart = anychart.pie(data);
  *  chart.hoverFill(['red', 'blue']);
  *  chart.container(stage).draw();
  * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighter fill of the default pallete.
@@ -1342,11 +1338,11 @@ anychart.charts.Pie.prototype.explodeSlice = function(index, opt_explode) {
  * Ascending, Descending and No sorting is supported.
  * @example
  *  var data = [3.4, 10, 6.6, 7, 3.4];
- *  anychart.pie.chart(data)
+ *  anychart.pie(data)
  *      .container(stage)
  *      .bounds(0,0,'50%', '100%')
  *      .draw();
- *  anychart.pie.chart(data)
+ *  anychart.pie(data)
  *      .container(stage)
  *      .bounds('50%',0,'50%', '100%')
  *      .sort(anychart.enums.Sort.DESC)

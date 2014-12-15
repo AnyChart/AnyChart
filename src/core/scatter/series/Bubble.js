@@ -595,7 +595,8 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(hover) {
  * Setter for series stroke by function.<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
+ * chart = anychart.scatter();
+ * chart.bubble([
  *   [1, 1.0, 2],
  *   [2, 1.6, -7],
  *   [3, 1.2, -4],
@@ -606,8 +607,8 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(hover) {
  *      function(){
  *        return '3 '+ this.sourceColor;
  *      }
- *   )
- *  .container(stage).draw();
+ *   );
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -962,7 +963,8 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
  * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
  * @example
- * anychart.core.scatter.series.bubble([
+ * chart = anychart.scatter();
+ * chart.bubble([
  *   [1, 1.0, 2],
  *   [2, 1.6, -7],
  *   [3, 1.2, -4],
@@ -970,7 +972,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * ])
  *  .displayNegative(true)
  *  .hoverNegativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
- *  .container(stage).draw();
+ * chart.container(stage).draw();
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.

@@ -433,13 +433,13 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 /**
  * Gets the value from the row by row index and field name.
  * @example
- * var chart = anychanychart.column* var data = anychart.data.set([
+ * var data = anychart.data.set([
  *     {x: 'A1', value: 8, fill: 'yellow'},
  *     {x: 'A2', value: 11, fill: 'orange'},
  *     {x: 'A3', value: 12, fill: 'red'},
  *     {x: 'A4', value: 9, fill: 'grey'}
  * ]);
- * chart.column(data);
+ * chart = anychart.column(data);
  * chart.container(stage).draw();
  * var view = data.mapAs();
  * var pointX = view.get(2, 'x');

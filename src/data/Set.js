@@ -419,13 +419,13 @@ anychart.data.Set.prototype.append = function(var_args) {
 /**
  * Inserts the row to the set at the specified position.
  * @example
- * var chart = anychanychart.column* var data = anychart.data.set([
+ * var data = anychart.data.set([
  *     ['A1', 8],
  *     ['A2', 11],
  *     ['A3', 12],
  *     ['A4', 9]
  * ]);
- * chart.column(data);
+ * chart = anychart.column(data);
  * chart.container(stage).draw();
  * data.insert({x: 'B1', value: 14, fill: 'grey'}, 2);
  * @param {*} row Row to insert.

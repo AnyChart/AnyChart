@@ -6,9 +6,7 @@ goog.require('anychart.core.radar.series.ContinuousBase');
 
 /**
  * Define Line series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Radar#line} or {@link anychart.core.Chart#lineChart}.
- * @example
- * anychart.core.radar.series.line([1, 4, 7, 1, 4]).container(stage).draw();
+ * <b>Note:</b> Better for use method {@link anychart.charts.Radar#line}.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

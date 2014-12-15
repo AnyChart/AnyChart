@@ -485,12 +485,6 @@ anychart.core.ui.LegendItem.prototype.iconStroke = function(opt_value) {
  * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
  *//**
  * Setter for icon hatch fill settings.
- * @example
- *  var item = anychart.ui.legendItem()
- *    .x(5)
- *    .y(5)
- *    .iconHatchFill('diagonalbrick')
- *    .container(stage).draw();
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.

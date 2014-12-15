@@ -6,9 +6,7 @@ goog.require('anychart.core.cartesian.series.BarBase');
 
 /**
  * Define RangeBar series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Cartesian#rangeBar}.
- * @example
- * anychart.core.cartesian.series.rangeBar([['A1', 1, 4],['A2', 7, 1]]).container(stage).draw();
+ * <b>Note:</b> Use method {@link anychart.charts.Cartesian#rangeBar} to get this series.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

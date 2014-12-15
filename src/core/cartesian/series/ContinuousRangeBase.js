@@ -118,13 +118,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.createPositionProvi
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .lowStroke('4 orange')
- *   .container(stage).draw();
+ *   .lowStroke('4 orange');
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -137,13 +138,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.createPositionProvi
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .lowStroke('orange', 3, '5 2', 'round')
- *   .container(stage).draw();
+ *   .lowStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -183,13 +185,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke = functi
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .hoverHighStroke('4 orange')
- *   .container(stage).draw();
+ *   .hoverHighStroke('4 orange');
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -202,13 +205,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke = functi
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .hoverHighStroke('orange', 3, '5 2', 'round')
- *   .container(stage).draw();
+ *   .hoverHighStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -267,13 +271,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke 
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .lowStroke('4 orange')
- *   .container(stage).draw();
+ *   .lowStroke('4 orange');
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -286,13 +291,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke 
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .lowStroke('orange', 3, '5 2', 'round')
- *   .container(stage).draw();
+ *   .lowStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -332,13 +338,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke = functio
  *//**
  * Setter for series stroke by function.
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .hoverLowStroke('4 orange')
- *   .container(stage).draw();
+ *   .hoverLowStroke('4 orange');
+ * chart.container(stage).draw();
  * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
  *  return anychart.color.darken(this.sourceColor);
  * }] Function that looks like <code>function(){
@@ -351,13 +358,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke = functio
  * Learn more about stroke settings:
  * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
  * @example
- * anychart.core.cartesian.series.rangeArea([
+ * chart = anychart.cartesian();
+ * chart.rangeArea([
  *     [0, 2, 3],
  *     [1, 3, 6],
  *     [2, 2, 4]
  *   ])
- *   .hoverLowStroke('orange', 3, '5 2', 'round')
- *   .container(stage).draw();
+ *   .hoverLowStroke('orange', 3, '5 2', 'round');
+ * chart.container(stage).draw();
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

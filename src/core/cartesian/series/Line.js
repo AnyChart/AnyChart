@@ -6,9 +6,7 @@ goog.require('anychart.core.cartesian.series.ContinuousBase');
 
 /**
  * Define Line series type.<br/>
- * <b>Note:</b> Better for use methods {@link anychart.charts.Cartesian#line} or {@link anychart.core.Chart#lineChart}.
- * @example
- * anychart.core.cartesian.series.line([1, 4, 7, 1]).container(stage).draw();
+ * <b>Note:</b> Use method {@link anychart.charts.Cartesian#line} to get this series.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -102,8 +100,6 @@ anychart.core.cartesian.series.Line.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function for line series.<br/>
- * @example
- * anychart.core.cartesian.series.line([1, 4, 7, 1]).container(stage).draw();
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.

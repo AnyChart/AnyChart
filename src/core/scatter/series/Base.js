@@ -1303,11 +1303,9 @@ anychart.core.scatter.series.Base.prototype.onScaleSignal_ = function(event) {
  *    [3.4, 17],
  *    [1.2, 20]
  * ]);
- * var tooltipSettings = anychart.ui.tooltip();
- * tooltipSettings
+ * series.tooltip()
  *     .background()
  *     .stroke('2 #cc8800').fill('grey 0.5');
- * series.tooltip(tooltipSettings);
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off tooltip.
@@ -1361,11 +1359,9 @@ anychart.core.scatter.series.Base.prototype.onTooltipSignal_ = function(event) {
  *    [3.4, 17],
  *    [1.2, 20]
  * ]);
- * var labelSettings = anychart.ui.labelsFactory();
- * labelSettings.enabled(true);
- * labelSettings.fontColor('white');
- * labelSettings.fontWeight('bold');
- * series.labels(labelSettings);
+ * series.labels()
+ *    .fontColor('white')
+ *    .fontWeight('bold');
  * chart.container(stage).draw();
  * @param {(Object|boolean|null)=} opt_value Series data labels settings.
  * <b>Note:</b> Pass <b>null</b> or <b>'none'</b> to turn off a label.

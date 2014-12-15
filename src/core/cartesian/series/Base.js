@@ -941,10 +941,6 @@ anychart.core.cartesian.series.Base.prototype.hasMarkers = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Draws series into the current container. If series has no scales - creates them.
- * @example
- * anychart.core.cartesian.series.line([1, 2, 1.3, 3])
- *    .container(stage)
- *    .draw(300, 300);
  * @return {anychart.core.cartesian.series.Base} An instance of {@link anychart.core.cartesian.series.Base} class for method chaining.
  */
 anychart.core.cartesian.series.Base.prototype.draw = function() {
