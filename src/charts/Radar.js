@@ -1489,23 +1489,27 @@ anychart.charts.Radar.prototype.serialize = function() {
     var grid = this.grids_[i];
     config = grid.serialize();
     scale = grid.xScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['xScale'] = scales.length - 1;
-    } else {
-      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['xScale'] = scales.length - 1;
+      } else {
+        config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
 
     scale = grid.yScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['yScale'] = scales.length - 1;
-    } else {
-      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['yScale'] = scales.length - 1;
+      } else {
+        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     grids.push(config);
   }
@@ -1516,23 +1520,27 @@ anychart.charts.Radar.prototype.serialize = function() {
     var minorGrid = this.minorGrids_[i];
     config = minorGrid.serialize();
     scale = minorGrid.xScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['xScale'] = scales.length - 1;
-    } else {
-      config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['xScale'] = scales.length - 1;
+      } else {
+        config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
 
     scale = minorGrid.yScale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['yScale'] = scales.length - 1;
-    } else {
-      config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['yScale'] = scales.length - 1;
+      } else {
+        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
     }
     minorGrids.push(config);
   }
