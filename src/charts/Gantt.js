@@ -583,7 +583,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 };
 
 
-/** @override */
+/** @inheritDoc */
 anychart.charts.Gantt.prototype.draw = function() {
   /*
     This method is used to add mouse wheel handler.
