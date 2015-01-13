@@ -1537,11 +1537,6 @@ anychart.core.gantt.Timeline.prototype.drawSegment_ = function(fromLeft, fromTop
 anychart.core.gantt.Timeline.prototype.drawArrow_ = function(left, top, orientation) {
   var path = null;
 
-  /*
-    TODO (A.Kudryavtsev): Change this algorithm like this:
-    Now we can't see the part of an arrow. We must be able to see it. It means that we have to pre-calclate bounds of
-    arrow to define if it crosses the visible area.
-   */
   if (left >= this.pixelBoundsCache_.left &&
       left <= this.pixelBoundsCache_.left + this.pixelBoundsCache_.width &&
       top >= this.pixelBoundsCache_.top &&
@@ -1798,7 +1793,11 @@ anychart.core.gantt.Timeline.prototype.mouseWheelHandler_ = function(e) {
 anychart.core.gantt.Timeline.prototype.getScrollBar = function() {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.core.ui.ScrollBar();
-    this.horizontalScrollBar_.layout(anychart.enums.Layout.HORIZONTAL);
+    this.horizontalScrollBar_
+        .layout(anychart.enums.Layout.HORIZONTAL)
+        .buttonsVisible(false)
+        .mouseOutOpacity(.25)
+        .mouseOverOpacity(.45);
 
     var scale = this.scale_;
     this.horizontalScrollBar_.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {

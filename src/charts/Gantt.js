@@ -95,6 +95,8 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    * @private
    */
   this.verticalScrollBar_ = this.controller_.getScrollBar();
+  this.verticalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
+  this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this.verticalScrollBar_);
   this.registerDisposable(this.verticalScrollBar_);
 
   /**
@@ -103,6 +105,8 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    * @private
    */
   this.horizontalScrollBar_ = this.getTimeline().getScrollBar();
+  this.horizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
+  this.horizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.horizontalScrollBar_);
   this.registerDisposable(this.horizontalScrollBar_);
 
 
@@ -158,10 +162,17 @@ anychart.charts.Gantt.Z_INDEX_DG_TL = 5;
 
 
 /**
+ * Scroll z-index.
+ * @type {number}
+ */
+anychart.charts.Gantt.Z_INDEX_SCROLL = 20;
+
+
+/**
  * Scroll bar side size.
  * @type {number}
  */
-anychart.charts.Gantt.SCROLL_BAR_SIDE = 15;
+anychart.charts.Gantt.SCROLL_BAR_SIDE = 10;
 
 
 /**
@@ -173,6 +184,16 @@ anychart.charts.Gantt.prototype.controllerInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
   }
+};
+
+
+/**
+ * Scroll invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.charts.Gantt.prototype.scrollInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) event.target.draw();
 };
 
 
@@ -482,9 +503,9 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
       anychart.core.Base.resumeSignalsDispatchingTrue(ths.getDataGrid(), ths.getTimeline());
 
       ths.horizontalScrollBar_.bounds(
-          b2.left,
-          (b2.top + b2.height + 1),
-          b2.width,
+          b2.left + anychart.charts.Gantt.SCROLL_BAR_SIDE,
+          (b2.top + b2.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
+          (b2.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
           anychart.charts.Gantt.SCROLL_BAR_SIDE
       ).draw();
     });
@@ -514,6 +535,8 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.suspendSignalsDispatching(this.dg_, this.tl_, this.splitter_, this.controller_);
 
+  var boundsChanged = false;
+
   if (!this.splitter().container()) {
     this.getDataGrid().container(this.rootElement);
     this.getTimeline().container(this.rootElement);
@@ -527,32 +550,11 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
   if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.gantt.Timeline} */ (this.getTimeline()));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.splitter().bounds(
-        bounds.left,
-        bounds.top,
-        (bounds.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 2),
-        (bounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
-    ); //This must automatically set bounds for TL and DG.
+    this.splitter().bounds(bounds);
 
     var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
     var dgRatio = dgWidth / bounds.width;
     this.splitter().position(dgRatio);
-
-    var tlBounds = this.splitter().getRightBounds();
-
-    this.verticalScrollBar_.bounds(
-        (bounds.left + bounds.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-        tlBounds.top,
-        anychart.charts.Gantt.SCROLL_BAR_SIDE,
-        (bounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
-    );
-
-    this.horizontalScrollBar_.bounds(
-        tlBounds.left,
-        (tlBounds.top + tlBounds.height + 1),
-        tlBounds.width,
-        anychart.charts.Gantt.SCROLL_BAR_SIDE
-    );
 
     var newAvailableHeight = bounds.height - this.headerHeight_;
     if (this.controller_.availableHeight() != newAvailableHeight) {
@@ -562,6 +564,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
       this.dg_.invalidate(anychart.ConsistencyState.BOUNDS);
     }
 
+    boundsChanged = true;
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
@@ -574,10 +577,27 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
   this.controller_.run(); //This must redraw DG and TL.
   this.splitter().draw();
 
-
   if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
     //This consistency state is used to set 'checkDrawingNeeded()' to TRUE. Controller must be run anyway.
     this.markConsistent(anychart.ConsistencyState.POSITION);
+  }
+
+  if (boundsChanged) {
+    var tlBounds = this.tl_.getPixelBounds();
+
+    this.verticalScrollBar_.bounds(
+        (bounds.left + bounds.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
+        (tlBounds.top + this.headerHeight_ + anychart.charts.Gantt.SCROLL_BAR_SIDE + 1),
+        anychart.charts.Gantt.SCROLL_BAR_SIDE,
+        (tlBounds.height - this.headerHeight_ - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
+    );
+
+    this.horizontalScrollBar_.bounds(
+        (tlBounds.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
+        (tlBounds.top + tlBounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
+        (tlBounds.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
+        anychart.charts.Gantt.SCROLL_BAR_SIDE
+    );
   }
 
 };

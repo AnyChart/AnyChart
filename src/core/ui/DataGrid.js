@@ -1801,12 +1801,13 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
           button.suspendSignalsDispatching();
 
           var top = totalTop + ((height - anychart.core.ui.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE) / 2);
+
           button
               .enabled(true)
               .collapsed(!!item.meta('collapsed'))
               .dataItemIndex(i)
               .parentBounds(this.pixelBoundsCache_)
-              .position({'x': this.pixelBoundsCache_.left + padding, 'y': top});
+              .position({'x': Math.floor(this.pixelBoundsCache_.left + padding) + .5, 'y': Math.floor(top) + 0.5});
 
           button.resumeSignalsDispatching(false);
           button.draw();

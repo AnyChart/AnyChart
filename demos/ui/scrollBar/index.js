@@ -1,4 +1,4 @@
-var verticalScroll, horizontalScroll;
+var verticalScroll, horizontalScroll, prettyScroll;
 var rect1, rect2, rect3, rect4;
 
 anychart.onDocumentReady(function() {
@@ -18,6 +18,7 @@ anychart.onDocumentReady(function() {
   verticalScroll
       .container(stage)
       .bounds(10, 20, 15, 180)
+      .buttonsVisible(true)
       .contentBounds(rect1Bounds)
       .visibleBounds(rect2Bounds);
 
@@ -31,12 +32,27 @@ anychart.onDocumentReady(function() {
       .container(stage)
       .bounds(40, 215, 180, 15)
       .layout('horizontal')
+      .buttonsVisible(true)
       .contentBounds(rect1Bounds)
       .visibleBounds(rect2Bounds);
 
   horizontalScroll.draw();
 
   horizontalScroll.listen('signal', horizontalScroll.draw, false, horizontalScroll);
+
+
+  prettyScroll = new anychart.core.ui.ScrollBar();
+  prettyScroll
+      .container(stage)
+      .parentBounds(40, 250, 180, 5)
+      .layout('horizontal')
+      .contentBounds(rect1Bounds)
+      .visibleBounds(rect2Bounds)
+      .mouseOutOpacity(.05)
+      .mouseOverOpacity(.3);
+
+  prettyScroll.draw();
+  prettyScroll.listen('signal', prettyScroll.draw, false, prettyScroll);
 
 
   //Setting a second demo block (ratio controlled).
@@ -84,6 +100,7 @@ anychart.onDocumentReady(function() {
 
     //Notifying the vertical scroll bar about changed visual bounds for sync purposes.
     verticalScroll.visibleBounds(e.visibleBounds);
+    prettyScroll.visibleBounds(e.visibleBounds);
 
     var startRatio = e.startRatio;
     var endRatio = e.endRatio;
@@ -97,6 +114,27 @@ anychart.onDocumentReady(function() {
     rect4Bounds = newBounds; //For sync purposes.
     rect4.setBounds(newBounds);
   });
+
+
+  prettyScroll.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
+    rect2.setBounds(e.visibleBounds);
+
+    //Notifying the vertical scroll bar about changed visual bounds for sync purposes.
+    verticalScroll.visibleBounds(e.visibleBounds);
+
+    var startRatio = e.startRatio;
+    var endRatio = e.endRatio;
+
+    var newBounds = new acgraph.math.Rect(
+        (rect3Bounds.left + startRatio * rect3Bounds.width),
+        rect4Bounds.top,
+        ((endRatio - startRatio) * rect3Bounds.width),
+        rect4Bounds.height);
+
+    rect4Bounds = newBounds; //For sync purposes.
+    rect4.setBounds(newBounds);
+  });
+
 });
 
 function hideScrollButtons() {

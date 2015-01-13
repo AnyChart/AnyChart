@@ -77,13 +77,27 @@ anychart.core.ui.ScrollBar = function() {
    */
   this.pixelBoundsCache_;
 
+  /**
+   * Mouse over opacity.
+   * @type {number}
+   * @private
+   */
+  this.mouseOverOpacity_ = 1;
+
+
+  /**
+   * Mouse out opacity.
+   * @type {number}
+   * @private
+   */
+  this.mouseOutOpacity_ = 1;
 
   /**
    * Background fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.bgFill_ = acgraph.vector.normalizeFill('#e0e0e0');
+  this.bgFill_ = acgraph.vector.normalizeFill('#e0e0e0', this.mouseOutOpacity_);
 
 
   /**
@@ -91,7 +105,7 @@ anychart.core.ui.ScrollBar = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.bgStroke_ = acgraph.vector.normalizeStroke('#d5d5d5');
+  this.bgStroke_ = acgraph.vector.normalizeStroke('#d5d5d5', this.mouseOutOpacity_);
 
 
   /**
@@ -99,15 +113,14 @@ anychart.core.ui.ScrollBar = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.sliderFill_ = acgraph.vector.normalizeFill('#d5d5d5');
-
+  this.sliderFill_ = acgraph.vector.normalizeFill('#d5d5d5', this.mouseOutOpacity_);
 
   /**
    * Slider stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.sliderStroke_ = acgraph.vector.normalizeStroke('#656565');
+  this.sliderStroke_ = acgraph.vector.normalizeStroke('#656565', this.mouseOutOpacity_);
 
 
   /**
@@ -155,7 +168,7 @@ anychart.core.ui.ScrollBar = function() {
    * @type {boolean}
    * @private
    */
-  this.buttonsVisible_ = true;
+  this.buttonsVisible_ = false;
 
 
   /**
@@ -206,6 +219,27 @@ anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP = 40;
  * @type {number}
  */
 anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP = .05;
+
+
+/**
+ * Maximal value that can be set to rect.round() as visual improvement.
+ * @type {number}
+ */
+anychart.core.ui.ScrollBar.MAX_ROUND = 5;
+
+
+/**
+ * Turns a numeric value to its integral part plus 0.5, method is used to fix a pixel coordinates to avoid a slim line blurring.
+ * NOTE: For 1px line only!
+ *
+ * TODO (A.Kudryavtsev): Move to utils?
+ *
+ * @param {number} actualPx - Actual pixel coordinate.
+ * @return {number} - Value for not blurred line.
+ */
+anychart.core.ui.ScrollBar.prototype.halfPixel = function(actualPx) {
+  return (acgraph.type() === acgraph.StageType.SVG) ? (Math.floor(actualPx) + .5) : Math.floor(actualPx);
+};
 
 
 /**
@@ -764,6 +798,40 @@ anychart.core.ui.ScrollBar.prototype.buttonsVisible = function(opt_value) {
 
 
 /**
+ * Gets/sets mouse out opacity.
+ * TODO (A.Kudryavtsev): Note! Do not export this method for a while.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(number|anychart.core.ui.ScrollBar)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.ScrollBar.prototype.mouseOutOpacity = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.mouseOutOpacity_ != opt_value) {
+      this.mouseOutOpacity_ = opt_value;
+      this.setOpacity_(this.mouseOutOpacity_);
+    }
+    return this;
+  }
+  return this.mouseOutOpacity_;
+};
+
+
+/**
+ * Gets/sets mouse over opacity.
+ * TODO (A.Kudryavtsev): Note! Do not export this method for a while.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(number|anychart.core.ui.ScrollBar)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.ScrollBar.prototype.mouseOverOpacity = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.mouseOverOpacity_ = opt_value;
+    //We do not invalidate anything. Changes will appear on next mouse over.
+    return this;
+  }
+  return this.mouseOverOpacity_;
+};
+
+
+/**
  * Inner getter for this.base_.
  * @return {acgraph.vector.Layer} - Base layer. Actually is container for all of DOM structure of slider.
  * @private
@@ -771,9 +839,58 @@ anychart.core.ui.ScrollBar.prototype.buttonsVisible = function(opt_value) {
 anychart.core.ui.ScrollBar.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOVER, this.baseMouseOverHandler_, false, this);
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.baseMouseOutHandler_, false, this);
+
+
     this.registerDisposable(this.base_);
   }
   return this.base_;
+};
+
+
+/**
+ * Sets opacity for bg and slider.
+ * TODO (A.Kudryavtsev): NOTE! It does not set opacity to buttons! (18 Dec 2014).
+ * @param {number} value - Opacity for bg and slider.
+ * @private
+ */
+anychart.core.ui.ScrollBar.prototype.setOpacity_ = function(value) {
+  this.suspendSignalsDispatching();
+  var bgFill = acgraph.vector.normalizeFill(this.bgFill_);
+  bgFill['opacity'] = value;
+
+  var bgStroke = acgraph.vector.normalizeStroke(this.bgStroke_);
+  bgStroke['opacity'] = value;
+
+  var sliderFill = acgraph.vector.normalizeFill(this.sliderFill_);
+  sliderFill['opacity'] = value;
+
+  var sliderStroke = acgraph.vector.normalizeStroke(this.sliderStroke_);
+  sliderStroke['opacity'] = value;
+
+  this.backgroundFill(bgFill).backgroundStroke(bgStroke);
+  this.sliderFill(sliderFill).sliderStroke(sliderStroke);
+  this.resumeSignalsDispatching(true);
+};
+
+
+/**
+ * Mouse over handler.
+ * @private
+ */
+anychart.core.ui.ScrollBar.prototype.baseMouseOverHandler_ = function() {
+  this.setOpacity_(this.mouseOverOpacity_);
+};
+
+
+/**
+ * Mouse out handler.
+ * @private
+ */
+anychart.core.ui.ScrollBar.prototype.baseMouseOutHandler_ = function() {
+  this.setOpacity_(this.mouseOutOpacity_);
 };
 
 
@@ -1138,7 +1255,10 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
   var isVertical = this.isVertical_();
   var b = this.pixelBoundsCache_;
 
-  this.bg_.setBounds(b);
+  var width = Math.min(b.width, b.height);
+  var round = Math.min(anychart.core.ui.ScrollBar.MAX_ROUND, width / 2);
+
+  this.bg_.setBounds(b).round(round);
   var sliderLeft, sliderTop, sliderWidth, sliderHeight;
   var drag, dragLeft, dragTop, dragWidth, dragHeight;
 
@@ -1185,10 +1305,11 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
       b.height;
 
   this.slider_
-      .setX(sliderLeft)
-      .setY(sliderTop)
-      .setWidth(sliderWidth)
-      .setHeight(sliderHeight)
+      .setX(this.halfPixel(sliderLeft))
+      .setY(this.halfPixel(sliderTop))
+      .setWidth(Math.round(sliderWidth))
+      .setHeight(Math.round(sliderHeight))
+      .round(round)
       .drag(drag);
 
   this.slider_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
@@ -1218,6 +1339,13 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
+
+      //Prevents blurring of scroll.
+      this.pixelBoundsCache_.left = this.halfPixel(this.pixelBoundsCache_.left);
+      this.pixelBoundsCache_.top = this.halfPixel(this.pixelBoundsCache_.top);
+      this.pixelBoundsCache_.width = Math.round(this.pixelBoundsCache_.width);
+      this.pixelBoundsCache_.height = Math.round(this.pixelBoundsCache_.height);
+
       this.placeButtons_();
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -1236,7 +1364,12 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
-      this.drawInternal_();
+      if (this.startRatio_ <= 0 && this.endRatio_ >= 1) {
+        this.getBase_().visible(false);
+      } else {
+        this.getBase_().visible(true);
+        this.drawInternal_();
+      }
       this.markConsistent(anychart.ConsistencyState.POSITION);
     }
 

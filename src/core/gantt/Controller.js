@@ -239,6 +239,17 @@ anychart.core.gantt.Controller.prototype.traverseChildrenCondition_ = function(i
 
 
 /**
+ * Function that decides whether data item has children.
+ * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @return {boolean} - Whether data item has children.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.itemHasChildrenCondition_ = function(item) {
+  return !!item.numChildren();
+};
+
+
+/**
  * Linearizes tree. Used to add necessary meta information to data items in a straight tree passage.
  * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  * @private
@@ -693,7 +704,11 @@ anychart.core.gantt.Controller.prototype.run = function() {
 anychart.core.gantt.Controller.prototype.getScrollBar = function() {
   if (!this.verticalScrollBar_) {
     this.verticalScrollBar_ = new anychart.core.ui.ScrollBar();
-    this.verticalScrollBar_.layout(anychart.enums.Layout.VERTICAL);
+    this.verticalScrollBar_
+        .layout(anychart.enums.Layout.VERTICAL)
+        .buttonsVisible(false)
+        .mouseOutOpacity(.25)
+        .mouseOverOpacity(.45);
 
     var controller = this;
 
@@ -704,7 +719,7 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
 
       controller.suspendSignalsDispatching();
 
-      if (startRatio == 0) { //This fixed JS rounding troubles.
+      if (startRatio == 0) { //This fixes JS rounding.
         controller
             .verticalOffset(0)
             .startIndex(0);
@@ -793,9 +808,10 @@ anychart.core.gantt.Controller.prototype.scrollToEnd = function(opt_index) {
  */
 anychart.core.gantt.Controller.prototype.collapseAll_ = function(value) {
   this.data_.suspendSignalsDispatching();
-  var fullPassageTraverser = this.data_.getTraverser();
-  while (fullPassageTraverser.advance()) {
-    var item = fullPassageTraverser.current();
+  var traverser = this.data_.getTraverser();
+  traverser.nodeYieldCondition(this.itemHasChildrenCondition_);
+  while (traverser.advance()) {
+    var item = traverser.current();
     item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
   }
 
