@@ -250,7 +250,7 @@ anychart.core.ui.DataGrid = function() {
   tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
   tooltip.content().hAlign(anychart.enums.Align.LEFT);
   tooltip.contentFormatter(function(data) {
-    return data['item'].get(anychart.enums.GanttDataFields.NAME) + '';
+    return data.get(anychart.enums.GanttDataFields.NAME) + '';
   });
   tooltip.resumeSignalsDispatching(false);
 
