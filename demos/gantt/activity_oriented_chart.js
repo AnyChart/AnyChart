@@ -14,7 +14,7 @@ anychart.onDocumentReady(function() {
   }).title().text('Start Time');
 
   dataGrid.column(3).width(70).textFormatter(function(item) {
-    var date = new Date(item.get('actualStart'));
+    var date = new Date(item.get('actualEnd'));
     return date.getFullYear() + '.' + date.getMonth() + '.' + date.getDay();
   }).title().text('End Time');
 

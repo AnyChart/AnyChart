@@ -1010,7 +1010,9 @@ anychart.enums.EventType = {
 
   SPLITTER_CHANGE: 'splitterChange',
 
-  SIGNAL: 'signal'
+  SIGNAL: 'signal',
+
+  ROW_HOVER: 'rowHover'
 };
 
 

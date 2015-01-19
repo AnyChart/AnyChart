@@ -6,6 +6,7 @@ goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.Button');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Splitter');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
@@ -166,25 +167,39 @@ anychart.core.ui.DataGrid = function() {
   this.evenPath_ = null;
 
   /**
+   * Hover path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.hoverPath_ = null;
+
+  /**
    * Odd fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.cellOddFill_ = acgraph.vector.normalizeFill('#fafafa');
+  this.rowOddFill_ = acgraph.vector.normalizeFill('#fafafa');
 
   /**
    * Even fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.cellEvenFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowEvenFill_ = acgraph.vector.normalizeFill('#fff');
 
   /**
-   * Default cells fill.
+   * Default rows fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.cellFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowFill_ = acgraph.vector.normalizeFill('#fff');
+
+  /**
+   * Default hover fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
 
   /**
    * Default title fill.
@@ -192,6 +207,29 @@ anychart.core.ui.DataGrid = function() {
    * @private
    */
   this.titleFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
+
+  /**
+   * TODO (A.Kudryavtsev): Describe!
+   * @type {Array.<number>}
+   * @private
+   */
+  this.gridHeightCache_ = [];
+
+  /**
+   * TODO (A.Kudryavtsev): Describe.
+   * @type {number}
+   * @private
+   */
+  this.hoveredIndex_ = -1;
+
+
+  /**
+   * Data grid tooltip.
+   * @type {anychart.core.ui.Tooltip}
+   * @private
+   */
+  this.tooltip_ = null;
+
 
   this.column(0).textFormatter(function(item) {
     return goog.isDefAndNotNull(item.meta('index')) ? (item.meta('index') + 1) + '' : '';
@@ -204,6 +242,18 @@ anychart.core.ui.DataGrid = function() {
         return goog.isDefAndNotNull(item.get('name')) ? item.get('name') + '' : '';
       })
       .depthPaddingMultiplier(3 * anychart.core.ui.DataGrid.DEFAULT_PADDING);
+
+
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  tooltip.suspendSignalsDispatching();
+  tooltip.isFloating(true);
+  tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
+  tooltip.content().hAlign(anychart.enums.Align.LEFT);
+  tooltip.contentFormatter(function(data) {
+    return data['item'].get(anychart.enums.GanttDataFields.NAME) + '';
+  });
+  tooltip.resumeSignalsDispatching(false);
+
 };
 goog.inherits(anychart.core.ui.DataGrid, anychart.core.VisualBaseWithBounds);
 
@@ -310,7 +360,7 @@ anychart.core.ui.DataGrid.prototype.titleFill = function(opt_fillOrColorOrKeys, 
 
 
 /**
- * Gets/sets a default cell fill. Resets cells odd fill and cells even fill.
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -320,23 +370,38 @@ anychart.core.ui.DataGrid.prototype.titleFill = function(opt_fillOrColorOrKeys, 
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
  */
-anychart.core.ui.DataGrid.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.ui.DataGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellFill_), val)) {
-      this.cellFill_ = val;
-      this.cellOddFill_ = null;
-      this.cellEvenFill_ = null;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowFill_), val)) {
+      this.rowFill_ = val;
+      this.rowOddFill_ = null;
+      this.rowEvenFill_ = null;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellFill_;
+  return this.rowFill_;
 };
 
 
 /**
- * Gets/sets a odd cell fill.
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowFill} instead.
+ */
+anychart.core.ui.DataGrid.prototype.cellFill = anychart.core.ui.DataGrid.prototype.rowFill;
+
+
+/**
+ * Gets/sets row odd fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -346,21 +411,36 @@ anychart.core.ui.DataGrid.prototype.cellFill = function(opt_fillOrColorOrKeys, o
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
  */
-anychart.core.ui.DataGrid.prototype.cellOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.ui.DataGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellOddFill_), val)) {
-      this.cellOddFill_ = val;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_), val)) {
+      this.rowOddFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellOddFill_;
+  return this.rowOddFill_;
 };
 
 
 /**
- * Gets/sets an even cell fill.
+ * Gets/sets row odd fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowOddFill} instead.
+ */
+anychart.core.ui.DataGrid.prototype.cellOddFill = anychart.core.ui.DataGrid.prototype.rowOddFill;
+
+
+/**
+ * Gets/sets row even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -370,16 +450,56 @@ anychart.core.ui.DataGrid.prototype.cellOddFill = function(opt_fillOrColorOrKeys
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
  */
-anychart.core.ui.DataGrid.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.ui.DataGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellEvenFill_), val)) {
-      this.cellEvenFill_ = val;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_), val)) {
+      this.rowEvenFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellEvenFill_;
+  return this.rowEvenFill_;
+};
+
+
+/**
+ * Gets/sets row even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowEvenFill} instead.
+ */
+anychart.core.ui.DataGrid.prototype.cellEvenFill = anychart.core.ui.DataGrid.prototype.rowEvenFill;
+
+
+/**
+ * Gets/sets row hover fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.DataGrid.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
+      //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
+      this.hoverFill_ = val;
+      this.getHoverPath_().fill(this.hoverFill_);
+    }
+    return this;
+  }
+  return this.hoverFill_;
 };
 
 
@@ -475,8 +595,107 @@ anychart.core.ui.DataGrid.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.registerDisposable(this.base_);
+
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
   }
   return this.base_;
+};
+
+
+/**
+ * Handler for mouse move.
+ * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
+  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+
+  var mouseHeight = event.offsetY - this.titleHeight_;
+
+  if (this.gridHeightCache_.length) {
+    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
+    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight + this.verticalOffset_);
+      index = index >= 0 ? index : ~index; //Index of row under mouse.
+
+      if (index != this.hoveredIndex_) {
+        var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
+        var startY = initialTop + startHeight;
+        var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
+        this.highlight(index, startY, endY);
+      }
+
+      var itemIndex = this.startIndex_ + index;
+      var item = this.visibleItems_[itemIndex];
+
+      var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+      var position = tooltip.isFloating() ? new acgraph.math.Coordinate(event.clientX, event.clientY) : new acgraph.math.Coordinate(0, 0);
+      tooltip.show(item, position);
+
+    } else {
+      this.tooltip().hide();
+      this.highlight();
+      this.hoveredIndex_ = -1;
+    }
+
+  }
+};
+
+
+/**
+ * Handler for mouse out.
+ * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
+  this.tooltip().hide();
+  this.highlight();
+  this.hoveredIndex_ = -1;
+};
+
+
+/**
+ * Highlights selected vertical range.
+ * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
+ * @param {number=} opt_index - Index of row.
+ * @param {number=} opt_startY - Start Y to be highlighted.
+ * @param {number=} opt_endY - End Y to be highlighted.
+ * @param {boolean=} opt_preventDispatching - If dispatching should be prevented.
+ */
+anychart.core.ui.DataGrid.prototype.highlight = function(opt_index, opt_startY, opt_endY, opt_preventDispatching) {
+  if (goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY)) {
+    this.hoveredIndex_ = opt_index;
+
+    this.getHoverPath_()
+        .clear()
+        .moveTo(this.pixelBoundsCache_.left, opt_startY)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, opt_startY)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, opt_endY)
+        .lineTo(this.pixelBoundsCache_.left, opt_endY)
+        .close();
+
+    if (!opt_preventDispatching) this.dispatchEvent({
+      'type': anychart.enums.EventType.ROW_HOVER,
+      'index': opt_index,
+      'startY': opt_startY,
+      'endY': opt_endY
+    });
+
+  } else {
+    if (this.hoveredIndex_ >= 0) {
+      this.getHoverPath_().clear();
+
+      if (!opt_preventDispatching) this.dispatchEvent({
+        'type': anychart.enums.EventType.ROW_HOVER,
+        'index': opt_index,
+        'startY': opt_startY,
+        'endY': opt_endY
+      });
+    }
+  }
 };
 
 
@@ -549,6 +768,21 @@ anychart.core.ui.DataGrid.prototype.getEvenPath_ = function() {
     this.registerDisposable(this.evenPath_);
   }
   return this.evenPath_;
+};
+
+
+/**
+ * Getter for this.hoverPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.getHoverPath_ = function() {
+  if (!this.hoverPath_) {
+    this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
+    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.registerDisposable(this.hoverPath_);
+  }
+  return this.hoverPath_;
 };
 
 
@@ -736,12 +970,52 @@ anychart.core.ui.DataGrid.prototype.verticalOffset = function(opt_value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
+ * @return {!(anychart.core.ui.DataGrid|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
+ */
+anychart.core.ui.DataGrid.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.registerDisposable(this.tooltip_);
+    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Tooltip invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.onTooltipSignal_ = function(event) {
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  tooltip.redraw();
+};
+
+
 /**
  * Draws cells depending on data.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.drawRowFills_ = function() {
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var totalTop = initialTop;
+  this.highlight();
+  this.gridHeightCache_.length = 0;
+  this.hoveredIndex_ = -1;
 
   this.getEvenPath_().clear();
   this.getOddPath_().clear();
@@ -762,6 +1036,7 @@ anychart.core.ui.DataGrid.prototype.drawRowFills_ = function() {
         .close();
 
     totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
+    this.gridHeightCache_.push(totalTop - initialTop);
   }
 };
 
@@ -1082,6 +1357,8 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) { //Actually sets rows for each columns.
+      this.tooltip().hide();
+
       var columnsWidth = 0;
       var splitWidth = this.splitters_[0] ? this.splitters_[0].splitterWidth() : 1;
 
@@ -1097,8 +1374,8 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) { //Actually redraws columns and their positions.
       this.bgRect_.fill(this.backgroundFill_);
-      this.getOddPath_().fill(this.cellOddFill_ || this.cellFill_);
-      this.getEvenPath_().fill(this.cellEvenFill_ || this.cellFill_);
+      this.getOddPath_().fill(this.rowOddFill_ || this.rowFill_);
+      this.getEvenPath_().fill(this.rowEvenFill_ || this.rowFill_);
 
       this.forEachVisibleColumn_(function(col) {
         col.invalidate(anychart.ConsistencyState.APPEARANCE);
@@ -1131,9 +1408,9 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
   json['titleHeight'] = this.titleHeight_;
   json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
   json['cellBorder'] = anychart.color.serialize(this.cellBorder_);
-  json['cellOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.cellOddFill_));
-  json['cellEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.cellEvenFill_));
-  json['cellFill'] = anychart.color.serialize(this.cellFill_);
+  json['rowOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_));
+  json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
+  json['rowFill'] = anychart.color.serialize(this.rowFill_);
   json['titleFill'] = anychart.color.serialize(this.titleFill_);
 
   for (var i = 0; i < this.columns_.length; i++) {
@@ -1156,9 +1433,9 @@ anychart.core.ui.DataGrid.prototype.setupByJSON = function(json) {
       .titleHeight(json['titleHeight'])
       .backgroundFill(json['backgroundFill'])
       .cellBorder(json['cellBorder'])
-      .cellOddFill(json['cellOddFill'])
-      .cellEvenFill(json['cellEvenFill'])
-      .cellFill(json['cellFill'])
+      .rowOddFill(json['rowOddFill'])
+      .rowEvenFill(json['rowEvenFill'])
+      .rowFill(json['rowFill'])
       .titleFill(json['titleFill']);
 
   for (var i = 0; i < json['columns'].length; i++) {
@@ -1991,9 +2268,14 @@ anychart.core.ui.DataGrid.Button.prototype.dataItemIndex = function(opt_value) {
 
 //exports
 anychart.core.ui.DataGrid.prototype['cellBorder'] = anychart.core.ui.DataGrid.prototype.cellBorder;
-anychart.core.ui.DataGrid.prototype['cellFill'] = anychart.core.ui.DataGrid.prototype.cellFill;
-anychart.core.ui.DataGrid.prototype['cellEvenFill'] = anychart.core.ui.DataGrid.prototype.cellEvenFill;
-anychart.core.ui.DataGrid.prototype['cellOddFill'] = anychart.core.ui.DataGrid.prototype.cellOddFill;
+anychart.core.ui.DataGrid.prototype['cellFill'] = anychart.core.ui.DataGrid.prototype.cellFill; //deprecated
+anychart.core.ui.DataGrid.prototype['cellEvenFill'] = anychart.core.ui.DataGrid.prototype.cellEvenFill; //deprecated
+anychart.core.ui.DataGrid.prototype['cellOddFill'] = anychart.core.ui.DataGrid.prototype.cellOddFill; //deprecated
+anychart.core.ui.DataGrid.prototype['rowFill'] = anychart.core.ui.DataGrid.prototype.rowFill;
+anychart.core.ui.DataGrid.prototype['rowEvenFill'] = anychart.core.ui.DataGrid.prototype.rowEvenFill;
+anychart.core.ui.DataGrid.prototype['rowOddFill'] = anychart.core.ui.DataGrid.prototype.rowOddFill;
+anychart.core.ui.DataGrid.prototype['rowHoverFill'] = anychart.core.ui.DataGrid.prototype.rowHoverFill;
+
 anychart.core.ui.DataGrid.prototype['backgroundFill'] = anychart.core.ui.DataGrid.prototype.backgroundFill;
 anychart.core.ui.DataGrid.prototype['titleHeight'] = anychart.core.ui.DataGrid.prototype.titleHeight;
 anychart.core.ui.DataGrid.prototype['column'] = anychart.core.ui.DataGrid.prototype.column;

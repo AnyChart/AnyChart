@@ -5,6 +5,7 @@ goog.require('anychart.core.gantt.TimelineHeader');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.ScrollBar');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.scales.GanttDateTime');
 
@@ -129,25 +130,39 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.evenPath_ = null;
 
   /**
+   * Hover path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.hoverPath_ = null;
+
+  /**
    * Odd fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.cellOddFill_ = acgraph.vector.normalizeFill('#fafafa');
+  this.rowOddFill_ = acgraph.vector.normalizeFill('#fafafa');
 
   /**
    * Even fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.cellEvenFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowEvenFill_ = acgraph.vector.normalizeFill('#fff');
 
   /**
-   * Default cells fill.
+   * Default rows fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.cellFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowFill_ = acgraph.vector.normalizeFill('#fff');
+
+  /**
+   * Default hover fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
 
   /**
    * Start index of this.visibleItems_. Actually is a first visible data item of data grid.
@@ -165,7 +180,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
 
   /**
    * Vertical offset.
-   * @type {number}
+   * @type {number} //deprecated
    * @private
    */
   this.verticalOffset_ = 0;
@@ -273,6 +288,27 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    */
   this.connectorStroke_ = acgraph.vector.normalizeStroke('#000090');
 
+  /**
+   * TODO (A.Kudryavtsev): Describe!
+   * @type {Array.<number>}
+   * @private
+   */
+  this.gridHeightCache_ = [];
+
+  /**
+   * TODO (A.Kudryavtsev): Describe.
+   * @type {number}
+   * @private
+   */
+  this.hoveredIndex_ = -1;
+
+  /**
+   * Timeline tooltip.
+   * @type {anychart.core.ui.Tooltip}
+   * @private
+   */
+  this.tooltip_ = null;
+
 
   /**
    * Date time scale.
@@ -289,6 +325,27 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.header_.zIndex(anychart.core.gantt.Timeline.HEADER_Z_INDEX);
   this.header_.resumeSignalsDispatching(false);
   this.registerDisposable(this.header_);
+
+
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  tooltip.suspendSignalsDispatching();
+  tooltip.isFloating(true);
+  tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
+  tooltip.content().hAlign(anychart.enums.Align.LEFT);
+  tooltip.contentFormatter(function(data) {
+    /*
+      Argument data is an instance of TreeDataItem (ProjectChart) or an object like this (ResourceChart):
+      {
+        'item': TreeDataItem,
+        'period': { ..RawPeriodObject.. }
+      }
+     */
+    var isTreeDataItem = data instanceof anychart.data.Tree.DataItem; //If item is tree data item.
+    return isTreeDataItem ?
+        data.get(anychart.enums.GanttDataFields.NAME) + '' :
+        data['item'].get(anychart.enums.GanttDataFields.NAME) + '';
+  });
+  tooltip.resumeSignalsDispatching(false);
 
 };
 goog.inherits(anychart.core.gantt.Timeline, anychart.core.VisualBaseWithBounds);
@@ -445,7 +502,7 @@ anychart.core.gantt.Timeline.prototype.getScale = function() {
 
 
 /**
- * Gets/sets a default cell fill. Resets cells odd fill and cells even fill.
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -455,23 +512,38 @@ anychart.core.gantt.Timeline.prototype.getScale = function() {
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
  */
-anychart.core.gantt.Timeline.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.gantt.Timeline.prototype.rowFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellFill_), val)) {
-      this.cellFill_ = val;
-      this.cellOddFill_ = null;
-      this.cellEvenFill_ = null;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowFill_), val)) {
+      this.rowFill_ = val;
+      this.rowOddFill_ = null;
+      this.rowEvenFill_ = null;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellFill_;
+  return this.rowFill_;
 };
 
 
 /**
- * Gets/sets a odd cell fill.
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowFill} instead.
+ */
+anychart.core.gantt.Timeline.prototype.cellFill = anychart.core.gantt.Timeline.prototype.rowFill;
+
+
+/**
+ * Gets/sets row odd fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -481,21 +553,36 @@ anychart.core.gantt.Timeline.prototype.cellFill = function(opt_fillOrColorOrKeys
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
  */
-anychart.core.gantt.Timeline.prototype.cellOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.gantt.Timeline.prototype.rowOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellOddFill_), val)) {
-      this.cellOddFill_ = val;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_), val)) {
+      this.rowOddFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellOddFill_;
+  return this.rowOddFill_;
 };
 
 
 /**
- * Gets/sets an even cell fill.
+ * Gets/sets row odd fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowOddFill} instead.
+ */
+anychart.core.gantt.Timeline.prototype.cellOddFill = anychart.core.gantt.Timeline.prototype.rowOddFill;
+
+
+/**
+ * Gets/sets row even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -505,16 +592,56 @@ anychart.core.gantt.Timeline.prototype.cellOddFill = function(opt_fillOrColorOrK
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
  */
-anychart.core.gantt.Timeline.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.gantt.Timeline.prototype.rowEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.cellEvenFill_), val)) {
-      this.cellEvenFill_ = val;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_), val)) {
+      this.rowEvenFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.cellEvenFill_;
+  return this.rowEvenFill_;
+};
+
+
+/**
+ * Gets/sets row even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowEvenFill} instead.
+ */
+anychart.core.gantt.Timeline.prototype.cellEvenFill = anychart.core.gantt.Timeline.prototype.rowEvenFill;
+
+
+/**
+ * Gets/sets row hover fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
+      //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
+      this.hoverFill_ = val;
+      this.getHoverPath_().fill(this.hoverFill_);
+    }
+    return this;
+  }
+  return this.hoverFill_;
 };
 
 
@@ -573,6 +700,21 @@ anychart.core.gantt.Timeline.prototype.getEvenPath_ = function() {
 
 
 /**
+ * Getter for this.hoverPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.getHoverPath_ = function() {
+  if (!this.hoverPath_) {
+    this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
+    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.registerDisposable(this.hoverPath_);
+  }
+  return this.hoverPath_;
+};
+
+
+/**
  * Getter for this.separationPath_.
  * @return {acgraph.vector.Path}
  * @private
@@ -622,14 +764,86 @@ anychart.core.gantt.Timeline.prototype.getSeparationLayer_ = function() {
  */
 anychart.core.gantt.Timeline.prototype.getDataLayer_ = function() {
   if (!this.dataLayer_) {
+    var ths = this;
     this.dataLayer_ = new anychart.core.utils.TypedLayer(function() {
-      return acgraph.path();
+      var path = acgraph.path();
+      acgraph.events.listen(path, acgraph.events.EventType.MOUSEMOVE, ths.mouseMoveTooltipHandler_, false, ths);
+      acgraph.events.listen(path, acgraph.events.EventType.MOUSEOUT, ths.mouseOutTooltipHandler_, false, ths);
+      return path;
     }, function(child) {
       (/** @type {acgraph.vector.Path} */ (child)).fill(null).stroke(null).clear();
     });
     this.registerDisposable(this.dataLayer_);
   }
   return this.dataLayer_;
+};
+
+
+/**
+ * Handler for tooltip mouse move.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.mouseMoveTooltipHandler_ = function(event) {
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+
+  var path = event['target'];
+  var id = path['__id'];
+  if (goog.isDef(id)) {
+    var map = this.isResourceChart_ ? this.controller_.getPeriodsMap() : this.controller_.getVisibleItemsMap();
+    var mapItem = map[id];
+    var item = this.isResourceChart_ ? {'item': this.visibleItems_[mapItem['index']], 'period': mapItem['period']} : mapItem['item'];
+    if (item) {
+      var position = tooltip.isFloating() ? new acgraph.math.Coordinate(event.clientX, event.clientY) : new acgraph.math.Coordinate(0, 0);
+      tooltip.show(item, position);
+    }
+  }
+};
+
+
+/**
+ * Handler for tooltip mouse out.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.mouseOutTooltipHandler_ = function(event) {
+  this.tooltip().hide();
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
+ * @return {!(anychart.core.gantt.Timeline|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.registerDisposable(this.tooltip_);
+    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Tooltip invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.onTooltipSignal_ = function(event) {
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  tooltip.redraw();
 };
 
 
@@ -678,8 +892,98 @@ anychart.core.gantt.Timeline.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.registerDisposable(this.base_);
+
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
+    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
   }
   return this.base_;
+};
+
+
+/**
+ * Handler for mouse move.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.mouseMoveHandler_ = function(event) {
+  var headerHeight = this.header_.getPixelBounds().height;
+  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+
+  var mouseHeight = event.offsetY - headerHeight;
+
+  if (this.gridHeightCache_.length) {
+    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
+    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight + this.verticalOffset_);
+      index = index >= 0 ? index : ~index; //Index of row under mouse.
+
+      if (index != this.hoveredIndex_) {
+        var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
+        var startY = initialTop + startHeight;
+        var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
+        this.highlight(index, startY, endY);
+      }
+
+    } else {
+      this.highlight();
+      this.hoveredIndex_ = -1;
+    }
+
+  }
+};
+
+
+/**
+ * Handler for mouse out.
+ * @param {acgraph.events.Event} event - Event.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.mouseOutHandler_ = function(event) {
+  this.highlight();
+  this.hoveredIndex_ = -1;
+};
+
+
+/**
+ * Highlights selected vertical range.
+ * @param {number=} opt_index - Index of row.
+ * @param {number=} opt_startY - Start Y to be highlighted.
+ * @param {number=} opt_endY - End Y to be highlighted.
+ * @param {boolean=} opt_preventDispatching - If dispatching should be prevented.
+ */
+anychart.core.gantt.Timeline.prototype.highlight = function(opt_index, opt_startY, opt_endY, opt_preventDispatching) {
+  if (goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY)) {
+    this.hoveredIndex_ = opt_index;
+
+    this.getHoverPath_()
+        .clear()
+        .moveTo(this.pixelBoundsCache_.left, opt_startY)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, opt_startY)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, opt_endY)
+        .lineTo(this.pixelBoundsCache_.left, opt_endY)
+        .close();
+
+    if (!opt_preventDispatching) this.dispatchEvent({
+      'type': anychart.enums.EventType.ROW_HOVER,
+      'index': opt_index,
+      'startY': opt_startY,
+      'endY': opt_endY
+    });
+
+  } else {
+    if (this.hoveredIndex_ >= 0) {
+      this.getHoverPath_().clear();
+
+      if (!opt_preventDispatching) this.dispatchEvent({
+        'type': anychart.enums.EventType.ROW_HOVER,
+        'index': opt_index,
+        'startY': opt_startY,
+        'endY': opt_endY
+      });
+
+    }
+  }
+
 };
 
 
@@ -701,7 +1005,11 @@ anychart.core.gantt.Timeline.prototype.halfPixel = function(actualPx) {
  */
 anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
   var headerHeight = this.header_.getPixelBounds().height;
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var totalTop = initialTop;
+  this.highlight();
+  this.gridHeightCache_.length = 0;
+  this.hoveredIndex_ = -1;
 
   this.getEvenPath_().clear();
   this.getOddPath_().clear();
@@ -722,6 +1030,7 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
         .close();
 
     totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
+    this.gridHeightCache_.push(totalTop - initialTop);
   }
 };
 
@@ -841,6 +1150,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
   }
 
   var bar = this.getDataLayer_().genNextChild();
+  bar['__id'] = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : item[anychart.enums.GanttDataFields.ID];
 
   var w = bounds.left + bounds.width;
   var h = bounds.top + bounds.height;
@@ -865,8 +1175,6 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
         .lineTo(bounds.left, h);
   }
   bar.close();
-
-
 
   if (settings) {
     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
@@ -1134,6 +1442,7 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
     var centerTop = this.halfPixel(totalTop + itemHeight / 2);
 
     var milestone = this.getDataLayer_().genNextChild();
+    milestone['__id'] = dataItem.get(anychart.enums.GanttDataFields.ID);
 
     milestone
         .zIndex(anychart.core.gantt.Timeline.BASE_Z_INDEX)
@@ -1728,8 +2037,8 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
       this.bgRect_.fill(this.backgroundFill_);
-      this.getOddPath_().fill(this.cellOddFill_ || this.cellFill_);
-      this.getEvenPath_().fill(this.cellEvenFill_ || this.cellFill_);
+      this.getOddPath_().fill(this.rowOddFill_ || this.rowFill_);
+      this.getEvenPath_().fill(this.rowEvenFill_ || this.rowFill_);
 
 
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -1748,6 +2057,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
     }
 
     if (redrawHeader || redrawPosition) {
+      this.tooltip().hide();
       this.drawRowFills_();
       this.drawTimelineElements_();
     }
@@ -1839,7 +2149,11 @@ anychart.core.gantt.Timeline.prototype.scroll = function(horizontalPixelOffset, 
 
 
 //exports
-anychart.core.gantt.Timeline.prototype['cellOddFill'] = anychart.core.gantt.Timeline.prototype.cellOddFill;
-anychart.core.gantt.Timeline.prototype['cellEvenFill'] = anychart.core.gantt.Timeline.prototype.cellEvenFill;
-anychart.core.gantt.Timeline.prototype['cellFill'] = anychart.core.gantt.Timeline.prototype.cellFill;
+anychart.core.gantt.Timeline.prototype['cellOddFill'] = anychart.core.gantt.Timeline.prototype.cellOddFill; //deprecated
+anychart.core.gantt.Timeline.prototype['cellEvenFill'] = anychart.core.gantt.Timeline.prototype.cellEvenFill; //deprecated
+anychart.core.gantt.Timeline.prototype['cellFill'] = anychart.core.gantt.Timeline.prototype.cellFill; //deprecated
+anychart.core.gantt.Timeline.prototype['rowFill'] = anychart.core.gantt.Timeline.prototype.rowFill;
+anychart.core.gantt.Timeline.prototype['rowEvenFill'] = anychart.core.gantt.Timeline.prototype.rowEvenFill;
+anychart.core.gantt.Timeline.prototype['rowOddFill'] = anychart.core.gantt.Timeline.prototype.rowOddFill;
+anychart.core.gantt.Timeline.prototype['rowHoverFill'] = anychart.core.gantt.Timeline.prototype.rowHoverFill;
 anychart.core.gantt.Timeline.prototype['backgroundFill'] = anychart.core.gantt.Timeline.prototype.backgroundFill;

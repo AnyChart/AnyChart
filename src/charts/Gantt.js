@@ -5,6 +5,8 @@ goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.Splitter');
 
+goog.require('goog.i18n.DateTimeFormat');
+
 
 
 /**
@@ -90,6 +92,13 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.headerHeight_ = anychart.core.gantt.Timeline.DEFAULT_HEADER_HEIGHT;
 
   /**
+   * Default hover fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
+
+  /**
    * Vertical scroll bar.
    * @type {anychart.core.ui.ScrollBar}
    * @private
@@ -118,6 +127,8 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    */
   this.initialRendering_ = true;
 
+  this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
+
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.Chart);
 
@@ -145,6 +156,13 @@ anychart.charts.Gantt.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.charts.Gantt.prototype.SUPPORTED_SIGNALS =
     anychart.core.Chart.prototype.SUPPORTED_SIGNALS;
+
+
+/**
+ * Default date time pattern.
+ * @type {string}
+ */
+anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN = 'yyyy.MM.dd';
 
 
 /**
@@ -238,11 +256,9 @@ anychart.charts.Gantt.prototype.headerHeight = function(opt_value) {
 
 /**
  * Getter for data grid.
- * TODO (A.Kudryavtsev): Turn it to getter for a while?
- * @param {(null|string|Object|anychart.core.ui.DataGrid)=} opt_value - Value to be set.
- * @return {anychart.core.ui.DataGrid} - Chart's timeline.
+ * @return {anychart.core.ui.DataGrid} - Chart's data grid.
  */
-anychart.charts.Gantt.prototype.getDataGrid = function(opt_value) {
+anychart.charts.Gantt.prototype.getDataGrid = function() {
   if (!this.dg_) {
     this.dg_ = new anychart.core.ui.DataGrid();
     this.dg_.controller(this.controller_);
@@ -252,6 +268,32 @@ anychart.charts.Gantt.prototype.getDataGrid = function(opt_value) {
     this.dg_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
+
+    this.dg_.listen(anychart.enums.EventType.ROW_HOVER, function(e) {
+      ths.tl_.highlight(e['index'], e['startY'], e['endY'], true);
+    });
+
+    this.dg_.tooltip().contentFormatter(function(data) {
+      //data here is always a tree data item.
+
+      var name = data.get(anychart.enums.GanttDataFields.NAME);
+
+      var startDate = ths.isResourcesChart_ ?
+          data.meta('minPeriodDate') :
+          data.get(anychart.enums.GanttDataFields.ACTUAL_START);
+
+      var endDate = ths.isResourcesChart_ ?
+          data.meta('maxPeriodDate') :
+          data.get(anychart.enums.GanttDataFields.ACTUAL_END);
+
+      var progress = ths.isResourcesChart_ ? data.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) : void 0;
+
+      return (name ? name + '\n' : '') +
+          (startDate ? 'Start Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) + '\n' : '') +
+          (endDate ? 'End Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+          (progress ? '\nComplete: ' + progress : '');
+
+    });
   }
 
   return this.dg_;
@@ -260,11 +302,9 @@ anychart.charts.Gantt.prototype.getDataGrid = function(opt_value) {
 
 /**
  * Getter for timeline.
- * TODO (A.Kudryavtsev): Turn it to getter for a while?
- * @param {(null|string|Object|anychart.core.gantt.Timeline)=} opt_value - Value to be set.
  * @return {anychart.core.gantt.Timeline} - Chart's timeline.
  */
-anychart.charts.Gantt.prototype.getTimeline = function(opt_value) {
+anychart.charts.Gantt.prototype.getTimeline = function() {
   if (!this.tl_) {
     this.tl_ = new anychart.core.gantt.Timeline(this.controller_, this.isResourcesChart_);
     this.tl_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
@@ -273,9 +313,59 @@ anychart.charts.Gantt.prototype.getTimeline = function(opt_value) {
     this.tl_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
+
+    this.tl_.listen(anychart.enums.EventType.ROW_HOVER, function(e) {
+      ths.dg_.highlight(e['index'], e['startY'], e['endY'], true);
+    });
+
+    this.tl_.tooltip().contentFormatter(function(data) {
+      var isTreeDataItem = data instanceof anychart.data.Tree.DataItem; //If item is tree data item.
+
+      var name = isTreeDataItem ?
+          data.get(anychart.enums.GanttDataFields.NAME) :
+          data['item'].get(anychart.enums.GanttDataFields.NAME);
+
+      var startDate = isTreeDataItem ?
+          data.get(anychart.enums.GanttDataFields.ACTUAL_START) :
+          data['period'][anychart.enums.GanttDataFields.START];
+
+      var endDate = isTreeDataItem ?
+          data.get(anychart.enums.GanttDataFields.ACTUAL_END) :
+          data['period'][anychart.enums.GanttDataFields.END];
+
+      var progress = isTreeDataItem ? data.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) : void 0;
+
+      return (name ? name + '\n' : '') +
+          (startDate ? 'Start Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) + '\n' : '') +
+          (endDate ? 'End Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+          (progress ? '\nComplete: ' + progress : '');
+
+    });
   }
 
   return this.tl_;
+};
+
+
+/**
+ * Gets/sets row hover fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.hoverFill_ = acgraph.vector.normalizeFill.apply(null, arguments);
+    //rowHoverFill does not invalidate anything. Here's no need to suspend it.
+    this.getTimeline().rowHoverFill(this.hoverFill_);
+    this.getDataGrid().rowHoverFill(this.hoverFill_);
+  }
+  return this.hoverFill_;
 };
 
 
@@ -503,7 +593,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
       anychart.core.Base.resumeSignalsDispatchingTrue(ths.getDataGrid(), ths.getTimeline());
 
       ths.horizontalScrollBar_.bounds(
-          b2.left + anychart.charts.Gantt.SCROLL_BAR_SIDE,
+          (b2.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
           (b2.top + b2.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
           (b2.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
           anychart.charts.Gantt.SCROLL_BAR_SIDE
@@ -663,6 +753,7 @@ anychart.charts.Gantt.prototype['draw'] = anychart.charts.Gantt.prototype.draw;
 anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
 anychart.charts.Gantt.prototype['getDataGrid'] = anychart.charts.Gantt.prototype.getDataGrid;
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;
+anychart.charts.Gantt.prototype['rowHoverFill'] = anychart.charts.Gantt.prototype.rowHoverFill;
 anychart.charts.Gantt.prototype['zoomIn'] = anychart.charts.Gantt.prototype.zoomIn;
 anychart.charts.Gantt.prototype['zoomOut'] = anychart.charts.Gantt.prototype.zoomOut;
 anychart.charts.Gantt.prototype['zoomTo'] = anychart.charts.Gantt.prototype.zoomTo;

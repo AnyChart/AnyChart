@@ -331,6 +331,8 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
 
     if (this.isResourceChart_) {
       var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
+      var minPeriodDate = NaN;
+      var maxPeriodDate = NaN;
       if (goog.isArray(periods)) {
         //Working with raw array.
         for (var i = 0, l = periods.length; i < l; i++) {
@@ -354,10 +356,27 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             this.connectorsData_.push(connectorsMapItem);
           }
 
-          //This extends dates range.
-          this.checkDate_(period[anychart.enums.GanttDataFields.START]);
-          this.checkDate_(period[anychart.enums.GanttDataFields.END]);
+          var periodStart = period[anychart.enums.GanttDataFields.START];
+          var periodEnd = period[anychart.enums.GanttDataFields.END];
+
+          if (periodStart && periodEnd) {
+            minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
+            maxPeriodDate = isNaN(maxPeriodDate) ? Math.max(periodStart, periodEnd) : Math.max(maxPeriodDate, periodStart, periodEnd);
+
+            //This extends dates range.
+            this.checkDate_(periodStart);
+            this.checkDate_(periodEnd);
+          }
+
         }
+
+        if (!isNaN(minPeriodDate) && !isNaN(maxPeriodDate)) {
+          item.tree().suspendSignalsDispatching();
+          item.meta('minPeriodDate', minPeriodDate);
+          item.meta('maxPeriodDate', maxPeriodDate);
+          item.tree().resumeSignalsDispatching(false);
+        }
+
       }
     } else {
       //Building connectors map for project chart.
@@ -382,9 +401,8 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
  * @param {number} startIndex - Start index.
  * @param {number=} opt_endIndex - End index.
  * @return {number} - Actual height.
- * @private
  */
-anychart.core.gantt.Controller.prototype.getHeightByIndexes_ = function(startIndex, opt_endIndex) {
+anychart.core.gantt.Controller.prototype.getHeightByIndexes = function(startIndex, opt_endIndex) {
   if (!this.heightCache_.length) return 0;
 
   var cacheEnd = this.heightCache_.length - 1;
@@ -408,10 +426,9 @@ anychart.core.gantt.Controller.prototype.getHeightByIndexes_ = function(startInd
  * Calculates index related to height specified.
  * NOTE: Make sure height belongs to [0 .. this.heightCache_[this.heightCache_.length - 1]].
  * @param {number} height - Height.
- * @private
  * @return {number} - Index.
  */
-anychart.core.gantt.Controller.prototype.getIndexByHeight_ = function(height) {
+anychart.core.gantt.Controller.prototype.getIndexByHeight = function(height) {
   var index = goog.array.binarySearch(this.heightCache_, height);
   return index >= 0 ? index : ~index;
 };
@@ -425,7 +442,7 @@ anychart.core.gantt.Controller.prototype.getIndexByHeight_ = function(height) {
 anychart.core.gantt.Controller.prototype.recalculate = function() {
   if (this.visibleData_.length) {
 
-    var totalHeight = this.getHeightByIndexes_(0, this.heightCache_.length - 1);
+    var totalHeight = this.getHeightByIndexes(0, this.heightCache_.length - 1);
 
     if (this.availableHeight_ >= totalHeight) {
       this.startIndex_ = 0;
@@ -435,29 +452,29 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
       if (isNaN(this.startIndex_) && isNaN(this.endIndex_)) this.startIndex_ = 0;
 
       if (!isNaN(this.startIndex_)) { //Start index is set.
-        totalHeight = this.getHeightByIndexes_(this.startIndex_) - this.verticalOffset_;
+        totalHeight = this.getHeightByIndexes(this.startIndex_) - this.verticalOffset_;
         if (totalHeight < this.availableHeight_) { //Going from end of list.
-          this.startIndex_ = this.getIndexByHeight_(this.heightCache_[this.heightCache_.length - 1] - this.availableHeight_);
+          this.startIndex_ = this.getIndexByHeight(this.heightCache_[this.heightCache_.length - 1] - this.availableHeight_);
           this.endIndex_ = this.heightCache_.length - 1;
-          this.verticalOffset_ = this.getHeightByIndexes_(this.startIndex_, this.endIndex_) - this.availableHeight_;
+          this.verticalOffset_ = this.getHeightByIndexes(this.startIndex_, this.endIndex_) - this.availableHeight_;
         } else {
           var height = this.startIndex_ == 0 ? 0 : this.heightCache_[this.startIndex_ - 1];
-          this.endIndex_ = this.getIndexByHeight_(height + this.availableHeight_ + this.verticalOffset_);
+          this.endIndex_ = this.getIndexByHeight(height + this.availableHeight_ + this.verticalOffset_);
         }
       } else { //End index is set, start index must be NaN here.
-        totalHeight = this.getHeightByIndexes_(0, this.endIndex_);
+        totalHeight = this.getHeightByIndexes(0, this.endIndex_);
         if (totalHeight < this.availableHeight_) { //Going from start of list.
           this.startIndex_ = 0;
           this.verticalOffset_ = 0;
-          this.endIndex_ = this.getIndexByHeight_(this.availableHeight_);
+          this.endIndex_ = this.getIndexByHeight(this.availableHeight_);
         } else {
           /*
            This case has another behaviour: when start index is set, we consider the vertical offset.
            In this case (end index is set instead), we suppose that end index cell is fully visible in the end
            of data grid. It means that we do not consider the vertical offset and calculate it as well.
            */
-          this.startIndex_ = this.getIndexByHeight_(this.heightCache_[this.endIndex_] - this.availableHeight_);
-          this.verticalOffset_ = this.getHeightByIndexes_(this.startIndex_, this.endIndex_) - this.availableHeight_;
+          this.startIndex_ = this.getIndexByHeight(this.heightCache_[this.endIndex_] - this.availableHeight_);
+          this.verticalOffset_ = this.getHeightByIndexes(this.startIndex_, this.endIndex_) - this.availableHeight_;
         }
       }
     }
@@ -671,7 +688,7 @@ anychart.core.gantt.Controller.prototype.run = function() {
     this.verticalScrollBar_.suspendSignalsDispatching();
     this.verticalScrollBar_.handlePositionChange(false);
 
-    var itemHeight = this.getHeightByIndexes_(this.startIndex_, this.startIndex_);
+    var itemHeight = this.getHeightByIndexes(this.startIndex_, this.startIndex_);
     var height = this.heightCache_[this.startIndex_] - itemHeight;
 
     var start = height + this.verticalOffset_;
@@ -727,7 +744,7 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
         controller.endIndex(controller.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
       } else {
         var startHeight = Math.round(startRatio * totalHeight);
-        var startIndex = controller.getIndexByHeight_(startHeight);
+        var startIndex = controller.getIndexByHeight(startHeight);
         var previousHeight = startIndex ? controller.heightCache_[startIndex - 1] : 0;
         var verticalOffset = startHeight - previousHeight;
         controller
@@ -757,7 +774,7 @@ anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
   if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
     this.endIndex(this.heightCache_.length - 1);
   } else {
-    var itemIndex = this.getIndexByHeight_(pxOffset);
+    var itemIndex = this.getIndexByHeight(pxOffset);
     var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
     var verticalOffset = pxOffset - previousHeight;
     this
