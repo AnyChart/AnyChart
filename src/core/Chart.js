@@ -98,11 +98,11 @@ anychart.core.Chart.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBo
  */
 anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.LEGEND |
-        anychart.ConsistencyState.CHART_LABELS |
-        anychart.ConsistencyState.BACKGROUND |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.CREDITS;
+    anychart.ConsistencyState.LEGEND |
+    anychart.ConsistencyState.CHART_LABELS |
+    anychart.ConsistencyState.BACKGROUND |
+    anychart.ConsistencyState.TITLE |
+    anychart.ConsistencyState.CREDITS;
 
 
 /**
@@ -804,9 +804,7 @@ anychart.core.Chart.prototype.draw = function() {
     legend.suspendSignalsDispatching();
     if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
     legend.parentBounds(legendParentBounds);
-    if (!legend.itemsProvider()) {
-      legend.itemsProvider(this.createLegendItemsProvider());
-    }
+    legend.itemsProvider(this.createLegendItemsProvider());
     legend.resumeSignalsDispatching(false);
     legend.draw();
     this.markConsistent(anychart.ConsistencyState.LEGEND);

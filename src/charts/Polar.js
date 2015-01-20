@@ -659,7 +659,10 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
+    this.invalidate(
+        anychart.ConsistencyState.SERIES |
+        anychart.ConsistencyState.LEGEND |
+        anychart.ConsistencyState.SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);

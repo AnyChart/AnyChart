@@ -334,7 +334,11 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
 anychart.charts.Pie.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
+
+      //drop data cache
       goog.dispose(this.parentViewToDispose_);
+      delete this.iterator_;
+
       /**
        * @type {anychart.data.View}
        */
@@ -358,7 +362,13 @@ anychart.charts.Pie.prototype.data = function(opt_value) {
     this.view_ = this.prepareData_(this.parentView_);
     this.view_.listenSignals(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
-    this.invalidate(anychart.ConsistencyState.DATA | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(
+        anychart.ConsistencyState.DATA |
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.LABELS |
+        anychart.ConsistencyState.LEGEND,
+        anychart.Signal.NEEDS_REDRAW
+    );
     return this;
   }
   return this.view_;
@@ -1956,7 +1966,15 @@ anychart.charts.Pie.prototype.applyHatchFill = function(hover) {
  */
 anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.invalidate(anychart.ConsistencyState.DATA | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+    this.invalidate(
+        anychart.ConsistencyState.DATA |
+        anychart.ConsistencyState.LABELS |
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.LEGEND,
+        anychart.Signal.NEEDS_REDRAW |
+        anychart.Signal.DATA_CHANGED
+    );
+
   }
 };
 
