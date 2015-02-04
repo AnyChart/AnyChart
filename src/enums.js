@@ -27,7 +27,8 @@ anychart.enums.ChartTypes = {
   PIE: 'pie',
   POLAR: 'polar',
   RADAR: 'radar',
-  SCATTER: 'scatter'
+  SCATTER: 'scatter',
+  SPARKLINE: 'sparkline'
 };
 
 
@@ -1122,6 +1123,56 @@ anychart.enums.CartesianSeriesType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  SparklineSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.SparklineSeriesType = {
+  AREA: 'area',
+  COLUMN: 'column',
+  LINE: 'line',
+  WIN_LOSS: 'winLoss'
+};
+
+
+/**
+ * Normalizes sparkline series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.SparklineSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.SparklineSeriesType}
+ */
+anychart.enums.normalizeSparklineSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+    case 'are':
+    case 'ar':
+    case 'a':
+      return anychart.enums.SparklineSeriesType.AREA;
+    case 'column':
+    case 'col':
+    case 'c':
+      return anychart.enums.SparklineSeriesType.COLUMN;
+    case 'line':
+    case 'lin':
+    case 'l':
+      return anychart.enums.SparklineSeriesType.LINE;
+    case 'win':
+    case 'loss':
+    case 'winloss':
+    case 'win_loss':
+    case 'wl':
+      return anychart.enums.SparklineSeriesType.WIN_LOSS;
+  }
+  return opt_default || anychart.enums.SparklineSeriesType.LINE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Gantt specific data item field.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1506,6 +1557,11 @@ goog.exportSymbol('anychart.enums.ScaleStackMode.PERCENT', anychart.enums.ScaleS
 
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LINEAR', anychart.enums.ScatterTicksMode.LINEAR);
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LOGARITHMIC', anychart.enums.ScatterTicksMode.LOGARITHMIC);
+
+goog.exportSymbol('anychart.enums.SparklineSeriesType.AREA', anychart.enums.SparklineSeriesType.AREA);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.LINE', anychart.enums.SparklineSeriesType.LINE);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.COLUMN', anychart.enums.SparklineSeriesType.COLUMN);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.WIN_LOSS', anychart.enums.SparklineSeriesType.WIN_LOSS);
 
 goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL', anychart.enums.GanttDataFields.ACTUAL);
 goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL_START', anychart.enums.GanttDataFields.ACTUAL_START);

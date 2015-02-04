@@ -1,7 +1,7 @@
 goog.provide('anychart.charts.Polar');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Polar');
 goog.require('anychart.core.axes.Radial');
 goog.require('anychart.core.grids.Polar');
@@ -21,7 +21,7 @@ goog.require('anychart.scales');
  * To get the chart use method {@link anychart.polar}.<br/>
  * Chart can contain any number of series.<br/>
  * Each series is interactive, you can customize click and hover behavior and other params.
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.SeparateChart}
  * @constructor
  */
 anychart.charts.Polar = function() {
@@ -105,15 +105,15 @@ anychart.charts.Polar = function() {
   }, false, this);
 
 };
-goog.inherits(anychart.charts.Polar, anychart.core.Chart);
+goog.inherits(anychart.charts.Polar, anychart.core.SeparateChart);
 
 
 /**
- * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.Chart states.
+ * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
  */
 anychart.charts.Polar.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.PALETTE |
     anychart.ConsistencyState.MARKER_PALETTE |
     anychart.ConsistencyState.HATCH_FILL_PALETTE |

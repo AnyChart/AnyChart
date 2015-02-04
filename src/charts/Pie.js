@@ -1,7 +1,7 @@
 goog.provide('anychart.charts.Pie');
 goog.require('acgraph');
 goog.require('anychart.color');
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.TypedLayer');
@@ -17,7 +17,7 @@ goog.require('anychart.palettes.RangeColors');
  * Pie (Donut) Chart Class.<br/>
  * <b>Note:</b> Use method {@link anychart.pie} to get an instance of this class:
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.SeparateChart}
  * @constructor
  */
 anychart.charts.Pie = function(opt_data) {
@@ -219,7 +219,7 @@ anychart.charts.Pie = function(opt_data) {
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
-goog.inherits(anychart.charts.Pie, anychart.core.Chart);
+goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
 
 /**
@@ -262,7 +262,7 @@ anychart.charts.Pie.OUTSIDE_LABELS_CONNECTOR_SIZE_ = 5;
  * @type {number}
  */
 anychart.charts.Pie.prototype.SUPPORTED_SIGNALS =
-    anychart.core.Chart.prototype.SUPPORTED_SIGNALS |
+    anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED;
 
 
@@ -271,7 +271,7 @@ anychart.charts.Pie.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.charts.Pie.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.DATA |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.LABELS;

@@ -1,7 +1,7 @@
 goog.provide('anychart.charts.Scatter');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
@@ -19,7 +19,7 @@ goog.require('anychart.scales');
 
 /**
  * Scatter chart class.<br/>
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.SeparateChart}
  * @constructor
  */
 anychart.charts.Scatter = function() {
@@ -118,7 +118,7 @@ anychart.charts.Scatter = function() {
 
   }, false, this);
 };
-goog.inherits(anychart.charts.Scatter, anychart.core.Chart);
+goog.inherits(anychart.charts.Scatter, anychart.core.SeparateChart);
 
 
 /**
@@ -134,7 +134,7 @@ anychart.charts.Scatter.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
  * @type {number}
  */
 anychart.charts.Scatter.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.SCALES |
     anychart.ConsistencyState.GRIDS |
     anychart.ConsistencyState.AXES |

@@ -523,6 +523,14 @@ anychart.polar = anychart.polar || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.sparkline = anychart.sparkline || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Sparkline chart']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -544,6 +552,7 @@ goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
 goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
 goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);
+goog.exportSymbol('anychart.sparkline', anychart.sparkline);
 goog.exportSymbol('anychart.scatter', anychart.scatter);
 goog.exportSymbol('anychart.areaChart', anychart.area);
 goog.exportSymbol('anychart.barChart', anychart.bar);

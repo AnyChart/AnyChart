@@ -232,7 +232,7 @@ anychart.core.axisMarkers.Text.prototype.layout = function(opt_value) {
  * Get/set rotation in degrees.
  * If null is provided then rotation angle depends on layout: vertical = -90 degrees; horizontal = 0 degrees.
  * @param {?number=} opt_value rotation.
- * @return {number|anychart.core.axisMarkers.Text} Rotation or self for chaining.
+ * @return {null|number|anychart.core.axisMarkers.Text} Rotation or self for chaining.
  */
 anychart.core.axisMarkers.Text.prototype.rotation = function(opt_value) {
   if (goog.isDef(opt_value)) {

@@ -573,25 +573,25 @@ anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial
 /** @inheritDoc */
 anychart.core.Text.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['fontSize'] = this.fontSize();
-  json['fontFamily'] = this.fontFamily();
-  json['fontColor'] = this.fontColor();
-  json['fontOpacity'] = this.fontOpacity();
-  json['fontDecoration'] = this.fontDecoration();
-  json['fontStyle'] = this.fontStyle();
-  json['fontVariant'] = this.fontVariant();
-  json['fontWeight'] = this.fontWeight();
-  json['letterSpacing'] = this.letterSpacing();
-  json['textDirection'] = this.textDirection();
-  json['lineHeight'] = this.lineHeight();
-  json['textIndent'] = this.textIndent();
-  json['vAlign'] = this.vAlign();
-  json['hAlign'] = this.hAlign();
-  json['textWrap'] = this.textWrap();
-  json['textOverflow'] = this.textOverflow();
-  json['selectable'] = this.selectable();
-  json['disablePointerEvents'] = this.disablePointerEvents();
-  json['useHtml'] = this.useHtml();
+  if (goog.isDef(this.fontSize())) json['fontSize'] = this.fontSize();
+  if (goog.isDef(this.fontFamily())) json['fontFamily'] = this.fontFamily();
+  if (goog.isDef(this.fontColor())) json['fontColor'] = this.fontColor();
+  if (goog.isDef(this.fontOpacity())) json['fontOpacity'] = this.fontOpacity();
+  if (goog.isDef(this.fontDecoration())) json['fontDecoration'] = this.fontDecoration();
+  if (goog.isDef(this.fontStyle())) json['fontStyle'] = this.fontStyle();
+  if (goog.isDef(this.fontVariant())) json['fontVariant'] = this.fontVariant();
+  if (goog.isDef(this.fontWeight())) json['fontWeight'] = this.fontWeight();
+  if (goog.isDef(this.letterSpacing())) json['letterSpacing'] = this.letterSpacing();
+  if (goog.isDef(this.textDirection())) json['textDirection'] = this.textDirection();
+  if (goog.isDef(this.lineHeight())) json['lineHeight'] = this.lineHeight();
+  if (goog.isDef(this.textIndent())) json['textIndent'] = this.textIndent();
+  if (goog.isDef(this.vAlign())) json['vAlign'] = this.vAlign();
+  if (goog.isDef(this.hAlign())) json['hAlign'] = this.hAlign();
+  if (goog.isDef(this.textWrap())) json['textWrap'] = this.textWrap();
+  if (goog.isDef(this.textOverflow())) json['textOverflow'] = this.textOverflow();
+  if (goog.isDef(this.selectable())) json['selectable'] = this.selectable();
+  if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
+  if (goog.isDef(this.useHtml())) json['useHtml'] = this.useHtml();
   return json;
 };
 

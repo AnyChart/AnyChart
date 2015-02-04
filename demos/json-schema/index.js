@@ -32,15 +32,32 @@ $(document).ready(function() {
   anychart.licenseKey(null);
   stage.suspend();
 
-  var chart = anychart.bar();
-  chart.bar([
-    ['A1' , 3],
-    ['A2' , 5],
-    ['A3' , 0],
-    ['A4' , 4.1],
-    ['A5' , 9.5]
-  ]);
-  chart.container(stage).draw();
+  var chart = anychart.sparkline(['-3',2,3,-7,6,9,8,2,5]).width(150).height(60);
+  chart.type('column');
+
+  chart.markers().enabled(true);
+  chart.lineMarker({value: -8});
+  chart.textMarker({value: -8, fontSize: 6, anchor: 'bottom', align: 'right'});
+  chart.rangeMarker({from: -3, to: 5  });
+
+  chart.maxLabels()
+      .enabled(true)
+      .fontColor('red');
+
+  chart.minLabels()
+      .enabled(true)
+      .fontColor('green');
+
+  chart.firstFill('blue');
+  chart.lastFill('red');
+
+  chart.clip(false);
+
+  chart.hatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
+
+  chart.pointWidth('70%');
+  chart.padding(10);
+  chart.container('container').draw();
   stage.resume();
   var config = chart.toJson();
 

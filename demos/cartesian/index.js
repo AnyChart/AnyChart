@@ -237,8 +237,8 @@ function load() {
   bubbleChart.container(stage);
   bubbleChart.bounds(630, 400, 200, 150);
   bubbleChart.title('Bubble chart');
-  bubbleChart.axis().orientation('left');
-  bubbleChart.axis().orientation('bottom');
+  //bubbleChart.axis(0).orientation('left');
+  //bubbleChart.axis(1).orientation('bottom');
   bubbleChart.bubble(data1)
       .minimumSize(5)
       .maximumSize(10)

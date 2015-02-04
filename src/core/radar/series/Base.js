@@ -63,20 +63,6 @@ anychart.core.radar.series.Base.SeriesTypesMap = {};
 
 
 /**
- * Calculates size scale for the series. If opt_minMax is passed, also compares with opt_minMax members.
- * @param {Array.<number>=} opt_minMax Array of two values: [min, max].
- */
-anychart.core.radar.series.Base.prototype.calculateSizeScale = goog.nullFunction;
-
-
-/**
- * @param {number} min .
- * @param {number} max .
- */
-anychart.core.radar.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
-
-
-/**
  * @type {anychart.math.Rect}
  * @protected
  */

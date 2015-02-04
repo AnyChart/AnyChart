@@ -1907,6 +1907,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   if (goog.isDef(this.size())) json['size'] = this.size();
   if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  if (!goog.isDef(this.enabled())) delete json['enabled'];
   return json;
 };
 

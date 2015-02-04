@@ -1,7 +1,7 @@
 goog.provide('anychart.charts.Cartesian');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
@@ -32,7 +32,7 @@ goog.require('anychart.scales');
  *  </ul>
  * Chart can contain any number of series.
  * Each series is interactive, you can customize click and hover behavior and other params.
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.SeparateChart}
  * @constructor
  * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
@@ -160,7 +160,7 @@ anychart.charts.Cartesian = function(opt_barChartMode) {
 
   this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
 };
-goog.inherits(anychart.charts.Cartesian, anychart.core.Chart);
+goog.inherits(anychart.charts.Cartesian, anychart.core.SeparateChart);
 
 
 /**
@@ -186,11 +186,11 @@ anychart.charts.Cartesian.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
 
 
 /**
- * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.Chart states.
+ * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
  */
 anychart.charts.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.PALETTE |
     anychart.ConsistencyState.MARKER_PALETTE |
     anychart.ConsistencyState.HATCH_FILL_PALETTE |

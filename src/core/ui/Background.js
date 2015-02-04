@@ -538,6 +538,31 @@ anychart.core.ui.Background.prototype.draw = function() {
 };
 
 
+/**
+ * Returns the remaining (after background placement) part of the container.
+ * @return {!anychart.math.Rect} Parent bounds without the space used by the background thickness.
+ */
+anychart.core.ui.Background.prototype.getRemainingBounds = function() {
+  var parentBounds = /** @type {anychart.math.Rect} */(this.getPixelBounds());
+  if (parentBounds)
+    parentBounds = parentBounds.clone();
+  else
+    parentBounds = anychart.math.rect(0, 0, 0, 0);
+
+  if (!this.enabled())
+    return parentBounds;
+
+  var thickness = anychart.utils.isNone(this.stroke_) ? 0 : acgraph.vector.getThickness(this.stroke_);
+
+  parentBounds.top += thickness;
+  parentBounds.left += thickness;
+  parentBounds.height -= 2 * thickness;
+  parentBounds.width -= 2 * thickness;
+
+  return parentBounds;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.remove = function() {
   if (this.rect_) this.rect_.parent(null);

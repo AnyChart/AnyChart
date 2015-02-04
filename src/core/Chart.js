@@ -55,12 +55,6 @@ anychart.core.Chart = function() {
   this.padding_ = null;
 
   /**
-   * @type {anychart.core.ui.Legend}
-   * @private
-   */
-  this.legend_ = null;
-
-  /**
    * @type {Array.<anychart.core.ui.Label>}
    * @private
    */
@@ -71,12 +65,6 @@ anychart.core.Chart = function() {
    * @private
    */
   this.autoRedraw_ = true;
-
-  /**
-   * @type {anychart.core.ui.Credits}
-   * @private
-   */
-  this.credits_ = null;
 
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
@@ -93,16 +81,14 @@ anychart.core.Chart.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBo
 
 
 /**
- * Supported consistency states. Adds BACKGROUND, TITLE and LEGEND to BaseWithBounds states.
+ * Supported consistency states. Adds BACKGROUND and TITLE to BaseWithBounds states.
  * @type {number}
  */
 anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.LEGEND |
-    anychart.ConsistencyState.CHART_LABELS |
-    anychart.ConsistencyState.BACKGROUND |
-    anychart.ConsistencyState.TITLE |
-    anychart.ConsistencyState.CREDITS;
+        anychart.ConsistencyState.CHART_LABELS |
+        anychart.ConsistencyState.BACKGROUND |
+        anychart.ConsistencyState.TITLE;
 
 
 /**
@@ -110,13 +96,6 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.core.Chart.ZINDEX_BACKGROUND = 1;
-
-
-/**
- * Legend z-index in chart root layer.
- * @type {number}
- */
-anychart.core.Chart.ZINDEX_LEGEND = 20;
 
 
 /**
@@ -498,73 +477,6 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Legend.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for current chart legend.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.line([7, 10, 2, 0]);
- * chart.legend()
- *         .position('right')
- *         .title(null)
- *         .itemsLayout('vertical')
- *         .align('left');
- * @return {!anychart.core.ui.Legend} An instance of {@link anychart.core.ui.Legend} for method chaining.
- *//**
- * Setter for chart legend setting.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.line([7, 10, 2, 0]);
- * chart.legend(true);
- * @param {(Object|boolean|null)=} opt_value Legend settings.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
- *//**
- * @ignoreDoc
- * @param {(Object|boolean|null)=} opt_value Legend settings.
- * @return {!(anychart.core.Chart|anychart.core.ui.Legend)} Chart legend instance of itself for chaining call.
- */
-anychart.core.Chart.prototype.legend = function(opt_value) {
-  if (!this.legend_) {
-    this.legend_ = new anychart.core.ui.Legend();
-    this.legend_.zIndex(anychart.core.Chart.ZINDEX_LEGEND);
-    this.registerDisposable(this.legend_);
-    this.legend_.listenSignals(this.onLegendSignal_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.legend_.setup(opt_value);
-    return this;
-  } else {
-    return this.legend_;
-  }
-};
-
-
-/**
- * Internal title invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.Chart.prototype.onLegendSignal_ = function(event) {
-  var state = 0;
-  var signal = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.LEGEND;
-    signal |= anychart.Signal.NEEDS_REDRAW;
-  }
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-  }
-  // If there are no signals – state == 0 and nothing will happen.
-  this.invalidate(state, signal);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  Labels.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -639,67 +551,53 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Credits.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter for current chart credits settings.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 2, 9]);
- * chart.credits().text('Click me!');
- * @return {!anychart.core.ui.Credits} An instance of {@link anychart.core.ui.Credits} class for method chaining.
- *//**
- * Setter for chart credits settings.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 2, 9]);
- * chart.credits(null);
- * @param {(Object|boolean|null)=} opt_value
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {(Object|boolean|null)=} opt_value
- * @return {!(anychart.core.Chart|anychart.core.ui.Credits)} Chart credits or itself for chaining call.
- */
-anychart.core.Chart.prototype.credits = function(opt_value) {
-  if (!this.credits_) {
-    this.credits_ = new anychart.core.ui.Credits();
-    this.registerDisposable(this.credits_);
-    this.credits_.listenSignals(this.onCreditsSignal_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.credits_.setup(opt_value);
-    return this;
-  } else {
-    return this.credits_;
-  }
-};
-
-
-/**
- * Internal title invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
-  var state = 0;
-  var signal = anychart.Signal.NEEDS_REDRAW;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.CREDITS;
-  }
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
-  }
-  // If there are no signals – state == 0 and nothing will happen.
-  this.invalidate(state, signal);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  Drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Calculate chart content bounds.
+ * @param {!anychart.math.Rect} totalBounds Total chart area bounds, do not override, it can be useful later.
+ * @return {!anychart.math.Rect} Chart content bounds, allocated space for all chart appearance items.
+ */
+anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) {
+  //chart area with applied margin
+  var boundsWithoutMargin;
+  //chart area with applied margin and padding
+  var boundsWithoutPadding;
+  // chart area with applied margin, padding and title
+  var boundsWithoutTitle;
+  //
+  var boundsWithoutBackgroundThickness;
+
+  boundsWithoutMargin = this.margin().tightenBounds(totalBounds).round();
+
+  var background = this.background();
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
+    background.suspendSignalsDispatching();
+    if (!background.container()) background.container(this.rootElement);
+    background.parentBounds(boundsWithoutMargin);
+    background.resumeSignalsDispatching(false);
+    background.draw();
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+  }
+
+  boundsWithoutBackgroundThickness = background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
+  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutBackgroundThickness);
+
+  var title = this.title();
+  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
+    title.suspendSignalsDispatching();
+    if (!title.container()) title.container(this.rootElement);
+    title.parentBounds(boundsWithoutPadding);
+    title.resumeSignalsDispatching(false);
+    title.draw();
+    this.markConsistent(anychart.ConsistencyState.TITLE);
+  }
+  boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
+  return boundsWithoutTitle.clone().round();
+};
+
+
 /**
  * Starts the rendering of the chart into the container.
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
@@ -718,22 +616,6 @@ anychart.core.Chart.prototype.draw = function() {
   var startTime = new Date().getTime();
 
   this.suspendSignalsDispatching();
-
-  //total chart area bounds, do not override, it can be useful later
-  var totalBounds;
-  //chart area with applied margin
-  var boundsWithoutMargin;
-  //chart area bounds with applied margin and copped by credits
-  var boundsWithoutCredits;
-  //chart area with applied margin and padding
-  var boundsWithoutPadding;
-  // chart area with applied margin, padding and title
-  var boundsWithoutTitle;
-  // chart area with applied margin, padding, title and legend
-  var boundsWithoutLegend;
-  //chart content bounds, allocated space for all chart appearance items.
-  var contentAreaBounds;
-
 
   //create root element only if draw is called
   if (!this.rootElement) {
@@ -761,59 +643,10 @@ anychart.core.Chart.prototype.draw = function() {
   }
   //end clear container consistency states
 
-  totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
-  boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
-
-  var background = this.background();
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
-    background.suspendSignalsDispatching();
-    if (!background.container()) background.container(this.rootElement);
-    background.parentBounds(boundsWithoutMargin);
-    background.resumeSignalsDispatching(false);
-    background.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
-  }
-
-  var credits = this.credits();
-  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
-    credits.suspendSignalsDispatching();
-    if (!credits.container())
-      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    credits.parentBounds(/** @type {anychart.math.Rect} */ (boundsWithoutMargin));
-    credits.resumeSignalsDispatching(false);
-    credits.draw();
-    this.markConsistent(anychart.ConsistencyState.CREDITS);
-  }
-  boundsWithoutCredits = this.credits().getRemainingBounds();
-
-  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
-  var title = this.title();
-  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
-    title.suspendSignalsDispatching();
-    if (!title.container()) title.container(this.rootElement);
-    title.parentBounds(boundsWithoutPadding);
-    title.resumeSignalsDispatching(false);
-    title.draw();
-    this.markConsistent(anychart.ConsistencyState.TITLE);
-  }
-
-  boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  var legendParentBounds = boundsWithoutTitle;
-  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND | anychart.ConsistencyState.BOUNDS)) {
-    legend.suspendSignalsDispatching();
-    if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
-    legend.parentBounds(legendParentBounds);
-    legend.itemsProvider(this.createLegendItemsProvider());
-    legend.resumeSignalsDispatching(false);
-    legend.draw();
-    this.markConsistent(anychart.ConsistencyState.LEGEND);
-  }
-
-  boundsWithoutLegend = legend.enabled() ? legend.getRemainingBounds() : legendParentBounds;
-
-  contentAreaBounds = boundsWithoutLegend.clone();
-  this.drawContent(contentAreaBounds);
+  //total chart area bounds, do not override, it can be useful later
+  var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
+  var contentBounds = this.calculateContentAreaSpace(totalBounds);
+  this.drawContent(contentBounds);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
     for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
@@ -837,7 +670,7 @@ anychart.core.Chart.prototype.draw = function() {
       stage.resize(stage.originalWidth, stage.originalHeight);
       this.container().getStage().listen(
           acgraph.vector.Stage.EventType.STAGE_RESIZE,
-          this.resizeHandler_,
+          this.resizeHandler,
           false,
           this
       );
@@ -893,10 +726,9 @@ anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
 
 /**
  * @param {goog.events.Event} evt
- * @private
+ * @protected
  */
-anychart.core.Chart.prototype.resizeHandler_ = function(evt) {
-  this.credits().invalidate(anychart.ConsistencyState.POSITION);
+anychart.core.Chart.prototype.resizeHandler = function(evt) {
   if (this.bounds().dependsOnContainerSize()) {
     this.invalidate(anychart.ConsistencyState.ALL,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -915,19 +747,6 @@ anychart.core.Chart.prototype.resizeHandler_ = function(evt) {
 anychart.core.Chart.prototype.remove = function() {
   if (this.rootElement) this.rootElement.parent(null);
 };
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Legend.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Create legend items provider specific to chart type.
- * @protected
- * @return {!Array.<anychart.core.ui.Legend.LegendItemProvider>} Legend items provider.
- */
-anychart.core.Chart.prototype.createLegendItemsProvider = goog.abstractMethod;
 
 
 //todo(Anton Saukh): refactor this mess!
@@ -978,8 +797,6 @@ anychart.core.Chart.prototype.serialize = function() {
   json['background'] = this.background().serialize();
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
-  json['legend'] = this.legend().serialize();
-  json['credits'] = this.credits().serialize();
   var labels = [];
   for (var i = 0; i < this.chartLabels_.length; i++) {
     labels.push(this.chartLabels_[i].serialize());
@@ -999,8 +816,6 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   this.background(config['background']);
   this.margin(config['margin']);
   this.padding(config['padding']);
-  this.legend(config['legend']);
-  this.credits(config['credits']);
 
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {
@@ -1038,33 +853,6 @@ anychart.core.Chart.prototype.restoreDefaults = function() {
   var title = /** @type {anychart.core.ui.Title} */(this.title());
   title.text('Chart title');
   title.margin().bottom(15);
-
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  legend.enabled(false);
-  legend.itemsLayout('horizontal');
-  legend.position('bottom');
-  legend.margin(0, 0, 0, 10);
-  legend.align(anychart.enums.Align.CENTER);
-  legend.fontSize(11);
-  legend.fontFamily('Tahoma');
-  legend.fontColor('rgb(34,34,34)');
-
-  var legendSeparator = /** @type {anychart.core.ui.Separator} */(legend.titleSeparator());
-  legendSeparator.enabled(false);
-  legendSeparator.height(1);
-  legendSeparator.fill(['#000000 0', '#000000 1', '#000000 0']);
-
-  var legendTitle = /** @type {anychart.core.ui.Title} */(legend.title());
-  legendTitle.enabled(false);
-  legendTitle.text('Legend title');
-  legendTitle.fontSize(10);
-  legendTitle.fontWeight('bold');
-  legendTitle.fontFamily('verdana');
-  legendTitle.fontColor('rgb(35,35,35)');
-
-  var legendBackground = /** @type {anychart.core.ui.Background} */(legend.background());
-  legendBackground.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
-  legendBackground.stroke('rgb(221,221,221)');
 };
 
 
@@ -1101,9 +889,7 @@ anychart.core.Chart.prototype['title'] = anychart.core.Chart.prototype.title;//d
 anychart.core.Chart.prototype['background'] = anychart.core.Chart.prototype.background;//doc|ex
 anychart.core.Chart.prototype['margin'] = anychart.core.Chart.prototype.margin;//doc|ex
 anychart.core.Chart.prototype['padding'] = anychart.core.Chart.prototype.padding;//doc|ex
-anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//doc|ex
 anychart.core.Chart.prototype['label'] = anychart.core.Chart.prototype.label;//doc|ex
-anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//doc|ex
 anychart.core.Chart.prototype['container'] = anychart.core.Chart.prototype.container;//doc
 anychart.core.Chart.prototype['draw'] = anychart.core.Chart.prototype.draw;//doc
 anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;//|need-ex

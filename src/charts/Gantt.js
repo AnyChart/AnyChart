@@ -1,5 +1,5 @@
 goog.provide('anychart.charts.Gantt');
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
@@ -16,7 +16,7 @@ goog.require('goog.i18n.DateTimeFormat');
  *
  * @param {boolean=} opt_isResourcesChart - Flag if chart should be interpreted as resource chart.
  * @constructor
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.SeparateChart}
  */
 anychart.charts.Gantt = function(opt_isResourcesChart) {
   goog.base(this);
@@ -130,7 +130,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
 
 };
-goog.inherits(anychart.charts.Gantt, anychart.core.Chart);
+goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
 
 /**
@@ -145,7 +145,7 @@ anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt
  * @type {number}
  */
 anychart.charts.Gantt.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.DATA | //New data is set.
     anychart.ConsistencyState.POSITION; //Position means that position of data items in DG and TL was changed.
 
@@ -155,7 +155,7 @@ anychart.charts.Gantt.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.charts.Gantt.prototype.SUPPORTED_SIGNALS =
-    anychart.core.Chart.prototype.SUPPORTED_SIGNALS;
+    anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS;
 
 
 /**

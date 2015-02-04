@@ -7,4 +7,5 @@ goog.require('anychart.modules.pie');
 goog.require('anychart.modules.polar');
 goog.require('anychart.modules.radar');
 goog.require('anychart.modules.scatter');
+goog.require('anychart.modules.sparkline');
 

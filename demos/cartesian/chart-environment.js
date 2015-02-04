@@ -44,7 +44,7 @@ function load() {
 
     chart.title().text(seriesName);
     chart.background().fill('gray .5');
-    chart.legend().enabled(true);
+    //chart.legend().enabled(true);
     chart.yAxis(0).orientation('left');
     chart.xAxis(0).orientation('bottom');
     chart.xAxis(1).orientation('top');
@@ -62,84 +62,84 @@ function load() {
   drawChart(areaChart, 'area');
   areaChart.bounds(0, 0, 500, 400);
   areaChart.draw();
-
-  barChart = new anychart.charts.Cartesian();
-  drawChart(barChart, 'bar');
-  barChart.bounds(510, 0, 500, 400);
-  barChart.draw();
-
-  var bubbleChart = new anychart.charts.Cartesian();
-  drawChart(bubbleChart, 'bubble');
-  bubbleChart.bounds(0, 410, 500, 400);
-  bubbleChart.draw();
-
-  var candlestick = new anychart.charts.Cartesian();
-  drawChart(candlestick, 'candlestick');
-  candlestick.bounds(510, 410, 500, 400);
-  candlestick.draw();
-
-  var column = new anychart.charts.Cartesian();
-  drawChart(column, 'column');
-  column.bounds(0, 820, 500, 400);
-  column.draw();
-
-  var line = new anychart.charts.Cartesian();
-  drawChart(line, 'line');
-  line.bounds(510, 820, 500, 400);
-  line.draw();
-
-  var ohlc = new anychart.charts.Cartesian();
-  drawChart(ohlc, 'ohlc');
-  ohlc.bounds(0, 1230, 500, 400);
-  ohlc.draw();
-
-  var rangeArea = new anychart.charts.Cartesian();
-  drawChart(rangeArea, 'rangeArea');
-  rangeArea.bounds(510, 1230, 500, 400);
-  rangeArea.draw();
-
-  var rangeBar = new anychart.charts.Cartesian();
-  drawChart(rangeBar, 'rangeBar');
-  rangeBar.bounds(0, 1640, 500, 400);
-  rangeBar.draw();
-
-  var rangeColumn = new anychart.charts.Cartesian();
-  drawChart(rangeColumn, 'rangeColumn');
-  rangeColumn.bounds(510, 1640, 500, 400);
-  rangeColumn.draw();
-
-  var rangeSplineArea = new anychart.charts.Cartesian();
-  drawChart(rangeSplineArea, 'rangeSplineArea');
-  rangeSplineArea.bounds(0, 2050, 500, 400);
-  rangeSplineArea.draw();
-
-  var rangeStepArea = new anychart.charts.Cartesian();
-  drawChart(rangeStepArea, 'rangeStepArea');
-  rangeStepArea.bounds(510, 2050, 500, 400);
-  rangeStepArea.draw();
-
-  var spline = new anychart.charts.Cartesian();
-  drawChart(spline, 'spline');
-  spline.bounds(0, 2460, 500, 400);
-  spline.draw();
-
-  var splineArea = new anychart.charts.Cartesian();
-  drawChart(splineArea, 'splineArea');
-  splineArea.bounds(510, 2460, 500, 400);
-  splineArea.draw();
-
-  var stepLine = new anychart.charts.Cartesian();
-  drawChart(stepLine, 'stepLine');
-  stepLine.bounds(0, 2870, 500, 400);
-  stepLine.draw();
-
-  var stepArea = new anychart.charts.Cartesian();
-  drawChart(stepArea, 'stepArea');
-  stepArea.bounds(510, 2870, 500, 400);
-  stepArea.draw();
-
-  var markerChart = new anychart.charts.Cartesian();
-  drawChart(markerChart, 'marker');
-  markerChart.bounds(0, 3280, 500, 400);
-  markerChart.draw();
+  //
+  //barChart = new anychart.charts.Cartesian();
+  //drawChart(barChart, 'bar');
+  //barChart.bounds(510, 0, 500, 400);
+  //barChart.draw();
+  //
+  //var bubbleChart = new anychart.charts.Cartesian();
+  //drawChart(bubbleChart, 'bubble');
+  //bubbleChart.bounds(0, 410, 500, 400);
+  //bubbleChart.draw();
+  //
+  //var candlestick = new anychart.charts.Cartesian();
+  //drawChart(candlestick, 'candlestick');
+  //candlestick.bounds(510, 410, 500, 400);
+  //candlestick.draw();
+  //
+  //var column = new anychart.charts.Cartesian();
+  //drawChart(column, 'column');
+  //column.bounds(0, 820, 500, 400);
+  //column.draw();
+  //
+  //var line = new anychart.charts.Cartesian();
+  //drawChart(line, 'line');
+  //line.bounds(510, 820, 500, 400);
+  //line.draw();
+  //
+  //var ohlc = new anychart.charts.Cartesian();
+  //drawChart(ohlc, 'ohlc');
+  //ohlc.bounds(0, 1230, 500, 400);
+  //ohlc.draw();
+  //
+  //var rangeArea = new anychart.charts.Cartesian();
+  //drawChart(rangeArea, 'rangeArea');
+  //rangeArea.bounds(510, 1230, 500, 400);
+  //rangeArea.draw();
+  //
+  //var rangeBar = new anychart.charts.Cartesian();
+  //drawChart(rangeBar, 'rangeBar');
+  //rangeBar.bounds(0, 1640, 500, 400);
+  //rangeBar.draw();
+  //
+  //var rangeColumn = new anychart.charts.Cartesian();
+  //drawChart(rangeColumn, 'rangeColumn');
+  //rangeColumn.bounds(510, 1640, 500, 400);
+  //rangeColumn.draw();
+  //
+  //var rangeSplineArea = new anychart.charts.Cartesian();
+  //drawChart(rangeSplineArea, 'rangeSplineArea');
+  //rangeSplineArea.bounds(0, 2050, 500, 400);
+  //rangeSplineArea.draw();
+  //
+  //var rangeStepArea = new anychart.charts.Cartesian();
+  //drawChart(rangeStepArea, 'rangeStepArea');
+  //rangeStepArea.bounds(510, 2050, 500, 400);
+  //rangeStepArea.draw();
+  //
+  //var spline = new anychart.charts.Cartesian();
+  //drawChart(spline, 'spline');
+  //spline.bounds(0, 2460, 500, 400);
+  //spline.draw();
+  //
+  //var splineArea = new anychart.charts.Cartesian();
+  //drawChart(splineArea, 'splineArea');
+  //splineArea.bounds(510, 2460, 500, 400);
+  //splineArea.draw();
+  //
+  //var stepLine = new anychart.charts.Cartesian();
+  //drawChart(stepLine, 'stepLine');
+  //stepLine.bounds(0, 2870, 500, 400);
+  //stepLine.draw();
+  //
+  //var stepArea = new anychart.charts.Cartesian();
+  //drawChart(stepArea, 'stepArea');
+  //stepArea.bounds(510, 2870, 500, 400);
+  //stepArea.draw();
+  //
+  //var markerChart = new anychart.charts.Cartesian();
+  //drawChart(markerChart, 'marker');
+  //markerChart.bounds(0, 3280, 500, 400);
+  //markerChart.draw();
 }

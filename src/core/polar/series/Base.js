@@ -63,20 +63,6 @@ anychart.core.polar.series.Base.SeriesTypesMap = {};
 
 
 /**
- * Calculates size scale for the series. If opt_minMax is passed, also compares with opt_minMax members.
- * @param {Array.<number>=} opt_minMax Array of two values: [min, max].
- */
-anychart.core.polar.series.Base.prototype.calculateSizeScale = goog.nullFunction;
-
-
-/**
- * @param {number} min .
- * @param {number} max .
- */
-anychart.core.polar.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
-
-
-/**
  * @type {anychart.math.Rect}
  * @protected
  */
@@ -807,29 +793,6 @@ anychart.core.polar.series.Base.prototype.getValuePointCoords = function() {
   }
 
   return fail ? null : res;
-};
-
-
-/**
- * Applies passed ratio (usually transformed by a scale) to bounds where
- * series is drawn.
- * @param {number} ratio .
- * @param {boolean} horizontal .
- * @return {number} .
- * @protected
- */
-anychart.core.polar.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
-  /** @type {acgraph.math.Rect} */
-  var bounds = this.pixelBoundsCache;
-  var min, range;
-  if (horizontal) {
-    min = bounds.left;
-    range = bounds.width;
-  } else {
-    min = bounds.getBottom();
-    range = -bounds.height;
-  }
-  return min + ratio * range;
 };
 
 

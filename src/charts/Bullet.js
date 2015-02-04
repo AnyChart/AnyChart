@@ -52,7 +52,6 @@ anychart.charts.Bullet = function(opt_data) {
   //default settings
   this.axis().stroke('0 black');
   this.background().enabled(false);
-  this.legend().enabled(false);
   this.margin(10);
   var title = /** @type {anychart.core.ui.Title} */(this.title());
   title.text('Chart title');
@@ -568,30 +567,6 @@ anychart.charts.Bullet.prototype.onPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Bullet.prototype.createLegendItemsProvider = function() {
-  var data = [];
-  var iterator = this.data_.getIterator().reset();
-
-
-  while (iterator.advance()) {
-    var index = iterator.getIndex();
-    var x = iterator.get('x');
-
-    data.push({
-      'index': index,
-      'text': String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x')),
-      'iconType': anychart.enums.LegendItemIconType.SQUARE,
-      'iconStroke': 'none',
-      'iconFill': iterator.get('fill'),
-      'iconHatchFill': 'none',
-      'iconMarker': null
-    });
-  }
-  return data;
 };
 
 

@@ -1940,6 +1940,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
   if (goog.isDef(this.width())) json['width'] = this.width();
   if (goog.isDef(this.height())) json['height'] = this.height();
   if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
+  if (!goog.isDef(this.enabled())) delete json['enabled'];
+
   return json;
 };
 
