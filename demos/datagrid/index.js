@@ -94,7 +94,7 @@ anychart.onDocumentReady(function() {
   splitter = new anychart.core.ui.Splitter();
 
   splitter
-      .bounds(10, 10, '90%', '90%')
+      .bounds(20, 20, '90%', '90%')
       .container(stage)
       .leftLimitSize(15)
       .rightLimitSize(15)

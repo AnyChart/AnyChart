@@ -120,7 +120,6 @@ anychart.core.ui.Button.prototype.textElement = null;
 
 /**
  * Path containing background.
- * @protected
  * @type {acgraph.vector.Path}
  */
 anychart.core.ui.Button.prototype.backgroundPath = null;

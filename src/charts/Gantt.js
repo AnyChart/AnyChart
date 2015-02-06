@@ -99,6 +99,13 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
 
   /**
+   * Default row selected fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#f1b8b9');
+
+  /**
    * Vertical scroll bar.
    * @type {anychart.core.ui.ScrollBar}
    * @private
@@ -273,6 +280,12 @@ anychart.charts.Gantt.prototype.getDataGrid = function() {
       ths.tl_.highlight(e['index'], e['startY'], e['endY'], true);
     });
 
+    this.dg_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+      ths.tl_.selectRow(e['item']); //This also deselects previous item.
+      ths.dispatchEvent(e);
+      ths.tl_.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    });
+
     this.dg_.tooltip().contentFormatter(function(data) {
       //data here is always a tree data item.
 
@@ -316,6 +329,12 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
 
     this.tl_.listen(anychart.enums.EventType.ROW_HOVER, function(e) {
       ths.dg_.highlight(e['index'], e['startY'], e['endY'], true);
+    });
+
+    this.tl_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+      ths.dg_.selectRow(e['item']); //This also deselects previous item.
+      ths.dispatchEvent(e);
+      ths.dg_.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
     });
 
     this.tl_.tooltip().contentFormatter(function(data) {
@@ -366,6 +385,33 @@ anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, o
     this.getDataGrid().rowHoverFill(this.hoverFill_);
   }
   return this.hoverFill_;
+};
+
+
+/**
+ * Gets/sets row selected fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.Gantt|string} - Current value or itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_), val)) {
+      this.rowSelectedFill_ = val;
+      anychart.core.Base.suspendSignalsDispatching(this.dg_, this.tl_);
+      this.getTimeline().rowSelectedFill(this.rowSelectedFill_);
+      this.getDataGrid().rowSelectedFill(this.rowSelectedFill_);
+      anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+    }
+    return this;
+  }
+  return this.rowSelectedFill_;
 };
 
 
@@ -754,6 +800,7 @@ anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
 anychart.charts.Gantt.prototype['getDataGrid'] = anychart.charts.Gantt.prototype.getDataGrid;
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;
 anychart.charts.Gantt.prototype['rowHoverFill'] = anychart.charts.Gantt.prototype.rowHoverFill;
+anychart.charts.Gantt.prototype['rowSelectedFill'] = anychart.charts.Gantt.prototype.rowSelectedFill;
 anychart.charts.Gantt.prototype['zoomIn'] = anychart.charts.Gantt.prototype.zoomIn;
 anychart.charts.Gantt.prototype['zoomOut'] = anychart.charts.Gantt.prototype.zoomOut;
 anychart.charts.Gantt.prototype['zoomTo'] = anychart.charts.Gantt.prototype.zoomTo;

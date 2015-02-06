@@ -28,6 +28,9 @@ anychart.onDocumentReady(function() {
     return item.get('also');
   });
 
+  chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+    console.log(e);
+  });
 
   chart.draw();
 
