@@ -536,7 +536,7 @@ anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial
   if (isInitial || 'fontFamily' in this.changedSettings)
     textElement.fontFamily(this.settingsObj['fontFamily']);
   if (isInitial || 'fontColor' in this.changedSettings)
-    textElement.color(this.settingsObj['fontColor']);
+    textElement.color(/** @type {string} */(this.fontColor()));
   if (isInitial || 'textDirection' in this.changedSettings)
     textElement.direction(this.settingsObj['textDirection']);
   if (isInitial || 'textWrap' in this.changedSettings)

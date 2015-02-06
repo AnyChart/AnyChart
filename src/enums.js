@@ -1013,7 +1013,8 @@ anychart.enums.EventType = {
 
   SIGNAL: 'signal',
 
-  ROW_HOVER: 'rowHover'
+  ROW_HOVER: 'rowHover',
+  ROW_CLICK: 'rowClick'
 };
 
 
@@ -1550,6 +1551,8 @@ goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK', anychart.
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);
+goog.exportSymbol('anychart.enums.EventType.ROW_HOVER', anychart.enums.EventType.ROW_HOVER);
+goog.exportSymbol('anychart.enums.EventType.ROW_CLICK', anychart.enums.EventType.ROW_CLICK);
 
 goog.exportSymbol('anychart.enums.ScaleStackMode.NONE', anychart.enums.ScaleStackMode.NONE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.VALUE', anychart.enums.ScaleStackMode.VALUE);

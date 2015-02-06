@@ -19,10 +19,10 @@ function load() {
   ];
 
   var dataWithMissing = [
-    {name: 'point - 0', value: 10, hatchFill: 'diagonalbrick', hoverHatchFill: 'none'},
-    {name: 'point - 1', value: 8, hatchFill: 'diagonalcross'},
-    {name: 'point - 2', value: 20},
-    {name: 'point - 3', value: 14},
+    {name: 'point - 0', value: 10},
+    {name: 'point - 1', value: 8},
+    {name: 'point - 2', value: 20, hoverLabel: {fontSize: 24}},
+    {name: 'point - 3', value: 14, label: {fontSize: 24}, hoverLabel: {fontSize: 34}},
     {name: 'point - 4', value: 7},
     {name: 'missing point', value: -10},
     {value: 5},
@@ -30,66 +30,47 @@ function load() {
     5
   ];
 
-  chart = anychart.pie(dataWithMissing)
+  var data = [
+    {name: "Product A", value: "1432"},
+    {name: "Product B", value: "2431"},
+    {name: "Product C", value: "3624"},
+    {name: "Product D", value: "5243"},
+    {name: "Product E", value: "8813"}
+  ];
+
+
+  chart = anychart.pie(data)
       .container('container')
-      .innerRadius('33%')
+      //.innerRadius('33%')
+      .insideLabelsOffset('60%')
       .startAngle(0)
-      .explode(15);
-  chart.hatchFill('vertical');
-  chart.hoverHatchFill('horizontal');
-  chart.listen(anychart.enums.EventType.POINT_CLICK, function(e) {
-    console.log(e);
-    return true;
-  });
+      //.explode(15);
+  //chart.hatchFill('vertical');
+  //chart.hoverHatchFill('horizontal');
+  //chart.listen(anychart.enums.EventType.POINT_CLICK, function(e) {
+  //  console.log(e);
+  //  return true;
+  //});
+
+  //chart.explodeSlices(true);
+
+  //chart.fill('aquaStyle');
+  chart.fill(['blue .2', 'gray'], 0.6, 0.7, null, 1, .5, .3);
 
   chart.title()
       .text('ACME Corp. apparel sales through different retail channels');
 
+  chart.labels()
+      .enabled(true)
+      .position('intside');
 
-  chart.background()
-      .stroke('2 rgb(36,102,177)')
-      .corners(10)
-      .fill({
-        keys: [
-          'rgb(255,255,255) 1',
-          'rgb(243,243,243) 1',
-          'rgb(255,255,255) 1'
-        ],
-        angle: -90
-      });
-
-  chart.labels().enabled(true);
-  chart.hoverLabels().fontColor('pink').fontSize(25);
+  chart.hoverLabels()
+      .enabled(true);
+  //chart.labels().textFormatter(function() {
+    //if (this.index == 8) return 'sdfsdf';
+    //else return '0';
+    //return this.value;
+  //});
+  //chart.hoverLabels().fontColor('pink').fontSize(25);
   chart.draw();
-  var stage = chart.container();
-  var trialText = stage.text(0, 0, 'AnyChart Trial Version', {
-    opacity: 0.15,
-    fontSize: chart.pixelBounds().height / 9
-  });
-
-  trialText.x(chart.pixelBounds().left + (chart.pixelBounds().width - trialText.getBounds().width) / 2)
-      .y(chart.pixelBounds().top + (chart.pixelBounds().height - trialText.getBounds().height) / 2)
-      .disablePointerEvents('none');
 }
-
-var foo = function() {
-  chart.group(function(val) {
-    return val > 1500000;
-  });
-  chart.sort('asc');
-  var iterator = chart.data().getIterator();
-  while (iterator.advance()) {
-    if (iterator.meta('groupedPoint')) {
-      console.log(iterator.meta('names'));
-      console.log(iterator.meta('values'));
-    }
-  }
-};
-
-var bar = function() {
-  chart.container().removeChildren();
-  var json = chart.serialize();
-  newPie = anychart.json(json);
-  newPie.container(chart.container());
-  newPie.draw();
-};

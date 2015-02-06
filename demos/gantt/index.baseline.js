@@ -40,6 +40,10 @@ anychart.onDocumentReady(function() {
   fourthColumn.textFormatter(fourthColumnTextFormatter);
   fourthColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
+  chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+    console.log(e);
+  });
+
   //initiate chart drawing
   chart.draw();
 

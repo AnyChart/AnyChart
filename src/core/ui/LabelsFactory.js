@@ -507,6 +507,26 @@ anychart.core.ui.LabelsFactory.prototype.height = function(opt_value) {
 
 
 /** @inheritDoc */
+anychart.core.ui.LabelsFactory.prototype.fontColor = function(opt_value) {
+  if (opt_value) {
+    return goog.base(this, 'fontColor', opt_value);
+  } else {
+    return goog.isDef(this.changedSettings['fontColor']) ?
+        goog.base(this, 'fontColor') : this.autoColor_ || goog.base(this, 'fontColor');
+  }
+};
+
+
+/**
+ * Sets labels color that parent series have set for it.
+ * @param {string} value Auto color distributed by the series.
+ */
+anychart.core.ui.LabelsFactory.prototype.setAutoColor = function(value) {
+  this.autoColor_ = value;
+};
+
+
+/** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isNull(json['enabled'])) delete json['enabled'];
@@ -1647,7 +1667,6 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.ENABLED);
     }
   }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER) ||
       labelsFactory.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (enabled) {

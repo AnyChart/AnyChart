@@ -432,7 +432,6 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
     }
   } else {
     while (!(firstFound && secondFound)) {
-      //TODO (A.Kudryavtsev): Similar code. Refactor somehow?
       anchorMs = anychart.utils.normalizeTimestamp(anchorDate);
       newAnchorDate = anchorDate.clone();
       newAnchorDate.add(interval);
@@ -483,22 +482,6 @@ anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
 
 
 /**
- * Transforms a passed ratio value into a timestamp depending on current scale date range.
- * @param {number} value - Ratio.
- * @return {number} - Timestamp.
- */
-anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
-  if (!isNaN(this.min_) && !isNaN(this.max_)) {
-    //You will get this return expression if you draw a time axis and mark a values there.
-    return value * (this.max_ - this.min_) + this.min_;
-  } else {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_DATE_RANGE_NOT_SET);
-    return NaN;
-  }
-};
-
-
-/**
  * Aligns passed timestamp to the left according to the passed interval.
  * @param {number} date - Date to align.
  * @param {goog.date.Interval} interval - Interval to align by.
@@ -514,8 +497,6 @@ anychart.scales.GanttDateTime.prototype.alignDateLeft_ = function(date, interval
   var days = dateObj.getUTCDate();
   var hours = dateObj.getUTCHours();
   var minutes = dateObj.getUTCMinutes();
-  //  var seconds = dateObj.getUTCSeconds();
-  //  var milliseconds = dateObj.getUTCMilliseconds();
 
   if (interval.years) {
     var flagDate = new Date(flagDateValue);
@@ -534,12 +515,6 @@ anychart.scales.GanttDateTime.prototype.alignDateLeft_ = function(date, interval
   } else if (interval.minutes) {
     minutes = anychart.utils.alignLeft(minutes, interval.minutes);
     return Date.UTC(years, months, days, hours, minutes);
-  //  } else if (interval.seconds >= 1) {
-  //    seconds = anychart.utils.alignLeft(seconds, interval.seconds);
-  //    return Date.UTC(years, months, days, hours, minutes, seconds);
-  //  } else if (interval.seconds) {
-  //    milliseconds = anychart.utils.alignLeft(milliseconds, interval.seconds * 1000);
-  //    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
   } else {
     return date;
   }

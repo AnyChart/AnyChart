@@ -70,10 +70,10 @@ anychart.onDocumentReady(function() {
 
   dataGrid.container(stage);
 
-  splitter = anychart.ui.splitter();
+  splitter = new anychart.core.ui.Splitter();
 
   splitter
-      .bounds(10, 10, '90%', '90%')
+      .bounds(100, 100, '90%', '90%')
       .container(stage)
       .leftLimitSize(15)
       .rightLimitSize(15)

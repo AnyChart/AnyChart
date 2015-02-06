@@ -441,6 +441,8 @@ anychart.core.gantt.Controller.prototype.getIndexByHeight = function(height) {
  */
 anychart.core.gantt.Controller.prototype.recalculate = function() {
   if (this.visibleData_.length) {
+    if (!isNaN(this.startIndex_)) this.startIndex_ = goog.math.clamp(this.startIndex_, 0, this.visibleData_.length - 1);
+    if (!isNaN(this.endIndex_)) this.endIndex_ = goog.math.clamp(this.endIndex_, 0, this.visibleData_.length - 1);
 
     var totalHeight = this.getHeightByIndexes(0, this.heightCache_.length - 1);
 
