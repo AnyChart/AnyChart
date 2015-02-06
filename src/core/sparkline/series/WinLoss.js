@@ -73,8 +73,8 @@ anychart.core.sparkline.series.WinLoss.prototype.getDefaults = function() {
   settings['negativeLabels']['position'] = anychart.enums.Position.CENTER_BOTTOM;
   settings['negativeLabels']['anchor'] = anychart.enums.Position.CENTER_BOTTOM;
 
-  settings['fill'] = '#87CEEB';
-  settings['negativeFill'] = '#FFC0CB';
+  settings['fill'] = '#305374';
+  settings['negativeFill'] = '#cb6762';
 
   return settings;
 };

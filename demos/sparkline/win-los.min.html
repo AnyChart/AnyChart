@@ -32,60 +32,75 @@
 
 
         table.contents([
-            ['Team', null, 'Wins', 'Win Lose Chart'],
-            ['1.', 'Liverpool', getWinsCount(t1), createWinLoss(t1)],
-            ['2.', 'Fulham', getWinsCount(t2), createWinLoss(t2)],
-            ['3.', 'Chelsea', getWinsCount(t3), createWinLoss(t3)],
-            ['4.', 'Man United', getWinsCount(t4), createWinLoss(t4)],
-            ['5.', 'Bolton', getWinsCount(t5), createWinLoss(t5)],
-            ['6.', 'Blackburn', getWinsCount(t6), createWinLoss(t6)],
-            ['7.', 'Wigan Athletic', getWinsCount(t7), createWinLoss(t7)],
-            ['8.', 'West Ham United', getWinsCount(t8), createWinLoss(t8)],
-            ['9.', 'Charlton', getWinsCount(t9), createWinLoss(t9)],
-            ['10.', 'Arsenal', getWinsCount(t10), createWinLoss(t10)],
-            ['11.', 'Sunderland', getWinsCount(t11), createWinLoss(t11)],
-            ['12.', 'Aston Villa', getWinsCount(t12), createWinLoss(t12)],
-            ['13.', 'Tottenham', getWinsCount(t13), createWinLoss(t13)],
-            ['14.', 'Everton', getWinsCount(t14), createWinLoss(t14)],
-            ['15.', 'West Bromwich', getWinsCount(t15), createWinLoss(t15)],
-            ['16.', 'Portsmouth', getWinsCount(t16), createWinLoss(t16)],
-            ['17.', 'Middlesbrough', getWinsCount(t17), createWinLoss(t17)],
-            ['18.', 'Newcastle', getWinsCount(t18), createWinLoss(t18)],
-            ['19.', 'Birmingham City', getWinsCount(t19), createWinLoss(t19)],
-            ['20.', 'Manchester City', getWinsCount(t20), createWinLoss(t20)]
+            ['Team', null, 'W', 'L', 'History', 'Percent'],
+            ['1.', 'Liverpool', getWins(t1), getLoses(t1), createWinLoss(t1), getPercent(t1)],
+            ['2.', 'Fulham', getWins(t2), getLoses(t2), createWinLoss(t2), getPercent(t2)],
+            ['3.', 'Chelsea', getWins(t3), getLoses(t3), createWinLoss(t3), getPercent(t3)],
+            ['4.', 'Man United', getWins(t4), getLoses(t4), createWinLoss(t4), getPercent(t4)],
+            ['5.', 'Bolton', getWins(t5), getLoses(t5), createWinLoss(t5), getPercent(t5)],
+            ['6.', 'Blackburn', getWins(t6), getLoses(t6), createWinLoss(t6), getPercent(t6)],
+            ['7.', 'Wigan Athletic', getWins(t7), getLoses(t7), createWinLoss(t7), getPercent(t7)],
+            ['8.', 'West Ham United', getWins(t8), getLoses(t8), createWinLoss(t8), getPercent(t8)],
+            ['9.', 'Charlton', getWins(t9), getLoses(t9), createWinLoss(t9), getPercent(t9)],
+            ['10.', 'Arsenal', getWins(t10), getLoses(t10), createWinLoss(t10), getPercent(t10)],
+            ['11.', 'Sunderland', getWins(t11), getLoses(t11), createWinLoss(t11), getPercent(t11)],
+            ['12.', 'Aston Villa', getWins(t12), getLoses(t12), createWinLoss(t12), getPercent(t12)],
+            ['13.', 'Tottenham', getWins(t13), getLoses(t13), createWinLoss(t13), getPercent(t13)],
+            ['14.', 'Everton', getWins(t14), getLoses(t14), createWinLoss(t14), getPercent(t14)],
+            ['15.', 'West Bromwich', getWins(t15), getLoses(t15), createWinLoss(t15), getPercent(t15)],
+            ['16.', 'Portsmouth', getWins(t16), getLoses(t16), createWinLoss(t16), getPercent(t16)],
+            ['17.', 'Middlesbrough', getWins(t17), getLoses(t17), createWinLoss(t17), getPercent(t17)],
+            ['18.', 'Newcastle', getWins(t18), getLoses(t18), createWinLoss(t18), getPercent(t18)],
+            ['19.', 'Birmingham City', getWins(t19), getLoses(t19), createWinLoss(t19), getPercent(t19)],
+            ['20.', 'Manchester City', getWins(t20), getLoses(t20), createWinLoss(t20), getPercent(t20)]
         ]);
         table.cellBorder('none');
         table.cellFill('#EEEEEE');
         table.cellOddFill('#FFF');
 
-        setupColProp(table, 0, 'padding', 6);
         setupColProp(table, 0, ['content', 'hAlign'], 'center');
         setupColProp(table, 2, ['content', 'hAlign'], 'center');
+        setupColProp(table, 3, ['content', 'hAlign'], 'center');
+        setupColProp(table, 4, ['content', 'hAlign'], 'center');
+        setupColProp(table, 5, ['content', 'hAlign'], 'center');
+
+        setupColProp(table, 0, 'padding', 6);
         setupColProp(table, 1, 'padding', 6);
         setupColProp(table, 2, 'padding', 6);
-        setupColProp(table, 3, 'padding', 2);
+        setupColProp(table, 3, 'padding', 6);
+        setupColProp(table, 4, 'padding', 2);
+        setupColProp(table, 5, 'padding', 6);
 
         table.getCell(0, 0).colSpan(2);
-        table.getCell(0, 2).content().hAlign('center');
-        table.getCell(0, 3).padding(6);
-        table.getCell(0, 3).content().hAlign('center');
+        table.getCell(0, 4).padding(6);
 
         table.colWidth(0, 40);
-        table.colWidth(1, 140);
-        table.colWidth(2, 50);
-        table.colWidth(3, 220);
+        table.colWidth(1, 120);
+        table.colWidth(2, 40);
+        table.colWidth(3, 40);
+        table.colWidth(4, 200);
+        table.colWidth(5, 70);
 
         table.getCell(0, 0).fill('#CC3300');
         table.getCell(0, 2).fill('#CC3300');
         table.getCell(0, 3).fill('#CC3300');
+        table.getCell(0, 4).fill('#CC3300');
+        table.getCell(0, 5).fill('#CC3300');
 
         table.getCell(0, 0).padding(4);
         table.getCell(0, 2).padding(4);
         table.getCell(0, 3).padding(4);
+        table.getCell(0, 4).padding(4);
+        table.getCell(0, 5).padding(4);
 
-        table.getCell(0, 0).content().fontColor('white').fontFamily('tahoma').fontWeight('bold').fontSize('12px');
-        table.getCell(0, 2).content().fontColor('white').fontFamily('tahoma').fontWeight('bold').fontSize('12px');
-        table.getCell(0, 3).content().fontColor('white').fontFamily('tahoma').fontWeight('bold').fontSize('12px');
+        table.getCell(0, 0).content().fontColor('white').fontFamily('arial').fontWeight('bold').fontSize('12px');
+        table.getCell(0, 2).content().fontColor('white').fontFamily('arial').fontWeight('bold').fontSize('12px');
+        table.getCell(0, 3).content().fontColor('white').fontFamily('arial').fontWeight('bold').fontSize('12px');
+        table.getCell(0, 4).content().fontColor('white').fontFamily('arial').fontWeight('bold').fontSize('12px');
+        table.getCell(0, 5).content().fontColor('white').fontFamily('arial').fontWeight('bold').fontSize('12px');
+
+        table.getCell(0, 5).border('1px black');
+        table.getCell(0, 4).border('1px black');
 
         table.draw();
 
@@ -93,15 +108,34 @@
         function createWinLoss(array) {
             var chart = anychart.sparkline(array);
             chart.type('winLoss');
+            chart.margin(0);
+            chart.padding(0);
             return chart;
         }
 
-        function getWinsCount(array) {
+        function getWins(array) {
             var wins = 0;
             for (var i = 0, count = array.length - 1; i < count; i++) {
                 if (array[i] > 0) wins++;
             }
             return wins;
+        }
+
+        function getLoses(array) {
+            var loses = 0;
+            for (var i = 0, count = array.length - 1; i < count; i++) {
+                if (array[i] < 0) loses++;
+            }
+            return loses;
+        }
+
+        function getPercent(array) {
+            var wins = 0;
+            var total = array.length;
+            for (var i = 0, count = array.length - 1; i < count; i++) {
+                if (array[i] > 0) wins++;
+            }
+            return Math.round(wins / total * 100) + '%';
         }
 
         function setupColProp(table, colIndex, propNameOrChain, propValueOrArray, opt_startFrom) {
