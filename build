@@ -291,7 +291,6 @@ def __compile_project_each():
     modules = __get_modules_list()
     for module in modules:
         arguments['modules'] = [str(module)]
-        print arguments
         __compile_project()
 
 @sync_required
@@ -325,7 +324,7 @@ def __build_project_sources(modules):
                __get_output_file_arg(output_file)
     __call_compiler(commands)
 
-    if arguments['gzip']:
+    if 'gzip' in arguments:
         __gzip(output_file)
 
 
@@ -349,7 +348,7 @@ def __build_project(modules):
 
     __call_compiler(commands)
 
-    if arguments['gzip']:
+    if 'gzip' in arguments:
         __gzip(output_file)
 
 
@@ -385,6 +384,7 @@ def __get_modules_list():
         if f.endswith('.js'):
             result.append(f[:-3])
     return result
+
 
 def __gzip(output_file):
     f_in = open(output_file, 'rb')
