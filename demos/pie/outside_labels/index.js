@@ -105,7 +105,7 @@ anychart.onDocumentLoad(function() {
     seriesData3.push({x: 'All other outlets', y: pointData2[2]});
   }
 
-  chart = anychart.pie.chart(seriesData2)
+  chart = anychart.pie(seriesData2)
       .container('container')
       .innerRadius('33%')
       .outsideLabelsSpace('30%')

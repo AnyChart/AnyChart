@@ -1,89 +1,71 @@
-anychart.onDocumentReady(function() {
-  //create data set on our data
-  var dataSet1 = anychart.data.set([
-    [1, 10, 1.2],
-    [2, 20, 1.3],
-    [3, 30, 1.5],
-    [4, 25, 1.6],
-    [5, 11, 1.4]
-  ]);
+var labels;
+var count = 1;
+var index;
 
-  var dataSet2 = anychart.data.set([
-    [1, -0.489863522578899, 0.848138677816903],
-    [2, -0.385774774190865, 0.779071607989758],
-    [3, 0.085320462046806, 0.665356275004035],
-    [4, 0.661951933364362, 1.48857802967009],
-    [5, 0.275939368771361, 1.78112017585948],
-    [6, 0.327782217100161, 0.910945756785081],
-    [7, -0.353034448974316, 0.51492272900181],
-    [8, -1.52464778559499, 0.260972126042923],
-    [9, -0.593361686260142, 0.162759391666744],
-    [10, -0.282102011275525, 0.828140289442679],
-    [11, -1.23059300530264, 0.451152587985225],
-    [12, -1.24995265027972, -0.31266194270582],
-    [13, -1.37795240635888, -0.589722591726911],
-    [14, -2.52518734732884, -0.95184304656081],
-    [15, -1.70164913297708, -1.54184969446708],
-    [16, -2.80066758524658, -1.31031245938982],
-    [17, -2.21871327339612, -0.895693067878342],
-    [18, -1.86045028588756, -1.26512897818588],
-    [19, -2.13514441304614, -1.08943821214579],
-    [20, -1.36106428148275, -0.751109295408758]
-  ]);
+anychart.onDocumentLoad(function() {
+  var start = new Date().getTime();
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  //helper function to setup same settings for all six charts
-  var setupChartSettings = function(chart) {
-    chart.container(stage);
-    chart.margin(10, 10, 10, 10);
-    chart.title().fontColor('#595959').align('left');
-    chart.background().stroke('#CCCCCC');
-    chart.xAxis().title().enabled(false);
-    chart.yAxis().title().enabled(false);
-    chart.minorGrid().enabled(false);
-  };
+  var labelsArr = [];
 
-  //create stage for all charts
-  stage = acgraph.create('container');
+  labels = new anychart.core.ui.LabelsFactory();
+  labels.container('container');
+  labels.clear();
 
-  var columnChart = anychart.column();
-  columnChart.title().text('Column');
-  columnChart.bounds(0, 0, '33.3%', '50%');
-  columnChart.column(dataSet1);
-  setupChartSettings(columnChart);
-  columnChart.draw();
+  var label;
 
-  var areaChart = anychart.area();
-  areaChart.title().text('Spline-Area');
-  areaChart.bounds('33.3%', 0, '33.3%', '50%');
-  areaChart.splineArea(dataSet1);
-  setupChartSettings(areaChart);
-  areaChart.draw();
+  for (index = 0; index < count; index++) {
+    //var formatProvider = {value: 'Label: ' + index};
+    var formatProvider = {value: '       ABCDEFGHI JKL      MNOPQ     RSTUVWXY <br> Zabcde  fghijklmn   opqrstuvwx   yz0123456  789'};
+    //var formatProvider = {value: 'iiiiiiiiiiiWWWWWWWWWiWiWiWiWiWiWiWiWiWiWiWWWWWWWWWiiiiiiiiiiiiiiiWWWWWWWWWiiiiiiiiiiWWWiiiiWWWiiiWWWiii'};
+    //var formatProvider = {value: 'Текст (от лат. textus — «ткань; сплетение, связь, сочетание») — зафиксированная на каком-либо материальном носителе человеческая мысль; в общем плане связная и полная последовательность символов. Существуют две основных трактовки понятия «текст»: «имманентная» (расширенная, философски нагруженная) и «репрезентативная» (более частная). Имманентный подход подразумевает отношение к тексту как к автономной реальности, нацеленность на выявление его внутренней структуры. Репрезентативный — рассмотрение текста как особой формы представления знаний о внешней тексту действительности. В лингвистике термин текст используется в широком значении, включая и образцы устной речи. Восприятие текста изучается в рамках лингвистики текста и психолингвистики. Так, например, И. Р. Гальперин определяет текст следующим образом: «это письменное сообщение, объективированное в виде письменного документа, состоящее из ряда высказываний, объединённых разными типами лексической, грамматической и логической связи, имеющее определённый моральный характер, прагматическую установку и соответственно литературно обработанное»[1].'};
+    //var formatProvider = {value: 'Текст (от лат. textus — «ткань; сплетение, связь, сочетание») — зафиксированная на каком-либо материальном носителе человеческая мысль; в общем плане связная и полная последовательность символов. Существуют две основных трактовки понятия «текст»: «имманентная» (расширенная, философски нагруженная) и «репрезентативная» (более частная). '};
+    var positionProvider = {value: {x: 0, y: 40 * index}};
 
-  var barChart = anychart.bar();
-  barChart.title().text('Bar');
-  barChart.bounds('66.6%', 0, '33.3%', '50%');
-  barChart.bar(dataSet1);
-  setupChartSettings(barChart);
-  barChart.draw();
+    label = labels.add(formatProvider, positionProvider);
+    //label.padding('40%', 10, '20%', 20);
 
-  var lineChart = anychart.line();
-  lineChart.title().text('Spline');
-  lineChart.bounds(0, '50%', '33.3%', '50%');
-  lineChart.spline(dataSet1);
-  setupChartSettings(lineChart);
-  lineChart.draw();
+    //label.textFormatter(function() {
+    //  var text = '';
+    //
+    //  for( var i=0; i < 30; i++ )
+    //    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    //
+    //  return text;
+    //});
 
-  var scatterChart = anychart.bubble();
-  scatterChart.title().text('Bubble');
-  scatterChart.bounds('33.3%', '50%', '33.3%', '50%');
-  scatterChart.bubble(dataSet1);
-  setupChartSettings(scatterChart);
-  scatterChart.draw();
+    //label.textFormatter(function() {
+    //  return 'Label'
+    //});
 
-  var rangeSplineAreaChart = anychart.area();
-  rangeSplineAreaChart.title().text('Range Spline-Area');
-  rangeSplineAreaChart.bounds('66.6%', '50%', '33.3%', '50%');
-  rangeSplineAreaChart.rangeSplineArea(dataSet2);
-  setupChartSettings(rangeSplineAreaChart);
-  rangeSplineAreaChart.draw();
+    labelsArr.push(label);
+  }
+  //labels.width(200);
+  //labels.height(40);
+  labels.useHtml(true);
+  labels.anchor(anychart.enums.Anchor.LEFT_TOP);
+  labels.fontColor('red');
+  labels.fontSize(15);
+  //labels.textOverflow('ellipsis');
+  labels.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
+  //labels.textIndent(20);
+  //labels.rotation(90);
+  //labels.textFormatter(function() {
+  //  return 'Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  //});
+  //labels.background().enabled(true);
+  //labels.background().fill('green 0.3');
+  labels.draw();
+
+  //labels.container().rect().setBounds(labels.measure(labelsArr[0]));
+  //labels.container().rect().setBounds(labels.measure(labelsArr[1]));
+
+
+  console.log((new Date().getTime() - start) + 'ms');
+
+
+  labels.container().rect().setBounds(labels.measure(label));
+  var renderer = acgraph.getRenderer();
+  console.log(goog.object.getKeys(renderer.textBoundsCache['-2069841799']).length);
+  console.log(renderer.textBoundsCache);
 });

@@ -1859,12 +1859,12 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     var isWidthSet = !goog.isNull(widthSettings);
     var isHeightSet = !goog.isNull(heightSettings);
 
-    //we should ask text element about bounds only after text format and text settings are applied
-    var textElementBounds = this.textElement_.getBounds();
-
     /** @type  {anychart.math.Rect} */
     var outerBounds = new anychart.math.Rect(0, 0, 0, 0);
     //calculate text width and outer width
+
+    var textElementBounds;
+
     var width, textX, textWidth;
     if (isWidthSet) {
       width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(widthSettings), parentWidth));
@@ -1877,6 +1877,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       }
       outerBounds.width = width;
     } else {
+      //we should ask text element about bounds only after text format and text settings are applied
+      textElementBounds = this.textElement_.getBounds();
       width = textElementBounds.width;
       if (padding) {
         outerBounds.width = padding.widenWidth(width);
@@ -1887,9 +1889,6 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       }
     }
     if (goog.isDef(textWidth)) this.textElement_.width(textWidth);
-
-    //we should ask text element about bounds only after text format and text settings are applied
-    textElementBounds = this.textElement_.getBounds();
 
     //calculate text height and outer height
     var height, textY, textHeight;
@@ -1904,6 +1903,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       }
       outerBounds.height = height;
     } else {
+      //we should ask text element about bounds only after text format and text settings are applied
+      textElementBounds = this.textElement_.getBounds();
       height = textElementBounds.height;
       if (padding) {
         outerBounds.height = padding.widenHeight(height);
