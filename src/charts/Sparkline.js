@@ -2969,12 +2969,12 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
   if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
   if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
   if (config['markers']) this.markers().setupByJSON(config['markers']);
+
   if (config['firstLabels']) this.firstLabels().setupByJSON(config['firstLabels']);
   if (config['lastLabels']) this.lastLabels().setupByJSON(config['lastLabels']);
   if (config['maxLabels']) this.maxLabels().setupByJSON(config['maxLabels']);
   if (config['minLabels']) this.minLabels().setupByJSON(config['minLabels']);
   if (config['negativeLabels']) this.negativeLabels().setupByJSON(config['negativeLabels']);
-  if (config['markers']) this.markers().setupByJSON(config['markers']);
   if (config['labels']) this.labels().setupByJSON(config['labels']);
 };
 

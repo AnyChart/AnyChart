@@ -236,7 +236,7 @@ anychart.charts.Pie = function(opt_data) {
   this.data(opt_data || null);
   this.legend().enabled(true);
 
-  this.insideLabelsOverlap(false);
+  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
   this.outsideLabelsSpace('30');
   this.insideLabelsOffset('50%');
   this.connectorLength('20');
@@ -849,20 +849,22 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
 
 
 /**
- * Defines show label if it don't fit to bounds slice or not show. Only for inside labels.
- * @param {boolean=} opt_value .
- * @return {boolean|anychart.charts.Pie} .
+ * Defines show label if it don't fit to bounds slice or not show. ONLY for inside labels.
+ * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value .
+ * @return {anychart.enums.LabelsOverlapMode|anychart.charts.Pie} .
  */
-anychart.charts.Pie.prototype.insideLabelsOverlap = function(opt_value) {
+anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.insideLabelsOverlap_ != opt_value) {
-      this.insideLabelsOverlap_ = opt_value;
+    var val = anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
+    if (this.insideLabelsOverlap_ != val) {
+      this.insideLabelsOverlap_ = val;
       this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
       return this;
     }
   }
-  return this.insideLabelsOverlap_;
+  return this.insideLabelsOverlap_ ?
+      anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
+      anychart.enums.LabelsOverlapMode.NO_OVERLAP;
 };
 
 
@@ -2982,20 +2984,21 @@ anychart.charts.Pie.prototype.serialize = function() {
   json['insideLabelsOffset'] = this.insideLabelsOffset();
   json['connectorLength'] = this.connectorLength();
   json['outsideLabelsCriticalAngle'] = this.outsideLabelsCriticalAngle();
-  json['insideLabelsOverlap'] = this.insideLabelsOverlap();
+  json['overlapMode'] = this.overlapMode();
 
 
-  if (goog.isFunction(this['group'])) {
-    if (goog.isFunction(this.group())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Pie group']
-      );
-    } else {
-      json['group'] = this.group();
-    }
-  }
+  // The values of group() function can be function or null or 'none'. So we don't serialize it anyway.
+  //if (goog.isFunction(this['group'])) {
+  //  if (goog.isFunction(this.group())) {
+  //    anychart.utils.warning(
+  //        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //        null,
+  //        ['Pie group']
+  //    );
+  //  } else {
+  //    json['group'] = this.group();
+  //  }
+  //}
   if (goog.isFunction(this['connectorStroke'])) {
     if (goog.isFunction(this.connectorStroke())) {
       anychart.utils.warning(
@@ -3095,7 +3098,7 @@ anychart.charts.Pie.prototype.setupByJSON = function(config) {
   this.explode(config['explode']);
   this.outsideLabelsSpace(config['outsideLabelsSpace']);
   this.insideLabelsOffset(config['insideLabelsOffset']);
-  this.insideLabelsOverlap(config['insideLabelsOverlap']);
+  this.overlapMode(config['overlapMode']);
   this.connectorLength(config['connectorLength']);
   this.outsideLabelsCriticalAngle(config['outsideLabelsCriticalAngle']);
   this.connectorStroke(config['connectorStroke']);
@@ -3555,7 +3558,7 @@ anychart.charts.Pie.prototype['explodeSlice'] = anychart.charts.Pie.prototype.ex
 anychart.charts.Pie.prototype['explodeSlices'] = anychart.charts.Pie.prototype.explodeSlices;
 anychart.charts.Pie.prototype['tooltip'] = anychart.charts.Pie.prototype.tooltip;//doc|ex
 anychart.charts.Pie.prototype['outsideLabelsSpace'] = anychart.charts.Pie.prototype.outsideLabelsSpace;//doc|ewx
-anychart.charts.Pie.prototype['insideLabelsOverlap'] = anychart.charts.Pie.prototype.insideLabelsOverlap;
+anychart.charts.Pie.prototype['overlapMode'] = anychart.charts.Pie.prototype.overlapMode;
 anychart.charts.Pie.prototype['insideLabelsOffset'] = anychart.charts.Pie.prototype.insideLabelsOffset;//doc|ewx
 anychart.charts.Pie.prototype['connectorLength'] = anychart.charts.Pie.prototype.connectorLength;//doc|ex
 anychart.charts.Pie.prototype['outsideLabelsCriticalAngle'] = anychart.charts.Pie.prototype.outsideLabelsCriticalAngle;//doc|ex

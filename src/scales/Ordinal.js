@@ -428,8 +428,10 @@ anychart.scales.Ordinal.prototype.ticksInvalidated_ = function(event) {
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['values'] = this.autoDomain_ ? null : this.values();
-  json['names'] = this.names_;
+  if (!this.autoDomain_)
+    json['values'] = this.values();
+  if (this.names_)
+    json['names'] = this.names_;
   json['ticks'] = this.ticks().serialize();
   return json;
 };

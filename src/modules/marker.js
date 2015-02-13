@@ -18,6 +18,7 @@ anychart.marker = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.MARKER);
+  chart.setType(anychart.enums.ChartTypes.MARKER);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);

@@ -19,6 +19,7 @@ anychart.bar = function(var_args) {
   var chart = new anychart.charts.Cartesian(true);
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BAR);
+  chart.setType(anychart.enums.ChartTypes.BAR);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bar(arguments[i]);

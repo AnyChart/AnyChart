@@ -374,8 +374,8 @@ anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
 /** @inheritDoc */
 anychart.scales.ScatterBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['maximum'] = this.maximumModeAuto ? this.max : null;
-  json['minimum'] = this.minimumModeAuto ? this.min : null;
+  json['maximum'] = this.maximumModeAuto ? null : this.max;
+  json['minimum'] = this.minimumModeAuto ? null : this.min;
   json['minimumGap'] = this.minimumGap();
   json['maximumGap'] = this.maximumGap();
   return json;

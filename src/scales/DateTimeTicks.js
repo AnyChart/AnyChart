@@ -543,9 +543,12 @@ anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['explicit'] = this.explicit_;
-  json['count'] = this.count_;
-  json['interval'] = this.interval_ ? this.interval_.toIsoString() : null;
+  if (this.explicit_)
+    json['explicit'] = this.explicit_;
+  else if (this.interval_)
+    json['interval'] = this.interval_.toIsoString();
+  else if (!isNaN(this.count_))
+    json['count'] = this.count_;
   return json;
 };
 

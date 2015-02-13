@@ -1277,10 +1277,11 @@ anychart.charts.Polar.prototype.serialize = function() {
       } else {
         config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
       }
-      grids.push(config);
     }
+    grids.push(config);
   }
-  json['grids'] = grids;
+  if (grids.length)
+    json['grids'] = grids;
 
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
@@ -1307,7 +1308,8 @@ anychart.charts.Polar.prototype.serialize = function() {
     }
     minorGrids.push(config);
   }
-  json['minorGrids'] = minorGrids;
+  if (minorGrids.length)
+    json['minorGrids'] = minorGrids;
 
   config = this.xAxis_.serialize();
   scale = this.xAxis_.scale();
@@ -1359,9 +1361,11 @@ anychart.charts.Polar.prototype.serialize = function() {
     }
     series.push(config);
   }
-  json['series'] = series;
+  if (series.length)
+    json['series'] = series;
 
-  json['scales'] = scales;
+  if (scales.length)
+    json['scales'] = scales;
   return {'chart': json};
 };
 

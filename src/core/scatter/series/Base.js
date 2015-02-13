@@ -2190,7 +2190,8 @@ anychart.core.scatter.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = this.getType();
   json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
-  json['name'] = this.name();
+  if (goog.isDef(this.name()))
+    json['name'] = this.name();
   json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();

@@ -606,14 +606,17 @@ anychart.scales.ScatterTicks.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['mode'] = this.mode_;
   json['base'] = this.base_;
-  json['explicit'] = this.explicit_;
-  if (this.minCount_ == this.maxCount_) {
-    if (!isNaN(this.minCount_)) json['count'] = this.minCount_;
-  } else {
-    if (!isNaN(this.minCount_)) json['minCount'] = this.minCount_;
-    if (!isNaN(this.maxCount_)) json['maxCount'] = this.maxCount_;
+  if (this.explicit_)
+    json['explicit'] = this.explicit_;
+  else {
+    if (this.minCount_ == this.maxCount_) {
+      if (!isNaN(this.minCount_)) json['count'] = this.minCount_;
+    } else {
+      if (!isNaN(this.minCount_)) json['minCount'] = this.minCount_;
+      if (!isNaN(this.maxCount_)) json['maxCount'] = this.maxCount_;
+    }
+    if (!isNaN(this.interval_)) json['interval'] = this.interval_;
   }
-  if (!isNaN(this.interval_)) json['interval'] = this.interval_;
   return json;
 };
 

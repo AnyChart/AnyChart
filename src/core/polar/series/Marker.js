@@ -527,7 +527,7 @@ anychart.core.polar.series.Marker.prototype.serialize = function() {
         null,
         ['Marker hoverType']
     );
-  } else {
+  } else if (goog.isDef(this.hoverType())) {
     json['hoverType'] = this.hoverType();
   }
 

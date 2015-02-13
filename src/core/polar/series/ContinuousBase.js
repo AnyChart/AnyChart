@@ -607,7 +607,7 @@ anychart.core.polar.series.ContinuousBase.prototype.serialize = function() {
   json['closed'] = this.closed();
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
-  json['connectMissingPoints'] = this.connectMissingPoints;
+  json['connectMissingPoints'] = this.connectMissingPoints();
   return json;
 };
 

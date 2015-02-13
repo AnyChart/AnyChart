@@ -801,8 +801,8 @@ anychart.core.Chart.prototype.serialize = function() {
   for (var i = 0; i < this.chartLabels_.length; i++) {
     labels.push(this.chartLabels_[i].serialize());
   }
-  // from VisualBase
-  json['chartLabels'] = labels;
+  if (labels.length > 0)
+    json['chartLabels'] = labels;
   // from VisualBaseWithBounds
   json['bounds'] = this.bounds().serialize();
   return json;
@@ -820,7 +820,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {
     for (var i = 0; i < labels.length; i++)
-      this.label(labels[i]);
+      this.label(i, labels[i]);
   }
 
   // from VisualBase

@@ -1038,14 +1038,16 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isNull(json['enabled'])) delete json['enabled'];
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
-  if (goog.isDef(this.position())) json['position'] = this.position();
-  if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
-  if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
-  if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
-  if (goog.isDef(this.type())) json['type'] = this.type();
+  if (this.changedSettings['position']) json['position'] = this.position();
+  if (this.changedSettings['anchor']) json['anchor'] = this.anchor();
+  if (this.changedSettings['offsetX']) json['offsetX'] = this.offsetX();
+  if (this.changedSettings['offsetY']) json['offsetY'] = this.offsetY();
+  if (this.changedSettings['type']) json['type'] = this.type();
   if (goog.isDef(this.size())) json['size'] = this.size();
-  if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  if (this.changedSettings['fill'] && goog.isDef(this.fill_))
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill_));
+  if (this.changedSettings['stroke'] && goog.isDef(this.stroke_))
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke_));
   return json;
 };
 
@@ -1923,6 +1925,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) 
   this.size(config['size']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
+  if (!goog.isDef(config['enabled'])) delete this.settingsObj.enabledLabel_;
 };
 
 

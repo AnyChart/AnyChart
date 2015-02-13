@@ -312,7 +312,7 @@ anychart.core.scatter.series.Line.prototype.getType = function() {
  */
 anychart.core.scatter.series.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['connectMissingPoints'] = this.connectMissingPoints;
+  json['connectMissingPoints'] = this.connectMissingPoints();
   return json;
 };
 

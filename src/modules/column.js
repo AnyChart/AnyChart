@@ -19,6 +19,7 @@ anychart.column = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.COLUMN);
+  chart.setType(anychart.enums.ChartTypes.COLUMN);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.column(arguments[i]);

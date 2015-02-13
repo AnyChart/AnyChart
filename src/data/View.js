@@ -614,6 +614,7 @@ anychart.data.View.prototype.serialize = function() {
   var key;
   var rowObject;
   var i;
+  var val;
   while (iterator.advance()) {
     index = iterator.getIndex();
     row = this.row(index);
@@ -625,9 +626,22 @@ anychart.data.View.prototype.serialize = function() {
       for (key in arrayMapping) {
         for (i = 0; i < arrayMapping[key].length; i++) {
           if (arrayMapping[key][i] in row) {
-            rowObject[key] = row[arrayMapping[key][i]];
+            val = row[arrayMapping[key][i]];
+            if (val instanceof Date)
+              val = val.getTime();
+            rowObject[key] = val;
             break;
           }
+        }
+      }
+    } else if (goog.isObject(row)) {
+      rowObject = {};
+      for (key in row) {
+        if (row.hasOwnProperty(key)) {
+          val = row[key];
+          if (val instanceof Date)
+            val = val.getTime();
+          rowObject[key] = val;
         }
       }
     } else {

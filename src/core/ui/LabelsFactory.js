@@ -530,15 +530,15 @@ anychart.core.ui.LabelsFactory.prototype.setAutoColor = function(value) {
 anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isNull(json['enabled'])) delete json['enabled'];
-  if (goog.isDef(this.background())) json['background'] = this.background().serialize();
-  if (goog.isDef(this.padding())) json['padding'] = this.padding().serialize();
-  if (goog.isDef(this.position())) json['position'] = this.position();
-  if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
-  if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
-  if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
-  if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
-  if (goog.isDef(this.width())) json['width'] = this.width();
-  if (goog.isDef(this.height())) json['height'] = this.height();
+  if (this.background_) json['background'] = this.background_.serialize();
+  if (this.padding_) json['padding'] = this.padding_.serialize();
+  if (this.changedSettings['position']) json['position'] = this.position();
+  if (this.changedSettings['anchor']) json['anchor'] = this.anchor();
+  if (this.changedSettings['offsetX']) json['offsetX'] = this.offsetX();
+  if (this.changedSettings['offsetY']) json['offsetY'] = this.offsetY();
+  if (this.changedSettings['rotation']) json['rotation'] = this.rotation();
+  if (this.changedSettings['width']) json['width'] = this.width();
+  if (this.changedSettings['height']) json['height'] = this.height();
   return json;
 };
 

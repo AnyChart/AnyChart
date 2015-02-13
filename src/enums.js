@@ -13,6 +13,10 @@ goog.require('acgraph');
 //  Chart types enum
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Chart types.
+ * @enum {string}
+ */
 anychart.enums.ChartTypes = {
   AREA: 'area',
   BAR: 'bar',

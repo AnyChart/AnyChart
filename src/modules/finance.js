@@ -26,6 +26,7 @@ anychart.financial = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.CANDLESTICK);
+  chart.setType(anychart.enums.ChartTypes.FINANCIAL);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.candlestick(arguments[i]);

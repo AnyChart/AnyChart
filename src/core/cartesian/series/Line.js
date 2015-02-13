@@ -72,7 +72,14 @@ anychart.core.cartesian.series.Line.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Line.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  var stroke = this.getFinalStroke(false, false);
+  if (goog.isObject(stroke)) {
+    delete stroke['thickness'];
+    delete stroke['dash'];
+    delete stroke['lineCap'];
+    delete stroke['lineJoin'];
+  }
+  return stroke;
 };
 
 

@@ -1873,7 +1873,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     grids.push(config);
   }
-  json['grids'] = grids;
+  if (grids.length)
+    json['grids'] = grids;
 
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
@@ -1890,7 +1891,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     minorGrids.push(config);
   }
-  json['minorGrids'] = minorGrids;
+  if (minorGrids.length)
+    json['minorGrids'] = minorGrids;
 
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
@@ -1907,7 +1909,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     xAxes.push(config);
   }
-  json['xAxes'] = xAxes;
+  if (xAxes.length)
+    json['xAxes'] = xAxes;
 
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
@@ -1924,7 +1927,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     yAxes.push(config);
   }
-  json['yAxes'] = yAxes;
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
 
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
@@ -1941,7 +1945,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     lineAxesMarkers.push(config);
   }
-  json['lineAxesMarkers'] = lineAxesMarkers;
+  if (lineAxesMarkers.length)
+    json['lineAxesMarkers'] = lineAxesMarkers;
 
   var rangeAxesMarkers = [];
   for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
@@ -1958,7 +1963,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     rangeAxesMarkers.push(config);
   }
-  json['rangeAxesMarkers'] = rangeAxesMarkers;
+  if (rangeAxesMarkers.length)
+    json['rangeAxesMarkers'] = rangeAxesMarkers;
 
   var textAxesMarkers = [];
   for (i = 0; i < this.textAxesMarkers_.length; i++) {
@@ -1975,7 +1981,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     textAxesMarkers.push(config);
   }
-  json['textAxesMarkers'] = textAxesMarkers;
+  if (textAxesMarkers.length)
+    json['textAxesMarkers'] = textAxesMarkers;
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {
@@ -2003,9 +2010,11 @@ anychart.charts.Scatter.prototype.serialize = function() {
     }
     series.push(config);
   }
-  json['series'] = series;
+  if (series.length)
+    json['series'] = series;
 
-  json['scales'] = scales;
+  if (scales.length)
+    json['scales'] = scales;
   return {'chart': json};
 };
 

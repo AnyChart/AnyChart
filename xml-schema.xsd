@@ -63,6 +63,29 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
+            <!-- charts.Sparkline elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="last_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="last_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="last_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="last_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="first_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="first_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="first_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="first_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="max_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="max_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="max_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="max_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="min_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="min_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="min_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="min_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -96,6 +119,8 @@
         <xsd:attribute name="inner_radius" type="simple.NumberOrPercent" default="0"/>
         <xsd:attribute name="explode" type="simple.NumberOrPercent" default="15"/>
         <xsd:attribute name="outside_labels_space" type="simple.NumberOrPercent" default="30%"/>
+        <xsd:attribute name="inside_labels_offset" type="simple.NumberOrPercent" default="50%"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
         <xsd:attribute name="connector_length" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="outside_labels_critical_angle" type="xsd:double" default="60"/>
         <xsd:attribute name="connectorStroke" type="xsd:string" default="black 0.3"/>
@@ -105,6 +130,32 @@
         <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill" default="false"/>
         <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill" default="false"/>
+        <!-- charts.Sparkline elements -->
+        <xsd:attribute name="clip" type="simple.Bool" default="true"/>
+        <xsd:attribute name="series_type" type="enums.SparkSeriesTypes" default="line"/>
+        <xsd:attribute name="point_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="connect_missing_points" type="simple.Bool" default="false"/>
+        <xsd:attribute name="last_fill" type="xsd:string"/>
+        <xsd:attribute name="last_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="last_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="last_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="first_fill" type="xsd:string"/>
+        <xsd:attribute name="first_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="first_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="first_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="max_fill" type="xsd:string"/>
+        <xsd:attribute name="max_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="max_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="max_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="min_fill" type="xsd:string"/>
+        <xsd:attribute name="min_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="min_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="min_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="negative_fill" type="xsd:string"/>
+        <xsd:attribute name="negative_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="negative_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="negative_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="markers" type="simple.MarkerType"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">
@@ -210,7 +261,7 @@
         <xsd:attribute name="falling_stroke" type="xsd:string"/>
         <xsd:attribute name="hover_falling_stroke" type="xsd:string"/>
         <!-- WidthBased series -->
-        <xsd:attribute name="point_width" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="point_width" type="simple.NumberOrPercentOrNull"/>
         <!-- Polar ContinuousBase series -->
         <xsd:attribute name="closed" type="simple.Bool" default="true"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -387,7 +438,7 @@
         <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
         <xsd:attribute name="align" type="enums.Align" default="center"/>
         <xsd:attribute name="layout" type="enums.Layout"/>
-        <xsd:attribute name="rotation" type="xsd:double" default="0"/>
+        <xsd:attribute name="rotation" type="simple.DoubleOrNull" default="0"/>
         <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
         <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
         <xsd:attribute name="text" type="xsd:string"/>
@@ -413,7 +464,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="is_minor" type="simple.Bool"/>
-        <xsd:attribute name="layout" type="enums.Layout"/>
+        <xsd:attribute name="layout" type="enums.GridLayout"/>
         <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
         <xsd:attribute name="odd_fill" type="xsd:string"/>
@@ -638,7 +689,7 @@
 
     <xsd:complexType name="palettes.ColorsItems">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="item" type="simple.Text"/>
+            <xsd:element name="item" type="Fill"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -701,7 +752,7 @@
 
     <!-- Colors -->
 
-    <xsd:complexType name="Fill">
+    <xsd:complexType name="Fill" mixed="true">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="mode" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="keys" type="GradientKeys"/>
@@ -718,7 +769,7 @@
         <xsd:attribute name="src" type="xsd:string"/>
     </xsd:complexType>
 
-    <xsd:complexType name="Stroke">
+    <xsd:complexType name="Stroke" mixed="true">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="mode" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="keys" type="GradientKeys"/>
@@ -882,7 +933,7 @@
         <xsd:union>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
-                    <xsd:pattern value="^-?P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?((\d+(\.\d+)?)S)?)?$"/>
+                    <xsd:pattern value="-?P(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?((\d+(\.\d+)?)S)?)?"/>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>
@@ -1083,13 +1134,14 @@
             <xsd:enumeration value="bullet"/>
             <xsd:enumeration value="cartesian"/>
             <xsd:enumeration value="column"/>
-            <xsd:enumeration value="finance"/>
+            <xsd:enumeration value="financial"/>
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
             <xsd:enumeration value="polar"/>
             <xsd:enumeration value="radar"/>
             <xsd:enumeration value="scatter"/>
+            <xsd:enumeration value="sparkline"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -1124,8 +1176,10 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="enums.RadialGridLayout">
+    <xsd:simpleType name="enums.GridLayout">
         <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="vertical"/>
+            <xsd:enumeration value="horizontal"/>
             <xsd:enumeration value="radial"/>
             <xsd:enumeration value="circuit"/>
         </xsd:restriction>
@@ -1162,6 +1216,10 @@
             <xsd:enumeration value="star6"/>
             <xsd:enumeration value="star7"/>
             <xsd:enumeration value="star10"/>
+            <xsd:enumeration value="bar"/>
+            <xsd:enumeration value="x"/>
+            <xsd:enumeration value="line"/>
+            <xsd:enumeration value="ellipse"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -1223,6 +1281,15 @@
             <xsd:enumeration value="splineArea"/>
             <xsd:enumeration value="stepArea"/>
             <xsd:enumeration value="stepLine"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.SparkSeriesTypes">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="area"/>
+            <xsd:enumeration value="column"/>
+            <xsd:enumeration value="line"/>
+            <xsd:enumeration value="winLoss"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -1358,7 +1425,7 @@
 
     <xsd:attributeGroup name="attrs.VisualBase">
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
-        <xsd:attribute name="z_index" type="xsd:int"/>
+        <xsd:attribute name="z_index" type="xsd:double"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.Bounds">

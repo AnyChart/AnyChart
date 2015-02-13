@@ -17,43 +17,71 @@
   </style>
 </head>
 <body>
-<input type="button" onclick="removeContainer()" value="remove container">
-<input type="button" onclick="resize(1)" value="increase">
-<input type="button" onclick="resize(-1)" value="decrease">
-<input type="text" id="step" value="20"/>px
-<div id="wrapper">
-  <div id="container"  style="width: 400px; height: 220px; border: 1px solid #000000"></div>
-</div>
-<div id="wrapper1">
-
-</div>
-
-<div id="status"></div>
+  <div id="container"  style="width: 800px; height: 600px; border: 1px solid #000000"></div>
 </body>
 <script>
-  var chart;
+  /**
+   * @type {anychart.core.Chart}
+   */
+  var chart, chart1;
   anychart.onDocumentLoad(function() {
-    chart = anychart.line([1,3,4]);
+    chart = anychart.sparkline([15.5, 16.6, -10.4, 25, 22, -19, 15, 9, -1, 10, 7]);
+    chart.title('Anchor').height('100%');
+    chart.textMarker()
+        .text('LEFT_TOP')
+        .value(-25)
+        .anchor(anychart.enums.Anchor.LEFT_TOP);
+
+    chart.textMarker(1)
+        .text('RIGHT_TOP')
+        .value(-20)
+        .anchor(anychart.enums.Anchor.RIGHT_TOP);
+
+    chart.textMarker(2)
+        .text('CENTER_TOP')
+        .value(-15)
+        .anchor(anychart.enums.Anchor.CENTER_TOP);
+//--------------------------------------------------
+    chart.textMarker(3)
+        .text('leftCenter')
+        .value(-10)
+        .anchor('leftCenter');
+
+    chart.textMarker(4)
+        .text('rightCenter')
+        .value(-5)
+        .anchor('rightCenter');
+
+    chart.textMarker(5)
+        .text('center')
+        .value(0)
+        .anchor('center');
+//--------------------------------------------------
+    chart.textMarker(6)
+        .text('LEFT_BOTTOM')
+        .value(5)
+        .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
+
+    chart.textMarker(7)
+        .text('RIGHT_BOTTOM')
+        .value(10)
+        .anchor(anychart.enums.Anchor.RIGHT_BOTTOM);
+
+    chart.textMarker(8)
+        .text('CENTER_BOTTOM')
+        .value(15)
+        .anchor(anychart.enums.Anchor.CENTER_BOTTOM);
+
     chart.container('container').draw();
 
+
+    var json = chart.toJson();
+    chart.dispose();
+
+    chart1 = anychart.fromJson(json);
+    chart1.container('container').draw();
+
   });
-
-  function removeContainer() {
-    var wrp = document.getElementById('wrapper');
-    var container = document.getElementById('container');
-    wrp.removeChild(container);
-    var wrp1 = document.getElementById('wrapper1');
-    wrp1.appendChild(container);
-  }
-
-  var width = 400;
-  var height = 220;
-  function resize(val){
-    width += val*document.getElementById('step').value;
-    height += val*document.getElementById('step').value;
-    document.getElementById('container').style.width = width;
-    document.getElementById('container').style.height = height;
-  }
 </script>
 </html>
 

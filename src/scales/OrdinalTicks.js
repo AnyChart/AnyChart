@@ -106,6 +106,7 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
     if (this.interval_ != opt_value) {
       this.interval_ = opt_value;
       this.explicit_ = null;
+      this.explicitIndexes_ = null;
       this.autoTicks_ = null;
       this.autoNames_ = null;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -271,9 +272,12 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['explicit'] = this.explicit_;
-  if (!isNaN(this.interval_)) json['interval'] = this.interval_;
-  json['names'] = this.names_;
+  if (this.explicitIndexes_)
+    json['explicit'] = this.explicitIndexes_;
+  else if (!isNaN(this.interval_))
+    json['interval'] = this.interval_;
+  if (this.names_)
+    json['names'] = this.names_;
   return json;
 };
 
@@ -292,8 +296,10 @@ anychart.scales.OrdinalTicks.prototype.setupSpecial = function(var_args) {
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.explicit_ = config['explicit'] || null;
-  this.interval_ = goog.isNumber(config['interval']) ? config['interval'] : 1;
+  if ('explicit' in config)
+    this.set(config['explicit']);
+  else if ('interval' in config)
+    this.interval(config['interval']);
   this.names_ = config['names'] || null;
   this.autoTicks_ = null;
   this.autoNames_ = null;

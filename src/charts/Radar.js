@@ -1516,7 +1516,8 @@ anychart.charts.Radar.prototype.serialize = function() {
     }
     grids.push(config);
   }
-  json['grids'] = grids;
+  if (grids.length)
+    json['grids'] = grids;
 
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
@@ -1547,7 +1548,8 @@ anychart.charts.Radar.prototype.serialize = function() {
     }
     minorGrids.push(config);
   }
-  json['minorGrids'] = minorGrids;
+  if (minorGrids.length)
+    json['minorGrids'] = minorGrids;
 
   config = this.xAxis_.serialize();
   scale = this.xAxis_.scale();
@@ -1599,9 +1601,11 @@ anychart.charts.Radar.prototype.serialize = function() {
     }
     series.push(config);
   }
-  json['series'] = series;
+  if (series.length)
+    json['series'] = series;
 
-  json['scales'] = scales;
+  if (scales.length)
+    json['scales'] = scales;
   return {'chart': json};
 };
 

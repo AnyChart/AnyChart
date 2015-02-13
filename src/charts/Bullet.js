@@ -789,7 +789,20 @@ anychart.charts.Bullet.prototype.setupByJSON = function(config) {
   this.layout(config['layout']);
   this.rangePalette(config['rangePalette']);
   this.markerPalette(config['markerPalette']);
-  this.scale(config['scale']);
+
+  var scaleJson = config['scale'];
+  var scale;
+  if (goog.isString(scaleJson)) {
+    scale = anychart.scales.Base.fromString(scaleJson, null);
+  } else if (goog.isObject(scaleJson)) {
+    scale = anychart.scales.Base.fromString(scaleJson['type'], false);
+    scale.setup(scaleJson);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.scale(scale);
+
   this.axis(config['axis']);
   var ranges = config['ranges'];
   if (goog.isArray(ranges))

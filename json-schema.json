@@ -654,6 +654,10 @@
         "outsideLabelsSpace": {
           "type": ["string", "number", "null"]
         },
+        "insideLabelsOffset": {
+          "type": ["string", "number", "null"]
+        },
+        "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
         "connectorLength": {
           "type": ["string", "number", "null"]
         },
@@ -2488,60 +2492,7 @@
     },
 
     "data": {
-      "type": "array",
-      "items": {
-        "type": [
-          "number",
-          "string",
-          "object",
-          "array"
-        ],
-        "properties": {
-          "x": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "y": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "open": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "low": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "high": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "close": {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          "fill": {"$ref": "#/definitions/fill"},
-          "stroke": {"$ref": "#/definitions/stroke"},
-          "hoverFill": {"$ref": "#/definitions/fill"},
-          "hoverStroke": {"$ref": "#/definitions/stroke"}
-        },
-        "items": {
-          "type": ["string", "number"]
-        }
-      }
+      "type": "array"
     },
 
     "disable": {

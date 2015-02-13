@@ -2190,7 +2190,8 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = this.getType();
   json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
-  json['name'] = this.name();
+  if (goog.isDef(this.name()))
+    json['name'] = this.name();
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();

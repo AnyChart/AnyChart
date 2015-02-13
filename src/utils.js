@@ -365,14 +365,18 @@ anychart.utils.recursiveClone = function(obj) {
   if (goog.isFunction(obj)) {
     return obj;
   } else if (goog.isArray(obj)) {
-    res = new Array(obj.length);
+    res = [];
+    for (var i = 0; i < obj.length; i++) {
+      if (i in obj)
+        res[i] = anychart.utils.recursiveClone(obj[i]);
+    }
   } else if (goog.isObject(obj)) {
     res = {};
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+        res[key] = anychart.utils.recursiveClone(obj[key]);
+    }
   } else return obj;
-
-  for (var key in obj) {
-    res[key] = anychart.utils.recursiveClone(obj[key]);
-  }
 
   return res;
 };
@@ -580,8 +584,10 @@ anychart.utils.xml2json = function(xml) {
         var attr = node.attributes[i];
         name = anychart.utils.toCamelCase(attr.nodeName);
         if (!(name in result)) {
-          var val = attr.nodeValue;
-          if (!isNaN(+val))
+          var val = attr.value;
+          if (val == '')
+            result[name] = val;
+          else if (!isNaN(+val))
             result[name] = +val;
           else if (val == 'true')
             result[name] = true;
@@ -595,7 +601,7 @@ anychart.utils.xml2json = function(xml) {
         }
       }
 
-      return onlyText ? textValue : result;
+      return onlyText ? (textValue.length > 0 ? anychart.utils.unescapeString(textValue) : null) : result;
     case anychart.utils.XmlNodeType_.TEXT_NODE:
       var value = anychart.utils.trim(node.nodeValue);
       return (value == '') ? null : value;
@@ -679,7 +685,7 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
           for (j = 0; j < child.length; j++) {
             grouper.appendChild(anychart.utils.json2xml_(child[j], itemName, doc));
           }
-        } else if (goog.isDefAndNotNull(child)) {
+        } else if (goog.isDef(child)) {
           if (goog.isObject(child) || !anychart.utils.ACCEPTED_BY_ATTRIBUTE_.test(child)) {
             root.appendChild(anychart.utils.json2xml_(child, i, doc));
           } else {
@@ -690,6 +696,42 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
     }
   }
   return root;
+};
+
+
+/**
+ * Unescapes strings escapes by goog.string.escapeString() method.
+ * @param {string} str String to unescape.
+ * @return {string} Unescaped string.
+ */
+anychart.utils.unescapeString = function(str) {
+  return str.replace(/\\([0bfnrt"'\\]|x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4}))/g, function(match, sym, hex, utf) {
+    var c = sym.charAt(0);
+    switch (c) {
+      case '0':
+        return '\0';
+      case 'b':
+        return '\b';
+      case 'f':
+        return '\f';
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case '"':
+        return '"';
+      case '\'':
+        return '\'';
+      case '\\':
+        return '\\';
+      case 'x':
+        return String.fromCharCode(parseInt(hex, 16));
+      case 'u':
+        return String.fromCharCode(parseInt(utf, 16));
+    }
+  });
 };
 
 

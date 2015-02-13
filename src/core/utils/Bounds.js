@@ -250,7 +250,9 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
  */
 anychart.core.utils.Bounds.prototype.left = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) || goog.isString(opt_value)) ? opt_value : null;
+    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) ||
+        (goog.isString(opt_value) && goog.string.trim(opt_value) != '')) ?
+        opt_value : null;
     if (val != this.left_) {
       this.left_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -370,12 +372,18 @@ anychart.core.utils.Bounds.prototype.dependsOnContainerSize = function() {
 /** @inheritDoc */
 anychart.core.utils.Bounds.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['top'] = this.top();
-  json['right'] = this.right();
-  json['bottom'] = this.bottom();
-  json['left'] = this.left();
-  json['width'] = this.width();
-  json['height'] = this.height();
+  if (!goog.isNull(this.top_))
+    json['top'] = this.top_;
+  if (!goog.isNull(this.right_))
+    json['right'] = this.right_;
+  if (!goog.isNull(this.bottom_))
+    json['bottom'] = this.bottom_;
+  if (!goog.isNull(this.left_))
+    json['left'] = this.left_;
+  if (!goog.isNull(this.width_))
+    json['width'] = this.width_;
+  if (!goog.isNull(this.height_))
+    json['height'] = this.height_;
   return json;
 };
 

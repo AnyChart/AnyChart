@@ -22,6 +22,7 @@ anychart.bubble = function(var_args) {
   var chart = new anychart.charts.Cartesian();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BUBBLE);
+  chart.setType(anychart.enums.ChartTypes.BUBBLE);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bubble(arguments[i]);
