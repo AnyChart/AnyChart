@@ -263,7 +263,6 @@ anychart.core.axes.Polar.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * @ignoreDoc
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|string|anychart.core.axes.Polar} Drawing flag or itself for method chaining.
  */
@@ -400,7 +399,6 @@ anychart.core.axes.Polar.prototype.ticksInvalidated_ = function(event) {
 
 
 /**
- * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
