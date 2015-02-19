@@ -81,6 +81,14 @@ anychart.core.cartesian.series.RangeColumn.prototype.createPositionProvider = fu
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.RangeColumn.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeColumn.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');

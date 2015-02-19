@@ -56,6 +56,8 @@ anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
     if (pointDrawn) {
       this.drawMarker(false);
       this.drawLabel(false);
+      if (this.isErrorAvailable())
+        this.drawError();
     }
     // if connectMissing == true, firstPointDrawn will never be false when drawing.
     this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;

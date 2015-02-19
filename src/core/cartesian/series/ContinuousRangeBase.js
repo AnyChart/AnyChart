@@ -447,6 +447,14 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.calculateStatistics
 /**
  * @inheritDoc
  */
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 

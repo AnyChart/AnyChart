@@ -4,8 +4,11 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.Error');
+goog.require('anychart.core.utils.ISeriesWithError');
 goog.require('anychart.data');
 goog.require('anychart.enums');
+goog.require('anychart.utils');
 
 
 
@@ -22,6 +25,7 @@ goog.require('anychart.enums');
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
+ * @implements {anychart.core.utils.ISeriesWithError}
  */
 anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
@@ -51,6 +55,20 @@ anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
   this.hatchFill(false);
 
   this.resumeSignalsDispatching(false);
+
+  /**
+   * Error paths dictionary by stroke object hash.
+   * @type {Object.<string, !acgraph.vector.Path>}
+   * @private
+   */
+  this.errorPaths_ = null;
+
+  /**
+   * Pool of freed paths that can be reused.
+   * @type {Array.<acgraph.vector.Path>}
+   * @private
+   */
+  this.pathsPool_ = null;
 };
 goog.inherits(anychart.core.cartesian.series.Base, anychart.core.VisualBaseWithBounds);
 
@@ -131,6 +149,13 @@ anychart.core.cartesian.series.Base.ZINDEX_SERIES = 1;
  * @type {number}
  */
 anychart.core.cartesian.series.Base.ZINDEX_HATCH_FILL = 2;
+
+
+/**
+ * Error path z-index in series root layer.
+ * @type {number}
+ */
+anychart.core.cartesian.series.Base.ZINDEX_ERROR_PATH = 3;
 
 
 /**
@@ -742,12 +767,19 @@ anychart.core.cartesian.series.Base.prototype.getReferenceScaleValues = function
   if (!this.enabled()) return null;
   var res = [];
   var iterator = this.getIterator();
-  var yScale = this.yScale();
+  var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
   for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
     if (this.referenceValueMeanings[i] != 'y') continue;
     var val = iterator.get(this.referenceValueNames[i]);
     if (yScale.isMissing(val)) return null;
     res.push(val);
+  }
+
+  if (anychart.core.utils.Error.isErrorAvailableForScale(yScale) && this.isErrorAvailable()) {
+    var errValues = this.getErrorValues(false);
+    errValues[0] = /** @type {number} */ (res[0]) - errValues[0];
+    errValues[1] = /** @type {number} */ (res[0]) + errValues[1];
+    res = res.concat(errValues);
   }
   return res;
 };
@@ -934,6 +966,15 @@ anychart.core.cartesian.series.Base.prototype.hasMarkers = function() {
 };
 
 
+/**
+ * Tester if the series can have an error. (All except range series, OHLC, Bubble).
+ * @return {boolean}
+ */
+anychart.core.cartesian.series.Base.prototype.isErrorAvailable = function() {
+  return true;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing.
@@ -1001,6 +1042,8 @@ anychart.core.cartesian.series.Base.prototype.drawPoint = function() {
       this.firstPointDrawn = this.drawFirstPoint();
     if (this.firstPointDrawn) {
       this.drawLabel(false);
+      if (this.isErrorAvailable())
+        this.drawError();
     }
   }
 };
@@ -1055,6 +1098,8 @@ anychart.core.cartesian.series.Base.prototype.startDrawing = function() {
   this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false));
 
   this.checkDrawingNeeded();
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
+    this.resetErrorPaths();
 
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();
@@ -2366,6 +2411,122 @@ anychart.core.cartesian.series.Base.prototype.getEnableChangeSignals = function(
 
 
 /**
+ * Sets an error for series.
+ * @param {(Object|null|boolean|string)=} opt_value Error or self for chaining.
+ * @return {(anychart.core.utils.Error|anychart.core.cartesian.series.Base)}
+ */
+anychart.core.cartesian.series.Base.prototype.error = function(opt_value) {
+  if (!this.error_) {
+    this.error_ = new anychart.core.utils.Error(this);
+    this.registerDisposable(this.error_);
+    this.error_.listenSignals(this.onErrorSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.error_.setup(opt_value);
+    return this;
+  }
+
+  return this.error_;
+};
+
+
+/**
+ * Listener for error invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.cartesian.series.Base.prototype.onErrorSignal_ = function(event) {
+  var state = anychart.ConsistencyState.APPEARANCE;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    signal |= anychart.Signal.NEEDS_RECALCULATION;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Removes all error paths and clears hashes.
+ */
+anychart.core.cartesian.series.Base.prototype.resetErrorPaths = function() {
+  if (!this.pathsPool_)
+    this.pathsPool_ = [];
+  if (this.errorPaths_) {
+    for (var hash in this.errorPaths_) {
+      var path = this.errorPaths_[hash];
+      path.clear();
+      path.parent(null);
+      delete this.errorPaths_[hash];
+    }
+  } else
+    this.errorPaths_ = {};
+};
+
+
+/**
+ * Returns error path for a stroke.
+ * @param {!acgraph.vector.Stroke} stroke
+ * @return {!acgraph.vector.Path}
+ */
+anychart.core.cartesian.series.Base.prototype.getErrorPath = function(stroke) {
+  var hash = anychart.utils.hash(stroke);
+  if (hash in this.errorPaths_)
+    return this.errorPaths_[hash];
+  else {
+    var path = this.pathsPool_.length ?
+        /** @type {!acgraph.vector.Path} */(this.pathsPool_.pop()) :
+        /** @type {!acgraph.vector.Path} */ (acgraph.path().zIndex(anychart.core.cartesian.series.Base.ZINDEX_ERROR_PATH));
+
+    this.rootLayer.addChild(path);
+    path.stroke(stroke);
+    path.fill(null);
+    this.errorPaths_[hash] = path;
+    return path;
+  }
+};
+
+
+/**
+ * Returns array of [lowerError, upperError].
+ * @param {boolean} horizontal is error horizontal (x error).
+ * @return {Array.<number, number>} Array of lower and upper errors value.
+ */
+anychart.core.cartesian.series.Base.prototype.getErrorValues = function(horizontal) {
+  return this.error().getErrorValues(horizontal);
+};
+
+
+/**
+ * Draws an error.
+ */
+anychart.core.cartesian.series.Base.prototype.drawError = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    var error = this.error();
+    var errorMode = error.errorMode();
+    var isBarBased = this.isBarBased();
+
+    switch (errorMode) {
+      case anychart.enums.ErrorMode.NONE:
+        break;
+      case anychart.enums.ErrorMode.X:
+        error.draw(true, isBarBased);
+        break;
+      case anychart.enums.ErrorMode.VALUE:
+        error.draw(false, isBarBased);
+        break;
+      case anychart.enums.ErrorMode.BOTH:
+        error.draw(true, isBarBased);
+        error.draw(false, isBarBased);
+        break;
+    }
+  }
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.core.cartesian.series.Base.prototype.serialize = function() {
@@ -2381,6 +2542,7 @@ anychart.core.cartesian.series.Base.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['error'] = this.error().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(
@@ -2470,6 +2632,7 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
   if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
   this.color(config['color']);
+  this.error(config['error']);
   this.xPointPosition(config['xPointPosition']);
   this.name(config['name']);
   this.meta(config['meta']);
@@ -2602,3 +2765,4 @@ anychart.core.cartesian.series.Base.prototype['tooltip'] = anychart.core.cartesi
 anychart.core.cartesian.series.Base.prototype['xPointPosition'] = anychart.core.cartesian.series.Base.prototype.xPointPosition;//doc|ex
 anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesian.series.Base.prototype.xScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;//doc|ex
+anychart.core.cartesian.series.Base.prototype['error'] = anychart.core.cartesian.series.Base.prototype.error;

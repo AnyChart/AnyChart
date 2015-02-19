@@ -60,6 +60,7 @@ anychart.core.scatter.series.Line.prototype.drawPoint = function() {
     if (pointDrawn) {
       this.drawMarker(false);
       this.drawLabel(false);
+      this.drawError();
     }
     this.pointDrawn = (this.connectMissing && this.pointDrawn) || pointDrawn;
   }

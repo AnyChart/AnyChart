@@ -853,7 +853,8 @@
         },
         "labels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
         "hoverLabels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
-        "clip": {"$ref": "#/definitions/clip"}
+        "clip": {"$ref": "#/definitions/clip"},
+        "error": {"$ref": "#/definitions/error"}
       }
     },
     "anychart.core.cartesian.series.BaseWithMarkers": {
@@ -1270,7 +1271,8 @@
         "tooltip": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.Tooltip"}]},
         "labels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
         "hoverLabels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
-        "clip": {"$ref": "#/definitions/clip"}
+        "clip": {"$ref": "#/definitions/clip"},
+        "error": {"$ref": "#/definitions/error"}
       }
     },
     "anychart.core.scatter.series.BaseWithMarkers": {
@@ -2438,6 +2440,9 @@
     "anychart.enums.ScaleStackMode": {
       "enum": ["none", "value", "percent"]
     },
+    "anychart.enums.ErrorMode": {
+      "enum": ["none", "x", "value", "both"]
+    },
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
         "backwardDiagonal",
@@ -2490,11 +2495,51 @@
         }
       }
     },
+    "anychart.core.utils.Error": {
+      "type": "object",
+      "properties": {
+        "errorMode": {
+          "$ref": "#/definitions/anychart.enums.ErrorMode"
+        },
+        "xError": {
+          "type": ["number", "string"]
+        },
+        "xUpperError": {
+          "type": ["number", "string"]
+        },
+        "xLowerError": {
+          "type": ["number", "string"]
+        },
+        "valueError": {
+          "type": ["number", "string"]
+        },
+        "valueUpperError": {
+          "type": ["number", "string"]
+        },
+        "valueLowerError": {
+          "type": ["number", "string"]
+        },
+        "xErrorWidth": {
+          "type": "number"
+        },
+        "valueErrorWidth": {
+          "type": "number"
+        },
+        "xErrorStroke": {"$ref": "#/definitions/stroke"},
+        "valueErrorStroke": {"$ref": "#/definitions/stroke"}
+      }
+    },
 
     "data": {
       "type": "array"
     },
 
+    "error": {
+      "oneOf": [
+        {"$ref": "#/definitions/anychart.core.utils.Error"},
+        {"type": ["number", "boolean", "string"]}
+      ]
+    },
     "disable": {
       "type": ["boolean", "null"]
     },

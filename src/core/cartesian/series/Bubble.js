@@ -281,6 +281,14 @@ anychart.core.cartesian.series.Bubble.prototype.isSizeBased = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.Bubble.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.rootTypedLayerInitializer = function() {
   return acgraph.circle();

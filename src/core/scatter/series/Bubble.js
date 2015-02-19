@@ -340,6 +340,14 @@ anychart.core.scatter.series.Bubble.prototype.isSizeBased = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.core.scatter.series.Bubble.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
+/**
  * Discrete-pointed series are based on a typed layer, that constructs children by this initializer.
  * @return {!acgraph.vector.Element} Returns new instance of an element.
  * @protected

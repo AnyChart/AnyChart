@@ -8,6 +8,7 @@ goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.cartesian.series.Base');
 goog.require('anychart.core.grids.Linear');
+goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.OrdinalIterator');
 goog.require('anychart.core.utils.ScatterIterator');
 goog.require('anychart.enums');
@@ -1637,6 +1638,8 @@ anychart.charts.Cartesian.prototype.calculate = function() {
   var values;
   /** @type {*} */
   var value;
+  /** @type {Array.<number, number>} */
+  var errValues;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
     anychart.core.Base.suspendSignalsDispatching(this.series_);
@@ -1654,6 +1657,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
           yScalesToCalc.push(scale);
       }
     }
+    var isErrorAvailableForScale;
     // parsing x scales map and calculating them if needed as they cannot be stacked.
     for (id in this.xScales_) {
       scale = this.xScales_[id];
@@ -1663,13 +1667,20 @@ anychart.charts.Cartesian.prototype.calculate = function() {
       // we can crash or warn user here if the scale is stacked, if we want.
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();
+        isErrorAvailableForScale = anychart.core.utils.Error.isErrorAvailableForScale(scale);
         for (i = 0; i < series.length; i++) {
           aSeries = series[i];
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             value = iterator.get('x');
-            if (goog.isDef(value))
-              scale.extendDataRange(value);
+            if (goog.isDef(value)) {
+              if (isErrorAvailableForScale && aSeries.isErrorAvailable()) {
+                errValues = aSeries.getErrorValues(true);
+                scale.extendDataRange(value - errValues[0], value + errValues[1]);
+              } else {
+                scale.extendDataRange(value);
+              }
+            }
           }
         }
       }

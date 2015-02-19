@@ -1444,6 +1444,48 @@ anychart.enums.normalizeInterval = function(value, opt_default) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  ErrorMode enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @enum {string}
+ */
+anychart.enums.ErrorMode = {
+  NONE: 'none',
+  X: 'x',
+  VALUE: 'value',
+  BOTH: 'both'
+};
+
+
+/**
+ * Normalizes error mode
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.ErrorMode=} opt_default Custom default value (defaults to BOTH).
+ * @return {anychart.enums.ErrorMode}
+ */
+anychart.enums.normalizeErrorMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'false':
+    case 'null':
+    case 'none':
+      return anychart.enums.ErrorMode.NONE;
+    case 'x':
+      return anychart.enums.ErrorMode.X;
+    case 'y':
+    case 'value':
+      return anychart.enums.ErrorMode.VALUE;
+    case 'true':
+    case 'both':
+      return anychart.enums.ErrorMode.BOTH;
+  }
+  return opt_default || anychart.enums.ErrorMode.BOTH;
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -1604,6 +1646,11 @@ goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAYS);
 goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOURS);
 goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTES);
 goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECONDS);
+
+goog.exportSymbol('anychart.enums.ErrorMode.NONE', anychart.enums.ErrorMode.NONE);
+goog.exportSymbol('anychart.enums.ErrorMode.X', anychart.enums.ErrorMode.X);
+goog.exportSymbol('anychart.enums.ErrorMode.VALUE', anychart.enums.ErrorMode.VALUE);
+goog.exportSymbol('anychart.enums.ErrorMode.BOTH', anychart.enums.ErrorMode.BOTH);
 
 goog.exportSymbol('anychart.enums.ScaleTypes.LINEAR', anychart.enums.ScaleTypes.LINEAR);
 goog.exportSymbol('anychart.enums.ScaleTypes.LOG', anychart.enums.ScaleTypes.LOG);

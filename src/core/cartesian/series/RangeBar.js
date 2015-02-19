@@ -89,6 +89,14 @@ anychart.core.cartesian.series.RangeBar.prototype.getType = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.RangeBar.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeBar.prototype.restoreDefaults = function() {
   var result = goog.base(this, 'restoreDefaults');

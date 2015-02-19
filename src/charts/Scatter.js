@@ -1445,6 +1445,8 @@ anychart.charts.Scatter.prototype.calculate = function() {
   var x;
   /** @type {*} */
   var y;
+  /** @type {Array.<number, number>} */
+  var errValues;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
     anychart.core.Base.suspendSignalsDispatching(this.series_);
@@ -1488,10 +1490,14 @@ anychart.charts.Scatter.prototype.calculate = function() {
       while (iterator.advance()) {
         x = iterator.get('x');
         y = iterator.get('value');
-        if (goog.isDef(x))
-          xScale.extendDataRange(x);
-        if (goog.isDef(y))
-          yScale.extendDataRange(y);
+        if (goog.isDef(x)) {
+          errValues = aSeries.getErrorValues(true);
+          xScale.extendDataRange(x - errValues[0], x + errValues[1]);
+        }
+        if (goog.isDef(y)) {
+          errValues = aSeries.getErrorValues(false);
+          yScale.extendDataRange(y - errValues[0], y + errValues[1]);
+        }
       }
     }
 

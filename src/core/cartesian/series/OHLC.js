@@ -494,6 +494,14 @@ anychart.core.cartesian.series.OHLC.prototype.getType = function() {
 /**
  * @inheritDoc
  */
+anychart.core.cartesian.series.OHLC.prototype.isErrorAvailable = function() {
+  return false;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.core.cartesian.series.OHLC.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
