@@ -58,7 +58,7 @@ anychart.core.cartesian.series.Marker = function(opt_data, opt_csvSettings) {
   // Define reference points for a series
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.core.cartesian.series.Marker, anychart.core.cartesian.series.Base);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.MARKER] = anychart.core.cartesian.series.Marker;

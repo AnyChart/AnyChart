@@ -54,8 +54,6 @@ anychart.core.polar.series.Marker = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.hoverSize_ = 12;
-
-  this.referenceValuesSupportStack = false;
 };
 goog.inherits(anychart.core.polar.series.Marker, anychart.core.polar.series.Base);
 anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.MARKER] = anychart.core.polar.series.Marker;
