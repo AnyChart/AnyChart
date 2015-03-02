@@ -134,7 +134,7 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
     this.makeHoverable(path);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
@@ -246,7 +246,7 @@ anychart.core.cartesian.series.Candlestick.prototype.risingHatchFill = function(
 
     if (hatchFill != this.risingHatchFill_) {
       this.risingHatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -372,7 +372,7 @@ anychart.core.cartesian.series.Candlestick.prototype.fallingHatchFill = function
 
     if (hatchFill != this.fallingHatchFill_) {
       this.fallingHatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

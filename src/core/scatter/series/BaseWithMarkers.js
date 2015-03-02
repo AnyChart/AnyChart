@@ -32,7 +32,7 @@ goog.inherits(anychart.core.scatter.series.BaseWithMarkers, anychart.core.scatte
  */
 anychart.core.scatter.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.scatter.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.MARKERS;
+    anychart.ConsistencyState.SERIES_MARKERS;
 
 
 /**
@@ -206,7 +206,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.hoverMarkers = function(o
  */
 anychart.core.scatter.series.BaseWithMarkers.prototype.onMarkersSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 

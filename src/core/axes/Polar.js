@@ -116,8 +116,8 @@ anychart.core.axes.Polar = function() {
    * @private
    */
   this.ALL_VISUAL_STATES_ = anychart.ConsistencyState.APPEARANCE |
-      anychart.ConsistencyState.LABELS |
-      anychart.ConsistencyState.TICKS |
+      anychart.ConsistencyState.AXIS_LABELS |
+      anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS;
 };
 goog.inherits(anychart.core.axes.Polar, anychart.core.VisualBase);
@@ -130,9 +130,8 @@ goog.inherits(anychart.core.axes.Polar, anychart.core.VisualBase);
 anychart.core.axes.Polar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.TICKS |
-    anychart.ConsistencyState.BOUNDS;
+    anychart.ConsistencyState.AXIS_LABELS |
+    anychart.ConsistencyState.AXIS_TICKS;
 
 
 /**
@@ -330,7 +329,7 @@ anychart.core.axes.Polar.prototype.labelsInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES_;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.LABELS;
+    state = anychart.ConsistencyState.AXIS_LABELS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropBoundsCache_();
@@ -390,7 +389,7 @@ anychart.core.axes.Polar.prototype.ticksInvalidated_ = function(event) {
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.TICKS | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
+    state |= anychart.ConsistencyState.AXIS_TICKS | anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   this.dropBoundsCache_();
@@ -831,7 +830,7 @@ anychart.core.axes.Polar.prototype.getLabelPositionOffsetForAngle_ = function(an
  * @private
  */
 anychart.core.axes.Polar.prototype.getOverlappedLabels_ = function() {
-  if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.OVERLAP)) {
+  if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.AXIS_OVERLAP)) {
     if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
     } else {
@@ -967,7 +966,7 @@ anychart.core.axes.Polar.prototype.getOverlappedLabels_ = function() {
       if (!isLabels) labels = false;
       this.overlappedLabels_ = {labels: labels, minorLabels: minorLabels};
     }
-    this.markConsistent(anychart.ConsistencyState.OVERLAP);
+    this.markConsistent(anychart.ConsistencyState.AXIS_OVERLAP);
   }
   return this.overlappedLabels_;
 };
@@ -1087,8 +1086,8 @@ anychart.core.axes.Polar.prototype.checkDrawingNeeded = function() {
       this.labels().invalidate(anychart.ConsistencyState.CONTAINER);
       this.invalidate(
           anychart.ConsistencyState.CONTAINER |
-          anychart.ConsistencyState.TICKS |
-          anychart.ConsistencyState.LABELS
+          anychart.ConsistencyState.AXIS_TICKS |
+          anychart.ConsistencyState.AXIS_LABELS
       );
     }
     return false;
@@ -1152,7 +1151,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.TICKS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TICKS)) {
     var ticks = /** @type {anychart.core.axes.RadialTicks} */(this.ticks());
     ticks.draw();
     ticksDrawer = ticks.drawTick;
@@ -1161,10 +1160,10 @@ anychart.core.axes.Polar.prototype.draw = function() {
     minorTicks.draw();
     minorTicksDrawer = minorTicks.drawTick;
 
-    this.markConsistent(anychart.ConsistencyState.TICKS);
+    this.markConsistent(anychart.ConsistencyState.AXIS_TICKS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_LABELS)) {
     var labels = this.labels();
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
@@ -1177,7 +1176,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
     minorLabels.clear();
     minorLabelsDrawer = this.drawLabel_;
 
-    this.markConsistent(anychart.ConsistencyState.LABELS);
+    this.markConsistent(anychart.ConsistencyState.AXIS_LABELS);
   }
 
   if (goog.isDef(ticksDrawer) || goog.isDef(labelsDrawer) || goog.isDef(minorLabelsDrawer) || goog.isDef(minorTicksDrawer)) {

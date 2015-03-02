@@ -84,7 +84,7 @@ anychart.core.gantt.TimelineHeader.SUPPORTED_SIGNALS = anychart.core.VisualBaseW
  */
 anychart.core.gantt.TimelineHeader.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.SCALES |
+    anychart.ConsistencyState.TIMELINE_HEADER_SCALES |
     anychart.ConsistencyState.APPEARANCE;
 
 
@@ -142,7 +142,7 @@ anychart.core.gantt.TimelineHeader.prototype.getLowLevel = function() {
  */
 anychart.core.gantt.TimelineHeader.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -158,7 +158,7 @@ anychart.core.gantt.TimelineHeader.prototype.scale = function(opt_value) {
       if (this.scale_) this.scale_.unlistenSignals(this.scaleInvalidated_, this);
       this.scale_ = opt_value;
       this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -205,7 +205,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_SCALES)) {
       if (!this.scale_) {
         anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
         return this;
@@ -218,10 +218,10 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
           level.anchor(levelsData[i]['anchor']);
           level.interval(levelsData[i]['interval']);
           level.textFormatter(levelsData[i]['formatter']);
-          level.invalidate(anychart.ConsistencyState.TICKS); //Scale is changed. It means that ticks must be recalculated anyway.
+          level.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS); //Scale is changed. It means that ticks must be recalculated anyway.
         }
       }
-      this.markConsistent(anychart.ConsistencyState.SCALES);
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -356,8 +356,8 @@ anychart.core.gantt.TimelineHeader.Level.SUPPORTED_SIGNALS = anychart.core.Visua
 anychart.core.gantt.TimelineHeader.Level.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.TICKS;
+    anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS |
+    anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS;
 
 
 /**
@@ -386,7 +386,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.textFormatter = function(opt_
     } else {
       this.textFormatter_ = this.defaultTextFormatter_;
     }
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.textFormatter_;
@@ -416,7 +416,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.interval = function(opt_value
   if (goog.isDef(opt_value)) {
     if (this.interval_ != opt_value) {
       this.interval_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.TICKS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -433,7 +433,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.anchor = function(opt_value) 
   if (goog.isDef(opt_value)) {
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.TICKS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -509,8 +509,8 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
     }
 
     var redrawTicks = this.hasInvalidationState(anychart.ConsistencyState.BOUNDS) ||
-        this.hasInvalidationState(anychart.ConsistencyState.TICKS) ||
-        this.hasInvalidationState(anychart.ConsistencyState.LABELS);
+        this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS) ||
+        this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS);
 
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     var stage = container ? container.getStage() : null;
@@ -530,10 +530,10 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.CONTAINER);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.TICKS)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS)) {
       this.ticks_.length = 0;
       this.ticks_ = scale.getTicks(this.anchor_, this.interval_);
-      this.markConsistent(anychart.ConsistencyState.TICKS);
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -543,8 +543,8 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
-      this.markConsistent(anychart.ConsistencyState.LABELS);
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS)) {
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {

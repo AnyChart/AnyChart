@@ -79,7 +79,7 @@ anychart.core.ui.Button.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototy
  */
 anychart.core.ui.Button.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BACKGROUND;
+    anychart.ConsistencyState.BUTTON_BACKGROUND;
 
 
 /**
@@ -144,7 +144,7 @@ anychart.core.ui.Button.prototype.state = function(state, opt_enable) {
     if (this.supportedStates(state) && opt_enable != this.state(state)) {
       this.state_ = /** @type {anychart.core.ui.Button.State} */ (opt_enable ? state : this.state_ & ~state);
       if (this.state_ == anychart.core.ui.Button.State.UNDEFINED) this.state_ = anychart.core.ui.Button.State.NORMAL;
-      this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BUTTON_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -426,7 +426,7 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
     this.textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.textElement.translate(/** @type {number} */(this.buttonBounds.left), /** @type {number} */(this.buttonBounds.top));
 
-    this.invalidate(anychart.ConsistencyState.BACKGROUND);
+    this.invalidate(anychart.ConsistencyState.BUTTON_BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 };
@@ -484,13 +484,13 @@ anychart.core.ui.Button.prototype.drawInternal = function(settings) {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateButtonBounds_();
     this.drawText(settings['text']);
-    this.invalidate(anychart.ConsistencyState.BACKGROUND);
+    this.invalidate(anychart.ConsistencyState.BUTTON_BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BUTTON_BACKGROUND)) {
     this.drawBackground(settings['fill'], settings['stroke']);
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.BUTTON_BACKGROUND);
   }
 };
 
@@ -880,7 +880,7 @@ anychart.core.ui.Button.prototype.stateSettings = function(opt_value) {
       this.stateSettings_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE |
           anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.BACKGROUND,
+          anychart.ConsistencyState.BUTTON_BACKGROUND,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;

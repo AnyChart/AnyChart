@@ -135,14 +135,14 @@ anychart.charts.Scatter.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
  */
 anychart.charts.Scatter.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.SCALES |
-    anychart.ConsistencyState.GRIDS |
-    anychart.ConsistencyState.AXES |
-    anychart.ConsistencyState.AXES_MARKERS |
-    anychart.ConsistencyState.PALETTE |
-    anychart.ConsistencyState.MARKER_PALETTE |
-    anychart.ConsistencyState.HATCH_FILL_PALETTE |
-    anychart.ConsistencyState.SERIES;
+    anychart.ConsistencyState.SCATTER_SCALES |
+    anychart.ConsistencyState.SCATTER_GRIDS |
+    anychart.ConsistencyState.SCATTER_AXES |
+    anychart.ConsistencyState.SCATTER_AXES_MARKERS |
+    anychart.ConsistencyState.SCATTER_PALETTE |
+    anychart.ConsistencyState.SCATTER_MARKER_PALETTE |
+    anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE |
+    anychart.ConsistencyState.SCATTER_SERIES;
 
 
 /**
@@ -272,7 +272,7 @@ anychart.charts.Scatter.prototype.xScale = function(opt_value) {
     }
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCATTER_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -327,7 +327,7 @@ anychart.charts.Scatter.prototype.yScale = function(opt_value) {
     }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCATTER_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -416,7 +416,7 @@ anychart.charts.Scatter.prototype.grid = function(opt_indexOrValue, opt_value) {
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -515,7 +515,7 @@ anychart.charts.Scatter.prototype.minorGrid = function(opt_indexOrValue, opt_val
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -533,7 +533,7 @@ anychart.charts.Scatter.prototype.minorGrid = function(opt_indexOrValue, opt_val
  * @private
  */
 anychart.charts.Scatter.prototype.onGridSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.SCATTER_GRIDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -614,7 +614,7 @@ anychart.charts.Scatter.prototype.xAxis = function(opt_indexOrValue, opt_value) 
     this.xAxes_[index] = axis;
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -703,7 +703,7 @@ anychart.charts.Scatter.prototype.yAxis = function(opt_indexOrValue, opt_value) 
     this.yAxes_[index] = axis;
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -724,7 +724,7 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.AXES;
+    state |= anychart.ConsistencyState.SCATTER_AXES;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -806,7 +806,7 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -894,7 +894,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -979,7 +979,7 @@ anychart.charts.Scatter.prototype.textMarker = function(opt_indexOrValue, opt_va
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -997,7 +997,7 @@ anychart.charts.Scatter.prototype.textMarker = function(opt_indexOrValue, opt_va
  * @private
  */
 anychart.charts.Scatter.prototype.onMarkersSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.SCATTER_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1082,7 +1082,7 @@ anychart.charts.Scatter.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
  */
 anychart.charts.Scatter.prototype.onPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1145,7 +1145,7 @@ anychart.charts.Scatter.prototype.markerPalette = function(opt_value) {
  */
 anychart.charts.Scatter.prototype.onMarkerPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1211,7 +1211,7 @@ anychart.charts.Scatter.prototype.hatchFillPalette = function(opt_value) {
  */
 anychart.charts.Scatter.prototype.onHatchFillPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1328,9 +1328,9 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     instance.restoreDefaults();
     instance.listenSignals(this.onSeriesSignal_, this);
     this.invalidate(
-        anychart.ConsistencyState.SERIES |
-        anychart.ConsistencyState.LEGEND |
-        anychart.ConsistencyState.SCALES,
+        anychart.ConsistencyState.SCATTER_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.SCATTER_SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
@@ -1349,14 +1349,14 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
 anychart.charts.Scatter.prototype.onSeriesSignal_ = function(event) {
   var state = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.SERIES;
+    state = anychart.ConsistencyState.SCATTER_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.SERIES;
+    state |= anychart.ConsistencyState.SCATTER_SERIES;
     this.invalidateSeries_();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.SCALES;
+    state |= anychart.ConsistencyState.SCATTER_SCALES;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -1368,7 +1368,7 @@ anychart.charts.Scatter.prototype.onSeriesSignal_ = function(event) {
  */
 anychart.charts.Scatter.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
 
 
@@ -1448,7 +1448,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
   /** @type {Array.<number, number>} */
   var errValues;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_SCALES)) {
     anychart.core.Base.suspendSignalsDispatching(this.series_);
 
     for (i = 0, count = this.series_.length; i < count; i++) {
@@ -1457,7 +1457,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
       if (!aSeries.xScale()) {
         aSeries.xScale(/** @type {anychart.scales.ScatterBase} */ (this.xScale()));
         this.invalidateSeries_();
-        this.invalidate(anychart.ConsistencyState.SERIES);
+        this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
       }
       scale = /** @type {anychart.scales.ScatterBase} */ (aSeries.xScale());
       id = goog.getUid(scale);
@@ -1466,7 +1466,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
       if (!aSeries.yScale()) {
         aSeries.yScale(/** @type {anychart.scales.ScatterBase} */ (this.yScale()));
         this.invalidateSeries_();
-        this.invalidate(anychart.ConsistencyState.SERIES);
+        this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
       }
       scale = /** @type {anychart.scales.ScatterBase} */ (aSeries.yScale());
       id = goog.getUid(scale);
@@ -1544,7 +1544,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
 
     anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
 
-    this.markConsistent(anychart.ConsistencyState.SCALES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_SCALES);
   }
 };
 
@@ -1564,36 +1564,36 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoColor(this.palette().colorAt(i));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.PALETTE);
+    this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.MARKER_PALETTE);
+    this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_MARKER_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoHatchFill(
           /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.HATCH_FILL_PALETTE);
+    this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE);
   }
 
   // set default scales for axis if they not set
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SCATTER_AXES)) {
     var item;
     for (i = this.xAxes_.length; i--;) {
       item = this.xAxes_[i];
@@ -1709,13 +1709,13 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     this.dataBounds_ = boundsWithoutAxes.clone().round();
 
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.AXES);
-    this.invalidate(anychart.ConsistencyState.GRIDS);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
-    this.invalidate(anychart.ConsistencyState.SERIES);
+    this.invalidate(anychart.ConsistencyState.SCATTER_AXES |
+        anychart.ConsistencyState.SCATTER_GRIDS |
+        anychart.ConsistencyState.SCATTER_AXES_MARKERS |
+        anychart.ConsistencyState.SCATTER_SERIES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_GRIDS)) {
     var grids = goog.array.concat(this.grids_, this.minorGrids_);
 
     for (i = 0, count = grids.length; i < count; i++) {
@@ -1732,12 +1732,12 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
         grid.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.GRIDS);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_GRIDS);
   }
 
   //draw axes outside of data bounds
   //only inside axes ticks can intersect data bounds
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_AXES)) {
     for (i = 0, count = axes.length; i < count; i++) {
       axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
       if (axis) {
@@ -1754,10 +1754,10 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
         axis.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.AXES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_AXES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_AXES_MARKERS)) {
     var markers = goog.array.concat(
         this.lineAxesMarkers_,
         this.rangeAxesMarkers_,
@@ -1777,10 +1777,10 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
         axesMarker.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_SERIES)) {
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
@@ -1791,7 +1791,7 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
 
     this.calcBubbleSizes_();
     this.drawSeries_();
-    this.markConsistent(anychart.ConsistencyState.SERIES);
+    this.markConsistent(anychart.ConsistencyState.SCATTER_SERIES);
   }
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);

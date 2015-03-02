@@ -77,8 +77,7 @@ anychart.core.Text.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.BOUNDS;
+    anychart.ConsistencyState.APPEARANCE;
 
 
 /**

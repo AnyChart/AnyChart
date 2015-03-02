@@ -145,8 +145,8 @@ anychart.core.ui.LabelsFactory.prototype.SUPPORTED_SIGNALS = anychart.core.Text.
  */
 anychart.core.ui.LabelsFactory.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BACKGROUND |
-    anychart.ConsistencyState.HANDLERS;
+    anychart.ConsistencyState.LABELS_FACTORY_BACKGROUND |
+    anychart.ConsistencyState.LABELS_FACTORY_HANDLERS;
 
 
 /**
@@ -586,7 +586,7 @@ anychart.core.ui.LabelsFactory.prototype.clear = function(opt_index) {
       }, this);
       this.labels_.length = 0;
     }
-    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   } else
     this.labels_ = [];
 
@@ -705,7 +705,7 @@ anychart.core.ui.LabelsFactory.prototype.draw = function() {
         label.container(this.layer_);
         label.draw();
 
-        if (this.hasInvalidationState(anychart.ConsistencyState.HANDLERS)) {
+        if (this.hasInvalidationState(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS)) {
           var element = label.getDomElement();
           if (element) {
             element['__tagIndex'] = index;
@@ -1141,7 +1141,7 @@ anychart.core.ui.LabelsFactory.prototype.ensureHandler_ = function(type, capture
       }
     }
     if (changed)
-      this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1155,7 +1155,7 @@ anychart.core.ui.LabelsFactory.prototype.removeAllHandlers_ = function() {
   this.attachedEvents_ = 0;
   this.attachedOnceEvents_ = 0;
   if (changed)
-    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 

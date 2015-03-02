@@ -68,11 +68,11 @@ anychart.core.sparkline.series.Base.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.sparkline.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.HATCH_FILL |
+    anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.MARKERS |
-    anychart.ConsistencyState.DATA;
+    anychart.ConsistencyState.SERIES_LABELS |
+    anychart.ConsistencyState.SERIES_MARKERS |
+    anychart.ConsistencyState.SERIES_DATA;
 
 
 /**

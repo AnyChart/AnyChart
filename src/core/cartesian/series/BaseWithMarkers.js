@@ -32,7 +32,7 @@ goog.inherits(anychart.core.cartesian.series.BaseWithMarkers, anychart.core.cart
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.MARKERS;
+        anychart.ConsistencyState.SERIES_MARKERS;
 
 
 /**
@@ -176,7 +176,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 

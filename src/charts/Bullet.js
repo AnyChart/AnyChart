@@ -67,11 +67,11 @@ goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
  */
 anychart.charts.Bullet.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.SCALES |        // scale calculation
-    anychart.ConsistencyState.AXES |          // axis
-    anychart.ConsistencyState.AXES_MARKERS |  // ranges
-    anychart.ConsistencyState.MARKERS |        // value markers
-    anychart.ConsistencyState.DATA;           //chart data
+    anychart.ConsistencyState.BULLET_SCALES |        // scale calculation
+    anychart.ConsistencyState.BULLET_AXES |          // axis
+    anychart.ConsistencyState.BULLET_AXES_MARKERS |  // ranges
+    anychart.ConsistencyState.BULLET_MARKERS |       // value markers
+    anychart.ConsistencyState.BULLET_DATA;           // chart data
 
 
 /**
@@ -135,11 +135,11 @@ anychart.charts.Bullet.prototype.data = function(opt_value, opt_csvSettings) {
     }
     this.data_.listenSignals(this.dataInvalidated_, this);
     this.invalidate(
-        anychart.ConsistencyState.DATA |
-            anychart.ConsistencyState.SCALES |
-            anychart.ConsistencyState.AXES |
-            anychart.ConsistencyState.MARKERS |
-            anychart.ConsistencyState.AXES_MARKERS,
+        anychart.ConsistencyState.BULLET_DATA |
+            anychart.ConsistencyState.BULLET_SCALES |
+            anychart.ConsistencyState.BULLET_AXES |
+            anychart.ConsistencyState.BULLET_MARKERS |
+            anychart.ConsistencyState.BULLET_AXES_MARKERS,
         anychart.Signal.NEEDS_REDRAW
     );
     return this;
@@ -156,11 +156,11 @@ anychart.charts.Bullet.prototype.data = function(opt_value, opt_csvSettings) {
 anychart.charts.Bullet.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(
-        anychart.ConsistencyState.DATA |
-            anychart.ConsistencyState.SCALES |
-            anychart.ConsistencyState.AXES |
-            anychart.ConsistencyState.MARKERS |
-            anychart.ConsistencyState.AXES_MARKERS,
+        anychart.ConsistencyState.BULLET_DATA |
+            anychart.ConsistencyState.BULLET_SCALES |
+            anychart.ConsistencyState.BULLET_AXES |
+            anychart.ConsistencyState.BULLET_MARKERS |
+            anychart.ConsistencyState.BULLET_AXES_MARKERS,
         anychart.Signal.NEEDS_REDRAW
     );
   }
@@ -192,10 +192,10 @@ anychart.charts.Bullet.prototype.layout = function(opt_value) {
     if (this.layout_ != opt_value) {
       this.layout_ = opt_value;
       this.invalidate(
-          anychart.ConsistencyState.AXES |
-              anychart.ConsistencyState.TITLE |
-              anychart.ConsistencyState.MARKERS |
-              anychart.ConsistencyState.AXES_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES |
+              anychart.ConsistencyState.CHART_TITLE |
+              anychart.ConsistencyState.BULLET_MARKERS |
+              anychart.ConsistencyState.BULLET_AXES_MARKERS |
               anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW |
               anychart.Signal.BOUNDS_CHANGED
@@ -284,10 +284,10 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
     if (this.scale_ != opt_value) {
       this.scale_ = opt_value;
       this.invalidate(
-          anychart.ConsistencyState.SCALES |
-              anychart.ConsistencyState.AXES |
-              anychart.ConsistencyState.MARKERS |
-              anychart.ConsistencyState.AXES_MARKERS,
+          anychart.ConsistencyState.BULLET_SCALES |
+              anychart.ConsistencyState.BULLET_AXES |
+              anychart.ConsistencyState.BULLET_MARKERS |
+              anychart.ConsistencyState.BULLET_AXES_MARKERS,
           anychart.Signal.NEEDS_REDRAW
       );
     }
@@ -340,9 +340,9 @@ anychart.charts.Bullet.prototype.axis = function(opt_value) {
     this.registerDisposable(this.axis_);
     this.axis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(
-        anychart.ConsistencyState.AXES |
-            anychart.ConsistencyState.MARKERS |
-            anychart.ConsistencyState.AXES_MARKERS |
+        anychart.ConsistencyState.BULLET_AXES |
+            anychart.ConsistencyState.BULLET_MARKERS |
+            anychart.ConsistencyState.BULLET_AXES_MARKERS |
             anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW |
             anychart.Signal.BOUNDS_CHANGED
@@ -367,7 +367,7 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.AXES;
+    state |= anychart.ConsistencyState.BULLET_AXES;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -450,7 +450,7 @@ anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
     this.ranges_[index] = range;
     this.registerDisposable(range);
     range.listenSignals(this.onRangeSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.BULLET_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -468,7 +468,7 @@ anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
  * @private
  */
 anychart.charts.Bullet.prototype.onRangeSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.BULLET_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -516,7 +516,7 @@ anychart.charts.Bullet.prototype.rangePalette = function(opt_value) {
  */
 anychart.charts.Bullet.prototype.onRangePaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.BULLET_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -565,7 +565,7 @@ anychart.charts.Bullet.prototype.markerPalette = function(opt_value) {
  */
 anychart.charts.Bullet.prototype.onPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.BULLET_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -648,18 +648,18 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
 
   var i, count;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BULLET_DATA)) {
     this.createMarkers_();
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.BULLET_DATA);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BULLET_SCALES)) {
     this.calculate();
-    this.markConsistent(anychart.ConsistencyState.SCALES);
+    this.markConsistent(anychart.ConsistencyState.BULLET_SCALES);
   }
 
   var axis = this.axis();
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BULLET_AXES | anychart.ConsistencyState.BOUNDS)) {
     axis.suspendSignalsDispatching();
     if (!axis.container() && axis.enabled()) {
       axis.container(this.rootElement);
@@ -668,11 +668,11 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
     axis.padding(0); //todo: hack to drop axis length cache, need consultation with Sergey Medvedev to drop it.
     axis.resumeSignalsDispatching(false);
     axis.draw();
-    this.markConsistent(anychart.ConsistencyState.AXES);
+    this.markConsistent(anychart.ConsistencyState.BULLET_AXES);
   }
 
   var boundsWithoutAxis = axis.enabled() ? axis.getRemainingBounds() : bounds;
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BULLET_AXES_MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.ranges_.length; i < count; i++) {
       var range = this.ranges_[i];
       if (range) {
@@ -693,10 +693,10 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
     if (count > 5) {
       anychart.utils.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_RANGES, [count]);
     }
-    this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
+    this.markConsistent(anychart.ConsistencyState.BULLET_AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BULLET_MARKERS | anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, count = this.markers_.length; i < count; i++) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
@@ -706,7 +706,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
       marker.draw();
       marker.resumeSignalsDispatching(false);
     }
-    this.markConsistent(anychart.ConsistencyState.MARKERS);
+    this.markConsistent(anychart.ConsistencyState.BULLET_MARKERS);
   }
 };
 

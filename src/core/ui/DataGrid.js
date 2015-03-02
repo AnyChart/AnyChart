@@ -308,10 +308,10 @@ anychart.core.ui.DataGrid.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBounds
 anychart.core.ui.DataGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.GRIDS |
-    anychart.ConsistencyState.POSITION |
-    anychart.ConsistencyState.HOVER |
-    anychart.ConsistencyState.CLICK;
+    anychart.ConsistencyState.DATA_GRID_GRIDS |
+    anychart.ConsistencyState.DATA_GRID_POSITION |
+    anychart.ConsistencyState.DATA_GRID_HOVER |
+    anychart.ConsistencyState.DATA_GRID_CLICK;
 
 
 /**
@@ -603,7 +603,7 @@ anychart.core.ui.DataGrid.prototype.titleHeight = function(opt_value) {
       } else {
         if (this.titleHeight_ != opt_value) {
           this.titleHeight_ = opt_value;
-          this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+          this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION, anychart.Signal.NEEDS_REDRAW);
         }
       }
     } else {
@@ -744,7 +744,7 @@ anychart.core.ui.DataGrid.prototype.mouseClickHandler_ = function(event) {
           'item': item
         });
 
-        this.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.DATA_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
       }
     }
   }
@@ -772,7 +772,7 @@ anychart.core.ui.DataGrid.prototype.highlight = function(opt_index, opt_startY, 
       'startY': opt_startY,
       'endY': opt_endY
     });
-    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -939,7 +939,7 @@ anychart.core.ui.DataGrid.prototype.cellBorder = function(opt_value) {
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.cellBorder_, val)) {
       this.cellBorder_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -964,7 +964,7 @@ anychart.core.ui.DataGrid.prototype.data = function(opt_value) {
       } else {
         if (this.data_ != opt_value) {
           this.data_ = opt_value;
-          this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+          this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION, anychart.Signal.NEEDS_REDRAW);
         }
       }
     } else {
@@ -1004,7 +1004,7 @@ anychart.core.ui.DataGrid.prototype.startIndex = function(opt_value) {
         if (this.startIndex_ != opt_value) {
           this.startIndex_ = opt_value;
           this.endIndex_ = NaN;
-          this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+          this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION, anychart.Signal.NEEDS_REDRAW);
         }
       }
     } else {
@@ -1035,7 +1035,7 @@ anychart.core.ui.DataGrid.prototype.endIndex = function(opt_value) {
         if (this.endIndex_ != opt_value) {
           this.endIndex_ = opt_value;
           this.startIndex_ = NaN;
-          this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+          this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION, anychart.Signal.NEEDS_REDRAW);
         }
       }
     } else {
@@ -1065,7 +1065,7 @@ anychart.core.ui.DataGrid.prototype.verticalOffset = function(opt_value) {
       } else {
         if (this.verticalOffset_ != opt_value) {
           this.verticalOffset_ = opt_value;
-          this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+          this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION, anychart.Signal.NEEDS_REDRAW);
         }
       }
     } else {
@@ -1235,7 +1235,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
     column.setup(value);
     return this;
   } else {
-    if (newColumn) this.invalidate(anychart.ConsistencyState.GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    if (newColumn) this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return column;
   }
 
@@ -1280,7 +1280,7 @@ anychart.core.ui.DataGrid.prototype.columnInvalidated_ = function(event) {
   var signal = anychart.Signal.NEEDS_REDRAW;
 
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) state |= anychart.ConsistencyState.APPEARANCE;
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) state |= anychart.ConsistencyState.GRIDS;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) state |= anychart.ConsistencyState.DATA_GRID_GRIDS;
 
   this.invalidate(state, signal);
 };
@@ -1345,7 +1345,7 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
   this.verticalOffset_ = verticalOffset;
   var drawRows = false;
 
-  if (opt_positionRecalculated) this.invalidate(anychart.ConsistencyState.POSITION);
+  if (opt_positionRecalculated) this.invalidate(anychart.ConsistencyState.DATA_GRID_POSITION);
 
   if (this.checkDrawingNeeded()) {
     var left, top;
@@ -1377,12 +1377,12 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
       this.getBase_().clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.titleHeight_ = this.pixelBoundsCache_.height - availableHeight;
-      this.invalidate(anychart.ConsistencyState.GRIDS);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS)) { //Actually redraws columns and their positions.
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_GRIDS)) { //Actually redraws columns and their positions.
       var width;
       var color;
       if (this.cellBorder_) {
@@ -1481,10 +1481,10 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
         this.splitters_[counter].enabled(false).draw();
       }
 
-      this.markConsistent(anychart.ConsistencyState.GRIDS);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_GRIDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) { //Actually sets rows for each columns.
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_POSITION)) { //Actually sets rows for each columns.
       this.tooltip().hide();
 
       var columnsWidth = 0;
@@ -1492,12 +1492,12 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
 
       this.forEachVisibleColumn_(function(col) {
         columnsWidth += (col.calculateBounds().width + splitWidth);
-        col.invalidate(anychart.ConsistencyState.POSITION); //Column takes data from own data grid.
+        col.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION); //Column takes data from own data grid.
         col.draw();
       });
 
       drawRows = true;
-      this.markConsistent(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_POSITION);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) { //Actually redraws columns and their positions.
@@ -1514,7 +1514,7 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_HOVER)) {
       if (this.hoveredIndex_ >= 0 && goog.isDef(this.hoverStartY_) && goog.isDef(this.hoverEndY_) && goog.isDef(this.hoveredIndex_)) {
         this.getHoverPath_()
             .clear()
@@ -1526,12 +1526,12 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
       } else {
         this.getHoverPath_().clear();
       }
-      this.markConsistent(anychart.ConsistencyState.HOVER);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_HOVER);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.CLICK)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_CLICK)) {
       drawRows = true;
-      this.markConsistent(anychart.ConsistencyState.CLICK);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_CLICK);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -1752,9 +1752,8 @@ goog.inherits(anychart.core.ui.DataGrid.Column, anychart.core.VisualBase);
 anychart.core.ui.DataGrid.Column.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.BOUNDS |
-    anychart.ConsistencyState.TITLE |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE |
+    anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
 
 
 /**
@@ -1786,7 +1785,7 @@ anychart.core.ui.DataGrid.Column.prototype.depthPaddingMultiplier = function(opt
   if (goog.isDef(opt_value)) {
     if (this.depthPaddingMultiplier_ != opt_value) {
       this.depthPaddingMultiplier_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1816,7 +1815,7 @@ anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
     } else {
       this.textFormatter_ = this.defaultTextFormatter_;
     }
-    this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.textFormatter_;
@@ -1854,7 +1853,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
     }
     if (redraw) {
       //TODO (A.Kudryavtsev): WE invalidate position because labels factory work that way: must clear and redraw all labels.
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1876,7 +1875,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettingsOverrider = function(
       this.cellTextSettingsOverrider_ = this.defaultCellTextSettingsOverrider_;
     }
     //TODO (A.Kudryavtsev): WE invalidate position because labels factory work that way: must clear and redraw all labels.
-    this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.cellTextSettingsOverrider_;
@@ -1893,7 +1892,7 @@ anychart.core.ui.DataGrid.Column.prototype.useButtons = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.useButtons_ != opt_value) {
       this.useButtons_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -2061,7 +2060,7 @@ anychart.core.ui.DataGrid.Column.prototype.getCellsLayer_ = function() {
 /** @inheritDoc */
 anychart.core.ui.DataGrid.Column.prototype.remove = function() {
   if (this.base_) this.base_.parent(null);
-  this.dataGrid_.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+  this.dataGrid_.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -2163,14 +2162,14 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         NOTE: Here I can't just say "Hey labelFactory, set new X and Y coordinate to all labels without clearing it before
         new data passage".
         In current implementation of labelsFactory we have to clear labels and add it again in new data passage.
-        That's why we invalidate anychart.ConsistencyState.POSITION here.
+        That's why we invalidate anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION here.
        */
-      this.invalidate(anychart.ConsistencyState.POSITION);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
 
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION)) {
       var titleHeight = /** @type {number} */ (this.dataGrid_.titleHeight());
 
       this.getTitlePath_()
@@ -2184,7 +2183,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.title_.parentBounds(this.pixelBoundsCache_);
       this.title_.height(titleHeight);
       this.title_.width(this.pixelBoundsCache_.width);
-      this.invalidate(anychart.ConsistencyState.TITLE);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
 
       var data = this.dataGrid_.getVisibleItems();
       var startIndex = this.dataGrid_.startIndex();
@@ -2280,18 +2279,18 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
       this.cellTextSettings().resumeSignalsDispatching(false);
       this.cellTextSettings().draw();
-      this.markConsistent(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
       this.getTitlePath_().fill(/** @type {acgraph.vector.Fill} */ (this.dataGrid_.titleFill()));
-      this.invalidate(anychart.ConsistencyState.TITLE);
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE)) {
       this.title_.draw();
-      this.markConsistent(anychart.ConsistencyState.TITLE);
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

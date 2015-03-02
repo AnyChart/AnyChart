@@ -65,15 +65,6 @@ anychart.core.scatter.series.Bubble.prototype.hatchFillRootElement = null;
 
 
 /**
- * Supported consistency states. Adds DATA to base series states.
- * @type {number}
- */
-anychart.core.scatter.series.Bubble.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.scatter.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.DATA;
-
-
-/**
  * Minimum bubble value.
  * @type {number}
  * @private
@@ -404,7 +395,7 @@ anychart.core.scatter.series.Bubble.prototype.startDrawing = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillRootElement) {
       this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
           this.rootTypedLayerInitializer,
@@ -440,7 +431,7 @@ anychart.core.scatter.series.Bubble.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.scatter.series.Bubble.prototype.calculateSizeScale = function(opt_minMax) {
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.selfMinimumBubbleValue_ = Number.MAX_VALUE;
     this.selfMaximumBubbleValue_ = -Number.MAX_VALUE;
 
@@ -460,7 +451,7 @@ anychart.core.scatter.series.Bubble.prototype.calculateSizeScale = function(opt_
     this.minimumBubbleValue_ = this.selfMinimumBubbleValue_;
     this.maximumBubbleValue_ = this.selfMaximumBubbleValue_;
 
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
   if (opt_minMax) {
     opt_minMax[0] = Math.min(opt_minMax[0], this.selfMinimumBubbleValue_);
@@ -524,7 +515,7 @@ anychart.core.scatter.series.Bubble.prototype.drawSeriesPoint = function() {
     this.makeHoverable(circle);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var hatchFillShape = iterator.meta('hatchFillShape');
     if (!hatchFillShape) {
       hatchFillShape = this.hatchFillRootElement ?
@@ -1098,7 +1089,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeHatchFill = function(opt_p
 
     if (hatchFill != this.negativeHatchFill_) {
       this.negativeHatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

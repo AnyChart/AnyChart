@@ -114,13 +114,13 @@ goog.inherits(anychart.charts.Radar, anychart.core.SeparateChart);
  */
 anychart.charts.Radar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.PALETTE |
-    anychart.ConsistencyState.MARKER_PALETTE |
-    anychart.ConsistencyState.HATCH_FILL_PALETTE |
-    anychart.ConsistencyState.SCALES |
-    anychart.ConsistencyState.SERIES |
-    anychart.ConsistencyState.AXES |
-    anychart.ConsistencyState.GRIDS;
+    anychart.ConsistencyState.RADAR_PALETTE |
+    anychart.ConsistencyState.RADAR_MARKER_PALETTE |
+    anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE |
+    anychart.ConsistencyState.RADAR_SCALES |
+    anychart.ConsistencyState.RADAR_SERIES |
+    anychart.ConsistencyState.RADAR_AXES |
+    anychart.ConsistencyState.RADAR_GRIDS;
 
 
 /**
@@ -262,7 +262,7 @@ anychart.charts.Radar.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.RADAR_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -304,7 +304,7 @@ anychart.charts.Radar.prototype.yScale = function(opt_value) {
     }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.RADAR_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -395,7 +395,7 @@ anychart.charts.Radar.prototype.grid = function(opt_indexOrValue, opt_value) {
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -463,7 +463,7 @@ anychart.charts.Radar.prototype.minorGrid = function(opt_indexOrValue, opt_value
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -481,7 +481,7 @@ anychart.charts.Radar.prototype.minorGrid = function(opt_indexOrValue, opt_value
  * @private
  */
 anychart.charts.Radar.prototype.onGridSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.RADAR_GRIDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -518,7 +518,7 @@ anychart.charts.Radar.prototype.xAxis = function(opt_value) {
     this.xAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.xAxis_);
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(opt_value)) {
@@ -558,7 +558,7 @@ anychart.charts.Radar.prototype.yAxis = function(opt_value) {
     this.yAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.yAxis_);
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(opt_value)) {
@@ -579,7 +579,7 @@ anychart.charts.Radar.prototype.onAxisSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.AXES;
+    state |= anychart.ConsistencyState.RADAR_AXES;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -697,9 +697,9 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(
-        anychart.ConsistencyState.SERIES |
-        anychart.ConsistencyState.LEGEND |
-        anychart.ConsistencyState.SCALES,
+        anychart.ConsistencyState.RADAR_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.RADAR_SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
@@ -743,14 +743,14 @@ anychart.charts.Radar.prototype.getSeries = function(index) {
 anychart.charts.Radar.prototype.seriesInvalidated_ = function(event) {
   var state = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.SERIES;
+    state = anychart.ConsistencyState.RADAR_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.SERIES;
+    state |= anychart.ConsistencyState.RADAR_SERIES;
     this.invalidateSeries_();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.SCALES;
+    state |= anychart.ConsistencyState.RADAR_SCALES;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -794,7 +794,7 @@ anychart.charts.Radar.prototype.calculate = function() {
   /** @type {*} */
   var value;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_SCALES)) {
     anychart.core.Base.suspendSignalsDispatching(this.series_);
 
     this.makeScaleMaps_();
@@ -963,7 +963,7 @@ anychart.charts.Radar.prototype.calculate = function() {
 
     anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
 
-    this.markConsistent(anychart.ConsistencyState.SCALES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_SCALES);
     this.scalesFinalization_ = true;
   }
 };
@@ -995,7 +995,7 @@ anychart.charts.Radar.prototype.makeScaleMaps_ = function() {
     if (!series.xScale()) {
       series.xScale(/** @type {anychart.scales.Base} */(this.xScale()));
       this.invalidateSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES);
+      this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
     }
     scale = series.xScale();
 
@@ -1019,7 +1019,7 @@ anychart.charts.Radar.prototype.makeScaleMaps_ = function() {
     if (!series.yScale()) {
       series.yScale(/** @type {anychart.scales.Base} */(this.yScale()));
       this.invalidateSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES);
+      this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
     }
     scale = series.yScale();
 
@@ -1188,7 +1188,7 @@ anychart.charts.Radar.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
  */
 anychart.charts.Radar.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1200,7 +1200,7 @@ anychart.charts.Radar.prototype.paletteInvalidated_ = function(event) {
  */
 anychart.charts.Radar.prototype.markerPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1212,7 +1212,7 @@ anychart.charts.Radar.prototype.markerPaletteInvalidated_ = function(event) {
  */
 anychart.charts.Radar.prototype.hatchFillPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1254,36 +1254,36 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxis_, this.yAxis_);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoColor(this.palette().colorAt(i));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.PALETTE);
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.MARKER_PALETTE);
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_MARKER_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoHatchFill(
           /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.HATCH_FILL_PALETTE);
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE);
   }
 
   // set default scales for axis if they not set
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.RADAR_AXES)) {
     if (this.xAxis() && !this.xAxis().scale())
       this.xAxis().scale(/** @type {anychart.scales.Base} */(this.xScale()));
 
@@ -1300,13 +1300,12 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     this.dataBounds_ = this.xAxis().getRemainingBounds().round();
 
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.AXES);
-    this.invalidate(anychart.ConsistencyState.GRIDS);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
-    this.invalidate(anychart.ConsistencyState.SERIES);
+    this.invalidate(anychart.ConsistencyState.RADAR_AXES |
+        anychart.ConsistencyState.RADAR_GRIDS |
+        anychart.ConsistencyState.RADAR_SERIES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_GRIDS)) {
     var grids = goog.array.concat(this.grids_, this.minorGrids_);
 
     for (i = 0, count = grids.length; i < count; i++) {
@@ -1322,12 +1321,12 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
         grid.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.GRIDS);
+    this.markConsistent(anychart.ConsistencyState.RADAR_GRIDS);
   }
 
   //draw axes outside of data bounds
   //only inside axes ticks can intersect data bounds
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_AXES)) {
     var xAxis = this.xAxis();
     xAxis.container(this.rootElement);
     xAxis.startAngle(this.startAngle_);
@@ -1340,10 +1339,10 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     yAxis.parentBounds(this.dataBounds_.clone());
     yAxis.draw();
 
-    this.markConsistent(anychart.ConsistencyState.AXES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_AXES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_SERIES)) {
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
@@ -1352,7 +1351,7 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     }
 
     this.drawSeries_();
-    this.markConsistent(anychart.ConsistencyState.SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_SERIES);
   }
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxis_, this.yAxis_);
@@ -1426,7 +1425,7 @@ anychart.charts.Radar.prototype.drawSeries_ = function() {
  */
 anychart.charts.Radar.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
 
 

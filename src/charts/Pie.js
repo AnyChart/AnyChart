@@ -316,9 +316,9 @@ anychart.charts.Pie.prototype.SUPPORTED_SIGNALS =
  */
 anychart.charts.Pie.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.DATA |
+    anychart.ConsistencyState.PIE_DATA |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS;
+    anychart.ConsistencyState.PIE_LABELS;
 
 
 /**
@@ -407,10 +407,10 @@ anychart.charts.Pie.prototype.data = function(opt_value) {
     this.view_.listenSignals(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
     this.invalidate(
-        anychart.ConsistencyState.DATA |
+        anychart.ConsistencyState.PIE_DATA |
         anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.LEGEND,
+        anychart.ConsistencyState.PIE_LABELS |
+        anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW
     );
     return this;
@@ -858,7 +858,7 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
     var val = anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
     if (this.insideLabelsOverlap_ != val) {
       this.insideLabelsOverlap_ = val;
-      this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
       return this;
     }
   }
@@ -920,7 +920,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
 
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1005,7 +1005,7 @@ anychart.charts.Pie.prototype.outsideLabelsSpace = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.outsideLabelsSpace_ != opt_value) {
       this.outsideLabelsSpace_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1037,7 +1037,7 @@ anychart.charts.Pie.prototype.insideLabelsOffset = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.insideLabelsOffset_ != opt_value) {
       this.insideLabelsOffset_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1070,7 +1070,7 @@ anychart.charts.Pie.prototype.connectorLength = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.connectorLength_ != opt_value) {
       this.connectorLength_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1105,7 +1105,7 @@ anychart.charts.Pie.prototype.outsideLabelsCriticalAngle = function(opt_value) {
     opt_value = goog.math.standardAngle(anychart.utils.normalizeSize(opt_value));
     if (this.outsideLabelsCriticalAngle_ != opt_value) {
       this.outsideLabelsCriticalAngle_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1242,7 +1242,8 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
 anychart.charts.Pie.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.radius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+        anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.radius_;
@@ -1285,7 +1286,8 @@ anychart.charts.Pie.prototype.radius = function(opt_value) {
 anychart.charts.Pie.prototype.innerRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.innerRadius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+        anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.innerRadius_;
@@ -1381,7 +1383,8 @@ anychart.charts.Pie.prototype.getPixelInnerRadius = function() {
 anychart.charts.Pie.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.startAngle_ = (goog.isNull(opt_value) || isNaN(+opt_value)) ? -90 : goog.math.standardAngle(+opt_value);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+        anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.startAngle_;
@@ -1415,7 +1418,8 @@ anychart.charts.Pie.prototype.explode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     // TODO(Anton Saukh): that's an inline of ex normalizeNumberOrStringPercentValue - we should do something about it.
     this.explode_ = isNaN(parseFloat(opt_value)) ? 15 : opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS |
+        anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.explode_;
@@ -1749,10 +1753,10 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LABELS);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
     var missingPoints = 0; // count of missing points
     var min = Number.MAX_VALUE;
     var max = -Number.MAX_VALUE;
@@ -1782,7 +1786,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     this.statistic_['sum'] = sum;
     this.statistic_['average'] = avg;
 
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.PIE_DATA);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1840,7 +1844,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
   }
 
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_LABELS)) {
     if (!this.labels().container()) this.labels_.container(this.rootElement);
     this.labels().clear();
     if (this.connectorsLayer_)
@@ -1859,7 +1863,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     }
     this.labels().draw();
     this.labels().getDomElement().clip(bounds);
-    this.markConsistent(anychart.ConsistencyState.LABELS);
+    this.markConsistent(anychart.ConsistencyState.PIE_LABELS);
   }
 };
 
@@ -2166,10 +2170,10 @@ anychart.charts.Pie.prototype.applyHatchFill = function(hover) {
 anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(
-        anychart.ConsistencyState.DATA |
-        anychart.ConsistencyState.LABELS |
+        anychart.ConsistencyState.PIE_DATA |
+        anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.LEGEND,
+        anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED
     );
@@ -2186,12 +2190,12 @@ anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
 anychart.charts.Pie.prototype.labelsInvalidated_ = function(event) {
   var state = 0, signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.LABELS;
+    state |= anychart.ConsistencyState.PIE_LABELS;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
 
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS;
+    state |= anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS;
     signal |= anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   }
 

@@ -242,7 +242,7 @@ anychart.core.ui.Splitter.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase
 anychart.core.ui.Splitter.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.SPLITTER_POSITION;
 
 
 /**
@@ -295,7 +295,7 @@ anychart.core.ui.Splitter.prototype.position = function(opt_value) {
         if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
       }
       this.position_ = pos;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
 
     }
 
@@ -318,7 +318,7 @@ anychart.core.ui.Splitter.prototype.dragAreaLength = function(opt_value) {
       opt_value = Math.abs(opt_value);
       if (this.dragAreaLength_ != opt_value) {
         this.dragAreaLength_ = opt_value;
-        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;
@@ -343,7 +343,7 @@ anychart.core.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thic
     if (!anychart.color.equals(this.stroke_, val)) {
       this.stroke_ = val;
       //Invalidates a position because changed line thickness affects a changes in drag area and line's positioning.
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -511,7 +511,7 @@ anychart.core.ui.Splitter.prototype.splitterWidth = function(opt_value) {
     opt_value = +opt_value;
     if (!isNaN(opt_value) && this.splitterWidth_ != opt_value) {
       this.splitterWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -532,7 +532,7 @@ anychart.core.ui.Splitter.prototype.startLimit_ = function(opt_value) {
       opt_value = Math.abs(opt_value);
       if (this.startLimitSize_ != opt_value) {
         this.newStartLimitSize_ = opt_value;
-        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;
@@ -554,7 +554,7 @@ anychart.core.ui.Splitter.prototype.endLimit_ = function(opt_value) {
       opt_value = Math.abs(opt_value);
       if (this.endLimitSize_ != opt_value) {
         this.newEndLimitSize_ = opt_value;
-        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
       }
     }
     return this;
@@ -1073,7 +1073,7 @@ anychart.core.ui.Splitter.prototype.draw = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
       if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SPLITTER_POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
@@ -1092,12 +1092,12 @@ anychart.core.ui.Splitter.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.SPLITTER_POSITION)) {
       this.getDragArea_().setTransformationMatrix(1, 0, 0, 1, 0, 0);
       this.drawStartLimit_();
       this.drawEndLimit_();
       this.drawVisualSplitter_();
-      this.markConsistent(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.SPLITTER_POSITION);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

@@ -52,15 +52,6 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 
 /**
- * Supported consistency states. Adds DATA to base series states.
- * @type {number}
- */
-anychart.core.cartesian.series.Bubble.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.DATA;
-
-
-/**
  * Minimum bubble value.
  * @type {number}
  * @private
@@ -324,7 +315,7 @@ anychart.core.cartesian.series.Bubble.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.calculateSizeScale = function(opt_minMax) {
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.selfMinimumBubbleValue_ = Number.MAX_VALUE;
     this.selfMaximumBubbleValue_ = -Number.MAX_VALUE;
 
@@ -344,7 +335,7 @@ anychart.core.cartesian.series.Bubble.prototype.calculateSizeScale = function(op
     this.minimumBubbleValue_ = this.selfMinimumBubbleValue_;
     this.maximumBubbleValue_ = this.selfMaximumBubbleValue_;
 
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
   if (opt_minMax) {
     opt_minMax[0] = Math.min(opt_minMax[0], this.selfMinimumBubbleValue_);
@@ -405,7 +396,7 @@ anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function()
     this.makeHoverable(circle);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
@@ -473,7 +464,7 @@ anychart.core.cartesian.series.Bubble.prototype.applyHatchFill = function(hover)
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.categoriseData = function(categories) {
   goog.base(this, 'categoriseData', categories);
-  this.invalidate(anychart.ConsistencyState.DATA);
+  this.invalidate(anychart.ConsistencyState.SERIES_DATA);
 };
 
 
@@ -984,7 +975,7 @@ anychart.core.cartesian.series.Bubble.prototype.negativeHatchFill = function(opt
 
     if (hatchFill != this.negativeHatchFill_) {
       this.negativeHatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

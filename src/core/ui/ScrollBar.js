@@ -204,7 +204,7 @@ anychart.core.ui.ScrollBar.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBas
 anychart.core.ui.ScrollBar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.SCROLLBAR_POSITION;
 
 
 /**
@@ -389,7 +389,7 @@ anychart.core.ui.ScrollBar.prototype.contentBounds = function(opt_value, opt_eve
         this.synchronizeBounds_();
       }
       this.synchronizeRatioToBounds_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
     return this;
@@ -417,7 +417,7 @@ anychart.core.ui.ScrollBar.prototype.visibleBounds = function(opt_value, opt_eve
         this.synchronizeBounds_();
       }
       this.synchronizeRatioToBounds_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
     return this;
@@ -481,7 +481,7 @@ anychart.core.ui.ScrollBar.prototype.startRatio = function(opt_value, opt_eventS
         this.endRatio_ = Math.max(opt_value, this.endRatio_);
       }
       this.synchronizeBoundsToRatio_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
     return this;
@@ -545,7 +545,7 @@ anychart.core.ui.ScrollBar.prototype.endRatio = function(opt_value, opt_eventSou
         this.startRatio_ = Math.min(opt_value, this.startRatio_);
       }
       this.synchronizeBoundsToRatio_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
     return this;
@@ -603,7 +603,7 @@ anychart.core.ui.ScrollBar.prototype.setRatio = function(startRatio, endRatio, o
       this.startRatio_ = newStartRatio;
       this.endRatio_ = newEndRatio;
       this.synchronizeBoundsToRatio_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
   }
@@ -634,7 +634,7 @@ anychart.core.ui.ScrollBar.prototype.scrollStartTo = function(value, opt_eventSo
       this.startRatio_ = newStartRatio;
       this.endRatio_ = newEndRatio;
       this.synchronizeBoundsToRatio_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
   }
@@ -667,7 +667,7 @@ anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo = function(value, opt_ev
       this.synchronizeBounds_();
       this.synchronizeRatioToBounds_();
 
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
   }
@@ -698,7 +698,7 @@ anychart.core.ui.ScrollBar.prototype.scrollEndTo = function(value, opt_eventSour
       this.startRatio_ = newStartRatio;
       this.endRatio_ = newEndRatio;
       this.synchronizeBoundsToRatio_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
   }
@@ -734,7 +734,7 @@ anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo = function(value, opt_even
 
       this.synchronizeBounds_();
       this.synchronizeRatioToBounds_();
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
       this.dispatchScrollEvent_(opt_eventSource || 'api');
     }
   }
@@ -1052,7 +1052,7 @@ anychart.core.ui.ScrollBar.prototype.drawWrapper_ = function(opt_dragging) {
 
   this.synchronizeBoundsToRatio_();
 
-  if (!dragging) this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+  if (!dragging) this.invalidate(anychart.ConsistencyState.SCROLLBAR_POSITION, anychart.Signal.NEEDS_REDRAW);
 
   this.dispatchScrollEvent_();
 
@@ -1347,7 +1347,7 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
       this.pixelBoundsCache_.height = Math.round(this.pixelBoundsCache_.height);
 
       this.placeButtons_();
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.POSITION);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SCROLLBAR_POSITION);
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
@@ -1363,14 +1363,14 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.SCROLLBAR_POSITION)) {
       if (this.startRatio_ <= 0 && this.endRatio_ >= 1) {
         this.getBase_().visible(false);
       } else {
         this.getBase_().visible(true);
         this.drawInternal_();
       }
-      this.markConsistent(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.SCROLLBAR_POSITION);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

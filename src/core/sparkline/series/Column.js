@@ -132,7 +132,7 @@ anychart.core.sparkline.series.Column.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
     this.rootElement.clear();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillRootElement) {
       this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
           this.rootTypedLayerInitializer,
@@ -212,7 +212,7 @@ anychart.core.sparkline.series.Column.prototype.drawSubsequentPoint = function()
     this.colorizeShape();
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :

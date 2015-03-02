@@ -415,10 +415,10 @@ anychart.core.gantt.Timeline.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBou
  */
 anychart.core.gantt.Timeline.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.SCALES |
-    anychart.ConsistencyState.POSITION |
+    anychart.ConsistencyState.TIMELINE_SCALES |
+    anychart.ConsistencyState.TIMELINE_POSITION |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.HOVER;
+    anychart.ConsistencyState.TIMELINE_HOVER;
 
 
 /**
@@ -539,7 +539,7 @@ anychart.core.gantt.Timeline.prototype.needsReapplicationHandler_ = function(eve
  */
 anychart.core.gantt.Timeline.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -949,7 +949,7 @@ anychart.core.gantt.Timeline.prototype.mouseClickElementHandler_ = function(even
     if (eventObj) {
       this.selectRow(item);
       this.dispatchEvent(eventObj);
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
   }
 };
@@ -1109,7 +1109,7 @@ anychart.core.gantt.Timeline.prototype.mouseClickHandler_ = function(event) {
           'item': item
         });
 
-        this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+        this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
       }
     }
   }
@@ -1136,7 +1136,7 @@ anychart.core.gantt.Timeline.prototype.highlight = function(opt_index, opt_start
       'startY': opt_startY,
       'endY': opt_endY
     });
-    this.invalidate(anychart.ConsistencyState.HOVER, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_HOVER, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2163,7 +2163,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
   this.endIndex_ = endIndex;
   this.verticalOffset_ = verticalOffset;
 
-  if (opt_positionRecalculated) this.invalidate(anychart.ConsistencyState.POSITION);
+  if (opt_positionRecalculated) this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION);
 
   if (this.checkDrawingNeeded()) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
@@ -2211,14 +2211,14 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_SCALES)) {
       //TODO (A.Kudryavtsev): Redraw all.
       redrawHeader = true;
-      this.markConsistent(anychart.ConsistencyState.SCALES);
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_SCALES);
     }
 
     if (redrawHeader) {
-      this.header_.invalidate(anychart.ConsistencyState.SCALES);
+      this.header_.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
       this.header_.draw();
       var ticks = this.header_.getLowLevel().getTicks();
       this.drawLowTicks_(ticks);
@@ -2252,7 +2252,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.HOVER)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HOVER)) {
       if (this.hoveredIndex_ >= 0 && goog.isDef(this.hoverStartY_) && goog.isDef(this.hoverEndY_) && goog.isDef(this.hoveredIndex_)) {
         this.getHoverPath_()
             .clear()
@@ -2264,14 +2264,14 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       } else {
         this.getHoverPath_().clear();
       }
-      this.markConsistent(anychart.ConsistencyState.HOVER);
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_HOVER);
     }
 
     var redrawPosition = false;
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_POSITION)) {
       redrawPosition = true;
-      this.markConsistent(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.TIMELINE_POSITION);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

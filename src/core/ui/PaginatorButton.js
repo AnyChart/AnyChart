@@ -40,7 +40,7 @@ anychart.core.ui.PaginatorButton.prototype.buttonDrawer = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.buttonDrawer_ != opt_value) {
       this.buttonDrawer_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BUTTON_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

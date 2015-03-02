@@ -47,8 +47,8 @@ anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS = anychart.core.Chart.pr
  */
 anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.LEGEND |
-    anychart.ConsistencyState.CREDITS;
+    anychart.ConsistencyState.CHART_LEGEND |
+    anychart.ConsistencyState.CHART_CREDITS;
 
 
 /**
@@ -113,7 +113,7 @@ anychart.core.SeparateChart.prototype.onLegendSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.LEGEND;
+    state |= anychart.ConsistencyState.CHART_LEGEND;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -181,7 +181,7 @@ anychart.core.SeparateChart.prototype.onCreditsSignal_ = function(event) {
   var state = 0;
   var signal = anychart.Signal.NEEDS_REDRAW;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.CREDITS;
+    state |= anychart.ConsistencyState.CHART_CREDITS;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
@@ -209,49 +209,49 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
   boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var background = this.background();
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
     background.suspendSignalsDispatching();
     if (!background.container()) background.container(this.rootElement);
     background.parentBounds(boundsWithoutMargin);
     background.resumeSignalsDispatching(false);
     background.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.CHART_BACKGROUND);
   }
   boundsWithoutBackgroundThickness = background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
 
   var credits = this.credits();
-  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_CREDITS | anychart.ConsistencyState.BOUNDS)) {
     credits.suspendSignalsDispatching();
     if (!credits.container())
       credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     credits.parentBounds(/** @type {anychart.math.Rect} */ (boundsWithoutBackgroundThickness));
     credits.resumeSignalsDispatching(false);
     credits.draw();
-    this.markConsistent(anychart.ConsistencyState.CREDITS);
+    this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
   }
   boundsWithoutCredits = this.credits().getRemainingBounds();
   boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
 
   var title = this.title();
-  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_TITLE | anychart.ConsistencyState.BOUNDS)) {
     title.suspendSignalsDispatching();
     if (!title.container()) title.container(this.rootElement);
     title.parentBounds(boundsWithoutPadding);
     title.resumeSignalsDispatching(false);
     title.draw();
-    this.markConsistent(anychart.ConsistencyState.TITLE);
+    this.markConsistent(anychart.ConsistencyState.CHART_TITLE);
   }
   boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
 
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND | anychart.ConsistencyState.BOUNDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
     legend.suspendSignalsDispatching();
     if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
     legend.parentBounds(boundsWithoutTitle);
     legend.itemsProvider(this.createLegendItemsProvider());
     legend.resumeSignalsDispatching(false);
     legend.draw();
-    this.markConsistent(anychart.ConsistencyState.LEGEND);
+    this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
   }
   boundsWithoutLegend = legend.enabled() ? legend.getRemainingBounds() : boundsWithoutTitle;
 
@@ -261,8 +261,11 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.resizeHandler = function(evt) {
-  this.credits().invalidate(anychart.ConsistencyState.POSITION);
+  this.suspendSignalsDispatching();
+  this.invalidate(anychart.ConsistencyState.CHART_CREDITS, anychart.Signal.NEEDS_REDRAW);
+  this.credits().invalidate(anychart.ConsistencyState.CREDITS_POSITION);
   goog.base(this, 'resizeHandler', evt);
+  this.resumeSignalsDispatching(true);
 };
 
 

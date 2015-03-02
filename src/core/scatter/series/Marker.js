@@ -291,7 +291,7 @@ anychart.core.scatter.series.Marker.prototype.startDrawing = function() {
 
   this.marker_.suspendSignalsDispatching();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.marker_.clear();
   }
 
@@ -335,7 +335,7 @@ anychart.core.scatter.series.Marker.prototype.startDrawing = function() {
   }
 
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var fill = this.getFinalHatchFill(false, false);
     if (!this.hatchFillElement_ && !anychart.utils.isNone(fill)) {
       this.hatchFillElement_ = new anychart.core.ui.MarkersFactory();
@@ -362,7 +362,7 @@ anychart.core.scatter.series.Marker.prototype.drawSeriesPoint = function() {
     this.drawMarker_(false);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     this.applyHatchFill(false);
   }
   return true;
@@ -376,7 +376,7 @@ anychart.core.scatter.series.Marker.prototype.finalizeDrawing = function() {
     this.marker_.resumeSignalsDispatching(false);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillElement_) {
       this.hatchFillElement_.draw();
       this.hatchFillElement_.resumeSignalsDispatching(false);

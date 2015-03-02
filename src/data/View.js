@@ -28,7 +28,7 @@ anychart.data.View = function(parentView) {
 
   parentView.listen(anychart.enums.EventType.SIGNAL, this.parentViewChangedHandler, false, this);
 
-  this.invalidate(anychart.ConsistencyState.DATA);
+  this.invalidate(anychart.ConsistencyState.DATA_MASK);
 };
 goog.inherits(anychart.data.View, anychart.core.Base);
 
@@ -44,7 +44,7 @@ anychart.data.View.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;
  * Consistency state mask supported by this object.
  * @type {number}
  */
-anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.DATA;
+anychart.data.View.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.DATA_MASK;
 
 
 /**
@@ -81,7 +81,7 @@ anychart.data.View.prototype.ensureConsistent = function() {
   if (this.metadata_)
     this.metadata_.length = 0;
   this.mask = this.buildMask();
-  this.markConsistent(anychart.ConsistencyState.DATA);
+  this.markConsistent(anychart.ConsistencyState.DATA_MASK);
 };
 
 
@@ -520,7 +520,7 @@ anychart.data.View.prototype.buildMask = function() {
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
   this.cachedValues = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
-    this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.DATA_MASK, anychart.Signal.DATA_CHANGED);
 };
 
 

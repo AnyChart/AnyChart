@@ -206,14 +206,14 @@ anychart.charts.Cartesian.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
  */
 anychart.charts.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.PALETTE |
-    anychart.ConsistencyState.MARKER_PALETTE |
-    anychart.ConsistencyState.HATCH_FILL_PALETTE |
-    anychart.ConsistencyState.SCALES |
-    anychart.ConsistencyState.SERIES |
-    anychart.ConsistencyState.AXES |
-    anychart.ConsistencyState.AXES_MARKERS |
-    anychart.ConsistencyState.GRIDS;
+    anychart.ConsistencyState.CARTESIAN_PALETTE |
+    anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE |
+    anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE |
+    anychart.ConsistencyState.CARTESIAN_SCALES |
+    anychart.ConsistencyState.CARTESIAN_SERIES |
+    anychart.ConsistencyState.CARTESIAN_AXES |
+    anychart.ConsistencyState.CARTESIAN_AXES_MARKERS |
+    anychart.ConsistencyState.CARTESIAN_GRIDS;
 
 
 /**
@@ -323,7 +323,7 @@ anychart.charts.Cartesian.prototype.xScale = function(opt_value) {
     }
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -370,7 +370,7 @@ anychart.charts.Cartesian.prototype.yScale = function(opt_value) {
     }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -500,7 +500,7 @@ anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value)
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -585,7 +585,7 @@ anychart.charts.Cartesian.prototype.minorGrid = function(opt_indexOrValue, opt_v
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
-    this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_GRIDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -603,7 +603,7 @@ anychart.charts.Cartesian.prototype.minorGrid = function(opt_indexOrValue, opt_v
  * @private
  */
 anychart.charts.Cartesian.prototype.onGridSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.GRIDS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.CARTESIAN_GRIDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -685,7 +685,7 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -771,7 +771,7 @@ anychart.charts.Cartesian.prototype.yAxis = function(opt_indexOrValue, opt_value
     this.restoreDefaultsForAxis(axis);
     this.registerDisposable(axis);
     axis.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -792,7 +792,7 @@ anychart.charts.Cartesian.prototype.onAxisSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.AXES;
+    state |= anychart.ConsistencyState.CARTESIAN_AXES;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -861,7 +861,7 @@ anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -930,7 +930,7 @@ anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -998,7 +998,7 @@ anychart.charts.Cartesian.prototype.textMarker = function(opt_indexOrValue, opt_
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -1016,7 +1016,7 @@ anychart.charts.Cartesian.prototype.textMarker = function(opt_indexOrValue, opt_
  * @private
  */
 anychart.charts.Cartesian.prototype.onMarkersSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1458,9 +1458,9 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(
-        anychart.ConsistencyState.SERIES |
-        anychart.ConsistencyState.LEGEND |
-        anychart.ConsistencyState.SCALES,
+        anychart.ConsistencyState.CARTESIAN_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.CARTESIAN_SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
@@ -1503,14 +1503,14 @@ anychart.charts.Cartesian.prototype.getSeries = function(index) {
 anychart.charts.Cartesian.prototype.seriesInvalidated_ = function(event) {
   var state = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.SERIES;
+    state = anychart.ConsistencyState.CARTESIAN_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.SERIES;
+    state |= anychart.ConsistencyState.CARTESIAN_SERIES;
     this.invalidateSeries_();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.SCALES;
+    state |= anychart.ConsistencyState.CARTESIAN_SCALES;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -1543,7 +1543,7 @@ anychart.charts.Cartesian.prototype.barGroupsPadding = function(opt_value) {
     if (this.barGroupsPadding_ != +opt_value) {
       this.barGroupsPadding_ = +opt_value;
       this.invalidateWidthBasedSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1591,7 +1591,7 @@ anychart.charts.Cartesian.prototype.barsPadding = function(opt_value) {
     if (this.barsPadding_ != +opt_value) {
       this.barsPadding_ = +opt_value;
       this.invalidateWidthBasedSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1641,7 +1641,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
   /** @type {Array.<number, number>} */
   var errValues;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
     anychart.core.Base.suspendSignalsDispatching(this.series_);
 
     this.makeScaleMaps_();
@@ -1827,7 +1827,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
 
     anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
 
-    this.markConsistent(anychart.ConsistencyState.SCALES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
     this.scalesFinalization_ = true;
   }
 };
@@ -1860,7 +1860,7 @@ anychart.charts.Cartesian.prototype.makeScaleMaps_ = function() {
     if (!series.xScale()) {
       series.xScale(/** @type {anychart.scales.Base} */(this.xScale()));
       this.invalidateSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
     }
     scale = series.xScale();
 
@@ -1884,7 +1884,7 @@ anychart.charts.Cartesian.prototype.makeScaleMaps_ = function() {
     if (!series.yScale()) {
       series.yScale(/** @type {anychart.scales.Base} */(this.yScale()));
       this.invalidateSeries_();
-      this.invalidate(anychart.ConsistencyState.SERIES);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
     }
     scale = series.yScale();
 
@@ -2178,7 +2178,7 @@ anychart.charts.Cartesian.prototype.setupPalette_ = function(cls, opt_cloneFrom)
  */
 anychart.charts.Cartesian.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2190,7 +2190,7 @@ anychart.charts.Cartesian.prototype.paletteInvalidated_ = function(event) {
  */
 anychart.charts.Cartesian.prototype.markerPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2202,7 +2202,7 @@ anychart.charts.Cartesian.prototype.markerPaletteInvalidated_ = function(event) 
  */
 anychart.charts.Cartesian.prototype.hatchFillPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2244,38 +2244,38 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoColor(this.palette().colorAt(i));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.PALETTE);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MARKER_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.MARKER_PALETTE);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL_PALETTE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoHatchFill(
           /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
     }
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.SERIES);
-    this.markConsistent(anychart.ConsistencyState.HATCH_FILL_PALETTE);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE);
   }
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
 
   // set default scales for axis if they not set
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CARTESIAN_AXES)) {
     var item;
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
       item = this.xAxes_[i];
@@ -2390,13 +2390,13 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     this.dataBounds_ = boundsWithoutAxes.clone().round();
 
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.AXES);
-    this.invalidate(anychart.ConsistencyState.GRIDS);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
-    this.invalidate(anychart.ConsistencyState.SERIES);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES |
+        anychart.ConsistencyState.CARTESIAN_GRIDS |
+        anychart.ConsistencyState.CARTESIAN_AXES_MARKERS |
+        anychart.ConsistencyState.CARTESIAN_SERIES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_GRIDS)) {
     var grids = goog.array.concat(this.grids_, this.minorGrids_);
 
     for (i = 0, count = grids.length; i < count; i++) {
@@ -2413,12 +2413,12 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
         grid.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.GRIDS);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_GRIDS);
   }
 
   //draw axes outside of data bounds
   //only inside axes ticks can intersect data bounds
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_AXES)) {
     for (i = 0, count = axes.length; i < count; i++) {
       axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
       if (axis) {
@@ -2435,10 +2435,10 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
         axis.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.AXES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_AXES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS)) {
     var markers = goog.array.concat(
         this.lineAxesMarkers_,
         this.rangeAxesMarkers_,
@@ -2458,10 +2458,10 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
         axesMarker.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SERIES)) {
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
@@ -2473,7 +2473,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     this.distributeSeries_();
     this.calcBubbleSizes_();
     this.drawSeries_();
-    this.markConsistent(anychart.ConsistencyState.SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_SERIES);
   }
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
@@ -2556,7 +2556,7 @@ anychart.charts.Cartesian.prototype.drawSeries_ = function() {
 anychart.charts.Cartesian.prototype.invalidateWidthBasedSeries_ = function() {
   for (var i = this.series_.length; i--;) {
     if (this.series_[i].isWidthBased())
-      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
   }
 };
 
@@ -2567,7 +2567,7 @@ anychart.charts.Cartesian.prototype.invalidateWidthBasedSeries_ = function() {
  */
 anychart.charts.Cartesian.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
 
 

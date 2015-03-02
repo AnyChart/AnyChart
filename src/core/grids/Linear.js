@@ -106,9 +106,8 @@ anychart.core.grids.Linear.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.grids.Linear.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.BOUNDS |
         anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.POSITION;
+        anychart.ConsistencyState.GRIDS_POSITION;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +123,7 @@ anychart.core.grids.Linear.prototype.layout = function(opt_value) {
     var layout = anychart.enums.normalizeLayout(opt_value);
     if (this.layout_ != layout) {
       this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -154,7 +153,7 @@ anychart.core.grids.Linear.prototype.scale = function(opt_value) {
     if (this.scale_ != opt_value) {
       this.scale_ = opt_value;
       this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.BOUNDS,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -278,7 +277,7 @@ anychart.core.grids.Linear.prototype.drawFirstLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawFirstLine_ != opt_value) {
       this.drawFirstLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -297,7 +296,7 @@ anychart.core.grids.Linear.prototype.drawLastLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawLastLine_ != opt_value) {
       this.drawLastLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -316,7 +315,7 @@ anychart.core.grids.Linear.prototype.isMinor = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.isMinor_ != opt_value) {
       this.isMinor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -471,7 +470,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.POSITION) ||
+  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var layout;
     var fill;
@@ -550,7 +549,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
       drawInterlace.call(this, 1, ratio, fill, layer, pixelShift);
     }
 
-    this.markConsistent(anychart.ConsistencyState.POSITION);
+    this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

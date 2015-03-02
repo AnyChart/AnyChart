@@ -184,8 +184,7 @@ anychart.core.ui.MarkersFactory.prototype.SUPPORTED_SIGNALS = anychart.core.Visu
 anychart.core.ui.MarkersFactory.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.BOUNDS |
-    anychart.ConsistencyState.HANDLERS;
+    anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS;
 
 
 /**
@@ -874,7 +873,7 @@ anychart.core.ui.MarkersFactory.prototype.clear = function(opt_index) {
       }, this);
       this.markers_.length = 0;
     }
-    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   } else
     this.markers_ = [];
   return this;
@@ -980,7 +979,7 @@ anychart.core.ui.MarkersFactory.prototype.draw = function() {
         marker.container(this.layer_);
         marker.draw();
 
-        if (this.hasInvalidationState(anychart.ConsistencyState.HANDLERS)) {
+        if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS)) {
           for (var type in anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_) {
 
             var element = marker.getDomElement();
@@ -1231,7 +1230,7 @@ anychart.core.ui.MarkersFactory.prototype.ensureHandler_ = function(type, captur
       }
     }
     if (changed)
-      this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1245,7 +1244,7 @@ anychart.core.ui.MarkersFactory.prototype.removeAllHandlers_ = function() {
   this.attachedEvents_ = 0;
   this.attachedOnceEvents_ = 0;
   if (changed)
-    this.invalidate(anychart.ConsistencyState.HANDLERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 

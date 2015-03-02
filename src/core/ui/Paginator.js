@@ -150,7 +150,7 @@ anychart.core.ui.Paginator.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prot
  */
 anychart.core.ui.Paginator.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BACKGROUND;
+    anychart.ConsistencyState.PAGINATOR_BACKGROUND;
 
 
 /**
@@ -259,7 +259,7 @@ anychart.core.ui.Paginator.prototype.background = function(opt_value) {
  */
 anychart.core.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.PAGINATOR_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -429,10 +429,10 @@ anychart.core.ui.Paginator.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR_BACKGROUND)) {
     this.background_.parentBounds(this.actualLeft_, this.actualTop_, this.backgroundWidth_, this.backgroundHeight_);
     this.background_.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.PAGINATOR_BACKGROUND);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

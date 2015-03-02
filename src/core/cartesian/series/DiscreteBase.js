@@ -79,7 +79,7 @@ anychart.core.cartesian.series.DiscreteBase.prototype.startDrawing = function() 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
     this.rootElement.clear();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillRootElement) {
       this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
           this.rootTypedLayerInitializer,

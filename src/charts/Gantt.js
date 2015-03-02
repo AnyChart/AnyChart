@@ -153,8 +153,8 @@ anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt
  */
 anychart.charts.Gantt.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.DATA | //New data is set.
-    anychart.ConsistencyState.POSITION; //Position means that position of data items in DG and TL was changed.
+    anychart.ConsistencyState.GANTT_DATA | //New data is set.
+    anychart.ConsistencyState.GANTT_POSITION; //Position means that position of data items in DG and TL was changed.
 
 
 /**
@@ -207,7 +207,7 @@ anychart.charts.Gantt.SCROLL_BAR_SIDE = 10;
  */
 anychart.charts.Gantt.prototype.controllerInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.GANTT_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -237,7 +237,7 @@ anychart.charts.Gantt.prototype.data = function(opt_data, opt_fillMethod) {
     } else {
       this.data_ = new anychart.data.Tree(opt_data, opt_fillMethod);
     }
-    this.invalidate(anychart.ConsistencyState.DATA);
+    this.invalidate(anychart.ConsistencyState.GANTT_DATA);
     return this;
   }
   return this.data_;
@@ -283,7 +283,7 @@ anychart.charts.Gantt.prototype.getDataGrid = function() {
     this.dg_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
       ths.tl_.selectRow(e['item']); //This also deselects previous item.
       ths.dispatchEvent(e);
-      ths.tl_.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+      ths.tl_.invalidate(anychart.ConsistencyState.GANTT_POSITION, anychart.Signal.NEEDS_REDRAW);
     });
 
     this.dg_.tooltip().contentFormatter(function(data) {
@@ -334,7 +334,7 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
     this.tl_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
       ths.dg_.selectRow(e['item']); //This also deselects previous item.
       ths.dispatchEvent(e);
-      ths.dg_.invalidate(anychart.ConsistencyState.CLICK, anychart.Signal.NEEDS_REDRAW);
+      ths.dg_.invalidate(anychart.ConsistencyState.DATA_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
     });
 
     this.tl_.tooltip().contentFormatter(function(data) {
@@ -703,19 +703,19 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
     boundsChanged = true;
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_DATA)) {
     this.controller_.data(this.data_);
-    this.invalidate(anychart.ConsistencyState.POSITION);
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.invalidate(anychart.ConsistencyState.GANTT_POSITION);
+    this.markConsistent(anychart.ConsistencyState.GANTT_DATA);
   }
 
   anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.splitter_, this.controller_);
   this.controller_.run(); //This must redraw DG and TL.
   this.splitter().draw();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_POSITION)) {
     //This consistency state is used to set 'checkDrawingNeeded()' to TRUE. Controller must be run anyway.
-    this.markConsistent(anychart.ConsistencyState.POSITION);
+    this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
   }
 
   if (boundsChanged) {

@@ -75,7 +75,7 @@ goog.inherits(anychart.core.polar.series.ContinuousBase, anychart.core.polar.ser
  */
 anychart.core.polar.series.ContinuousBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.polar.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.MARKERS;
+    anychart.ConsistencyState.SERIES_MARKERS;
 
 
 /**
@@ -183,7 +183,7 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers = function(opt_
  */
 anychart.core.polar.series.ContinuousBase.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -293,7 +293,7 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillPath) {
       this.hatchFillPath = acgraph.path();
       this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));

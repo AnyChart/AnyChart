@@ -85,10 +85,10 @@ anychart.core.polar.series.Base.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.polar.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.HATCH_FILL |
+    anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.DATA;
+    anychart.ConsistencyState.SERIES_LABELS |
+    anychart.ConsistencyState.SERIES_DATA;
 
 
 /**
@@ -561,7 +561,7 @@ anychart.core.polar.series.Base.prototype.data = function(opt_value, opt_csvSett
     this.data_ = this.parentView_;
     this.data_.listenSignals(this.dataInvalidated_, this);
     // DATA is supported only in Bubble, so we invalidate only for it.
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.DATA,
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     return this;
   }
@@ -1422,7 +1422,7 @@ anychart.core.polar.series.Base.prototype.hoverLabels = function(opt_value) {
  */
 anychart.core.polar.series.Base.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1615,7 +1615,7 @@ anychart.core.polar.series.Base.prototype.hatchFill = function(opt_patternFillOr
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

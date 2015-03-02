@@ -40,12 +40,11 @@ anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS = anychart.core.V
 
 
 /**
- * Supported consistency states. Adds BOUNDS and PIXEL_BOUNDS to Base states.
+ * Supported consistency states. ENABLED, CONTAINER, BOUNDS and Z_INDEX.
  * @type {number}
  */
 anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BOUNDS;
+    anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
 /**

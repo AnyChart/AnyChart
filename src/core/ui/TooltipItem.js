@@ -178,13 +178,12 @@ anychart.core.ui.TooltipItem.prototype.SUPPORTED_SIGNALS = 0;
  */
 anychart.core.ui.TooltipItem.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.POSITION |
-        anychart.ConsistencyState.BOUNDS |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.SEPARATOR |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.BACKGROUND |
-        anychart.ConsistencyState.VISIBILITY;
+        anychart.ConsistencyState.TOOLTIP_POSITION |
+        anychart.ConsistencyState.TOOLTIP_TITLE |
+        anychart.ConsistencyState.TOOLTIP_SEPARATOR |
+        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_BACKGROUND |
+        anychart.ConsistencyState.TOOLTIP_VISIBILITY;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -223,14 +222,14 @@ anychart.core.ui.TooltipItem.prototype.onTitleSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     this.contentBounds_ = null;
     this.invalidate((anychart.ConsistencyState.BOUNDS |
-        anychart.ConsistencyState.POSITION |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.SEPARATOR |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.BACKGROUND),
+        anychart.ConsistencyState.TOOLTIP_POSITION |
+        anychart.ConsistencyState.TOOLTIP_TITLE |
+        anychart.ConsistencyState.TOOLTIP_SEPARATOR |
+        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.TITLE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_TITLE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -271,14 +270,14 @@ anychart.core.ui.TooltipItem.prototype.onSeparatorSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     this.contentBounds_ = null;
     this.invalidate((anychart.ConsistencyState.BOUNDS |
-        anychart.ConsistencyState.POSITION |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.SEPARATOR |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.BACKGROUND),
+        anychart.ConsistencyState.TOOLTIP_POSITION |
+        anychart.ConsistencyState.TOOLTIP_TITLE |
+        anychart.ConsistencyState.TOOLTIP_SEPARATOR |
+        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SEPARATOR, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_SEPARATOR, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -319,14 +318,14 @@ anychart.core.ui.TooltipItem.prototype.onContentSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     this.contentBounds_ = null;
     this.invalidate((anychart.ConsistencyState.BOUNDS |
-        anychart.ConsistencyState.POSITION |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.SEPARATOR |
-        anychart.ConsistencyState.LABELS |
-        anychart.ConsistencyState.BACKGROUND),
+        anychart.ConsistencyState.TOOLTIP_POSITION |
+        anychart.ConsistencyState.TOOLTIP_TITLE |
+        anychart.ConsistencyState.TOOLTIP_SEPARATOR |
+        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -365,7 +364,7 @@ anychart.core.ui.TooltipItem.prototype.background = function(opt_value) {
  */
 anychart.core.ui.TooltipItem.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -425,7 +424,7 @@ anychart.core.ui.TooltipItem.prototype.x = function(opt_value) {
     if (this.x_ != opt_value) {
       this.x_ = opt_value;
       this.position_ = null;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -445,7 +444,7 @@ anychart.core.ui.TooltipItem.prototype.y = function(opt_value) {
     if (this.y_ != opt_value) {
       this.y_ = opt_value;
       this.position_ = null;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -465,7 +464,7 @@ anychart.core.ui.TooltipItem.prototype.offsetX = function(opt_value) {
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
       this.position_ = null;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -484,7 +483,7 @@ anychart.core.ui.TooltipItem.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -505,7 +504,7 @@ anychart.core.ui.TooltipItem.prototype.anchor = function(opt_value) {
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
       this.position_ = null;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -529,7 +528,7 @@ anychart.core.ui.TooltipItem.prototype.visible = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.visible_ != opt_value) {
       this.visible_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.VISIBILITY, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TOOLTIP_VISIBILITY, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -608,7 +607,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.VISIBILITY)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER | anychart.ConsistencyState.TOOLTIP_VISIBILITY)) {
     if (this.visible()) {
       this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.timer_.stop();
@@ -620,16 +619,16 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
       }
     }
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
-    this.markConsistent(anychart.ConsistencyState.VISIBILITY);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_VISIBILITY);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_POSITION)) {
     this.calculatePosition_();
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.layer_.translate(this.position_.x, this.position_.y);
 
-    this.markConsistent(anychart.ConsistencyState.POSITION);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_POSITION);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -643,7 +642,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
   }
 
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_BACKGROUND)) {
     var background = /** @type {anychart.core.ui.Background} */(this.background());
     background.suspendSignalsDispatching();
     background.parentBounds(this.contentBounds_);
@@ -651,11 +650,11 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     background.resumeSignalsDispatching(false);
     background.draw();
 
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_BACKGROUND);
   }
 
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_TITLE)) {
     var title = /** @type {anychart.core.ui.Title} */ (this.title());
     title.suspendSignalsDispatching();
     if (this.enabled() && this.visible()) title.container(this.layer_);
@@ -667,10 +666,10 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     if (!this.titleRemainingBounds_ && title.enabled())
       this.titleRemainingBounds_ = title.getRemainingBounds();
 
-    this.markConsistent(anychart.ConsistencyState.TITLE);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_TITLE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SEPARATOR)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_SEPARATOR)) {
     var separator = /** @type {anychart.core.ui.Separator} */(this.separator());
     separator.suspendSignalsDispatching();
     if (this.enabled() && this.visible()) separator.container(this.layer_);
@@ -682,10 +681,10 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     if (!this.separatorRemainingBounds_ && separator.enabled())
       this.separatorRemainingBounds_ = separator.getRemainingBounds();
 
-    this.markConsistent(anychart.ConsistencyState.SEPARATOR);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_SEPARATOR);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_LABELS)) {
     var label = /** @type {anychart.core.ui.Label} */(this.content());
     var remainingBounds = this.separatorRemainingBounds_ || this.titleRemainingBounds_ || this.contentBounds_;
     label.suspendSignalsDispatching();
@@ -694,7 +693,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     label.resumeSignalsDispatching(false);
     label.draw();
 
-    this.markConsistent(anychart.ConsistencyState.LABELS);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_LABELS);
   }
 
   if (manualSuspend) stage.resume();

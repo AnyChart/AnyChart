@@ -96,7 +96,7 @@ anychart.core.ui.Credits.CssClass_ = {
 anychart.core.ui.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.CREDITS_POSITION;
 
 
 /**
@@ -229,7 +229,7 @@ anychart.core.ui.Credits.prototype.logoSrc = function(opt_value) {
 
 /** @inheritDoc */
 anychart.core.ui.Credits.prototype.invalidateParentBounds = function() {
-  this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.CREDITS_POSITION, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -354,14 +354,14 @@ anychart.core.ui.Credits.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.POSITION)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS_POSITION)) {
     var containerSize = containerElement ? goog.style.getBorderBoxSize(containerElement) : stage ? stage.getBounds() : new anychart.math.Rect(0, 0, 0, 0);
 
     var right = anychart.core.ui.Credits.RIGHT + (containerSize.width - parentBounds.width - parentBounds.left);
     var bottom = anychart.core.ui.Credits.BOTTOM + (containerSize.height - parentBounds.height - parentBounds.top);
 
     this.setPosition_(right, bottom);
-    this.markConsistent(anychart.ConsistencyState.POSITION);
+    this.markConsistent(anychart.ConsistencyState.CREDITS_POSITION);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

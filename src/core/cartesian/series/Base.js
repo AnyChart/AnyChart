@@ -124,10 +124,10 @@ anychart.core.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.cartesian.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.HATCH_FILL |
+    anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.LABELS |
-    anychart.ConsistencyState.DATA;
+    anychart.ConsistencyState.SERIES_LABELS |
+    anychart.ConsistencyState.SERIES_DATA;
 
 
 /**
@@ -696,7 +696,7 @@ anychart.core.cartesian.series.Base.prototype.data = function(opt_value, opt_csv
     this.data_ = this.parentView_;
     this.data_.listenSignals(this.dataInvalidated_, this);
     // DATA is supported only in Bubble, so we invalidate only for it.
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.DATA,
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
         anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     return this;
   }
@@ -987,7 +987,7 @@ anychart.core.cartesian.series.Base.prototype.isErrorAvailable = function() {
 anychart.core.cartesian.series.Base.prototype.draw = function() {
   this.suspendSignalsDispatching();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
   var iterator;
   var value;
   var scale;
@@ -1712,7 +1712,7 @@ anychart.core.cartesian.series.Base.prototype.hoverLabels = function(opt_value) 
  */
 anychart.core.cartesian.series.Base.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1893,7 +1893,7 @@ anychart.core.cartesian.series.Base.prototype.hatchFill = function(opt_patternFi
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

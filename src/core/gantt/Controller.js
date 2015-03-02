@@ -197,9 +197,9 @@ anychart.core.gantt.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEE
  * @type {number}
  */
 anychart.core.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.ConsistencyState.DATA |
-    anychart.ConsistencyState.VISIBILITY |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.CONTROLLER_DATA |
+    anychart.ConsistencyState.CONTROLLER_VISIBILITY |
+    anychart.ConsistencyState.CONTROLLER_POSITION;
 
 
 /**
@@ -215,13 +215,13 @@ anychart.core.gantt.Controller.prototype.dataInvalidated_ = function(event) {
    Here meta_changed_signal comes from tree on tree data item change.
    We have to initialize rebuilding of visible data items.
    */
-  if (event.hasSignal(anychart.Signal.META_CHANGED)) state |= anychart.ConsistencyState.VISIBILITY;
+  if (event.hasSignal(anychart.Signal.META_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_VISIBILITY;
 
   /*
    Here data_changed_signal comes from tree when tree has some structural changes.
    We have to relinerize data and rebuild visible data items.
    */
-  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.DATA;
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) state |= anychart.ConsistencyState.CONTROLLER_DATA;
 
   this.invalidate(state, signal);
 };
@@ -487,7 +487,7 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
     this.verticalOffset_ = 0;
   }
   this.positionRecalculated_ = true;
-  this.markConsistent(anychart.ConsistencyState.POSITION);
+  this.markConsistent(anychart.ConsistencyState.CONTROLLER_POSITION);
 };
 
 
@@ -542,7 +542,7 @@ anychart.core.gantt.Controller.prototype.data = function(opt_value) {
       this.expandedItemsTraverser_ = this.data_.getTraverser();
       this.expandedItemsTraverser_.traverseChildrenCondition(this.traverseChildrenCondition_);
 
-      this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_DATA, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -559,7 +559,7 @@ anychart.core.gantt.Controller.prototype.verticalOffset = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.verticalOffset_ != opt_value) {
       this.verticalOffset_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -578,7 +578,7 @@ anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
     if (this.startIndex_ != opt_value && !isNaN(opt_value)) {
       this.startIndex_ = opt_value;
       this.endIndex_ = NaN;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -597,7 +597,7 @@ anychart.core.gantt.Controller.prototype.endIndex = function(opt_value) {
     if (this.endIndex_ != opt_value && !isNaN(opt_value)) {
       this.endIndex_ = opt_value;
       this.startIndex_ = NaN;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -614,7 +614,7 @@ anychart.core.gantt.Controller.prototype.availableHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.availableHeight_ != opt_value) {
       this.availableHeight_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -631,7 +631,7 @@ anychart.core.gantt.Controller.prototype.dataGrid = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.dataGrid_ != opt_value) {
       this.dataGrid_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -648,7 +648,7 @@ anychart.core.gantt.Controller.prototype.timeline = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.timeline_ != opt_value) {
       this.timeline_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION, anychart.Signal.NEEDS_REAPPLICATION);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   }
@@ -663,16 +663,16 @@ anychart.core.gantt.Controller.prototype.timeline = function(opt_value) {
  */
 anychart.core.gantt.Controller.prototype.run = function() {
   if (!this.isConsistent()) {
-    if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.CONTROLLER_DATA)) {
       this.linearizeData_();
-      this.markConsistent(anychart.ConsistencyState.DATA);
-      this.invalidate(anychart.ConsistencyState.VISIBILITY);
+      this.markConsistent(anychart.ConsistencyState.CONTROLLER_DATA);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY);
     }
 
-    if (this.hasInvalidationState(anychart.ConsistencyState.VISIBILITY)) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.CONTROLLER_VISIBILITY)) {
       this.getVisibleData_();
-      this.markConsistent(anychart.ConsistencyState.VISIBILITY);
-      this.invalidate(anychart.ConsistencyState.POSITION);
+      this.markConsistent(anychart.ConsistencyState.CONTROLLER_VISIBILITY);
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION);
     }
 
     this.recalculate();

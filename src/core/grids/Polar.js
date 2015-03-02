@@ -109,9 +109,8 @@ anychart.core.grids.Polar.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.grids.Polar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BOUNDS |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.POSITION;
+    anychart.ConsistencyState.GRIDS_POSITION;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,7 +126,7 @@ anychart.core.grids.Polar.prototype.layout = function(opt_value) {
     var layout = anychart.enums.normalizePolarLayout(opt_value, anychart.enums.RadialGridLayout.CIRCUIT);
     if (this.layout_ != layout) {
       this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -157,7 +156,7 @@ anychart.core.grids.Polar.prototype.yScale = function(opt_value) {
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
       this.yScale_.listenSignals(this.yScaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.BOUNDS,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -205,7 +204,7 @@ anychart.core.grids.Polar.prototype.xScale = function(opt_value) {
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
       this.xScale_.listenSignals(this.xScaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.BOUNDS,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -320,7 +319,7 @@ anychart.core.grids.Polar.prototype.drawLastLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.drawLastLine_ != opt_value) {
       this.drawLastLine_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -339,7 +338,7 @@ anychart.core.grids.Polar.prototype.isMinor = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.isMinor_ != opt_value) {
       this.isMinor_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.POSITION | anychart.ConsistencyState.APPEARANCE,
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -489,7 +488,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.POSITION) ||
+  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
 
     var layout;
@@ -615,7 +614,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
       }
     }
 
-    this.markConsistent(anychart.ConsistencyState.POSITION);
+    this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

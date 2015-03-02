@@ -11,130 +11,168 @@ goog.require('goog.events.EventTarget');
  * @enum {number}
  */
 anychart.ConsistencyState = {
+  //---------------------------------- GENERAL STATES ---------------------------------
   /**
    * enabled() has changed.
    */
-  ENABLED: 0x00000001,
+  ENABLED: 1 << 0,
   /**
    * Container has changed.
    */
-  CONTAINER: 0x00000002,
-  /**
-   * Z index has changed.
-   */
-  Z_INDEX: 0x00000004,
-  /**
-   * Visual settings have changed (fill, stroke, etc.).
-   */
-  APPEARANCE: 0x00000008,
+  CONTAINER: 1 << 1,
   /**
    * Size has changed.
    */
-  BOUNDS: 0x00000010,
+  BOUNDS: 1 << 2,
   /**
-   * Background has changed.
+   * Z index has changed.
    */
-  BACKGROUND: 0x00000020,
+  Z_INDEX: 1 << 3,
   /**
-   * Data has changed.
+   * Visual settings have changed (fill, stroke, etc.).
    */
-  DATA: 0x00000040,
+  APPEARANCE: 1 << 4,
+  //---------------------------------- DATA STATES (BASE) ---------------------------------
   /**
-   * Title has changed.
+   * Data mask invalidated.
    */
-  TITLE: 0x00000080,
+  DATA_MASK: 1 << 0,
+  //---------------------------------- CHART STATES (VB) ---------------------------------
   /**
-   * Axes has changed.
+   * Chart title has changed.
    */
-  AXES: 0x00000100,
+  CHART_BACKGROUND: 1 << 5,
   /**
-   * Palette has changed.
+   * Chart title has changed.
    */
-  PALETTE: 0x00000200,
+  CHART_TITLE: 1 << 6,
   /**
-   * Scales have changed.
+   * Chart title has changed.
    */
-  SCALES: 0x00000400,
-  /**
-   * Series have changed.
-   */
-  SERIES: 0x00000800,
-  /**
-   * Ticks have changed.
-   */
-  TICKS: 0x00001000,
-  /**
-   * Markers have changed.
-   */
-  MARKERS: 0x00002000,
-  /**
-   * Hatch fill palette has changed.
-   */
-  HATCH_FILL_PALETTE: 0x00004000,
-  /**
-   * Labels have changed.
-   */
-  LABELS: 0x00008000,
-  /**
-   * Credits have changed.
-   */
-  CREDITS: 0x00010000,
-  /**
-   * Separator has changed.
-   */
-  SEPARATOR: 0x00020000,
-  /**
-   * Paginator has changed.
-   */
-  PAGINATOR: 0x00040000,
-  /**
-   * Legend has changed.
-   */
-  LEGEND: 0x00080000,
-  /**
-   * Overlap has changed.
-   */
-  OVERLAP: 0x00100000,
-  /**
-   * Visibility has changed.
-   */
-  VISIBILITY: 0x00200000,
-  /**
-   * Position has changed.
-   */
-  POSITION: 0x00400000,
-  /**
-   * Click.
-   */
-  CLICK: 0x00800000,
-  /**
-   * Hover.
-   */
-  HOVER: 0x01000000,
-  /**
-   * Axes markers have changed.
-   */
-  AXES_MARKERS: 0x02000000,
-  /**
-   * Grids have changed.
-   */
-  GRIDS: 0x04000000,
-  /**
-   * Handlers set has changed.
-   */
-  HANDLERS: 0x08000000,
-  /**
-   * Chart labels have changed (weird naming due to the fact that we use LABELS state for pie chart)
-   */
-  CHART_LABELS: 0x10000000,
-  /**
-   * Marker palette has changed.
-   */
-  MARKER_PALETTE: 0x20000000,
-  /**
-   * Hatch fill has changed
-   */
-  HATCH_FILL: 0x40000000,
+  CHART_LABELS: 1 << 7,
+  // We also add SeparateChart states here to not to add prefix SEPARATE_CHART.
+  // But if bullet or spark chart will need some new consistency states, there is a possibility to add 2 here.
+  CHART_LEGEND: 1 << 8,
+  CHART_CREDITS: 1 << 9,
+  //---------------------------------- BULLET STATES (CHART) ---------------------------------
+  BULLET_DATA: 1 << 10,
+  BULLET_SCALES: 1 << 11,
+  BULLET_AXES: 1 << 12,
+  BULLET_AXES_MARKERS: 1 << 13,
+  BULLET_MARKERS: 1 << 14,
+  //---------------------------------- CARTESIAN STATES (CHART) ---------------------------------
+  CARTESIAN_PALETTE: 1 << 10,
+  CARTESIAN_MARKER_PALETTE: 1 << 11,
+  CARTESIAN_HATCH_FILL_PALETTE: 1 << 12,
+  CARTESIAN_SCALES: 1 << 13,
+  CARTESIAN_SERIES: 1 << 14,
+  CARTESIAN_AXES: 1 << 15,
+  CARTESIAN_AXES_MARKERS: 1 << 16,
+  CARTESIAN_GRIDS: 1 << 17,
+  //---------------------------------- GANTT STATES (CHART) ---------------------------------
+  GANTT_DATA: 1 << 10,
+  GANTT_POSITION: 1 << 11,
+  //---------------------------------- PIE STATES (CHART) ---------------------------------
+  PIE_DATA: 1 << 10,
+  PIE_LABELS: 1 << 11,
+  //---------------------------------- POLAR STATES (CHART) ---------------------------------
+  POLAR_PALETTE: 1 << 10,
+  POLAR_MARKER_PALETTE: 1 << 11,
+  POLAR_HATCH_FILL_PALETTE: 1 << 12,
+  POLAR_SCALES: 1 << 13,
+  POLAR_SERIES: 1 << 14,
+  POLAR_AXES: 1 << 15,
+  POLAR_GRIDS: 1 << 16,
+  //---------------------------------- RADAR STATES (CHART) ---------------------------------
+  RADAR_PALETTE: 1 << 10,
+  RADAR_MARKER_PALETTE: 1 << 11,
+  RADAR_HATCH_FILL_PALETTE: 1 << 12,
+  RADAR_SCALES: 1 << 13,
+  RADAR_SERIES: 1 << 14,
+  RADAR_AXES: 1 << 15,
+  RADAR_GRIDS: 1 << 16,
+  //---------------------------------- SCATTER STATES (CHART) ---------------------------------
+  SCATTER_PALETTE: 1 << 10,
+  SCATTER_MARKER_PALETTE: 1 << 11,
+  SCATTER_HATCH_FILL_PALETTE: 1 << 12,
+  SCATTER_SCALES: 1 << 13,
+  SCATTER_SERIES: 1 << 14,
+  SCATTER_AXES: 1 << 15,
+  SCATTER_AXES_MARKERS: 1 << 16,
+  SCATTER_GRIDS: 1 << 17,
+  //---------------------------------- SPARKLINE STATES (CHART) ---------------------------------
+  SPARK_SCALES: 1 << 10,
+  SPARK_SERIES: 1 << 11,
+  SPARK_AXES_MARKERS: 1 << 12,
+  //---------------------------------- SERIES STATES (VB) ---------------------------------
+  // also combined, due to a very big prefix
+  SERIES_HATCH_FILL: 1 << 5,
+  SERIES_MARKERS: 1 << 6,
+  SERIES_LABELS: 1 << 7,
+  SERIES_DATA: 1 << 8,
+  //---------------------------------- AXES STATES (VB) ---------------------------------
+  // also combined
+  AXIS_TITLE: 1 << 5,
+  AXIS_LABELS: 1 << 6,
+  AXIS_TICKS: 1 << 7,
+  AXIS_OVERLAP: 1 << 8,
+  //---------------------------------- GANTT CONTROLLER STATES (VB) ---------------------------------
+  CONTROLLER_DATA: 1 << 5,
+  CONTROLLER_VISIBILITY: 1 << 6,
+  CONTROLLER_POSITION: 1 << 7,
+  //---------------------------------- GANTT TIMELINE STATES (VB) ---------------------------------
+  TIMELINE_SCALES: 1 << 5,
+  TIMELINE_POSITION: 1 << 6,
+  TIMELINE_HOVER: 1 << 7,
+  //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
+  TIMELINE_HEADER_SCALES: 1 << 5,
+  //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
+  TIMELINE_HEADER_LEVEL_LABELS: 1 << 5,
+  TIMELINE_HEADER_LEVEL_TICKS: 1 << 6,
+  //---------------------------------- GRIDS STATES (VB) ---------------------------------
+  // also combined
+  GRIDS_POSITION: 1 << 5,
+  //---------------------------------- BUTTON STATES (VB) ---------------------------------
+  BUTTON_BACKGROUND: 1 << 5,
+  //---------------------------------- CREDITS STATES (VB) ---------------------------------
+  CREDITS_POSITION: 1 << 5,
+  //---------------------------------- DATA GRID STATES (VB) ---------------------------------
+  DATA_GRID_GRIDS: 1 << 5,
+  DATA_GRID_POSITION: 1 << 6,
+  DATA_GRID_HOVER: 1 << 7,
+  DATA_GRID_CLICK: 1 << 8,
+  //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
+  DATA_GRID_COLUMN_TITLE: 1 << 5,
+  DATA_GRID_COLUMN_POSITION: 1 << 6,
+  //---------------------------------- LABEL STATES (VB) ---------------------------------
+  LABEL_BACKGROUND: 1 << 5,
+  //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------
+  LABELS_FACTORY_BACKGROUND: 1 << 5,
+  LABELS_FACTORY_HANDLERS: 1 << 6,
+  //---------------------------------- LEGEND STATES (VB) ---------------------------------
+  LEGEND_BACKGROUND: 1 << 5,
+  LEGEND_TITLE: 1 << 6,
+  LEGEND_SEPARATOR: 1 << 7,
+  LEGEND_PAGINATOR: 1 << 8,
+  LEGEND_DATA: 1 << 9,
+  //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
+  MARKERS_FACTORY_HANDLERS: 1 << 5,
+  //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
+  PAGINATOR_BACKGROUND: 1 << 5,
+  //---------------------------------- SCROLLBAR STATES (VB) ---------------------------------
+  SCROLLBAR_POSITION: 1 << 5,
+  //---------------------------------- SPLITTER STATES (VB) ---------------------------------
+  SPLITTER_POSITION: 1 << 5,
+  //---------------------------------- TITLE STATES (VB) ---------------------------------
+  TITLE_BACKGROUND: 1 << 5,
+  //---------------------------------- TOOLTIP STATES (VB) ---------------------------------
+  // actually its for TooltipItem, but tooltip doesn't have any states and we hope they will merge
+  TOOLTIP_POSITION: 1 << 5,
+  TOOLTIP_TITLE: 1 << 6,
+  TOOLTIP_SEPARATOR: 1 << 7,
+  TOOLTIP_LABELS: 1 << 8,
+  TOOLTIP_BACKGROUND: 1 << 9,
+  TOOLTIP_VISIBILITY: 1 << 10,
   /**
    * Combination of all states.
    */
@@ -143,42 +181,16 @@ anychart.ConsistencyState = {
 
 
 /**
- * List of all possible signals.
+ * List of all possible signals (can be only from 1 << 0 to 1 << 30)
  * @enum {number}
  */
 anychart.Signal = {
-  NEEDS_REDRAW: 0x00000001,
-  NEEDS_REAPPLICATION: 0x00000002,
-  NEEDS_RECALCULATION: 0x00000004,
-  BOUNDS_CHANGED: 0x00000008,
-  DATA_CHANGED: 0x00000010,
-  META_CHANGED: 0x00000020,
-
-  RESERVED_7: 0x00000040,
-  RESERVED_8: 0x00000080,
-  RESERVED_9: 0x00000100,
-  RESERVED_10: 0x00000200,
-  RESERVED_11: 0x00000400,
-  RESERVED_12: 0x00000800,
-  RESERVED_13: 0x00001000,
-  RESERVED_14: 0x00002000,
-  RESERVED_15: 0x00004000,
-  RESERVED_16: 0x00008000,
-  RESERVED_17: 0x00010000,
-  RESERVED_18: 0x00020000,
-  RESERVED_19: 0x00040000,
-  RESERVED_20: 0x00080000,
-  RESERVED_21: 0x00100000,
-  RESERVED_22: 0x00200000,
-  RESERVED_23: 0x00400000,
-  RESERVED_24: 0x00800000,
-  RESERVED_25: 0x01000000,
-  RESERVED_26: 0x02000000,
-  RESERVED_27: 0x04000000,
-  RESERVED_28: 0x08000000,
-  RESERVED_29: 0x10000000,
-  RESERVED_30: 0x20000000,
-  RESERVED_31: 0x40000000
+  NEEDS_REDRAW: 1 << 0,
+  NEEDS_REAPPLICATION: 1 << 1,
+  NEEDS_RECALCULATION: 1 << 2,
+  BOUNDS_CHANGED: 1 << 3,
+  DATA_CHANGED: 1 << 4,
+  META_CHANGED: 1 << 5
 };
 
 

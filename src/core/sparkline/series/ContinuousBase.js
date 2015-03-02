@@ -105,7 +105,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.startDrawing = function(
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillPath) {
       this.hatchFillPath = acgraph.path();
       this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));

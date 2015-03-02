@@ -420,7 +420,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalLowStroke =
 
 /** @inheritDoc */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.finalizeHatchFill = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillPath) {
       this.hatchFillPath.deserialize(this.path.serialize());
       this.applyHatchFill(false);

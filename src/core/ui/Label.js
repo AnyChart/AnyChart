@@ -148,8 +148,8 @@ anychart.core.ui.Label.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototyp
  * @type {number}
  */
 anychart.core.ui.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
-    (anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.BACKGROUND);
+    anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
+        anychart.ConsistencyState.LABEL_BACKGROUND;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,7 +232,7 @@ anychart.core.ui.Label.prototype.background = function(opt_value) {
  */
 anychart.core.ui.Label.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.BACKGROUND,
+    this.invalidate(anychart.ConsistencyState.LABEL_BACKGROUND,
         anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -1089,19 +1089,19 @@ anychart.core.ui.Label.prototype.draw = function() {
     var clipRect = new acgraph.math.Rect(0, 0, this.textWidth_, this.textHeight_);
     this.textElement_.clip(clipRect);
 
-    this.invalidate(anychart.ConsistencyState.BACKGROUND);
+    this.invalidate(anychart.ConsistencyState.LABEL_BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABEL_BACKGROUND)) {
     if (this.background_) {
       this.background_.suspendSignalsDispatching();
       this.background_.parentBounds(backgroundBounds);
       this.background_.draw();
       this.background_.resumeSignalsDispatching(false);
     }
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.LABEL_BACKGROUND);
   }
 
   return this;

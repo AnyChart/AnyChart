@@ -69,7 +69,7 @@ anychart.core.ui.Title.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototyp
  */
 anychart.core.ui.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BACKGROUND;
+    anychart.ConsistencyState.TITLE_BACKGROUND;
 
 
 /**
@@ -620,7 +620,7 @@ anychart.core.ui.Title.prototype.draw = function() {
       // settings proper bounds to the background
       background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
       background.draw();
-      this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+      this.markConsistent(anychart.ConsistencyState.TITLE_BACKGROUND);
     }
     // settings text offset for
     this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.backgroundWidth_));
@@ -641,10 +641,10 @@ anychart.core.ui.Title.prototype.draw = function() {
   }
 
   // If background appearance changed, we should do something about that.
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE_BACKGROUND)) {
     background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
     background.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.TITLE_BACKGROUND);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -986,7 +986,7 @@ anychart.core.ui.Title.prototype.helperPlacer_ = function(tx, x, y) {
  */
 anychart.core.ui.Title.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TITLE_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 

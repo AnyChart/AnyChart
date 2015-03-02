@@ -218,11 +218,11 @@ anychart.core.ui.Legend.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototy
  */
 anychart.core.ui.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |  // ENABLED CONTAINER Z_INDEX APPEARANCE BOUNDS
-    anychart.ConsistencyState.BACKGROUND |
-    anychart.ConsistencyState.TITLE |
-    anychart.ConsistencyState.SEPARATOR |
-    anychart.ConsistencyState.PAGINATOR |
-    anychart.ConsistencyState.DATA;
+    anychart.ConsistencyState.LEGEND_BACKGROUND |
+    anychart.ConsistencyState.LEGEND_TITLE |
+    anychart.ConsistencyState.LEGEND_SEPARATOR |
+    anychart.ConsistencyState.LEGEND_PAGINATOR |
+    anychart.ConsistencyState.LEGEND_DATA;
 
 
 /**
@@ -260,7 +260,7 @@ anychart.core.ui.Legend.prototype.itemsProvider = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value != this.itemsProvider_ && goog.isArray(opt_value) && opt_value.length > 0) {
       this.itemsProvider_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.DATA, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.LEGEND_DATA, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -417,7 +417,7 @@ anychart.core.ui.Legend.prototype.background = function(opt_value) {
  */
 anychart.core.ui.Legend.prototype.backgroundInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.BACKGROUND, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.LEGEND_BACKGROUND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -460,7 +460,7 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.TITLE;
+    state |= anychart.ConsistencyState.LEGEND_TITLE;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -510,7 +510,7 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.SEPARATOR;
+    state |= anychart.ConsistencyState.LEGEND_SEPARATOR;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -560,7 +560,7 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.PAGINATOR;
+    state |= anychart.ConsistencyState.LEGEND_PAGINATOR;
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
@@ -668,7 +668,7 @@ anychart.core.ui.Legend.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.BACKGROUND,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -693,7 +693,7 @@ anychart.core.ui.Legend.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.height_ != opt_value) {
       this.height_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.BACKGROUND,
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LEGEND_BACKGROUND,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1295,9 +1295,9 @@ anychart.core.ui.Legend.prototype.draw = function() {
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_DATA)) {
     this.initializeLegendItems_();
-    this.markConsistent(anychart.ConsistencyState.DATA);
+    this.markConsistent(anychart.ConsistencyState.LEGEND_DATA);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
@@ -1314,10 +1314,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
   this.clearLastDrawedPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateBounds_();
-    this.invalidate(anychart.ConsistencyState.BACKGROUND |
-        anychart.ConsistencyState.TITLE |
-        anychart.ConsistencyState.SEPARATOR |
-        anychart.ConsistencyState.PAGINATOR);
+    this.invalidate(anychart.ConsistencyState.LEGEND_BACKGROUND |
+        anychart.ConsistencyState.LEGEND_TITLE |
+        anychart.ConsistencyState.LEGEND_SEPARATOR |
+        anychart.ConsistencyState.LEGEND_PAGINATOR);
     this.rootElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.rootElement.translate(this.pixelBounds_.left, this.pixelBounds_.top);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -1329,50 +1329,50 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
   var boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_BACKGROUND)) {
     var background = /** @type {anychart.core.ui.Background} */(this.background());
     background.suspendSignalsDispatching();
     background.parentBounds(boundsWithoutMargin);
     if (this.enabled()) background.container(this.rootElement);
     background.resumeSignalsDispatching(false);
     background.draw();
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.LEGEND_BACKGROUND);
   }
 
   var boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutMargin);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.TITLE)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_TITLE)) {
     var title = /** @type {anychart.core.ui.Title} */(this.title());
     title.suspendSignalsDispatching();
     title.parentBounds(boundsWithoutPadding);
     if (this.enabled()) title.container(this.rootElement);
     title.resumeSignalsDispatching(false);
     title.draw();
-    this.markConsistent(anychart.ConsistencyState.TITLE);
+    this.markConsistent(anychart.ConsistencyState.LEGEND_TITLE);
   }
 
   var boundsWithoutTitle = this.title_ ? this.title_.getRemainingBounds() : boundsWithoutPadding;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SEPARATOR)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_SEPARATOR)) {
     var titleSeparator = /** @type {anychart.core.ui.Separator} */(this.titleSeparator());
     titleSeparator.suspendSignalsDispatching();
     titleSeparator.parentBounds(boundsWithoutTitle);
     if (this.enabled()) titleSeparator.container(this.rootElement);
     titleSeparator.resumeSignalsDispatching(false);
     titleSeparator.draw();
-    this.markConsistent(anychart.ConsistencyState.SEPARATOR);
+    this.markConsistent(anychart.ConsistencyState.LEGEND_SEPARATOR);
   }
 
   var boundsWithoutSeparator = this.titleSeparator_ ? this.titleSeparator_.getRemainingBounds() : boundsWithoutTitle;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.PAGINATOR)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_PAGINATOR)) {
     var paginator = /** @type {anychart.core.ui.Paginator} */(this.paginator());
     paginator.suspendSignalsDispatching();
     paginator.parentBounds(boundsWithoutSeparator);
     if (this.enabled()) paginator.container(this.rootElement);
     paginator.resumeSignalsDispatching(false);
     paginator.draw();
-    this.markConsistent(anychart.ConsistencyState.PAGINATOR);
+    this.markConsistent(anychart.ConsistencyState.LEGEND_PAGINATOR);
   }
 
   var contentBounds = this.paginator().enabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;

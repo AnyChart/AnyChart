@@ -244,7 +244,7 @@ anychart.core.radar.series.Area.prototype.colorizeShape = function(hover) {
 
 /** @inheritDoc */
 anychart.core.radar.series.Area.prototype.finalizeHatchFill = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.HATCH_FILL)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillPath) {
       this.hatchFillPath.deserialize(this.path.serialize());
       this.applyHatchFill(false);

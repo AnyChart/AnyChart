@@ -117,9 +117,9 @@ goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
  */
 anychart.charts.Sparkline.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.SCALES |
-    anychart.ConsistencyState.SERIES |
-    anychart.ConsistencyState.AXES_MARKERS;
+    anychart.ConsistencyState.SPARK_SCALES |
+    anychart.ConsistencyState.SPARK_SERIES |
+    anychart.ConsistencyState.SPARK_AXES_MARKERS;
 
 
 /**
@@ -270,7 +270,7 @@ anychart.charts.Sparkline.prototype.xScale = function(opt_value) {
     }
     if (this.xScale_ != opt_value) {
       this.xScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPARK_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -317,7 +317,7 @@ anychart.charts.Sparkline.prototype.yScale = function(opt_value) {
     }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPARK_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -387,7 +387,7 @@ anychart.charts.Sparkline.prototype.lineMarker = function(opt_indexOrValue, opt_
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -456,7 +456,7 @@ anychart.charts.Sparkline.prototype.rangeMarker = function(opt_indexOrValue, opt
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -524,7 +524,7 @@ anychart.charts.Sparkline.prototype.textMarker = function(opt_indexOrValue, opt_
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (goog.isDef(value)) {
@@ -542,7 +542,7 @@ anychart.charts.Sparkline.prototype.textMarker = function(opt_indexOrValue, opt_
  * @private
  */
 anychart.charts.Sparkline.prototype.onMarkersSignal_ = function(event) {
-  this.invalidate(anychart.ConsistencyState.AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -721,7 +721,7 @@ anychart.charts.Sparkline.prototype.createSeriesByType_ = function(type) {
 
     this.seriesDefaults_ = this.series_.getDefaults();
 
-    this.invalidate(anychart.ConsistencyState.SERIES | anychart.ConsistencyState.SCALES,
+    this.invalidate(anychart.ConsistencyState.SPARK_SERIES | anychart.ConsistencyState.SPARK_SCALES,
         anychart.Signal.NEEDS_REDRAW);
 
   } else {
@@ -741,14 +741,14 @@ anychart.charts.Sparkline.prototype.createSeriesByType_ = function(type) {
 anychart.charts.Sparkline.prototype.seriesInvalidated_ = function(event) {
   var state = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.SERIES;
+    state = anychart.ConsistencyState.SPARK_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.SERIES;
+    state |= anychart.ConsistencyState.SPARK_SERIES;
     this.invalidateSeries_();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.SCALES;
+    state |= anychart.ConsistencyState.SPARK_SCALES;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -773,7 +773,7 @@ anychart.charts.Sparkline.prototype.type = function(opt_type) {
         this.series_.dispose();
         this.series_ = null;
       }
-      this.invalidate(anychart.ConsistencyState.SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SPARK_SERIES, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -833,7 +833,7 @@ anychart.charts.Sparkline.prototype.pointWidth = function(opt_value) {
     if (this.barWidth_ != opt_value) {
       this.barWidth_ = opt_value;
       if (this.series_ && this.series_.isWidthBased())
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL | anychart.ConsistencyState.APPEARANCE,
             anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -877,7 +877,7 @@ anychart.charts.Sparkline.prototype.connectMissingPoints = function(opt_value) {
     if (this.connectMissing != opt_value) {
       this.connectMissing = opt_value;
       if (this.series_ && !this.series_.isWidthBased())
-        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL,
+        this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL,
             anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -1710,7 +1710,7 @@ anychart.charts.Sparkline.prototype.hatchFill = function(opt_patternFillOrTypeOr
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1753,7 +1753,7 @@ anychart.charts.Sparkline.prototype.negativeHatchFill = function(opt_patternFill
     if (hatchFill != this.negativeHatchFill_) {
       this.negativeHatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1796,7 +1796,7 @@ anychart.charts.Sparkline.prototype.firstHatchFill = function(opt_patternFillOrT
     if (hatchFill != this.firstHatchFill_) {
       this.firstHatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1839,7 +1839,7 @@ anychart.charts.Sparkline.prototype.lastHatchFill = function(opt_patternFillOrTy
     if (hatchFill != this.lastHatchFill_) {
       this.lastHatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1882,7 +1882,7 @@ anychart.charts.Sparkline.prototype.maxHatchFill = function(opt_patternFillOrTyp
     if (hatchFill != this.maxHatchFill_) {
       this.maxHatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1925,7 +1925,7 @@ anychart.charts.Sparkline.prototype.minHatchFill = function(opt_patternFillOrTyp
     if (hatchFill != this.minHatchFill_) {
       this.minHatchFill_ = hatchFill;
       if (this.series_)
-        this.series_.invalidate(anychart.ConsistencyState.HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+        this.series_.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -2328,7 +2328,7 @@ anychart.charts.Sparkline.prototype.getFinalMarker = function(usePointSettings) 
  */
 anychart.charts.Sparkline.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    if (this.series_) this.series_.invalidate(anychart.ConsistencyState.MARKERS, anychart.Signal.NEEDS_REDRAW);
+    if (this.series_) this.series_.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2653,7 +2653,7 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
  */
 anychart.charts.Sparkline.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    if (this.series_) this.series_.invalidate(anychart.ConsistencyState.LABELS, anychart.Signal.NEEDS_REDRAW);
+    if (this.series_) this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2672,7 +2672,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
   /** @type {*} */
   var value;
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SCALES)) {
     var x, y;
     var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
     var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
@@ -2725,7 +2725,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
     this.statistics('average', seriesAverage);
     this.statistics('pointsCount', seriesPointsCount);
 
-    this.markConsistent(anychart.ConsistencyState.SCALES);
+    this.markConsistent(anychart.ConsistencyState.SPARK_SCALES);
   }
 };
 
@@ -2740,7 +2740,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
  * @param {anychart.math.Rect} bounds Bounds of sparkline content area.
  */
 anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SERIES)) {
     if (!this.series_)
       this.series_ = this.createSeriesByType_(this.type_);
   }
@@ -2759,11 +2759,11 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
       this.series_.fixBounds(this.dataBounds_);
 
     this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.AXES_MARKERS);
-    this.invalidate(anychart.ConsistencyState.SERIES);
+    this.invalidate(anychart.ConsistencyState.SPARK_AXES_MARKERS |
+        anychart.ConsistencyState.SPARK_SERIES);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.AXES_MARKERS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_AXES_MARKERS)) {
     var markers = goog.array.concat(
         this.lineAxesMarkers_,
         this.rangeAxesMarkers_,
@@ -2784,10 +2784,10 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
         axesMarker.resumeSignalsDispatching(false);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.AXES_MARKERS);
+    this.markConsistent(anychart.ConsistencyState.SPARK_AXES_MARKERS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SERIES)) {
     var series = this.series_;
     if (series) {
       series.container(this.rootElement);
@@ -2802,7 +2802,7 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
 
       this.series_.finalizeDrawing();
     }
-    this.markConsistent(anychart.ConsistencyState.SERIES);
+    this.markConsistent(anychart.ConsistencyState.SPARK_SERIES);
   }
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
@@ -2815,7 +2815,7 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
  */
 anychart.charts.Sparkline.prototype.invalidateWidthBasedSeries_ = function() {
   if (this.series_ && this.series_.isWidthBased())
-    this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
 
 
@@ -2825,7 +2825,7 @@ anychart.charts.Sparkline.prototype.invalidateWidthBasedSeries_ = function() {
  */
 anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
   if (this.series_)
-    this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.HATCH_FILL);
+    this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
 };
 
 
