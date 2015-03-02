@@ -38,13 +38,13 @@ anychart.core.grids.Polar = function() {
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.oddFill_ = '#FFFFFF 0.3';
+  this.oddFill_ = acgraph.vector.normalizeFill('#FFFFFF 0.3');
 
   /**
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.evenFill_ = '#F5F5F5 0.3';
+  this.evenFill_ = acgraph.vector.normalizeFill('#F5F5F5 0.3');
 
   /**
    * @type {string|acgraph.vector.Stroke}
@@ -240,37 +240,49 @@ anychart.core.grids.Polar.prototype.xScaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/set grid odd fill settings.
- * @param {string|acgraph.vector.Fill=} opt_value Grid odd fill settings.
- * @return {string|acgraph.vector.Fill|anychart.core.grids.Polar} Grid odd fill settings or Grid instance for method chaining.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {!(acgraph.vector.Fill|anychart.core.grids.Polar)} Grid odd fill settings or Grid instance for method chaining.
  */
-anychart.core.grids.Polar.prototype.oddFill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.oddFill_ != opt_value) {
-      this.oddFill_ = opt_value;
+anychart.core.grids.Polar.prototype.oddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.oddFill_), val)) {
+      this.oddFill_ = val;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    return this.oddFill_;
   }
+  return this.oddFill_;
 };
 
 
 /**
  * Get/set grid even fill settings.
- * @param {string|acgraph.vector.Fill=} opt_value Grid even fill settings.
- * @return {string|acgraph.vector.Fill|anychart.core.grids.Polar} Grid even fill settings or Grid instance for method chaining.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {!(acgraph.vector.Fill|anychart.core.grids.Polar)} Grid even fill settings or Grid instance for method chaining.
  */
-anychart.core.grids.Polar.prototype.evenFill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.evenFill_ != opt_value) {
-      this.evenFill_ = opt_value;
+anychart.core.grids.Polar.prototype.evenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.evenFill_), val)) {
+      this.evenFill_ = val;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    return this.evenFill_;
   }
+  return this.evenFill_;
 };
 
 
@@ -294,13 +306,19 @@ anychart.core.grids.Polar.prototype.startAngle = function(opt_value) {
 
 /**
  * Get/set grid stroke line.
- * @param {string|acgraph.vector.Stroke=} opt_value Grid stroke line settings.
- * @return {string|acgraph.vector.Stroke|anychart.core.grids.Polar} Grid stroke line settings or Grid instance for method chaining.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!(anychart.core.grids.Polar|acgraph.vector.Stroke)} Grid stroke line settings or Grid instance for method chaining.
  */
-anychart.core.grids.Polar.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.stroke_ != opt_value) {
-      this.stroke_ = opt_value;
+anychart.core.grids.Polar.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != stroke) {
+      this.stroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

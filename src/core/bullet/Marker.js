@@ -66,7 +66,7 @@ anychart.core.bullet.Marker = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.defaultFill_;
+  this.defaultFill_ = 'black';
 
   /**
    * Stroke of bullet marker.
@@ -257,20 +257,25 @@ anychart.core.bullet.Marker.prototype.onScaleSignal_ = function(event) {
 
 /**
  * Get/set bullet marker fill.
- * @param {string|acgraph.vector.Fill=} opt_value RangeMarker line settings.
- * @return {string|acgraph.vector.Fill|anychart.core.bullet.Marker} RangeMarker line settings or RangeMarker instance for method chaining.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {!(acgraph.vector.Fill|anychart.core.bullet.Marker)} .
  */
-anychart.core.bullet.Marker.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (this.fill_ != opt_value) {
-      this.fill_ = opt_value;
+anychart.core.bullet.Marker.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.fill_) {
+      this.fill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    return this.fill_ || this.defaultFill_;
   }
+  return this.fill_ || this.defaultFill_;
 };
 
 
@@ -284,14 +289,19 @@ anychart.core.bullet.Marker.prototype.setDefaultFill = function(value) {
 
 /**
  * Get/set bullet marker stroke.
- * @param {string|acgraph.vector.Stroke=} opt_value LineMarker line settings.
- * @return {string|acgraph.vector.Stroke|anychart.core.bullet.Marker} LineMarker line settings or LineMarker instance for method chaining.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!(anychart.core.bullet.Marker|acgraph.vector.Stroke)} LineMarker line settings or LineMarker instance for method chaining.
  */
-anychart.core.bullet.Marker.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.stroke_ != opt_value) {
-      this.stroke_ = opt_value;
+anychart.core.bullet.Marker.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != stroke) {
+      this.stroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

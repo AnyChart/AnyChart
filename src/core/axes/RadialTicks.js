@@ -160,19 +160,25 @@ anychart.core.axes.RadialTicks.prototype.length = function(opt_value) {
  * @return {anychart.core.axes.RadialTicks} {@link anychart.core.axes.RadialTicks} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke)=} opt_value .
- * @return {(!anychart.core.axes.RadialTicks|acgraph.vector.Stroke)} .
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!(anychart.core.axes.RadialTicks|acgraph.vector.Stroke)} .
  */
-anychart.core.axes.RadialTicks.prototype.stroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = acgraph.vector.normalizeStroke(opt_value);
-    if (this.stroke_ != opt_value) {
-      this.stroke_ = opt_value;
+anychart.core.axes.RadialTicks.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.stroke_ != stroke) {
+      this.stroke_ = stroke;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else
+  } else {
     return this.stroke_;
+  }
 };
 
 

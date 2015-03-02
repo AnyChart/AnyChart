@@ -62,7 +62,7 @@ anychart.core.axisMarkers.Range = function() {
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.defaultFill_;
+  this.defaultFill_ = 'black';
 
   this.restoreDefaults();
 };
@@ -204,19 +204,25 @@ anychart.core.axisMarkers.Range.prototype.axesLinesSpace = function(opt_spaceOrT
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/set range marker fill.
- * @param {string|acgraph.vector.Fill=} opt_value RangeMarker line settings.
- * @return {string|acgraph.vector.Fill|anychart.core.axisMarkers.Range} RangeMarker line settings or RangeMarker instance for method chaining.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {!(acgraph.vector.Fill|anychart.core.axisMarkers.Range)} .
  */
-anychart.core.axisMarkers.Range.prototype.fill = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.fill_ != opt_value) {
-      this.fill_ = opt_value;
+anychart.core.axisMarkers.Range.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.fill_) {
+      this.fill_ = fill;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
-    return this.fill_ || this.defaultFill_;
   }
+  return this.fill_ || this.defaultFill_;
 };
 
 
