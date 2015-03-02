@@ -48,18 +48,20 @@ anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
 
   if (index >= count && count > 0) index = index % count;
 
+  var marker;
+
   // work as setter
   if (goog.isDef(opt_marker)) {
-    opt_marker = anychart.enums.normalizeMarkerType(opt_marker);
-    if (opt_marker != this.markers_[index]) {
-      this.markers_[index] = opt_marker;
+    marker = anychart.enums.normalizeAnyMarkerType(opt_marker);
+    if (marker != this.markers_[index]) {
+      this.markers_[index] = marker;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   // work as getter
   } else {
-    var marker = this.markers_[index];
-    return marker ? marker : null;
+    marker = this.markers_[index];
+    return marker || null;
   }
 };
 
@@ -81,7 +83,7 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
     }
     if (goog.isArray(opt_markers)) {
       this.markers_ = goog.array.map(opt_markers, function(marker) {
-        return anychart.enums.normalizeMarkerType(marker);
+        return anychart.enums.normalizeAnyMarkerType(marker);
       });
     }
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);

@@ -573,6 +573,8 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
   switch (type) {
     case 'star4':
       return anychart.enums.MarkerType.STAR4;
+    case 'star5':
+      return anychart.enums.MarkerType.STAR5;
     case 'star6':
       return anychart.enums.MarkerType.STAR6;
     case 'star7':
@@ -595,6 +597,51 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
       return anychart.enums.MarkerType.SQUARE;
   }
   return opt_default || anychart.enums.MarkerType.STAR5;
+};
+
+
+/**
+ * Method to get marker drawer.
+ * @param {*} type Marker type.
+ * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|null} Normalized marker type.
+ */
+anychart.enums.normalizeAnyMarkerType = function(type) {
+  type = (String(type)).toLowerCase();
+  switch (type) {
+    case 'star4':
+      return anychart.enums.MarkerType.STAR4;
+    case 'star5':
+      return anychart.enums.MarkerType.STAR5;
+    case 'star6':
+      return anychart.enums.MarkerType.STAR6;
+    case 'star7':
+      return anychart.enums.MarkerType.STAR7;
+    case 'star10':
+      return anychart.enums.MarkerType.STAR10;
+    case 'diamond':
+      return anychart.enums.MarkerType.DIAMOND;
+    case 'triangleup':
+      return anychart.enums.MarkerType.TRIANGLE_UP;
+    case 'triangledown':
+      return anychart.enums.MarkerType.TRIANGLE_DOWN;
+    case 'cross':
+      return anychart.enums.MarkerType.CROSS;
+    case 'diagonalcross':
+      return anychart.enums.MarkerType.DIAGONAL_CROSS;
+    case 'circle':
+      return anychart.enums.MarkerType.CIRCLE;
+    case 'square':
+      return anychart.enums.MarkerType.SQUARE;
+    case 'x':
+      return anychart.enums.BulletMarkerType.X;
+    case 'line':
+      return anychart.enums.BulletMarkerType.LINE;
+    case 'ellipse':
+      return anychart.enums.BulletMarkerType.ELLIPSE;
+    case 'bar':
+      return anychart.enums.BulletMarkerType.BAR;
+  }
+  return null;
 };
 
 
