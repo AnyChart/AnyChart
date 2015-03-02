@@ -50,9 +50,11 @@ anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
 
   // work as setter
   if (goog.isDef(opt_marker)) {
-    opt_marker = opt_marker.toLowerCase();
-    this.markers_[index] = opt_marker;
-    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    opt_marker = anychart.enums.normalizeMarkerType(opt_marker);
+    if (opt_marker != this.markers_[index]) {
+      this.markers_[index] = opt_marker;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
     return this;
   // work as getter
   } else {
@@ -79,7 +81,7 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
     }
     if (goog.isArray(opt_markers)) {
       this.markers_ = goog.array.map(opt_markers, function(marker) {
-        return ('' + marker).toLowerCase();
+        return anychart.enums.normalizeMarkerType(marker);
       });
     }
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
