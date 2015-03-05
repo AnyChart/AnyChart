@@ -408,8 +408,7 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
 
   var parentWidth, parentHeight;
   if (parentBounds) {
-    if (this.orientation_ == anychart.enums.Orientation.TOP ||
-        this.orientation_ == anychart.enums.Orientation.BOTTOM) {
+    if (this.isHorizontal()) {
       parentWidth = parentBounds.width;
       parentHeight = parentBounds.height;
     } else {
@@ -496,16 +495,10 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
   } else {
     this.actualLeft_ = leftMargin;
     this.actualTop_ = topMargin;
-    switch (this.orientation_) {
-      case anychart.enums.Orientation.TOP:
-      case anychart.enums.Orientation.BOTTOM:
-        this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
-        break;
-      case anychart.enums.Orientation.LEFT:
-      case anychart.enums.Orientation.RIGHT:
-        this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
-        break;
-    }
+    if (this.isHorizontal())
+      this.pixelBounds_ = new anychart.math.Rect(0, 0, widthWithMargin, heightWithMargin);
+    else
+      this.pixelBounds_ = new anychart.math.Rect(0, 0, heightWithMargin, widthWithMargin);
   }
 };
 
@@ -520,6 +513,15 @@ anychart.core.ui.Separator.prototype.marginInvalidated_ = function(event) {
     this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
+};
+
+
+/**
+ * Whether orientation is horizontal.
+ * @return {boolean}
+ */
+anychart.core.ui.Separator.prototype.isHorizontal = function() {
+  return (this.orientation_ == anychart.enums.Orientation.TOP || this.orientation_ == anychart.enums.Orientation.BOTTOM);
 };
 
 
@@ -542,14 +544,24 @@ anychart.core.ui.Separator.prototype.restoreDefaults = function() {
       })
       .stroke('none');
 
-  this.drawer(function(path, bounds) {
+  var drawer = goog.bind(function(path, bounds) {
+    bounds = bounds.clone().round();
+
+    if (!this.isHorizontal()) {
+      var shift = bounds.width == 1 ? 0.5 : 0;
+      bounds.left -= shift;
+      bounds.width += 2 * shift;
+    }
+
     path
         .moveTo(bounds.left, bounds.top)
-        .lineTo(bounds.getRight(), bounds.top)
-        .lineTo(bounds.getRight(), bounds.getBottom())
-        .lineTo(bounds.left, bounds.getBottom())
+        .lineTo(bounds.left + bounds.width, bounds.top)
+        .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
+        .lineTo(bounds.left, bounds.top + bounds.height)
         .close();
-  });
+  }, this);
+
+  this.drawer(drawer);
   this.resumeSignalsDispatching(true);
 };
 

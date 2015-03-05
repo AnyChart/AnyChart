@@ -30,8 +30,8 @@
     }
   </style>
 </head>
-<body onload="load()">
-<div id="container" style="border: 1px solid; width: 1000px; height: 600px;"></div>
+<body>
+<div id="container" style="border: 1px solid; width: 400px; height: 300px;"></div>
 <table>
   <tr>
     <td>
@@ -95,5 +95,23 @@
     </td>
   </tr>
 </table>
+<script>
+    anychart.onDocumentLoad(function() {
+        var stage = acgraph.create('container', 400, 300);
+        stage.suspend();
+        var data = [
+            {name: 'item 1'},
+            {name: 'item 2'}
+
+        ];
+        var legend = anychart.ui.legend();
+        legend.itemsProvider(data);
+        legend.title().text('Complex_test').orientation('left');
+        legend.titleSeparator().orientation(anychart.enums.Orientation.LEFT);
+
+        legend.container(stage).draw();
+        stage.resume();
+    });
+</script>
 </body>
 </html>
