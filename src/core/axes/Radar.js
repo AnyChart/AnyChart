@@ -634,7 +634,7 @@ anychart.core.axes.Radar.prototype.getLabelBounds_ = function(index) {
 
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': x, 'y': y}};
-  var bounds = labels.measure(formatProvider, positionProvider);
+  var bounds = labels.measure(formatProvider, positionProvider, undefined, index);
   var offset = this.getLabelPositionOffsetForAngle_(angle, bounds);
   bounds.left += offset.x;
   bounds.top += offset.y;
@@ -703,7 +703,7 @@ anychart.core.axes.Radar.prototype.drawLabel_ = function(index, x, y) {
 
   var formatProvider = this.getLabelsFormatProvider_(index, scaleTicksArr[index]);
   var positionProvider = {'value': {x: x, y: y}};
-  this.labels().add(formatProvider, positionProvider);
+  this.labels().add(formatProvider, positionProvider, index);
 };
 
 

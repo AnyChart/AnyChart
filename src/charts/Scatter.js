@@ -1597,12 +1597,16 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     var item;
     for (i = this.xAxes_.length; i--;) {
       item = this.xAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
       if (item && !item.scale())
         item.scale(/** @type {anychart.scales.ScatterBase} */(this.xScale()));
     }
 
     for (i = this.yAxes_.length; i--;) {
       item = this.yAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
       if (item && !item.scale())
         item.scale(/** @type {anychart.scales.ScatterBase} */(this.yScale()));
     }

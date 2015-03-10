@@ -1738,6 +1738,7 @@ anychart.charts.Pie.prototype.remove = function() {
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
 anychart.charts.Pie.prototype.drawContent = function(bounds) {
+  this.labels().dropCallsCache();
   var iterator = this.getIterator();
   var exploded;
   var value;
@@ -2070,7 +2071,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
     var bpx = cx + this.radiusValue_ * Math.cos(angle);
     var bpy = cy + this.radiusValue_ * Math.sin(angle);
 
-    var bounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(sliceLabel));
+    var bounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(sliceLabel), index);
 
     var notIntersectStartLine = anychart.math.checkPointsRelativeLine(ax, ay, cx, cy, bounds) ||
         anychart.math.checkPointsRelativeLine(apx, apy, cx, cy, bounds);

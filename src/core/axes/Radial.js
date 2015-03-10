@@ -816,7 +816,7 @@ anychart.core.axes.Radial.prototype.getLabelBounds_ = function(index, isMajor) {
 
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': xTick, 'y': yTick}};
-  var labelBounds = labels.measure(formatProvider, positionProvider);
+  var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
 
   var offset = this.getLabelPositionOffsetForAngle_(goog.math.standardAngle(angle + 90), labelBounds);
   labelBounds.left += offset.x + labelBounds.width / 2;
@@ -825,7 +825,7 @@ anychart.core.axes.Radial.prototype.getLabelBounds_ = function(index, isMajor) {
   positionProvider['value']['x'] = labelBounds.left;
   positionProvider['value']['y'] = labelBounds.top;
 
-  return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider);
+  return boundsCache[index] = labels.measureWithTransform(formatProvider, positionProvider, undefined, index);
 };
 
 
@@ -1119,7 +1119,7 @@ anychart.core.axes.Radial.prototype.drawLabel_ = function(index, isMajor) {
   var y = bounds.top + bounds.height / 2;
 
   var positionProvider = {'value': {x: x, y: y}};
-  labels.add(formatProvider, positionProvider);
+  labels.add(formatProvider, positionProvider, index);
 };
 
 

@@ -2279,12 +2279,16 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     var item;
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
       item = this.xAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
       if (item && !item.scale())
         item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
     }
 
     for (i = 0, count = this.yAxes_.length; i < count; i++) {
       item = this.yAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
       if (item && !item.scale())
         item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
     }

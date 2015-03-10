@@ -1087,11 +1087,17 @@ anychart.charts.Polar.prototype.drawContent = function(bounds) {
 
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.POLAR_AXES)) {
-    if (this.xAxis() && !this.xAxis().scale())
+    if (!this.xAxis().scale()) {
       this.xAxis().scale(/** @type {anychart.scales.ScatterBase} */(this.xScale()));
+    }
+    this.xAxis().labels().dropCallsCache();
+    this.xAxis().minorLabels().dropCallsCache();
 
-    if (this.yAxis() && !this.yAxis().scale())
+    if (!this.yAxis().scale()) {
       this.yAxis().scale(/** @type {anychart.scales.Base} */(this.yScale()));
+    }
+    this.yAxis().labels().dropCallsCache();
+    this.yAxis().minorLabels().dropCallsCache();
   }
 
   //calculate axes space first, the result is data bounds

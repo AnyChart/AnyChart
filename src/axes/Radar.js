@@ -13,6 +13,13 @@ anychart.axes.Radar = function() {
 goog.inherits(anychart.axes.Radar, anychart.core.axes.Radar);
 
 
+/** @inheritDoc */
+anychart.axes.Radar.prototype.draw = function() {
+  this.labels().dropCallsCache();
+  return goog.base(this, 'draw');
+};
+
+
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.

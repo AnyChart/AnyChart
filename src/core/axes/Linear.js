@@ -1493,7 +1493,7 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, o
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
-  var labelBounds = labels.measure(formatProvider, positionProvider);
+  var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
 
   switch (this.orientation()) {
     case anychart.enums.Orientation.TOP:
@@ -1947,7 +1947,7 @@ anychart.core.axes.Linear.prototype.drawLabel_ = function(value, ratio, index, p
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {x: x, y: y}};
 
-  labels.add(formatProvider, positionProvider);
+  labels.add(formatProvider, positionProvider, index);
 };
 
 

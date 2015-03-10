@@ -13,6 +13,14 @@ anychart.axes.Radial = function() {
 goog.inherits(anychart.axes.Radial, anychart.core.axes.Radial);
 
 
+/** @inheritDoc */
+anychart.axes.Radial.prototype.draw = function() {
+  this.labels().dropCallsCache();
+  this.minorLabels().dropCallsCache();
+  return goog.base(this, 'draw');
+};
+
+
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.

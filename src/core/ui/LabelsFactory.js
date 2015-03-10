@@ -578,8 +578,10 @@ anychart.core.ui.LabelsFactory.prototype.clear = function(opt_index) {
     if (!isNaN(opt_index) && opt_index in this.labels_) {
       this.labels_[opt_index].clear();
       this.freeToUseLabelsPool_.push(this.labels_[opt_index]);
+      this.dropCallsCache(opt_index);
       delete this.labels_[opt_index];
     } else {
+      this.dropCallsCache();
       goog.array.forEach(this.labels_, function(label) {
         label.clear();
         this.freeToUseLabelsPool_.push(label);
@@ -760,9 +762,10 @@ anychart.core.ui.LabelsFactory.prototype.draw = function() {
  * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
  * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
+ * @param {number=} opt_cacheIndex .
  * @return {anychart.math.Rect} Label bounds.
  */
-anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
+anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
   var text;
   var textElementBounds;
   var textWidth;
@@ -810,7 +813,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
 
 
   if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
-  text = this.textFormatter_.call(formatProvider, formatProvider);
+  text = this.callTextFormatter(this.textFormatter_, formatProvider, opt_cacheIndex);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   if (isHtml) {
@@ -882,10 +885,11 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
  * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
  * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
+ * @param {number=} opt_cacheIndex .
  * @return {anychart.math.Rect} Labels bounds.
  */
-anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
-  var arr = this.measureWithTransform(formatProviderOrLabel, opt_positionProvider, opt_settings);
+anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
+  var arr = this.measureWithTransform(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex);
   return anychart.math.Rect.fromCoordinateBox(arr);
 };
 
@@ -895,19 +899,21 @@ anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabe
  * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for textFormatter function.
  * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
  * @param {Object=} opt_settings .
+ * @param {number=} opt_cacheIndex .
  * @return {Array.<number>} Label bounds.
  */
-anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings) {
-  var bounds = this.getDimension(formatProviderOrLabel, opt_positionProvider, opt_settings);
-
+anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
   var rotation, anchor;
   if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
     rotation = goog.isDef(formatProviderOrLabel.rotation()) ? formatProviderOrLabel.rotation() : this.rotation();
     anchor = formatProviderOrLabel.anchor() || this.anchor();
+    opt_cacheIndex = opt_cacheIndex || formatProviderOrLabel.getIndex();
   } else {
     rotation = goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.rotation();
     anchor = goog.isDef(opt_settings) && opt_settings['anchor'] || this.anchor();
   }
+
+  var bounds = this.getDimension(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex);
 
   var rotationAngle = /** @type {number} */(rotation);
   var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
@@ -917,6 +923,40 @@ anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatP
   tx.transform(arr, 0, arr, 0, 4);
 
   return arr;
+};
+
+
+/**
+ * Calls text formatter in scope of provider, or returns value from cache.
+ * @param {Function} formatter Text formatter function.
+ * @param {*} provider Provider for text formatter.
+ * @param {number=} opt_cacheIndex Label index.
+ * @return {*}
+ */
+anychart.core.ui.LabelsFactory.prototype.callTextFormatter = function(formatter, provider, opt_cacheIndex) {
+  if (!this.textFormatterCallsCache_)
+    this.textFormatterCallsCache_ = {};
+  if (goog.isDefAndNotNull(opt_cacheIndex)) {
+    if (!goog.isDef(this.textFormatterCallsCache_[opt_cacheIndex]))
+      this.textFormatterCallsCache_[opt_cacheIndex] = formatter.call(provider, provider);
+
+    return this.textFormatterCallsCache_[opt_cacheIndex];
+  }
+  return formatter.call(provider, provider);
+};
+
+
+/**
+ * Drops tet formatter calls cache.
+ * @param {number=} opt_index
+ * @return {anychart.core.ui.LabelsFactory} Self for chaining.
+ */
+anychart.core.ui.LabelsFactory.prototype.dropCallsCache = function(opt_index) {
+  if (!goog.isDef(opt_index))
+    this.textFormatterCallsCache_ = {};
+  else
+    this.textFormatterCallsCache_[opt_index] = null;
+  return this;
 };
 
 
@@ -1812,7 +1852,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
             parentLabelsFactory.positionFormatter();
 
     var formatProvider = this.formatProvider();
-    var text = textFormatter.call(formatProvider, formatProvider);
+    var text = parentLabelsFactory.callTextFormatter(textFormatter, formatProvider, this.getIndex());
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
