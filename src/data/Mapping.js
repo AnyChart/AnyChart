@@ -51,28 +51,26 @@ anychart.data.Mapping.prototype.SUPPORTED_CONSISTENCY_STATES = 0;
 anychart.data.Mapping.prototype.getInternal = function(row, rowIndex, fieldName) {
   /** @type {*} */
   var result;
-  if (goog.isDefAndNotNull(row)) {
-    /** @type {string} */
-    var rowType = goog.typeOf(row);
-    if (rowType == 'array') {
-      /** @type {Array.<number>} */
-      var indexes = this.arrayMapping_[fieldName];
-      if (indexes) {
-        for (var i = 0; i < indexes.length; i++) {
-          if (indexes[i] < row.length) {
-            result = row[indexes[i]];
-            break;
-          }
+  /** @type {string} */
+  var rowType = goog.typeOf(row);
+  if (rowType == 'array') {
+    /** @type {Array.<number>} */
+    var indexes = this.arrayMapping_[fieldName];
+    if (indexes) {
+      for (var i = 0; i < indexes.length; i++) {
+        if (indexes[i] < row.length) {
+          result = row[indexes[i]];
+          break;
         }
       }
-    } else if (rowType == 'object') {
-      result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName]);
-    } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
-      result = row;
     }
-    if (!goog.isDef(result) && goog.array.indexOf(this.indexProps_, fieldName) > -1) {
-      result = rowIndex;
-    }
+  } else if (rowType == 'object') {
+    result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName]);
+  } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
+    result = row;
+  }
+  if (!goog.isDef(result) && goog.array.indexOf(this.indexProps_, fieldName) > -1) {
+    result = rowIndex;
   }
   return result;
 };
