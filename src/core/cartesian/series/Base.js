@@ -783,8 +783,8 @@ anychart.core.cartesian.series.Base.prototype.getReferenceScaleValues = function
 
   if (anychart.core.utils.Error.isErrorAvailableForScale(yScale) && this.isErrorAvailable()) {
     var errValues = this.getErrorValues(false);
-    errValues[0] = /** @type {number} */ (res[0]) - errValues[0];
-    errValues[1] = /** @type {number} */ (res[0]) + errValues[1];
+    errValues[0] = +res[0] - errValues[0];
+    errValues[1] = +res[0] + errValues[1];
     res = res.concat(errValues);
   }
   return res;

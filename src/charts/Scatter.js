@@ -1488,13 +1488,13 @@ anychart.charts.Scatter.prototype.calculate = function() {
       iterator = aSeries.getResetIterator();
 
       while (iterator.advance()) {
-        x = iterator.get('x');
-        y = iterator.get('value');
-        if (goog.isDef(x)) {
+        x = anychart.utils.toNumber(iterator.get('x'));
+        y = anychart.utils.toNumber(iterator.get('value'));
+        if (!isNaN(x)) {
           errValues = aSeries.getErrorValues(true);
           xScale.extendDataRange(x - errValues[0], x + errValues[1]);
         }
-        if (goog.isDef(y)) {
+        if (!isNaN(y)) {
           errValues = aSeries.getErrorValues(false);
           yScale.extendDataRange(y - errValues[0], y + errValues[1]);
         }

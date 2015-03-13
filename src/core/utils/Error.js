@@ -433,7 +433,7 @@ anychart.core.utils.Error.prototype.draw = function(horizontal, isBarBased) {
   var iterator = this.series_.getIterator();
   var x = /** @type {number} */ (iterator.meta('x'));
   var y = /** @type {number} */ (iterator.meta('y'));
-  var value = /** @type {number} */ (horizontal ? iterator.get('x') : iterator.get('value'));
+  var value = anychart.utils.toNumber((horizontal ? iterator.get('x') : iterator.get('value')));
   var stroke = this.getErrorStroke(horizontal);
   var path = this.series_.getErrorPath(stroke);
 

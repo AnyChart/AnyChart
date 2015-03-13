@@ -1676,6 +1676,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
             if (goog.isDef(value)) {
               if (isErrorAvailableForScale && aSeries.isErrorAvailable()) {
                 errValues = aSeries.getErrorValues(true);
+                value = anychart.utils.toNumber(value);
                 scale.extendDataRange(value - errValues[0], value + errValues[1]);
               } else {
                 scale.extendDataRange(value);
