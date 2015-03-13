@@ -73,8 +73,7 @@ anychart.ConsistencyState = {
   GANTT_DATA: 1 << 10,
   GANTT_POSITION: 1 << 11,
   //---------------------------------- PIE STATES (CHART) ---------------------------------
-  PIE_DATA: 1 << 10,
-  PIE_LABELS: 1 << 11,
+  PIE_LABELS: 1 << 10,
   //---------------------------------- POLAR STATES (CHART) ---------------------------------
   POLAR_PALETTE: 1 << 10,
   POLAR_MARKER_PALETTE: 1 << 11,

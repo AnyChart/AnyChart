@@ -5,6 +5,7 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
 
@@ -24,6 +25,11 @@ goog.require('anychart.enums');
  */
 anychart.core.sparkline.series.Base = function(chart) {
   this.suspendSignalsDispatching();
+  /**
+   * @type {anychart.core.utils.SeriesPointContextProvider}
+   * @private
+   */
+  this.pointProvider_;
   goog.base(this);
 
   /**
@@ -317,18 +323,10 @@ anychart.core.sparkline.series.Base.prototype.finalizeDrawing = function() {
  * @return {Object} Object with info for labels formatting.
  */
 anychart.core.sparkline.series.Base.prototype.createFormatProvider = function() {
-  var iterator = this.getIterator();
-  var index = iterator.getIndex();
-  return {
-    'index': index,
-    'pointsCount': this.chart.statistics('pointsCount'),
-    'max': this.chart.statistics('max'),
-    'min': this.chart.statistics('min'),
-    'sum': this.chart.statistics('sum'),
-    'average': this.chart.statistics('average'),
-    'x': iterator.get('x'),
-    'value': iterator.get('value')
-  };
+  if (!this.pointProvider_)
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['x', 'value']);
+  this.pointProvider_.applyReferenceValues();
+  return this.pointProvider_;
 };
 
 

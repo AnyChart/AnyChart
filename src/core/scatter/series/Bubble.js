@@ -1182,16 +1182,6 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeHatchFill = functi
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Bubble.prototype.createFormatProvider = function() {
-  var provider = goog.base(this, 'createFormatProvider');
-  provider['size'] = this.getIterator().get('size');
-  return provider;
-};
-
-
-/**
- * @inheritDoc
- */
 anychart.core.scatter.series.Bubble.prototype.getType = function() {
   return anychart.enums.ScatterSeriesTypes.BUBBLE;
 };

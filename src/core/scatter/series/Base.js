@@ -6,6 +6,7 @@ goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
+goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -23,6 +24,11 @@ goog.require('anychart.utils');
  */
 anychart.core.scatter.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
+  /**
+   * @type {anychart.core.utils.SeriesPointContextProvider}
+   * @private
+   */
+  this.pointProvider_;
   goog.base(this);
   this.data(opt_data || null, opt_csvSettings);
 
@@ -1098,37 +1104,12 @@ anychart.core.scatter.series.Base.prototype.hideTooltip = function() {
  * @protected
  */
 anychart.core.scatter.series.Base.prototype.createFormatProvider = function() {
-  var iterator = this.getIterator();
-  var index = iterator.getIndex();
-  var provider = {
-    'index': index,
-    'seriesName': this.name_ ? this.name_ : 'Series: ' + this.index_,
-    'seriesPointsCount': this.statistics('seriesPointsCount'),
-    'pointsCount': this.statistics('pointsCount')
-  };
-
-  var seriesMax = this.statistics('seriesMax');
-  var seriesMin = this.statistics('seriesMin');
-  var seriesSum = this.statistics('seriesSum');
-  var seriesAverage = this.statistics('seriesAverage');
-  var max = this.statistics('max');
-  var min = this.statistics('min');
-  var sum = this.statistics('sum');
-  var average = this.statistics('average');
-
-  provider['seriesMax'] = seriesMax;
-  provider['seriesMin'] = seriesMin;
-  provider['seriesSum'] = seriesSum;
-  provider['seriesAverage'] = seriesAverage;
-  provider['max'] = max;
-  provider['min'] = min;
-  provider['sum'] = sum;
-  provider['average'] = average;
-
-  provider['x'] = iterator.get('x');
-  provider['value'] = iterator.get('value');
-
-  return provider;
+  if (!this.pointProvider_) {
+    var referenceValueNames = this.isSizeBased() ? ['x', 'value', 'size'] : ['x', 'value'];
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, referenceValueNames);
+  }
+  this.pointProvider_.applyReferenceValues();
+  return this.pointProvider_;
 };
 
 

@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.PiePointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
 goog.require('anychart.math');
@@ -23,6 +24,13 @@ goog.require('anychart.palettes.RangeColors');
 anychart.charts.Pie = function(opt_data) {
   goog.base(this);
   this.suspendSignalsDispatching();
+
+  /**
+   * Pie point provider.
+   * @type {anychart.core.utils.PiePointContextProvider}
+   * @private
+   */
+  this.pointProvider_;
 
   /**
    * Filter function that should accept a field value and return true if the row
@@ -106,7 +114,7 @@ anychart.charts.Pie = function(opt_data) {
    * @type {Object}
    * @private
    */
-  this.statistic_ = {};
+  this.statistics_;
 
   /**
    * Template for aqua style fill.
@@ -316,7 +324,6 @@ anychart.charts.Pie.prototype.SUPPORTED_SIGNALS =
  */
 anychart.charts.Pie.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.PIE_DATA |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.PIE_LABELS;
 
@@ -383,6 +390,8 @@ anychart.charts.Pie.prototype.data = function(opt_value) {
       goog.dispose(this.parentViewToDispose_);
       delete this.iterator_;
 
+      this.statistics_ = null;
+
       /**
        * @type {anychart.data.View}
        */
@@ -407,7 +416,6 @@ anychart.charts.Pie.prototype.data = function(opt_value) {
     this.view_.listenSignals(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
     this.invalidate(
-        anychart.ConsistencyState.PIE_DATA |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.CHART_LEGEND,
@@ -912,7 +920,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
     this.labels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.labels_.textFormatter(function() {
-      return (this['value'] * 100 / this['sum']).toFixed(1) + '%';
+      return (this['value'] * 100 / this.getStat('sum')).toFixed(1) + '%';
     });
     this.labels_.positionFormatter(function() {
       return this['value'];
@@ -1757,39 +1765,6 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
-    var missingPoints = 0; // count of missing points
-    var min = Number.MAX_VALUE;
-    var max = -Number.MAX_VALUE;
-    var sum = 0;
-
-    iterator.reset();
-    while (iterator.advance()) {
-      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-      // if missing
-      if (this.isMissing_(value)) {
-        missingPoints++;
-        continue;
-      }
-      value = +value;
-      min = Math.min(value, min);
-      max = Math.max(value, max);
-      sum += value;
-    }
-
-    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
-    var avg;
-    if (count == 0) min = max = sum = avg = undefined;
-    else avg = sum / count;
-    this.statistic_['count'] = count;
-    this.statistic_['min'] = min;
-    this.statistic_['max'] = max;
-    this.statistic_['sum'] = sum;
-    this.statistic_['average'] = avg;
-
-    this.markConsistent(anychart.ConsistencyState.PIE_DATA);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.dataLayer_) {
       this.dataLayer_.clear();
@@ -1821,7 +1796,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
       if (this.isMissing_(value)) continue;
       value = +value;
-      sweep = value / this.statistic_['sum'] * 360;
+      sweep = value / /** @type {number} */ (this.statistics('sum')) * 360;
 
       iterator.meta('start', start).meta('sweep', sweep);
       if (!goog.isDef(exploded = iterator.meta('exploded'))) {
@@ -1982,9 +1957,11 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
   var enabled;
   var wasNoLabel;
   var anchor;
+  var formatProvider = this.createFormatProvider();
+  var positionProvider = this.createPositionProvider();
   if (isDraw) {
     if (wasNoLabel = !label) {
-      label = this.labels().add(this.createFormatProvider(), this.createPositionProvider(), index);
+      label = this.labels().add(formatProvider, positionProvider, index);
     }
 
     // save enabled setting for label
@@ -2007,7 +1984,7 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
     label.clear();
     label.enabled(/** @type {boolean} */(enabled));
   } else {
-    label = this.labels().add(this.createFormatProvider(), this.createPositionProvider(), index);
+    label = this.labels().add(formatProvider, positionProvider, index);
     anchor = iterator.meta('anchor');
     if (goog.isDef(anchor))
       label.anchor(/** @type {string} */(anchor));
@@ -2171,7 +2148,6 @@ anychart.charts.Pie.prototype.applyHatchFill = function(hover) {
 anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidate(
-        anychart.ConsistencyState.PIE_DATA |
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND,
@@ -2499,27 +2475,74 @@ anychart.charts.Pie.prototype.moveTooltip = function(opt_event) {
 
 
 /**
+ * Calculates statistic for pie.
+ * @private
+ */
+anychart.charts.Pie.prototype.calculateStatistics_ = function() {
+  this.statistics_ = {};
+  var iterator = this.data().getIterator();
+  var value;
+  var missingPoints = 0;
+  var min = Number.MAX_VALUE;
+  var max = -Number.MAX_VALUE;
+  var sum = 0;
+  while (iterator.advance()) {
+    value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+    // if missing
+    if (this.isMissing_(value)) {
+      missingPoints++;
+      continue;
+    }
+    value = +value;
+    min = Math.min(value, min);
+    max = Math.max(value, max);
+    sum += value;
+  }
+
+  var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+  var avg;
+  if (count == 0) min = max = sum = avg = undefined;
+  else avg = sum / count;
+  this.statistics_['count'] = count;
+  this.statistics_['min'] = min;
+  this.statistics_['max'] = max;
+  this.statistics_['sum'] = sum;
+  this.statistics_['average'] = avg;
+};
+
+
+/**
+ * Gets statistic value by its key.
+ * @param {string=} opt_key
+ * @param {string=} opt_value
+ * @return {*} Statistic value by key, statistic object, or self in case of setter.
+ */
+anychart.charts.Pie.prototype.statistics = function(opt_key, opt_value) {
+  if (!this.statistics_)
+    this.calculateStatistics_();
+  if (goog.isDef(opt_key)) {
+    if (goog.isDef(opt_value)) {
+      this.statistics_[opt_key] = opt_value;
+      return this;
+    } else {
+      return this.statistics_[opt_key];
+    }
+  } else {
+    return this.statistics_;
+  }
+};
+
+
+/**
  * Create pie label format provider.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
 anychart.charts.Pie.prototype.createFormatProvider = function() {
-  var iterator = this.getIterator();
-  // no need to store this information always in this.statistic_
-  var formatProvider = {};
-
-  formatProvider['index'] = iterator.getIndex();
-  formatProvider['name'] = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
-  formatProvider['x'] = iterator.get('x');
-  formatProvider['value'] = iterator.get('value');
-  if (iterator.meta('groupedPoint') == true) {
-    formatProvider['name'] = 'Grouped Point';
-    formatProvider['groupedPoint'] = true;
-    formatProvider['names'] = iterator.meta('names');
-    formatProvider['values'] = iterator.meta('values');
-  }
-  goog.object.extend(formatProvider, this.statistic_);
-  return formatProvider;
+  if (!this.pointProvider_)
+    this.pointProvider_ = new anychart.core.utils.PiePointContextProvider(this, ['x', 'value', 'name']);
+  this.pointProvider_.applyReferenceValues();
+  return this.pointProvider_;
 };
 
 
@@ -2679,6 +2702,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   for (i = 0, len = leftSideLabels.length; i < len; i++) {
     label = leftSideLabels[i];
     if (label) {
+      iterator.select(label.getIndex());
+      label.formatProvider(this.createFormatProvider());
       bounds = this.getLabelBounds(label);
 
       if (!domain || domain.isNotIntersect(bounds.top, bounds.height)) {
@@ -2711,6 +2736,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     for (i = 0, len = droppedLabels.length; i < len; i++) {
       label = droppedLabels[i];
       if (label) {
+        iterator.select(label.getIndex());
+        label.formatProvider(this.createFormatProvider());
         bounds = this.getLabelBounds(label);
 
         notIntersection = true;
@@ -2757,6 +2784,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   for (i = rightSideLabels.length; i--;) {
     label = rightSideLabels[i];
     if (label) {
+      iterator.select(label.getIndex());
+      label.formatProvider(this.createFormatProvider());
       bounds = this.getLabelBounds(label);
 
       if (!domain || domain.isNotIntersect(bounds.top, bounds.height)) {
@@ -2788,6 +2817,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     for (i = droppedLabels.length; i--;) {
       label = droppedLabels[i];
       if (label) {
+        iterator.select(label.getIndex());
+        label.formatProvider(this.createFormatProvider());
         bounds = this.getLabelBounds(label);
 
         notIntersection = true;
