@@ -5,7 +5,7 @@ anychart.onDocumentReady(function() {
   chart.bounds(0, 0, '100%', '100%');
   chart.data(treeData);
 
-  var dataGrid = chart.getDataGrid();
+  var dataGrid = chart.dataGrid();
   dataGrid.column(0).title().text('#');
   dataGrid.column(1).width(200);
   dataGrid.column(2).width(70).textFormatter(function(item) {

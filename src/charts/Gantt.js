@@ -125,15 +125,6 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.horizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.horizontalScrollBar_);
   this.registerDisposable(this.horizontalScrollBar_);
 
-
-  /**
-   * If chart is rendered first time.
-   * This flag is used to add mouse wheel event handlers.
-   * @type {boolean}
-   * @private
-   */
-  this.initialRendering_ = true;
-
   this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
 
 };
@@ -262,10 +253,11 @@ anychart.charts.Gantt.prototype.headerHeight = function(opt_value) {
 
 
 /**
- * Getter for data grid.
+ * Internal getter for data grid.
  * @return {anychart.core.ui.DataGrid} - Chart's data grid.
+ * @private
  */
-anychart.charts.Gantt.prototype.getDataGrid = function() {
+anychart.charts.Gantt.prototype.getDataGrid_ = function() {
   if (!this.dg_) {
     this.dg_ = new anychart.core.ui.DataGrid();
     this.dg_.controller(this.controller_);
@@ -310,6 +302,27 @@ anychart.charts.Gantt.prototype.getDataGrid = function() {
   }
 
   return this.dg_;
+};
+
+
+/**
+ * Gets data grid or enables/disables it.
+ * NOTE: In current implementation (25 Feb 2015) data grid is not configurable by JSON, can't be set directly and can't be null.
+ * @param {boolean=} opt_enabled - If data grid must be enabled/disabled.
+ * @return {(anychart.core.ui.DataGrid|anychart.charts.Gantt)} - Data grid or chart itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.dataGrid = function(opt_enabled) {
+  if (goog.isDef(opt_enabled)) {
+    if (this.getDataGrid_().enabled() != opt_enabled) {
+      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter());
+      this.getDataGrid_().enabled(opt_enabled);
+      this.splitter().enabled(opt_enabled);
+      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter()); //We don't need to send any signal.
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW); //Invalidate a whole chart.
+    }
+    return this;
+  }
+  return this.getDataGrid_();
 };
 
 
@@ -382,7 +395,7 @@ anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, o
     this.hoverFill_ = acgraph.vector.normalizeFill.apply(null, arguments);
     //rowHoverFill does not invalidate anything. Here's no need to suspend it.
     this.getTimeline().rowHoverFill(this.hoverFill_);
-    this.getDataGrid().rowHoverFill(this.hoverFill_);
+    this.getDataGrid_().rowHoverFill(this.hoverFill_);
   }
   return this.hoverFill_;
 };
@@ -406,7 +419,7 @@ anychart.charts.Gantt.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys
       this.rowSelectedFill_ = val;
       anychart.core.Base.suspendSignalsDispatching(this.dg_, this.tl_);
       this.getTimeline().rowSelectedFill(this.rowSelectedFill_);
-      this.getDataGrid().rowSelectedFill(this.rowSelectedFill_);
+      this.getDataGrid_().rowSelectedFill(this.rowSelectedFill_);
       anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
     }
     return this;
@@ -633,10 +646,10 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
       var b1 = ths.splitter().getLeftBounds();
       var b2 = ths.splitter().getRightBounds();
 
-      anychart.core.Base.suspendSignalsDispatching(ths.getDataGrid(), ths.getTimeline());
-      ths.getDataGrid().bounds().set(b1);
+      anychart.core.Base.suspendSignalsDispatching(ths.getDataGrid_(), ths.getTimeline());
+      ths.getDataGrid_().bounds().set(b1);
       ths.getTimeline().bounds().set(b2);
-      anychart.core.Base.resumeSignalsDispatchingTrue(ths.getDataGrid(), ths.getTimeline());
+      anychart.core.Base.resumeSignalsDispatchingTrue(ths.getDataGrid_(), ths.getTimeline());
 
       ths.horizontalScrollBar_.bounds(
           (b2.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
@@ -674,7 +687,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
   var boundsChanged = false;
 
   if (!this.splitter().container()) {
-    this.getDataGrid().container(this.rootElement);
+    this.getDataGrid_().container(this.rootElement);
     this.getTimeline().container(this.rootElement);
     this.splitter().container(this.rootElement);
     this.verticalScrollBar_.container(this.rootElement);
@@ -682,15 +695,18 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
     this.splitter().draw(); //Just initialization.
   }
 
-  if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid()));
+  if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
   if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.gantt.Timeline} */ (this.getTimeline()));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.splitter().bounds(bounds);
-
-    var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
-    var dgRatio = dgWidth / bounds.width;
-    this.splitter().position(dgRatio);
+    if (this.getDataGrid_().enabled()) {
+      this.splitter().bounds(bounds);
+      var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
+      var dgRatio = dgWidth / bounds.width;
+      this.splitter().position(dgRatio);
+    } else {
+      this.tl_.bounds().set(bounds);
+    }
 
     var newAvailableHeight = bounds.height - this.headerHeight_;
     if (this.controller_.availableHeight() != newAvailableHeight) {
@@ -739,25 +755,6 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 };
 
 
-/** @inheritDoc */
-anychart.charts.Gantt.prototype.draw = function() {
-  /*
-    This method is used to add mouse wheel handler.
-    Current implementation (03 Dec 2014) of mouse wheel handler in closure library
-    requires an Element as parameter. Element as element appears on render event only.
-    That's why we need to add handler right after first rendering.
-   */
-  goog.base(this, 'draw');
-
-  if (this.initialRendering_) {
-    this.initialRendering_ = false;
-    this.dg_.initMouseFeatures();
-    this.tl_.initMouseFeatures();
-  }
-  return this;
-};
-
-
 /**
  * Constructor function for gantt project chart.
  * @return {!anychart.charts.Gantt}
@@ -797,7 +794,7 @@ goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 anychart.charts.Gantt.prototype['draw'] = anychart.charts.Gantt.prototype.draw;
 anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
-anychart.charts.Gantt.prototype['getDataGrid'] = anychart.charts.Gantt.prototype.getDataGrid;
+anychart.charts.Gantt.prototype['dataGrid'] = anychart.charts.Gantt.prototype.dataGrid;
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;
 anychart.charts.Gantt.prototype['rowHoverFill'] = anychart.charts.Gantt.prototype.rowHoverFill;
 anychart.charts.Gantt.prototype['rowSelectedFill'] = anychart.charts.Gantt.prototype.rowSelectedFill;

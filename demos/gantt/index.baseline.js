@@ -15,7 +15,7 @@ anychart.onDocumentReady(function(){
   chart.splitterPosition(370);
 
   //get chart data grid link to set column settings
-  var dataGrid = chart.getDataGrid();
+  var dataGrid = chart.dataGrid();
 
   //set first column settings
   var firstColumn = dataGrid.column(0);
@@ -51,6 +51,8 @@ anychart.onDocumentReady(function(){
     var strMonth = (month > 9) ? month : '0' + month;
     return date.getFullYear() + '.' + strMonth + '.' + date.getDay();
   });
+
+  chart.dataGrid(false);
 
   //initiate chart drawing
   chart.draw();

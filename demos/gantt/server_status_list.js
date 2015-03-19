@@ -15,7 +15,7 @@ anychart.onDocumentReady(function() {
   chart.splitterPosition(320);
 
   //get chart data grid link to set column settings
-  var dataGrid = chart.getDataGrid();
+  var dataGrid = chart.dataGrid();
 
   //set first column settings
   var firstColumn = dataGrid.column(0);

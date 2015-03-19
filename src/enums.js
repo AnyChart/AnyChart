@@ -1417,7 +1417,6 @@ anychart.enums.WarningCode = {
   //anychart.core.ui.DataGrid incorrect component usage.
   DG_INCORRECT_METHOD_USAGE: 9, //can't be tested now
 
-
   BULLET_CHART_OUT_OF_RANGE: 10,
 
   GANTT_FIT_TO_TASK: 11,

@@ -35,7 +35,7 @@ anychart.onDocumentReady(function() {
   chart.data(data);
   chart.splitterPosition(350);
 
-  var dataGrid = chart.getDataGrid();
+  var dataGrid = chart.dataGrid();
   var timeline = chart.getTimeline();
 
   dataGrid.cellEvenFill('#fcfcfc');

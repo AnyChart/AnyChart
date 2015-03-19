@@ -18,7 +18,7 @@ anychart.onDocumentReady(function() {
   chart.bounds(0, 0, '100%', '100%');
   chart.data(data);
 
-  var dataGrid = chart.getDataGrid();
+  var dataGrid = chart.dataGrid();
 
   dataGrid.column(1).width(250);
 

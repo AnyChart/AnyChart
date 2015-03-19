@@ -24,6 +24,13 @@ anychart.core.ui.DataGrid = function() {
   goog.base(this);
 
   /**
+   * Mouse wheel handler object.
+   * @type {goog.events.MouseWheelHandler}
+   * @private
+   */
+  this.mwh_ = null;
+
+  /**
    * Source data tree.
    * @type {anychart.data.Tree}
    * @private
@@ -1287,6 +1294,14 @@ anychart.core.ui.DataGrid.prototype.columnInvalidated_ = function(event) {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.core.ui.DataGrid.prototype.remove = function() {
+  if (this.base_) this.base_.parent(null);
+};
+
+
+/**
  * Draws data grid.
  * @return {anychart.core.ui.DataGrid}
  */
@@ -1542,6 +1557,9 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
     if (drawRows) this.drawRowFills_();
     if (manualSuspend) stage.resume();
   }
+
+  this.initMouseFeatures_();
+
   return this;
 };
 
@@ -2067,16 +2085,22 @@ anychart.core.ui.DataGrid.Column.prototype.remove = function() {
 /**
  * Initializes mouse wheel scrolling and mouse drag scrolling.
  * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
+ * @private
  */
-anychart.core.ui.DataGrid.prototype.initMouseFeatures = function() {
-  var mwh = new goog.events.MouseWheelHandler(this.getBase_().domElement());
-  var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
-  goog.events.listen(mwh, mouseWheelEvent, this.mouseWheelHandler_, false, this);
-  var ths = this;
+anychart.core.ui.DataGrid.prototype.initMouseFeatures_ = function() {
+  if (!this.mwh_) {
+    var element = this.getBase_().domElement();
+    if (element) {
+      this.mwh_ = new goog.events.MouseWheelHandler(element);
+      var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
+      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+      var ths = this;
 
-  goog.events.listen(window, 'unload', function(e) {
-    goog.events.unlisten(mwh, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
-  });
+      goog.events.listen(window, 'unload', function(e) {
+        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+      });
+    }
+  }
 };
 
 
