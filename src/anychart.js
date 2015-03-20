@@ -478,6 +478,14 @@ anychart.column = anychart.column || function() {
 /**
  * @ignoreDoc
  */
+anychart.box = anychart.box || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Box chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.financial = anychart.financial || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Financial chart']);
 };

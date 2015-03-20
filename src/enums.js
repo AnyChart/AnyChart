@@ -20,6 +20,7 @@ goog.require('acgraph');
 anychart.enums.ChartTypes = {
   AREA: 'area',
   BAR: 'bar',
+  BOX: 'box',
   BUBBLE: 'bubble',
   BULLET: 'bullet',
   CARTESIAN: 'cartesian',
@@ -1155,6 +1156,7 @@ anychart.enums.ScatterTicksMode = {
 anychart.enums.CartesianSeriesType = {
   AREA: 'area',
   BAR: 'bar',
+  BOX: 'box',
   BUBBLE: 'bubble',
   CANDLESTICK: 'candlestick',
   COLUMN: 'column',

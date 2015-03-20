@@ -204,6 +204,13 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_rising_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="falling_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_falling_stroke" type="Stroke"/>
+            <!-- Box series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="median_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_median_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stem_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stem_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="whisker_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_whisker_stroke" type="Stroke"/>
         </xsd:all>
         <!-- Base series -->
         <xsd:attribute name="series_type" type="enums.SeriesTypes"/>
@@ -267,6 +274,15 @@
         <!-- Polar ContinuousBase series -->
         <xsd:attribute name="closed" type="simple.Bool" default="true"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <!-- Box series -->
+        <xsd:attribute name="median_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_median_stroke" type="xsd:string"/>
+        <xsd:attribute name="stem_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stem_stroke" type="xsd:string"/>
+        <xsd:attribute name="whisker_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_whisker_stroke" type="xsd:string"/>
+        <xsd:attribute name="whisker_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="hover_whisker_width" type="simple.NumberOrPercentOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -1170,6 +1186,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
             <xsd:enumeration value="bar"/>
+            <xsd:enumeration value="box"/>
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="bullet"/>
             <xsd:enumeration value="cartesian"/>
@@ -1306,6 +1323,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
             <xsd:enumeration value="bar"/>
+            <xsd:enumeration value="box"/>
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="column"/>

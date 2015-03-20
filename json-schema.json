@@ -76,7 +76,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "area", "bar", "bubble", "column", "financial", "line", "marker"]},
+        "type": {"enum": ["cartesian", "area", "bar", "box", "bubble", "column", "financial", "line", "marker"]},
         "grids": {
           "type": "array",
           "items": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.grids.Linear"}]}
@@ -116,6 +116,7 @@
               {"$ref": "#/definitions/disable"},
               {"$ref": "#/definitions/anychart.core.cartesian.series.Area"},
               {"$ref": "#/definitions/anychart.core.cartesian.series.Bar"},
+              {"$ref": "#/definitions/anychart.core.cartesian.series.Box"},
               {"$ref": "#/definitions/anychart.core.cartesian.series.Bubble"},
               {"$ref": "#/definitions/anychart.core.cartesian.series.Candlestick"},
               {"$ref": "#/definitions/anychart.core.cartesian.series.Column"},
@@ -918,6 +919,27 @@
       ],
       "properties": {
         "seriesType": {"enum": ["bar"]}
+      }
+    },
+    "anychart.core.cartesian.series.Box": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["box"]},
+        "medianStroke": {"$ref": "#/definitions/stroke"},
+        "hoverMedianStroke": {"$ref": "#/definitions/stroke"},
+        "stemStroke": {"$ref": "#/definitions/stroke"},
+        "hoverStemStroke": {"$ref": "#/definitions/stroke"},
+        "whiskerStroke": {"$ref": "#/definitions/stroke"},
+        "hoverWhiskerStroke": {"$ref": "#/definitions/stroke"},
+        "whiskerWidth": {
+          "type": ["string", "number", "null"]
+        },
+        "hoverWhiskerWidth": {
+          "type": ["string", "number", "null"]
+        }
       }
     },
     "anychart.core.cartesian.series.Bubble": {

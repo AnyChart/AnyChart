@@ -973,6 +973,15 @@ anychart.core.cartesian.series.Base.prototype.hasMarkers = function() {
 
 
 /**
+ * Tester if the series has outlierMarkers() method.
+ * @return {boolean}
+ */
+anychart.core.cartesian.series.Base.prototype.hasOutlierMarkers = function() {
+  return false;
+};
+
+
+/**
  * Tester if the series can have an error. (All except range series, OHLC, Bubble).
  * @return {boolean}
  */
@@ -2517,7 +2526,8 @@ anychart.core.cartesian.series.Base.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
   json['tooltip'] = this.tooltip().serialize();
-  json['error'] = this.error().serialize();
+  if (this.isErrorAvailable())
+    json['error'] = this.error().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(

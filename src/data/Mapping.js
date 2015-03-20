@@ -165,7 +165,15 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     'open': [1],
     'high': [2],
     'low': [3, 1],
-    'close': [4]
+    'close': [4],
+
+    // box/whisker series
+    'lowest': [1],
+    'q1': [2],
+    'median': [3],
+    'q3': [4],
+    'highest': [5],
+    'outliers': [6]
   };
 
   /**
@@ -175,7 +183,9 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    */
   this.objectMapping_ = opt_objectMapping || {
     //'x': ['x'], // this mapping entry can be omitted cause of defaults
-    'value': ['value', 'y', 'close'] // 'value' here enforces checking order
+    'value': ['value', 'y', 'close'], // 'value' here enforces checking order
+    'lowest': ['lowest', 'low'],
+    'highest': ['highest', 'high']
   };
 
   /**

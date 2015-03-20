@@ -1080,6 +1080,33 @@ anychart.charts.Cartesian.prototype.bar = function(data, opt_csvSettings) {
 
 
 /**
+ * Adds Box series.
+ * @example
+ * var data = [
+ *     {x: 'p1', low: 760, q1: 801, median: 848, q3: 895, high: 965, outliers: [650]},
+ *     ['p2', 733, 853, 939, 980, 1080],
+ *     ['p3', 714, 762, 817, 870, 918],
+ *     ['p4', 724, 802, 806, 871, 950],
+ *     ['p5', 834, 836, 864, 882, 910, [710, 970, 980]]
+ * ];
+ * var chart = anychart.box();
+ * chart.box(data);
+ * chart.container(stage).draw();
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Box} instance for method chaining.
+ */
+anychart.charts.Cartesian.prototype.box = function(data, opt_csvSettings) {
+  return this.createSeriesByType_(
+      anychart.enums.CartesianSeriesType.BOX,
+      data,
+      opt_csvSettings
+  );
+};
+
+
+/**
  * Adds Bubble series.
  * @example
  * var chart = anychart.cartesian();
@@ -1450,6 +1477,8 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Cartesian.ZINDEX_SERIES) + inc);
     if (instance.hasMarkers())
       instance.markers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
+    if (instance.hasOutlierMarkers())
+      instance.outlierMarkers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
     instance.labels().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_LABEL + inc + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
@@ -3057,6 +3086,7 @@ anychart.charts.Cartesian.prototype['yAxis'] = anychart.charts.Cartesian.prototy
 anychart.charts.Cartesian.prototype['getSeries'] = anychart.charts.Cartesian.prototype.getSeries;//doc|ex
 anychart.charts.Cartesian.prototype['area'] = anychart.charts.Cartesian.prototype.area;//doc|ex
 anychart.charts.Cartesian.prototype['bar'] = anychart.charts.Cartesian.prototype.bar;//doc|ex
+anychart.charts.Cartesian.prototype['box'] = anychart.charts.Cartesian.prototype.box;//doc|ex
 anychart.charts.Cartesian.prototype['bubble'] = anychart.charts.Cartesian.prototype.bubble;//doc|ex
 anychart.charts.Cartesian.prototype['candlestick'] = anychart.charts.Cartesian.prototype.candlestick;//doc|ex
 anychart.charts.Cartesian.prototype['column'] = anychart.charts.Cartesian.prototype.column;//doc|ex
