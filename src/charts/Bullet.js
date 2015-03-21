@@ -719,6 +719,7 @@ anychart.charts.Bullet.prototype.createMarkers_ = function() {
   goog.array.forEach(this.markers_, function(marker) {
     goog.dispose(marker);
   });
+  this.markers_.length = 0;
 
   var iterator = this.data_.getIterator().reset();
 
