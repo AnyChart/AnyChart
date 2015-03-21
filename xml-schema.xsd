@@ -906,11 +906,14 @@
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="linear"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
         <xsd:attribute name="log_base" type="xsd:double" default="10"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
         <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_minimum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
     </xsd:complexType>

@@ -14,6 +14,8 @@ goog.require('anychart.scales.ScatterTicks');
  * @extends {anychart.scales.ScatterBase}
  */
 anychart.scales.Linear = function() {
+  goog.base(this);
+
   /**
    * Major ticks for the scale.
    * @type {anychart.scales.ScatterTicks}
@@ -38,7 +40,7 @@ anychart.scales.Linear = function() {
    */
   this.logBaseVal = 10;
 
-  goog.base(this);
+  this.stickToZeroFlag = true;
 };
 goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
 
@@ -108,13 +110,37 @@ anychart.scales.Linear.prototype.minorTicks = function(opt_value) {
 };
 
 
+/**
+ * Flag to stick to zero value on auto calc if gaps lead to zero crossing.
+ * @param {boolean=} opt_value
+ * @return {!(anychart.scales.Linear|boolean)}
+ */
+anychart.scales.Linear.prototype.stickToZero = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.stickToZeroFlag) {
+      this.stickToZeroFlag = opt_value;
+      if (this.minimumModeAuto || this.maximumModeAuto) {
+        this.consistent = false;
+        this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+      }
+    }
+    return this;
+  }
+  return this.stickToZeroFlag;
+};
+
+
 /** @inheritDoc */
 anychart.scales.Linear.prototype.calculate = function() {
   if (this.consistent) return;
 
   goog.base(this, 'calculate');
 
-  var setupResult = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto, this.logBaseVal);
+  var setupResult = this.ticks().setupAsMajor(this.min, this.max,
+      this.minimumModeAuto && this.min != this.softMin,
+      this.maximumModeAuto && this.max != this.softMax,
+      this.logBaseVal);
 
   if (this.minimumModeAuto)
     this.min = setupResult[0]; // new min
@@ -163,6 +189,7 @@ anychart.scales.Linear.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stackMode'] = this.stackMode();
+  json['stickToZero'] = this.stickToZero();
   return json;
 };
 
@@ -173,6 +200,7 @@ anychart.scales.Linear.prototype.setupByJSON = function(config) {
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
+  this.stickToZero(config['stickToZero']);
 };
 
 
@@ -201,3 +229,4 @@ goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
 anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;//doc|ex
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex
 anychart.scales.Linear.prototype['stackMode'] = anychart.scales.Linear.prototype.stackMode;//inherited
+anychart.scales.Linear.prototype['stickToZero'] = anychart.scales.Linear.prototype.stickToZero;

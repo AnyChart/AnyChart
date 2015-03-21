@@ -63,6 +63,20 @@ anychart.scales.ScatterBase = function() {
   this.max = NaN;
 
   /**
+   * Soft minimum setting.
+   * @type {number}
+   * @protected
+   */
+  this.softMin = NaN;
+
+  /**
+   * Soft maximum setting.
+   * @type {number}
+   * @protected
+   */
+  this.softMax = NaN;
+
+  /**
    * @type {number}
    * @protected
    */
@@ -74,6 +88,13 @@ anychart.scales.ScatterBase = function() {
    * @protected
    */
   this.consistent = false;
+
+  /**
+   * Flag to stick to zero value on auto calc if gaps lead to zero crossing. Used in Linear scales only.
+   * @type {boolean}
+   * @protected
+   */
+  this.stickToZeroFlag = false;
 };
 goog.inherits(anychart.scales.ScatterBase, anychart.scales.Base);
 
@@ -95,11 +116,12 @@ goog.inherits(anychart.scales.ScatterBase, anychart.scales.Base);
  */
 anychart.scales.ScatterBase.prototype.minimum = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = goog.isNull(opt_value) ? NaN : +opt_value;
+    var val = anychart.utils.toNumber(opt_value);
     var auto = isNaN(val);
     if (auto != this.minimumModeAuto || (!auto && val != this.min)) {
       this.minimumModeAuto = auto;
       this.min = val;
+      this.softMin = NaN;
       this.consistent = false;
       if (auto)
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
@@ -130,11 +152,12 @@ anychart.scales.ScatterBase.prototype.minimum = function(opt_value) {
  */
 anychart.scales.ScatterBase.prototype.maximum = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = goog.isNull(opt_value) ? NaN : +opt_value;
+    var val = anychart.utils.toNumber(opt_value);
     var auto = isNaN(val);
     if (auto != this.maximumModeAuto || (!auto && val != this.max)) {
       this.maximumModeAuto = auto;
       this.max = val;
+      this.softMax = NaN;
       this.consistent = false;
       if (auto)
         this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
@@ -145,6 +168,50 @@ anychart.scales.ScatterBase.prototype.maximum = function(opt_value) {
   }
   this.calculate();
   return this.max;
+};
+
+
+/**
+ * Soft minimum getter and setter. If data range minimum is greater than soft minimum, the soft minimum value will
+ * become the scale minimum.
+ * @param {number=} opt_value
+ * @return {!(anychart.scales.ScatterBase|number)}
+ */
+anychart.scales.ScatterBase.prototype.softMinimum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (!(isNaN(opt_value) && isNaN(this.softMin)) && opt_value != this.softMin) {
+      this.softMin = opt_value;
+      this.min = NaN;
+      this.minimumModeAuto = true;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.softMin;
+};
+
+
+/**
+ * Soft maximum getter and setter. If data range maximum is less than soft maximum, the soft maximum value will
+ * become the scale maximum.
+ * @param {number=} opt_value
+ * @return {!(anychart.scales.ScatterBase|number)}
+ */
+anychart.scales.ScatterBase.prototype.softMaximum = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (!(isNaN(opt_value) && isNaN(this.softMax)) && opt_value != this.softMax) {
+      this.softMax = opt_value;
+      this.max = NaN;
+      this.maximumModeAuto = true;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.softMax;
 };
 
 
@@ -328,7 +395,17 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
-  var range = (this.maximumModeAuto ? this.dataRangeMax : this.max) - (this.minimumModeAuto ? this.dataRangeMin : this.min);
+  var max = this.maximumModeAuto ?
+      (isNaN(this.softMax) ?
+          this.dataRangeMax :
+          Math.max(this.dataRangeMax, this.softMax)) :
+      this.max;
+  var min = this.minimumModeAuto ?
+      (isNaN(this.softMin) ?
+          this.dataRangeMin :
+          Math.min(this.dataRangeMin, this.softMin)) :
+      this.min;
+  var range = max - min;
   if (!isFinite(range)) {
     this.dataRangeMin = 0;
     this.dataRangeMax = 1;
@@ -340,13 +417,25 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
   }
   if (this.minimumModeAuto) {
     this.min = this.dataRangeMin - range * this.minimumRangeBasedGap;
-    if (this.min < 0 && this.dataRangeMin >= 0)
+    if (!isNaN(this.softMin)) {
+      if (range > 0)
+        this.min = Math.min(this.min, this.softMin);
+      else
+        this.min = Math.max(this.min, this.softMin);
+    }
+    if (this.stickToZeroFlag && this.min < 0 && this.dataRangeMin >= 0 && this.min != this.softMin)
       this.min = 0;
   }
 
   if (this.maximumModeAuto) {
     this.max = this.dataRangeMax + range * this.maximumRangeBasedGap;
-    if (this.max < 0 && this.dataRangeMax >= 0)
+    if (!isNaN(this.softMax)) {
+      if (range > 0)
+        this.max = Math.max(this.max, this.softMax);
+      else
+        this.max = Math.min(this.max, this.softMax);
+    }
+    if (this.stickToZeroFlag && this.max < 0 && this.dataRangeMax >= 0 && this.max != this.softMax)
       this.max = 0;
   }
 };
@@ -378,6 +467,8 @@ anychart.scales.ScatterBase.prototype.serialize = function() {
   json['minimum'] = this.minimumModeAuto ? null : this.min;
   json['minimumGap'] = this.minimumGap();
   json['maximumGap'] = this.maximumGap();
+  json['softMinimum'] = isNaN(this.softMin) ? null : this.softMin;
+  json['softMaximum'] = isNaN(this.softMax) ? null : this.softMax;
   return json;
 };
 
@@ -387,6 +478,8 @@ anychart.scales.ScatterBase.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.minimumGap(config['minimumGap']);
   this.maximumGap(config['maximumGap']);
+  this.softMinimum(config['softMinimum']);
+  this.softMaximum(config['softMaximum']);
   this.minimum(config['minimum']);
   this.maximum(config['maximum']);
 };
@@ -421,6 +514,8 @@ anychart.scales.ScatterBase.prototype['transform'] = anychart.scales.ScatterBase
 anychart.scales.ScatterBase.prototype['inverseTransform'] = anychart.scales.ScatterBase.prototype.inverseTransform;//doc|ex
 anychart.scales.ScatterBase.prototype['minimum'] = anychart.scales.ScatterBase.prototype.minimum;//doc|ex
 anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.prototype.maximum;//doc|ex
+anychart.scales.ScatterBase.prototype['softMinimum'] = anychart.scales.ScatterBase.prototype.softMinimum;
+anychart.scales.ScatterBase.prototype['softMaximum'] = anychart.scales.ScatterBase.prototype.softMaximum;
 anychart.scales.ScatterBase.prototype['minimumGap'] = anychart.scales.ScatterBase.prototype.minimumGap;//doc|ex
 anychart.scales.ScatterBase.prototype['maximumGap'] = anychart.scales.ScatterBase.prototype.maximumGap;//doc|ex
 anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex

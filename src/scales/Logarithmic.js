@@ -95,11 +95,25 @@ anychart.scales.Logarithmic.prototype.determineScaleMinMax = function() {
   }
   if (this.minimumModeAuto) {
     this.transformedMin_ = logMin - range * this.minimumRangeBasedGap;
+    if (!isNaN(this.softMin)) {
+      var softMin = anychart.math.log(this.softMin, this.logBaseVal);
+      if (range > 0)
+        this.transformedMin_ = Math.min(this.transformedMin_, softMin);
+      else
+        this.transformedMin_ = Math.max(this.transformedMin_, softMin);
+    }
     this.min = anychart.math.pow(this.logBaseVal, this.transformedMin_);
   }
 
   if (this.maximumModeAuto) {
     this.transformedMax_ = logMax + range * this.maximumRangeBasedGap;
+    if (!isNaN(this.softMax)) {
+      var softMax = anychart.math.log(this.softMax, this.logBaseVal);
+      if (range > 0)
+        this.transformedMax_ = Math.max(this.transformedMax_, softMax);
+      else
+        this.transformedMax_ = Math.min(this.transformedMax_, softMax);
+    }
     this.max = anychart.math.pow(this.logBaseVal, this.transformedMax_);
   }
 };

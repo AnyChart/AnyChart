@@ -1574,6 +1574,12 @@
         },
         "maximum": {
           "type": ["number", "string", "null"]
+        },
+        "softMinimum": {
+          "type": ["number", "string", "null"]
+        },
+        "softMaximum": {
+          "type": ["number", "string", "null"]
         }
       }
     },
@@ -1586,7 +1592,8 @@
         "type": {"enum": ["linear"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
         "minorTicks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
-        "stackMode": {"$ref": "#/definitions/anychart.enums.ScaleStackMode"}
+        "stackMode": {"$ref": "#/definitions/anychart.enums.ScaleStackMode"},
+        "stickToZero": {"type": "boolean"}
       }
     },
     "anychart.scales.Logarithmic": {
@@ -1599,7 +1606,8 @@
         "logBase": {"type": "number"},
         "ticks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
         "minorTicks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
-        "stackMode": {"$ref": "#/definitions/anychart.enums.ScaleStackMode"}
+        "stackMode": {"$ref": "#/definitions/anychart.enums.ScaleStackMode"},
+        "stickToZero": {"type": "boolean"}
       }
     },
     "anychart.scales.Ordinal": {
