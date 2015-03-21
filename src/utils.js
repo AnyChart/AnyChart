@@ -1114,7 +1114,7 @@ anychart.utils.callLog_ = function(name, message, opt_exception) {
   var console = goog.global['console'];
   if (console) {
     var log = console[name] || console['log'];
-    if (log) {
+    if (typeof log != 'object') {
       log.call(console, message, opt_exception);
     }
   }
