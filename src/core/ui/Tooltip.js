@@ -473,6 +473,17 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 
 
 /** @inheritDoc */
+anychart.core.ui.Tooltip.prototype.setupSpecial = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    this.enabled(!!arg0);
+    return true;
+  }
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+};
+
+
+/** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.allowLeaveScreen(config['allowLeaveScreen']);
@@ -485,7 +496,7 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
   this.offsetY(config['offsetY']);
   this.anchor(config['anchor']);
   this.hideDelay(config['hideDelay']);
-  this.enabled(config['enabled']);
+  this.enabled('enabled' in config ? config['enabled'] : true);
 };
 
 
