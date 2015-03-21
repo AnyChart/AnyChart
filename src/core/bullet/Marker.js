@@ -140,7 +140,10 @@ anychart.core.bullet.Marker.prototype.type = function(opt_value) {
  * @param {anychart.enums.BulletMarkerType} value Default type value.
  */
 anychart.core.bullet.Marker.prototype.setDefaultType = function(value) {
+  var needInvalidate = !this.type_ && this.defaultType_ != value;
   this.defaultType_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -204,7 +207,10 @@ anychart.core.bullet.Marker.prototype.layout = function(opt_value) {
  * @param {anychart.enums.Layout} value Default layout value.
  */
 anychart.core.bullet.Marker.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
   this.defaultLayout_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -283,7 +289,10 @@ anychart.core.bullet.Marker.prototype.fill = function(opt_fillOrColorOrKeys, opt
  * @param {acgraph.vector.Fill} value Default fill value.
  */
 anychart.core.bullet.Marker.prototype.setDefaultFill = function(value) {
+  var needInvalidate = !this.fill_ && this.defaultFill_ != value;
   this.defaultFill_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
 };
 
 
@@ -315,7 +324,10 @@ anychart.core.bullet.Marker.prototype.stroke = function(opt_strokeOrFill, opt_th
  * @param {acgraph.vector.Stroke} value Default stroke value.
  */
 anychart.core.bullet.Marker.prototype.setDefaultStroke = function(value) {
+  var needInvalidate = !this.stroke_ && this.defaultStroke_ != value;
   this.defaultStroke_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
 };
 
 

@@ -713,7 +713,10 @@ anychart.core.axes.Linear.prototype.orientation = function(opt_value) {
  * @param {anychart.enums.Orientation} value Default orientation value.
  */
 anychart.core.axes.Linear.prototype.setDefaultOrientation = function(value) {
+  var needInvalidate = (this.defaultOrientation_ != value && !this.orientation_);
   this.defaultOrientation_ = value;
+  if (needInvalidate)
+    this.invalidate(this.ALL_VISUAL_STATES_);
 };
 
 

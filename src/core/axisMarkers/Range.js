@@ -118,7 +118,10 @@ anychart.core.axisMarkers.Range.prototype.layout = function(opt_value) {
  * @param {anychart.enums.Layout} value Layout value.
  */
 anychart.core.axisMarkers.Range.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
   this.defaultLayout_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -230,7 +233,10 @@ anychart.core.axisMarkers.Range.prototype.fill = function(opt_fillOrColorOrKeys,
  * @param {acgraph.vector.Fill} value Default fill value.
  */
 anychart.core.axisMarkers.Range.prototype.setDefaultFill = function(value) {
+  var needInvalidate = !this.fill_ && this.defaultFill_ != value;
   this.defaultFill_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.APPEARANCE);
 };
 
 

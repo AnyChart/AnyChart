@@ -836,6 +836,7 @@ anychart.charts.Polar.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
+    this.invalidate(anychart.ConsistencyState.POLAR_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 

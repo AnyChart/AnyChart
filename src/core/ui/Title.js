@@ -517,7 +517,10 @@ anychart.core.ui.Title.prototype.orientation = function(opt_value) {
  * @param {anychart.enums.Orientation} value .
  */
 anychart.core.ui.Title.prototype.setDefaultOrientation = function(value) {
+  var needInvalidate = !this.orientation_ && this.defaultOrientation_ != value;
   this.defaultOrientation_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -545,7 +548,10 @@ anychart.core.ui.Title.prototype.rotation = function(opt_value) {
  * @param {number} value .
  */
 anychart.core.ui.Title.prototype.setDefaultRotation = function(value) {
+  var needInvalidate = !this.rotation_ && this.defaultRotation_ != value;
   this.defaultRotation_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 

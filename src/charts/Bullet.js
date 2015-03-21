@@ -741,6 +741,7 @@ anychart.charts.Bullet.prototype.createMarkers_ = function() {
 anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   var index = iterator.getIndex();
   var marker = new anychart.core.bullet.Marker();
+  marker.suspendSignalsDispatching();
   this.markers_[index] = marker;
   this.registerDisposable(marker);
 
@@ -759,6 +760,7 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.gap(/** @type {string|number} */(iterator.get('gap')));
   marker.fill(/** @type {acgraph.vector.Fill} */(iterator.get('fill')));
   marker.stroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')));
+  marker.resumeSignalsDispatching(false);
 
   return marker;
 };
