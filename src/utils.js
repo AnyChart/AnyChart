@@ -555,7 +555,7 @@ anychart.utils.xml2json = function(xml) {
           }
           onlyText = false;
           result[subnode['index']] = subnode['value'];
-        } else if (!goog.isNull(subnode) && !resultIsArray) {
+        } else if ((!goog.isNull(subnode) || anychart.utils.isNullNodeAllowed(subNodeName)) && !resultIsArray) {
           onlyText = false;
           var names;
           name = anychart.utils.toCamelCase(subNodeName);
@@ -826,6 +826,16 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['items', 'item'];
   }
   return null;
+};
+
+
+/**
+ * Returns true if the node with name should be kept in JSON even if it is empty in XML and false otherwise.
+ * @param {string} name
+ * @return {boolean}
+ */
+anychart.utils.isNullNodeAllowed = function(name) {
+  return name == 'point';
 };
 
 

@@ -217,6 +217,15 @@ anychart.data.Mapping.prototype.getArrayMapping = function() {
 };
 
 
+/**
+ * Getter for object mapping.
+ * @return {!Object.<Array.<string>>} Object mapping.
+ */
+anychart.data.Mapping.prototype.getObjectMapping = function() {
+  return this.objectMapping_;
+};
+
+
 //exports
 anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//inherited
 anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//inherited

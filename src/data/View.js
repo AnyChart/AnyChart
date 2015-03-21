@@ -610,7 +610,7 @@ anychart.data.View.prototype.serialize = function() {
   var iterator = this.getIterator();
   var index;
   var row;
-  var arrayMapping;
+  var mapping, map;
   var key;
   var rowObject;
   var i;
@@ -621,30 +621,54 @@ anychart.data.View.prototype.serialize = function() {
     // if row represented by array - convert it to object with help of array mapping.
     if (goog.isArray(row)) {
       // get array mapping for the row
-      arrayMapping = this.getRowMapping(index).getArrayMapping();
+      mapping = this.getRowMapping(index).getArrayMapping();
       rowObject = {};
-      for (key in arrayMapping) {
-        for (i = 0; i < arrayMapping[key].length; i++) {
-          if (arrayMapping[key][i] in row) {
-            val = row[arrayMapping[key][i]];
+      for (key in mapping) {
+        map = mapping[key];
+        for (i = 0; i < map.length; i++) {
+          if (map[i] in row) {
+            val = row[map[i]];
             if (val instanceof Date)
               val = val.getTime();
+            if (!goog.isDef(val))
+              val = null;
             rowObject[key] = val;
             break;
           }
         }
       }
     } else if (goog.isObject(row)) {
+      // if row is presented by object - normalize it to default mapping, because we cannot provide
+      // mapping info to the resulting JSON now
+      mapping = this.getRowMapping(index).getObjectMapping();
       rowObject = {};
+      for (key in mapping) {
+        map = mapping[key];
+        for (i = 0; i < map.length; i++) {
+          if (map[i] in row) {
+            val = row[map[i]];
+            if (val instanceof Date)
+              val = val.getTime();
+            if (!goog.isDef(val))
+              val = null;
+            rowObject[key] = val;
+            break;
+          }
+        }
+      }
       for (key in row) {
-        if (row.hasOwnProperty(key)) {
+        if (row.hasOwnProperty(key) && !(key in mapping)) {
           val = row[key];
           if (val instanceof Date)
             val = val.getTime();
+          if (!goog.isDef(val))
+            val = null;
           rowObject[key] = val;
         }
       }
     } else {
+      if (!goog.isDef(row))
+        row = null;
       rowObject = row;
     }
     arr.push(rowObject);
