@@ -1674,7 +1674,7 @@ anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
  */
 anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value);
+    opt_value = goog.isNull(opt_value) ? null : anychart.utils.normalizeToNaturalNumber(opt_value);
     if (this.staggerLines_ != opt_value) {
       this.staggerLines_ = opt_value;
       this.dropStaggeredLabelsCache_();

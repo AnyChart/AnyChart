@@ -2798,7 +2798,7 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
       if (seriesInst) {
         if (seriesType == anychart.enums.CartesianSeriesType.LINE ||
             seriesType == anychart.enums.CartesianSeriesType.SPLINE ||
-            seriesType == anychart.enums.CartesianSeriesType.STEP_LINE)
+            seriesType == anychart.enums.CartesianSeriesType.STEP_LINE.toLowerCase())
           seriesInst.zIndex(anychart.charts.Cartesian.ZINDEX_LINE_SERIES);
         seriesInst.setup(json);
         if (goog.isObject(json)) {
