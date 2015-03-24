@@ -1567,8 +1567,11 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
   var fx = (ac6_focalPoint * r * Math.cos(ac6_angle) / bounds.width) + defFx;
   var fy = (ac6_focalPoint * r * Math.sin(ac6_angle) / bounds.height) + defFy;
 
-  this.aquaStyleObj_['fx'] = fx;
-  this.aquaStyleObj_['fy'] = fy;
+  if (bounds.width < 0) bounds.width = 0;
+  if (bounds.height < 0) bounds.height = 0;
+
+  this.aquaStyleObj_['fx'] = !isNaN(fx) && isFinite(fx) ? fx : 0;
+  this.aquaStyleObj_['fy'] = !isNaN(fy) && isFinite(fy) ? fy : 0;
   this.aquaStyleObj_['mode'] = bounds;
 };
 

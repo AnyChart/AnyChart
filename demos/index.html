@@ -1,62 +1,53 @@
 <html>
 <head>
-    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
-    <script src="../contrib/closure-library/closure/goog/base.js"></script>
-    <script src="../src/deps.js"></script>
-    <meta charset="utf-8">
+  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+  <script src="../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../src/deps.js"></script>
+  <meta charset="utf-8">
 
-    <script>
-        goog.require('anychart.modules.anychart');
-    </script>
-    <style>
-        html, body, #container {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-        }
+  <script>
+    goog.require('anychart.modules.anychart');
+  </script>
+  <style>
+    html, body, #container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
 
-        .anychart-credits {
-            display: none;
-        }
-    </style>
+    .anychart-credits {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 <div id="wrapper">
-    <div id="container" style="width: 400px; height: 300px; border: 1px solid #000000"></div>
+  <div id="container" style="width: 400px; height: 300px; border: 1px solid #000000"></div>
 </div>
 
 <div id="status"></div>
 </body>
 <script>
-    var chart, line;
-    anychart.onDocumentLoad(function() {
-        /*var data = [
-            {value: 2, valueUpperError: 1.5},
-            {value: 3, valueUpperError: 1.5, valueLowerError: 0.75, valueErrorStroke: '6 pink'},
-            {value: 2, valueLowerError: 1, xUpperError: 1, valueErrorStroke: '6 #f6e'},
-            {value: 4, xLowerError: 1.75, xErrorStroke: '4 black'}
-        ];*/
-        var data = [1, 2, 4, 3];
-        chart = anychart.scatter();
-        line = chart.line(data).name('blue');
-        chart.line([3, 5, 2, 1]).name('red').error(2).error().xError(.5);
-//        chart.xScale(anychart.scales.linear());
-//        chart.xScale().minimum(-1).maximum(4).ticks().interval(1);
-//        chart.yScale().minimum(0).maximum(5).ticks().interval(1);
-        //line = chart.getSeries(0);
-//        line.markers().type('square');
+  var chart, line;
 
-        line.error().valueError(1).valueUpperError(0.5);
-//        line.error().valueLowerError(1.5);
-        line.error().xError(1);
-//        line.error().xErrorStroke('2 #2AD62A');
-//        line.error().valueErrorStroke('3 #2AD62A');
+  function drawChart() {
+    chart = anychart.pie([1,3,4]);
+    chart.fill('AQUASTYLE');
+    chart.container('container').draw();
+  }
 
-        chart.title(false);
-        chart.xAxis().title(false);
-        chart.yAxis().title(false);
-        chart.container('container').draw();
-    });
+  function reDraw() {
+    drawChart();
+
+    document.getElementById('container').innerHTML = '';
+
+    drawChart();
+  }
+
+
+  anychart.onDocumentLoad(function() {
+    reDraw();
+  });
 </script>
 </html>
 

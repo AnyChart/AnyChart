@@ -504,7 +504,9 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
     var parentBounds = this.parentBounds();
 
     if (parentBounds) {
-      this.radius_ = Math.round(Math.min(parentBounds.width, parentBounds.height) / 2);
+      var radius = Math.round(Math.min(parentBounds.width, parentBounds.height) / 2);
+      if (isNaN(radius) || radius < 0) radius = 0;
+      this.radius_ = radius;
       this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
       this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
 
@@ -514,7 +516,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
         var delta = 0;
         if (this.enabled()) {
           this.dropBoundsCache_();
-          var x, y, x1, y1, lineThickness, radius, tickLen, labelBounds;
+          var x, y, x1, y1, lineThickness, tickLen, labelBounds;
           var i, j, overlappedLabels, needDrawLabels, needDrawMinorLabels;
 
           var leftExtreme = NaN;
