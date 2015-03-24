@@ -1,71 +1,78 @@
-var labels;
-var count = 1;
-var index;
+var gauge;
+anychart.onDocumentReady(function() {
+  //create data set on our data
+  var dataSet = anychart.data.set([]);
 
-anychart.onDocumentLoad(function() {
-  var start = new Date().getTime();
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  setInterval(function() {
+    var now = new Date();
+    var hours = now.getHours();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
 
-  var labelsArr = [];
+    dataSet.data([hours, minutes, seconds]);
+  }, 1000);
 
-  labels = new anychart.core.ui.LabelsFactory();
-  labels.container('container');
-  labels.clear();
+  gauge = anychart.circularGauge();
+  gauge.data(dataSet);
+  gauge.padding('4%', '4%', '2%', '4%');
+  gauge.circularPadding('10%');
+  gauge.startAngle(-90);
+  gauge.sweepAngle(360);
+  gauge.stroke('#A9A9A9');
+  gauge.fill({
+    src: 'http://juliewight.com/wp-content/uploads/2013/11/rastafarian-pictures.jpg',
+    mode: acgraph.vector.ImageFillMode.STRETCH
+  });
+  //gauge.fill({keys:[{color: "#FDFDFD"}, {color: "#F7F3F4"}], angle: 45});
+  //gauge.fill({keys:[{color: "#FDFDFD"}, {color: "green"}], angle: 45, opacity: 0.7});
+  var axisHours = gauge.axis()
+    //.startAngle(-140)
+    //.sweepAngle(100)
+      .fill('#aaa')
+      .radius(95)
+      .width(1)
+      .minimum(0)
+      .maximum(12)
+      .ticksInterval(1);
 
-  var label;
+  axisHours.ticks()
+    //.hatchFill('confetti')
+      .fill('red')
+      .type('line')
+      .width(2)
+      .length(axisHours.width());
 
-  for (index = 0; index < count; index++) {
-    //var formatProvider = {value: 'Label: ' + index};
-    var formatProvider = {value: '       ABCDEFGHI JKL      MNOPQ     RSTUVWXY <br> Zabcde  fghijklmn   opqrstuvwx   yz0123456  789'};
-    //var formatProvider = {value: 'iiiiiiiiiiiWWWWWWWWWiWiWiWiWiWiWiWiWiWiWiWWWWWWWWWiiiiiiiiiiiiiiiWWWWWWWWWiiiiiiiiiiWWWiiiiWWWiiiWWWiii'};
-    //var formatProvider = {value: 'Текст (от лат. textus — «ткань; сплетение, связь, сочетание») — зафиксированная на каком-либо материальном носителе человеческая мысль; в общем плане связная и полная последовательность символов. Существуют две основных трактовки понятия «текст»: «имманентная» (расширенная, философски нагруженная) и «репрезентативная» (более частная). Имманентный подход подразумевает отношение к тексту как к автономной реальности, нацеленность на выявление его внутренней структуры. Репрезентативный — рассмотрение текста как особой формы представления знаний о внешней тексту действительности. В лингвистике термин текст используется в широком значении, включая и образцы устной речи. Восприятие текста изучается в рамках лингвистики текста и психолингвистики. Так, например, И. Р. Гальперин определяет текст следующим образом: «это письменное сообщение, объективированное в виде письменного документа, состоящее из ряда высказываний, объединённых разными типами лексической, грамматической и логической связи, имеющее определённый моральный характер, прагматическую установку и соответственно литературно обработанное»[1].'};
-    //var formatProvider = {value: 'Текст (от лат. textus — «ткань; сплетение, связь, сочетание») — зафиксированная на каком-либо материальном носителе человеческая мысль; в общем плане связная и полная последовательность символов. Существуют две основных трактовки понятия «текст»: «имманентная» (расширенная, философски нагруженная) и «репрезентативная» (более частная). '};
-    var positionProvider = {value: {x: 0, y: 40 * index}};
+  axisHours.labels().position('o').fontColor('white');
 
-    label = labels.add(formatProvider, positionProvider);
-    //label.padding('40%', 10, '20%', 20);
+  var axisMinutes = gauge.axis(1)
+      .width(0)
+      .radius(95)
+      .minimum(0)
+      .maximum(60)
+      .ticksInterval(1);
 
-    //label.textFormatter(function() {
-    //  var text = '';
-    //
-    //  for( var i=0; i < 30; i++ )
-    //    text += possible.charAt(Math.floor(Math.random() * possible.length));
-    //
-    //  return text;
-    //});
+  axisMinutes.ticks().enabled(false);
+  axisMinutes.labels().position('i').fontColor('white');
 
-    //label.textFormatter(function() {
-    //  return 'Label'
-    //});
+  var axisMs = gauge.axis(2)
+      .width(0)
+      .radius(25)
+      .minimum(0)
+      .maximum(1000)
+      .ticksInterval(1);
 
-    labelsArr.push(label);
-  }
-  //labels.width(200);
-  //labels.height(40);
-  labels.useHtml(true);
-  labels.anchor(anychart.enums.Anchor.LEFT_TOP);
-  labels.fontColor('red');
-  labels.fontSize(15);
-  //labels.textOverflow('ellipsis');
-  labels.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
-  //labels.textIndent(20);
-  //labels.rotation(90);
-  //labels.textFormatter(function() {
-  //  return 'Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  //});
-  //labels.background().enabled(true);
-  //labels.background().fill('green 0.3');
-  labels.draw();
+  axisMs.ticks().enabled(false);
+  axisMs.labels().enabled(false);
 
-  //labels.container().rect().setBounds(labels.measure(labelsArr[0]));
-  //labels.container().rect().setBounds(labels.measure(labelsArr[1]));
+  gauge.cap().radius('5%');
 
+  var color1 = 'rgb(242,41,34)';
+  var color2 = 'rgb(255,255,7)';
+  var color3 = 'rgb(2,119,40)';
 
-  console.log((new Date().getTime() - start) + 'ms');
+  gauge.bar(0).fill(color1).stroke(color1).radius('85%').hatchFill(true);
+  gauge.bar(1).fill(color2).stroke(color2).radius('80%').hatchFill(true).axisIndex(1);
+  gauge.bar(2).fill(color3).stroke(color3).radius('75%').hatchFill(true).axisIndex(1);
 
-
-  labels.container().rect().setBounds(labels.measure(label));
-  var renderer = acgraph.getRenderer();
-  console.log(goog.object.getKeys(renderer.textBoundsCache['-2069841799']).length);
-  console.log(renderer.textBoundsCache);
+  gauge.container('container').draw();
 });

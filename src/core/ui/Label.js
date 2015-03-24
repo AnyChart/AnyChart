@@ -99,9 +99,9 @@ anychart.core.ui.Label = function() {
   /**
    * Label text element.
    * @type {acgraph.vector.Text}
-   * @private
+   * @protected
    */
-  this.textElement_ = null;
+  this.textElement = null;
 
   /**
    * Adjust font size by width.
@@ -899,14 +899,14 @@ anychart.core.ui.Label.prototype.calculateLabelBounds_ = function() {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
     if (goog.isDefAndNotNull(this.width_)) {
-      this.backgroundWidth_ = width = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
+      this.backgroundWidth = width = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
       autoWidth = false;
     } else {
       width = 0;
       autoWidth = true;
     }
     if (goog.isDefAndNotNull(this.height_)) {
-      this.backgroundHeight_ = height = anychart.utils.normalizeSize(/** @type {number|string} */(this.height_), parentHeight);
+      this.backgroundHeight = height = anychart.utils.normalizeSize(/** @type {number|string} */(this.height_), parentHeight);
       autoHeight = false;
     } else {
       height = 0;
@@ -915,14 +915,14 @@ anychart.core.ui.Label.prototype.calculateLabelBounds_ = function() {
   } else {
     if (!anychart.utils.isNaN(this.width_)) {
       autoWidth = false;
-      this.backgroundWidth_ = width = anychart.utils.toNumber(this.width_);
+      this.backgroundWidth = width = anychart.utils.toNumber(this.width_);
     } else {
       autoWidth = true;
       width = 0;
     }
     if (!anychart.utils.isNaN(this.height_)) {
       autoHeight = false;
-      this.backgroundHeight_ = height = anychart.utils.toNumber(this.height_);
+      this.backgroundHeight = height = anychart.utils.toNumber(this.height_);
     } else {
       autoHeight = true;
       height = 0;
@@ -931,28 +931,28 @@ anychart.core.ui.Label.prototype.calculateLabelBounds_ = function() {
 
   var padding = this.padding();
 
-  this.textElement_.width(null);
-  this.textElement_.height(null);
+  this.textElement.width(null);
+  this.textElement.height(null);
 
   if (autoWidth) {
-    width += this.textElement_.getBounds().width;
-    this.textWidth_ = width;
-    width = this.backgroundWidth_ = padding.widenWidth(width);
+    width += this.textElement.getBounds().width;
+    this.textWidth = width;
+    width = this.backgroundWidth = padding.widenWidth(width);
   } else {
-    width = this.textWidth_ = padding.tightenWidth(width);
+    width = this.textWidth = padding.tightenWidth(width);
   }
 
-  this.textElement_.width(this.textWidth_);
+  this.textElement.width(this.textWidth);
 
   if (autoHeight) {
-    height += this.textElement_.getBounds().height;
-    this.textHeight_ = height;
-    height = this.backgroundHeight_ = padding.widenHeight(height);
+    height += this.textElement.getBounds().height;
+    this.textHeight = height;
+    height = this.backgroundHeight = padding.widenHeight(height);
   } else {
-    height = this.textHeight_ = padding.tightenHeight(height);
+    height = this.textHeight = padding.tightenHeight(height);
   }
 
-  this.textElement_.height(this.textHeight_);
+  this.textElement.height(this.textHeight);
 
   var canAdjustByWidth = !autoWidth;
   var canAdjustByHeight = !autoHeight;
@@ -963,12 +963,106 @@ anychart.core.ui.Label.prototype.calculateLabelBounds_ = function() {
     var calculatedFontSize = this.calculateFontSize_(width, height);
     this.suspendSignalsDispatching();
     this.fontSize(calculatedFontSize);
-    this.textElement_.fontSize(calculatedFontSize);
+    this.textElement.fontSize(calculatedFontSize);
     this.resumeSignalsDispatching(false);
   }
 
-  this.textX_ = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth_);
-  this.textY_ = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight_);
+  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth);
+  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight);
+};
+
+
+/**
+ * Label drawing.
+ * @return {anychart.math.Rect}
+ * @protected
+ */
+anychart.core.ui.Label.prototype.drawLabel = function() {
+  //bounds
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
+  var parentX = parentBounds.left;
+  var parentY = parentBounds.top;
+  var parentWidth = parentBounds.width;
+  var parentHeight = parentBounds.height;
+  var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);
+
+  // calculate position
+  var position = new acgraph.math.Coordinate(0, 0);
+
+  if (this.parentBounds()) {
+    switch (this.position_) {
+      case anychart.enums.Position.LEFT_TOP:
+        position.x = parentX;
+        position.y = parentY;
+        break;
+
+      case anychart.enums.Position.LEFT_CENTER:
+        position.x = parentX;
+        position.y = parentY + parentHeight / 2;
+        break;
+
+      case anychart.enums.Position.LEFT_BOTTOM:
+        position.x = parentX;
+        position.y = parentY + parentHeight;
+        break;
+
+      case anychart.enums.Position.CENTER_TOP:
+        position.x = parentX + parentWidth / 2;
+        position.y = parentY;
+        break;
+
+      case anychart.enums.Position.CENTER:
+        position.x = parentX + parentWidth / 2;
+        position.y = parentY + parentHeight / 2;
+        break;
+
+      case anychart.enums.Position.CENTER_BOTTOM:
+        position.x = parentX + parentWidth / 2;
+        position.y = parentY + parentHeight;
+        break;
+
+      case anychart.enums.Position.RIGHT_TOP:
+        position.x = parentX + parentWidth;
+        position.y = parentY;
+        break;
+
+      case anychart.enums.Position.RIGHT_CENTER:
+        position.x = parentX + parentWidth;
+        position.y = parentY + parentHeight / 2;
+        break;
+
+      case anychart.enums.Position.RIGHT_BOTTOM:
+        position.x = parentX + parentWidth;
+        position.y = parentY + parentHeight;
+        break;
+    }
+  } else {
+    position.x = 0;
+    position.y = 0;
+  }
+
+  var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
+      new acgraph.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
+      this.anchor_);
+
+  position.x -= anchorCoordinate.x;
+  position.y -= anchorCoordinate.y;
+
+  var offsetX = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(this.offsetX_, parentWidth) : 0;
+  var offsetY = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(this.offsetY_, parentHeight) : 0;
+  anychart.utils.applyOffsetByAnchor(position, this.anchor_, offsetX, offsetY);
+
+  this.textX += position.x;
+  this.textY += position.y;
+  backgroundBounds.left = position.x;
+  backgroundBounds.top = position.y;
+
+  this.textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  this.textElement.translate(/** @type {number} */(this.textX), /** @type {number} */(this.textY));
+  var clipRect = new acgraph.math.Rect(0, 0, this.textWidth, this.textHeight);
+  this.textElement.clip(clipRect);
+
+  return backgroundBounds;
 };
 
 
@@ -985,19 +1079,19 @@ anychart.core.ui.Label.prototype.draw = function() {
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), isInitial);
+    this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement), isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (this.background_) this.background_.container(container).draw();
-    if (this.textElement_) this.textElement_.parent(container);
+    if (this.textElement) this.textElement.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
-    if (this.textElement_) this.textElement_.zIndex(zIndex);
+    if (this.textElement) this.textElement.zIndex(zIndex);
     if (this.background_) this.background_.zIndex(zIndex);
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
@@ -1005,89 +1099,7 @@ anychart.core.ui.Label.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateLabelBounds_();
 
-    //bounds
-    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
-    var parentX = parentBounds.left;
-    var parentY = parentBounds.top;
-    var parentWidth = parentBounds.width;
-    var parentHeight = parentBounds.height;
-    var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_);
-
-    // calculate position
-    var position = new acgraph.math.Coordinate(0, 0);
-
-    if (this.parentBounds()) {
-      switch (this.position_) {
-        case anychart.enums.Position.LEFT_TOP:
-          position.x = parentX;
-          position.y = parentY;
-          break;
-
-        case anychart.enums.Position.LEFT_CENTER:
-          position.x = parentX;
-          position.y = parentY + parentHeight / 2;
-          break;
-
-        case anychart.enums.Position.LEFT_BOTTOM:
-          position.x = parentX;
-          position.y = parentY + parentHeight;
-          break;
-
-        case anychart.enums.Position.CENTER_TOP:
-          position.x = parentX + parentWidth / 2;
-          position.y = parentY;
-          break;
-
-        case anychart.enums.Position.CENTER:
-          position.x = parentX + parentWidth / 2;
-          position.y = parentY + parentHeight / 2;
-          break;
-
-        case anychart.enums.Position.CENTER_BOTTOM:
-          position.x = parentX + parentWidth / 2;
-          position.y = parentY + parentHeight;
-          break;
-
-        case anychart.enums.Position.RIGHT_TOP:
-          position.x = parentX + parentWidth;
-          position.y = parentY;
-          break;
-
-        case anychart.enums.Position.RIGHT_CENTER:
-          position.x = parentX + parentWidth;
-          position.y = parentY + parentHeight / 2;
-          break;
-
-        case anychart.enums.Position.RIGHT_BOTTOM:
-          position.x = parentX + parentWidth;
-          position.y = parentY + parentHeight;
-          break;
-      }
-    } else {
-      position.x = 0;
-      position.y = 0;
-    }
-
-    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-        new acgraph.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_),
-        this.anchor_);
-
-    position.x -= anchorCoordinate.x;
-    position.y -= anchorCoordinate.y;
-
-    var offsetX = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(this.offsetX_, parentWidth) : 0;
-    var offsetY = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(this.offsetY_, parentHeight) : 0;
-    anychart.utils.applyOffsetByAnchor(position, this.anchor_, offsetX, offsetY);
-
-    this.textX_ += position.x;
-    this.textY_ += position.y;
-    backgroundBounds.left = position.x;
-    backgroundBounds.top = position.y;
-
-    this.textElement_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.textElement_.translate(/** @type {number} */(this.textX_), /** @type {number} */(this.textY_));
-    var clipRect = new acgraph.math.Rect(0, 0, this.textWidth_, this.textHeight_);
-    this.textElement_.clip(clipRect);
+    var backgroundBounds = this.drawLabel();
 
     this.invalidate(anychart.ConsistencyState.LABEL_BACKGROUND);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -1110,7 +1122,7 @@ anychart.core.ui.Label.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.remove = function() {
-  if (this.textElement_) this.textElement_.parent(null);
+  if (this.textElement) this.textElement.parent(null);
   if (this.background_) this.background_.remove();
 };
 
@@ -1135,10 +1147,10 @@ anychart.core.ui.Label.prototype.applyTextSettings = function(textElement, isIni
  */
 anychart.core.ui.Label.prototype.createTextElement_ = function() {
   var isInitial;
-  if (isInitial = !this.textElement_) {
-    this.textElement_ = acgraph.text();
+  if (isInitial = !this.textElement) {
+    this.textElement = acgraph.text();
 
-    this.registerDisposable(this.textElement_);
+    this.registerDisposable(this.textElement);
   }
   return isInitial;
 };
@@ -1151,7 +1163,7 @@ anychart.core.ui.Label.prototype.createTextElement_ = function() {
 anychart.core.ui.Label.prototype.getContentBounds = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var isInitial = this.createTextElement_();
-    this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), isInitial);
+    this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement), isInitial);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -1159,7 +1171,7 @@ anychart.core.ui.Label.prototype.getContentBounds = function() {
     this.calculateLabelBounds_();
   }
 
-  return new anychart.math.Rect(0, 0, this.backgroundWidth_, this.backgroundHeight_);
+  return new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);
 };
 
 

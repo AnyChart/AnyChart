@@ -500,6 +500,9 @@ anychart.core.ui.Background.prototype.draw = function() {
     bounds.height -= thicknessHalf + thicknessHalf;
     this.rect_.setBounds(bounds);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
+
+    if (goog.isObject(this.fill_) && ('keys' in this.fill_ || 'src' in this.fill_))
+      this.invalidate(anychart.ConsistencyState.APPEARANCE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {

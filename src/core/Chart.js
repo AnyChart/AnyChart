@@ -521,7 +521,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   }
   var label = this.chartLabels_[index];
   if (!label) {
-    label = new anychart.core.ui.Label();
+    label = this.createChartLabel();
     label.text('Chart label');
     label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
     this.chartLabels_[index] = label;
@@ -546,6 +546,16 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
  */
 anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.CHART_LABELS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Creates chart label.
+ * @return {anychart.core.ui.Label} Label instance.
+ * @protected
+ */
+anychart.core.Chart.prototype.createChartLabel = function() {
+  return new anychart.core.ui.Label();
 };
 
 
@@ -595,6 +605,17 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
   }
   boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
   return boundsWithoutTitle.clone().round();
+};
+
+
+/**
+ * Sets chart label settings.
+ * @param {anychart.core.ui.Label} label Label for tuning.
+ * @param {anychart.math.Rect} bounds Label parent bounds.
+ * @protected
+ */
+anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
+  label.parentBounds(bounds);
 };
 
 
@@ -654,7 +675,7 @@ anychart.core.Chart.prototype.draw = function() {
       if (label) {
         label.suspendSignalsDispatching();
         if (!label.container() && label.enabled()) label.container(this.rootElement);
-        label.parentBounds(totalBounds);
+        this.setLabelSettings(label, totalBounds);
         label.resumeSignalsDispatching(false);
         label.draw();
       }

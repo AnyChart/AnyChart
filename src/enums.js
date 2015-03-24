@@ -39,6 +39,20 @@ anychart.enums.ChartTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Gauge types enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gauge types.
+ * @enum {string}
+ */
+anychart.enums.GaugeTypes = {
+  CIRCULAR: 'circular'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Anchor
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -559,7 +573,10 @@ anychart.enums.MarkerType = {
    *      .height(30)
    *      .star10(stage.width()/2, stage.height()/2, stage.height()/2-5);
    */
-  STAR10: 'star10'
+  STAR10: 'star10',
+  PENTAGON: 'pentagon',
+  TRAPEZIUM: 'trapezium',
+  LINE: 'line'
 };
 
 
@@ -572,6 +589,8 @@ anychart.enums.MarkerType = {
 anychart.enums.normalizeMarkerType = function(type, opt_default) {
   type = (String(type)).toLowerCase();
   switch (type) {
+    case 'line':
+      return anychart.enums.MarkerType.LINE;
     case 'star4':
       return anychart.enums.MarkerType.STAR4;
     case 'star5':
@@ -596,6 +615,11 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
       return anychart.enums.MarkerType.CIRCLE;
     case 'square':
       return anychart.enums.MarkerType.SQUARE;
+    case 'trapezoid':
+    case 'trapezium':
+      return anychart.enums.MarkerType.TRAPEZIUM;
+    case 'pentagon':
+      return anychart.enums.MarkerType.PENTAGON;
   }
   return opt_default || anychart.enums.MarkerType.STAR5;
 };
@@ -641,15 +665,42 @@ anychart.enums.normalizeAnyMarkerType = function(type) {
       return anychart.enums.BulletMarkerType.ELLIPSE;
     case 'bar':
       return anychart.enums.BulletMarkerType.BAR;
+    case 'trapezoid':
+    case 'trapezium':
+      return anychart.enums.MarkerType.TRAPEZIUM;
+    case 'pentagon':
+      return anychart.enums.MarkerType.PENTAGON;
   }
   return null;
 };
 
 
 /**
+ * @type {Array.<number>}
+ */
+anychart.enums.PENTAGON_COS = [
+  1 + Math.cos((2 / 5 - .5) * Math.PI),
+  1 + Math.cos((4 / 5 - .5) * Math.PI),
+  1 + Math.cos((6 / 5 - .5) * Math.PI),
+  1 + Math.cos((8 / 5 - .5) * Math.PI),
+  1 + Math.cos(1.5 * Math.PI)];
+
+
+/**
+ * @type {Array.<number>}
+ */
+anychart.enums.PENTAGON_SIN = [
+  1 + Math.sin((2 / 5 - .5) * Math.PI),
+  1 + Math.sin((4 / 5 - .5) * Math.PI),
+  1 + Math.sin((6 / 5 - .5) * Math.PI),
+  1 + Math.sin((8 / 5 - .5) * Math.PI),
+  1 + Math.sin(1.5 * Math.PI)];
+
+
+/**
  * Method to get marker drawer.
  * @param {*} type Marker type.
- * @return {function(!acgraph.vector.Path, number, number, number):acgraph.vector.Path} Marker drawer.
+ * @return {function(!acgraph.vector.Path, number, number, number):!acgraph.vector.Path} Marker drawer.
  */
 anychart.enums.getMarkerDrawer = function(type) {
   type = (String(type)).toLowerCase();
@@ -676,12 +727,63 @@ anychart.enums.getMarkerDrawer = function(type) {
       return function(path, x, y, radius) {
         return acgraph.vector.primitives.pie(path, x, y, radius, 0, 360);
       };
+    case 'trapezium':
+      return function(path, x, y, radius) {
+        var d = radius / 3;
+        var halfW = radius / 2;
+        var halfL = radius / 2;
+        var left = x - halfW;
+        var top = y - halfL;
+
+        path.moveTo(left + d, top + radius);
+        path.lineTo(left + radius - d, top + radius);
+        path.lineTo(left + radius, top);
+        path.lineTo(left, top);
+        path.close();
+
+        return path;
+      };
+    case 'pentagon':
+      return function(path, x, y, radius) {
+        var pentagonCos = anychart.enums.PENTAGON_COS;
+        var pentagonSin = anychart.enums.PENTAGON_SIN;
+        path.moveTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
+        for (var i = 1; i < 5; i++)
+          path.lineTo(x + radius * pentagonCos[i], y + radius * pentagonSin[i]);
+        path.lineTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
+        path.close();
+
+        return path;
+      };
     case 'square':
       return function(path, x, y, size) {
         var left = x - size;
         var top = y - size;
         var right = left + size * 2;
         var bottom = top + size * 2;
+
+        path
+            .moveTo(left, top)
+            .lineTo(right, top)
+            .lineTo(right, bottom)
+            .lineTo(left, bottom)
+            .lineTo(left, top)
+            .close();
+
+        return path;
+      };
+    case 'line':
+      return function(path, x, y, size) {
+        var height = size * 2;
+        var width = height / 2;
+
+        var halfW = width / 2;
+        var halfL = height / 2;
+
+        var left = x - halfW;
+        var top = y - halfL;
+        var right = left + width;
+        var bottom = top + height;
 
         path
             .moveTo(left, top)
@@ -997,6 +1099,57 @@ anychart.enums.normalizeBulletMarkerType = function(value, opt_default) {
 //  SidePosition
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gauges elements position relative axis.
+ * @enum {string}
+ */
+anychart.enums.GaugeSidePosition = {
+  /**
+   * Outside of a axis, but closer to the gauge center.
+   */
+  INSIDE: 'inside',
+  /**
+   * Inside a axis, no matter where the gauge center is.
+   */
+  CENTER: 'center',
+  /**
+   * Outside of a axis, but further from the gauge center.
+   */
+  OUTSIDE: 'outside'
+};
+
+
+/**
+ * Normalizes gauge side position. (ticks, labels)
+ * @param {*} value Position to normalize.
+ * @param {anychart.enums.GaugeSidePosition=} opt_default Custom default value (defaults to CENTER).
+ * @return {anychart.enums.GaugeSidePosition}
+ */
+anychart.enums.normalizeGaugeSidePosition = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'inside':
+    case 'in':
+    case 'i':
+    case 'inner':
+      return anychart.enums.GaugeSidePosition.INSIDE;
+    case 'center':
+    case 'cen':
+    case 'c':
+    case 'middle':
+    case 'mid':
+    case 'm':
+      return anychart.enums.GaugeSidePosition.CENTER;
+    case 'outside':
+    case 'out':
+    case 'o':
+    case 'outer':
+      return anychart.enums.GaugeSidePosition.OUTSIDE;
+  }
+  return opt_default || anychart.enums.GaugeSidePosition.CENTER;
+};
+
+
 /**
  * Ticks position (inside ot outside).
  * @enum {string}
@@ -1366,6 +1519,60 @@ anychart.enums.ScatterScaleTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Gauge scale types
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all scale types.
+ * @enum {string}
+ */
+anychart.enums.GaugeScaleTypes = {
+  LINEAR: 'linear',
+  LOG: 'log'
+};
+
+
+/**
+ * Normalize gauge scale type.
+ * @param {string} value .
+ * @return {anychart.enums.GaugeScaleTypes|string} .
+ */
+anychart.enums.normalizeGaugeScaleTypes = function(value) {
+  value = (String(value)).toLowerCase();
+
+  switch (value) {
+    case 'lin':
+    case 'linear':
+      return anychart.enums.GaugeScaleTypes.LINEAR;
+    case 'log':
+    case 'logarithmic':
+      return anychart.enums.GaugeScaleTypes.LOG;
+  }
+
+  return anychart.enums.GaugeScaleTypes.LINEAR;
+};
+
+
+/**
+ * @param {string} value String scale name.
+ * @return {anychart.scales.Linear|anychart.scales.Logarithmic} Scale for gauge axis.
+ */
+anychart.enums.getGaugeScale = function(value) {
+  switch (anychart.enums.normalizeGaugeScaleTypes(value)) {
+    case anychart.enums.GaugeScaleTypes.LINEAR:
+      return anychart.scales.linear();
+      break;
+    case anychart.enums.GaugeScaleTypes.LOG:
+      return anychart.scales.log();
+      break;
+  }
+
+  return anychart.scales.linear();
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1632,6 +1839,10 @@ goog.exportSymbol('anychart.enums.LegendItemIconType.SQUARE', anychart.enums.Leg
 goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
 goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/
 
+goog.exportSymbol('anychart.enums.GaugeSidePosition.INSIDE', anychart.enums.GaugeSidePosition.INSIDE);
+goog.exportSymbol('anychart.enums.GaugeSidePosition.CENTER', anychart.enums.GaugeSidePosition.CENTER);
+goog.exportSymbol('anychart.enums.GaugeSidePosition.OUTSIDE', anychart.enums.GaugeSidePosition.OUTSIDE);
+
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OUT', anychart.enums.EventType.POINT_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OVER', anychart.enums.EventType.POINT_MOUSE_OVER);
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
@@ -1709,3 +1920,5 @@ goog.exportSymbol('anychart.enums.ScatterScaleTypes.LINEAR', anychart.enums.Scat
 goog.exportSymbol('anychart.enums.ScatterScaleTypes.LOG', anychart.enums.ScatterScaleTypes.LOG);
 goog.exportSymbol('anychart.enums.ScatterScaleTypes.DATE_TIME', anychart.enums.ScatterScaleTypes.DATE_TIME);
 
+goog.exportSymbol('anychart.enums.GaugeScaleTypes.LINEAR', anychart.enums.GaugeScaleTypes.LINEAR);
+goog.exportSymbol('anychart.enums.GaugeScaleTypes.LOG', anychart.enums.GaugeScaleTypes.LOG);

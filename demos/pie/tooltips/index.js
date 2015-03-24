@@ -25,7 +25,7 @@ anychart.onDocumentLoad(function() {
 
   var seriesData = [1,2,3,4,5,6,6,7];
 
-  chart = anychart.pie.chart(seriesData)
+  chart = anychart.pie(seriesData)
       .container('container')
 //      .innerRadius('33%')
 //      .labelsPosition('outside')

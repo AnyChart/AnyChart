@@ -235,7 +235,7 @@ anychart.math.Rect.prototype.clone;
 
 
 /**
- * @return {Array.<number>}
+ * @return {!Array.<number>}
  */
 anychart.math.Rect.prototype.toCoordinateBox = function() {
   return [this.left, this.top,
@@ -247,7 +247,7 @@ anychart.math.Rect.prototype.toCoordinateBox = function() {
 
 /**
  * @param {Array.<number>} value .
- * @return {anychart.math.Rect} .
+ * @return {!anychart.math.Rect} .
  */
 anychart.math.Rect.fromCoordinateBox = function(value) {
   /** @type {anychart.math.Rect} */
@@ -279,7 +279,7 @@ anychart.math.Rect.prototype.serialize = function() {
 /**
  * Creates the rect and setups it from the config.
  * @param {Object} config
- * @return {anychart.math.Rect} Deserialized rect.
+ * @return {!anychart.math.Rect} Deserialized rect.
  */
 anychart.math.Rect.fromJSON = function(config) {
   return new anychart.math.Rect(

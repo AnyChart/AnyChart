@@ -161,6 +161,24 @@ anychart.utils.isPercent = function(value) {
 
 
 /**
+ * Normalizes passed value to a percent format string.
+ * @param {*} value Value to normalize.
+ * @return {string} Normalized to percent format value. If source value doesn't like percent format then trying to
+ * convert it. If convert was failed then returns default value ['0%'].
+ */
+anychart.utils.normalizeToPercent = function(value) {
+  if (anychart.utils.isPercent(value))
+    return /** @type {string} */(value);
+
+  if (!goog.isNumber(value))
+    value = parseFloat(value);
+
+  if (isNaN(value)) return '0%';
+  return value + '%';
+};
+
+
+/**
  * Converts value of any type to number, according to these rules:
  * 1) number -> number
  * 2) string -> number only if it is a number (no parseFloat, just +)
@@ -763,6 +781,16 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['x_axes', 'axis'];
     case 'yAxes':
       return ['y_axes', 'axis'];
+    case 'axes':
+      return ['axes', 'axis'];
+    case 'bars':
+      return ['bars', 'bar'];
+    case 'markers':
+      return ['markers', 'marker'];
+    case 'needles':
+      return ['needles', 'needle'];
+    case 'knobs':
+      return ['knobs', 'knob'];
     case 'scales':
       return ['scales', 'scale'];
     case 'explicit':
@@ -810,6 +838,16 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['xAxes', 'axis'];
     case 'yAxes':
       return ['yAxes', 'axis'];
+    case 'axes':
+      return ['axes', 'axis'];
+    case 'bars':
+      return ['bars', 'bar'];
+    case 'markers':
+      return ['markers', 'marker'];
+    case 'needles':
+      return ['needles', 'needle'];
+    case 'knobs':
+      return ['knobs', 'knob'];
     case 'scales':
       return ['scales', 'scale'];
     case 'explicit':

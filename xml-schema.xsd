@@ -9,10 +9,11 @@
 
     <xsd:element name="anychart" type="Anychart"/>
 
-    <xsd:complexType name="Anychart">
-        <xsd:all minOccurs="0" maxOccurs="1">
+    <xsd:complexType name="Anychart" >
+        <xsd:choice minOccurs="0" maxOccurs="1">
             <xsd:element name="chart" type="Chart"/>
-        </xsd:all>
+            <xsd:element name="gauge" type="Gauge"/>
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="Chart">
@@ -156,6 +157,47 @@
         <xsd:attribute name="negative_markers" type="simple.MarkerType"/>
         <xsd:attribute name="negative_labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="markers" type="simple.MarkerType"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Gauge">
+        <xsd:all>
+            <!-- VisualBaseWithBounds elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="bounds" type="utils.Bounds"/>
+            <!-- core.Chart elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <!-- Common elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
+            <!-- anychart.gauges.Circular elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="cap" type="core.gauge.Cap"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="axes" type="core.axes.Circular_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bars" type="core.gauge.pointers.Bar_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.gauge.pointers.Marker_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="needles" type="core.gauge.pointers.Needle_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="knobs" type="core.gauge.pointers.Knob_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="core.axisMarkers.CircularRange_list"/>
+        </xsd:all>
+        <!-- core.Chart attrs -->
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attributeGroup ref="attrs.Bounds"/>
+        <xsd:attribute name="type" type="enums.GaugeTypes" use="required"/>
+        <xsd:attribute name="container" type="xsd:string"/>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <!-- anychart.gauges.Circular common attrs -->
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="start_angle" type="xsd:double"/>
+        <xsd:attribute name="sweep_angle" type="xsd:double"/>
+        <xsd:attribute name="circular_padding" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="enclose_with_straight_line" type="simple.Bool"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">
@@ -315,6 +357,37 @@
 
     <!-- core.axes complex types -->
 
+    <xsd:complexType name="core.axes.Circular">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.CircularLabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.CircularLabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.CircularTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.CircularTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="LogOrLinScale"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="start_angle" type="simple.DoubleOrNull"/>
+        <xsd:attribute name="sweep_angle" type="simple.DoubleOrNull"/>
+        <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="scale" type="enums.GaugeScaleTypes"/>
+        <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.axes.Circular_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="axis" type="core.axes.Circular"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="core.axes.Linear">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
@@ -355,6 +428,21 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="length" type="xsd:double" default="5"/>
         <xsd:attribute name="position" type="enums.SidePosition" default="outside"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.axes.CircularTicks">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <xsd:attribute name="length" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="type" type="enums.MarkerType"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="position" type="enums.GaugeSidePosition" default="center"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -473,6 +561,27 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="core.axisMarkers.CircularRange">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+        </xsd:all>
+        <xsd:attribute name="from" type="xsd:double"/>
+        <xsd:attribute name="to" type="xsd:double"/>
+        <xsd:attribute name="axis_index" type="xsd:double"/>
+        <xsd:attribute name="start_size" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="end_size" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="position" type="enums.GaugeSidePosition"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.axisMarkers.CircularRange_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="range" type="core.axisMarkers.CircularRange"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <!-- core.grids complex types -->
 
     <xsd:complexType name="Grid">
@@ -562,6 +671,7 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="position" type="xsd:string"/>
@@ -571,6 +681,31 @@
         <xsd:attribute name="rotation" type="xsd:double" default="0"/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.CircularLabelsFactory">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+        </xsd:all>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="position" type="xsd:string"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition"/>
+        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
+        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
+        <xsd:attribute name="rotation" type="xsd:double" default="0"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attribute name="auto_rotate" type="xsd:boolean"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -918,6 +1053,24 @@
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
     </xsd:complexType>
 
+    <xsd:complexType name="LogOrLinScale">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="ScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="ScaleTicks"/>
+        </xsd:all>
+        <xsd:attribute name="type" type="enums.GaugeScaleTypes" default="linear"/>
+        <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
+        <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="log_base" type="xsd:double" default="10"/>
+        <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_minimum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
+    </xsd:complexType>
+
     <xsd:complexType name="Scale_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="scale" type="Scale"/>
@@ -952,6 +1105,132 @@
     <xsd:complexType name="ScaleTicksValues">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="tick" type="simple.Text"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Gauge elements -->
+
+    <xsd:complexType name="core.gauge.Cap">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="radius" type="simple.NumberOrPercent"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Bar">
+        <xsd:all>
+            <!-- Pointers base elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <!-- Pointers base attr -->
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="axis_index" type="xsd:double"/>
+        <xsd:attribute name="data_index" type="xsd:double"/>
+        <!-- Bar pointer attr -->
+        <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="position" type="enums.GaugeSidePosition"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Bar_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="bar" type="core.gauge.pointers.Bar"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Knob">
+        <xsd:all>
+            <!-- Pointers base elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <!-- Pointers base attr -->
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="axis_index" type="xsd:double"/>
+        <xsd:attribute name="data_index" type="xsd:double"/>
+        <!-- Knob pointer attr -->
+        <xsd:attribute name="vertices_count" type="xsd:double"/>
+        <xsd:attribute name="vertices_curvature" type="xsd:double"/>
+        <xsd:attribute name="top_ratio" type="xsd:double"/>
+        <xsd:attribute name="bottom_ratio" type="xsd:double"/>
+        <xsd:attribute name="top_radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="bottom_radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Knob_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="knob" type="core.gauge.pointers.Knob"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Marker">
+        <xsd:all>
+            <!-- Pointers base elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <!-- Pointers base attr -->
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="axis_index" type="xsd:double"/>
+        <xsd:attribute name="data_index" type="xsd:double"/>
+        <!-- Bar pointer attr -->
+        <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="size" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="position" type="enums.GaugeSidePosition"/>
+        <xsd:attribute name="type" type="enums.MarkerType"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Marker_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="marker" type="core.gauge.pointers.Marker"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Needle">
+        <xsd:all>
+            <!-- Pointers base elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+        </xsd:all>
+        <!-- Pointers base attr -->
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="axis_index" type="xsd:double"/>
+        <xsd:attribute name="data_index" type="xsd:double"/>
+        <!-- Knob pointer attr -->
+        <xsd:attribute name="start_radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="middle_radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="end_radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="start_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="middle_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="end_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.gauge.pointers.Needle_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="needle" type="core.gauge.pointers.Needle"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -1033,7 +1312,7 @@
         <xsd:union>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
-                    <xsd:pattern value="[0-9]*\.?[0-9]+%"/>
+                    <xsd:pattern value="-?[0-9]*\.?[0-9]+%"/>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>
@@ -1205,6 +1484,12 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.GaugeTypes">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="circular"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="enums.AnchorAndPosition">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="leftTop"/>
@@ -1280,6 +1565,8 @@
             <xsd:enumeration value="x"/>
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="ellipse"/>
+            <xsd:enumeration value="trapezium"/>
+            <xsd:enumeration value="pentagon"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -1302,6 +1589,14 @@
     <xsd:simpleType name="enums.SidePosition">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="inside"/>
+            <xsd:enumeration value="outside"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.GaugeSidePosition">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="inside"/>
+            <xsd:enumeration value="center"/>
             <xsd:enumeration value="outside"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -1405,6 +1700,13 @@
             <xsd:enumeration value="linear"/>
             <xsd:enumeration value="log"/>
             <xsd:enumeration value="dateTime"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.GaugeScaleTypes">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="linear"/>
+            <xsd:enumeration value="log"/>
         </xsd:restriction>
     </xsd:simpleType>
 

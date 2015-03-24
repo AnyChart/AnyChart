@@ -17,22 +17,23 @@ anychart.onDocumentLoad(function() {
   var time1 = new Date().getTime();
   for (var i = 0, n = 1; i < n; i++) {
     chart = anychart.sparkline(data()).width(250).height(60);
-    chart.type('wl');
+    chart.type('line');
 
-    //chart.margin(0, 0, 5, 0);
+    chart.margin(10);
 
-    chart.labels().enabled(true);
+
+    //chart.labels().enabled(true);
     //chart.labels().anchor(anychart.enums.Position.CENTER_BOTTOM);
     //chart.labels().position(anychart.enums.Position.CENTER_TOP);
 
-    chart.markers().enabled(true);
-    //chart.negativeMarkers().enabled(true).fill('green').size(10);
+    //chart.markers(true);
+    //chart.markers('star5');
+    chart.negativeMarkers().enabled(true).stroke('red').fill('green').size(10);
     //chart.minMarkers().enabled(true);
     //chart.maxMarkers().enabled(true);
     //chart.lineMarker({value: -8});
     //chart.textMarker({value: -8, fontSize: 6, anchor: 'bottom', align: 'right'});
-    //chart.rangeMarker({from: -3, to: 5  });
-
+    chart.rangeMarker({from: -3, to: 5  });
     //chart.maxLabels()
     //    .enabled(true)
     //    .fontColor('red');
@@ -44,7 +45,7 @@ anychart.onDocumentLoad(function() {
     //chart.firstFill('blue');
     //chart.lastFill('red');
     //
-    //chart.clip(true);
+    chart.clip(true);
     //
     //chart.hatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
 

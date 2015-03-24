@@ -172,6 +172,14 @@ anychart.ConsistencyState = {
   TOOLTIP_LABELS: 1 << 8,
   TOOLTIP_BACKGROUND: 1 << 9,
   TOOLTIP_VISIBILITY: 1 << 10,
+  //---------------------------------- GAUGE (CHART) ------------------------------------------
+  GAUGE_POINTERS: 1 << 10,
+  GAUGE_KNOB: 1 << 11,
+  GAUGE_CAP: 1 << 12,
+  GAUGE_AXES: 1 << 13,
+  GAUGE_HATCH_FILL: 1 << 14,
+  GAUGE_AXIS_MARKERS: 1 << 15,
+  GAUGE_SCALE: 1 << 16,
   /**
    * Combination of all states.
    */
