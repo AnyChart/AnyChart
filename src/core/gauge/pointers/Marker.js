@@ -133,8 +133,14 @@ anychart.core.gauge.pointers.Marker.prototype.type = function(opt_value) {
 anychart.core.gauge.pointers.Marker.prototype.draw = function() {
   var gauge = this.gauge();
   var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
-  if (!this.checkDrawingNeeded() || !axis)
+  if (!this.checkDrawingNeeded())
     return this;
+
+  if (!axis || !axis.enabled()) {
+    if (this.domElement) this.domElement.clear();
+    if (this.hatchFillElement) this.hatchFillElement.clear();
+    return this;
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_HATCH_FILL)) {
     var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());

@@ -956,11 +956,11 @@ anychart.core.axes.Circular.prototype.gauge = function(opt_gauge) {
 
 /** @inheritDoc */
 anychart.core.axes.Circular.prototype.remove = function() {
-  this.line_.parent(null);
-  this.ticks().container(null);
-  this.labels().container(null);
-  this.minorTicks().container(null);
-  this.minorLabels().container(null);
+  if (this.line_) this.line_.parent(null);
+  this.ticks().remove();
+  this.labels().remove();
+  this.minorTicks().remove();
+  this.minorLabels().remove();
 };
 
 
@@ -1078,10 +1078,10 @@ anychart.core.axes.Circular.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.line_.parent(container);
+    if (this.line_) this.line_.parent(container);
     this.ticks().container(container);
-    this.labels().container(container);
     this.minorTicks().container(container);
+    this.labels().container(container);
     this.minorLabels().container(container);
 
     this.markConsistent(anychart.ConsistencyState.CONTAINER);

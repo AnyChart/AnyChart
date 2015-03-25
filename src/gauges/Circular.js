@@ -549,7 +549,9 @@ anychart.gauges.Circular.prototype.onAxisSignal_ = function(event) {
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
+    state |= anychart.ConsistencyState.BOUNDS |
+        anychart.ConsistencyState.GAUGE_POINTERS |
+        anychart.ConsistencyState.GAUGE_AXIS_MARKERS;
   }
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     state |= anychart.ConsistencyState.GAUGE_SCALE | anychart.ConsistencyState.BOUNDS;

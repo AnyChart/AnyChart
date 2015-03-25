@@ -702,6 +702,7 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.remove = function() {
+  this.container(null);
   if (this.layer_) this.layer_.parent(null);
 };
 

@@ -267,8 +267,8 @@ anychart.core.axes.CircularTicks.prototype.getRadius = function() {
 
 /** @inheritDoc */
 anychart.core.axes.CircularTicks.prototype.remove = function() {
-  this.ticks_.container(null);
-  if (this.hatchFillElement_) this.hatchFillElement_.container(null);
+  if (this.ticks_) this.ticks_.remove();
+  if (this.hatchFillElement_) this.hatchFillElement_.remove();
 };
 
 

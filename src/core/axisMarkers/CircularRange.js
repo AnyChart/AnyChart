@@ -345,8 +345,13 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
   var gauge = this.gauge_;
   var axis = gauge.getAxis(/** @type {number} */(this.axisIndex()));
 
-  if (!this.checkDrawingNeeded() || !axis)
+  if (!this.checkDrawingNeeded())
     return this;
+
+  if (!axis || !axis.enabled()) {
+    if (this.domElement) this.domElement.clear();
+    return this;
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var scale = axis.scale();
@@ -372,13 +377,16 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
       var fromRatio = goog.math.clamp(scale.transform(inverse ? to : from), 0, 1);
       var toRatio = goog.math.clamp(scale.transform(inverse ? from : to), 0, 1);
 
+      if (fromRatio == toRatio)
+        return this;
+
       var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.startAngle() : gauge.startAngle());
       var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
       var startAngle = axisStartAngle + fromRatio * axisSweepAngle;
       var endAngle = axisStartAngle + toRatio * axisSweepAngle;
 
-      var sweepAngle = goog.math.standardAngle(endAngle - startAngle);
-      if (sweepAngle == 0) sweepAngle = from == to ? 0 : 360;
+      var sweepAngle = endAngle - startAngle;
+      if (sweepAngle == 0) sweepAngle = fromRatio == toRatio ? 0 : 360;
 
       var startAngleRad = goog.math.toRadians(startAngle);
       var endAngleRad = goog.math.toRadians(endAngle);

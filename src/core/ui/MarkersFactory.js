@@ -1050,7 +1050,7 @@ anychart.core.ui.MarkersFactory.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.remove = function() {
-  this.layer_.remove();
+  if (this.layer_) this.layer_.remove();
 };
 
 
