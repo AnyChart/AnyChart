@@ -7,8 +7,14 @@
     <script>
         goog.require('anychart.modules.anychart');
     </script>
-    <script src="index.baseline.js"></script>
-    <script src="rawBaselineData.js"></script>
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <style>
         body {
             -webkit-touch-callout: none;
@@ -20,9 +26,11 @@
         }
     </style>
     <link rel="stylesheet" href="../../css/anychart.css">
+    <script src="index.js"></script>
+    <title>Anychart Toolbar Demo</title>
 </head>
 <body>
-<br>
-<div id="container" style="border: 1px solid #d9d9d9; width: 90%; height: 90%; position:absolute; background-color: #fdfdfd;"></div>
+<h3>NOTE: Toolbar css is embedded automatically in compiled version only.</h3>
+<div id="container" style="border: 1px solid #d9d9d9; width: 90%; height: 600px; position:absolute; background-color: #fdfdfd;"></div>
 </body>
 </html>

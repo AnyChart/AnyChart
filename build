@@ -22,6 +22,7 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
+CSS_PATH = os.path.join(PROJECT_PATH, 'css', 'anychart.css')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 
 #graphics
@@ -190,6 +191,24 @@ def __get_developers_edition_compiler_args():
         '--define "anychart.DEVELOP=%s"' % flag,
     ]
 
+def __get_toolbar_css_compiler_args(modules):
+    if ('anychart' in modules) or ('toolbar' in modules):
+        with open (CSS_PATH, 'r') as css_file:
+            #Removing new lines
+            css_data = css_file.read().replace('\n', '')
+
+            #Removing comments
+            css_data = re.sub('\/\*[^*]*\*+([^/*][^*]*\*+)*\/', '', css_data)
+
+            #Removing multiple spaces
+            css_data = re.sub('\s\s+', ' ', css_data)
+
+        return [
+            '--define "anychart.TOOLBAR_CSS=\'%s\'"' % css_data
+        ]
+
+    return []
+
 
 def __get_optimized_compiler_args():
     compiler_args = [
@@ -319,6 +338,7 @@ def __build_project_sources(modules):
     commands = __get_default_compiler_args() + \
                __get_not_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
+               __get_toolbar_css_compiler_args(modules) +\
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file)
@@ -329,6 +349,7 @@ def __build_project_sources(modules):
 
 
 def __build_project(modules):
+
     dev_postfix = '.dev' if __is_develop() else ''
     file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
     file_name = __apply_specific_file_name_rule(file_name, modules)
@@ -338,6 +359,7 @@ def __build_project(modules):
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
+               __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \

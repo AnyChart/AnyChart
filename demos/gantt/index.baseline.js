@@ -5,6 +5,11 @@ anychart.onDocumentReady(function() {
   //create project gantt chart
   chart = anychart.ganttProject();
 
+  var toolbar = anychart.ganttToolbar();
+  toolbar.container('container');
+  toolbar.target(chart);
+  toolbar.draw();
+
   //set container id for the chart
   chart.container('container');
 

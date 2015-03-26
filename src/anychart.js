@@ -2,6 +2,7 @@ goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
 goog.require('anychart.utils');
+goog.require('goog.dom');
 goog.require('goog.json.hybrid');
 
 /**
@@ -33,6 +34,15 @@ anychart.VERSION = '';
  * @define {boolean} Replaced on compile time.
  */
 anychart.DEVELOP = true;
+
+
+/**
+ * Full toolbar css.
+ * Takes content from {project_dir}/css/anychart.css file.
+ * Used to embed anychart default css if toolbar module is in use.
+ * @define {string} Replaced on compile time.
+ */
+anychart.TOOLBAR_CSS = '';
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -441,6 +451,25 @@ anychart.isValidKey = function() {
   var value = anychart.licenseKey_.substr(0, lio);
   var hashToCheck = anychart.licenseKey_.substr(lio + 1);
   return (hashToCheck == anychart.utils.crc32(value + anychart.utils.getSalt()));
+};
+
+
+/**
+ * Embeds default anychart style node.
+ * @param {string} css - CSS string to be embedded.
+ */
+anychart.embedCss = function(css) {
+  if (css) {
+    var cssEl = goog.dom.createDom(goog.dom.TagName.STYLE);
+    cssEl.type = 'text/css';
+
+    if (cssEl.styleSheet)
+      cssEl['styleSheet']['cssText'] = css;
+    else
+      goog.dom.appendChild(cssEl, goog.dom.createTextNode(css));
+
+    goog.dom.insertChildAt(goog.dom.getElementsByTagNameAndClass('head')[0], cssEl, 0);
+  }
 };
 
 
