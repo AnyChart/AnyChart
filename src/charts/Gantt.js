@@ -103,7 +103,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#f1b8b9');
+  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#d2eafa');
 
   /**
    * Vertical scroll bar.
@@ -116,14 +116,25 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.registerDisposable(this.verticalScrollBar_);
 
   /**
-   * Horizontal scroll bar.
+   * Timeline horizontal scroll bar.
    * @type {anychart.core.ui.ScrollBar}
    * @private
    */
-  this.horizontalScrollBar_ = this.getTimeline().getScrollBar();
-  this.horizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
-  this.horizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.horizontalScrollBar_);
-  this.registerDisposable(this.horizontalScrollBar_);
+  this.timelineHorizontalScrollBar_ = this.getTimeline().getHorizontalScrollBar();
+  this.timelineHorizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
+  this.timelineHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.timelineHorizontalScrollBar_);
+  this.registerDisposable(this.timelineHorizontalScrollBar_);
+
+
+  /**
+   * Data grid horizontal scroll bar.
+   * @type {anychart.core.ui.ScrollBar}
+   * @private
+   */
+  this.dataGridHorizontalScrollBar_ = this.dataGrid().getHorizontalScrollBar();
+  this.dataGridHorizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
+  this.dataGridHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.dataGridHorizontalScrollBar_);
+  this.registerDisposable(this.dataGridHorizontalScrollBar_);
 
   this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
 
@@ -145,7 +156,8 @@ anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt
 anychart.charts.Gantt.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.GANTT_DATA | //New data is set.
-    anychart.ConsistencyState.GANTT_POSITION; //Position means that position of data items in DG and TL was changed.
+    anychart.ConsistencyState.GANTT_POSITION | //Position means that position of data items in DG and TL was changed.
+    anychart.ConsistencyState.GANTT_SPLITTER_POSITION; //Position of splitter has been changed.
 
 
 /**
@@ -275,7 +287,7 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
     this.dg_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
       ths.tl_.selectRow(e['item']); //This also deselects previous item.
       ths.dispatchEvent(e);
-      ths.tl_.invalidate(anychart.ConsistencyState.GANTT_POSITION, anychart.Signal.NEEDS_REDRAW);
+      ths.tl_.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
     });
 
     this.dg_.tooltip().contentFormatter(function(data) {
@@ -314,10 +326,12 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
 anychart.charts.Gantt.prototype.dataGrid = function(opt_enabled) {
   if (goog.isDef(opt_enabled)) {
     if (this.getDataGrid_().enabled() != opt_enabled) {
-      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter());
+      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter(), this.dataGridHorizontalScrollBar_);
       this.getDataGrid_().enabled(opt_enabled);
       this.splitter().enabled(opt_enabled);
-      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter()); //We don't need to send any signal.
+      this.dataGridHorizontalScrollBar_.enabled(opt_enabled);
+      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter(), this.dataGridHorizontalScrollBar_); //We don't need to send any signal.
+
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW); //Invalidate a whole chart.
     }
     return this;
@@ -388,7 +402,7 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
+ * @return {acgraph.vector.Fill|anychart.charts.Gantt|string} - Current value or itself for method chaining.
  */
 anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
@@ -396,6 +410,7 @@ anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, o
     //rowHoverFill does not invalidate anything. Here's no need to suspend it.
     this.getTimeline().rowHoverFill(this.hoverFill_);
     this.getDataGrid_().rowHoverFill(this.hoverFill_);
+    return this;
   }
   return this.hoverFill_;
 };
@@ -604,7 +619,7 @@ anychart.charts.Gantt.prototype.splitterPosition = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.splitterPosition_ != opt_value) {
       this.splitterPosition_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.GANTT_SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -620,7 +635,7 @@ anychart.charts.Gantt.prototype.splitterPosition = function(opt_value) {
  */
 anychart.charts.Gantt.prototype.splitter = function(opt_value) {
   if (!this.splitter_) {
-    this.splitter_ = new anychart.core.ui.Splitter;
+    this.splitter_ = new anychart.core.ui.Splitter();
     this.registerDisposable(this.splitter_);
     this.splitter_.zIndex(anychart.charts.Gantt.Z_INDEX_SPLITTER);
 
@@ -643,20 +658,10 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
         .resumeSignalsDispatching(false);
 
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
-      var b1 = ths.splitter().getLeftBounds();
-      var b2 = ths.splitter().getRightBounds();
-
-      anychart.core.Base.suspendSignalsDispatching(ths.getDataGrid_(), ths.getTimeline());
-      ths.getDataGrid_().bounds().set(b1);
-      ths.getTimeline().bounds().set(b2);
-      anychart.core.Base.resumeSignalsDispatchingTrue(ths.getDataGrid_(), ths.getTimeline());
-
-      ths.horizontalScrollBar_.bounds(
-          (b2.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
-          (b2.top + b2.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-          (b2.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
-          anychart.charts.Gantt.SCROLL_BAR_SIDE
-      ).draw();
+      //This also stores current position for case if dg is being disabled.
+      //Here we don't check if newPosition == oldPosition because it is handled by splitter.
+      ths.splitterPosition_ = anychart.math.round(100 * ths.splitter().position(), 2) + '%';
+      ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 
   }
@@ -691,19 +696,23 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
     this.getTimeline().container(this.rootElement);
     this.splitter().container(this.rootElement);
     this.verticalScrollBar_.container(this.rootElement);
-    this.horizontalScrollBar_.container(this.rootElement);
-    this.splitter().draw(); //Just initialization.
+    this.dataGridHorizontalScrollBar_.container(this.rootElement);
+    this.timelineHorizontalScrollBar_.container(this.rootElement);
   }
 
   if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
   if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.gantt.Timeline} */ (this.getTimeline()));
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION)) {
+    var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
+    var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
+    this.splitter().position(dgRatio);
+    this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (this.getDataGrid_().enabled()) {
       this.splitter().bounds(bounds);
-      var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
-      var dgRatio = dgWidth / bounds.width;
-      this.splitter().position(dgRatio);
     } else {
       this.tl_.bounds().set(bounds);
     }
@@ -735,6 +744,22 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
   }
 
   if (boundsChanged) {
+    if (this.dg_.enabled()) {
+      var b1 = this.splitter().getLeftBounds();
+      var b2 = this.splitter().getRightBounds();
+      this.getDataGrid_().bounds().set(b1);
+      this.getTimeline().bounds().set(b2);
+
+      var dgBounds = this.dg_.getPixelBounds();
+
+      this.dataGridHorizontalScrollBar_.bounds(
+          (dgBounds.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
+          (dgBounds.top + dgBounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
+          (dgBounds.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
+          anychart.charts.Gantt.SCROLL_BAR_SIDE
+      );
+    }
+
     var tlBounds = this.tl_.getPixelBounds();
 
     this.verticalScrollBar_.bounds(
@@ -744,12 +769,16 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
         (tlBounds.height - this.headerHeight_ - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
     );
 
-    this.horizontalScrollBar_.bounds(
+    this.timelineHorizontalScrollBar_.bounds(
         (tlBounds.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
         (tlBounds.top + tlBounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
         (tlBounds.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
         anychart.charts.Gantt.SCROLL_BAR_SIDE
     );
+
+    //This line hides dataGridHorizontalScrollBar_ if is disabled and does nothing otherwise.
+    this.dataGridHorizontalScrollBar_.draw();
+
   }
 
 };

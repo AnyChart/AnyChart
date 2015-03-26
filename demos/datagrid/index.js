@@ -1,7 +1,7 @@
-var stage, splitter, dataGrid, scroller, controller;
+var stage;
+var dataGrid;
 
 var ROOTS_COUNT = 5, CHILDREN_COUNT = 3;
-
 
 var labelTextSettingsOverrider = function(label, dataItem) {
   if (!dataItem.getParent()) {
@@ -12,7 +12,6 @@ var labelTextSettingsOverrider = function(label, dataItem) {
     }
   }
 };
-
 
 function generateTree() {
   var rawData = [];
@@ -55,33 +54,9 @@ function generateTree() {
 }
 
 
-function doController() {
-  var itemHeight = controller.getHeightByIndexes_(controller.startIndex_, controller.startIndex_);
-  var height = controller.heightCache_[controller.startIndex_] - itemHeight;
-
-  var start = height + controller.verticalOffset_; //(actually, start = height)
-  var end = start + controller.availableHeight_;
-
-  var totalEnd = controller.heightCache_[controller.heightCache_.length - 1];
-
-  var contentBoundsSimulation = new acgraph.math.Rect(0, 0, 0, totalEnd);
-
-  var startRatio = anychart.math.round(start / totalEnd, 4);
-  var endRatio = anychart.math.round(end / totalEnd, 4);
-
-  scroller.suspendSignalsDispatching();
-  scroller
-      .contentBounds(contentBoundsSimulation)
-      .setRatio(startRatio, endRatio);
-  scroller.resumeSignalsDispatching(true);
-}
-
-
 function dataGridRedraw(event) {
   dataGrid.draw();
-  if (!controller.isConsistent()) doController();
 }
-
 
 anychart.onDocumentReady(function() {
   var tree = generateTree();
@@ -91,27 +66,13 @@ anychart.onDocumentReady(function() {
 
   dataGrid.container(stage);
 
-  splitter = new anychart.core.ui.Splitter();
-
-  splitter
-      .bounds(20, 20, '90%', '90%')
-      .container(stage)
-      .leftLimitSize(15)
-      .rightLimitSize(15)
-      .stroke('#000')
-      .splitterWidth(5)
-      .fill('#555')
-      .dragPreviewFill('#777 0.3')
-      .position(0.7);
-
-
-  dataGrid.bounds().set(splitter.getLeftBounds());
+  dataGrid.bounds(20, 20, 450, 300);
 
   dataGrid
       .data(tree)
       .cellBorder({thickness: 2, color: '#999'})
       .startIndex(0)
-//      .verticalOffset(39)
+      .verticalOffset(0)
       .titleHeight(25);
 
   var valueColumn = dataGrid.column(10);
@@ -123,6 +84,7 @@ anychart.onDocumentReady(function() {
 
   var uidColumn = dataGrid.column(15);
   uidColumn.title().text('UID');
+
   uidColumn.textFormatter(function(item) {
     return (item.get('uid') != null) ? item.get('uid') + '' : '';
   });
@@ -133,70 +95,9 @@ anychart.onDocumentReady(function() {
   dataGrid.column(15).cellTextSettingsOverrider(labelTextSettingsOverrider);
 
   dataGrid.draw();
-  splitter.draw();
 
   dataGrid.listen('signal', dataGridRedraw, false, dataGrid);
-  splitter.listen('signal', splitter.draw, false, splitter);
-
-  splitter.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
-    dataGrid.bounds(splitter.getLeftBounds());
-  });
-
-  controller = dataGrid.controller();
-  controller.listen('signal', doController, false, controller);
-
-  //-------------
-  // SCROLLER
-  //-------------
-
-  scroller = anychart.ui.scrollBar();
-  var dgBounds = dataGrid.pixelBounds();
-
-  scroller
-      .container(stage)
-      .bounds(790, dgBounds.top, 15, dgBounds.height)
-      .layout('vertical');
-
-  scroller.draw();
-  scroller.listen('signal', scroller.draw, false, scroller);
-
-  doController();
-
-  scroller.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
-    var startRatio = e.startRatio;
-
-    var startHeight = Math.round(startRatio * controller.heightCache_[controller.heightCache_.length - 1]);
-
-    var startIndex = controller.getIndexByHeight_(startHeight);
-
-    var rowHeight = controller.getHeightByIndexes_(startIndex, startIndex);
-    var verticalOffset = rowHeight - (controller.heightCache_[startIndex] - startHeight);
-
-    controller.suspendSignalsDispatching();
-    controller
-        .verticalOffset(verticalOffset)
-        .startIndex(startIndex);
-    controller.resumeSignalsDispatching(false);
-    controller.run();
-
-//    console.log('startHeight', startHeight);
-//    console.log('index', startIndex);
-//    console.log('endIndex', controller.endIndex_);
-//    console.log('verticalOffset', verticalOffset);
-//    console.log('');
-
-  });
-
 
 });
-
-
-
-
-
-
-
-
-
 
 

@@ -1,4 +1,4 @@
-anychart.onDocumentReady(function(){
+anychart.onDocumentReady(function() {
   //create data tree on our data
   var treeData = anychart.data.tree(getData(), anychart.enums.TreeFillingMethod.AS_TABLE);
 
@@ -12,156 +12,468 @@ anychart.onDocumentReady(function(){
   chart.data(treeData);
 
   //set start splitter position settings
-  chart.splitterPosition(370);
+  chart.splitterPosition(460);
 
   //get chart data grid link to set column settings
   var dataGrid = chart.dataGrid();
 
   //set first column settings
   var firstColumn = dataGrid.column(0);
-  firstColumn.title('#');
-  firstColumn.width(30);
   firstColumn.cellTextSettings().hAlign('center');
 
   //set second column settings
   var secondColumn = dataGrid.column(1);
-  secondColumn.cellTextSettings().hAlign('left');
-  secondColumn.width(180);
+  secondColumn.width(200);
+  secondColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
   //set third column settings
   var thirdColumn = dataGrid.column(2);
-  thirdColumn.title('Start Time');
-  thirdColumn.width(70);
-  thirdColumn.cellTextSettings().hAlign('right');
-  thirdColumn.textFormatter(function(item) {
-    var date = new Date(item.get('actualStart'));
-    var month = date.getMonth();
-    var strMonth = (month > 9) ? month : '0' + month;
-    return date.getFullYear() + '.' + strMonth + '.' + date.getDay();
-  });
+  thirdColumn.title('Baseline Start');
+  thirdColumn.width(100);
+  thirdColumn.textFormatter(thirdColumnTextFormatter);
+  thirdColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
   //set fourth column settings
   var fourthColumn = dataGrid.column(3);
-  fourthColumn.title('End Time');
-  fourthColumn.width(80);
-  fourthColumn.cellTextSettings().hAlign('right');
-  fourthColumn.textFormatter(function(item) {
-    var date = new Date(item.get('actualEnd'));
-    var month = date.getMonth();
-    var strMonth = (month > 9) ? month : '0' + month;
-    return date.getFullYear() + '.' + strMonth + '.' + date.getDay();
-  });
-
-  chart.dataGrid(false);
+  fourthColumn.title().text('Baseline End');
+  fourthColumn.width(100);
+  fourthColumn.textFormatter(fourthColumnTextFormatter);
+  fourthColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
   //initiate chart drawing
   chart.draw();
 
   //zoom chart to specified date
-  chart.zoomTo(951350400000, 954201600000);
+  chart.zoomTo(Date.UTC(2010, 0, 8, 15), Date.UTC(2010, 3, 25, 20));
 });
+
 function getData() {
   return [
-    {"id": "1", "name": "Phase 1 - Strategic Plan", "progressValue": "14%", "actualStart": 951350400000, "actualEnd": 954201600000},
-    {"id": "2", "name": "Self-Assessment", parent:"1", "progressValue": "25%", "actualStart": 951350400000, "actualEnd": 951955200000},
-    {"id": "3", "name": "Define business vision", parent:"2", "progressValue": "0%", "actualStart": 951408000000, "actualEnd": 951440400000, "connectTo": "4", "connectorType": "FinishStart"},
-    {"id": "4", "name": "Identify available skills, information and support", parent:"2", "progressValue": "0%", "actualStart": 951494400000, "actualEnd": 951526800000, "connectTo": "5", "connectorType": "FinishStart"},
-    {"id": "5", "name": "Decide whether to proceed", parent:"2", "progressValue": "0%", "actualStart": 951753600000, "actualEnd": 951786000000, "connectTo": "7", "connectorType": "FinishStart"},
-    {"id": "6", "name": "Define the Opportunity", parent:"1", "progressValue": "27%", "actualStart": 951782400000, "actualEnd": 952992000000},
-    {"id": "7", "name": "Research the market and competition", parent:"6", "progressValue": "0%", "actualStart": 951840000000, "actualEnd": 951872400000, "connectTo": "8", "connectorType": "FinishStart"},
-    {"id": "8", "name": "Interview owners of similar businesses", parent:"6", "progressValue": "60%", "actualStart": 951868800000, "actualEnd": 952473600000, "connectTo": "9", "connectorType": "FinishStart"},
-    {"id": "9", "name": "Identify needed resources", parent:"6", "progressValue": "0%", "actualStart": 952531200000, "actualEnd": 952650000000, "connectTo": "10", "connectorType": "FinishStart"},
-    {"id": "10", "name": "Identify operating cost elements", parent:"6", "progressValue": "0%", "actualStart": 952704000000, "actualEnd": 952995600000, "connectTo": "12", "connectorType": "FinishStart"},
-    {"id": "11", "name": "Evaluate Business Approach", parent:"1", "progressValue": "0%", "actualStart": 953049600000, "actualEnd": 953341200000},
-    {"id": "12", "name": "Define new entity requirements", parent:"11", "progressValue": "0%", "actualStart": 953049600000, "actualEnd": 953082000000, "connectTo": "17", "connectorType": "FinishStart"},
-    {"id": "13", "name": "Identify on-going business purchase opportunities", parent:"11", "progressValue": "0%", "actualStart": 953136000000, "actualEnd": 953168400000, "connectTo": "14", "connectorType": "FinishStart"},
-    {"id": "14", "name": "Research franchise possibilities", parent:"11", "progressValue": "0%", "actualStart": 953222400000, "actualEnd": 953254800000, "connectTo": "15", "connectorType": "FinishStart"},
-    {"id": "15", "name": "Summarize business approach", parent:"11", "progressValue": "0%", "actualStart": 953308800000, "actualEnd": 953341200000, "connectTo": "21", "connectorType": "FinishStart"},
-    {"id": "16", "name": "Evaluate Potential Risks and Rewards", parent:"1", "progressValue": "0%", "actualStart": 953136000000, "actualEnd": 953946000000},
-    {"id": "17", "name": "Assess market size and stability", parent:"16", "progressValue": "0%", "actualStart": 953136000000, "actualEnd": 953254800000, "connectTo": "18", "connectorType": "FinishStart"},
-    {"id": "18", "name": "Estimate the competition", parent:"16", "progressValue": "0%", "actualStart": 953308800000, "actualEnd": 953341200000, "connectTo": "19", "connectorType": "FinishStart"},
-    {"id": "19", "name": "Assess needed resource availability", parent:"16", "progressValue": "0%", "actualStart": 953740800000, "actualEnd": 953859600000, "connectTo": "20", "connectorType": "FinishStart"},
-    {"id": "20", "name": "Evaluate realistic initial market share", parent:"16", "progressValue": "0%", "actualStart": 953913600000, "actualEnd": 953946000000},
-    {"id": "21", "name": "Determine financial requirements", parent:"16", "progressValue": "0%", "actualStart": 953568000000, "actualEnd": 953686800000, "connectTo": "22", "connectorType": "FinishStart"},
-    {"id": "22", "name": "Review personal suitability", parent:"16", "progressValue": "0%", "actualStart": 953740800000, "actualEnd": 953773200000, "connectTo": "23", "connectorType": "FinishStart"},
-    {"id": "23", "name": "Evaluate initial profitability", parent:"16", "progressValue": "0%", "actualStart": 953827200000, "actualEnd": 953859600000, "connectTo": "24", "connectorType": "FinishStart"},
-    {"id": "24", "name": "Review and modify the strategic plan", parent:"1", "progressValue": "0%", "actualStart": 953913600000, "actualEnd": 954208800000, "connectTo": "25", "connectorType": "FinishStart"},
-    {"id": "25", "name": "Confirm decision to proceed", parent:"1", "progressValue": "0%", "actualStart": 954208800000, "actualEnd": 954208800000, "connectTo": "28", "connectorType": "FinishStart"},
-    {"id": "26", "name": "Phase 2 - Define the Business Opportunity", "progressValue": "19%", "actualStart": 954201600000, "actualEnd": 957312000000},
-    {"id": "27", "name": "Define the Market", parent:"26", "progressValue": "28%", "actualStart": 954201600000, "actualEnd": 955670400000},
-    {"id": "28", "name": "Access available information", parent:"27", "progressValue": "0%", "actualStart": 954262800000, "actualEnd": 954295200000, "connectTo": "35", "connectorType": "StartStart"},
-    {"id": "29", "name": "Create market analysis plan", parent:"27", "progressValue": "0%", "actualStart": 954349200000, "actualEnd": 954468000000},
-    {"id": "30", "name": "Implement market analysis plan", parent:"27", "progressValue": "40%", "actualStart": 954460800000, "actualEnd": 955065600000, "connectTo": "31", "connectorType": "FinishStart"},
-    {"id": "31", "name": "Identify competition", parent:"27", "progressValue": "60%", "actualStart": 955065600000, "actualEnd": 955411200000, "connectTo": "32", "connectorType": "FinishStart"},
-    {"id": "32", "name": "Summarize the market", parent:"27", "progressValue": "0%", "actualStart": 955472400000, "actualEnd": 955591200000, "connectTo": "33", "connectorType": "FinishStart"},
-    {"id": "33", "name": "Identify target market niche", parent:"27", "progressValue": "0%", "actualStart": 955645200000, "actualEnd": 955677600000, "connectTo": "35", "connectorType": "StartStart"},
-    {"id": "34", "name": "Identify Needed Materials and Supplies", parent:"26", "progressValue": "0%", "actualStart": 955645200000, "actualEnd": 956368800000},
-    {"id": "35", "name": "Select a business approach (from 'Evaluate Business Approach' above)", parent:"34", "progressValue": "0%", "actualStart": 955645200000, "actualEnd": 955764000000, "connectTo": "36", "connectorType": "FinishStart"},
-    {"id": "36", "name": "Identify management staff resources", parent:"34", "progressValue": "0%", "actualStart": 955990800000, "actualEnd": 956023200000, "connectTo": "37", "connectorType": "FinishStart"},
-    {"id": "37", "name": "Identify staffing requirements", parent:"34", "progressValue": "0%", "actualStart": 956077200000, "actualEnd": 956109600000, "connectTo": "38", "connectorType": "FinishStart"},
-    {"id": "38", "name": "Identify needed raw materials", parent:"34", "progressValue": "0%", "actualStart": 956163600000, "actualEnd": 956196000000, "connectTo": "39", "connectorType": "FinishStart"},
-    {"id": "39", "name": "Identify needed utilities", parent:"34", "progressValue": "0%", "actualStart": 956250000000, "actualEnd": 956282400000, "connectTo": "40", "connectorType": "FinishStart"},
-    {"id": "40", "name": "Summarize operating expenses and financial projections", parent:"34", "progressValue": "0%", "actualStart": 956336400000, "actualEnd": 956368800000, "connectTo": "42", "connectorType": "FinishStart"},
-    {"id": "41", "name": "Evaluate Potential Risks and Rewards", parent:"26", "progressValue": "17%", "actualStart": 956534400000, "actualEnd": 957225600000},
-    {"id": "42", "name": "Assess market size and stability", parent:"41", "progressValue": "50%", "actualStart": 956534400000, "actualEnd": 956707200000, "connectTo": "43", "connectorType": "FinishStart"},
-    {"id": "43", "name": "Assess needed resources availability", parent:"41", "progressValue": "0%", "actualStart": 956768400000, "actualEnd": 956887200000, "connectTo": "44", "connectorType": "FinishStart"},
-    {"id": "44", "name": "Forecast financial returns", parent:"41", "progressValue": "0%", "actualStart": 956941200000, "actualEnd": 957232800000, "connectTo": "45", "connectorType": "FinishStart"},
-    {"id": "45", "name": "Review and modify the business opportunity", parent:"26", "progressValue": "0%", "actualStart": 957286800000, "actualEnd": 957319200000, "connectTo": "46", "connectorType": "FinishStart"},
-    {"id": "46", "name": "Confirm decision to proceed", parent:"26", "progressValue": "0%", "actualStart": 957319200000, "actualEnd": 957319200000, "connectTo": "49", "connectorType": "FinishStart"},
-    {"id": "47", "name": "Phase 3 - Plan for Action", "progressValue": "17%", "actualStart": 957312000000, "actualEnd": 959817600000},
-    {"id": "48", "name": "Develop Detailed 5-Year Business Plan", parent:"47", "progressValue": "17%", "actualStart": 957312000000, "actualEnd": 959817600000},
-    {"id": "49", "name": "Describe the vision and opportunity", parent:"48", "progressValue": "0%", "actualStart": 957373200000, "actualEnd": 957405600000, "connectTo": "50", "connectorType": "FinishStart"},
-    {"id": "50", "name": "List assumptions", parent:"48", "progressValue": "0%", "actualStart": 957459600000, "actualEnd": 957492000000, "connectTo": "51", "connectorType": "FinishStart"},
-    {"id": "51", "name": "Describe the market", parent:"48", "progressValue": "0%", "actualStart": 957546000000, "actualEnd": 957578400000, "connectTo": "52", "connectorType": "FinishStart"},
-    {"id": "52", "name": "Describe the new business", parent:"48", "progressValue": "0%", "actualStart": 957805200000, "actualEnd": 957837600000, "connectTo": "53", "connectorType": "FinishStart"},
-    {"id": "53", "name": "Describe strengths, weaknesses, assets and threats", parent:"48", "progressValue": "0%", "actualStart": 957891600000, "actualEnd": 957924000000, "connectTo": "54", "connectorType": "FinishStart"},
-    {"id": "54", "name": "Estimate sales volume during startup period", parent:"48", "progressValue": "0%", "actualStart": 957978000000, "actualEnd": 958010400000, "connectTo": "55", "connectorType": "FinishStart"},
-    {"id": "55", "name": "Forecast operating costs", parent:"48", "progressValue": "0%", "actualStart": 958064400000, "actualEnd": 958096800000, "connectTo": "56", "connectorType": "FinishStart"},
-    {"id": "56", "name": "Establish pricing strategy", parent:"48", "progressValue": "0%", "actualStart": 958150800000, "actualEnd": 958183200000, "connectTo": "57", "connectorType": "FinishStart"},
-    {"id": "57", "name": "Forecast revenue", parent:"48", "progressValue": "0%", "actualStart": 958410000000, "actualEnd": 958442400000, "connectTo": "58", "connectorType": "FinishStart"},
-    {"id": "58", "name": "X", parent:"48", "progressValue": "0%", "actualStart": 958496400000, "actualEnd": 958615200000, "connectTo": "59", "connectorType": "FinishStart"},
-    {"id": "59", "name": "Develop break-even analysis", parent:"48", "progressValue": "0%", "actualStart": 958669200000, "actualEnd": 958701600000, "connectTo": "60", "connectorType": "FinishStart"},
-    {"id": "60", "name": "Develop cash-flow projection", parent:"48", "progressValue": "0%", "actualStart": 958755600000, "actualEnd": 958788000000, "connectTo": "61", "connectorType": "FinishStart"},
-    {"id": "61", "name": "Identify licensing and permitting requirements", parent:"48", "progressValue": "0%", "actualStart": 959014800000, "actualEnd": 959047200000, "connectTo": "62", "connectorType": "FinishStart"},
-    {"id": "62", "name": "Develop startup plan", parent:"48", "progressValue": "100%", "actualStart": 959101200000, "actualEnd": 959220000000, "connectTo": "63", "connectorType": "FinishStart"},
-    {"id": "63", "name": "Develop sales and marketing strategy", parent:"48", "progressValue": "0%", "actualStart": 959274000000, "actualEnd": 959306400000, "connectTo": "64", "connectorType": "FinishStart"},
-    {"id": "64", "name": "Develop distribution structure", parent:"48", "progressValue": "0%", "actualStart": 959360400000, "actualEnd": 959392800000, "connectTo": "65", "connectorType": "FinishStart"},
-    {"id": "65", "name": "Describe risks and opportunities", parent:"48", "progressValue": "20%", "actualStart": 959558400000, "actualEnd": 959731200000, "connectTo": "66", "connectorType": "FinishStart"},
-    {"id": "66", "name": "Publish the business plan", parent:"48", "progressValue": "0%", "actualStart": 959792400000, "actualEnd": 959824800000, "connectTo": "67", "connectorType": "FinishStart"},
-    {"id": "67", "name": "Confirm decision to proceed", parent:"48", "progressValue": "0%", "actualStart": 959824800000, "actualEnd": 959824800000, "connectTo": "69", "connectorType": "FinishStart"},
-    {"id": "68", "name": "Phase 4 - Proceed With Startup Plan", "progressValue": "24%", "actualStart": 959817600000, "actualEnd": 967075200000},
-    {"id": "69", "name": "Choose a location", parent:"68", "progressValue": "36%", "actualStart": 959817600000, "actualEnd": 959904000000, "connectTo": "72", "connectorType": "FinishStart"},
-    {"id": "70", "name": "Establish Business Structure", parent:"68", "progressValue": "14%", "actualStart": 959904000000, "actualEnd": 963273600000},
-    {"id": "71", "name": "Choose a Name", parent:"70", "progressValue": "33%", "actualStart": 959904000000, "actualEnd": 960249600000},
-    {"id": "72", "name": "Identify implications", parent:"71", "progressValue": "40%", "actualStart": 959904000000, "actualEnd": 959990400000, "connectTo": "73", "connectorType": "FinishStart"},
-    {"id": "73", "name": "Research name availability", parent:"71", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960256800000, "connectTo": "87", "connectorType": "StartStart"},
-    {"id": "74", "name": "Choose a Bank", parent:"70", "progressValue": "0%", "actualStart": 960310800000, "actualEnd": 960861600000},
-    {"id": "75", "name": "Establish accounts", parent:"74", "progressValue": "0%", "actualStart": 960310800000, "actualEnd": 960602400000, "connectTo": "77", "connectorType": "StartStart"},
-    {"id": "76", "name": "Establish line of credit", parent:"74", "progressValue": "0%", "actualStart": 960829200000, "actualEnd": 960861600000, "connectTo": "77", "connectorType": "StartStart"},
-    {"id": "77", "name": "Choose legal representation", parent:"70", "progressValue": "0%", "actualStart": 960829200000, "actualEnd": 960861600000, "connectTo": "78", "connectorType": "FinishStart"},
-    {"id": "78", "name": "Select business tax-basis category", parent:"70", "progressValue": "0%", "actualStart": 960915600000, "actualEnd": 961034400000, "connectTo": "79", "connectorType": "FinishStart"},
-    {"id": "79", "name": "Choose capital funding source", parent:"70", "progressValue": "0%", "actualStart": 961088400000, "actualEnd": 961207200000, "connectTo": "98", "connectorType": "FinishStart"},
-    {"id": "80", "name": "Commit capital funding", parent:"70", "progressValue": "0%", "actualStart": 961207200000, "actualEnd": 961207200000, "connectTo": "82", "connectorType": "FinishStart"},
-    {"id": "81", "name": "Establish the Operating Control Base", parent:"70", "progressValue": "19%", "actualStart": 961372800000, "actualEnd": 963273600000},
-    {"id": "82", "name": "Choose and set up the accounting system", parent:"81", "progressValue": "0%", "actualStart": 961434000000, "actualEnd": 961552800000, "connectTo": "83", "connectorType": "FinishStart"},
-    {"id": "83", "name": "Obtain required licenses and permits", parent:"81", "progressValue": "38%", "actualStart": 961545600000, "actualEnd": 962409600000, "connectTo": "84", "connectorType": "FinishStart"},
-    {"id": "84", "name": "Obtain needed insurance", parent:"81", "progressValue": "0%", "actualStart": 962643600000, "actualEnd": 962935200000, "connectTo": "85", "connectorType": "FinishStart"},
-    {"id": "85", "name": "Establish security plan", parent:"81", "progressValue": "0%", "actualStart": 962989200000, "actualEnd": 963280800000, "connectTo": "91", "connectorType": "FinishStart"},
-    {"id": "86", "name": "Develop Marketing Program", parent:"70", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960516000000},
-    {"id": "87", "name": "Establish an advertising program", parent:"86", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960343200000, "connectTo": "88", "connectorType": "FinishStart"},
-    {"id": "88", "name": "Develop a logo", parent:"86", "progressValue": "0%", "actualStart": 960397200000, "actualEnd": 960429600000, "connectTo": "89", "connectorType": "FinishStart"},
-    {"id": "89", "name": "Order promotional materials", parent:"86", "progressValue": "0%", "actualStart": 960483600000, "actualEnd": 960516000000, "connectTo": "91", "connectorType": "FinishStart"},
-    {"id": "90", "name": "Provide Physical Facilities", parent:"68", "progressValue": "16%", "actualStart": 963273600000, "actualEnd": 967075200000},
-    {"id": "91", "name": "Secure operation space", parent:"90", "progressValue": "0%", "actualStart": 963334800000, "actualEnd": 963885600000, "connectTo": "92", "connectorType": "FinishStart"},
-    {"id": "92", "name": "Select computer network hardware", parent:"90", "progressValue": "100%", "actualStart": 963939600000, "actualEnd": 963972000000, "connectTo": "93", "connectorType": "FinishStart"},
-    {"id": "93", "name": "Select computer software", parent:"90", "progressValue": "0%", "actualStart": 964026000000, "actualEnd": 964058400000, "connectTo": "94", "connectorType": "FinishStart"},
-    {"id": "94", "name": "Establish utilities", parent:"90", "progressValue": "67%", "actualStart": 964137600000, "actualEnd": 964569600000, "connectTo": "95", "connectorType": "FinishStart"},
-    {"id": "95", "name": "Provide furniture and equipment", parent:"90", "progressValue": "15%", "actualStart": 964569600000, "actualEnd": 965088000000, "connectTo": "96", "connectorType": "FinishStart"},
-    {"id": "96", "name": "Move in", parent:"90", "progressValue": "13%", "actualStart": 966988800000, "actualEnd": 967075200000},
-    {"id": "97", "name": "Provide Staffing", parent:"68", "progressValue": "30%", "actualStart": 961372800000, "actualEnd": 966988800000},
-    {"id": "98", "name": "Interview and test candidates", parent:"97", "progressValue": "43%", "actualStart": 961372800000, "actualEnd": 962928000000, "connectTo": "99", "connectorType": "FinishStart"},
-    {"id": "99", "name": "Hire staff", parent:"97", "progressValue": "10%", "actualStart": 962928000000, "actualEnd": 964137600000, "connectTo": "100", "connectorType": "FinishStart"},
-    {"id": "100", "name": "Train staff", parent:"97", "progressValue": "31%", "actualStart": 965088000000, "actualEnd": 966988800000},
-    {"id": "102", "name": "Mau & Ago business", parent:"97", "progressValue": "40%", "actualStart": 951350400000, "actualEnd": 951955200000}
+    {
+      'id': 'pre-planning',
+      'name': 'Pre-planning',
+      'actualStart': Date.UTC(2010, 0, 17, 8),
+      'actualEnd': Date.UTC(2010, 1, 5, 18),
+      'progressValue': '17%',
+      'baselineStart': Date.UTC(2010, 0, 10, 8),
+      'baselineEnd': Date.UTC(2010, 1, 4, 8),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'investigate',
+      'name': 'Investigate the task',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 17, 8),
+      'actualEnd': Date.UTC(2010, 0, 25, 12),
+      'progressValue': '15%',
+      'baselineStart': Date.UTC(2010, 0, 18, 10),
+      'baselineEnd': Date.UTC(2010, 0, 23, 16),
+      'rowHeight': 35,
+      'connectTo': 'distribute'
+    },
+
+    {
+      'id': 'distribute',
+      'name': 'Distribute roles and resources',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 25, 12),
+      'actualEnd': Date.UTC(2010, 0, 30, 16),
+      'progressValue': '0%',
+      'baselineStart': Date.UTC(2010, 0, 20, 8),
+      'baselineEnd': Date.UTC(2010, 0, 27, 20),
+      'rowHeight': 35,
+      'connectTo': 'documents'
+    },
+
+    {
+      'id': 'documents',
+      'name': 'Gather technical documentation',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 27, 12),
+      'actualEnd': Date.UTC(2010, 1, 6, 10),
+      'progressValue': '65%',
+      'baselineStart': Date.UTC(2010, 0, 23, 8),
+      'baselineEnd': Date.UTC(2010, 1, 4, 20),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'planning-report',
+      'name': 'Summary planning report',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 1, 4, 8),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'proto-impl',
+      'name': 'Prototype Implementation',
+      'actualStart': Date.UTC(2010, 0, 25, 8),
+      'actualEnd': Date.UTC(2010, 2, 21, 15),
+      'progressValue': '42%',
+      'baselineStart': Date.UTC(2010, 0, 21, 8),
+      'baselineEnd': Date.UTC(2010, 2, 19, 18),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'evaluate-phase',
+      'name': 'Evaluate development phase',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 0, 27, 8),
+      'actualEnd': Date.UTC(2010, 1, 1, 15),
+      'progressValue': '10%',
+      'baselineStart': Date.UTC(2010, 0, 21, 8),
+      'baselineEnd': Date.UTC(2010, 0, 27, 16),
+      'rowHeight': 35,
+      'actual': {
+        'label': {
+          'fontColor': '#333',
+          'value': 'Evaluating ~10%',
+          'position': 'left',
+          'anchor': 'centerRight',
+          'fontWeight': 'bold'
+        }
+      },
+      'connectTo': 'step1'
+    },
+
+    {
+      'id': 'evaluate-tech',
+      'name': 'Evaluate available technologies',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 1, 22, 15),
+      'actualEnd': Date.UTC(2010, 2, 4, 12),
+      'progressValue': '30%',
+      'baselineStart': Date.UTC(2010, 1, 18, 8),
+      'baselineEnd': Date.UTC(2010, 2, 3, 10),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'dev-kit',
+      'name': 'Choose development kit',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 2, 10, 8),
+      'actualEnd': Date.UTC(2010, 2, 21, 15),
+      'progressValue': '14%',
+      'baselineStart': Date.UTC(2010, 2, 9, 8),
+      'baselineEnd': Date.UTC(2010, 2, 21, 15),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'proto-def',
+      'name': 'Define the Architecture of the Prototype',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 1, 2, 8),
+      'actualEnd': Date.UTC(2010, 2, 12, 18),
+      'progressValue': '68%',
+      'baselineStart': Date.UTC(2010, 0, 30, 8),
+      'baselineEnd': Date.UTC(2010, 2, 11, 18),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'step1',
+      'name': 'Step1: Build prototype',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 1, 2, 8),
+      'actualEnd': Date.UTC(2010, 1, 15, 16),
+      'progressValue': '33%',
+      'baselineStart': Date.UTC(2010, 1, 1, 10),
+      'baselineEnd': Date.UTC(2010, 1, 14, 10),
+      'rowHeight': 35,
+      'connectTo': 'step2'
+    },
+
+    {
+      'id': 'step2',
+      'name': 'Step2: Collect results',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 1, 20, 8),
+      'actualEnd': Date.UTC(2010, 1, 27, 16),
+      'progressValue': '80%',
+      'baselineStart': Date.UTC(2010, 1, 14, 10),
+      'baselineEnd': Date.UTC(2010, 1, 25, 18),
+      'rowHeight': 35,
+      'connectTo': 'step3',
+      'baseline': {
+        'label': {
+          'value': 're-evaluate'
+        }
+      }
+    },
+
+    {
+      'id': 'step3',
+      'name': 'Step3: Analyze results',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 2, 1, 8),
+      'actualEnd': Date.UTC(2010, 2, 11, 18),
+      'progressValue': '0%',
+      'baselineStart': Date.UTC(2010, 2, 1, 8),
+      'baselineEnd': Date.UTC(2010, 2, 11, 10),
+      'rowHeight': 35,
+      'connectTo': 'follow-up'
+    },
+
+    {
+      'id': 'follow-up',
+      'name': 'Follow up with stuff',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 2, 12, 8),
+      'actualEnd': Date.UTC(2010, 2, 16, 18),
+      'progressValue': '74%',
+      'baselineStart': Date.UTC(2010, 2, 12, 10),
+      'baselineEnd': Date.UTC(2010, 2, 13, 12),
+      'rowHeight': 35,
+      'connectTo': 'approval1'
+    },
+
+    {
+      'id': 'approval1',
+      'name': 'First customer approval',
+      'actualStart': Date.UTC(2010, 2, 21, 18),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'approved-impl',
+      'name': 'Approved Implementation',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '12%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 35,
+      'connectTo': 'approval2'
+    },
+
+    {
+      'id': 'parallel3',
+      'name': 'Parallel task: Engine development',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '4%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'parallel2',
+      'name': 'Parallel task: Engine debugging',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '16%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 35,
+      'connectTo': 'parallel3',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'parallel1',
+      'name': 'Parallel task: Major features documentation',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '23%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 35,
+      'connectTo': 'parallel2',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'parallel0',
+      'name': 'Paralleling the tasks',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '64%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 35,
+      'connectTo': 'parallel1',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'approval2',
+      'name': 'Second customer approval',
+      'actualStart': Date.UTC(2010, 3, 24, 10),
+      'rowHeight': 35,
+      'connectTo': 'production'
+    },
+
+    {
+      'id': 'production',
+      'name': 'Production Phase',
+      'actualStart': Date.UTC(2010, 3, 28, 8),
+      'actualEnd': Date.UTC(2010, 5, 15, 18),
+      'progressValue': '12%',
+      'baselineStart': Date.UTC(2010, 3, 25, 10),
+      'baselineEnd': Date.UTC(2010, 5, 16, 18),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'assemble',
+      'name': 'Assemble the production resources',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 3, 28, 8),
+      'actualEnd': Date.UTC(2010, 4, 3, 18),
+      'progressValue': '50%',
+      'baselineStart': Date.UTC(2010, 3, 26, 8),
+      'baselineEnd': Date.UTC(2010, 4, 2, 12),
+      'rowHeight': 35,
+      'connectTo': 'risks'
+    },
+
+    {
+      'id': 'risks',
+      'name': 'Confirm the risks',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 4, 10, 8),
+      'actualEnd': Date.UTC(2010, 4, 21, 18),
+      'progressValue': '22%',
+      'baselineStart': Date.UTC(2010, 4, 10, 14),
+      'baselineEnd': Date.UTC(2010, 4, 20, 16),
+      'rowHeight': 35,
+      'connectTo': 'development',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'development',
+      'name': 'Development',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 4, 3, 8),
+      'actualEnd': Date.UTC(2010, 6, 1, 14),
+      'progressValue': '82%',
+      'baselineStart': Date.UTC(2010, 4, 3, 8),
+      'baselineEnd': Date.UTC(2010, 5, 14, 15),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'basic-testing',
+      'name': 'Basic testing',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 5, 1, 8),
+      'actualEnd': Date.UTC(2010, 5, 24, 18),
+      'progressValue': '41%',
+      'baselineStart': Date.UTC(2010, 4, 29, 9),
+      'baselineEnd': Date.UTC(2010, 5, 27, 18),
+      'rowHeight': 35,
+      'connectTo': 'final-testing'
+    },
+
+    {
+      'id': 'final-testing',
+      'name': 'Final testing',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 5, 25, 8),
+      'actualEnd': Date.UTC(2010, 6, 20, 18),
+      'progressValue': '5%',
+      'baselineStart': Date.UTC(2010, 5, 20, 10),
+      'baselineEnd': Date.UTC(2010, 6, 17, 18),
+      'rowHeight': 35,
+      'connectTo': 'delivery'
+    },
+
+    {
+      'id': 'perf-testing1',
+      'name': 'Phase 1: Performance testing',
+      'parent': 'final-testing',
+      'actualStart': Date.UTC(2010, 5, 25, 8),
+      'actualEnd': Date.UTC(2010, 6, 4, 18),
+      'progressValue': '15%',
+      'baselineStart': Date.UTC(2010, 5, 20, 10),
+      'baselineEnd': Date.UTC(2010, 6, 5, 18),
+      'rowHeight': 35,
+      'connectTo': 'perf-testing2'
+    },
+
+    {
+      'id': 'perf-testing2',
+      'name': 'Phase 2: Performance testing',
+      'parent': 'final-testing',
+      'actualStart': Date.UTC(2010, 6, 5, 8),
+      'actualEnd': Date.UTC(2010, 6, 27, 18),
+      'progressValue': '35%',
+      'baselineStart': Date.UTC(2010, 6, 20, 10),
+      'baselineEnd': Date.UTC(2010, 7, 2, 16),
+      'rowHeight': 35
+    },
+
+    {
+      'id': 'delivery',
+      'name': 'Product delivery',
+      'actualStart': Date.UTC(2010, 5, 26, 8),
+      'rowHeight': 35
+    }
   ];
+}
+
+
+
+//add bold and italic text settings to all parent items
+function labelTextSettingsFormatter(label, dataItem) {
+  if (dataItem.numChildren()) {
+    label.fontWeight('bold').fontStyle('italic');
+  }
+}
+
+//do pretty formatting for dates in third column
+function thirdColumnTextFormatter(item) {
+  var field = item.get(anychart.enums.GanttDataFields.BASELINE_START);
+
+  //format base line text
+  if (field) {
+    var baselineStart = new Date(field);
+    return formatDate(baselineStart.getUTCMonth() + 1) + '/' +
+        formatDate(baselineStart.getUTCDate()) + '/' + baselineStart.getUTCFullYear() + ' ' +
+        formatDate(baselineStart.getUTCHours()) + ':' +
+        formatDate(baselineStart.getUTCMinutes());
+  } else {
+    //format milestone text
+    var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
+    var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+    if ((actualStart == actualEnd) || (actualStart && !actualEnd)) {
+      var start = new Date(actualStart);
+      return formatDate(start.getUTCMonth() + 1) + '/' +
+          formatDate(start.getUTCDate()) + '/' + start.getUTCFullYear() + ' ' +
+          formatDate(start.getUTCHours()) + ':' +
+          formatDate(start.getUTCMinutes());
+    }
+    return '';
+  }
+}
+
+//do pretty formatting for dates in fourth column
+function fourthColumnTextFormatter(item) {
+  var field = item.get(anychart.enums.GanttDataFields.BASELINE_END);
+  if (field) {
+    var baselineEnd = new Date(field);
+    return formatDate((baselineEnd.getUTCMonth() + 1)) + '/' +
+        formatDate(baselineEnd.getUTCDate()) + '/' + baselineEnd.getUTCFullYear() + ' ' +
+        formatDate(baselineEnd.getUTCHours()) + ':' +
+        formatDate(baselineEnd.getUTCMinutes());
+  } else {
+    return '';
+  }
+}
+
+//do pretty formatting for passed date unit
+function formatDate(dateUnit) {
+  if (dateUnit < 10) dateUnit = '0' + dateUnit;
+  return dateUnit + '';
 }

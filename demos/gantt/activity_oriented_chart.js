@@ -1,6 +1,8 @@
+var chart;
+
 anychart.onDocumentReady(function() {
   var treeData = anychart.data.tree(data, anychart.enums.TreeFillingMethod.AS_TABLE);
-  var chart = anychart.ganttProject();
+  chart = anychart.ganttProject();
   chart.container('container');
   chart.bounds(0, 0, '100%', '100%');
   chart.data(treeData);

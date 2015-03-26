@@ -1055,14 +1055,14 @@ anychart.core.gantt.Timeline.prototype.getBase_ = function() {
  */
 anychart.core.gantt.Timeline.prototype.mouseMoveHandler_ = function(event) {
   var headerHeight = this.header_.getPixelBounds().height;
-  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
 
   var mouseHeight = event.offsetY - headerHeight - this.pixelBoundsCache_.top;
 
   if (this.gridHeightCache_.length) {
     var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
     if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight + this.verticalOffset_);
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
       index = index >= 0 ? index : ~index; //Index of row under mouse.
 
       if (index != this.hoveredIndex_) {
@@ -1105,7 +1105,7 @@ anychart.core.gantt.Timeline.prototype.mouseClickHandler_ = function(event) {
   if (this.gridHeightCache_.length) {
     var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
     if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight + this.verticalOffset_);
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
       index = index >= 0 ? index : ~index; //Index of row under mouse.
 
       var item = this.visibleItems_[this.startIndex_ + index]; //Theoretically, here must not be any exceptions.
@@ -1170,8 +1170,8 @@ anychart.core.gantt.Timeline.prototype.selectRow = function(item) {
  */
 anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
   var headerHeight = this.header_.getPixelBounds().height;
-  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
-  var totalTop = initialTop;
+  var header = this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE;
+  var totalTop = (header - this.verticalOffset_);
   this.highlight();
   this.gridHeightCache_.length = 0;
   this.hoveredIndex_ = -1;
@@ -1179,11 +1179,17 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
   this.getEvenPath_().clear();
   this.getOddPath_().clear();
   this.getSelectedPath_().clear();
+
   for (var i = this.startIndex_; i <= this.endIndex_; i++) {
     var item = this.visibleItems_[i];
     if (!item) break;
 
+    var firstCell = (i == this.startIndex_);
+
+    var top = firstCell ? header : totalTop;
+
     var height = anychart.core.gantt.Controller.getItemHeight(item);
+    height = firstCell ? height - this.verticalOffset_ + anychart.core.ui.DataGrid.ROW_SPACE : height;
 
     /*
       Note: Straight indexing starts with 0 (this.visibleItems_[0], this.visibleItems_[1], this.visibleItems_[2]...).
@@ -1196,25 +1202,25 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
      */
     var path = i % 2 ? this.evenPath_ : this.oddPath_;
 
-    var newTop = /** @type {number} */ (totalTop + height);
+    var newTop = /** @type {number} */ (top + height);
     path
-        .moveTo(this.pixelBoundsCache_.left, totalTop)
-        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, totalTop)
+        .moveTo(this.pixelBoundsCache_.left, top)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, top)
         .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, newTop)
         .lineTo(this.pixelBoundsCache_.left, newTop)
         .close();
 
     if (item.meta('selected')) {
       this.selectedPath_
-          .moveTo(this.pixelBoundsCache_.left, totalTop)
-          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, totalTop)
+          .moveTo(this.pixelBoundsCache_.left, top)
+          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, top)
           .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, newTop)
           .lineTo(this.pixelBoundsCache_.left, newTop)
           .close();
     }
 
     totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
-    this.gridHeightCache_.push(totalTop - initialTop);
+    this.gridHeightCache_.push(totalTop - header);
   }
 };
 
@@ -2239,16 +2245,21 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       var visibleMin = this.scale_.timestampToRatio(visibleRange['min']) * this.pixelBoundsCache_.width;
       var visibleMax = this.scale_.timestampToRatio(visibleRange['max']) * this.pixelBoundsCache_.width;
 
-      var contentBoundsSimulation = new acgraph.math.Rect(totMin, 0, totMax - totMin, 0);
-      var visibleBoundsSimulation = new acgraph.math.Rect(visibleMin, 0, visibleMax - visibleMin, 0);
-      this.horizontalScrollBar_
-          .suspendSignalsDispatching()
-          .handlePositionChange(false)
-          .contentBounds(contentBoundsSimulation)
-          .visibleBounds(visibleBoundsSimulation)
-          .draw()
-          .handlePositionChange(true)
-          .resumeSignalsDispatching(false);
+      if (this.horizontalScrollBar_) {
+        var contentBoundsSimulation = new acgraph.math.Rect(totMin, 0, totMax - totMin, 0);
+        var visibleBoundsSimulation = new acgraph.math.Rect(visibleMin, 0, visibleMax - visibleMin, 0);
+
+        this.horizontalScrollBar_
+            .suspendSignalsDispatching()
+            .handlePositionChange(false)
+            .contentBounds(contentBoundsSimulation)
+            .visibleBounds(visibleBoundsSimulation)
+            .draw()
+            .handlePositionChange(true)
+            .resumeSignalsDispatching(false);
+
+        if (this.horizontalScrollBar_.container()) this.horizontalScrollBar_.draw();
+      }
 
     }
 
@@ -2339,7 +2350,7 @@ anychart.core.gantt.Timeline.prototype.mouseWheelHandler_ = function(e) {
  * Generates horizontal scroll bar.
  * @return {anychart.core.ui.ScrollBar} - Scroll bar.
  */
-anychart.core.gantt.Timeline.prototype.getScrollBar = function() {
+anychart.core.gantt.Timeline.prototype.getHorizontalScrollBar = function() {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.core.ui.ScrollBar();
     this.horizontalScrollBar_
