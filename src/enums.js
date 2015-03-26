@@ -745,6 +745,8 @@ anychart.enums.getMarkerDrawer = function(type) {
       };
     case 'pentagon':
       return function(path, x, y, radius) {
+        x -= radius;
+        y -= radius;
         var pentagonCos = anychart.enums.PENTAGON_COS;
         var pentagonSin = anychart.enums.PENTAGON_SIN;
         path.moveTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
