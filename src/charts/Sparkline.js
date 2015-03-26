@@ -2040,6 +2040,8 @@ anychart.charts.Sparkline.prototype.markers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.markers_.setup(opt_value);
     return this;
   }
@@ -2076,6 +2078,8 @@ anychart.charts.Sparkline.prototype.negativeMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.negativeMarkers_.setup(opt_value);
     return this;
   }
@@ -2112,6 +2116,8 @@ anychart.charts.Sparkline.prototype.firstMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.firstMarkers_.setup(opt_value);
     return this;
   }
@@ -2148,6 +2154,8 @@ anychart.charts.Sparkline.prototype.lastMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.lastMarkers_.setup(opt_value);
     return this;
   }
@@ -2184,6 +2192,8 @@ anychart.charts.Sparkline.prototype.maxMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.maxMarkers_.setup(opt_value);
     return this;
   }
@@ -2220,6 +2230,8 @@ anychart.charts.Sparkline.prototype.minMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.minMarkers_.setup(opt_value);
     return this;
   }
@@ -2367,6 +2379,8 @@ anychart.charts.Sparkline.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -2403,6 +2417,8 @@ anychart.charts.Sparkline.prototype.negativeLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.negativeLabels_.setup(opt_value);
     return this;
   }
@@ -2439,6 +2455,8 @@ anychart.charts.Sparkline.prototype.firstLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.firstLabels_.setup(opt_value);
     return this;
   }
@@ -2475,6 +2493,8 @@ anychart.charts.Sparkline.prototype.lastLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.lastLabels_.setup(opt_value);
     return this;
   }
@@ -2511,6 +2531,8 @@ anychart.charts.Sparkline.prototype.maxLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.maxLabels_.setup(opt_value);
     return this;
   }
@@ -2547,6 +2569,8 @@ anychart.charts.Sparkline.prototype.minLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.minLabels_.setup(opt_value);
     return this;
   }

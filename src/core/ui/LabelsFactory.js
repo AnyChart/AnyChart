@@ -2392,6 +2392,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
   this.adjustFontSize(config['adjustFontSize']);
   this.minFontSize(config['minFontSize']);
   this.minFontSize(config['minFontSize']);
+  if (!goog.isDef(config['enabled'])) delete this.settingsObj.enabledLabel;
 };
 
 
