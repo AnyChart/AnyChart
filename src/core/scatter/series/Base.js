@@ -870,10 +870,7 @@ anychart.core.scatter.series.Base.prototype.getErrorPath = function(stroke) {
  * @return {Array.<number, number>} Array of lower and upper errors value.
  */
 anychart.core.scatter.series.Base.prototype.getErrorValues = function(horizontal) {
-  if (this.isErrorAvailable())
-    return this.error().getErrorValues(horizontal);
-  else
-    return [0, 0];
+  return this.error().getErrorValues(horizontal);
 };
 
 
