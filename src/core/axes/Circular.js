@@ -481,6 +481,17 @@ anychart.core.axes.Circular.prototype.getPixRadius = function() {
 
 
 /**
+ * Internal getter for fixed gauge start angle. All for human comfort.
+ * @return {number}
+ */
+anychart.core.axes.Circular.prototype.getStartAngle = function() {
+  return goog.isDefAndNotNull(this.startAngle_) ?
+      this.startAngle_ + anychart.gauges.Circular.DEFAULT_START_ANGLE :
+      this.gauge_.getStartAngle();
+};
+
+
+/**
  * @private
  */
 anychart.core.axes.Circular.prototype.dropBoundsCache_ = function() {
@@ -765,7 +776,7 @@ anychart.core.axes.Circular.prototype.getLabelBounds_ = function(index, isMajor)
   var radius = this.getLabelRadius_(bounds.height, isMajor, autoRotate ? bounds.height : 0);
   radius += anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.gauge_.getPixRadius());
 
-  var startAngle = goog.isDef(this.startAngle_) ? this.startAngle_ : this.gauge_.startAngle();
+  var startAngle = this.getStartAngle();
   var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
 
   var angle = goog.math.standardAngle(startAngle + ratio * sweepAngle);
@@ -976,7 +987,7 @@ anychart.core.axes.Circular.prototype.draw = function() {
 
   var ticksDrawer, labelsDrawer, minorTicksDrawer, minorLabelsDrawer;
 
-  var startAngle = goog.isDefAndNotNull(this.startAngle_) ? this.startAngle_ : this.gauge_.startAngle();
+  var startAngle = this.getStartAngle();
   var sweepAngle = goog.isDefAndNotNull(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
   var cx = this.gauge_.getCx();
   var cy = this.gauge_.getCy();

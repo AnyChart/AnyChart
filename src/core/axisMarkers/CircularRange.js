@@ -380,7 +380,7 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
       if (fromRatio == toRatio)
         return this;
 
-      var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.startAngle() : gauge.startAngle());
+      var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
       var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
       var startAngle = axisStartAngle + fromRatio * axisSweepAngle;
       var endAngle = axisStartAngle + toRatio * axisSweepAngle;

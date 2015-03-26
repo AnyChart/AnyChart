@@ -183,7 +183,7 @@ anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
  */
 anychart.charts.Polar.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.math.standardAngle((goog.isNull(opt_value) || isNaN(+opt_value)) ? 0 : +opt_value);
+    opt_value = goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
     if (this.startAngle_ != opt_value) {
       this.startAngle_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);

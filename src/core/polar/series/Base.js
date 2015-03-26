@@ -657,6 +657,9 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
   var Cx, Cy, Ca, Cr;
   var Dx, Dy, Da, Dr;
 
+
+  var xScale = /** @type {anychart.scales.Base} */(this.xScale());
+
   if (startPoint) {
     Ax = startPoint[0];
     Ay = startPoint[1];
@@ -681,9 +684,15 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
     Da = NaN;
   }
 
+  var sweep;
+  if (xScale.inverted()) {
+    if (Da > Aa) Da -= Math.PI * 2;
+    sweep = Aa - Da;
+  } else {
+    if (Aa > Da) Aa -= Math.PI * 2;
+    sweep = Da - Aa;
+  }
 
-  if (Aa > Da) Aa -= Math.PI * 2;
-  var sweep = Da - Aa;
   sweep = isNaN(sweep) ? sweep : anychart.math.round(sweep, 4);
   if (sweep == 0) return null;
 
@@ -703,7 +712,7 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
 
     for (i = 0; i < parts; i++) {
       angleStep = (i == parts - 1 && sweep % a90 != 0) ? sweep % a90 : a90;
-      Ea = Sa + angleStep;
+      Ea = Sa + (xScale.inverted() ? -angleStep : angleStep);
       Er = (Ea - Sa) * (Dr - Sr) / (Da - Sa) + Sr;
       Ex = this.cx + Er * Math.cos(Ea);
       Ey = this.cy + Er * Math.sin(Ea);
@@ -718,21 +727,39 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
   } else {
     angleStep = sweep / 3;
 
-    Ba = Aa + angleStep;
-    Br = (Ba - Aa) * (Dr - Ar) / (Da - Aa) + Ar;
-    Bx = this.cx + Br * Math.cos(Ba);
-    By = this.cy + Br * Math.sin(Ba);
+    if (xScale.inverted()) {
+      Ba = Da + angleStep;
+      Br = (Ba - Da) * (Ar - Dr) / (Aa - Da) + Dr;
+      Bx = this.cx + Br * Math.cos(Ba);
+      By = this.cy + Br * Math.sin(Ba);
 
-    Ca = Aa + angleStep * 2;
-    Cr = (Ca - Aa) * (Dr - Ar) / (Da - Aa) + Ar;
-    Cx = this.cx + Cr * Math.cos(Ca);
-    Cy = this.cy + Cr * Math.sin(Ca);
+      Ca = Da + angleStep * 2;
+      Cr = (Ca - Da) * (Ar - Dr) / (Aa - Da) + Dr;
+      Cx = this.cx + Cr * Math.cos(Ca);
+      Cy = this.cy + Cr * Math.sin(Ca);
 
-    P2x = (-5 * Ax + 18 * Bx - 9 * Cx + 2 * Dx) / 6;
-    P2y = (-5 * Ay + 18 * By - 9 * Cy + 2 * Dy) / 6;
+      P2x = (2 * Dx - 9 * Bx + 18 * Cx - 5 * Ax) / 6;
+      P2y = (2 * Dy - 9 * By + 18 * Cy - 5 * Ay) / 6;
 
-    P3x = (2 * Ax - 9 * Bx + 18 * Cx - 5 * Dx) / 6;
-    P3y = (2 * Ay - 9 * By + 18 * Cy - 5 * Dy) / 6;
+      P3x = (-5 * Dx + 18 * Bx - 9 * Cx + 2 * Ax) / 6;
+      P3y = (-5 * Dy + 18 * By - 9 * Cy + 2 * Ay) / 6;
+    } else {
+      Ba = Aa + angleStep;
+      Br = (Ba - Aa) * (Dr - Ar) / (Da - Aa) + Ar;
+      Bx = this.cx + Br * Math.cos(Ba);
+      By = this.cy + Br * Math.sin(Ba);
+
+      Ca = Aa + angleStep * 2;
+      Cr = (Ca - Aa) * (Dr - Ar) / (Da - Aa) + Ar;
+      Cx = this.cx + Cr * Math.cos(Ca);
+      Cy = this.cy + Cr * Math.sin(Ca);
+
+      P2x = (-5 * Ax + 18 * Bx - 9 * Cx + 2 * Dx) / 6;
+      P2y = (-5 * Ay + 18 * By - 9 * Cy + 2 * Dy) / 6;
+
+      P3x = (2 * Ax - 9 * Bx + 18 * Cx - 5 * Dx) / 6;
+      P3y = (2 * Ay - 9 * By + 18 * Cy - 5 * Dy) / 6;
+    }
 
     P4x = Dx;
     P4y = Dy;
@@ -787,6 +814,7 @@ anychart.core.polar.series.Base.prototype.getValuePointCoords = function() {
   if (isNaN(Dx) || isNaN(Dy)) fail = true;
 
   var res = this.approximateCurve(this.prevValuePointCoords, [Dx, Dy, Da, Dr]);
+  //var res = this.approximateCurve([Dx, Dy, Da, Dr], this.prevValuePointCoords);
 
   if (!fail) {
     if (!this.prevValuePointCoords)

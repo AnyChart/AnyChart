@@ -236,9 +236,8 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
       this.domElement.clear();
 
     var axisRadius = axis.getPixRadius();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.startAngle() : gauge.startAngle());
+    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
-
 
     var pixStartRadius = anychart.utils.normalizeSize(
         goog.isDefAndNotNull(this.startRadius_) ? this.startRadius_ : '-20%', gauge.getPixRadius());
@@ -307,7 +306,8 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
     this.contextProvider['middleWidth'] = pixMiddleWidth;
     this.contextProvider['endRadius'] = pixEndRadius;
     this.contextProvider['endWidth'] = pixEndWidth;
-    this.contextProvider['angle'] = angle;
+    //we shouldn't opening secret for mere mortals
+    this.contextProvider['angle'] = goog.math.standardAngle(angle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
 
 
     this.domElement

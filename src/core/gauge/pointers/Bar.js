@@ -157,7 +157,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
 
     var axisRadius = axis.getPixRadius();
     var axisWidth = axis.getPixWidth();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.startAngle() : gauge.startAngle());
+    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
 
     var pixRadius = goog.isDefAndNotNull(this.radius_) ?
@@ -185,7 +185,8 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
     this.contextProvider['cx'] = cx;
     this.contextProvider['cy'] = cy;
     this.contextProvider['radius'] = pixRadius;
-    this.contextProvider['startAngle'] = startAngle;
+    //we shouldn't opening secret for mere mortals
+    this.contextProvider['startAngle'] = goog.math.standardAngle(startAngle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
     this.contextProvider['sweepAngle'] = sweepAngle;
     this.contextProvider['width'] = pixWidth;
 

@@ -42,10 +42,10 @@ anychart.charts.Pie = function(opt_data) {
 
   /**
    * Start angle for the first slice of a pie chart.
-   * @type {(string|number)}
+   * @type {number}
    * @private
    */
-  this.startAngle_ = -90;
+  this.startAngle_ = 0;
 
   /**
    * Outer radius of the pie chart.
@@ -293,6 +293,13 @@ anychart.charts.Pie.ZINDEX_HATCH_FILL = 31;
  * @type {number}
  */
 anychart.charts.Pie.ZINDEX_LABEL = 32;
+
+
+/**
+ * Default start angle.
+ * @type {number}
+ */
+anychart.charts.Pie.DEFAULT_START_ANGLE = -90;
 
 
 /**
@@ -1362,7 +1369,7 @@ anychart.charts.Pie.prototype.getPixelInnerRadius = function() {
 
 /**
  * Getter for the angle from which the first slice is drawn clockwise.
- * @return {(string|number)} Current start angle.
+ * @return {(number)} Current start angle.
  *//**
  * Setter for the angle from which the first slice is drawn clockwise.
  * @illustration <t>stageOnly</t>
@@ -1390,17 +1397,29 @@ anychart.charts.Pie.prototype.getPixelInnerRadius = function() {
  *//**
  * @ignoreDoc
  * @param {(string|number)=} opt_value .
- * @return {(string|number|anychart.charts.Pie)} .
+ * @return {(number|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.startAngle_ = (goog.isNull(opt_value) || isNaN(+opt_value)) ? -90 : goog.math.standardAngle(+opt_value);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-        anychart.Signal.NEEDS_REDRAW);
+    opt_value = goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
+    if (this.startAngle_ != opt_value) {
+      this.startAngle_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+          anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   } else {
     return this.startAngle_;
   }
+};
+
+
+/**
+ * Internal getter for fixed gauge start angle. All for human comfort.
+ * @return {number}
+ */
+anychart.charts.Pie.prototype.getStartAngle = function() {
+  return this.startAngle_ + anychart.charts.Pie.DEFAULT_START_ANGLE;
 };
 
 
@@ -1795,7 +1814,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       this.hatchLayer_.zIndex(/** @type {number} */(anychart.charts.Pie.ZINDEX_HATCH_FILL)).disablePointerEvents(true);
     }
 
-    var start = /** @type {number} */ (this.startAngle_);
+    var start = /** @type {number} */ (this.getStartAngle());
     var sweep = 0;
 
     iterator.reset();

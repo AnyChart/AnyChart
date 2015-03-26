@@ -218,7 +218,7 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
       this.domElement.clear();
 
     var axisRadius = axis.getPixRadius();
-    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.startAngle() : gauge.startAngle());
+    var axisStartAngle = /** @type {number} */(goog.isDef(axis.startAngle()) ? axis.getStartAngle() : gauge.getStartAngle());
     var axisSweepAngle = /** @type {number} */(goog.isDef(axis.sweepAngle()) ? axis.sweepAngle() : gauge.sweepAngle());
 
     var pixTopRadius = goog.isDefAndNotNull(this.topRadius_) ?
@@ -242,7 +242,8 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
     this.contextProvider['cy'] = cy;
     this.contextProvider['topRadius'] = pixTopRadius;
     this.contextProvider['bottomRadius'] = pixBottomRadius;
-    this.contextProvider['angle'] = startAngle;
+    //we shouldn't opening secret for mere mortals
+    this.contextProvider['angle'] = goog.math.standardAngle(startAngle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
 
 
     var r0 = Math.abs(pixTopRadius - pixBottomRadius);

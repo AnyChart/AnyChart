@@ -108,6 +108,13 @@ anychart.gauges.Circular.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.Hatc
 
 
 /**
+ * Default start angle.
+ * @type {number}
+ */
+anychart.gauges.Circular.DEFAULT_START_ANGLE = -90;
+
+
+/**
  * Z-index frame.
  * @type {number}
  */
@@ -693,6 +700,15 @@ anychart.gauges.Circular.prototype.getPixRadius = function() {
 
 
 /**
+ * Internal getter for fixed gauge start angle. All for human comfort.
+ * @return {number}
+ */
+anychart.gauges.Circular.prototype.getStartAngle = function() {
+  return this.startAngle_ + anychart.gauges.Circular.DEFAULT_START_ANGLE;
+};
+
+
+/**
  * Gets X coordinate of gauge center point.
  * @return {number}
  */
@@ -744,7 +760,7 @@ anychart.gauges.Circular.prototype.circularPadding = function(opt_value) {
  */
 anychart.gauges.Circular.prototype.createFrame_ = function(path, cx, cy, radius) {
   var sweepAngle = this.sweepAngle_;
-  var startAngle = this.startAngle_;
+  var startAngle = this.getStartAngle();
 
   var endAngle = startAngle + sweepAngle;
 
@@ -966,7 +982,7 @@ anychart.gauges.Circular.prototype.setLabelSettings = function(label, bounds) {
   label.parentRadius(this.getPixRadius());
   label.cx(this.getCx());
   label.cy(this.getCy());
-  label.startAngle(this.startAngle());
+  label.startAngle(this.getStartAngle());
   label.sweepAngle(this.sweepAngle());
 };
 

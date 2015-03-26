@@ -43,7 +43,7 @@ function load() {
       .container('container')
       //.innerRadius('33%')
       .insideLabelsOffset('60%')
-      .startAngle(0)
+      .startAngle(0);
       //.explode(15);
   //chart.hatchFill('vertical');
   //chart.hoverHatchFill('horizontal');

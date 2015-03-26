@@ -455,7 +455,7 @@ anychart.onDocumentLoad(function() {
     [190, 19.101],
     [216, 40.997],
     [280, 31.462],
-    [356, 30.279]
+    [356,30.279]
   ];
 
 
@@ -476,10 +476,10 @@ anychart.onDocumentLoad(function() {
       .startAngle(0);
 
   //chart.yScale().ticks().interval(10);
-  chart.yScale(anychart.scales.ordinal());
+  chart.xScale().maximum(360).minimum(0).inverted(false);
+  //chart.yScale().inverted(true);
 
-  chart.xScale().maximum(360).minimum(0);
-  chart.xScale().ticks().interval(15);
+  //chart.xScale().ticks().interval(15);
 
 
   chart.yAxis().minorTicks().enabled(false);
@@ -487,22 +487,22 @@ anychart.onDocumentLoad(function() {
       .textFormatter(function() {
         return this['value'] + '°'
       });
-  chart.xAxis().minorLabels().enabled(true);
-  chart.xAxis().minorTicks().enabled(true);
+
+  //chart.xAxis().minorLabels().enabled(true);
+  //chart.xAxis().minorTicks().enabled(true);
 
   chart.title(null);
   chart.background().enabled(true);
 
-  chart.grid(0).oddFill('white').stroke('5 green').drawLastLine(false);
-  chart.grid(1).oddFill(null).evenFill(null);
-
-
   chart.palette(['blue .3', 'red .3', '#44F24A .9']);
+
   var series1 = chart.line().closed(false).connectMissingPoints(false);
+  series1.data(data5);
   series1.markers();
   series1.stroke('3 blue');
 
   var series2 = chart.area().closed(false).connectMissingPoints(false);
+  series2.data(data6);
   series2.stroke('3 red');
 
   //var series3 = chart.marker(data3);
