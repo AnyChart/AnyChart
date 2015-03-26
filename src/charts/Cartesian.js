@@ -2191,13 +2191,16 @@ anychart.charts.Cartesian.prototype.setupPalette_ = function(cls, opt_cloneFrom)
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
   } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
     goog.dispose(this.palette_);
     this.palette_ = new cls();
     if (opt_cloneFrom)
       this.palette_.setup(opt_cloneFrom);
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    if (doDispatch)
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_PALETTE, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
