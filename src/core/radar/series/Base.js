@@ -1046,7 +1046,7 @@ anychart.core.radar.series.Base.prototype.hideTooltip = function() {
  */
 anychart.core.radar.series.Base.prototype.createFormatProvider = function() {
   if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['x', 'value']);
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['x', 'value'], false);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };

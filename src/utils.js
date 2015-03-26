@@ -1018,7 +1018,7 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
       return 'Dates range must be set for Gantt DateTime scale. Please, use scale.setRange(minDate, maxDate) to set it.';
 
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
-      return 'Scatter chart scales should be only scatter type (linear, log)';
+      return 'Scatter chart scales should be only scatter type (linear, log).';
 
     default:
       return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
@@ -1134,6 +1134,10 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
       return 'Can not fit gantt chart timeline to task with id \'' + opt_arguments[0] + '\' because both fields \'' +
           anychart.enums.GanttDataFields.ACTUAL_START + '\' and \'' + anychart.enums.GanttDataFields.ACTUAL_END +
           '\' must be specified in data item.';
+
+    case anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR:
+      return 'Series type "' + opt_arguments[0] + '" does not support error settings - ' +
+          'only Area, Bar, Column, Line, Marker, Spline, SplineArea, StepLine and StepLineArea do.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

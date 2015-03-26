@@ -787,6 +787,8 @@ anychart.core.scatter.series.Base.prototype.isErrorAvailable = function() {
  * @return {(anychart.core.utils.Error|anychart.core.scatter.series.Base)}
  */
 anychart.core.scatter.series.Base.prototype.error = function(opt_value) {
+  if (!this.isErrorAvailable())
+    anychart.utils.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.getType()]);
   if (!this.error_) {
     this.error_ = new anychart.core.utils.Error(this);
     this.registerDisposable(this.error_);
@@ -844,7 +846,7 @@ anychart.core.scatter.series.Base.prototype.resetErrorPaths = function() {
  * @protected
  */
 anychart.core.scatter.series.Base.prototype.getErrorPath = function(stroke) {
-  var hash = anychart.utils.hash(stroke);
+  var hash = '' + this.getIterator().getIndex() + anychart.utils.hash(stroke);
   if (hash in this.errorPaths_)
     return this.errorPaths_[hash];
   else {
@@ -853,6 +855,7 @@ anychart.core.scatter.series.Base.prototype.getErrorPath = function(stroke) {
         /** @type {!acgraph.vector.Path} */ (acgraph.path().zIndex(anychart.core.scatter.series.Base.ZINDEX_ERROR_PATH));
 
     this.rootLayer.addChild(path);
+    this.makeHoverable(path);
     path.stroke(stroke);
     path.fill(null);
     this.errorPaths_[hash] = path;
@@ -877,7 +880,7 @@ anychart.core.scatter.series.Base.prototype.getErrorValues = function(horizontal
 anychart.core.scatter.series.Base.prototype.drawError = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var error = this.error();
-    var errorMode = error.errorMode();
+    var errorMode = error.mode();
     var isBarBased = false;
 
     switch (errorMode) {
@@ -1106,7 +1109,8 @@ anychart.core.scatter.series.Base.prototype.hideTooltip = function() {
 anychart.core.scatter.series.Base.prototype.createFormatProvider = function() {
   if (!this.pointProvider_) {
     var referenceValueNames = this.isSizeBased() ? ['x', 'value', 'size'] : ['x', 'value'];
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, referenceValueNames);
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, referenceValueNames,
+        this.isErrorAvailable() && anychart.core.utils.Error.isErrorAvailableForScale(this.xScale_));
   }
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;

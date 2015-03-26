@@ -1271,7 +1271,8 @@ anychart.core.cartesian.series.Base.prototype.hideTooltip = function() {
  */
 anychart.core.cartesian.series.Base.prototype.createFormatProvider = function() {
   if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames);
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames,
+        this.isErrorAvailable() && anychart.core.utils.Error.isErrorAvailableForScale(this.xScale_));
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };
@@ -2400,6 +2401,8 @@ anychart.core.cartesian.series.Base.prototype.getEnableChangeSignals = function(
  * @return {(anychart.core.utils.Error|anychart.core.cartesian.series.Base)}
  */
 anychart.core.cartesian.series.Base.prototype.error = function(opt_value) {
+  if (!this.isErrorAvailable())
+    anychart.utils.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.getType()]);
   if (!this.error_) {
     this.error_ = new anychart.core.utils.Error(this);
     this.registerDisposable(this.error_);
@@ -2456,7 +2459,7 @@ anychart.core.cartesian.series.Base.prototype.resetErrorPaths = function() {
  * @return {!acgraph.vector.Path}
  */
 anychart.core.cartesian.series.Base.prototype.getErrorPath = function(stroke) {
-  var hash = anychart.utils.hash(stroke);
+  var hash = '' + this.getIterator().getIndex() + anychart.utils.hash(stroke);
   if (hash in this.errorPaths_)
     return this.errorPaths_[hash];
   else {
@@ -2465,6 +2468,7 @@ anychart.core.cartesian.series.Base.prototype.getErrorPath = function(stroke) {
         /** @type {!acgraph.vector.Path} */ (acgraph.path().zIndex(anychart.core.cartesian.series.Base.ZINDEX_ERROR_PATH));
 
     this.rootLayer.addChild(path);
+    this.makeHoverable(path);
     path.stroke(stroke);
     path.fill(null);
     this.errorPaths_[hash] = path;
@@ -2489,7 +2493,7 @@ anychart.core.cartesian.series.Base.prototype.getErrorValues = function(horizont
 anychart.core.cartesian.series.Base.prototype.drawError = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var error = this.error();
-    var errorMode = error.errorMode();
+    var errorMode = error.mode();
     var isBarBased = this.isBarBased();
 
     switch (errorMode) {

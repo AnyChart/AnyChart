@@ -46,7 +46,7 @@ anychart.core.utils.Error = function(series) {
    * @type {anychart.enums.ErrorMode}
    * @private
    */
-  this.errorMode_ = anychart.enums.ErrorMode.BOTH;
+  this.mode_ = anychart.enums.ErrorMode.BOTH;
 
   /**
    * X error.
@@ -142,16 +142,16 @@ anychart.core.utils.Error.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {string=} opt_value value.
  * @return {(anychart.enums.ErrorMode|anychart.core.utils.Error)} Error mode or self for chaining.
  */
-anychart.core.utils.Error.prototype.errorMode = function(opt_value) {
+anychart.core.utils.Error.prototype.mode = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeErrorMode(opt_value);
-    if (this.errorMode_ != opt_value) {
-      this.errorMode_ = opt_value;
+    if (this.mode_ != opt_value) {
+      this.mode_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
-  return this.errorMode_;
+  return this.mode_;
 };
 
 
@@ -539,7 +539,7 @@ anychart.core.utils.Error.prototype.getErrorValues = function(horizontal) {
  */
 anychart.core.utils.Error.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['errorMode'] = this.errorMode();
+  json['mode'] = this.mode();
   json['xError'] = this.xError();
   if (goog.isDef(this.xUpperError()))
     json['xUpperError'] = this.xUpperError();
@@ -591,9 +591,9 @@ anychart.core.utils.Error.prototype.setupSpecial = function(var_args) {
     return true;
   } else if (goog.isBoolean(arg0)) {
     if (arg0)
-      this.errorMode(anychart.enums.ErrorMode.BOTH);
+      this.mode(anychart.enums.ErrorMode.BOTH);
     else
-      this.errorMode(anychart.enums.ErrorMode.NONE);
+      this.mode(anychart.enums.ErrorMode.NONE);
     return true;
   }
   return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
@@ -605,7 +605,7 @@ anychart.core.utils.Error.prototype.setupSpecial = function(var_args) {
  */
 anychart.core.utils.Error.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.errorMode(config['errorMode']);
+  this.mode(config['mode']);
   this.xError(config['xError']);
   this.xUpperError(config['xUpperError']);
   this.xLowerError(config['xLowerError']);
@@ -697,8 +697,16 @@ anychart.core.utils.ISeriesWithError.prototype.isErrorAvailable;
  */
 anychart.core.utils.ISeriesWithError.prototype.drawError;
 
+
+/**
+ * Gets/Sets an error for series.
+ * @param {(Object|null|boolean|string)=} opt_value Error or self for chaining.
+ * @return {(anychart.core.utils.Error|anychart.core.utils.ISeriesWithError)}
+ */
+anychart.core.utils.ISeriesWithError.prototype.error;
+
 //exports
-anychart.core.utils.Error.prototype['errorMode'] = anychart.core.utils.Error.prototype.errorMode;
+anychart.core.utils.Error.prototype['mode'] = anychart.core.utils.Error.prototype.mode;
 anychart.core.utils.Error.prototype['xError'] = anychart.core.utils.Error.prototype.xError;
 anychart.core.utils.Error.prototype['xUpperError'] = anychart.core.utils.Error.prototype.xUpperError;
 anychart.core.utils.Error.prototype['xLowerError'] = anychart.core.utils.Error.prototype.xLowerError;

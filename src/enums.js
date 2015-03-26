@@ -1632,6 +1632,8 @@ anychart.enums.WarningCode = {
 
   GANTT_FIT_TO_TASK: 11,
 
+  SERIES_DOESNT_SUPPORT_ERROR: 12,
+
   NOT_FOUND: 404
 
 };
