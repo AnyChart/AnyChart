@@ -303,7 +303,7 @@ anychart.core.ui.DataGrid = function() {
 
   this
       .column(1)
-      .useButtons(true)
+      .collapseExpandButtons(true)
       .textFormatter(function(item) {
         return goog.isDefAndNotNull(item.get('name')) ? item.get('name') + '' : '';
       })
@@ -1883,7 +1883,7 @@ anychart.core.ui.DataGrid.Column = function(dataGrid) {
    * @type {boolean}
    * @private
    */
-  this.useButtons_ = false;
+  this.collapseExpandButtons_ = false;
 
   /**
    * Pool of collapse/expand buttons.
@@ -2053,15 +2053,15 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettingsOverrider = function(
  * @param {boolean=} opt_value - Value to be set.
  * @return {(anychart.core.ui.DataGrid.Column|boolean)} - Current value or itself for method chaining.
  */
-anychart.core.ui.DataGrid.Column.prototype.useButtons = function(opt_value) {
+anychart.core.ui.DataGrid.Column.prototype.collapseExpandButtons = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.useButtons_ != opt_value) {
-      this.useButtons_ = opt_value;
+    if (this.collapseExpandButtons_ != opt_value) {
+      this.collapseExpandButtons_ = opt_value;
       this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.useButtons_;
+  return this.collapseExpandButtons_;
 };
 
 
@@ -2388,7 +2388,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         var addButton = 0;
         var newButton = false;
 
-        if (this.useButtons_ && item.numChildren()) {
+        if (this.collapseExpandButtons_ && item.numChildren()) {
           counter++;
           addButton = anychart.core.ui.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE + anychart.core.ui.DataGrid.DEFAULT_PADDING;
           var button = this.buttons_[counter];
@@ -2445,7 +2445,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
       }
 
-      while (++counter < this.buttons_.length && this.useButtons_) { //This disables all remaining buttons.
+      while (++counter < this.buttons_.length && this.collapseExpandButtons_) { //This disables all remaining buttons.
         if (!this.buttons_[counter].enabled()) break;
         this.buttons_[counter].enabled(false).draw();
       }
@@ -2484,7 +2484,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 
   json['width'] = this.width_;
   json['height'] = this.height_;
-  json['useButtons'] = this.useButtons_;
+  json['collapseExpandButtons'] = this.collapseExpandButtons_;
   json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
   json['labelsFactory'] = this.labelsFactory_.serialize();
   json['title'] = this.title_.serialize();
@@ -2500,7 +2500,7 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
   this
       .width(json['width'])
       .height(json['height'])
-      .useButtons(json['useButtons'])
+      .collapseExpandButtons(json['collapseExpandButtons'])
       .depthPaddingMultiplier(json['depthPaddingMultiplier'])
       .cellTextSettings(json['labelsFactory'])
       .title(json['title']);
@@ -2635,4 +2635,6 @@ anychart.core.ui.DataGrid.Column.prototype['enabled'] = anychart.core.ui.DataGri
 anychart.core.ui.DataGrid.Column.prototype['textFormatter'] = anychart.core.ui.DataGrid.Column.prototype.textFormatter;
 anychart.core.ui.DataGrid.Column.prototype['cellTextSettings'] = anychart.core.ui.DataGrid.Column.prototype.cellTextSettings;
 anychart.core.ui.DataGrid.Column.prototype['cellTextSettingsOverrider'] = anychart.core.ui.DataGrid.Column.prototype.cellTextSettingsOverrider;
+anychart.core.ui.DataGrid.Column.prototype['collapseExpandButtons'] = anychart.core.ui.DataGrid.Column.prototype.collapseExpandButtons;
+anychart.core.ui.DataGrid.Column.prototype['depthPaddingMultiplier'] = anychart.core.ui.DataGrid.Column.prototype.depthPaddingMultiplier;
 anychart.core.ui.DataGrid.Column.prototype['draw'] = anychart.core.ui.DataGrid.Column.prototype.draw;
