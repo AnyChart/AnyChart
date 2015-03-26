@@ -1743,6 +1743,79 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Text hAlign/vAlign
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Horizontal align enum.
+ * @enum {string}
+ */
+anychart.enums.HALIGN = acgraph.vector.Text.HAlign;
+
+
+/**
+ * Normalizes HAlign enum.
+ * @param {*} value
+ * @return {acgraph.vector.Text.HAlign}
+ */
+anychart.enums.normalizeHAlign = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'left':
+    case 'l':
+      return anychart.enums.HALIGN.LEFT;
+    case 'right':
+    case 'r':
+      return anychart.enums.HALIGN.RIGHT;
+    case 'center':
+    case 'middle':
+    case 'c':
+    case 'm':
+      return anychart.enums.HALIGN.CENTER;
+    case 'start':
+    case 's':
+      return anychart.enums.HALIGN.START;
+    case 'end':
+    case 'e':
+      return anychart.enums.HALIGN.END;
+  }
+  return anychart.enums.HALIGN.START;
+};
+
+
+/**
+ * Vertical align enum.
+ * @enum {string}
+ */
+anychart.enums.VALIGN = acgraph.vector.Text.VAlign;
+
+
+/**
+ * Normalizes VAlign enum.
+ * @param {*} value
+ * @return {acgraph.vector.Text.VAlign}
+ */
+anychart.enums.normalizeVAlign = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'top':
+    case 't':
+      return anychart.enums.VALIGN.TOP;
+    case 'bottom':
+    case 'b':
+      return anychart.enums.VALIGN.BOTTOM;
+    case 'center':
+    case 'middle':
+    case 'c':
+    case 'm':
+      return anychart.enums.VALIGN.MIDDLE;
+  }
+  return anychart.enums.VALIGN.TOP;
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
