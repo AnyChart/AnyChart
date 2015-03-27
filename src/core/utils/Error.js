@@ -391,7 +391,9 @@ anychart.core.utils.Error.prototype.drawVerticalErrorLine_ = function(path, lowe
  * @return {boolean} Availability.
  */
 anychart.core.utils.Error.isErrorAvailableForScale = function(scale) {
-  return (scale instanceof anychart.scales.ScatterBase) && (scale.stackMode() == anychart.enums.ScaleStackMode.NONE);
+  return (scale instanceof anychart.scales.ScatterBase) &&
+      !(scale instanceof anychart.scales.DateTime) &&
+      (scale.stackMode() == anychart.enums.ScaleStackMode.NONE);
 };
 
 
