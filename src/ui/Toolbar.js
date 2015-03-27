@@ -55,21 +55,22 @@ anychart.ui.Toolbar = function() {
   printA4.setId('anychart_print_a4');
   printMenu.addChild(printA4, true);
 
-  var printA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  printA3.setId('anychart_print_a3');
-  printMenu.addChild(printA3, true);
-
-  var printA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  printA2.setId('anychart_print_a2');
-  printMenu.addChild(printA2, true);
-
-  var printA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  printA1.setId('anychart_print_a1');
-  printMenu.addChild(printA1, true);
-
-  var printA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  printA0.setId('anychart_print_a0');
-  printMenu.addChild(printA0, true);
+  //TODO (A.Kudryavtsev): Uncomment on future implementation.
+  //var printA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //printA3.setId('anychart_print_a3');
+  //printMenu.addChild(printA3, true);
+  //
+  //var printA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //printA2.setId('anychart_print_a2');
+  //printMenu.addChild(printA2, true);
+  //
+  //var printA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //printA1.setId('anychart_print_a1');
+  //printMenu.addChild(printA1, true);
+  //
+  //var printA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //printA0.setId('anychart_print_a0');
+  //printMenu.addChild(printA0, true);
 
   printMenu.render(); //Create a DOM-structure to attach 'action'-event.
 
