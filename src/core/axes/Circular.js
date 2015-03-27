@@ -1276,10 +1276,13 @@ anychart.core.axes.Circular.prototype.serialize = function() {
   if (goog.isDef(this.sweepAngle()))
     json['sweepAngle'] = this.sweepAngle();
 
+  if (goog.isDef(this.width()))
+    json['width'] = this.width();
+  if (goog.isDef(this.radius()))
+    json['radius'] = this.radius();
+
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['width'] = this.width();
   json['overlapMode'] = this.overlapMode();
-  json['radius'] = this.radius();
 
   json['drawFirstLabel'] = this.drawFirstLabel();
   json['drawLastLabel'] = this.drawLastLabel();
