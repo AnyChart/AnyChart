@@ -990,6 +990,17 @@ anychart.core.cartesian.series.Base.prototype.isErrorAvailable = function() {
 };
 
 
+/**
+ * This method is here for compatability.
+ * @ignoreDoc
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.Base)} Markers instance or itself for chaining call.
+ */
+anychart.core.cartesian.series.Base.prototype.outlierMarkers = function(opt_value) {
+  return this;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing.
