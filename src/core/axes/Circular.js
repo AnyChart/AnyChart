@@ -171,7 +171,7 @@ anychart.core.axes.Circular.prototype.overlapMode_ = anychart.enums.LabelsOverla
 anychart.core.axes.Circular.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      opt_value = anychart.enums.getGaugeScale(opt_value);
+      opt_value = this.getGaugeScale_(opt_value);
     }
     if (this.scale_ != opt_value) {
       if (this.scale_)
@@ -189,6 +189,25 @@ anychart.core.axes.Circular.prototype.scale = function(opt_value) {
     }
     return /** @type {anychart.scales.Linear|anychart.scales.Logarithmic}*/(this.scale_);
   }
+};
+
+
+/**
+ * @param {string} value String scale name.
+ * @return {anychart.scales.Linear|anychart.scales.Logarithmic} Scale for gauge axis.
+ * @private
+ */
+anychart.core.axes.Circular.prototype.getGaugeScale_ = function(value) {
+  switch (anychart.enums.normalizeGaugeScaleTypes(value)) {
+    case anychart.enums.GaugeScaleTypes.LINEAR:
+      return anychart.scales.linear();
+      break;
+    case anychart.enums.GaugeScaleTypes.LOG:
+      return anychart.scales.log();
+      break;
+  }
+
+  return anychart.scales.linear();
 };
 
 
@@ -1276,10 +1295,13 @@ anychart.core.axes.Circular.prototype.serialize = function() {
   if (goog.isDef(this.sweepAngle()))
     json['sweepAngle'] = this.sweepAngle();
 
+  if (goog.isDef(this.width()))
+    json['width'] = this.width();
+  if (goog.isDef(this.radius()))
+    json['radius'] = this.radius();
+
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['width'] = this.width();
   json['overlapMode'] = this.overlapMode();
-  json['radius'] = this.radius();
 
   json['drawFirstLabel'] = this.drawFirstLabel();
   json['drawLastLabel'] = this.drawLastLabel();
@@ -1295,9 +1317,9 @@ anychart.core.axes.Circular.prototype.setupByJSON = function(config) {
   var scale;
   var json = config['scale'];
   if (goog.isString(json)) {
-    scale = anychart.enums.getGaugeScale(json);
+    scale = this.getGaugeScale_(json);
   } else if (goog.isObject(json)) {
-    scale = anychart.enums.getGaugeScale(json['type']);
+    scale = this.getGaugeScale_(json['type']);
     scale.setup(json);
   } else {
     scale = null;

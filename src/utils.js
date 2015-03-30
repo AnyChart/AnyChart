@@ -666,14 +666,13 @@ anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#:%_(),. -]*$/;
 
 /**
  * Converts JSON object to an XML Node tree or String (string by default).
- * @param {Object|string} json
+ * @param {Object|string|number} json
  * @param {string} rootNodeName
  * @param {Document} doc
- * @return {Node}
+ * @return {!Node}
  * @private
  */
 anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
-  if (goog.isNull(json)) return null;
   rootNodeName = anychart.utils.toXmlCase(rootNodeName);
   var root = doc.createElement(rootNodeName);
   var i, j;
@@ -685,7 +684,7 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
         root.appendChild(anychart.utils.json2xml_({'index': i, 'value': json[i]}, '__element', doc));
       }
     }
-  } else {
+  } else if (goog.isDefAndNotNull(json)) {
     for (i in json) {
       if (json.hasOwnProperty(i)) {
         var child = json[i];

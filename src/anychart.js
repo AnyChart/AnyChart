@@ -601,6 +601,22 @@ anychart.circularGauge = anychart.circularGauge || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.ganttProject = anychart.ganttProject || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.ganttResource = anychart.ganttResource || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Resource chart']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -638,3 +654,5 @@ goog.exportSymbol('anychart.radarChart', anychart.radar);
 goog.exportSymbol('anychart.polarChart', anychart.polar);
 goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
+goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
+goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);

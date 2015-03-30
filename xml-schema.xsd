@@ -253,6 +253,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_stem_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="whisker_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_whisker_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="outlier_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_outlier_markers" type="core.MarkersFactory"/>
         </xsd:all>
         <!-- Base series -->
         <xsd:attribute name="series_type" type="enums.SeriesTypes"/>
@@ -325,6 +327,8 @@
         <xsd:attribute name="hover_whisker_stroke" type="xsd:string"/>
         <xsd:attribute name="whisker_width" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="hover_whisker_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="outlier_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="hover_outlier_markers" type="simple.MarkerType"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -908,7 +912,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="x_error_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="value_error_stroke" type="Stroke"/>
         </xsd:all>
-        <xsd:attribute name="error_mode" type="enums.ErrorMode" default="both"/>
+        <xsd:attribute name="mode" type="enums.ErrorMode" default="both"/>
         <xsd:attribute name="x_error" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="x_upper_error" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="x_lower_error" type="simple.NumberOrPercentOrNull"/>

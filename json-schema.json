@@ -1446,6 +1446,18 @@
         },
         "hoverWhiskerWidth": {
           "type": ["string", "number", "null"]
+        },
+        "outlierMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverOutlierMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
         }
       }
     },
@@ -3521,7 +3533,7 @@
     "anychart.core.utils.Error": {
       "type": "object",
       "properties": {
-        "errorMode": {
+        "mode": {
           "$ref": "#/definitions/anychart.enums.ErrorMode"
         },
         "xError": {

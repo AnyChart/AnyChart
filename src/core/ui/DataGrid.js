@@ -344,6 +344,14 @@ anychart.core.ui.DataGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.DATA_GRID_CLICK;
 
 
+//todo: SHOULD COME BACK TO GANTT
+/**
+ * Scroll bar side size.
+ * @type {number}
+ */
+anychart.core.ui.DataGrid.SCROLL_BAR_SIDE = 10;
+
+
 /**
  * Default cell height.
  * @type {number}
@@ -1517,17 +1525,17 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
         horizontalScrollBar = this.getHorizontalScrollBar();
 
         verticalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.charts.Gantt.SCROLL_BAR_SIDE + 1),
-            anychart.charts.Gantt.SCROLL_BAR_SIDE,
-            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
+            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE + 1),
+            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE,
+            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 2)
         );
 
         horizontalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
-            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
-            anychart.charts.Gantt.SCROLL_BAR_SIDE
+            (this.pixelBoundsCache_.left + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
+            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.width - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
+            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE
         );
       }
 
