@@ -192,7 +192,7 @@ def __get_developers_edition_compiler_args():
     ]
 
 def __get_toolbar_css_compiler_args(modules):
-    if ('anychart' in modules) or ('toolbar' in modules):
+    if ('anychart' in modules) or ('toolbar' in modules) or ('anygantt' in modules) or ('anychart_bundle' in modules):
         with open (CSS_PATH, 'r') as css_file:
             #Removing new lines
             css_data = css_file.read().replace('\n', '')

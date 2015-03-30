@@ -4,7 +4,6 @@ goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.Splitter');
-
 goog.require('goog.i18n.DateTimeFormat');
 
 

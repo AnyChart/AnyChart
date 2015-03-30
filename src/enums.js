@@ -1555,24 +1555,6 @@ anychart.enums.normalizeGaugeScaleTypes = function(value) {
 };
 
 
-/**
- * @param {string} value String scale name.
- * @return {anychart.scales.Linear|anychart.scales.Logarithmic} Scale for gauge axis.
- */
-anychart.enums.getGaugeScale = function(value) {
-  switch (anychart.enums.normalizeGaugeScaleTypes(value)) {
-    case anychart.enums.GaugeScaleTypes.LINEAR:
-      return anychart.scales.linear();
-      break;
-    case anychart.enums.GaugeScaleTypes.LOG:
-      return anychart.scales.log();
-      break;
-  }
-
-  return anychart.scales.linear();
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Errors, Warnings, Info
