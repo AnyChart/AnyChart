@@ -1,6 +1,6 @@
 goog.provide('anychart.ui');
 goog.require('anychart.ui.Background');
-//goog.require('anychart.ui.DataGrid');
+goog.require('anychart.ui.DataGrid');
 goog.require('anychart.ui.Label');
 goog.require('anychart.ui.LabelsFactory');
 goog.require('anychart.ui.Legend');
