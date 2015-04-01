@@ -519,7 +519,7 @@ anychart.charts.Scatter.prototype.minorGrid = function(opt_indexOrValue, opt_val
   }
 
   if (goog.isDef(value)) {
-    grid.setup(opt_value);
+    grid.setup(value);
     return this;
   } else {
     return grid;
