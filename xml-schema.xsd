@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd"
-        xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd"
+        targetNamespace="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
+        xmlns="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
         elementFormDefault="qualified">
 
     <!-- Online validator http://www.utilities-online.info/xsdvalidation/#.VImqs6SsUn- -->
