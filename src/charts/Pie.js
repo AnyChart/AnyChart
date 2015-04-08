@@ -18,10 +18,11 @@ goog.require('anychart.palettes.RangeColors');
  * Pie (Donut) Chart Class.<br/>
  * <b>Note:</b> Use method {@link anychart.pie} to get an instance of this class:
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @constructor
  */
-anychart.charts.Pie = function(opt_data) {
+anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   goog.base(this);
   this.suspendSignalsDispatching();
 
@@ -241,7 +242,7 @@ anychart.charts.Pie = function(opt_data) {
       .fontSize(13)
       .padding(1);
   (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
-  this.data(opt_data || null);
+  this.data(opt_data || null, opt_csvSettings);
   this.legend().enabled(true);
 
   this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
@@ -383,13 +384,15 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
  *      .bounds('50%',0,'50%', '100%')
  *      .draw();
  * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_value Data for the chart.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
  * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
  *//**
  * @ignoreDoc
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(anychart.data.View|anychart.charts.Pie)} .
  */
-anychart.charts.Pie.prototype.data = function(opt_value) {
+anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
     if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
 
@@ -409,10 +412,9 @@ anychart.charts.Pie.prototype.data = function(opt_value) {
       } else {
         if (opt_value instanceof anychart.data.Set)
           parentView = (this.parentViewToDispose_ = opt_value).mapAs();
-        else if (goog.isArray(opt_value) || goog.isString(opt_value))
-          parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value)).mapAs();
         else
-          parentView = (this.parentViewToDispose_ = new anychart.data.Set(null)).mapAs();
+          parentView = (this.parentViewToDispose_ = new anychart.data.Set(
+              (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
         this.registerDisposable(this.parentViewToDispose_);
       }
       this.parentView_ = parentView.derive();

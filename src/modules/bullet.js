@@ -12,10 +12,11 @@ goog.require('anychart.modules.base');
  * bulletChart.range(1).from(10).to(20);
  * bulletChart.container(stage).draw();
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {!anychart.charts.Bullet} Bullet chart.
  */
-anychart.bullet = function(opt_data) {
-  return new anychart.charts.Bullet(opt_data);
+anychart.bullet = function(opt_data, opt_csvSettings) {
+  return new anychart.charts.Bullet(opt_data, opt_csvSettings);
 };
 
 

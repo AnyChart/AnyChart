@@ -22,9 +22,10 @@ goog.require('anychart.utils');
  *  </ul>
  * @constructor
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
  */
-anychart.charts.Bullet = function(opt_data) {
+anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
   goog.base(this);
 
   /**
@@ -46,7 +47,7 @@ anychart.charts.Bullet = function(opt_data) {
    */
   this.layout_ = anychart.enums.Layout.HORIZONTAL;
 
-  this.data(opt_data || null);
+  this.data(opt_data || null, opt_csvSettings);
 
 
   //default settings
