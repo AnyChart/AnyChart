@@ -1859,6 +1859,9 @@ goog.exportSymbol('anychart.enums.MarkerType.STAR5', anychart.enums.MarkerType.S
 goog.exportSymbol('anychart.enums.MarkerType.STAR6', anychart.enums.MarkerType.STAR6);
 goog.exportSymbol('anychart.enums.MarkerType.STAR7', anychart.enums.MarkerType.STAR7);
 goog.exportSymbol('anychart.enums.MarkerType.STAR10', anychart.enums.MarkerType.STAR10);
+goog.exportSymbol('anychart.enums.MarkerType.PENTAGON', anychart.enums.MarkerType.PENTAGON);
+goog.exportSymbol('anychart.enums.MarkerType.TRAPEZIUM', anychart.enums.MarkerType.TRAPEZIUM);
+goog.exportSymbol('anychart.enums.MarkerType.LINE', anychart.enums.MarkerType.LINE);
 
 goog.exportSymbol('anychart.enums.MapAsTableMode.VALUE', anychart.enums.MapAsTableMode.VALUE);//doc
 goog.exportSymbol('anychart.enums.MapAsTableMode.RANGE', anychart.enums.MapAsTableMode.RANGE);//doc
