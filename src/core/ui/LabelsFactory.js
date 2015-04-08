@@ -2164,6 +2164,9 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
           currentLabelsFactory[field](),
           !!(settingsChangedStates && settingsChangedStates[field]));
     }
+    if (!(this.mergedSettings['padding'] instanceof anychart.core.utils.Padding)) {
+      this.mergedSettings['padding'] = currentLabelsFactory['padding']().setup(this.superSettingsObj['padding']);
+    }
 
     var adjFontSizePointSupSet = this.superSettingsObj['adjustFontSize'];
     var adjustByWidthPointSupSet, adjustByHeightPointSupSet;
@@ -2206,7 +2209,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       this.backgroundElement_.zIndex(0);
       this.backgroundElement_.container(this.layer_);
     }
-    this.backgroundElement_.setup(this.mergedSettings['background'].serialize());
+    if (this.mergedSettings['background'] instanceof anychart.core.ui.Background)
+      this.backgroundElement_.setup(this.mergedSettings['background'].serialize());
+    else
+      this.backgroundElement_.setup(this.mergedSettings['background']);
     this.backgroundElement_.draw();
 
 
