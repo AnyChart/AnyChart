@@ -34,7 +34,7 @@ anychart.core.sparkline.series.WinLoss.prototype.getReferenceCoords = function()
 
   var xVal = iterator.get('x');
   var yVal = /** @type {number} */(iterator.get('value'));
-  yVal = yVal > 0 ? 1 : yVal < 0 ? 0 : .5;
+  yVal = yVal > 0 ? (yScale.inverted() ? 0 : 1) : yVal < 0 ? (yScale.inverted() ? 1 : 0) : .5;
 
   if (!goog.isDef(xVal) || !goog.isDef(yVal))
     return null;
