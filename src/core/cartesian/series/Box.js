@@ -1076,7 +1076,7 @@ anychart.core.cartesian.series.Box.prototype.restoreDefaults = function() {
         'q1: ' + parseFloat(this['q1']).toFixed(2) + '\n' +
         'median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
         'q3: ' + parseFloat(this['q3']).toFixed(2) + '\n' +
-        'highest: ' + parseFloat(this['highest']).toFixed(2) + '\n';
+        'highest: ' + parseFloat(this['highest']).toFixed(2);
   });
 
   var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());

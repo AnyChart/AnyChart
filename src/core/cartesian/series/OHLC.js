@@ -573,7 +573,7 @@ anychart.core.cartesian.series.OHLC.prototype.restoreDefaults = function() {
     return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
         'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
         'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-        'C: ' + parseFloat(this['close']).toFixed(4) + '\n';
+        'C: ' + parseFloat(this['close']).toFixed(4);
   });
 
   var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());

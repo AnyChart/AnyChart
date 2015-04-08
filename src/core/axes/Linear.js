@@ -1001,7 +1001,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
             }
 
             if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
-              if (isLabels && i == nextDrawableLabel && this.labels().enabled()) {
+              if (isLabels && i == nextDrawableLabel) {
                 prevDrawableLabel = i;
                 nextDrawableLabel = -1;
                 labels.push(true);
