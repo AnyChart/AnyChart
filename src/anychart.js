@@ -617,6 +617,22 @@ anychart.ganttResource = anychart.ganttResource || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.toolbar = anychart.toolbar || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.ganttToolbar = anychart.ganttToolbar || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -628,6 +644,7 @@ goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
 goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
 goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
+goog.exportSymbol('anychart.box', anychart.box);
 goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule
 goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
 goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
@@ -656,3 +673,5 @@ goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
+goog.exportSymbol('anychart.toolbar', anychart.toolbar);
+goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
