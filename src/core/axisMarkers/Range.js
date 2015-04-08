@@ -372,8 +372,8 @@ anychart.core.axisMarkers.Range.prototype.draw = function() {
           .lineTo(x_max, y_start)
           .close();
 
-      this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
     }
+    this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
