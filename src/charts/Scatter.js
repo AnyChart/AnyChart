@@ -1752,13 +1752,6 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
       if (axis) {
         axis.suspendSignalsDispatching();
         axis.container(this.rootElement);
-        if (axis.isHorizontal()) {
-          axis.padding().left(parseFloat(leftOffset));
-          axis.padding().right(parseFloat(rightOffset));
-        } else {
-          axis.padding().top(parseFloat(topOffset));
-          axis.padding().bottom(parseFloat(bottomOffset));
-        }
         axis.draw();
         axis.resumeSignalsDispatching(false);
       }
