@@ -780,13 +780,14 @@ anychart.gauges.Circular.prototype.createFrame_ = function(path, cx, cy, radius)
   if (sweepAngle % 360 == 0 && sweepAngle != 0) {
     path.circularArc(cx, cy, radius + this.pixCircularPadding_, radius + this.pixCircularPadding_, startAngle, sweepAngle);
   } else if (Math.abs(sweepAngle) > 180 && this.encloseWithStraightLine_) {
+    var correctiveAngle = 90 - (360 - Math.abs(sweepAngle)) / 2;
     path.circularArc(
         startCenterPt_x,
         startCenterPt_y,
         this.pixCircularPadding_,
         this.pixCircularPadding_,
-        sweepAngle < 0 ? startAngle + 90 : startAngle + 270,
-        sweepAngle < 0 ? -90 : 90);
+        sweepAngle < 0 ? startAngle + 90 - correctiveAngle : startAngle + 270 + correctiveAngle,
+        sweepAngle < 0 ? -90 + correctiveAngle : 90 - correctiveAngle);
     path.circularArc(
         cx,
         cy,
@@ -800,7 +801,7 @@ anychart.gauges.Circular.prototype.createFrame_ = function(path, cx, cy, radius)
         this.pixCircularPadding_,
         this.pixCircularPadding_,
         endAngle,
-        sweepAngle < 0 ? -90 : 90, true);
+        sweepAngle < 0 ? -90 + correctiveAngle : 90 - correctiveAngle, true);
   } else {
     var sweepAboutCap = 360 - Math.abs(sweepAngle) - 90;
     if (sweepAboutCap > 0) {
