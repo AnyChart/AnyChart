@@ -254,18 +254,6 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   var title = this.title();
   title.margin().bottom(0);
 
-  // Add handler to listen legend item click for legend and explode slice.
-  this.legend().listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
-    // function that explodes pie slice by index of the clicked legend item
-
-    var index = event['index'];
-    var pieChart = /** @type {anychart.charts.Pie} */ (this);
-    var iterator = pieChart.data().getIterator();
-    if (iterator.select(index)) {
-      var isExploded = !!iterator.meta('exploded');
-      pieChart.explodeSlice(index, !isExploded);
-    }
-  }, false, this);
   this.legend().tooltip().contentFormatter(function() {
     return (this['value']) + '\n' + this['meta']['pointValue'];
   });
@@ -556,7 +544,7 @@ anychart.charts.Pie.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -635,7 +623,7 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = /** @type {acgraph.vector.Fill}*/(fill);
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -683,7 +671,7 @@ anychart.charts.Pie.prototype.stroke = function(opt_strokeOrFill, opt_thickness,
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.stroke_) {
       this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -821,7 +809,7 @@ anychart.charts.Pie.prototype.hatchFill = function(opt_patternFillOrTypeOrState,
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1602,20 +1590,6 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
 
 /**
  * Method that gets final fill color for the current point, with all fallbacks taken into account.
- * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
- * @protected
- */
-anychart.charts.Pie.prototype.getLegendItemIconColor = function() {
-  var iterator = this.getIterator();
-
-  return this.normalizeColor(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke|Function} */(iterator.get('legendItemIconColor') ||
-      iterator.get('fill') ||
-      this.palette().colorAt(iterator.getIndex())));
-};
-
-
-/**
- * Method that gets final fill color for the current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
  * @param {boolean} hover If the fill should be a hover fill.
  * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
@@ -2215,7 +2189,7 @@ anychart.charts.Pie.prototype.labelsInvalidated_ = function(event) {
  */
 anychart.charts.Pie.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -2241,7 +2215,8 @@ anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
   if (this.getIterator().reset().select(index)) {
     this.colorizeSlice(true);
     this.applyHatchFill(true);
-    this.showTooltip(opt_event);
+    if (goog.isDef(opt_event))
+      this.showTooltip(opt_event);
     this.drawLabel_(true, true);
   }
   this.hoverStatus = index;
@@ -2366,32 +2341,86 @@ anychart.charts.Pie.prototype.mouseDblClickHandler_ = function(event) {
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.createLegendItemsProvider = function() {
+anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
   var data = [];
   var iterator = this.getIterator().reset();
-
-
+  var x, index;
+  var isAqua = (this.fill() == 'aquastyle');
+  if (isAqua) {
+    /** @type {Object} */
+    var aquaStyleObj = this.aquaStyleObj_;
+    this.aquaStyleObj_ = {};
+  }
   while (iterator.advance()) {
-    var index = iterator.getIndex();
-    var x = iterator.get('x');
-
-    data.push({
+    x = iterator.get('x');
+    index = iterator.getIndex();
+    var legendItem = /** @type {Object} */ (iterator.get('legendItem') || {});
+    var itemText = null;
+    if (goog.isFunction(itemsTextFormatter)) {
+      var format = this.createFormatProvider();
+      itemText = itemsTextFormatter.call(format, format);
+    }
+    if (!goog.isString(itemText)) {
+      itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
+    }
+    var obj = {
+      'enabled': true,
       'meta': {
+        'pointIndex': index,
         'pointValue': iterator.get('value')
       },
-      'index': index,
-      'text': String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x')),
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
-      'iconStroke': 'none',
-      'iconFill': this.getLegendItemIconColor(),
-      'iconHatchFill': this.getFinalHatchFill(true, false),
-      'iconMarker': null
-    });
+      'text': itemText,
+      'iconStroke': this.getStrokeColor(true, false),
+      'iconFill': this.getFillColor(true, false),
+      'iconHatchFill': this.getFinalHatchFill(true, false)
+    };
+    goog.object.extend(obj, legendItem);
+    obj['sourceUid'] = goog.getUid(this);
+    obj['sourceKey'] = index;
+    data.push(obj);
   }
+  if (isAqua)
+    this.aquaStyleObj_ = aquaStyleObj;
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.legendItemCanInteractInMode = function(mode) {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.legendItemClick = function(item) {
+  var sourceKey = item.sourceKey();
+  var iterator = this.data().getIterator();
+  if (iterator.select(/** @type {number} */ (sourceKey))) {
+    var isExploded = !!iterator.meta('exploded');
+    this.explodeSlice(/** @type {number} */ (sourceKey), !isExploded);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.legendItemOver = function(item) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var iterator = this.data().getIterator();
+  if (iterator.select(/** @type {number} */ (sourceKey))) {
+    this.hoverSlice(/** @type {number} */ (sourceKey));
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.legendItemOut = function(item) {
+  this.unhover();
 };
 
 

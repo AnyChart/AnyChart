@@ -154,7 +154,6 @@ anychart.ConsistencyState = {
   LEGEND_TITLE: 1 << 6,
   LEGEND_SEPARATOR: 1 << 7,
   LEGEND_PAGINATOR: 1 << 8,
-  LEGEND_DATA: 1 << 9,
   //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
   MARKERS_FACTORY_HANDLERS: 1 << 5,
   //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
@@ -198,7 +197,8 @@ anychart.Signal = {
   NEEDS_RECALCULATION: 1 << 2,
   BOUNDS_CHANGED: 1 << 3,
   DATA_CHANGED: 1 << 4,
-  META_CHANGED: 1 << 5
+  META_CHANGED: 1 << 5,
+  NEED_UPDATE_LEGEND: 1 << 6
 };
 
 
@@ -336,11 +336,12 @@ anychart.core.Base.prototype.hasInvalidationState = function(state) {
  * NOTE: YOU CAN ONLY SEND SIGNALS FROM SUPPORTED_SIGNALS MASK!
  *
  * @param {anychart.Signal|number} state Invalidation state(s).
+ * @param {boolean=} opt_force Force to dispatch signal.
  */
-anychart.core.Base.prototype.dispatchSignal = function(state) {
+anychart.core.Base.prototype.dispatchSignal = function(state, opt_force) {
   state &= this.SUPPORTED_SIGNALS;
   if (!state) return;
-  if (isNaN(this.suspendedDispatching)) {
+  if (isNaN(this.suspendedDispatching) || !!opt_force) {
     this.dispatchEvent(new anychart.SignalEvent(this, state));
   } else {
     this.suspendedDispatching |= state;

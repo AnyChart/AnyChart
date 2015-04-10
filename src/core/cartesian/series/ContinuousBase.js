@@ -281,12 +281,10 @@ anychart.core.cartesian.series.ContinuousBase.prototype.hoverPoint = function(in
     this.drawLabel(false);
     this.hideTooltip();
   }
-  // TODO(AntonKagakin): comment this to avoid series selection
-  // wating for a feedback. See Base.js:1206
-  /*if (isNaN(this.hoverStatus)) {
+  if (isNaN(this.hoverStatus)) {
     this.applyHatchFill(true);
     this.colorizeShape(true);
-  }*/
+  }
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);

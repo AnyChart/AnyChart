@@ -103,20 +103,6 @@ anychart.charts.Scatter = function() {
    * @private
    */
   this.series_ = [];
-
-  // Add handler to listen legend item click for legend and enable/disable series.
-  var legend = /** @type {anychart.core.ui.Legend} */ (this.legend());
-  legend.listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
-    // function that enables or disables series by index of clicked legend item
-
-    var scatterChart = /** @type {anychart.charts.Scatter} */ (this);
-    var index = event['index'];
-    var series = scatterChart.getSeries(index);
-    if (series) {
-      series.enabled(!series.enabled());
-    }
-
-  }, false, this);
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.SeparateChart);
 
@@ -1074,7 +1060,7 @@ anychart.charts.Scatter.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
     this.palette_.listenSignals(this.onPaletteSignal_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
-      this.invalidate(anychart.ConsistencyState.SCATTER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SCATTER_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1086,7 +1072,7 @@ anychart.charts.Scatter.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
  */
 anychart.charts.Scatter.prototype.onPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.SCATTER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1149,7 +1135,7 @@ anychart.charts.Scatter.prototype.markerPalette = function(opt_value) {
  */
 anychart.charts.Scatter.prototype.onMarkerPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.SCATTER_MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_MARKER_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1215,7 +1201,7 @@ anychart.charts.Scatter.prototype.hatchFillPalette = function(opt_value) {
  */
 anychart.charts.Scatter.prototype.onHatchFillPaletteSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1322,13 +1308,16 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     var inc = index * anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Scatter.ZINDEX_SERIES) + inc);
-    if (instance.hasMarkers())
-      instance.markers().setAutoZIndex(anychart.charts.Scatter.ZINDEX_MARKER + inc);
     instance.labels().setAutoZIndex(anychart.charts.Scatter.ZINDEX_LABEL + inc + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
     instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
+    if (instance.hasMarkers()) {
+      instance.markers().setAutoZIndex(anychart.charts.Scatter.ZINDEX_MARKER + inc);
+      instance.markers().setAutoFill(instance.getMarkerFill());
+      instance.markers().setAutoStroke(instance.getMarkerStroke());
+    }
     instance.restoreDefaults();
     instance.listenSignals(this.onSeriesSignal_, this);
     this.invalidate(
@@ -1361,6 +1350,11 @@ anychart.charts.Scatter.prototype.onSeriesSignal_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.SCATTER_SCALES;
+  }
+  if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
+    state |= anychart.ConsistencyState.CHART_LEGEND;
+    if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+      state |= anychart.ConsistencyState.BOUNDS;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -1401,18 +1395,63 @@ anychart.charts.Scatter.prototype.getSeries = function(index) {
 
 
 /** @inheritDoc */
-anychart.charts.Scatter.prototype.createLegendItemsProvider = function() {
+anychart.charts.Scatter.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+  var i, count;
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
   var data = [];
-  for (var i = 0, count = this.series_.length; i < count; i++) {
+  // we need to calculate statistics
+  this.calculate();
+  for (i = 0, count = this.series_.length; i < count; i++) {
     /** @type {anychart.core.scatter.series.Base} */
     var series = this.series_[i];
-    data.push(series.getLegendItemData());
+    var itemData = series.getLegendItemData(itemsTextFormatter);
+    itemData['sourceUid'] = goog.getUid(this);
+    itemData['sourceKey'] = series.index();
+    data.push(itemData);
   }
-
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.legendItemCanInteractInMode = function(mode) {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.legendItemClick = function(item) {
+  var sourceKey = item.sourceKey();
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.enabled(!series.enabled());
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.legendItemOver = function(item) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.hoverSeries();
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.legendItemOut = function(item) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.unhover();
+  }
 };
 
 

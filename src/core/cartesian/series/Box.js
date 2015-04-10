@@ -935,19 +935,50 @@ anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event)
 
 
 /** @inheritDoc */
+anychart.core.cartesian.series.Box.prototype.hoverSeries = function() {
+  if (this.hoverStatus == -1) return this;
+  if (this.hoverStatus >= 0) {
+    if (this.getResetIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+      this.hideTooltip();
+    }
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(true);
+      this.applyHatchFill(true);
+      this.drawWhisker_(true);
+      this.drawOutlierMarkers_(true);
+    }
+  }
+  this.hoverStatus = -1;
+  return this;
+};
+
+
+/** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
     if (goog.isDef(rect)) {
       this.colorizeShape(false);
       this.applyHatchFill(false);
+      this.drawWhisker_(false);
       this.drawMarker(false);
       this.drawOutlierMarkers_(false);
       this.drawLabel(false);
-      this.drawWhisker_(false);
     }
     this.hideTooltip();
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(false);
+      this.applyHatchFill(false);
+      this.drawWhisker_(false);
+      this.drawOutlierMarkers_(false);
+    }
   }
   this.hoverStatus = NaN;
   return this;

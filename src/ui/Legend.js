@@ -45,7 +45,7 @@ goog.exportSymbol('anychart.ui.legend', anychart.ui.legend);
 anychart.ui.Legend.prototype['draw'] = anychart.ui.Legend.prototype.draw;
 anychart.ui.Legend.prototype['parentBounds'] = anychart.ui.Legend.prototype.parentBounds;
 anychart.ui.Legend.prototype['container'] = anychart.ui.Legend.prototype.container;
-anychart.ui.Legend.prototype['itemsProvider'] = anychart.ui.Legend.prototype.itemsProvider;
+anychart.ui.Legend.prototype['itemsSource'] = anychart.ui.Legend.prototype.itemsSource;
 anychart.core.ui.LegendItem.prototype['x'] = anychart.core.ui.LegendItem.prototype.x;
 anychart.core.ui.LegendItem.prototype['y'] = anychart.core.ui.LegendItem.prototype.y;
 anychart.core.ui.LegendItem.prototype['iconType'] = anychart.core.ui.LegendItem.prototype.iconType;

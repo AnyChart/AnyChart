@@ -4,6 +4,8 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.LegendContextProvider');
+goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -82,7 +84,8 @@ anychart.core.radar.series.Base.prototype.pixelBoundsCache;
 anychart.core.radar.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
-    anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.NEEDS_RECALCULATION |
+    anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -638,6 +641,42 @@ anychart.core.radar.series.Base.prototype.startAngle = function(opt_value) {
 
 
 /**
+ * Sets/Gets legend item setting for series.
+ * @param {(Object)=} opt_value Legend item settings object.
+ * @return {(anychart.core.utils.LegendItemSettings|anychart.core.radar.series.Base)} Legend item settings or self for chaining.
+ */
+anychart.core.radar.series.Base.prototype.legendItem = function(opt_value) {
+  if (!this.legendItem_) {
+    this.legendItem_ = new anychart.core.utils.LegendItemSettings();
+    this.registerDisposable(this.legendItem_);
+    this.legendItem_.listenSignals(this.onLegendItemSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.legendItem_.setup(opt_value);
+    return this;
+  }
+
+  return this.legendItem_;
+};
+
+
+/**
+ * Listener for legend item settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.radar.series.Base.prototype.onLegendItemSignal_ = function(event) {
+  var signal = anychart.Signal.NEED_UPDATE_LEGEND;
+  var force = false;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+    force = true;
+  }
+  this.dispatchSignal(signal, force);
+};
+
+
+/**
  * DO NOT PUBLISH.
  */
 anychart.core.radar.series.Base.prototype.resetCategorisation = function() {
@@ -1125,13 +1164,8 @@ anychart.core.radar.series.Base.prototype.handleMouseOver = function(event) {
             this.handleMouseMove,
             false,
             this);
-      }
-      // TODO(AntonKagakin):
-      // Due to the fact that continious series can get point index by the coordinate
-      // we comment this for now - so no series selection.
-      // Let's wait for feedback on this.
-      //else if (event.target['__tagSeriesGlobal'])
-      //  this.hoverSeries();
+      } else if (event.target['__tagSeriesGlobal'])
+        this.hoverSeries();
       else
         this.unhover();
     } else
@@ -1556,7 +1590,7 @@ anychart.core.radar.series.Base.prototype.color = function(opt_fillOrColorOrKeys
     var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.color_ != color) {
       this.color_ = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1625,7 +1659,7 @@ anychart.core.radar.series.Base.prototype.hatchFill = function(opt_patternFillOr
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1822,7 +1856,7 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1997,7 +2031,7 @@ anychart.core.radar.series.Base.prototype.stroke = function(opt_strokeOrFill, op
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.strokeInternal) {
       this.strokeInternal = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -2115,20 +2149,56 @@ anychart.core.radar.series.Base.prototype.normalizeColor = function(color, var_a
 
 
 /**
+ * Creates context provider for legend items text formatter function.
+ * @return {anychart.core.utils.LegendContextProvider} Legend context provider.
+ * @private
+ */
+anychart.core.radar.series.Base.prototype.createLegendContextProvider_ = function() {
+  if (!this.legendProvider_)
+    this.legendProvider_ = new anychart.core.utils.LegendContextProvider(this);
+  return this.legendProvider_;
+};
+
+
+/**
  * Return color for legend item.
+ * @param {Function} itemsTextFormatter Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.core.radar.series.Base.prototype.getLegendItemData = function() {
-  return /** @type {!anychart.core.ui.Legend.LegendItemProvider} */ ({
-    'index': this.index(),
-    'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
-    'iconType': this.getLegendIconType() || anychart.enums.LegendItemIconType.SQUARE,
-    'iconStroke': this.getFinalStroke(false, false),
-    'iconFill': this.getFinalFill(false, false),
-    'iconHatchFill': this.getFinalHatchFill(false, false),
-    'iconMarker': null,
-    'meta': this.meta()
-  });
+anychart.core.radar.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var legendItem = this.legendItem();
+  legendItem.markAllConsistent();
+  var json = legendItem.serialize();
+  var iconFill, iconStroke, iconHatchFill;
+  if (goog.isFunction(legendItem.iconFill())) {
+    iconFill = legendItem.iconFill().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconStroke())) {
+    iconStroke = legendItem.iconStroke().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconHatchFill())) {
+    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill_);
+  }
+  var itemText;
+  if (goog.isFunction(itemsTextFormatter)) {
+    var format = this.createLegendContextProvider_();
+    itemText = itemsTextFormatter.call(format, format);
+  }
+  if (!goog.isString(itemText))
+    itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
+
+  var ret = {
+    'meta': /** @type {Object} */ (this.meta()),
+    'text': /** @type {string} */ (itemText),
+    'iconEnabled': true,
+    'iconType': this.getLegendIconType(),
+    'iconStroke': iconStroke || this.getFinalStroke(false, false),
+    'iconFill': iconFill || this.getFinalFill(false, false),
+    'iconHatchFill': iconHatchFill || this.getFinalHatchFill(false, false),
+    'disabled': !this.enabled()
+  };
+  goog.object.extend(ret, json);
+  return ret;
 };
 
 
@@ -2162,6 +2232,12 @@ anychart.core.radar.series.Base.prototype.getLegendIconType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
+  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.NEED_UPDATE_LEGEND;
+};
+
+
 /**
  * @inheritDoc
  */
@@ -2175,6 +2251,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['legendItem'] = this.legendItem().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(
@@ -2271,6 +2348,7 @@ anychart.core.radar.series.Base.prototype.setupByJSON = function(config) {
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
   this.tooltip(config['tooltip']);
+  this.legendItem(config['legendItem']);
 };
 
 
@@ -2391,3 +2469,4 @@ anychart.core.radar.series.Base.prototype['hoverLabels'] = anychart.core.radar.s
 anychart.core.radar.series.Base.prototype['tooltip'] = anychart.core.radar.series.Base.prototype.tooltip;//doc|ex
 anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
 anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex
+anychart.core.radar.series.Base.prototype['legendItem'] = anychart.core.radar.series.Base.prototype.legendItem;

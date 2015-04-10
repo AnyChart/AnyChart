@@ -6,6 +6,8 @@ goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
+goog.require('anychart.core.utils.LegendContextProvider');
+goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -121,7 +123,8 @@ anychart.core.cartesian.series.Base.prototype.pixelBoundsCache = null;
 anychart.core.cartesian.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
-    anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.NEEDS_RECALCULATION |
+    anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -1822,7 +1825,7 @@ anychart.core.cartesian.series.Base.prototype.color = function(opt_fillOrColorOr
     var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.color_ != color) {
       this.color_ = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1889,7 +1892,7 @@ anychart.core.cartesian.series.Base.prototype.hatchFill = function(opt_patternFi
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -2074,7 +2077,7 @@ anychart.core.cartesian.series.Base.prototype.fill = function(opt_fillOrColorOrK
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -2233,7 +2236,7 @@ anychart.core.cartesian.series.Base.prototype.stroke = function(opt_strokeOrFill
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.strokeInternal) {
       this.strokeInternal = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -2353,20 +2356,56 @@ anychart.core.cartesian.series.Base.prototype.normalizeColor = function(color, v
 
 
 /**
- * Return color for legend item.
- * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
+ * Creates context provider for legend items text formatter function.
+ * @return {anychart.core.utils.LegendContextProvider} Legend context provider.
+ * @private
  */
-anychart.core.cartesian.series.Base.prototype.getLegendItemData = function() {
-  return /** @type {!anychart.core.ui.Legend.LegendItemProvider} */ ({
-    'index': this.index(),
-    'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
-    'iconType': this.getLegendIconType() || anychart.enums.LegendItemIconType.SQUARE,
-    'iconStroke': this.getFinalStroke(false, false),
-    'iconFill': this.getFinalFill(false, false),
-    'iconHatchFill': this.getFinalHatchFill(false, false),
-    'iconMarker': null,
-    'meta': this.meta()
-  });
+anychart.core.cartesian.series.Base.prototype.createLegendContextProvider_ = function() {
+  if (!this.legendProvider_)
+    this.legendProvider_ = new anychart.core.utils.LegendContextProvider(this);
+  return this.legendProvider_;
+};
+
+
+/**
+ * Creates legend item config.
+ * @param {Function} itemsTextFormatter Items text formatter.
+ * @return {!anychart.core.ui.Legend.LegendItemProvider} Legend item config.
+ */
+anychart.core.cartesian.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var legendItem = this.legendItem();
+  legendItem.markAllConsistent();
+  var json = legendItem.serialize();
+  var iconFill, iconStroke, iconHatchFill;
+  if (goog.isFunction(legendItem.iconFill())) {
+    iconFill = legendItem.iconFill().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconStroke())) {
+    iconStroke = legendItem.iconStroke().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconHatchFill())) {
+    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill_);
+  }
+  var itemText;
+  if (goog.isFunction(itemsTextFormatter)) {
+    var format = this.createLegendContextProvider_();
+    itemText = itemsTextFormatter.call(format, format);
+  }
+  if (!goog.isString(itemText))
+    itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
+
+  var ret = {
+    'meta': /** @type {Object} */ (this.meta()),
+    'text': /** @type {string} */ (itemText),
+    'iconEnabled': true,
+    'iconType': this.getLegendIconType(),
+    'iconStroke': iconStroke || this.getFinalStroke(false, false),
+    'iconFill': iconFill || this.getFinalFill(false, false),
+    'iconHatchFill': iconHatchFill || this.getFinalHatchFill(false, false),
+    'disabled': !this.enabled()
+  };
+  goog.object.extend(ret, json);
+  return ret;
 };
 
 
@@ -2402,14 +2441,14 @@ anychart.core.cartesian.series.Base.prototype.getLegendIconType = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION;
+  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
 
 /**
- * Sets an error for series.
- * @param {(Object|null|boolean|string)=} opt_value Error or self for chaining.
- * @return {(anychart.core.utils.Error|anychart.core.cartesian.series.Base)}
+ * Getter/Setter for an error for series.
+ * @param {(Object|null|boolean|string)=} opt_value Error.
+ * @return {(anychart.core.utils.Error|anychart.core.cartesian.series.Base)} Series error or self for chaining.
  */
 anychart.core.cartesian.series.Base.prototype.error = function(opt_value) {
   if (!this.isErrorAvailable())
@@ -2526,6 +2565,42 @@ anychart.core.cartesian.series.Base.prototype.drawError = function() {
 
 
 /**
+ * Sets/Gets legend item setting for series.
+ * @param {(Object)=} opt_value Legend item settings object.
+ * @return {(anychart.core.utils.LegendItemSettings|anychart.core.cartesian.series.Base)} Legend item settings or self for chaining.
+ */
+anychart.core.cartesian.series.Base.prototype.legendItem = function(opt_value) {
+  if (!this.legendItem_) {
+    this.legendItem_ = new anychart.core.utils.LegendItemSettings();
+    this.registerDisposable(this.legendItem_);
+    this.legendItem_.listenSignals(this.onLegendItemSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.legendItem_.setup(opt_value);
+    return this;
+  }
+
+  return this.legendItem_;
+};
+
+
+/**
+ * Listener for legend item settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.cartesian.series.Base.prototype.onLegendItemSignal_ = function(event) {
+  var signal = anychart.Signal.NEED_UPDATE_LEGEND;
+  var force = false;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+    force = true;
+  }
+  this.dispatchSignal(signal, force);
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.core.cartesian.series.Base.prototype.serialize = function() {
@@ -2543,6 +2618,7 @@ anychart.core.cartesian.series.Base.prototype.serialize = function() {
   json['tooltip'] = this.tooltip().serialize();
   if (this.isErrorAvailable())
     json['error'] = this.error().serialize();
+  json['legendItem'] = this.legendItem().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(
@@ -2642,6 +2718,7 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
   this.hoverLabels(config['hoverLabels']);
   this.tooltip(config['tooltip']);
   this.clip(config['clip']);
+  this.legendItem(config['legendItem']);
 };
 
 
@@ -2766,3 +2843,4 @@ anychart.core.cartesian.series.Base.prototype['xPointPosition'] = anychart.core.
 anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesian.series.Base.prototype.xScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['error'] = anychart.core.cartesian.series.Base.prototype.error;
+anychart.core.cartesian.series.Base.prototype['legendItem'] = anychart.core.cartesian.series.Base.prototype.legendItem;

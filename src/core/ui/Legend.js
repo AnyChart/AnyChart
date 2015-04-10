@@ -55,14 +55,14 @@ anychart.core.ui.Legend = function() {
 
   /**
    * Width of legend element.
-   * @type {(number|string)?}
+   * @type {?(number|string)}
    * @private
    */
   this.width_ = null;
 
   /**
    * Height of legend element.
-   * @type {(number|string)?}
+   * @type {?(number|string)}
    * @private
    */
   this.height_ = null;
@@ -164,7 +164,7 @@ anychart.core.ui.Legend = function() {
       });
   this.paginator()
     .enabled(false)
-    .zIndex(20)
+    .zIndex(30) // data item layer have zIndex: 20, paginator should be over than item data layer
     .fontFamily('Verdana')
     .fontSize('10')
     .fontWeight('normal')
@@ -200,6 +200,34 @@ anychart.core.ui.Legend = function() {
   tooltipTitle.padding(0);
   tooltipTitle.margin(3, 3, 0, 3);
 
+  this.inverted(false);
+  this.items(null);
+  this.itemsSourceMode(anychart.enums.LegendItemsSourceMode.DEFAULT);
+  this.itemsFormatter(function(items) {
+    return items;
+  });
+
+  /**
+   * Legend items text formatter.
+   * @type {?Function}
+   * @private
+   */
+  this.itemsTextFormatter_ = null;
+
+  /**
+   * Flag that shows what we need: true - create items, false - update them.
+   * @type {boolean}
+   * @private
+   */
+  this.recreateItems_ = true;
+
+  /**
+   * Hover cursor setting.
+   * @type {anychart.enums.Cursor}
+   * @private
+   */
+  this.hoverCursor_ = anychart.enums.Cursor.POINTER;
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.ui.Legend, anychart.core.Text);
@@ -221,8 +249,7 @@ anychart.core.ui.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.LEGEND_BACKGROUND |
     anychart.ConsistencyState.LEGEND_TITLE |
     anychart.ConsistencyState.LEGEND_SEPARATOR |
-    anychart.ConsistencyState.LEGEND_PAGINATOR |
-    anychart.ConsistencyState.LEGEND_DATA;
+    anychart.ConsistencyState.LEGEND_PAGINATOR;
 
 
 /**
@@ -245,26 +272,132 @@ anychart.core.ui.Legend.prototype.itemsLayout = function(opt_value) {
 
 
 /**
- * Getter for items provider.
- * @return {Array.<anychart.core.ui.Legend.LegendItemProvider>} Array of legend item provider.
- *//**
- * Setter for items provider.
- * @param {Array.<anychart.core.ui.Legend.LegendItemProvider>=} opt_value Items provider.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {Array.<anychart.core.ui.Legend.LegendItemProvider>=} opt_value Items provider.
- * @return {(Array.<anychart.core.ui.Legend.LegendItemProvider>|anychart.core.ui.Legend)} Legend items provider.
+ * Getter/setter for inverted setting.
+ * @param {boolean=} opt_value Whether item list should be inverted or not.
+ * @return {(boolean|anychart.core.ui.Legend)} Whether item list inverted or not or self for chaining.
  */
-anychart.core.ui.Legend.prototype.itemsProvider = function(opt_value) {
+anychart.core.ui.Legend.prototype.inverted = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value != this.itemsProvider_ && goog.isArray(opt_value) && opt_value.length > 0) {
-      this.itemsProvider_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.LEGEND_DATA, anychart.Signal.NEEDS_REDRAW);
+    opt_value = !!opt_value;
+    if (this.inverted_ != opt_value) {
+      this.inverted_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.itemsProvider_;
+  return this.inverted_;
+};
+
+
+/**
+ * Getter/setter for custom items.
+ * @param {?Array.<Object>=} opt_value Items.
+ * @return {(?Array.<Object>|anychart.core.ui.Legend)} Custom items or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.items = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.customItems_ != opt_value) {
+      this.customItems_ = opt_value;
+      this.recreateItems_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.customItems_;
+};
+
+
+/**
+ * .
+ * @param {Array.<Object>} sourceArray Array of source.
+ * @return {boolean} .
+ * @private
+ */
+anychart.core.ui.Legend.prototype.sourceEquals_ = function(sourceArray) {
+  if (!this.itemsSource_ || !sourceArray || (this.itemsSource_.length != sourceArray.length))
+    return false;
+
+  for (var i = 0; i < sourceArray.length; i++) {
+    if (this.itemsSource_[i] != sourceArray[i])
+      return false;
+  }
+
+  return true;
+};
+
+
+/**
+ * Getter/setter for items source.
+ * @param {(anychart.core.SeparateChart|Array.<anychart.core.SeparateChart>)=} opt_value Items source.
+ * @return {(anychart.core.SeparateChart|Array.<anychart.core.SeparateChart>|anychart.core.ui.Legend)} Items source or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.itemsSource = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isArray(opt_value) ?
+        goog.array.slice(/** @type {Array.<anychart.core.SeparateChart>} */ (opt_value), 0) :
+        goog.isNull(opt_value) ?
+            opt_value : [opt_value];
+    if (!this.sourceEquals_(opt_value)) {
+      this.itemsSource_ = opt_value;
+      this.recreateItems_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.itemsSource_;
+};
+
+
+/**
+ * Getter/setter for items source mode.
+ * @param {string=} opt_value Items source mode.
+ * @return {(string|anychart.core.ui.Legend)} Items source mode or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.itemsSourceMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeLegendItemsSourceMode(opt_value);
+    if (this.itemsSourceMode_ != opt_value) {
+      this.itemsSourceMode_ = opt_value;
+      this.recreateItems_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.itemsSourceMode_;
+};
+
+
+/**
+ * Getter/setter for items formatter
+ * @param {function(Array.<Object>):Array.<Object>=} opt_value Formatter function.
+ * @return {(function(Array.<Object>):Array.<Object>|anychart.core.ui.Legend)} Formatter function or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.itemsFormatter_ != opt_value) {
+      this.itemsFormatter_ = opt_value;
+      this.recreateItems_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+  return this.itemsFormatter_;
+};
+
+
+/**
+ * Getter/setter for items text formatter.
+ * @param {function(Object):string=} opt_value Items text formatter function.
+ * @return {(function(Object):string|anychart.core.ui.Legend)} Items text formatter function or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.itemsTextFormatter = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.itemsTextFormatter_ != opt_value) {
+      this.itemsTextFormatter_ = opt_value;
+      this.recreateItems_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+  return this.itemsTextFormatter_;
 };
 
 
@@ -307,9 +440,9 @@ anychart.core.ui.Legend.prototype.itemsSpacing = function(opt_value) {
  */
 anychart.core.ui.Legend.prototype.iconTextSpacing = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = !isNaN(parseFloat(opt_value)) ? opt_value : 5;
+    opt_value = !anychart.utils.isNaN(opt_value) ? +opt_value : 5;
     if (this.iconTextSpacing_ != opt_value) {
-      this.iconTextSpacing_ = parseFloat(opt_value);
+      this.iconTextSpacing_ = opt_value;
       if (goog.isDefAndNotNull(this.items_)) {
         for (var i = 0, len = this.items_.length; i < len; i++) {
           this.items_[i].iconTextSpacing(this.iconTextSpacing_);
@@ -637,7 +770,9 @@ anychart.core.ui.Legend.prototype.moveTooltip = function(event) {
     'iconStroke': item.iconStroke(),
     'iconFill': item.iconFill(),
     'iconHatchFill': item.iconHatchFill(),
-    'iconMarker': item.iconMarker(),
+    'iconMarkerType': item.iconMarkerType(),
+    'iconMarkerStroke': item.iconMarkerStroke(),
+    'iconMarkerFill': item.iconMarkerFill(),
     'meta': this.legendItemsMeta_[index]
   };
   if (tooltip.isFloating() && event) {
@@ -794,9 +929,80 @@ anychart.core.ui.Legend.prototype.getRemainingBounds = function() {
 /**
  * Init items.
  * @private
+ * @return {Array.<Object>}
  */
-anychart.core.ui.Legend.prototype.initializeLegendItems_ = function() {
-  if (this.itemsProvider_ && this.itemsProvider_.length > 0) {
+anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
+  if (goog.isArray(this.customItems_))
+    return this.customItems_;
+  else if (goog.isDefAndNotNull(this.itemsSource_)) {
+    var source;
+    var items = [];
+    for (var i = 0; i < this.itemsSource_.length; i++) {
+      source = /** @type {anychart.core.SeparateChart} */ (this.itemsSource_[i]);
+      if (!goog.isNull(source))
+        items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, this.itemsTextFormatter_));
+    }
+    return items;
+  } else
+    return [];
+};
+
+
+/**
+ * Prepare items to initialization.
+ * @param {!Array.<Object>} items Items.
+ * @return {!Array.<Object>} Items prepared to initialization.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.prepareItems_ = function(items) {
+  if (!goog.isArray(items))
+    return [];
+  var itemList = [];
+  var config;
+  var textSettings = /** @type {Object} */ (this.textSettings());
+  for (var i = 0; i < items.length; i++) {
+    config = {
+      'iconTextSpacing': this.iconTextSpacing_,
+      'hoverCursor': this.hoverCursor_
+    };
+    goog.object.extend(config, textSettings, items[i]);
+    itemList.push(config);
+  }
+  return itemList;
+};
+
+
+/**
+ * Init items.
+ * @param {!Array.<Object>} items Array of items.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
+  /** @type {anychart.core.ui.LegendItem} */
+  var item;
+  var i;
+  /**
+   * Items that were disabled by one of legendItem(null), legendItem(false), legendItem().enabled(false)
+   * @type {Object.<number, boolean>}
+   * @private
+   */
+  this.notEnabledItems_ = {};
+  if (!this.recreateItems_ && this.items_) {
+    for (i = 0; i < items.length; i++) {
+      if (goog.isDef(items[i]['enabled']) && !items[i]['enabled'])
+        this.notEnabledItems_[i] = true;
+      for (var j = 0; j < this.items_.length; j++) {
+        item = this.items_[j];
+        var itemSourceUid = item.sourceUid();
+        var itemSourceKey = item.sourceKey();
+        if ((goog.isDef(itemSourceUid) && goog.isDef(itemSourceKey) && itemSourceUid == items[i]['sourceUid'] && itemSourceKey == items[i]['sourceKey'])) {
+          item.setup(items[i]);
+          item.applyTextSettings(item.getTextElement(), false);
+          break;
+        }
+      }
+    }
+  } else if (items && items.length > 0) {
     goog.disposeAll(this.items_);
     /**
      * Array of legend item.
@@ -810,38 +1016,26 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function() {
      * @private
      */
     this.legendItemsMeta_ = [];
-    var settingsObj = this.textSettings();
-    var item; // legend item
-    var provider; // legend item provider object
-    for (var i = 0; i < this.itemsProvider_.length; i++) {
-      provider = this.itemsProvider_[i];
+    for (i = 0; i < items.length; i++) {
+      if (goog.isDef(items[i]['enabled']) && !items[i]['enabled'])
+        this.notEnabledItems_[i] = true;
       item = this.createItem();
-
-      item.iconType(provider['iconType'] ? provider['iconType'] : anychart.enums.LegendItemIconType.SQUARE);
-      item.iconStroke(provider['iconStroke'] ? provider['iconStroke'] : 'none');
-      item.iconFill(provider['iconFill'] ? provider['iconFill'] : 'none');
-      item.iconHatchFill(provider['iconHatchFill'] ? provider['iconHatchFill'] : null);
-      item.iconMarker(provider['iconMarker'] ? provider['iconMarker'] : null);
-
-      item.text(provider['text'] ? provider['text'] : 'Item ' + i);
-      item.iconTextSpacing(this.iconTextSpacing_);
-
-      item.textSettings(/** @type {Object} */(settingsObj));
-      item.applyTextSettings(item.getTextElement(), true);
-
       item.container(this.layer_);
-      item.enabled(false);
+      items[i]['enabled'] = false;
+      item.setup(items[i]);
+      item.applyTextSettings(item.getTextElement(), true);
 
       this.setupMouseEventsListeners_(item);
 
       this.items_.push(item);
-      this.legendItemsMeta_.push(provider['meta'] ? provider['meta'] : {});
+      this.legendItemsMeta_.push(items[i]['meta'] ? items[i]['meta'] : {});
     }
   } else {
     goog.disposeAll(this.items_);
     this.items_ = null;
     this.legendItemsMeta_ = null;
   }
+  this.recreateItems_ = false;
   this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
@@ -882,6 +1076,29 @@ anychart.core.ui.Legend.prototype.getItemIndexInLegend_ = function(item) {
 
 
 /**
+ * Getter/Setter for hover cursor setting.
+ * @param {anychart.enums.Cursor=} opt_value hover cursor setting.
+ * @return {(anychart.enums.Cursor|anychart.core.ui.Legend)} Hover cursor setting or self for chaining.
+ */
+anychart.core.ui.Legend.prototype.hoverCursor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeCursor(opt_value);
+    if (this.hoverCursor_ != opt_value) {
+      this.hoverCursor_ = opt_value;
+      if (goog.isDefAndNotNull(this.items_)) {
+        for (var i = 0, len = this.items_.length; i < len; i++) {
+          this.items_[i].hoverCursor(this.hoverCursor_);
+        }
+      }
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      return this;
+    }
+  }
+  return this.hoverCursor_;
+};
+
+
+/**
  * LegendItem click handler.
  * @param {anychart.core.ui.LegendItem.BrowserEvent} event Event.
  * @private
@@ -891,7 +1108,17 @@ anychart.core.ui.Legend.prototype.onLegendItemClick_ = function(event) {
   // save index of legend item and itself to event and dispatch event
   event['index'] = this.getItemIndexInLegend_(item);
   event['item'] = item;
-  this.dispatchEvent(event);
+  if (this.dispatchEvent(event)) {
+    if (this.itemsSource_) {
+      for (var i = 0; i < this.itemsSource_.length; i++) {
+        var source = /** @type {anychart.core.SeparateChart} */ (this.itemsSource_[i]);
+        if (goog.getUid(source) == item.sourceUid() && source.legendItemCanInteractInMode(this.itemsSourceMode_)) {
+          source.legendItemClick(item);
+          break;
+        }
+      }
+    }
+  }
 };
 
 
@@ -906,6 +1133,15 @@ anychart.core.ui.Legend.prototype.onLegendItemMouseOver_ = function(event) {
   event['index'] = this.getItemIndexInLegend_(item);
   event['item'] = item;
   if (this.dispatchEvent(event)) {
+    if (this.itemsSource_) {
+      for (var i = 0; i < this.itemsSource_.length; i++) {
+        var source = /** @type {anychart.core.SeparateChart} */ (this.itemsSource_[i]);
+        if (goog.getUid(source) == item.sourceUid() && source.legendItemCanInteractInMode(this.itemsSourceMode_)) {
+          source.legendItemOver(item);
+          break;
+        }
+      }
+    }
     this.showTooltip(event);
   }
 };
@@ -922,6 +1158,15 @@ anychart.core.ui.Legend.prototype.onLegendItemMouseOut_ = function(event) {
   event['index'] = this.getItemIndexInLegend_(item);
   event['item'] = item;
   if (this.dispatchEvent(event)) {
+    if (this.itemsSource_) {
+      for (var i = 0; i < this.itemsSource_.length; i++) {
+        var source = /** @type {anychart.core.SeparateChart} */ (this.itemsSource_[i]);
+        if (goog.getUid(source) == item.sourceUid() && source.legendItemCanInteractInMode(this.itemsSourceMode_)) {
+          source.legendItemOut(item);
+          break;
+        }
+      }
+    }
     this.hideTooltip();
   }
 };
@@ -955,10 +1200,14 @@ anychart.core.ui.Legend.prototype.calculateContentWidth_ = function() {
   var maxWidth = -Number.MAX_VALUE;
 
   for (var i = 0, len = this.items_.length; i < len; i++) {
+    if (i in this.notEnabledItems_)
+      continue;
     width = this.items_[i].getWidth();
     fullWidth += width + this.itemsSpacing_;
     maxWidth = Math.max(maxWidth, width);
   }
+  if (fullWidth == 0 || maxWidth < 0)
+    return 0;
   fullWidth -= this.itemsSpacing_;
 
   if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
@@ -981,10 +1230,14 @@ anychart.core.ui.Legend.prototype.calculateContentHeight_ = function() {
   var maxHeight = -Number.MAX_VALUE;
 
   for (var i = 0, len = this.items_.length; i < len; i++) {
+    if (i in this.notEnabledItems_)
+      continue;
     height = this.items_[i].getHeight();
     fullHeight += height + this.itemsSpacing_;
     maxHeight = Math.max(maxHeight, height);
   }
+  if (fullHeight == 0 || maxHeight < 0)
+    return 0;
   fullHeight -= this.itemsSpacing_;
 
   if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
@@ -1192,6 +1445,8 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   } while (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS));
 
   var left, top;
+  width = isFinite(maxWidth) && goog.isDefAndNotNull(this.width_) ? padding.widenWidth(maxWidth) : width;
+  height = isFinite(maxHeight) && goog.isDefAndNotNull(this.height_) ? padding.widenHeight(maxHeight) : height;
 
   if (parentBounds) {
     left = parentBounds.getLeft();
@@ -1274,7 +1529,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
        * @private
        */
       this.layer_ = acgraph.layer();
-      this.layer_.parent(this.rootElement).zIndex(30);
+      this.layer_.parent(this.rootElement).zIndex(20);
       this.registerDisposable(this.layer_);
     }
   }
@@ -1295,19 +1550,16 @@ anychart.core.ui.Legend.prototype.draw = function() {
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_DATA)) {
-    this.initializeLegendItems_();
-    this.markConsistent(anychart.ConsistencyState.LEGEND_DATA);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (goog.isDefAndNotNull(this.items_)) {
-      var textSettings = /** @type {Object} */ (this.textSettings());
-      for (var i = 0, len = this.items_.length; i < len; i++) {
-        this.items_[i].textSettings(textSettings);
-        this.items_[i].applyTextSettings(this.items_[i].getTextElement(), false);
-      }
-    }
+    var formatter = this.itemsFormatter();
+    var items = this.createItemsFromSource_();
+    if (this.inverted_)
+      items = items.reverse();
+    items = goog.isFunction(formatter) ? formatter(items) : items;
+    if (this.items_ && this.items_.length != items.length)
+      this.recreateItems_ = true;
+    var finalItems = this.prepareItems_(items);
+    this.initializeLegendItems_(finalItems);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -1376,10 +1628,8 @@ anychart.core.ui.Legend.prototype.draw = function() {
   }
 
   var contentBounds = this.paginator().enabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;
-  this.layer_.clip(/** @type {acgraph.math.Rect} */ (contentBounds));
 
   var pageToDraw = this.paginator().enabled() ? this.paginator().currentPage() - 1 : 0;
-  //TODO(AntonKagakin): extract content bounds calculation to prototype method
   this.drawLegendContent_(pageToDraw, contentBounds);
 
   if (manualSuspend) stage.resume();
@@ -1405,12 +1655,22 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
 
   this.suspendSignalsDispatching();
 
-  if (this.items_) {
+  var itemsLength = this.items_ && this.items_.length;
+
+  var k;
+  // find first item that need to be showed
+  for (k = 0; k < itemsLength; k++) {
+    if (!(k in this.notEnabledItems_))
+      break;
+  }
+  if (this.items_ && k != itemsLength) {
     this.distributedItems_[page] = [];
-    this.distributedItems_[page][0] = this.items_[0];
+    this.distributedItems_[page][0] = this.items_[k];
     if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
-      w = this.items_[0].getWidth();
-      for (i = 1, len = this.items_.length; i < len; i++) {
+      w = this.items_[k].getWidth();
+      for (i = k + 1; i < itemsLength; i++) {
+        if (i in this.notEnabledItems_)
+          continue;
         if (w + this.itemsSpacing_ + this.items_[i].getWidth() > width) {
           page++;
           this.distributedItems_[page] = [];
@@ -1422,8 +1682,10 @@ anychart.core.ui.Legend.prototype.distributeItemsInBounds_ = function(width, hei
         }
       }
     } else {
-      h = this.items_[0].getHeight();
-      for (i = 1, len = this.items_.length; i < len; i++) {
+      h = this.items_[k].getHeight();
+      for (i = k + 1, len = this.items_.length; i < len; i++) {
+        if (i in this.notEnabledItems_)
+          continue;
         if (h + this.itemsSpacing_ + this.items_[i].getHeight() > height) {
           page++;
           this.distributedItems_[page] = [];
@@ -1483,7 +1745,7 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
               .x(x)
               .y(y)
               .enabled(true)
-              .resumeSignalsDispatching()
+              .resumeSignalsDispatching(false)
               .draw();
             x += items[i].getWidth() + this.itemsSpacing_;
           }
@@ -1521,11 +1783,16 @@ anychart.core.ui.Legend.prototype.serialize = function() {
   json['tooltip'] = this.tooltip().serialize();
   json['itemsLayout'] = this.itemsLayout();
   json['itemsSpacing'] = this.itemsSpacing();
+  json['itemsSourceMode'] = this.itemsSourceMode();
+  json['inverted'] = this.inverted();
+  if (goog.isDef(this.items()))
+    json['items'] = this.items();
   json['iconTextSpacing'] = this.iconTextSpacing();
   json['width'] = this.width();
   json['height'] = this.height();
   json['position'] = this.position();
   json['align'] = this.align();
+  json['hoverCursor'] = this.hoverCursor();
   return json;
 };
 
@@ -1542,11 +1809,15 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
   this.tooltip(config['tooltip']);
   this.itemsLayout(config['itemsLayout']);
   this.itemsSpacing(config['itemsSpacing']);
+  this.inverted(config['inverted']);
+  this.itemsSourceMode(config['itemsSourceMode']);
+  this.items(config['items']);
   this.iconTextSpacing(config['iconTextSpacing']);
   this.width(config['width']);
   this.height(config['height']);
   this.position(config['position']);
   this.align(config['align']);
+  this.hoverCursor(config['hoverCursor']);
 };
 
 
@@ -1556,11 +1827,16 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
  * @typedef {{
  *    index: (number|null|undefined),
  *    text: (string|null|undefined),
- *    iconType: (string|null|undefined),
+ *    iconEnabled: (boolean|undefined),
+ *    iconType: (Function, string|null|undefined),
  *    iconStroke: (acgraph.vector.Stroke|null|undefined),
  *    iconFill: (acgraph.vector.Fill|null|undefined),
  *    iconHatchFill: (acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|null|undefined),
- *    iconMarker: (string|null|undefined),
+ *    iconMarkerType: (string|null|undefined),
+ *    iconMarkerStroke: (acgraph.vector.Stroke|null|undefined),
+ *    iconMarkerFill: (acgraph.vector.Fill|null|undefined),
+ *    iconTextSpacing: (number|null|undefined),
+ *    disabled: (boolean|undefined),
  *    meta: (Object|null|undefined)
  * }}
  */
@@ -1570,6 +1846,12 @@ anychart.core.ui.Legend.LegendItemProvider;
 //exports
 anychart.core.ui.Legend.prototype['itemsLayout'] = anychart.core.ui.Legend.prototype.itemsLayout;
 anychart.core.ui.Legend.prototype['itemsSpacing'] = anychart.core.ui.Legend.prototype.itemsSpacing;
+anychart.core.ui.Legend.prototype['items'] = anychart.core.ui.Legend.prototype.items;
+anychart.core.ui.Legend.prototype['itemsFormatter'] = anychart.core.ui.Legend.prototype.itemsFormatter;
+anychart.core.ui.Legend.prototype['itemsTextFormatter'] = anychart.core.ui.Legend.prototype.itemsTextFormatter;
+anychart.core.ui.Legend.prototype['itemsSourceMode'] = anychart.core.ui.Legend.prototype.itemsSourceMode;
+anychart.core.ui.Legend.prototype['inverted'] = anychart.core.ui.Legend.prototype.inverted;
+anychart.core.ui.Legend.prototype['hoverCursor'] = anychart.core.ui.Legend.prototype.hoverCursor;
 anychart.core.ui.Legend.prototype['iconTextSpacing'] = anychart.core.ui.Legend.prototype.iconTextSpacing;
 anychart.core.ui.Legend.prototype['margin'] = anychart.core.ui.Legend.prototype.margin;
 anychart.core.ui.Legend.prototype['padding'] = anychart.core.ui.Legend.prototype.padding;

@@ -15,6 +15,9 @@ goog.require('anychart.core.polar.series.ContinuousBase');
  */
 anychart.core.polar.series.Line = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
+  this.hoverStroke(function() {
+    return anychart.color.lighten(this['sourceColor']);
+  });
 };
 goog.inherits(anychart.core.polar.series.Line, anychart.core.polar.series.ContinuousBase);
 anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.LINE] = anychart.core.polar.series.Line;

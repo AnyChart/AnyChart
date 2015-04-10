@@ -20,6 +20,10 @@ anychart.core.cartesian.series.StepLine = function(opt_data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = false;
+
+  this.hoverStroke(function() {
+    return anychart.color.lighten(this['sourceColor']);
+  });
 };
 goog.inherits(anychart.core.cartesian.series.StepLine, anychart.core.cartesian.series.ContinuousBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.STEP_LINE] = anychart.core.cartesian.series.StepLine;

@@ -206,7 +206,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.hoverMarkers = function(o
  */
 anychart.core.scatter.series.BaseWithMarkers.prototype.onMarkersSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
@@ -367,10 +367,16 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.getMarkerStroke = functio
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.BaseWithMarkers.prototype.getLegendItemData = function() {
-  var data = goog.base(this, 'getLegendItemData');
-  if (this.markers().enabled())
-    data['iconMarker'] = this.markers().type();
+anychart.core.scatter.series.BaseWithMarkers.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var markers = this.markers();
+  markers.setAutoFill(this.getMarkerFill());
+  markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  if (markers.enabled()) {
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.type();
+    data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
+    data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  }
   return data;
 };
 

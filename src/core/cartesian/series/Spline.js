@@ -28,6 +28,10 @@ anychart.core.cartesian.series.Spline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.queue_ = new anychart.core.cartesian.series.SplineDrawer(this.path);
+
+  this.hoverStroke(function() {
+    return anychart.color.lighten(this['sourceColor']);
+  });
 };
 goog.inherits(anychart.core.cartesian.series.Spline, anychart.core.cartesian.series.ContinuousBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.SPLINE] = anychart.core.cartesian.series.Spline;

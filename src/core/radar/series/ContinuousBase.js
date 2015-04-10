@@ -169,7 +169,7 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers = function(opt_
  */
 anychart.core.radar.series.ContinuousBase.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
@@ -441,12 +441,10 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index,
     this.drawLabel(false);
     this.hideTooltip();
   }
-  // TODO(AntonKagakin): comment this to avoid series selection
-  // wating for a feedback. See Base.js:1206
-  /*if (isNaN(this.hoverStatus)) {
-   this.applyHatchFill(true);
-   this.colorizeShape(true);
-   }*/
+  if (isNaN(this.hoverStatus)) {
+    this.applyHatchFill(true);
+    this.colorizeShape(true);
+  }
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
@@ -594,10 +592,17 @@ anychart.core.radar.series.ContinuousBase.prototype.getMarkerStroke = function()
 /**
  * @inheritDoc
  */
-anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function() {
-  var data = goog.base(this, 'getLegendItemData');
-  if (this.markers().enabled())
-    data['iconMarker'] = this.markers().type() || this.autoMarkerType;
+anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+
+  var markers = this.markers();
+  markers.setAutoFill(this.getMarkerFill());
+  markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  if (markers.enabled()) {
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.type() || this.autoMarkerType;
+    data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
+    data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  }
   return data;
 };
 

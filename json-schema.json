@@ -1349,7 +1349,8 @@
           ]
         },
         "clip": {"$ref": "#/definitions/clip"},
-        "error": {"$ref": "#/definitions/error"}
+        "error": {"$ref": "#/definitions/error"},
+        "legendItem": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
       }
     },
     "anychart.core.cartesian.series.BaseWithMarkers": {
@@ -1661,24 +1662,9 @@
         "hoverFill": {"$ref": "#/definitions/fill"},
         "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "tooltip": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
-          ]
-        },
-        "labels": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
-          ]
-        },
-        "hoverLabels": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
-          ]
-        },
+        "tooltip": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.Tooltip"}]},
+        "labels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
+        "hoverLabels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
         "clip": {"$ref": "#/definitions/clip"}
       }
     },
@@ -1763,25 +1749,11 @@
         "hoverFill": {"$ref": "#/definitions/fill"},
         "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "tooltip": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
-          ]
-        },
-        "labels": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
-          ]
-        },
-        "hoverLabels": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
-          ]
-        },
-        "clip": {"$ref": "#/definitions/clip"}
+        "tooltip": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.Tooltip"}]},
+        "labels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
+        "hoverLabels": {"oneOf":[{"$ref": "#/definitions/disable"},{"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}]},
+        "clip": {"$ref": "#/definitions/clip"},
+        "legendItem": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
       }
     },
     "anychart.core.radar.series.ContinuousBase": {
@@ -1884,7 +1856,8 @@
           ]
         },
         "clip": {"$ref": "#/definitions/clip"},
-        "error": {"$ref": "#/definitions/error"}
+        "error": {"$ref": "#/definitions/error"},
+        "legendItem": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
       }
     },
     "anychart.core.scatter.series.BaseWithMarkers": {
@@ -2705,19 +2678,18 @@
             "string"
           ]
         },
+        "itemsSourceMode": {"$ref": "#/definitions/anychart.enums.LegendItemsSourceMode"},
+        "hoverCursor": {"$ref": "#/definitions/anychart.enums.Cursor"},
+        "inverted": {
+          "type": "boolean"
+        },
         "position": {"$ref": "#/definitions/anychart.enums.Orientation"},
         "align": {"$ref": "#/definitions/anychart.enums.Align"},
         "itemsLayout": {"$ref": "#/definitions/anychart.enums.Layout"},
         "items": {
           "type": "array",
           "items": {
-            "type": [
-              "string",
-              "number",
-              "object",
-              "null",
-              "boolean"
-            ]
+            "type": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
           }
         },
         "background": {
@@ -3477,7 +3449,28 @@
         "both"
       ]
     },
-
+    "anychart.enums.LegendItemsSourceMode": {
+      "enum": ["default", "categories"]
+    },
+    "anychart.enums.Cursor": {
+      "enum": [
+        "default",
+        "crosshair",
+        "pointer",
+        "move",
+        "text",
+        "wait",
+        "help",
+        "n-resize",
+        "ne-resize",
+        "e-resize",
+        "se-resize",
+        "s-resize",
+        "sw-resize",
+        "w-resize",
+        "nw-resize"
+      ]
+    },
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
         "backwardDiagonal",
@@ -3580,6 +3573,39 @@
         },
         "xErrorStroke": {"$ref": "#/definitions/stroke"},
         "valueErrorStroke": {"$ref": "#/definitions/stroke"}
+      }
+    },
+
+    "anychart.core.utils.LegendItemSettings": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.Text"}
+      ],
+      "properties": {
+        "iconTextSpacing": {
+          "type": ["number", "string"]
+        },
+        "iconEnabled": {
+          "type": "boolean"
+        },
+        "iconType": {
+          "type": "string"
+        },
+        "iconMarkerType": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "iconFill": {"$ref": "#/definitions/fill"},
+        "iconStroke": {"$ref": "#/definitions/stroke"},
+        "iconHatchFill": {"$ref": "#/definitions/hatchFill"},
+        "iconMarkerFill": {"$ref": "#/definitions/fill"},
+        "iconMarkerStroke": {"$ref": "#/definitions/stroke"}
       }
     },
     "data": {

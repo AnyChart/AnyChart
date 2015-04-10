@@ -675,7 +675,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.charts.Gantt.prototype.createLegendItemsProvider = function() {
+anychart.charts.Gantt.prototype.createLegendItemsProvider = function(sourceMode) {
   return []; //TODO (A.Kudryavtsev): Do we need any kind of standard legend here?
 };
 

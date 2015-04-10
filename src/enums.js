@@ -53,6 +53,82 @@ anychart.enums.GaugeTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Cursor
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Cursor enum. Defines 15 items.
+ * @enum {string}
+ */
+anychart.enums.Cursor = acgraph.vector.Cursor;
+
+
+/**
+ * Normalizes value to Cursor enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.Cursor=} opt_default Default value, if input cannot be recognized. Defaults to DEFAULT.
+ * @return {anychart.enums.Cursor}
+ */
+anychart.enums.normalizeCursor = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'default':
+    case 'def':
+    case 'd':
+      return anychart.enums.Cursor.DEFAULT;
+    case 'crosshair':
+    case 'cross':
+      return anychart.enums.Cursor.CROSSHAIR;
+    case 'pointer':
+    case 'point':
+      return anychart.enums.Cursor.POINTER;
+    case 'move':
+      return anychart.enums.Cursor.MOVE;
+    case 'text':
+      return anychart.enums.Cursor.TEXT;
+    case 'wait':
+      return anychart.enums.Cursor.WAIT;
+    case 'help':
+      return anychart.enums.Cursor.HELP;
+    case 'n-resize':
+    case 'north':
+    case 'n':
+      return anychart.enums.Cursor.N_RESIZE;
+    case 'ne-resize':
+    case 'northeast':
+    case 'ne':
+      return anychart.enums.Cursor.NE_RESIZE;
+    case 'e-resize':
+    case 'east':
+    case 'e':
+      return anychart.enums.Cursor.E_RESIZE;
+    case 'se-resize':
+    case 'southeast':
+    case 'se':
+      return anychart.enums.Cursor.SE_RESIZE;
+    case 's-resize':
+    case 'south':
+    case 's':
+      return anychart.enums.Cursor.S_RESIZE;
+    case 'sw-resize':
+    case 'southwest':
+    case 'sw':
+      return anychart.enums.Cursor.SW_RESIZE;
+    case 'w-resize':
+    case 'west':
+    case 'w':
+      return anychart.enums.Cursor.W_RESIZE;
+    case 'nw-resize':
+    case 'northwest':
+    case 'nw':
+      return anychart.enums.Cursor.NW_RESIZE;
+  }
+  return opt_default || anychart.enums.Cursor.DEFAULT;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Anchor
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1057,6 +1133,95 @@ anychart.enums.LegendItemIconType = {
 };
 
 
+/**
+ * Normalizes legend item icon type.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.LegendItemIconType=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.LegendItemIconType} normalized value.
+ */
+anychart.enums.normalizeLegendItemIconType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.LegendItemIconType.AREA;
+    case 'bar':
+      return anychart.enums.LegendItemIconType.BAR;
+    case 'bubble':
+      return anychart.enums.LegendItemIconType.BUBBLE;
+    case 'candlestick':
+      return anychart.enums.LegendItemIconType.CANDLESTICK;
+    case 'column':
+      return anychart.enums.LegendItemIconType.COLUMN;
+    case 'line':
+      return anychart.enums.LegendItemIconType.LINE;
+    case 'marker':
+      return anychart.enums.LegendItemIconType.MARKER;
+    case 'ohlc':
+      return anychart.enums.LegendItemIconType.OHLC;
+    case 'rangearea':
+      return anychart.enums.LegendItemIconType.RANGE_AREA;
+    case 'rangebar':
+      return anychart.enums.LegendItemIconType.RANGE_BAR;
+    case 'rangecolumn':
+      return anychart.enums.LegendItemIconType.RANGE_COLUMN;
+    case 'rangesplinearea':
+      return anychart.enums.LegendItemIconType.RANGE_SPLINE_AREA;
+    case 'rangesteparea':
+      return anychart.enums.LegendItemIconType.RANGE_STEP_AREA;
+    case 'spline':
+      return anychart.enums.LegendItemIconType.SPLINE;
+    case 'splinearea':
+      return anychart.enums.LegendItemIconType.SPLINE_AREA;
+    case 'stepline':
+      return anychart.enums.LegendItemIconType.STEP_LINE;
+    case 'steparea':
+      return anychart.enums.LegendItemIconType.STEP_AREA;
+    case 'circle':
+      return anychart.enums.LegendItemIconType.CIRCLE;
+    case 'square':
+      return anychart.enums.LegendItemIconType.SQUARE;
+  }
+  return opt_default || anychart.enums.LegendItemIconType.SQUARE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  LegendItemsSourceMode
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Predefined icons type.
+ * @enum {string}
+ */
+anychart.enums.LegendItemsSourceMode = {
+  DEFAULT: 'default',
+  CATEGORIES: 'categories'
+};
+
+
+/**
+ * Normalizes legend items source mode.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.LegendItemsSourceMode=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.LegendItemsSourceMode} normalized value.
+ */
+anychart.enums.normalizeLegendItemsSourceMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'd':
+    case 'def':
+    case 'default':
+      return anychart.enums.LegendItemsSourceMode.DEFAULT;
+    case 'c':
+    case 'cat':
+    case 'categories':
+      return anychart.enums.LegendItemsSourceMode.CATEGORIES;
+  }
+  return opt_default || anychart.enums.LegendItemsSourceMode.DEFAULT;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  BulletMarkerType
@@ -1814,6 +1979,22 @@ goog.exportSymbol('anychart.enums.Anchor.RIGHT_TOP', anychart.enums.Anchor.RIGHT
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_CENTER', anychart.enums.Anchor.RIGHT_CENTER);
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_BOTTOM', anychart.enums.Anchor.RIGHT_BOTTOM);
 
+goog.exportSymbol('anychart.enums.Cursor.DEFAULT', anychart.enums.Cursor.DEFAULT);
+goog.exportSymbol('anychart.enums.Cursor.CROSSHAIR', anychart.enums.Cursor.CROSSHAIR);
+goog.exportSymbol('anychart.enums.Cursor.POINTER', anychart.enums.Cursor.POINTER);
+goog.exportSymbol('anychart.enums.Cursor.MOVE', anychart.enums.Cursor.MOVE);
+goog.exportSymbol('anychart.enums.Cursor.TEXT', anychart.enums.Cursor.TEXT);
+goog.exportSymbol('anychart.enums.Cursor.WAIT', anychart.enums.Cursor.WAIT);
+goog.exportSymbol('anychart.enums.Cursor.HELP', anychart.enums.Cursor.HELP);
+goog.exportSymbol('anychart.enums.Cursor.N_RESIZE', anychart.enums.Cursor.N_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.NE_RESIZE', anychart.enums.Cursor.NE_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.E_RESIZE', anychart.enums.Cursor.E_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.SE_RESIZE', anychart.enums.Cursor.SE_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.S_RESIZE', anychart.enums.Cursor.S_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.SW_RESIZE', anychart.enums.Cursor.SW_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.W_RESIZE', anychart.enums.Cursor.W_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.NW_RESIZE', anychart.enums.Cursor.NW_RESIZE);
+
 goog.exportSymbol('anychart.enums.Position.LEFT_TOP', anychart.enums.Position.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Position.LEFT_CENTER', anychart.enums.Position.LEFT_CENTER);
 goog.exportSymbol('anychart.enums.Position.LEFT_BOTTOM', anychart.enums.Position.LEFT_BOTTOM);
@@ -1897,6 +2078,9 @@ goog.exportSymbol('anychart.enums.LegendItemIconType.STEP_LINE', anychart.enums.
 goog.exportSymbol('anychart.enums.LegendItemIconType.STEP_AREA', anychart.enums.LegendItemIconType.STEP_AREA);
 goog.exportSymbol('anychart.enums.LegendItemIconType.CIRCLE', anychart.enums.LegendItemIconType.CIRCLE);
 goog.exportSymbol('anychart.enums.LegendItemIconType.SQUARE', anychart.enums.LegendItemIconType.SQUARE);
+
+goog.exportSymbol('anychart.enums.LegendItemsSourceMode.DEFAULT', anychart.enums.LegendItemsSourceMode.DEFAULT);
+goog.exportSymbol('anychart.enums.LegendItemsSourceMode.CATEGORIES', anychart.enums.LegendItemsSourceMode.CATEGORIES);
 
 goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
 goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/

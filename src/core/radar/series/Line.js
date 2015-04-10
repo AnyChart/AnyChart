@@ -18,6 +18,9 @@ anychart.core.radar.series.Line = function(opt_data, opt_csvSettings) {
 
   this.referenceValuesSupportStack = false;
 
+  this.hoverStroke(function() {
+    return anychart.color.lighten(this['sourceColor']);
+  });
 };
 goog.inherits(anychart.core.radar.series.Line, anychart.core.radar.series.ContinuousBase);
 anychart.core.radar.series.Base.SeriesTypesMap[anychart.enums.RadarSeriesType.LINE] = anychart.core.radar.series.Line;

@@ -376,7 +376,22 @@ anychart.core.cartesian.series.Marker.prototype.finalizeDrawing = function() {
  * @return {!anychart.core.cartesian.series.Marker} {@link anychart.core.cartesian.series.Marker} instance for method chaining.
  */
 anychart.core.cartesian.series.Marker.prototype.hoverSeries = function() {
-  this.unhover();
+  if (this.hoverStatus == -1) return this;
+  if (this.hoverStatus >= 0) {
+    if (this.getResetIterator().select(this.hoverStatus)) {
+      this.drawMarker_(false, true);
+      this.applyHatchFill(false);
+      this.drawLabel(false);
+      this.hideTooltip();
+    }
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.drawMarker_(true, true);
+      this.applyHatchFill(true);
+    }
+  }
+  this.hoverStatus = -1;
   return this;
 };
 
@@ -409,11 +424,17 @@ anychart.core.cartesian.series.Marker.prototype.hoverPoint = function(index, eve
  */
 anychart.core.cartesian.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker_(false, true);
     this.applyHatchFill(false);
     this.drawLabel(false);
     this.hideTooltip();
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.drawMarker_(false, true);
+      this.applyHatchFill(false);
+    }
   }
   this.hoverStatus = NaN;
   return this;

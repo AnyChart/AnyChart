@@ -21,6 +21,9 @@ anychart.core.cartesian.series.Line = function(opt_data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = false;
 
+  this.hoverStroke(function() {
+    return anychart.color.lighten(this['sourceColor']);
+  });
 };
 goog.inherits(anychart.core.cartesian.series.Line, anychart.core.cartesian.series.ContinuousBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.LINE] = anychart.core.cartesian.series.Line;
