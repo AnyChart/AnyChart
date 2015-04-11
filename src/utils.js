@@ -1019,6 +1019,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return 'Scatter chart scales should be only scatter type (linear, log).';
 
+    case anychart.enums.ErrorCode.EMPTY_CONFIG:
+      return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';
+
     default:
       return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';

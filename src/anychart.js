@@ -190,20 +190,22 @@ anychart.fromJson = function(jsonConfig) {
     json = jsonConfig;
   }
 
-  if (!json) throw 'Empty json config';
+  var instance = null;
 
-  var chart = json['chart'];
-  var gauge = json['gauge'];
-  if (!(chart || gauge)) throw 'Config should contain the chart or gauge node';
-
-  var instance;
-  if (chart)
-    instance = anychart.createChartByType(chart['type']);
-  else if (gauge)
-    instance = anychart.createGaugeByType(gauge['type']);
+  if (json) {
+    var chart = json['chart'];
+    var gauge = json['gauge'];
+    if (chart)
+      instance = anychart.createChartByType(chart['type']);
+    else if (gauge)
+      instance = anychart.createGaugeByType(gauge['type']);
+  }
 
   if (instance)
     instance.setup(chart || gauge);
+  else
+    anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
+
   return instance;
 };
 

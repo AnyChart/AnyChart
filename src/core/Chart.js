@@ -793,9 +793,10 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * @return {*} Chart JSON.
  */
 anychart.core.Chart.prototype.toJson = function(opt_stringify) {
+  var data = this.isDisposed() ? {} : this.serialize();
   return opt_stringify ?
-      goog.json.hybrid.stringify(/** @type {!Object} */(this.serialize())) :
-      this.serialize();
+      goog.json.hybrid.stringify(data) :
+      data;
 };
 
 
@@ -805,7 +806,7 @@ anychart.core.Chart.prototype.toJson = function(opt_stringify) {
  * @return {string|Node} Chart configuration.
  */
 anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
-  return anychart.utils.json2xml(this.serialize(), undefined, opt_asXmlNode);
+  return anychart.utils.json2xml(this.isDisposed() ? {} : this.serialize(), '', opt_asXmlNode);
 };
 
 

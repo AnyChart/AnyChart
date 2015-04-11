@@ -1739,7 +1739,9 @@ anychart.enums.ErrorCode = {
 
   INCORRECT_SCALE_TYPE: 5,
 
-  SCALE_DATE_RANGE_NOT_SET: 6
+  SCALE_DATE_RANGE_NOT_SET: 6,
+
+  EMPTY_CONFIG: 7
 };
 
 
