@@ -1828,7 +1828,7 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
  *    index: (number|null|undefined),
  *    text: (string|null|undefined),
  *    iconEnabled: (boolean|undefined),
- *    iconType: (Function, string|null|undefined),
+ *    iconType: (Function|string|null|undefined),
  *    iconStroke: (acgraph.vector.Stroke|null|undefined),
  *    iconFill: (acgraph.vector.Fill|null|undefined),
  *    iconHatchFill: (acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill|acgraph.vector.HatchFill|null|undefined),
