@@ -166,6 +166,7 @@ anychart.data.Iterator.prototype.advance = function() {
  */
 anychart.data.Iterator.prototype.get = function(fieldName) {
   // iterator does not use this.view_.get(), because of more light currentRow_ cache usage through direct getInternal call.
+  if (this.currentIndex_ >= this.getRowsCount()) return undefined;
   return this.view_.getRowMapping(this.currentIndex_).getInternal(this.currentRow_, this.currentIndex_, fieldName);
 };
 

@@ -450,6 +450,7 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
  * @return {*} The field value or undefined, if not found.
  */
 anychart.data.View.prototype.get = function(rowIndex, fieldName) {
+  if (rowIndex >= this.getRowsCount()) return undefined;
   return this.getRowMapping(rowIndex).getInternal(this.row(rowIndex), rowIndex, fieldName);
 };
 

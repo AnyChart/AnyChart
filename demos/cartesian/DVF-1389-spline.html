@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../src/deps.js"></script>
+  <meta charset="utf-8">
+  <script>
+    goog.require('anychart.modules.anychart');
+    goog.require('anychart.core.axes.Linear');
+    goog.require('anychart.charts.Cartesian');
+  </script>
+  <script>
+    var chart, series;
+
+    function load() {
+        chart = anychart.line();
+        chart.spline([1, 2, undefined, 3]);
+        chart.spline();
+        chart.xScale('linear');
+        chart.container('container');
+        chart.draw();
+    }
+  </script>
+  <style>
+    #container {
+      position: absolute;
+      width: 500px;
+      height: 300px;
+      /*border: 1px solid #000000;*/
+    }
+  </style>
+</head>
+
+
+<body onload="load()">
+
+<div id="container"></div>
+
+</body>
+</html>
