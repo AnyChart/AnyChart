@@ -100,6 +100,12 @@ anychart.gauges.Circular.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.GAUGE_AXIS_MARKERS;
 
 
+/** @inheritDoc */
+anychart.gauges.Circular.prototype.getType = function() {
+  return anychart.enums.GaugeTypes.CIRCULAR;
+};
+
+
 /**
  * Default hatch fill type.
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
@@ -1278,3 +1284,4 @@ anychart.gauges.Circular.prototype['range'] = anychart.gauges.Circular.prototype
 
 anychart.gauges.Circular.prototype['circularPadding'] = anychart.gauges.Circular.prototype.circularPadding;
 anychart.gauges.Circular.prototype['encloseWithStraightLine'] = anychart.gauges.Circular.prototype.encloseWithStraightLine;
+anychart.gauges.Circular.prototype['getType'] = anychart.gauges.Circular.prototype.getType;

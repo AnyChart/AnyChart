@@ -107,6 +107,12 @@ anychart.charts.Scatter = function() {
 goog.inherits(anychart.charts.Scatter, anychart.core.SeparateChart);
 
 
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.getType = function() {
+  return anychart.enums.ChartTypes.SCATTER;
+};
+
+
 /**
  * Maximal number of attempts to calculate axes length.
  * @type {number}
@@ -2225,3 +2231,4 @@ anychart.charts.Scatter.prototype['textMarker'] = anychart.charts.Scatter.protot
 anychart.charts.Scatter.prototype['palette'] = anychart.charts.Scatter.prototype.palette;//doc|ex
 anychart.charts.Scatter.prototype['markerPalette'] = anychart.charts.Scatter.prototype.markerPalette;
 anychart.charts.Scatter.prototype['hatchFillPalette'] = anychart.charts.Scatter.prototype.hatchFillPalette;
+anychart.charts.Scatter.prototype['getType'] = anychart.charts.Scatter.prototype.getType;

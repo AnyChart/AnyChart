@@ -93,6 +93,12 @@ anychart.charts.Polar = function() {
 goog.inherits(anychart.charts.Polar, anychart.core.SeparateChart);
 
 
+/** @inheritDoc */
+anychart.charts.Polar.prototype.getType = function() {
+  return anychart.enums.ChartTypes.POLAR;
+};
+
+
 /**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
@@ -1543,3 +1549,4 @@ anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.pal
 anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;//doc|ex
 anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
 anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex
+anychart.charts.Polar.prototype['getType'] = anychart.charts.Polar.prototype.getType;

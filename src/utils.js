@@ -1022,8 +1022,14 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.EMPTY_CONFIG:
       return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';
 
+    case anychart.enums.ErrorCode.NO_LEGEND_IN_CHART:
+      return 'Bullet and Sparkline charts do not support Legend. Please use anychart.ui.Legend component for a group of charts instead.';
+
+    case anychart.enums.ErrorCode.NO_CREDITS_IN_CHART:
+      return 'Bullet and Sparkline charts do not support Credits.';
+
     default:
-      return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
+      return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
   }
 };

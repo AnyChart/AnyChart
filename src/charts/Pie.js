@@ -263,6 +263,12 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
 goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
 
+/** @inheritDoc */
+anychart.charts.Pie.prototype.getType = function() {
+  return anychart.enums.ChartTypes.PIE;
+};
+
+
 /**
  * Series element z-index in series root layer.
  * @type {number}
@@ -3657,3 +3663,4 @@ anychart.charts.Pie.prototype['connectorLength'] = anychart.charts.Pie.prototype
 anychart.charts.Pie.prototype['outsideLabelsCriticalAngle'] = anychart.charts.Pie.prototype.outsideLabelsCriticalAngle;//doc|ex
 anychart.charts.Pie.prototype['connectorStroke'] = anychart.charts.Pie.prototype.connectorStroke;//doc|ex
 anychart.charts.Pie.prototype['hatchFillPalette'] = anychart.charts.Pie.prototype.hatchFillPalette;
+anychart.charts.Pie.prototype['getType'] = anychart.charts.Pie.prototype.getType;

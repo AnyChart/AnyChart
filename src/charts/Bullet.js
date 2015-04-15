@@ -96,6 +96,12 @@ anychart.charts.Bullet.ZINDEX_RANGES = 2;
 anychart.charts.Bullet.ZINDEX_AXIS = 3;
 
 
+/** @inheritDoc */
+anychart.charts.Bullet.prototype.getType = function() {
+  return anychart.enums.ChartTypes.BULLET;
+};
+
+
 /**
  * Getter for chart data.
  * @return {!anychart.data.View} {@link anychart.data.View} instance for method chaining.
@@ -825,3 +831,4 @@ anychart.charts.Bullet.prototype['axis'] = anychart.charts.Bullet.prototype.axis
 anychart.charts.Bullet.prototype['range'] = anychart.charts.Bullet.prototype.range;//doc|ex
 anychart.charts.Bullet.prototype['draw'] = anychart.charts.Bullet.prototype.draw;//inherited
 anychart.charts.Bullet.prototype['isHorizontal'] = anychart.charts.Bullet.prototype.isHorizontal;//doc
+anychart.charts.Bullet.prototype['getType'] = anychart.charts.Bullet.prototype.getType;//doc

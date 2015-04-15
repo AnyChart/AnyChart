@@ -111,6 +111,12 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
 goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
 
 
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getType = function() {
+  return anychart.enums.ChartTypes.SPARKLINE;
+};
+
+
 /**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.Chart states.
  * @type {number}
@@ -3248,3 +3254,5 @@ anychart.charts.Sparkline.prototype['markers'] = anychart.charts.Sparkline.proto
 anychart.charts.Sparkline.prototype['labels'] = anychart.charts.Sparkline.prototype.labels;
 
 anychart.charts.Sparkline.prototype['stroke'] = anychart.charts.Sparkline.prototype.stroke;
+
+anychart.charts.Sparkline.prototype['getType'] = anychart.charts.Sparkline.prototype.getType;

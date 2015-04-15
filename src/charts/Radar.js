@@ -93,6 +93,12 @@ anychart.charts.Radar = function() {
 goog.inherits(anychart.charts.Radar, anychart.core.SeparateChart);
 
 
+/** @inheritDoc */
+anychart.charts.Radar.prototype.getType = function() {
+  return anychart.enums.ChartTypes.RADAR;
+};
+
+
 /**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
@@ -1829,3 +1835,4 @@ anychart.charts.Radar.prototype['marker'] = anychart.charts.Radar.prototype.mark
 anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.palette;//doc|ex
 anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;//doc|ex
 anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;//doc|ex
+anychart.charts.Radar.prototype['getType'] = anychart.charts.Radar.prototype.getType;

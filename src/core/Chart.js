@@ -887,6 +887,35 @@ anychart.core.Chart.prototype.print = function(opt_stage) {
 };
 
 
+/**
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
+ * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
+ */
+anychart.core.Chart.prototype.legend = function(opt_value) {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
+/**
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.Chart|anychart.core.ui.Credits}
+ */
+anychart.core.Chart.prototype.credits = function(opt_value) {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
+/**
+ * Returns chart or gauge type. Published in charts.
+ * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes}
+ */
+anychart.core.Chart.prototype.getType = goog.abstractMethod;
+
+
 
 /**
  * @param {anychart.core.Chart} chart
@@ -914,3 +943,5 @@ anychart.core.Chart.prototype['container'] = anychart.core.Chart.prototype.conta
 anychart.core.Chart.prototype['draw'] = anychart.core.Chart.prototype.draw;//doc
 anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;//|need-ex
 anychart.core.Chart.prototype['toXml'] = anychart.core.Chart.prototype.toXml;//|need-ex
+anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//dummy DO NOT USE
+anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//dummy DO NOT USE

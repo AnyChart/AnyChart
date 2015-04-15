@@ -178,6 +178,12 @@ anychart.charts.Cartesian.prototype.setType = function(value) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Cartesian.prototype.getType = function() {
+  return this.type_;
+};
+
+
 /**
  * Maximal number of attempts to calculate axes length.
  * @type {number}
@@ -3197,3 +3203,4 @@ anychart.charts.Cartesian.prototype['textMarker'] = anychart.charts.Cartesian.pr
 anychart.charts.Cartesian.prototype['palette'] = anychart.charts.Cartesian.prototype.palette;//doc|ex
 anychart.charts.Cartesian.prototype['markerPalette'] = anychart.charts.Cartesian.prototype.markerPalette;
 anychart.charts.Cartesian.prototype['hatchFillPalette'] = anychart.charts.Cartesian.prototype.hatchFillPalette;
+anychart.charts.Cartesian.prototype['getType'] = anychart.charts.Cartesian.prototype.getType;

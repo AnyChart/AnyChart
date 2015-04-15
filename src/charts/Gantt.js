@@ -148,6 +148,12 @@ anychart.charts.Gantt.CHART_TYPE = 'gantt';
 anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt;
 
 
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.getType = function() {
+  return anychart.enums.ChartTypes.GANTT;
+};
+
+
 /**
  * Supported consistency states.
  * @type {number}
@@ -840,6 +846,4 @@ anychart.charts.Gantt.prototype['expandAll'] = anychart.charts.Gantt.prototype.e
 anychart.charts.Gantt.prototype['expandTask'] = anychart.charts.Gantt.prototype.expandTask;
 anychart.charts.Gantt.prototype['collapseTask'] = anychart.charts.Gantt.prototype.collapseTask;
 anychart.charts.Gantt.prototype['splitterPosition'] = anychart.charts.Gantt.prototype.splitterPosition;
-
-
-
+anychart.charts.Gantt.prototype['getType'] = anychart.charts.Gantt.prototype.getType;

@@ -1741,7 +1741,11 @@ anychart.enums.ErrorCode = {
 
   SCALE_DATE_RANGE_NOT_SET: 6,
 
-  EMPTY_CONFIG: 7
+  EMPTY_CONFIG: 7,
+
+  NO_LEGEND_IN_CHART: 8,
+
+  NO_CREDITS_IN_CHART: 9
 };
 
 
