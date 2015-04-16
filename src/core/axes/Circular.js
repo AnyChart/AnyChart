@@ -755,7 +755,7 @@ anychart.core.axes.Circular.prototype.getLabelBoundsWithoutTransform_ = function
   var value = scaleTicks.get()[index];
 
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {'x': 0, 'y': 0}};
+  var positionProvider = {'value': {'angle': 0, 'radius': 0}};
 
   if (label)
     boundsWTCache[index] = labels.measure(label);

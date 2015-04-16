@@ -924,7 +924,7 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
  */
 anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_ = new anychart.core.ui.CircularLabelsFactory();
     this.labels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.labels_.textFormatter(function() {
       return (this['value'] * 100 / this.getStat('sum')).toFixed(1) + '%';
@@ -983,7 +983,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
  */
 anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
+    this.hoverLabels_ = new anychart.core.ui.CircularLabelsFactory();
     this.hoverLabels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
@@ -1591,6 +1591,16 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
   this.aquaStyleObj_['fx'] = !isNaN(fx) && isFinite(fx) ? fx : 0;
   this.aquaStyleObj_['fy'] = !isNaN(fy) && isFinite(fy) ? fy : 0;
   this.aquaStyleObj_['mode'] = bounds;
+
+  this.labels()
+      .suspendSignalsDispatching()
+      .cx(this.cx_)
+      .cy(this.cy_)
+      .parentRadius(this.radiusValue_)
+      .startAngle(this.startAngle_)
+      .sweepAngle(360)
+      .parentBounds(this.pieBounds_)
+      .resumeSignalsDispatching(false);
 };
 
 
@@ -2651,29 +2661,52 @@ anychart.charts.Pie.prototype.domainDefragmentation = function(domain) {
   var tmpDomain = null;
   var tmpLabels = labels.slice();
   var domainsLength = sourcePieLabelsDomains.length;
+  var domainExpanded = false;
 
   for (i = 0, len = labels.length; i < len; i++) {
     label = labels[i];
     if (label) {
       bounds = this.getLabelBounds(label);
 
-      if (!prevDomain || prevDomain.isNotIntersect(bounds.top, bounds.height)) {
-        if (!tmpDomain || tmpDomain.isNotIntersect(bounds.top, bounds.height)) {
-          if (tmpDomain) sourcePieLabelsDomains.push(tmpDomain);
+      if (!prevDomain || prevDomain.isNotIntersect(bounds)) {
+
+        if (!tmpDomain || tmpDomain.isNotIntersect(bounds)) {
+          if (tmpDomain) {
+            sourcePieLabelsDomains.push(tmpDomain);
+            prevDomain = tmpDomain;
+          }
           var isRightSide = label.anchor() == anychart.enums.Anchor.LEFT_CENTER;
           tmpDomain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, sourcePieLabelsDomains);
-          tmpDomain.addLabel(label);
+          tmpDomain.softAddLabel(label);
         } else {
-          tmpDomain.addLabel(label);
+          tmpDomain.softAddLabel(label);
+
+          if (this.isCriticalAngle) {
+            label.enabled(false);
+            if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
+            tmpDomain.droppedLabels.push(label);
+            tmpDomain.labels.pop();
+            tmpDomain.calcDomain();
+          } else if (prevDomain && tmpDomain && !prevDomain.isNotIntersect(tmpDomain.getBounds())) {
+            sourcePieLabelsDomains.pop();
+            tmpDomain.labels = goog.array.concat(prevDomain.labels, tmpDomain.labels);
+            prevDomain = null;
+            tmpDomain.calcDomain();
+
+            domainExpanded = true;
+          }
         }
       } else {
-        tmpLabels.splice(i, 1);
-        prevDomain.addLabel(label);
+        label.enabled(false);
+        if (tmpDomain) {
+          if (!tmpDomain.droppedLabels) tmpDomain.droppedLabels = [];
+          tmpDomain.droppedLabels.push(label);
+        }
       }
     }
   }
   if (tmpDomain) {
-    if (sourcePieLabelsDomains.length - domainsLength > 0) {
+    if (sourcePieLabelsDomains.length - domainsLength > 0 || domainExpanded) {
       domain.labels = tmpDomain.labels;
     } else {
       tmpDomain.clearDroppedLabels();
@@ -2689,12 +2722,10 @@ anychart.charts.Pie.prototype.domainDefragmentation = function(domain) {
  */
 anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   var iterator = this.getIterator();
-  var label, x0, y0, x, y, dR, dR0, isRightSide;
+  var label, x0, y0, dR0, isRightSide;
 
   this.connectorAnchorCoords = [];
   var connector;
-
-  var positionProvider;
 
   //--------calculate absolute labels position, sort labels, separation of the labels on the left and right side--------
 
@@ -2759,8 +2790,9 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
   //------------------------------------ left domain calculation ------------------------------------------------------
 
-  var i, j, len, bounds;
+  var i, len, bounds, droppedLabels, notIntersection, m, l;
   var leftDomains = [], domain = null;
+  var domainBounds;
 
   for (i = 0, len = leftSideLabels.length; i < len; i++) {
     label = leftSideLabels[i];
@@ -2769,7 +2801,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       label.formatProvider(this.createFormatProvider());
       bounds = this.getLabelBounds(label);
 
-      if (!domain || domain.isNotIntersect(bounds.top, bounds.height)) {
+      if (!domain || domain.isNotIntersect(bounds)) {
         if (domain) leftDomains.push(domain);
         isRightSide = label.anchor() == anychart.enums.Position.LEFT_CENTER;
         domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, leftDomains);
@@ -2781,7 +2813,6 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   }
   leftDomains.push(domain);
 
-  var droppedLabels, notIntersection, m, l;
   for (i = 0, len = leftDomains.length; i < len; i++) {
     domain = leftDomains[i];
     if (domain.droppedLabels) {
@@ -2791,7 +2822,6 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   }
 
   domain = null;
-  var domainBounds;
   if (droppedLabels) {
     goog.array.sort(droppedLabels, function(a, b) {
       return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0});
@@ -2805,7 +2835,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
         notIntersection = true;
         for (m = 0, l = leftDomains.length; m < l; m++) {
-          notIntersection = notIntersection && leftDomains[m].isNotIntersect(bounds.top, bounds.height);
+          notIntersection = notIntersection && leftDomains[m].isNotIntersect(bounds);
         }
 
         if (notIntersection) {
@@ -2818,7 +2848,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
           notIntersection = true;
           for (m = 0; m < l; m++) {
-            notIntersection = notIntersection && leftDomains[m].isNotIntersect(domainBounds.top, domainBounds.height);
+            notIntersection = notIntersection && leftDomains[m].isNotIntersect(domainBounds);
           }
 
           if (domain.isCriticalAngle || !notIntersection) {
@@ -2836,7 +2866,10 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
           }
         }
       }
-
+    }
+    if (domain) {
+      leftDomains.push(domain);
+      domain = null;
     }
   }
 
@@ -2851,7 +2884,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       label.formatProvider(this.createFormatProvider());
       bounds = this.getLabelBounds(label);
 
-      if (!domain || domain.isNotIntersect(bounds.top, bounds.height)) {
+      if (!domain || domain.isNotIntersect(bounds)) {
         if (domain) rightDomains.push(domain);
         isRightSide = label.anchor() == anychart.enums.Position.LEFT_CENTER;
         domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, rightDomains);
@@ -2886,7 +2919,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
         notIntersection = true;
         for (m = 0, l = rightDomains.length; m < l; m++) {
-          notIntersection = notIntersection && rightDomains[m].isNotIntersect(bounds.top, bounds.height);
+          notIntersection = notIntersection && rightDomains[m].isNotIntersect(bounds);
         }
 
         if (notIntersection) {
@@ -2899,7 +2932,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
           notIntersection = true;
           for (m = 0; m < l; m++) {
-            notIntersection = notIntersection && rightDomains[m].isNotIntersect(domainBounds.top, domainBounds.height);
+            notIntersection = notIntersection && rightDomains[m].isNotIntersect(domainBounds);
           }
 
           if (domain.isCriticalAngle || !notIntersection) {
@@ -2920,8 +2953,13 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
     }
   }
+  if (domain) {
+    leftDomains.push(domain);
+    domain = null;
+  }
 
   //-----------init connector element------------------------------------------------------------------------
+
   if (this.connectorsLayer_) {
     this.connectorsLayer_.clear();
   } else {
@@ -2939,7 +2977,9 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     this.hoveredLabelConnectorPath_ = this.rootElement.path();
     this.hoveredLabelConnectorPath_.stroke(this.connectorStroke_);
   }
+
   //-----------left domains connectors calculation, applying labels positions--------------------------------
+
   var k, labelsLen;
   var connectorPath;
   for (i = 0, len = leftDomains.length; i < len; i++) {
@@ -3001,8 +3041,20 @@ anychart.charts.Pie.prototype.drawConnectorLine = function(label, path) {
     var connector = /** @type {number} */(iterator.meta('connector'));
     var positionProvider = label.positionProvider()['value'];
 
-    var x = positionProvider['x'] - connector;
-    var y = positionProvider['y'];
+    var offsetY = goog.isDef(label.offsetY()) ? label.offsetY() : this.labels().offsetY();
+    if (!offsetY) offsetY = 0;
+    var offsetRadius = anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.radiusValue_);
+
+    var offsetX = goog.isDef(label.offsetX()) ? label.offsetX() : this.labels().offsetX();
+    if (!offsetX) offsetX = 0;
+    var offsetAngle = anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), 360);
+
+    var angle = positionProvider['angle'] + offsetAngle;
+    var angleRad = goog.math.toRadians(angle);
+    var radius = positionProvider['radius'] + offsetRadius;
+
+    var x = this.cx_ + radius * Math.cos(angleRad) - connector;
+    var y = this.cy_ + radius * Math.sin(angleRad);
 
     path.clear().moveTo(x0, y0).lineTo(x, y).lineTo(x + connector, y);
   }
@@ -3048,18 +3100,18 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
   var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !singlePoint;
-  var angle = (start + sweep / 2) * Math.PI / 180;
+  var angle = start + sweep / 2;
   var dR;
+
   if (outside)
     dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
-  else
-    dR = anychart.utils.normalizeSize(this.insideLabelsOffset_, this.radiusValue_ - this.innerRadiusValue_) +
+  else {
+    var radius = singlePoint && !this.innerRadiusValue_ ? 0 : this.radiusValue_ - this.innerRadiusValue_;
+    dR = anychart.utils.normalizeSize(this.insideLabelsOffset_, radius) +
         this.innerRadiusValue_ + (exploded ? this.explodeValue_ : 0);
-  var connector = /** @type {number} */ (iterator.meta('connector'));
+  }
 
-  var x = this.cx_ + ((!singlePoint || outside) ? dR * Math.cos(angle) : 0);
-  var y = this.cy_ + ((!singlePoint || outside) ? dR * Math.sin(angle) : 0);
-  return {'value': {'x': x + (outside ? goog.isDef(connector) ? connector : 0 : 0), 'y': y}};
+  return {'value': {'angle': angle, 'radius': dR}};
 };
 
 
@@ -3328,6 +3380,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.clearDroppedLabels = functi
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.dropLabel = function(label, index) {
   if (!isNaN(index)) {
+
     label.enabled(false);
     if (!this.droppedLabels) this.droppedLabels = [];
     this.droppedLabels.push(label);
@@ -3346,8 +3399,6 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.getBounds = function() {
     var firstLabelHeight = this.labels[0] ? this.pie.getLabelBounds(this.labels[0]).height : 0;
     var domainY = this.y + firstLabelHeight / 2;
     this.boundsCache = new acgraph.math.Rect(this.x, domainY, this.width, this.height);
-  } else {
-
   }
 
   return this.boundsCache;
@@ -3363,14 +3414,14 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.dropBoundsCache = function(
 
 
 /**
- * Check intersections this domain with other domain by y coordinate and height value.
- * @param {number} y Y Coordinate left top position.
- * @param {number} height Height value.
+ * Check intersections this domain with other domain.
+ * @param {anychart.math.Rect} bounds Passed labels bounds.
  * @return {boolean} is not intersect with entry with incoming params.
  */
-anychart.charts.Pie.PieOutsideLabelsDomain.prototype.isNotIntersect = function(y, height) {
-  var bounds = this.getBounds();
-  return y + height < bounds.top || y > bounds.top + bounds.height;
+anychart.charts.Pie.PieOutsideLabelsDomain.prototype.isNotIntersect = function(bounds) {
+  var bounds1 = this.getBounds().toCoordinateBox();
+  var bounds2 = bounds.toCoordinateBox();
+  return !anychart.math.checkRectIntersection(bounds1, bounds2);
 };
 
 
@@ -3381,12 +3432,13 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.applyPositions = function()
   for (var j = 0, len = this.labels.length; j < len; j++) {
     var label = this.labels[j];
 
-    var x = this.labelsPositions[j * 2];
-    var y = this.labelsPositions[j * 2 + 1];
+    var angle = this.labelsPositions[j * 2];
+    var radius = this.labelsPositions[j * 2 + 1];
 
     var positionProviderValue = label.positionProvider()['value'];
-    positionProviderValue['x'] = x;
-    positionProviderValue['y'] = y;
+
+    positionProviderValue['angle'] = angle;
+    positionProviderValue['radius'] = radius;
 
     this.pie.dropLabelBoundsCache(label);
   }
@@ -3455,7 +3507,15 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     sweep = /** @type {number} */ (iterator.meta('sweep'));
     exploded = /** @type {boolean} */ (iterator.meta('exploded'));
 
-    angle = (start + sweep / 2) * Math.PI / 180;
+    var offsetX = goog.isDef(label.offsetX()) ? label.offsetX() : this.pie.labels().offsetX();
+    if (!offsetX) offsetX = 0;
+    var offsetAngle = anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), 360);
+
+    var offsetY = goog.isDef(label.offsetY()) ? label.offsetY() : this.pie.labels().offsetY();
+    if (!offsetY) offsetY = 0;
+    var offsetRadius = anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), this.pie.radiusValue_);
+
+    angle = (start + sweep / 2 + offsetAngle) * Math.PI / 180;
     angleDeg = goog.math.standardAngle(goog.math.toDegrees(angle));
 
     connector = this.isRightSide ?
@@ -3463,7 +3523,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
         -anychart.charts.Pie.OUTSIDE_LABELS_CONNECTOR_SIZE_;
 
     dRPie = this.pie.radiusValue_ + (exploded ? this.pie.explodeValue_ : 0);
-    dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0);
+    dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0) + offsetRadius;
 
     // new coordinates of the point where connector touches a label
     y = startLabelsDrawingYPos;
@@ -3495,7 +3555,28 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     rightBound = this.isRightSide ? labelXCoord + labelBounds.width : labelXCoord;
     this.width = isNaN(this.width) ? rightBound : this.width < rightBound ? rightBound : this.width;
 
-    this.labelsPositions.push(labelXCoord, y);
+
+    var x_ = labelXCoord - cx;
+    var y_ = y - cy;
+
+    var radius_ = Math.sqrt(Math.pow(labelXCoord - cx, 2) + Math.pow(y - cy, 2)) - offsetRadius;
+
+    var angle_ = NaN;
+    if (x_ > 0 && y_ >= 0) {
+      angle_ = goog.math.toDegrees(Math.atan(y_ / x_));
+    } else if (x_ > 0 && y_ < 0) {
+      angle_ = goog.math.toDegrees(Math.atan(y_ / x_)) + 360;
+    } else if (x_ < 0) {
+      angle_ = goog.math.toDegrees(Math.atan(y_ / x_)) + 180;
+    } else if (x_ == 0 && y_ > 0) {
+      angle_ = 90;
+    } else if (x_ == 0 && y_ < 0) {
+      angle_ = 270;
+    }
+
+    angle_ -= offsetAngle;
+
+    this.labelsPositions.push(angle_, radius_);
 
     startLabelsDrawingYPos -= labelBounds.height / 2 + nextLabelHeight / 2;
   }
@@ -3520,7 +3601,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calculate = function() {
     if (prevDomain) boundsPrevDomain = prevDomain.getBounds();
     //If domain is so large that we overlap the previous domain, we assimilate (resistance is futile)
     //previous domain (take its labels into the current domain and remove the previous from the list of domains)
-    if (boundsPrevDomain && !this.isNotIntersect(boundsPrevDomain.top, boundsPrevDomain.height)) {
+    if (boundsPrevDomain && !this.isNotIntersect(boundsPrevDomain)) {
       this.pieLabelsDomains.pop();
       this.labels = goog.array.concat(prevDomain.labels, this.labels);
       for (var j = 0, len = this.labels.length; j < len; j++) {

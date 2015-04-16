@@ -2224,7 +2224,16 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     }
     //define parent bounds
     var parentWidth, parentHeight;
-    var parentBounds = /** @type {anychart.math.Rect} */(labelsFactory.parentBounds());
+    var parentBounds;
+    if (labelsFactory.parentBounds()) {
+      parentBounds = /** @type {anychart.math.Rect} */(labelsFactory.parentBounds());
+    } else if (notSelfSettings && parentLabelsFactory.parentBounds()) {
+      parentBounds = /** @type {anychart.math.Rect} */(parentLabelsFactory.parentBounds());
+    } else if (parentLabelsFactory.container()) {
+      parentBounds = parentLabelsFactory.container().getBounds();
+    } else {
+      parentBounds = anychart.math.rect(0, 0, 0, 0);
+    }
     if (parentBounds) {
       parentWidth = parentBounds.width;
       parentHeight = parentBounds.height;
