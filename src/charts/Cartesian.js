@@ -1495,8 +1495,8 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
-      instance.markers().setAutoFill(instance.getMarkerFill());
-      instance.markers().setAutoStroke(instance.getMarkerStroke());
+      instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
+      instance.markers().setAutoStroke((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
     }
     if (instance.hasOutlierMarkers()) {
       instance.outlierMarkers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
