@@ -2,7 +2,7 @@ goog.provide('anychart.charts.Pie');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.SeparateChart');
-goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.PiePointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
@@ -78,7 +78,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.sort_ = anychart.enums.Sort.NONE;
 
   /**
-   * @type {anychart.core.ui.LabelsFactory}
+   * @type {anychart.core.ui.CircularLabelsFactory}
    * @private
    */
   this.labels_ = null;
@@ -241,7 +241,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.labels()
       .fontSize(13)
       .padding(1);
-  (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
+  (/** @type {anychart.core.ui.CircularLabelsFactory} */(this.hoverLabels())).enabled(null);
   this.data(opt_data || null, opt_csvSettings);
   this.legend().enabled(true);
 
@@ -900,11 +900,11 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
  *      .fontSize(10)
  *      .fontColor('red');
  *  chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory} An instance of {@link anychart.core.ui.LabelsFactory} class for method chaining.
+ * @return {!anychart.core.ui.CircularLabelsFactory} An instance of {@link anychart.core.ui.CircularLabelsFactory} class for method chaining.
  *//**
  * Setter for the pie labels.<br/>
- * <b>Note:</b> positioing is done using {@link anychart.core.ui.LabelsFactory#positionFormatter} method
- * and text is formatted using {@link anychart.core.ui.LabelsFactory#textFormatter} method.
+ * <b>Note:</b> positioing is done using {@link anychart.core.ui.CircularLabelsFactory#positionFormatter} method
+ * and text is formatted using {@link anychart.core.ui.CircularLabelsFactory#textFormatter} method.
  * @example
  *  var data = [
  *    {name: 'Point 1', value: 10},
@@ -920,7 +920,7 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value .
- * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.Pie)} .
+ * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
@@ -961,7 +961,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
  *      .fontStyle('italic')
  *      .fontColor('red');
  *  chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory} Current labels instance.
+ * @return {!anychart.core.ui.CircularLabelsFactory} Current labels instance.
  *//**
  * Setter for series hover data labels.
  * @example
@@ -979,7 +979,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
  *//**
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.Pie)} Labels instance or itself for chaining call.
+ * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.charts.Pie)} Labels instance or itself for chaining call.
  */
 anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
@@ -1939,7 +1939,7 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
  * @private
  * @param {boolean} hovered If it is a hovered label drawing.
  * @param {boolean=} opt_updateConnector Whether to update connector or not.
- * @return {anychart.core.ui.LabelsFactory.Label} Label.
+ * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
  */
 anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateConnector) {
   var iterator = this.getIterator();
@@ -1949,7 +1949,7 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
 
   var index = iterator.getIndex();
 
-  var labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
 
   var label = this.labels().getLabel(index);
 
@@ -2009,8 +2009,8 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
     label.enabled(false);
   }
   if (opt_updateConnector)
-    this.updateConnector_(label, isDraw);
-  return label;
+    this.updateConnector_(/** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label), isDraw);
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
 
 
@@ -2019,7 +2019,7 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
  * @private
  * @param {boolean} hovered If it is a hovered label drawing.
  * @param {boolean=} opt_updateConnector Whether to update connector or not. Used only with outside labels.
- * @return {anychart.core.ui.LabelsFactory.Label} Label.
+ * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
  */
 anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector) {
   if (this.isOutsideLabels_())
@@ -2029,7 +2029,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
   var sliceLabel = iterator.get('label');
   var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
   var index = iterator.getIndex();
-  var labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+  var labelsFactory = /** @type {anychart.core.ui.CircularLabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
 
   var label = this.labels().getLabel(index);
 
@@ -2116,7 +2116,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
   } else if (label) {
     label.clear();
   }
-  return label;
+  return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
 
 
@@ -2621,7 +2621,7 @@ anychart.charts.Pie.prototype.createFormatProvider = function() {
 
 /**
  *
- * @param {anychart.core.ui.LabelsFactory.Label} label .
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label .
  * @return {anychart.math.Rect}
  */
 anychart.charts.Pie.prototype.getLabelBounds = function(label) {
@@ -2636,7 +2636,7 @@ anychart.charts.Pie.prototype.getLabelBounds = function(label) {
 
 /**
  * Drop label bounds cache.
- * @param {anychart.core.ui.LabelsFactory.Label} label Label to drop bounds.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label to drop bounds.
  */
 anychart.charts.Pie.prototype.dropLabelBoundsCache = function(label) {
   var index = label.getIndex();
@@ -3028,7 +3028,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
 /**
  * Draws connector line for label.
- * @param {anychart.core.ui.LabelsFactory.Label} label Label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
  * @param {acgraph.vector.Path} path Connector path element.
  */
 anychart.charts.Pie.prototype.drawConnectorLine = function(label, path) {
@@ -3063,7 +3063,7 @@ anychart.charts.Pie.prototype.drawConnectorLine = function(label, path) {
 
 /**
  * Show or hide connector for label.
- * @param {anychart.core.ui.LabelsFactory.Label} label Label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Label.
  * @param {boolean} show Whether to show connector ot not for label.
  * @private
  */
@@ -3285,7 +3285,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain = function(isRight, pie, domains) {
 
   /**
    * Domain labels.
-   * @type {Array.<anychart.core.ui.LabelsFactory.Label>}
+   * @type {Array.<anychart.core.ui.CircularLabelsFactory.Label>}
    */
   this.labels = [];
 
@@ -3329,14 +3329,14 @@ anychart.charts.Pie.PieOutsideLabelsDomain = function(isRight, pie, domains) {
 
 /**
  * Dropped labels.
- * @type {Array.<anychart.core.ui.LabelsFactory.Label>}
+ * @type {Array.<anychart.core.ui.CircularLabelsFactory.Label>}
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.droppedLabels;
 
 
 /**
  * Adding label to domain with checks critical angles and intersection with other domains.
- * @param {anychart.core.ui.LabelsFactory.Label} label Adding label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Adding label.
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.addLabel = function(label) {
   if (label) {
@@ -3348,7 +3348,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.addLabel = function(label) 
 
 /**
  * Adding label to domain without any checks.
- * @param {anychart.core.ui.LabelsFactory.Label} label Adding label.
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label Adding label.
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.softAddLabel = function(label) {
   if (label) {
@@ -3375,7 +3375,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.clearDroppedLabels = functi
 
 /**
  * Drop label.
- * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @param {anychart.core.ui.CircularLabelsFactory.Label} label
  * @param {number} index Label index in domain labels array.
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.dropLabel = function(label, index) {
