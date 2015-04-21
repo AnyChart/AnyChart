@@ -4,6 +4,7 @@ goog.require('anychart.core.ui.TooltipItem');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.dom');
+goog.require('goog.userAgent');
 
 
 
@@ -15,7 +16,12 @@ goog.require('goog.dom');
  */
 anychart.core.utils.TooltipsContainer = function() {
   goog.base(this);
-  this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; z-index: 9999; left: -10000px; top: -10000px'});
+  var document = goog.dom.getDocument();
+  if (goog.userAgent.IE && (!goog.userAgent.isVersionOrHigher('7') || document.documentMode && document.documentMode <= 6)) {
+    this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; left:0; top:0; z-index: 9999;'});
+  } else {
+    this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; z-index: 9999; left: -10000px; top: -10000px'});
+  }
   var aw = goog.dom.getWindow().screen.availWidth;
   var ah = goog.dom.getWindow().screen.availHeight;
 

@@ -1057,9 +1057,8 @@ anychart.core.ui.Label.prototype.drawLabel = function() {
   backgroundBounds.left = position.x;
   backgroundBounds.top = position.y;
 
-  this.textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.textElement.translate(/** @type {number} */(this.textX), /** @type {number} */(this.textY));
-  var clipRect = new acgraph.math.Rect(0, 0, this.textWidth, this.textHeight);
+  this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
+  var clipRect = new acgraph.math.Rect(this.textX, this.textY, this.textWidth, this.textHeight);
   this.textElement.clip(clipRect);
 
   return backgroundBounds;

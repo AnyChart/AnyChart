@@ -597,6 +597,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
 
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
+
     this.registerDisposable(this.layer_);
     this.layer_.disablePointerEvents(true);
   }
