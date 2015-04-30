@@ -706,7 +706,7 @@ anychart.core.ui.DataGrid.prototype.getBase_ = function() {
 
 /**
  * Handler for mouse move.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
@@ -732,7 +732,7 @@ anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
 
       var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
       var position = tooltip.isFloating() ?
-          new acgraph.math.Coordinate(event.clientX, event.clientY) :
+          new acgraph.math.Coordinate(event['clientX'], event['clientY']) :
           new acgraph.math.Coordinate(0, 0);
       tooltip.show(item, position);
 
@@ -749,7 +749,7 @@ anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
 /**
  * Handler for mouse out.
  * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
@@ -761,11 +761,11 @@ anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
 
 /**
  * Handler for mouse click.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseClickHandler_ = function(event) {
-  var mouseHeight = event.offsetY - this.titleHeight_ - this.pixelBoundsCache_.top;
+  var mouseHeight = event['offsetY'] - this.titleHeight_ - this.pixelBoundsCache_.top;
 
   if (this.gridHeightCache_.length) {
     var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];

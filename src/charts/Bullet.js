@@ -342,6 +342,7 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
 anychart.charts.Bullet.prototype.axis = function(opt_value) {
   if (!this.axis_) {
     this.axis_ = new anychart.core.axes.Linear();
+    this.axis_.setParentEventTarget(this);
     this.axis_.zIndex(anychart.charts.Bullet.ZINDEX_AXIS);
     this.axis_.title().enabled(false);
     this.registerDisposable(this.axis_);

@@ -530,7 +530,7 @@ anychart.core.scatter.series.Bubble.prototype.drawSeriesPoint = function() {
 
     circle.radius(Math.abs(size)).centerX(x).centerY(y);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == iterator.getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(circle);
   }

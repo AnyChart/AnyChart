@@ -440,6 +440,7 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 anychart.core.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.onTitleSignal_, this);
     this.title_.zIndex(anychart.core.Chart.ZINDEX_TITLE);
     this.registerDisposable(this.title_);
@@ -522,6 +523,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   var label = this.chartLabels_[index];
   if (!label) {
     label = this.createChartLabel();
+    label.setParentEventTarget(this);
     label.text('Chart label');
     label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
     this.chartLabels_[index] = label;
@@ -641,6 +643,7 @@ anychart.core.Chart.prototype.draw = function() {
   //create root element only if draw is called
   if (!this.rootElement) {
     this.rootElement = acgraph.layer();
+    this.bindHandlersToGraphics(this.rootElement);
     this.registerDisposable(this.rootElement);
   }
 

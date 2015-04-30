@@ -339,7 +339,7 @@ anychart.detachDomEvents_ = function() {
 
 /**
  * Function called when one of [ DOMContentLoad , onreadystatechanged ] events fired on document or onload on window.
- * @param {acgraph.events.Event} event Event object.
+ * @param {goog.events.Event} event Event object.
  * @private
  */
 anychart.completed_ = function(event) {
@@ -363,7 +363,7 @@ anychart.isReady_ = false;
 /**
  * Function called when document content loaded.
  * @private
- * @param {acgraph.events.Event} event Event object.
+ * @param {goog.events.Event} event Event object.
  * @return {*} Nothing if document already loaded or timeoutID.
  */
 anychart.ready_ = function(event) {

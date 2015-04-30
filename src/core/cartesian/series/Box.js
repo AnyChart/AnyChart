@@ -16,10 +16,6 @@ goog.require('anychart.utils');
 anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.outlierMarkers().listen(acgraph.events.EventType.MOUSEOVER, this.handleOutlierMarkerMouseOver_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.MOUSEOUT, this.handleOutlierMarkerMouseOut_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.CLICK, this.handleOutlierMarkerBrowserEvents_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.DBLCLICK, this.handleOutlierMarkerBrowserEvents_, false, this);
   this.outlierMarkers().anchor(anychart.enums.Position.CENTER);
 
   // Define reference fields for a series
@@ -242,7 +238,7 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     this.drawStem_(stemPath, x, low, high, q1, q3);
     this.drawWhisker_(false);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(path);
     this.makeHoverable(medianPath);
@@ -447,57 +443,6 @@ anychart.core.cartesian.series.Box.prototype.getPointIndexByMarkerIndex_ = funct
       return value == markerIndex;
     });
   }));
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseOver_ = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    if (event && goog.isDef(event['markerIndex'])) {
-      var pointIndex = this.getPointIndexByMarkerIndex_(event['markerIndex']);
-      this.hoverPoint(pointIndex, event);
-      var markerElement = this.outlierMarkers().getMarker(event['markerIndex']).getDomElement();
-      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleOutlierMarkerMouseMove_, false, this);
-    } else
-      this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseMove_ = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex'])) {
-    var pointIndex = this.getPointIndexByMarkerIndex_(event.target['__tagIndex']);
-    this.hoverPoint(pointIndex, event);
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseOut_ = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    var markerElement = this.outlierMarkers().getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleOutlierMarkerMouseMove_, false, this);
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerBrowserEvents_ = function(event) {
-  this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
 };
 
 
@@ -862,6 +807,7 @@ anychart.core.cartesian.series.Box.prototype.getWhiskerWidth = function(hover) {
 anychart.core.cartesian.series.Box.prototype.outlierMarkers = function(opt_value) {
   if (!this.outlierMarkers_) {
     this.outlierMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.outlierMarkers_.setParentEventTarget(this);
     this.registerDisposable(this.outlierMarkers_);
     this.outlierMarkers_.listenSignals(this.outlierMarkersInvalidated_, this);
   }
@@ -909,6 +855,16 @@ anychart.core.cartesian.series.Box.prototype.outlierMarkersInvalidated_ = functi
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.Box.prototype.makePointEvent = function(event) {
+  if (event['target'] == this.outlierMarkers() && !isNaN(event['markerIndex']))
+    event['pointIndex'] = this.getPointIndexByMarkerIndex_(event['markerIndex']);
+  return goog.base(this, 'makePointEvent', event);
 };
 
 

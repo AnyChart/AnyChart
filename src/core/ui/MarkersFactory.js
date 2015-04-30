@@ -1,12 +1,10 @@
 goog.provide('anychart.core.ui.MarkersFactory');
+goog.provide('anychart.core.ui.MarkersFactory.Marker');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
-goog.require('goog.events.BrowserEvent');
-goog.provide('anychart.core.ui.MarkersFactory.BrowserEvent');
-goog.provide('anychart.core.ui.MarkersFactory.Marker');
 
 
 
@@ -127,20 +125,6 @@ anychart.core.ui.MarkersFactory = function() {
    * @private
    */
   this.positionFormatter_ = null;
-
-  /**
-   * Handlers to attach on next end().
-   * @type {number}
-   * @private
-   */
-  this.attachedEvents_ = 0;
-
-  /**
-   * One-off handlers to attach on next end().
-   * @type {number}
-   * @private
-   */
-  this.attachedOnceEvents_ = 0;
 
   /**
    * Markers array.
@@ -987,6 +971,7 @@ anychart.core.ui.MarkersFactory.prototype.createMarker = function() {
 anychart.core.ui.MarkersFactory.prototype.draw = function() {
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
+    this.bindHandlersToGraphics(this.layer_);
     this.registerDisposable(this.layer_);
   }
   this.layer_.disablePointerEvents(/** @type {boolean} */(this.disablePointerEvents()));
@@ -1000,31 +985,9 @@ anychart.core.ui.MarkersFactory.prototype.draw = function() {
       if (marker) {
         marker.container(this.layer_);
         marker.draw();
-
-        if (this.hasInvalidationState(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS)) {
-          for (var type in anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_) {
-
-            var element = marker.getDomElement();
-            if (element) {
-              element['__tagIndex'] = index;
-              var code = anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_[type];
-              if (!!(this.attachedEvents_ & code))
-                element.listen(type, this.handleBrowserEvent_, false, this);
-              else if (!!(this.attachedOnceEvents_ & code))
-                element.listenOnce(type, this.handleBrowserEvent_, false, this);
-              else
-                element.unlisten(type, this.handleBrowserEvent_, false, this);
-
-              code = code << acgraph.vector.Element.HANDLED_EVENT_TYPES_CAPTURE_SHIFT;
-              if (!!(this.attachedEvents_ & code))
-                element.listen(type, this.handleBrowserEvent_, true, this);
-              else if (!!(this.attachedOnceEvents_ & code))
-                element.listenOnce(type, this.handleBrowserEvent_, true, this);
-              else
-                element.unlisten(type, this.handleBrowserEvent_, true, this);
-            }
-          }
-          this.attachedOnceEvents_ = 0x00;
+        var element = marker.getDomElement();
+        if (element) {
+          element.tag = index;
         }
       }
     }, this);
@@ -1100,258 +1063,19 @@ anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Events
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Adds an event listener. A listener can only be added once to an
- * object and if it is added again the key for the listener is
- * returned. Note that if the existing listener is a one-off listener
- * (registered via listenOnce), it will no longer be a one-off
- * listener after a call to listen().
- *
- * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
- * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
- *     method.
- * @param {boolean=} opt_useCapture Whether to fire in capture phase
- *     (defaults to false).
- * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
- *     listener.
- * @return {goog.events.ListenableKey} Unique key for the listener.
- * @template SCOPE,EVENTOBJ
- */
-anychart.core.ui.MarkersFactory.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
-  var res = goog.base(this, 'listen', type, listener, opt_useCapture, opt_listenerScope);
-  this.ensureHandler_('' + type, !!opt_useCapture, true, false);
-  return res;
-};
-
-
-/**
- * Adds an event listener that is removed automatically after the
- * listener fired once.
- *
- * If an existing listener already exists, listenOnce will do
- * nothing. In particular, if the listener was previously registered
- * via listen(), listenOnce() will not turn the listener into a
- * one-off listener. Similarly, if there is already an existing
- * one-off listener, listenOnce does not modify the listeners (it is
- * still a once listener).
- *
- * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
- * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
- *     method.
- * @param {boolean=} opt_useCapture Whether to fire in capture phase
- *     (defaults to false).
- * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
- *     listener.
- * @return {goog.events.ListenableKey} Unique key for the listener.
- * @template SCOPE,EVENTOBJ
- */
-anychart.core.ui.MarkersFactory.prototype.listenOnce = function(type, listener, opt_useCapture, opt_listenerScope) {
-  var res = goog.base(this, 'listenOnce', type, listener, opt_useCapture, opt_listenerScope);
-  this.ensureHandler_('' + type, !!opt_useCapture, true, true);
-  return res;
-};
-
-
-/**
- * Removes an event listener which was added with listen() or listenOnce().
- *
- * @param {!goog.events.EventId.<EVENTOBJ>|string} type The event type id.
- * @param {function(this:SCOPE, EVENTOBJ):(boolean|undefined)} listener Callback
- *     method.
- * @param {boolean=} opt_useCapture Whether to fire in capture phase
- *     (defaults to false).
- * @param {SCOPE=} opt_listenerScope Object in whose scope to call
- *     the listener.
- * @return {boolean} Whether any listener was removed.
- * @template SCOPE,EVENTOBJ
- */
-anychart.core.ui.MarkersFactory.prototype.unlisten = function(type, listener, opt_useCapture, opt_listenerScope) {
-  var res = goog.base(this, 'unlisten', type, listener, opt_useCapture, opt_listenerScope);
-  this.ensureHandler_('' + type, !!opt_useCapture, false, false);
-  return res;
-};
-
-
-/**
- * Removes an event listener which was added with listen() by the key
- * returned by listen().
- *
- * @param {goog.events.ListenableKey} key The key returned by
- *     listen() or listenOnce().
- * @return {boolean} Whether any listener was removed.
- */
-anychart.core.ui.MarkersFactory.prototype.unlistenByKey = function(key) {
-  var res = goog.base(this, 'unlistenByKey', key);
-  if (res)
-    this.ensureHandler_(key.type, key.capture, false, false);
-  return res;
-};
-
-
-/**
- * Removes all listeners from this listenable. If type is specified,
- * it will only remove listeners of the particular type. otherwise all
- * registered listeners will be removed.
- *
- * @param {string=} opt_type Type of event to remove, default is to
- *     remove all types.
- * @return {number} Number of listeners removed.
- */
-anychart.core.ui.MarkersFactory.prototype.removeAllListeners = function(opt_type) {
-  var res = goog.base(this, 'removeAllListeners', opt_type);
-  if (res) {
-    if (opt_type) {
-      this.ensureHandler_(/** @type {string} */(opt_type), false, false, false);
-      this.ensureHandler_(/** @type {string} */(opt_type), true, false, false);
-    } else {
-      this.removeAllHandlers_();
-    }
+/** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  var target = res['domTarget'];
+  var tag;
+  while (target instanceof acgraph.vector.Element) {
+    tag = target.tag;
+    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag))
+      break;
+    target = target.parent();
   }
+  res['markerIndex'] = anychart.utils.toNumber(tag);
   return res;
-};
-
-
-/**
- * Synchronizes Element and DOM handlers. Should be called after all handler operations on the Element are finished.
- * @param {string} type Event type string.
- * @param {boolean} capture If event should be listened on capture.
- * @param {boolean} armed If this handler should be armed or not.
- * @param {boolean=} opt_once Use listenOnce.
- * @private
- */
-anychart.core.ui.MarkersFactory.prototype.ensureHandler_ = function(type, capture, armed, opt_once) {
-  if (type == 'signal') return;
-  opt_once = !!opt_once && armed;
-  /** @type {number} */
-  var eventTypeCode = acgraph.vector.Element.HANDLED_EVENT_TYPES[type] || 0;
-  if (capture)
-    eventTypeCode = eventTypeCode << acgraph.vector.Element.HANDLED_EVENT_TYPES_CAPTURE_SHIFT;
-  if (eventTypeCode) {
-    var changed = false;
-    /** @type {boolean} */
-    var eventAttached = !!(this.attachedEvents_ & eventTypeCode);
-    if (opt_once) {
-      eventAttached = !!(this.attachedOnceEvents_ & eventTypeCode);
-      if (armed && !eventAttached) {
-        this.attachedOnceEvents_ |= eventTypeCode;
-        changed = true;
-      }
-    } else {
-      if (armed && !eventAttached) {
-        this.attachedEvents_ |= eventTypeCode;
-        changed = true;
-      } else if (!armed && eventAttached) {
-        this.attachedEvents_ &= ~eventTypeCode;
-        this.attachedOnceEvents_ &= ~eventTypeCode;
-        changed = true;
-      }
-    }
-    if (changed)
-      this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Synchronizes Element and DOM handlers. Should be called after all handler operations on the Element are finished.
- * @private
- */
-anychart.core.ui.MarkersFactory.prototype.removeAllHandlers_ = function() {
-  var changed = !!(this.attachedEvents_ | this.attachedOnceEvents_);
-  this.attachedEvents_ = 0;
-  this.attachedOnceEvents_ = 0;
-  if (changed)
-    this.invalidate(anychart.ConsistencyState.MARKERS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Handles most of browser events happened with underlying DOM element redirecting them to
- * Element event listeners. Event.target property value is replaced by this method.
- * @param {goog.events.BrowserEvent} e Mouse event to handle.
- * @private
- */
-anychart.core.ui.MarkersFactory.prototype.handleBrowserEvent_ = function(e) {
-  if (e instanceof goog.events.BrowserEvent) {
-    e.stopPropagation();
-    var target = this.getMarker(e.target && e.target['__tagIndex']);
-    if (target)
-      this.dispatchEvent(new anychart.core.ui.MarkersFactory.BrowserEvent(e, target));
-  }
-};
-
-
-
-/**
- * Encapsulates browser event for acgraph.
- * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- * @constructor
- * @extends {goog.events.BrowserEvent}
- */
-anychart.core.ui.MarkersFactory.BrowserEvent = function(opt_e, opt_target) {
-  goog.base(this);
-  if (opt_e)
-    this.copyFrom(opt_e, opt_target);
-};
-goog.inherits(anychart.core.ui.MarkersFactory.BrowserEvent, goog.events.BrowserEvent);
-
-
-/**
- * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
- * @private
- * @type {goog.events.BrowserEvent}
- */
-anychart.core.ui.MarkersFactory.BrowserEvent.prototype.event_;
-
-
-/**
- * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
- * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- */
-anychart.core.ui.MarkersFactory.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
-  this.type = e.type;
-  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
-  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
-  // from Node to EventTarget, which would make more sense.
-  /** @type {Node} */
-  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
-  this.target = target || e.target;
-  this.currentTarget = e.currentTarget || this.target;
-  this.relatedTarget = e.relatedTarget || this.target;
-
-  this['markerIndex'] = e.target && e.target['__tagIndex'];
-  if (isNaN(this['markerIndex']))
-    this['markerIndex'] = -1;
-
-  this.offsetX = e.offsetX;
-  this.offsetY = e.offsetY;
-
-  this.clientX = e.clientX;
-  this.clientY = e.clientY;
-
-  this.screenX = e.screenX;
-  this.screenY = e.screenY;
-
-  this.button = e.button;
-
-  this.keyCode = e.keyCode;
-  this.charCode = e.charCode;
-  this.ctrlKey = e.ctrlKey;
-  this.altKey = e.altKey;
-  this.shiftKey = e.shiftKey;
-  this.metaKey = e.metaKey;
-  this.platformModifierKey = e.platformModifierKey;
-  this.state = e.state;
-
-  this.event_ = e;
-  delete this.propagationStopped_;
 };
 
 

@@ -600,6 +600,7 @@ anychart.charts.Scatter.prototype.xAxis = function(opt_indexOrValue, opt_value) 
   var axis = this.xAxes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
     axis.orientation(anychart.enums.Orientation.BOTTOM);
     axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
     axis.title().text('X-Axis');
@@ -689,6 +690,7 @@ anychart.charts.Scatter.prototype.yAxis = function(opt_indexOrValue, opt_value) 
   var axis = this.yAxes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
     axis.orientation(anychart.enums.Orientation.LEFT);
     axis.zIndex(anychart.charts.Scatter.ZINDEX_AXIS);
     axis.title().text('Y-Axis');

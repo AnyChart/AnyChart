@@ -17,10 +17,6 @@ goog.require('anychart.enums');
 anychart.core.radar.series.ContinuousBase = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.markers().listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
-  this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
-  this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
-  this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().position(anychart.enums.Position.CENTER);
 
   /**
@@ -114,6 +110,7 @@ anychart.core.radar.series.ContinuousBase.prototype.hasMarkers = function() {
 anychart.core.radar.series.ContinuousBase.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.core.ui.MarkersFactory();
+    this.markers_.setParentEventTarget(this);
     this.registerDisposable(this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
@@ -234,7 +231,7 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(false);
+    this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -405,27 +402,23 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverSeries = function() {
  * @inheritDoc
  */
 anychart.core.radar.series.ContinuousBase.prototype.getIndexByEvent = function(event) {
-  if (goog.isDef(event.target['__tagIndex']))
-    return event.target['__tagIndex'];
-  else {
-    var x = event.clientX;
-    var y = event.clientY;
-    var value, index;
+  var x = event['clientX'];
+  var y = event['clientY'];
+  var value, index;
 
-    var startAngle = goog.math.toRadians(this.startAngle() - 90);
-    var currRadius = Math.sqrt(Math.pow(x - this.cx, 2) + Math.pow(y - this.cy, 2));
-    var angle = Math.acos((x - this.cx) / currRadius);
-    if (y < this.cy) angle = 2 * Math.PI - startAngle - angle;
-    else angle = angle - startAngle;
+  var startAngle = goog.math.toRadians(this.startAngle() - 90);
+  var currRadius = Math.sqrt(Math.pow(x - this.cx, 2) + Math.pow(y - this.cy, 2));
+  var angle = Math.acos((x - this.cx) / currRadius);
+  if (y < this.cy) angle = 2 * Math.PI - startAngle - angle;
+  else angle = angle - startAngle;
 
-    angle = goog.math.modulo(angle, Math.PI * 2);
+  angle = goog.math.modulo(angle, Math.PI * 2);
 
-    var ratio = angle / (2 * Math.PI);
-    value = this.xScale().inverseTransform(ratio);
-    index = this.data().find('x', value);
+  var ratio = angle / (2 * Math.PI);
+  value = this.xScale().inverseTransform(ratio);
+  index = this.data().find('x', value);
 
-    return /** @type {number} */(index);
-  }
+  return /** @type {number} */(index);
 };
 
 
@@ -470,54 +463,6 @@ anychart.core.radar.series.ContinuousBase.prototype.unhover = function() {
   this.colorizeShape(false);
   this.hoverStatus = NaN;
   return this;
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.ContinuousBase.prototype.handleMarkerMouseOver = function(event) {
-  if (this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event))) {
-    if (event && goog.isDef(event['markerIndex'])) {
-      this.hoverPoint(event['markerIndex'], event);
-      var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    } else
-      this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.ContinuousBase.prototype.handleMarkerMouseOut = function(event) {
-  if (this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event))) {
-    var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.ContinuousBase.prototype.handleMarkerMouseMove = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.ContinuousBase.prototype.handleMarkerBrowserEvents = function(event) {
-  this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event));
 };
 
 

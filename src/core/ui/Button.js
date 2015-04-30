@@ -1,7 +1,6 @@
 goog.provide('anychart.core.ui.Button');
 goog.require('acgraph');
 goog.require('anychart.core.Text');
-goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.math');
 
@@ -17,14 +16,14 @@ anychart.core.ui.Button = function() {
 
   /**
    * Width of a button.
-   * @type {(string|number)?}
+   * @type {string|number|null}
    * @private
    */
   this.width_ = null;
 
   /**
    * Height of a button.
-   * @type {(string|number)?}
+   * @type {string|number|null}
    * @private
    */
   this.height_ = null;
@@ -35,13 +34,6 @@ anychart.core.ui.Button = function() {
    * @private
    */
   this.state_ = anychart.core.ui.Button.State.NORMAL;
-
-  /**
-   * Is there events handling on a button.
-   * @type {boolean}
-   * @private
-   */
-  this.eventHandling_ = false;
 
   /**
    * Is a button checked.
@@ -268,9 +260,6 @@ anychart.core.ui.Button.prototype.checked = function(opt_enable) {
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
 anychart.core.ui.Button.prototype.disabled = function(opt_enable) {
-  if (goog.isDef(opt_enable)) {
-    this.enableEventHandling_(!opt_enable);
-  }
   return this.state(anychart.core.ui.Button.State.DISABLED, opt_enable);
 };
 
@@ -409,6 +398,8 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
 
   if (isInitial) {
     this.textElement = acgraph.text();
+    this.bindHandlersToGraphics(this.textElement, this.handleMouseOver, this.handleMouseOut, null, null,
+        this.handleMouseDown, this.handleMouseUp);
     this.registerDisposable(this.textElement);
     this.textElement.disablePointerEvents(true);
   }
@@ -444,6 +435,8 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
 anychart.core.ui.Button.prototype.drawBackground = function(fill, stroke) {
   if (!this.backgroundPath) {
     this.backgroundPath = acgraph.path();
+    this.bindHandlersToGraphics(this.backgroundPath, this.handleMouseOver, this.handleMouseOut, null, null,
+        this.handleMouseDown, this.handleMouseUp);
     this.registerDisposable(this.backgroundPath);
   }
 
@@ -707,10 +700,6 @@ anychart.core.ui.Button.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (!this.eventHandling_ && !this.state(anychart.core.ui.Button.State.DISABLED)) {
-    this.enableEventHandling_(true);
-  }
-
   return this;
 };
 
@@ -725,90 +714,57 @@ anychart.core.ui.Button.prototype.remove = function() {
 
 
 /**
- * Enables or disables event handling.
- * @param {boolean} enable Whether to enable event handling or not.
- * @private
- */
-anychart.core.ui.Button.prototype.enableEventHandling_ = function(enable) {
-  if (!this.backgroundPath) return;
-  if (enable) {
-    acgraph.events.listen(this.backgroundPath, acgraph.events.EventType.MOUSEOVER, this.handleMouseOver, false, this);
-    acgraph.events.listen(this.backgroundPath, acgraph.events.EventType.DBLCLICK, this.handleMouseDblClick, false, this);
-  } else {
-    acgraph.events.unlisten(this.backgroundPath, acgraph.events.EventType.MOUSEOVER, this.handleMouseOver, false, this);
-    acgraph.events.unlisten(this.backgroundPath, acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
-    acgraph.events.unlisten(this.backgroundPath, acgraph.events.EventType.MOUSEDOWN, this.handleMouseDown, false, this);
-    acgraph.events.unlisten(this.backgroundPath, acgraph.events.EventType.MOUSEUP, this.handleMouseUp, false, this);
-    acgraph.events.unlisten(this.backgroundPath, acgraph.events.EventType.DBLCLICK, this.handleMouseDblClick, false, this);
-  }
-  this.eventHandling_ = enable;
-};
-
-
-/**
- * Handler for double click.
- * @param {acgraph.events.Event} event Event.
- */
-anychart.core.ui.Button.prototype.handleMouseDblClick = function(event) {
-  event.preventDefault();
-  event.stopPropagation();
-};
-
-
-/**
  * Handler for mouse over.
- * @param {acgraph.events.Event} event Event..
+ * @param {acgraph.events.BrowserEvent} event Event..
  */
 anychart.core.ui.Button.prototype.handleMouseOver = function(event) {
-  var target = event.target;
+  if (this.disabled() || this.pushing_ || this.checked()) return;
 
-  acgraph.events.listen(target, acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
-  acgraph.events.listen(target, acgraph.events.EventType.MOUSEDOWN, this.handleMouseDown, false, this);
-
-  if (this.pushing_ || this.checked()) return;
-
-  this.hover(true);
+  if (this.handleBrowserEvent(event))
+    this.hover(true);
 };
 
 
 /**
  * Handler for mouse out.
- * @param {acgraph.events.Event} event Event..
+ * @param {acgraph.events.BrowserEvent} event Event..
  */
 anychart.core.ui.Button.prototype.handleMouseOut = function(event) {
-  var target = event.target;
+  if (this.disabled() || this.pushing_ || this.checked()) return;
 
-  acgraph.events.unlisten(target, acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
-  acgraph.events.unlisten(target, acgraph.events.EventType.MOUSEDOWN, this.handleMouseDown, false, this);
+  this.pushing_ = false;
 
-  if (this.pushing_ || this.checked()) return;
-
-  this.normal(true);
+  if (this.handleBrowserEvent(event))
+    this.normal(true);
 };
 
 
 /**
  * Handler for mouse down.
- * @param {acgraph.events.Event} event Event..
+ * @param {acgraph.events.BrowserEvent} event Event..
  */
 anychart.core.ui.Button.prototype.handleMouseDown = function(event) {
+  event.preventDefault();
+
+  if (this.disabled()) return;
+
   this.pushing_ = true;
 
-  acgraph.events.listen(goog.dom.getDocument(), acgraph.events.EventType.MOUSEUP, this.handleMouseUp, false, this);
-
-  this.pushed(true);
+  if (this.handleBrowserEvent(event))
+    this.pushed(true);
 };
 
 
 /**
  * Handler for mouse up.
- * @param {acgraph.events.Event} event Event..
+ * @param {acgraph.events.BrowserEvent} event Event..
  */
 anychart.core.ui.Button.prototype.handleMouseUp = function(event) {
+  if (this.disabled() || !this.pushing_ || !this.handleBrowserEvent(event)) return;
+
   this.pushing_ = false;
 
-  var onElement = !!event.target && goog.dom.contains(/** @type {Node} */ (this.backgroundPath.domElement()), event.target);
-  acgraph.events.unlisten(goog.dom.getDocument(), acgraph.events.EventType.MOUSEUP, this.handleMouseUp, false, this);
+  var onElement = event['target'] == this.backgroundPath || event['target'] == this.textElement;
 
   if (this.supportedStates(anychart.core.ui.Button.State.CHECKED)) {
     this.checkedInternal_ = !this.checkedInternal_;

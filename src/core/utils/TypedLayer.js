@@ -47,7 +47,10 @@ goog.inherits(anychart.core.utils.TypedLayer, acgraph.vector.Layer);
  * @return {anychart.core.utils.TypedLayer} .
  */
 anychart.core.utils.TypedLayer.prototype.clear = function() {
-  this.childrenPool_.push.apply(this.childrenPool_, this.removeChildren());
+  var len;
+  while (len = this.numChildren()) {
+    this.childrenPool_.push(this.removeChildAt(len - 1));
+  }
   return this;
 };
 

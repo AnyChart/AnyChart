@@ -617,6 +617,7 @@ anychart.core.ui.Title.prototype.draw = function() {
   }
 
   var elementToPosition = hasBackground ? this.layer_ : this.text_;
+  this.bindHandlersToGraphics(elementToPosition);
 
   // Checking BOUNDS state. If it is inconsistent, we need to recalculate title bounds.
   // But we don't need to mark it consistent here, because we don't know where to apply that new bounds yet.

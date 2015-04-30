@@ -527,10 +527,11 @@ anychart.charts.Radar.prototype.onGridSignal_ = function(event) {
 anychart.charts.Radar.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = new anychart.core.axes.Radar();
+    this.xAxis_.setParentEventTarget(this);
     this.xAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.xAxis_);
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS);
   }
 
   if (goog.isDef(opt_value)) {
@@ -567,10 +568,11 @@ anychart.charts.Radar.prototype.xAxis = function(opt_value) {
 anychart.charts.Radar.prototype.yAxis = function(opt_value) {
   if (!this.yAxis_) {
     this.yAxis_ = new anychart.core.axes.Radial();
+    this.yAxis_.setParentEventTarget(this);
     this.yAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.yAxis_);
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS);
   }
 
   if (goog.isDef(opt_value)) {
@@ -688,6 +690,7 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
     var index = this.series_.length - 1;

@@ -118,6 +118,38 @@ anychart.utils.compareNumericDesc = function(a, b) {
 
 
 /**
+ * Extracts tag from BrowserEvent target object. Used in interactivity.
+ * @param {*} target
+ * @return {anychart.core.VisualBase|number|boolean|undefined}
+ */
+anychart.utils.extractTag = function(target) {
+  var tag;
+  while (target instanceof acgraph.vector.Element) {
+    tag = target.tag;
+    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag) || goog.isBoolean(tag)) {
+      return /** @type {anychart.core.VisualBase|number|boolean} */(tag);
+    }
+    target = target.parent();
+  }
+  return undefined;
+};
+
+
+/**
+ * Checks if target is among parent child event targets.
+ * @param {!goog.events.EventTarget} parent
+ * @param {goog.events.EventTarget} target
+ * @return {boolean}
+ */
+anychart.utils.checkIfParent = function(parent, target) {
+  while (target instanceof goog.events.EventTarget && target != parent) {
+    target = target.getParentEventTarget();
+  }
+  return target == parent;
+};
+
+
+/**
  * Default hashing function for all objects. Can distinguish any two objects.
  * @param {*} value Value to get hash of.
  * @return {string} Hash value.

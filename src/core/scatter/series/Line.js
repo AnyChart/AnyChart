@@ -97,7 +97,7 @@ anychart.core.scatter.series.Line.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.path.clear();
-    this.colorizeShape(false);
+    this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {

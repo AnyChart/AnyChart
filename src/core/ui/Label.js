@@ -131,6 +131,14 @@ anychart.core.ui.Label = function() {
    */
   this.maxFontSize_ = 72;
 
+  /**
+   * Root layer to listen events on.
+   * @type {!acgraph.vector.Layer}
+   * @private
+   */
+  this.rootLayer_ = acgraph.layer();
+  this.bindHandlersToGraphics(this.rootLayer_);
+
   this.restoreDefaults();
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.Text);
@@ -1083,15 +1091,14 @@ anychart.core.ui.Label.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (this.background_) this.background_.container(container).draw();
-    if (this.textElement) this.textElement.parent(container);
+    if (this.background_) this.background_.container(this.rootLayer_).draw();
+    if (this.textElement) this.textElement.parent(this.rootLayer_);
+    this.rootLayer_.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    if (this.textElement) this.textElement.zIndex(zIndex);
-    if (this.background_) this.background_.zIndex(zIndex);
+    this.rootLayer_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
@@ -1148,7 +1155,6 @@ anychart.core.ui.Label.prototype.createTextElement_ = function() {
   var isInitial;
   if (isInitial = !this.textElement) {
     this.textElement = acgraph.text();
-
     this.registerDisposable(this.textElement);
   }
   return isInitial;

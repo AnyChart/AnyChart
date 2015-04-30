@@ -1,8 +1,36 @@
+goog.provide('anychart.core.MouseEvent');
 goog.provide('anychart.core.VisualBase');
 goog.require('acgraph');
 goog.require('anychart.core.Base');
 goog.require('goog.dom');
 goog.require('goog.json.hybrid');
+
+
+/**
+ * @typedef {{
+ *   type: acgraph.events.EventType,
+ *   target: (anychart.core.VisualBase|acgraph.vector.Element|acgraph.vector.Stage|Node|undefined),
+ *   currentTarget: (anychart.core.VisualBase|acgraph.vector.Element|acgraph.vector.Stage|Node|undefined),
+ *   relatedTarget: (anychart.core.VisualBase|acgraph.vector.Element|acgraph.vector.Stage|Node|undefined),
+ *   domTarget: (acgraph.vector.Element|acgraph.vector.Stage|Node|undefined),
+ *   relatedDomTarget: (acgraph.vector.Element|acgraph.vector.Stage|Node|undefined),
+ *   offsetX: number,
+ *   offsetY: number,
+ *   clientX: number,
+ *   clientY: number,
+ *   screenX: number,
+ *   screenY: number,
+ *   button: number,
+ *   keyCode: number,
+ *   charCode: number,
+ *   ctrlKey: boolean,
+ *   altKey: boolean,
+ *   shiftKey: boolean,
+ *   metaKey: boolean,
+ *   platformModifierKey: boolean
+ * }}
+ */
+anychart.core.MouseEvent;
 
 
 
@@ -13,6 +41,14 @@ goog.require('goog.json.hybrid');
  */
 anychart.core.VisualBase = function() {
   goog.base(this);
+
+  /**
+   * Handler to manage broswer event listeners.
+   * @type {goog.events.EventHandler}
+   * @private
+   */
+  this.eventsHandler_ = new goog.events.EventHandler(this);
+  this.registerDisposable(this.eventsHandler_);
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -88,6 +124,131 @@ anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
+ * Applies all handlers to passed element. By default this.defaultBrowserEvent handler is applied. But you can override
+ * handlers by corresponding parameters.
+ * @param {acgraph.vector.Element|acgraph.vector.Stage} element
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_overHandler
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_outHandler
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_clickHandler
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_moveHandler
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_downHandler
+ * @param {?function(acgraph.events.BrowserEvent)=} opt_upHandler
+ * @protected
+ */
+anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, opt_overHandler, opt_outHandler,
+    opt_clickHandler, opt_moveHandler, opt_downHandler, opt_upHandler) {
+  element.tag = this;
+  this.eventsHandler_.listen(element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
+  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
+};
+
+
+/**
+ * Applies all handlers to passed element. By default this.defaultBrowserEvent handler is applied. But you can override
+ * handlers by corresponding parameters.
+ * @param {anychart.core.VisualBase} target
+ * @param {?function(anychart.core.MouseEvent)=} opt_overHandler
+ * @param {?function(anychart.core.MouseEvent)=} opt_outHandler
+ * @param {?function(anychart.core.MouseEvent)=} opt_clickHandler
+ * @param {?function(anychart.core.MouseEvent)=} opt_moveHandler
+ * @param {?function(anychart.core.MouseEvent)=} opt_allHandler - if set, replaces this.handleMouseEvent default.
+ * @protected
+ */
+anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, opt_overHandler, opt_outHandler,
+    opt_clickHandler, opt_moveHandler, opt_allHandler) {
+  this.eventsHandler_.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
+};
+
+
+/**
+ * Default browser event handler. Redispatches the event over ACDVF event target hierarchy.
+ * @param {acgraph.events.BrowserEvent} e
+ * @return {boolean} If anyone called preventDefault on the event object (or
+ *     if any of the listeners returns false) this will also return false.
+ * @protected
+ */
+anychart.core.VisualBase.prototype.handleBrowserEvent = function(e) {
+  // we stop wrapper propagation to prevent parent elements hearing this event from their layer.
+  // we stop only wrapper propagation to continue DOM event propagation through DOM elements under the Stage.
+  e.stopWrapperPropagation();
+  return this.dispatchEvent(this.makeBrowserEvent(e));
+};
+
+
+/**
+ * Default event patcher. Does nothing by default.
+ * @param {anychart.core.MouseEvent} e
+ * @protected
+ */
+anychart.core.VisualBase.prototype.handleMouseEvent = function(e) {
+};
+
+
+/**
+ * Creates anychart.core.MouseEvent from acgraph.events.BrowserEvent. Can be used to patch event before dispatching.
+ * @param {acgraph.events.BrowserEvent} e
+ * @return {anychart.core.MouseEvent}
+ * @protected
+ */
+anychart.core.VisualBase.prototype.makeBrowserEvent = function(e) {
+  return {
+    'type': e['type'],
+    'target': this,
+    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
+    'domTarget': e['target'],
+    'relatedDomTarget': e['relatedTarget'],
+    'offsetX': e['offsetX'],
+    'offsetY': e['offsetY'],
+    'clientX': e['clientX'],
+    'clientY': e['clientY'],
+    'screenX': e['screenX'],
+    'screenY': e['screenY'],
+    'button': e['button'],
+    'keyCode': e['keyCode'],
+    'charCode': e['charCode'],
+    'ctrlKey': e['ctrlKey'],
+    'altKey': e['altKey'],
+    'shiftKey': e['shiftKey'],
+    'metaKey': e['metaKey'],
+    'platformModifierKey': e['platformModifierKey'],
+    'state': e['state']
+  };
+};
+
+
+/**
+ * Finds owner element for a graphics element. Uses tag of the element.
+ * @param {*} target
+ * @return {anychart.core.VisualBase}
+ * @protected
+ */
+anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
+  while (target instanceof acgraph.vector.Element) {
+    if (target.tag instanceof anychart.core.VisualBase) {
+      return /** @type {anychart.core.VisualBase} */(target.tag);
+    }
+    target = (/** @type {acgraph.vector.Element} */(target)).parent();
+  }
+  return null;
+};
+
+
+/**
  * Getter for the element current container.
  * @return {acgraph.vector.ILayer} The current container.
  *//**
@@ -142,8 +303,10 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
       if (this.container_ instanceof acgraph.vector.Stage) {
         if (!this.container_.wrapped_) {
           innerDom = goog.dom.createDom(goog.dom.TagName.DIV, {
-            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden'});
-          goog.dom.appendChild(/** @type {Element} */((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
+            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden'
+          });
+          goog.dom.appendChild(/** @type {Element} */
+              ((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
           this.container_.container(innerDom);
           this.container_.wrapped_ = true;
         }

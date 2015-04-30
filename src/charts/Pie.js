@@ -259,6 +259,9 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   });
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
+      this.handleMouseOverAndMove_);
 };
 goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
@@ -934,6 +937,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
     });
 
     this.labels_.listenSignals(this.labelsInvalidated_, this);
+    this.labels_.setParentEventTarget(this);
     this.registerDisposable(this.labels_);
     this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -1852,7 +1856,8 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
-        this.drawLabel_(false);
+        var hovered = this.hoverStatus == iterator.getIndex();
+        this.drawLabel_(hovered, hovered);
       }
     }
     this.labels().draw();
@@ -1890,18 +1895,21 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
   if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return false;
   var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
 
-  var slice, hatchSlice;
+  /** @type {!acgraph.vector.Path} */
+  var slice;
+  /** @type {acgraph.vector.Path} */
+  var hatchSlice;
   if (opt_update) {
-    slice = /** @type {acgraph.vector.Path} */ (iterator.meta('slice'));
+    slice = /** @type {!acgraph.vector.Path} */ (iterator.meta('slice'));
     hatchSlice = /** @type {acgraph.vector.Path} */ (iterator.meta('hatchSlice'));
     slice.clear();
     if (hatchSlice) hatchSlice.clear();
   } else {
-    slice = this.dataLayer_.genNextChild();
+    slice = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
     iterator.meta('slice', slice);
-    hatchSlice = iterator.meta('hatchSlice');
+    hatchSlice = /** @type {acgraph.vector.Path} */(iterator.meta('hatchSlice'));
     if (!hatchSlice) {
-      hatchSlice = this.hatchLayer_.genNextChild();
+      hatchSlice = /** @type {acgraph.vector.Path} */(this.hatchLayer_.genNextChild());
       iterator.meta('hatchSlice', hatchSlice);
     }
   }
@@ -1917,18 +1925,14 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
     slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, start, sweep);
   }
 
-  slice['__index'] = index;
+  slice.tag = index;
   var hover = (this.hoverStatus == index);
   this.colorizeSlice(hover);
   if (hatchSlice) {
     hatchSlice.deserialize(slice.serialize());
-    hatchSlice['__index'] = index;
+    hatchSlice.tag = index;
     this.applyHatchFill(hover);
   }
-
-  acgraph.events.listen(slice, acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
-  acgraph.events.listen(slice, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
-  acgraph.events.listen(slice, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
 
   return true;
 };
@@ -2221,14 +2225,18 @@ anychart.charts.Pie.prototype.hoverStatus = NaN;
 /**
  * Hovers pie slice by its index.
  * @param {number} index Index of the slice to hover.
- * @param {acgraph.events.Event=} opt_event Event that initiate Slice hovering.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate Slice hovering.
  * @protected
  * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
  */
 anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
-  if (this.hoverStatus == index) return this;
+  if (this.hoverStatus == index) {
+    if (this.getIterator().reset().select(index))
+      this.showTooltip(opt_event);
+    return this;
+  }
   this.unhover();
-  if (this.getIterator().reset().select(index)) {
+  if (this.getIterator().select(index)) {
     this.colorizeSlice(true);
     this.applyHatchFill(true);
     if (goog.isDef(opt_event))
@@ -2246,7 +2254,7 @@ anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
  */
 anychart.charts.Pie.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().reset().select(this.hoverStatus)) {
+  if (this.getIterator().select(this.hoverStatus)) {
     this.colorizeSlice(false);
     this.applyHatchFill(false);
     this.hideTooltip();
@@ -2296,63 +2304,135 @@ anychart.charts.Pie.prototype.isOutsideLabels_ = function() {
 };
 
 
-/**
- * Mouse over internal handler.
- * @param {acgraph.events.Event} event Event object.
- * @private
- */
-anychart.charts.Pie.prototype.mouseOverHandler_ = function(event) {
-  if (this.dispatchEvent(new anychart.charts.Pie.BrowserEvent(this, event))) {
-    if (event && event.target) {
-      if (goog.isDef(event.target['__index']))
-        this.hoverSlice(event.target['__index'], event);
-      else
-        this.unhover();
-    } else
-      this.unhover();
-
-    acgraph.events.listen(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-  }
-};
-
-
-/**
- * Mouse out internal handler.
- * @param {acgraph.events.Event} event Event object.
- * @private
- */
-anychart.charts.Pie.prototype.mouseOutHandler_ = function(event) {
-  if (this.dispatchEvent(new anychart.charts.Pie.BrowserEvent(this, event))) {
-    this.unhover();
-    acgraph.events.unlisten(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-  }
+/** @inheritDoc */
+anychart.charts.Pie.prototype.makeBrowserEvent = function(e) {
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  var tag = anychart.utils.extractTag(res['domTarget']);
+  if (!anychart.utils.isNaN(tag))
+    res['pointIndex'] = res['sliceIndex'] = anychart.utils.toNumber(tag);
+  return res;
 };
 
 
 /**
  * Mouse click internal handler.
- * @param {acgraph.events.Event} event Event object.
+ * @param {anychart.core.MouseEvent} event Event object.
  * @private
  */
-anychart.charts.Pie.prototype.mouseClickHandler_ = function(event) {
-  if (this.dispatchEvent(new anychart.charts.Pie.BrowserEvent(this, event))) {
-    if (event && event.target) {
-      if (goog.isDef(event.target['__index'])) {
-        this.getIterator().select(event.target['__index']);
-        this.clickSlice();
-      }
-    }
+anychart.charts.Pie.prototype.handleMouseClick_ = function(event) {
+  var evt = this.makePointEvent_(event);
+  if (evt && this.dispatchEvent(evt) && this.getIterator().select(anychart.utils.toNumber(evt['pointIndex']))) {
+    this.clickSlice();
   }
 };
 
 
 /**
- * Mouse dblclick internal handler.
- * @param {acgraph.events.Event} event Event object.
+ * @param {anychart.core.MouseEvent} event .
  * @private
  */
-anychart.charts.Pie.prototype.mouseDblClickHandler_ = function(event) {
-  this.dispatchEvent(new anychart.charts.Pie.BrowserEvent(this, event));
+anychart.charts.Pie.prototype.handleMouseOverAndMove_ = function(event) {
+  var evt = this.makePointEvent_(event);
+  if (evt &&
+      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && !isNaN(this.hoverStatus)) ||
+      this.dispatchEvent(evt))) {
+    // we don't want to dispatch if this an out-over from the same slice
+    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
+    this.hoverSlice(/** @type {number} */ (evt['pointIndex']), event);
+  }
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event .
+ * @private
+ */
+anychart.charts.Pie.prototype.handleMouseOut_ = function(event) {
+  var evt = this.makePointEvent_(event);
+  if (evt) {
+    if (anychart.utils.checkIfParent(this, event['relatedTarget']) &&
+        anychart.utils.toNumber(anychart.utils.extractTag(event['relatedDomTarget'])) == evt['pointIndex']) {
+      // this means we got an out-over on the same slice, for example - from the slice to inside label
+      // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
+      this.hoverSlice(/** @type {number} */ (evt['pointIndex']), event);
+    } else if (this.dispatchEvent(evt)) {
+      this.unhover();
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent_(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ * @private
+ */
+anychart.charts.Pie.prototype.makePointEvent_ = function(event) {
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  if (isNaN(pointIndex))
+    return null;
+
+  event['pointIndex'] = pointIndex;
+
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'pie': this,
+    'iterator': iter,
+    'sliceIndex': pointIndex,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
 };
 
 
@@ -2497,18 +2577,21 @@ anychart.charts.Pie.prototype.onTooltipSignal_ = function(event) {
 
 
 /**
- * Show data point tooltip.
+ * @param {anychart.core.MouseEvent=} opt_event initiates tooltip show.
  * @protected
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
  */
 anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
-  this.moveTooltip(opt_event);
-  acgraph.events.listen(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  var formatProvider = this.createFormatProvider();
+  if (tooltip.isFloating() && opt_event) {
+    tooltip.show(
+        formatProvider,
+        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+  } else {
+    tooltip.show(
+        formatProvider,
+        new acgraph.math.Coordinate(0, 0));
+  }
 };
 
 
@@ -2517,33 +2600,7 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
  * @protected
  */
 anychart.charts.Pie.prototype.hideTooltip = function() {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  acgraph.events.unlisten(
-      goog.dom.getDocument(),
-      acgraph.events.EventType.MOUSEMOVE,
-      this.moveTooltip,
-      false,
-      this);
-  tooltip.hide();
-};
-
-
-/**
- * @protected
- * @param {goog.events.BrowserEvent=} opt_event initiates tooltip show.
- */
-anychart.charts.Pie.prototype.moveTooltip = function(opt_event) {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  var formatProvider = this.createFormatProvider();
-  if (tooltip.isFloating() && opt_event) {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
-  } else {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(0, 0));
-  }
+  (/** @type {anychart.core.ui.Tooltip} */(this.tooltip())).hide();
 };
 
 
@@ -3610,107 +3667,6 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calculate = function() {
       this.calculate();
     }
   }
-};
-
-
-
-/**
- * Encapsulates browser event for acgraph.
- * @param {anychart.charts.Pie} target EventTarget to be set as a target of the event.
- * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
- * @constructor
- * @extends {goog.events.BrowserEvent}
- */
-anychart.charts.Pie.BrowserEvent = function(target, opt_e) {
-  goog.base(this);
-  if (opt_e)
-    this.copyFrom(opt_e, target);
-
-  /**
-   * Slice index.
-   * @type {number}
-   */
-  this['sliceIndex'] = opt_e && opt_e.target && opt_e.target['__index'];
-  if (isNaN(this['sliceIndex']))
-    this['sliceIndex'] = -1;
-
-  /**
-   * Pie chart data iterator ready for the slice capturing.
-   * @type {!anychart.data.Iterator}
-   */
-  this['iterator'] = target.data().getIterator();
-  this['iterator'].select(this['sliceIndex']) || this['iterator'].reset();
-
-  /**
-   * Series.
-   * @type {anychart.charts.Pie}
-   */
-  this['pie'] = target;
-};
-goog.inherits(anychart.charts.Pie.BrowserEvent, goog.events.BrowserEvent);
-
-
-/**
- * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
- * @private
- * @type {goog.events.BrowserEvent}
- */
-anychart.charts.Pie.BrowserEvent.prototype.event_;
-
-
-/**
- * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
- * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- */
-anychart.charts.Pie.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
-  var type = e.type;
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.POINT_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.POINT_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.POINT_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.POINT_DOUBLE_CLICK;
-      break;
-  }
-  this.type = type;
-  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
-  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
-  // from Node to EventTarget, which would make more sense.
-  /** @type {Node} */
-  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
-  this.target = target || e.target;
-  this.currentTarget = e.currentTarget || this.target;
-  this.relatedTarget = e.relatedTarget || this.target;
-
-  this.offsetX = e.offsetX;
-  this.offsetY = e.offsetY;
-
-  this.clientX = e.clientX;
-  this.clientY = e.clientY;
-
-  this.screenX = e.screenX;
-  this.screenY = e.screenY;
-
-  this.button = e.button;
-
-  this.keyCode = e.keyCode;
-  this.charCode = e.charCode;
-  this.ctrlKey = e.ctrlKey;
-  this.altKey = e.altKey;
-  this.shiftKey = e.shiftKey;
-  this.metaKey = e.metaKey;
-  this.platformModifierKey = e.platformModifierKey;
-  this.state = e.state;
-
-  this.event_ = e;
-  delete this.propagationStopped_;
 };
 
 

@@ -391,7 +391,7 @@ anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function()
 
     circle.radius(Math.abs(size)).centerX(x).centerY(y);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(circle);
   }

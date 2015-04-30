@@ -35,7 +35,7 @@ anychart.core.Text = function() {
     'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
     'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
     'selectable': false,
-    'disablePointerEvents': true,
+    'disablePointerEvents': false,
     'useHtml': false
   };
 

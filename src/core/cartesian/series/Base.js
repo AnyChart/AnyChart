@@ -53,11 +53,10 @@ anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
   this.statistics_ = {};
 
   // make label hoverable
-  this.labels().disablePointerEvents(false);
-  this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
-  this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
-  this.labels().position(anychart.enums.Position.CENTER);
-  this.labels().enabled(false);
+  var labels = this.labels();
+  labels.disablePointerEvents(false);
+  labels.position(anychart.enums.Position.CENTER);
+  labels.enabled(false);
   (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
 
   this.hatchFill(false);
@@ -77,6 +76,8 @@ anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.pathsPool_ = null;
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove);
 };
 goog.inherits(anychart.core.cartesian.series.Base, anychart.core.VisualBaseWithBounds);
 
@@ -427,41 +428,6 @@ anychart.core.cartesian.series.Base.prototype.strokeInternal = (function() {
  * @private
  */
 anychart.core.cartesian.series.Base.prototype.hoverStroke_ = null;
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.Base.prototype.handleLabelMouseOver = function(event) {
-  if (event && goog.isDef(event['labelIndex'])) {
-    this.hoverPoint(event['labelIndex'], event);
-    var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
-    acgraph.events.listen(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
-  } else
-    this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.Base.prototype.handleLabelMouseOut = function(event) {
-  var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
-  acgraph.events.unlisten(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
-  this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.Base.prototype.handleLabelMouseMove = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
-};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1070,7 +1036,7 @@ anychart.core.cartesian.series.Base.prototype.drawPoint = function() {
     else
       this.firstPointDrawn = this.drawFirstPoint();
     if (this.firstPointDrawn) {
-      this.drawLabel(false);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
       if (this.isErrorAvailable())
         this.drawError();
     }
@@ -1115,6 +1081,7 @@ anychart.core.cartesian.series.Base.prototype.startDrawing = function() {
 
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
+    this.bindHandlersToGraphics(this.rootLayer);
     this.registerDisposable(this.rootLayer);
   }
 
@@ -1252,7 +1219,7 @@ anychart.core.cartesian.series.Base.prototype.drawLabel = function(hovered) {
 /**
  * Show data point tooltip.
  * @protected
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate tooltip to show.
  */
 anychart.core.cartesian.series.Base.prototype.showTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
@@ -1260,7 +1227,7 @@ anychart.core.cartesian.series.Base.prototype.showTooltip = function(opt_event) 
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
         this.createFormatProvider(),
-        new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
+        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
   } else {
     tooltip.show(
         this.createFormatProvider(),
@@ -1355,93 +1322,127 @@ anychart.core.cartesian.series.Base.prototype.applyRatioToBounds = function(rati
 //  Interactivity
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  res['pointIndex'] = this.getIndexByEvent(res);
+  return res;
+};
+
+
 /**
- * Get point index by event.
- * @param {acgraph.events.Event} event .
+ * Get point index by event. Used for events from data layer only
+ * @param {anychart.core.MouseEvent} event .
  * @protected
- * @return {?number} Point index.
+ * @return {number} Point index.
  */
 anychart.core.cartesian.series.Base.prototype.getIndexByEvent = function(event) {
-  if (goog.isDef(event.target['__tagIndex']))
-    return event.target['__tagIndex'];
-  else
-    return null;
+  return anychart.utils.toNumber(anychart.utils.extractTag(event['domTarget']));
 };
 
 
 /**
- * @param {acgraph.events.Event} event .
+ * @param {anychart.core.MouseEvent} event .
  * @protected
  */
-anychart.core.cartesian.series.Base.prototype.handleMouseOver = function(event) {
-  var res = this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
-  if (res) {
-    if (event && event.target) {
-      var index = this.getIndexByEvent(event);
-      if (!goog.isNull(index)) {
-        this.hoverPoint(/** @type {number} */ (index), event);
-        acgraph.events.listen(
-            event.target,
-            acgraph.events.EventType.MOUSEMOVE,
-            this.handleMouseMove,
-            false,
-            this);
-      }
-      // TODO(AntonKagakin):
-      // Due to the fact that continious series can get point index by the coordinate
-      // we comment this for now - so no series selection.
-      // Let's wait for feedback on this.
-      //else if (event.target['__tagSeriesGlobal'])
-      //  this.hoverSeries();
-      else
-        this.unhover();
-    } else
-      this.unhover();
+anychart.core.cartesian.series.Base.prototype.handleMouseOverAndMove = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt &&
+      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && !isNaN(this.hoverStatus)) ||
+      this.dispatchEvent(evt))) {
+    // we don't want to dispatch if this an out-over from the same point
+    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
+    this.hoverPoint(/** @type {number} */ (evt['pointIndex']), event);
   }
 };
 
 
 /**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.Base.prototype.handleMouseMove = function(event) {
-  var res = this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
-  if (res) {
-    if (event && event.target) {
-      var index = this.getIndexByEvent(event);
-      if (!goog.isNull(index)) {
-        this.hoverPoint(/** @type {number} */ (index), event);
-      }
-    }
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
+ * @param {anychart.core.MouseEvent} event .
  * @protected
  */
 anychart.core.cartesian.series.Base.prototype.handleMouseOut = function(event) {
-  var res = this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
-  if (res) {
-    acgraph.events.unlisten(
-        event.target,
-        acgraph.events.EventType.MOUSEMOVE,
-        this.handleMouseMove,
-        false,
-        this);
+  var evt = this.makePointEvent(event);
+  var prevTag = anychart.utils.toNumber(anychart.utils.extractTag(event['relatedDomTarget']));
+  var index = evt['pointIndex'];
+  if (anychart.utils.checkIfParent(this, event['relatedTarget']) && (isNaN(prevTag) || prevTag == index)) {
+    // this means we got an out-over on the same point, for example - from the point to inside label
+    // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
+    this.hoverPoint(/** @type {number} */ (index), event);
+  } else if (this.dispatchEvent(evt)) {
     this.unhover();
   }
 };
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
 /**
- * @param {acgraph.events.Event} event
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
  * @protected
  */
-anychart.core.cartesian.series.Base.prototype.handleBrowserEvents = function(event) {
-  this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
+anychart.core.cartesian.series.Base.prototype.makePointEvent = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  event['pointIndex'] = pointIndex;
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'series': this,
+    'iterator': iter,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
 };
 
 
@@ -1463,7 +1464,7 @@ anychart.core.cartesian.series.Base.prototype.hoverSeries = goog.abstractMethod;
 /**
  * Hovers a point of the series by its index.
  * @param {number} index Index of the point to hover.
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate point hovering.<br/>
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
  *    <b>Note:</b> Used only to display float tooltip.
  * @return {!anychart.core.cartesian.series.Base}  {@link anychart.core.cartesian.series.Base} instance for method chaining.
  */
@@ -1486,13 +1487,9 @@ anychart.core.cartesian.series.Base.prototype.unhover = goog.abstractMethod;
 anychart.core.cartesian.series.Base.prototype.makeHoverable = function(element, opt_seriesGlobal) {
   if (!element) return;
   if (opt_seriesGlobal)
-    element['__tagSeriesGlobal'] = true;
+    element.tag = true;
   else
-    element['__tagIndex'] = this.getIterator().getIndex();
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.CLICK, this.handleBrowserEvents, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.DBLCLICK, this.handleBrowserEvents, false, this);
+    element.tag = this.getIterator().getIndex();
 };
 
 
@@ -1673,6 +1670,7 @@ anychart.core.cartesian.series.Base.prototype.onTooltipSignal_ = function(event)
 anychart.core.cartesian.series.Base.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.registerDisposable(this.labels_);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
   }
@@ -2719,107 +2717,6 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
   this.tooltip(config['tooltip']);
   this.clip(config['clip']);
   this.legendItem(config['legendItem']);
-};
-
-
-
-/**
- * Encapsulates browser event for acgraph.
- * @param {anychart.core.cartesian.series.Base} target EventTarget to be set as a target of the event.
- * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
- * @constructor
- * @extends {goog.events.BrowserEvent}
- */
-anychart.core.cartesian.series.Base.BrowserEvent = function(target, opt_e) {
-  goog.base(this);
-  if (opt_e)
-    this.copyFrom(opt_e, target);
-
-  /**
-   * Point index.
-   * @type {number}
-   */
-  this['pointIndex'] = opt_e && opt_e.target && opt_e.target['__tagIndex'];
-  if (isNaN(this['pointIndex']))
-    this['pointIndex'] = -1;
-
-  /**
-   * Series data iterator ready for the point capturing.
-   * @type {!anychart.data.Iterator}
-   */
-  this['iterator'] = target.data().getIterator();
-  this['iterator'].select(this['pointIndex']) || this['iterator'].reset();
-
-  /**
-   * Series.
-   * @type {anychart.core.cartesian.series.Base}
-   */
-  this['series'] = target;
-};
-goog.inherits(anychart.core.cartesian.series.Base.BrowserEvent, goog.events.BrowserEvent);
-
-
-/**
- * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
- * @private
- * @type {goog.events.BrowserEvent}
- */
-anychart.core.cartesian.series.Base.BrowserEvent.prototype.event_;
-
-
-/**
- * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
- * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- */
-anychart.core.cartesian.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
-  var type = e.type;
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.POINT_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.POINT_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.POINT_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.POINT_DOUBLE_CLICK;
-      break;
-  }
-  this.type = type;
-  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
-  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
-  // from Node to EventTarget, which would make more sense.
-  /** @type {Node} */
-  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
-  this.target = target || e.target;
-  this.currentTarget = e.currentTarget || this.target;
-  this.relatedTarget = e.relatedTarget || this.target;
-
-  this.offsetX = e.offsetX;
-  this.offsetY = e.offsetY;
-
-  this.clientX = e.clientX;
-  this.clientY = e.clientY;
-
-  this.screenX = e.screenX;
-  this.screenY = e.screenY;
-
-  this.button = e.button;
-
-  this.keyCode = e.keyCode;
-  this.charCode = e.charCode;
-  this.ctrlKey = e.ctrlKey;
-  this.altKey = e.altKey;
-  this.shiftKey = e.shiftKey;
-  this.metaKey = e.metaKey;
-  this.platformModifierKey = e.platformModifierKey;
-  this.state = e.state;
-
-  this.event_ = e;
-  delete this.propagationStopped_;
 };
 
 

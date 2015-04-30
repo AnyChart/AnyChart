@@ -32,6 +32,8 @@ anychart.core.axes.Radial = function() {
   this.minorLabelsBounds_ = [];
 
   this.line_ = acgraph.path();
+  this.bindHandlersToGraphics(this.line_);
+  this.registerDisposable(this.line_);
 
   this.labels()
       .suspendSignalsDispatching()
@@ -263,6 +265,7 @@ anychart.core.axes.Radial.prototype.minorLabelsBounds_ = null;
 anychart.core.axes.Radial.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -310,6 +313,7 @@ anychart.core.axes.Radial.prototype.labelsInvalidated_ = function(event) {
 anychart.core.axes.Radial.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
@@ -357,6 +361,7 @@ anychart.core.axes.Radial.prototype.minorLabelsInvalidated_ = function(event) {
 anychart.core.axes.Radial.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.core.axes.RadialTicks();
+    this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
@@ -404,6 +409,7 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
 anychart.core.axes.Radial.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.core.axes.RadialTicks();
+    this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.minorTicksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
   }
@@ -1225,10 +1231,6 @@ anychart.core.axes.Radial.prototype.draw = function() {
   this.minorTicks().suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.line_) {
-      this.line_ = acgraph.path();
-      this.registerDisposable(this.line_);
-    }
     this.line_.clear();
     this.line_.stroke(this.stroke_);
 

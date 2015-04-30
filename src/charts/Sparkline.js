@@ -96,6 +96,7 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.markersInternal_ = new anychart.core.ui.MarkersFactory();
+  this.markersInternal_.setParentEventTarget(this);
   this.markersInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_MARKER);
 
   /**
@@ -103,6 +104,7 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.labelsInternal_ = new anychart.core.ui.LabelsFactory();
+  this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_LABEL);
 
   this.data(opt_data || null, opt_csvSettings);

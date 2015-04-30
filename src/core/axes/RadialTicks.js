@@ -37,6 +37,7 @@ anychart.core.axes.RadialTicks = function() {
    * @private
    */
   this.path_ = acgraph.path();
+  this.bindHandlersToGraphics(this.path_);
   this.registerDisposable(this.path_);
 
   this.restoreDefaults();

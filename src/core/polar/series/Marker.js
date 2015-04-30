@@ -22,8 +22,7 @@ anychart.core.polar.series.Marker = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.marker_ = new anychart.core.ui.MarkersFactory();
-  this.marker_.listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver_, false, this);
-  this.marker_.listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut_, false, this);
+  this.marker_.setParentEventTarget(this);
   this.marker_.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES);
   this.marker_.enabled(true);
   this.registerDisposable(this.marker_);
@@ -245,7 +244,7 @@ anychart.core.polar.series.Marker.prototype.drawSubsequentPoint = function() {
 
     this.getIterator().meta('x', x).meta('y', y);
 
-    this.drawMarker_(false);
+    this.drawMarker_(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -469,41 +468,6 @@ anychart.core.polar.series.Marker.prototype.applyHatchFill = function(hovered) {
 
     hatchFill.draw();
   }
-};
-
-
-/**
- * @param {anychart.core.ui.MarkersFactory.BrowserEvent} event .
- * @private
- */
-anychart.core.polar.series.Marker.prototype.handleMouseOver_ = function(event) {
-  if (event && goog.isDef(event['markerIndex'])) {
-    this.hoverPoint(event['markerIndex'], event);
-    var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
-  } else
-    this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.polar.series.Marker.prototype.handleMouseOut_ = function(event) {
-  var markerElement = this.marker_.getMarker(event['markerIndex']).getDomElement();
-  acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMouseMove_, false, this);
-  this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.polar.series.Marker.prototype.handleMouseMove_ = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
 };
 
 

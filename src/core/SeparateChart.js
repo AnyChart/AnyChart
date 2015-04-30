@@ -94,6 +94,7 @@ anychart.core.SeparateChart.prototype.legend = function(opt_value) {
     this.legend_.zIndex(anychart.core.SeparateChart.ZINDEX_LEGEND);
     this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal_, this);
+    this.legend_.setParentEventTarget(this);
   }
 
   if (goog.isDef(opt_value)) {

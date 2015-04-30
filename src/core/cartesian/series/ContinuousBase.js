@@ -54,8 +54,8 @@ anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
     else
       pointDrawn = this.drawFirstPoint();
     if (pointDrawn) {
-      this.drawMarker(false);
-      this.drawLabel(false);
+      this.drawMarker(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
       if (this.isErrorAvailable())
         this.drawError();
     }
@@ -99,7 +99,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(false);
+    this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -250,22 +250,19 @@ anychart.core.cartesian.series.ContinuousBase.prototype.hoverSeries = function()
  * @inheritDoc
  */
 anychart.core.cartesian.series.ContinuousBase.prototype.getIndexByEvent = function(event) {
-  if (goog.isDef(event.target['__tagIndex']))
-    return event.target['__tagIndex'];
-  else {
-    var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
-    var x = event.clientX;
-    var min, range;
-    var value, index;
+  var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
+  var x = event['clientX'];
+  var min, range;
+  var value, index;
 
-    min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
-    range = bounds.width;
-    var ratio = (x - min) / range;
-    value = this.xScale().inverseTransform(ratio);
-    index = this.data().find('x', value);
+  min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+  range = bounds.width;
+  var ratio = (x - min) / range;
+  value = this.xScale().inverseTransform(ratio);
+  index = this.data().find('x', value);
+  if (index < 0) index = NaN;
 
-    return /** @type {number} */(index);
-  }
+  return /** @type {number} */(index);
 };
 
 

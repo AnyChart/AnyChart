@@ -129,7 +129,7 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
         .lineTo(x, rising ? open : close);
 
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(path);
   }

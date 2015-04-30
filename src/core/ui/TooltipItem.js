@@ -201,6 +201,7 @@ anychart.core.ui.TooltipItem.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.zIndex(1);
     this.title_.listenSignals(this.onTitleSignal_, this);
+    this.title_.setParentEventTarget(this);
     this.registerDisposable(this.title_);
   }
 
@@ -297,6 +298,7 @@ anychart.core.ui.TooltipItem.prototype.content = function(opt_value) {
     this.label_ = new anychart.core.ui.Label();
     this.label_.zIndex(1);
     this.label_.listenSignals(this.onContentSignal_, this);
+    this.label_.setParentEventTarget(this);
     this.registerDisposable(this.label_);
   }
 
@@ -600,6 +602,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
 
     this.registerDisposable(this.layer_);
     this.layer_.disablePointerEvents(true);
+    this.bindHandlersToGraphics(this.layer_);
   }
 
 

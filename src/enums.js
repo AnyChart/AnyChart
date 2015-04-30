@@ -1367,26 +1367,31 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
  * @enum {string}
  */
 anychart.enums.EventType = {
-  POINT_MOUSE_OUT: 'pointMouseOut',
-  POINT_MOUSE_OVER: 'pointMouseOver',
-  POINT_CLICK: 'pointClick',
-  POINT_DOUBLE_CLICK: 'pointDoubleClick',
-  CHART_DRAW: 'chartDraw',
+  POINT_MOUSE_OUT: 'pointmouseout',
+  POINT_MOUSE_OVER: 'pointmouseover',
+  POINT_MOUSE_MOVE: 'pointmousemove',
+  POINT_MOUSE_DOWN: 'pointmousedown',
+  POINT_MOUSE_UP: 'pointmouseup',
+  POINT_CLICK: 'pointclick',
+  POINT_DBLCLICK: 'pointdblclick',
+  CHART_DRAW: 'chartdraw',
 
-  LEGEND_ITEM_MOUSE_OUT: 'legendItemMouseOut',
-  LEGEND_ITEM_MOUSE_OVER: 'legendItemMouseOver',
-  LEGEND_ITEM_MOUSE_MOVE: 'legendItemMouseMove',
-  LEGEND_ITEM_CLICK: 'legendItemClick',
-  LEGEND_ITEM_DOUBLE_CLICK: 'legendItemDoubleClick',
+  LEGEND_ITEM_MOUSE_OUT: 'legenditemmouseout',
+  LEGEND_ITEM_MOUSE_OVER: 'legenditemmouseover',
+  LEGEND_ITEM_MOUSE_MOVE: 'legenditemmousemove',
+  LEGEND_ITEM_MOUSE_DOWN: 'legenditemmousedown',
+  LEGEND_ITEM_MOUSE_UP: 'legenditemmouseup',
+  LEGEND_ITEM_CLICK: 'legenditemclick',
+  LEGEND_ITEM_DBLCLICK: 'legenditemdblclick',
 
-  SCROLL_CHANGE: 'scrollChange',
+  SCROLL_CHANGE: 'scrollchange',
 
-  SPLITTER_CHANGE: 'splitterChange',
+  SPLITTER_CHANGE: 'splitterchange',
 
   SIGNAL: 'signal',
 
-  ROW_HOVER: 'rowHover',
-  ROW_CLICK: 'rowClick'
+  ROW_HOVER: 'rowhover',
+  ROW_CLICK: 'rowclick'
 };
 
 
@@ -2097,14 +2102,19 @@ goog.exportSymbol('anychart.enums.GaugeSidePosition.OUTSIDE', anychart.enums.Gau
 
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OUT', anychart.enums.EventType.POINT_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OVER', anychart.enums.EventType.POINT_MOUSE_OVER);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_DOWN', anychart.enums.EventType.POINT_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_UP', anychart.enums.EventType.POINT_MOUSE_UP);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.EventType.POINT_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
-goog.exportSymbol('anychart.enums.EventType.POINT_DOUBLE_CLICK', anychart.enums.EventType.POINT_DOUBLE_CLICK);
+goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE', anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_DOWN', anychart.enums.EventType.LEGEND_ITEM_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP', anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_CLICK', anychart.enums.EventType.LEGEND_ITEM_CLICK);
-goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK', anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DBLCLICK', anychart.enums.EventType.LEGEND_ITEM_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);

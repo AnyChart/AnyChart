@@ -107,7 +107,7 @@ anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
         .moveTo(x + widthHalf, close)
         .lineTo(x, close);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(path);
   }

@@ -45,7 +45,7 @@ anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = funct
 
     rect.setX(x - barWidth / 2).setY(Math.min(low, high)).setWidth(barWidth).setHeight(Math.abs(low - high));
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(rect);
   }

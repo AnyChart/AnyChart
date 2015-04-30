@@ -691,6 +691,7 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
   var axis = this.xAxes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
     axis.orientation(this.barChartMode ? anychart.enums.Orientation.LEFT : anychart.enums.Orientation.BOTTOM);
     axis.zIndex(anychart.charts.Cartesian.ZINDEX_AXIS);
     axis.title().text('X-Axis');
@@ -777,6 +778,7 @@ anychart.charts.Cartesian.prototype.yAxis = function(opt_indexOrValue, opt_value
   var axis = this.yAxes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
     axis.orientation(this.barChartMode ? anychart.enums.Orientation.BOTTOM : anychart.enums.Orientation.LEFT);
     axis.zIndex(anychart.charts.Cartesian.ZINDEX_AXIS);
     axis.title().text('Y-Axis');
@@ -1482,6 +1484,7 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
     var index = this.series_.length - 1;

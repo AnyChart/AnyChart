@@ -189,7 +189,7 @@ anychart.core.ui.LegendItem.prototype.drawIconMarker_ = function(path, size) {
     this.registerDisposable(this.marker_);
   } else
     this.marker_.clear();
-  this.applyMarkerFillAndStroke_(false);
+  this.applyMarkerFillAndStroke_(this.hovered_);
   var type = (/** @type {anychart.core.ui.LegendItem} */(this)).iconMarkerType_;
   var markerDrawer = goog.isString(type) ? anychart.enums.getMarkerDrawer(type) : type;
   markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
@@ -819,6 +819,15 @@ anychart.core.ui.LegendItem.prototype.getTextElement = function() {
 
 
 /**
+ * Sets item index to root layer tag.
+ * @param {number} index
+ */
+anychart.core.ui.LegendItem.prototype.setItemIndexToLayer = function(index) {
+  this.layer_.tag = index;
+};
+
+
+/**
  * Calculating actual width of legend item independently of enabled state.
  * @return {number} Width.
  */
@@ -892,73 +901,19 @@ anychart.core.ui.LegendItem.prototype.remove = function() {
 
 
 /**
- * Applies hover settings to item.
+ * Applies hover settings to item. Used by the Legend.
  * @param {boolean} hover Whether item is hovered.
- * @private
  */
-anychart.core.ui.LegendItem.prototype.applyHover_ = function(hover) {
+anychart.core.ui.LegendItem.prototype.applyHover = function(hover) {
+  /**
+   * If item is hovered.
+   * @type {boolean}
+   * @private
+   */
+  this.hovered_ = hover;
   this.applyFillAndStroke_(hover);
   this.applyMarkerFillAndStroke_(hover);
   this.applyFontColor_(hover);
-};
-
-
-/**
- * Mouse over handler.
- * @param {acgraph.events.Event} event Event.
- * @private
- */
-anychart.core.ui.LegendItem.prototype.mouseOverHandler_ = function(event) {
-  /** @type {acgraph.vector.Element} */ (/** @type {Object} */(event.target)).cursor(/** @type {acgraph.vector.Cursor} */ (this.hoverCursor()));
-  this.applyHover_(true);
-  if (this.dispatchEvent(new anychart.core.ui.LegendItem.BrowserEvent(this, event))) {
-    acgraph.events.listen(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    acgraph.events.listen(goog.dom.getDocument(), acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
-  }
-};
-
-
-/**
- * Mouse out handler.
- * @param {acgraph.events.Event} event Event.
- * @private
- */
-anychart.core.ui.LegendItem.prototype.mouseOutHandler_ = function(event) {
-  /** @type {acgraph.vector.Element} */ (/** @type {Object} */(event.target)).cursor(acgraph.vector.Cursor.DEFAULT);
-  this.applyHover_(false);
-  this.dispatchEvent(new anychart.core.ui.LegendItem.BrowserEvent(this, event));
-  acgraph.events.unlisten(event.target, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-  acgraph.events.unlisten(goog.dom.getDocument(), acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
-};
-
-
-/**
- * Mouse move handler.
- * @param {acgraph.events.Event} event Event.
- * @private
- */
-anychart.core.ui.LegendItem.prototype.mouseMoveHandler_ = function(event) {
-  this.dispatchEvent(new anychart.core.ui.LegendItem.BrowserEvent(this, event));
-};
-
-
-/**
- * Mouse click handler.
- * @param {acgraph.events.Event} event Event.
- * @private
- */
-anychart.core.ui.LegendItem.prototype.mouseClickHandler_ = function(event) {
-  this.dispatchEvent(new anychart.core.ui.LegendItem.BrowserEvent(this, event));
-};
-
-
-/**
- * Mouse double click handler.
- * @param {acgraph.events.Event} event Event.
- * @private
- */
-anychart.core.ui.LegendItem.prototype.mouseDoubleClickHandler_ = function(event) {
-  this.dispatchEvent(new anychart.core.ui.LegendItem.BrowserEvent(this, event));
 };
 
 
@@ -1008,11 +963,10 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
       .fill('#FFFFFF 0.00001');
 
     this.registerDisposable(/** @type {goog.disposable.IDisposable} */ (this.rectTheListener_));
-
-    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.MOUSEOVER, this.mouseOverHandler_, false, this);
-    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
-    acgraph.events.listen(/** @type {goog.events.Listenable} */ (this.rectTheListener_), acgraph.events.EventType.DBLCLICK, this.mouseDoubleClickHandler_, false, this);
   }
+
+  // if it is not changed - nothing will happen
+  this.layer_.cursor(/** @type {anychart.enums.Cursor} */(this.hoverCursor()));
 
   var needHatch = goog.isDef(this.iconHatchFill_) && (!anychart.utils.isNone(this.iconHatchFill_) && !this.hatch_);
   if (needHatch) {
@@ -1043,12 +997,12 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
       this.iconType_;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.applyFontColor_(false, isInitial);
+    this.applyFontColor_(this.hovered_, isInitial);
     if (this.redrawIcon_ && !isInitial) {
       this.drawIcon_(drawer);
       this.redrawIcon_ = false;
     }
-    this.applyFillAndStroke_(false);
+    this.applyFillAndStroke_(this.hovered_);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -1216,89 +1170,6 @@ anychart.core.ui.LegendItem.prototype.setupByJSON = function(config) {
   this.sourceUid(config['sourceUid']);
   this.sourceKey(config['sourceKey']);
   this.hoverCursor(config['hoverCursor']);
-};
-
-
-
-/**
- * Encapsulates browser event for acgraph.
- * @param {anychart.core.ui.LegendItem} target EventTarget to be set as a target of the event.
- * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
- * @constructor
- * @extends {goog.events.BrowserEvent}
- */
-anychart.core.ui.LegendItem.BrowserEvent = function(target, opt_e) {
-  goog.base(this);
-  if (opt_e)
-    this.copyFrom(opt_e, target);
-};
-goog.inherits(anychart.core.ui.LegendItem.BrowserEvent, goog.events.BrowserEvent);
-
-
-/**
- * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
- * @private
- * @type {goog.events.BrowserEvent}
- */
-anychart.core.ui.LegendItem.BrowserEvent.prototype.event_;
-
-
-/**
- * Copies all info from a BrowserEvent to represent a new event, that can be redispatched.
- * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- */
-anychart.core.ui.LegendItem.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
-  var type = e.type;
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.MOUSEMOVE:
-      type = anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.LEGEND_ITEM_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK;
-      break;
-  }
-  this.type = type;
-  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
-  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
-  // from Node to EventTarget, which would make more sense.
-  /** @type {Node} */
-  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
-  this.target = target || e.target;
-  this.currentTarget = e.currentTarget || this.target;
-  this.relatedTarget = e.relatedTarget || this.target;
-
-  this.offsetX = e.offsetX;
-  this.offsetY = e.offsetY;
-
-  this.clientX = e.clientX;
-  this.clientY = e.clientY;
-
-  this.screenX = e.screenX;
-  this.screenY = e.screenY;
-
-  this.button = e.button;
-
-  this.keyCode = e.keyCode;
-  this.charCode = e.charCode;
-  this.ctrlKey = e.ctrlKey;
-  this.altKey = e.altKey;
-  this.shiftKey = e.shiftKey;
-  this.metaKey = e.metaKey;
-  this.platformModifierKey = e.platformModifierKey;
-  this.state = e.state;
-
-  this.event_ = e;
-  delete this.propagationStopped_;
 };
 
 
