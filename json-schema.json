@@ -3310,6 +3310,34 @@
             "string",
             "null"
           ]
+        },
+        "minWidth": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "minHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "maxWidth": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "maxHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
         }
       }
     },

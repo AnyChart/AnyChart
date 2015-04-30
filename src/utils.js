@@ -166,7 +166,7 @@ anychart.utils.hash = function(value) {
 /**
  * Normalizes number or string value and converts it to number.
  * Supports percent strings if opt_containerSize is defined and not NaN - calculates percentage in that case.
- * @param {string|number} value Value to normalize.
+ * @param {string|number|null|undefined} value Value to normalize.
  * @param {number=} opt_containerSize Optional container dimension to support percent option.
  * @param {boolean=} opt_invert Counts the result from the right/bottom side of the container (supported if
  *    opt_containerSize is passed).
@@ -226,6 +226,25 @@ anychart.utils.toNumber = function(value) {
   if (goog.isNull(value) || goog.isBoolean(value))
     return NaN;
   return +value;
+};
+
+
+/**
+ * Converts value of any type to number or string, according to these rules:
+ * 1) number -> number
+ * 2) string -> leaved as is
+ * 3) NaN -> NaN
+ * 4) null -> NaN
+ * 5) boolean -> NaN
+ * 6) undefined -> NaN
+ * 7) Object -> Object.valueOf
+ * @param {*} value
+ * @return {number|string}
+ */
+anychart.utils.toNumberOrString = function(value) {
+  if (goog.isString(value))
+    return value;
+  return anychart.utils.toNumber(value);
 };
 
 

@@ -1912,7 +1912,7 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
  * Horizontal align enum.
  * @enum {string}
  */
-anychart.enums.HALIGN = acgraph.vector.Text.HAlign;
+anychart.enums.HAlign = acgraph.vector.Text.HAlign;
 
 
 /**
@@ -1925,23 +1925,23 @@ anychart.enums.normalizeHAlign = function(value) {
   switch (value) {
     case 'left':
     case 'l':
-      return anychart.enums.HALIGN.LEFT;
+      return anychart.enums.HAlign.LEFT;
     case 'right':
     case 'r':
-      return anychart.enums.HALIGN.RIGHT;
+      return anychart.enums.HAlign.RIGHT;
     case 'center':
     case 'middle':
     case 'c':
     case 'm':
-      return anychart.enums.HALIGN.CENTER;
+      return anychart.enums.HAlign.CENTER;
     case 'start':
     case 's':
-      return anychart.enums.HALIGN.START;
+      return anychart.enums.HAlign.START;
     case 'end':
     case 'e':
-      return anychart.enums.HALIGN.END;
+      return anychart.enums.HAlign.END;
   }
-  return anychart.enums.HALIGN.START;
+  return anychart.enums.HAlign.START;
 };
 
 
@@ -1949,7 +1949,7 @@ anychart.enums.normalizeHAlign = function(value) {
  * Vertical align enum.
  * @enum {string}
  */
-anychart.enums.VALIGN = acgraph.vector.Text.VAlign;
+anychart.enums.VAlign = acgraph.vector.Text.VAlign;
 
 
 /**
@@ -1962,17 +1962,169 @@ anychart.enums.normalizeVAlign = function(value) {
   switch (value) {
     case 'top':
     case 't':
-      return anychart.enums.VALIGN.TOP;
+      return anychart.enums.VAlign.TOP;
     case 'bottom':
     case 'b':
-      return anychart.enums.VALIGN.BOTTOM;
+      return anychart.enums.VAlign.BOTTOM;
     case 'center':
     case 'middle':
     case 'c':
     case 'm':
-      return anychart.enums.VALIGN.MIDDLE;
+      return anychart.enums.VAlign.MIDDLE;
   }
-  return anychart.enums.VALIGN.TOP;
+  return anychart.enums.VAlign.TOP;
+};
+
+
+/**
+ * Font decoration enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextDecoration = acgraph.vector.Text.Decoration;
+
+
+/**
+ * Normalizes font decoration.
+ * @param {*} value
+ * @return {acgraph.vector.Text.Decoration}
+ */
+anychart.enums.normalizeFontDecoration = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'blink':
+    case 'b':
+      return anychart.enums.TextDecoration.BLINK;
+    case 'line-through':
+    case 'line_through':
+    case 'linethrough':
+    case 'line':
+    case 'l':
+      return anychart.enums.TextDecoration.LINE_THROUGH;
+    case 'overline':
+    case 'over':
+    case 'o':
+      return anychart.enums.TextDecoration.OVERLINE;
+    case 'underline':
+    case 'under':
+    case 'u':
+      return anychart.enums.TextDecoration.UNDERLINE;
+    case 'none':
+    case 'n':
+      return anychart.enums.TextDecoration.NONE;
+  }
+  return anychart.enums.TextDecoration.NONE;
+};
+
+
+/**
+ * Font style enumeration.
+ * @enum {string}
+ */
+anychart.enums.FontStyle = acgraph.vector.Text.FontStyle;
+
+
+/**
+ * Normalizes font style.
+ * @param {*} value
+ * @return {acgraph.vector.Text.FontStyle}
+ */
+anychart.enums.normalizeFontStyle = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'normal':
+    case 'n':
+      return anychart.enums.FontStyle.NORMAL;
+    case 'italic':
+    case 'i':
+      return anychart.enums.FontStyle.ITALIC;
+    case 'oblique':
+    case 'o':
+      return anychart.enums.FontStyle.OBLIQUE;
+  }
+  return anychart.enums.FontStyle.NORMAL;
+};
+
+
+/**
+ * Font variant enumeration.
+ * @enum {string}
+ */
+anychart.enums.FontVariant = acgraph.vector.Text.FontVariant;
+
+
+/**
+ * Normalizes font variant.
+ * @param {*} value
+ * @return {acgraph.vector.Text.FontVariant}
+ */
+anychart.enums.normalizeFontVariant = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'normal':
+    case 'n':
+      return anychart.enums.FontVariant.NORMAL;
+    case 'small-caps':
+    case 'small_caps':
+    case 'smallcaps':
+    case 'small':
+    case 'caps':
+    case 'sc':
+    case 's':
+    case 'c':
+      return anychart.enums.FontVariant.SMALL_CAP;
+  }
+  return anychart.enums.FontVariant.NORMAL;
+};
+
+
+/**
+ * Text direction enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextDirection = acgraph.vector.Text.Direction;
+
+
+/**
+ * Normalizes text direction.
+ * @param {*} value
+ * @return {acgraph.vector.Text.Direction}
+ */
+anychart.enums.normalizeTextDirection = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'ltr':
+    case 'l':
+      return anychart.enums.TextDirection.LTR;
+    case 'rtl':
+    case 'r':
+      return anychart.enums.TextDirection.RTL;
+  }
+  return anychart.enums.TextDirection.LTR;
+};
+
+
+/**
+ * Text wrap settings enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextWrap = acgraph.vector.Text.TextWrap;
+
+
+/**
+ * Normalizes font style.
+ * @param {*} value
+ * @return {acgraph.vector.Text.TextWrap}
+ */
+anychart.enums.normalizeTextWrap = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'nowrap':
+    case 'no':
+    case 'n':
+      return anychart.enums.TextWrap.NO_WRAP;
+    default:
+      return anychart.enums.TextWrap.BY_LETTER;
+  }
 };
 
 

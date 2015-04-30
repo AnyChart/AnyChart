@@ -180,6 +180,13 @@ anychart.ConsistencyState = {
   GAUGE_HATCH_FILL: 1 << 14,
   GAUGE_AXIS_MARKERS: 1 << 15,
   GAUGE_SCALE: 1 << 16,
+  //---------------------------------- TABLE (VB) ---------------------------------------------
+  TABLE_CELL_BOUNDS: 1 << 5,
+  TABLE_OVERLAP: 1 << 6,
+  TABLE_BORDERS: 1 << 7,
+  TABLE_FILLS: 1 << 8,
+  TABLE_CONTENT: 1 << 9,
+  TABLE_STRUCTURE: 1 << 10,
   /**
    * Combination of all states.
    */

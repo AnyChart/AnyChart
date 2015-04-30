@@ -177,6 +177,7 @@ anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value
  * @return {!anychart.core.Text|string|number} .
  */
 anychart.core.Text.prototype.fontSize = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
   return /** @type {!anychart.core.Text|string|number} */(this.textSettings('fontSize', opt_value));
 };
 
@@ -196,6 +197,7 @@ anychart.core.Text.prototype.fontSize = function(opt_value) {
  * @return {!anychart.core.Text|string} .
  */
 anychart.core.Text.prototype.fontFamily = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
   return /** @type {!anychart.core.Text|string} */(this.textSettings('fontFamily', opt_value));
 };
 
@@ -217,6 +219,7 @@ anychart.core.Text.prototype.fontFamily = function(opt_value) {
  * @return {!anychart.core.Text|string} .
  */
 anychart.core.Text.prototype.fontColor = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
   return /** @type {!anychart.core.Text|string} */(this.textSettings('fontColor', opt_value));
 };
 
@@ -237,6 +240,7 @@ anychart.core.Text.prototype.fontColor = function(opt_value) {
  * @return {!anychart.core.Text|number} .
  */
 anychart.core.Text.prototype.fontOpacity = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = goog.math.clamp(+opt_value, 0, 1);
   return /** @type {!anychart.core.Text|number} */(this.textSettings('fontOpacity', opt_value));
 };
 
@@ -257,15 +261,7 @@ anychart.core.Text.prototype.fontOpacity = function(opt_value) {
  */
 anychart.core.Text.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value).toLowerCase();
-    var found = false;
-    for (var i in acgraph.vector.Text.Decoration) {
-      if (opt_value == acgraph.vector.Text.Decoration[i]) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) opt_value = acgraph.vector.Text.Decoration.NONE;
+    opt_value = anychart.enums.normalizeFontDecoration(opt_value);
   }
   return /** @type {!anychart.core.Text|acgraph.vector.Text.Decoration} */(this.textSettings('fontDecoration', opt_value));
 };
@@ -287,15 +283,7 @@ anychart.core.Text.prototype.fontDecoration = function(opt_value) {
  */
 anychart.core.Text.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value).toLowerCase();
-    var found = false;
-    for (var i in acgraph.vector.Text.FontStyle) {
-      if (opt_value == acgraph.vector.Text.FontStyle[i]) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) opt_value = acgraph.vector.Text.FontStyle.NORMAL;
+    opt_value = anychart.enums.normalizeFontStyle(opt_value);
   }
   return /** @type {!anychart.core.Text|acgraph.vector.Text.FontStyle} */(this.textSettings('fontStyle', opt_value));
 };
@@ -317,15 +305,7 @@ anychart.core.Text.prototype.fontStyle = function(opt_value) {
  */
 anychart.core.Text.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value).toLowerCase();
-    var found = false;
-    for (var i in acgraph.vector.Text.FontVariant) {
-      if (opt_value == acgraph.vector.Text.FontVariant[i]) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) opt_value = acgraph.vector.Text.FontVariant.NORMAL;
+    opt_value = anychart.enums.normalizeFontVariant(opt_value);
   }
   return /** @type {!anychart.core.Text|acgraph.vector.Text.FontVariant} */(this.textSettings('fontVariant', opt_value));
 };
@@ -348,6 +328,7 @@ anychart.core.Text.prototype.fontVariant = function(opt_value) {
  * @return {!anychart.core.Text|string|number} .
  */
 anychart.core.Text.prototype.fontWeight = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
   return /** @type {!anychart.core.Text|string|number} */(this.textSettings('fontWeight', opt_value));
 };
 
@@ -368,6 +349,7 @@ anychart.core.Text.prototype.fontWeight = function(opt_value) {
  * @return {!anychart.core.Text|number|string} .
  */
 anychart.core.Text.prototype.letterSpacing = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
   return /** @type {!anychart.core.Text|number|string} */(this.textSettings('letterSpacing', opt_value));
 };
 
@@ -388,15 +370,7 @@ anychart.core.Text.prototype.letterSpacing = function(opt_value) {
  */
 anychart.core.Text.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value).toLowerCase();
-    var found = false;
-    for (var i in acgraph.vector.Text.Direction) {
-      if (opt_value == acgraph.vector.Text.Direction[i]) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) opt_value = acgraph.vector.Text.Direction.LTR;
+    opt_value = anychart.enums.normalizeTextDirection(opt_value);
   }
   return /** @type {!anychart.core.Text|acgraph.vector.Text.Direction} */(this.textSettings('textDirection', opt_value));
 };
@@ -418,6 +392,7 @@ anychart.core.Text.prototype.textDirection = function(opt_value) {
  * @return {!anychart.core.Text|number|string} .
  */
 anychart.core.Text.prototype.lineHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
   return /** @type {!anychart.core.Text|number|string} */(this.textSettings('lineHeight', opt_value));
 };
 
@@ -437,6 +412,7 @@ anychart.core.Text.prototype.lineHeight = function(opt_value) {
  * @return {!anychart.core.Text|number} .
  */
 anychart.core.Text.prototype.textIndent = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = parseFloat(anychart.utils.toNumberOrString(opt_value));
   return /** @type {!anychart.core.Text|number} */(this.textSettings('textIndent', opt_value));
 };
 
@@ -501,17 +477,7 @@ anychart.core.Text.prototype.hAlign = function(opt_value) {
  */
 anychart.core.Text.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = String(opt_value).toLowerCase();
-    switch (opt_value) {
-      case 'nowrap':
-      case 'no':
-      case 'n':
-        opt_value = acgraph.vector.Text.TextWrap.NO_WRAP;
-        break;
-      default:
-        opt_value = acgraph.vector.Text.TextWrap.BY_LETTER;
-        break;
-    }
+    opt_value = anychart.enums.normalizeTextWrap(opt_value);
   }
   return /** @type {!anychart.core.Text|acgraph.vector.Text.TextWrap} */(this.textSettings('textWrap', opt_value));
 };
@@ -532,6 +498,7 @@ anychart.core.Text.prototype.textWrap = function(opt_value) {
  * @return {!anychart.core.Text|acgraph.vector.Text.TextOverflow} .
  */
 anychart.core.Text.prototype.textOverflow = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
   return /** @type {!anychart.core.Text|acgraph.vector.Text.TextOverflow} */(this.textSettings('textOverflow', opt_value));
 };
 
@@ -552,6 +519,7 @@ anychart.core.Text.prototype.textOverflow = function(opt_value) {
  * @return {!anychart.core.Text|boolean} .
  */
 anychart.core.Text.prototype.selectable = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
   return /** @type {!anychart.core.Text|boolean} */(this.textSettings('selectable', opt_value));
 };
 
@@ -562,6 +530,7 @@ anychart.core.Text.prototype.selectable = function(opt_value) {
  * @return {!anychart.core.Text|boolean} .
  */
 anychart.core.Text.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
   return /** @type {!anychart.core.Text|boolean} */(this.textSettings('disablePointerEvents', opt_value));
 };
 
@@ -582,6 +551,7 @@ anychart.core.Text.prototype.disablePointerEvents = function(opt_value) {
  * @return {!anychart.core.Text|boolean} .
  */
 anychart.core.Text.prototype.useHtml = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
   return /** @type {!anychart.core.Text|boolean} */(this.textSettings('useHtml', opt_value));
 };
 

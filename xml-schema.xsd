@@ -1867,12 +1867,16 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.Bounds">
-        <xsd:attribute name="left" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="right" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="top" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="bottom" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="width" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="height" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="left" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="right" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="top" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="bottom" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="min_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.TextSettings">

@@ -1,10 +1,12 @@
 goog.provide('anychart.core.ui.Table');
-goog.provide('anychart.core.ui.Table.Cell');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.core.ui.table.Cell');
+goog.require('anychart.core.ui.table.Column');
+goog.require('anychart.core.ui.table.IProxyUser');
+goog.require('anychart.core.ui.table.Row');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -12,19 +14,20 @@ goog.require('anychart.utils');
 
 
 /**
- * Declares table element.<br/>
- * <b>Note:</b> Better to use methods in {@link anychart.ui.table}.
+ * Represents table element.<br/>
+ * <b>Note:</b> Use {@link anychart.ui.table} method to create it.
  * @param {number=} opt_rowsCount Number of rows in the table.
  * @param {number=} opt_colsCount Number of columns in the table.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
+ * @implements {anychart.core.ui.table.IProxyUser}
  */
 anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
   goog.base(this);
 
   /**
    * Cells array.
-   * @type {Array.<anychart.core.ui.Table.Cell>}
+   * @type {Array.<anychart.core.ui.table.Cell>}
    * @private
    */
   this.cells_ = [];
@@ -53,181 +56,103 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
 
   /**
    * Cells that should be disposed.
-   * @type {Array.<anychart.core.ui.Table.Cell>}
+   * @type {Array.<anychart.core.ui.table.Cell>}
    * @private
    */
   this.cellsPool_ = [];
 
   /**
    * Row height settings. Array can contain holes.
-   * @type {Array.<number|string>}
+   * @type {!Array.<number|string>}
    * @private
    */
   this.rowHeightSettings_ = [];
 
   /**
    * Col width settings. Array can contain holes.
-   * @type {Array.<number|string>}
+   * @type {!Array.<number|string>}
    * @private
    */
   this.colWidthSettings_ = [];
 
   /**
    * Incremental row heights array. rowBottoms_[i] = rowBottoms_[i-1] + rowHeight[i] in pixels.
-   * @type {Array.<number>}
+   * @type {!Array.<number>}
    * @private
    */
   this.rowBottoms_ = [];
 
   /**
    * Incremental col widths array. colRights_[i] = colRights_[i-1] + colWidth[i] in pixels.
-   * @type {Array.<number>}
+   * @type {!Array.<number>}
    * @private
    */
   this.colRights_ = [];
 
   /**
-   * Factory for cell text content wrappers.
-   * @type {anychart.core.ui.LabelsFactory}
-   * @private
+   * Settings accumulator.
+   * Possible structure: {!{
+   *  // The same structure, as anychart.core.ui.table.Base.prototype.settingsObj has
+   *  // cell fill
+   *  fill: (acgraph.vector.Fill|undefined),
+   *
+   *  // cell border in Cell settings and row/col/table border in Row/Column/Table settings
+   *  topBorder: (acgraph.vector.Stroke|undefined),
+   *  rightBorder: (acgraph.vector.Stroke|undefined),
+   *  bottomBorder: (acgraph.vector.Stroke|undefined),
+   *  leftBorder: (acgraph.vector.Stroke|undefined),
+   *  border: (acgraph.vector.Stroke|undefined), // actually Table do not use this property
+   *
+   *  // cell border in Row/Column settings
+   *  cellTopBorder: (acgraph.vector.Stroke|undefined),
+   *  cellRightBorder: (acgraph.vector.Stroke|undefined),
+   *  cellBottomBorder: (acgraph.vector.Stroke|undefined),
+   *  cellLeftBorder: (acgraph.vector.Stroke|undefined),
+   *  cellBorder: (acgraph.vector.Stroke|undefined),
+   *
+   *  // cell padding
+   *  topPadding: (number|undefined),
+   *  rightPadding: (number|undefined),
+   *  bottomPadding: (number|undefined),
+   *  leftPadding: (number|undefined),
+   *
+   *  // text settings for text cells
+   *  fontSize: (string|number|undefined),
+   *  fontFamily: (string|undefined),
+   *  fontColor: (string|undefined),
+   *  fontOpacity: (number|undefined),
+   *  fontDecoration: (acgraph.vector.Text.Decoration|undefined),
+   *  fontStyle: (acgraph.vector.Text.FontStyle|undefined),
+   *  fontVariant: (acgraph.vector.Text.FontVariant|undefined),
+   *  fontWeight: (string|number|undefined),
+   *  letterSpacing: (string|number|undefined),
+   *  textDirection: (acgraph.vector.Text.Direction|undefined),
+   *  lineHeight: (string|number|undefined),
+   *  textIndent: (number|undefined),
+   *  vAlign: (acgraph.vector.Text.VAlign|undefined),
+   *  hAlign: (acgraph.vector.Text.HAlign|undefined),
+   *  textWrap: (acgraph.vector.Text.TextWrap|undefined),
+   *  textOverflow: (acgraph.vector.Text.TextOverflow|undefined),
+   *  selectable: (boolean|undefined),
+   *  disablePointerEvents: (boolean|undefined),
+   *  useHtml: (boolean|undefined)
+   *
+   *  // Plus these two properties:
+   *  rowEvenFill: (acgraph.vector.Fill|undefined),
+   *  rowOddFill: (acgraph.vector.Fill|undefined)
+   * }}
+   * @type {!Object}
    */
-  this.labelsFactory_ = null;
-
-  /**
-   * Table layer.
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.layer_ = null;
-
-  /**
-   * Cell contents container.
-   * @type {acgraph.vector.Layer}
-   * @private
-   */
-  this.contentLayer_ = null;
-
-  /**
-   * Internal flag used by table to mark that row heights or col widths changed and should be rebuilt.
-   * @type {boolean}
-   */
-  this.shouldRebuildSizes = true;
-
-  /**
-   * Internal flag used by cells to mark that row or col span changed.
-   * @type {boolean}
-   */
-  this.shouldDropOverlap = false;
-
-  /**
-   * Internal flag used by cells to mark that table grid changed and should be rebuilt.
-   * @type {boolean}
-   */
-  this.shouldRedrawBorders = true;
-
-  /**
-   * Internal flag used by cells to mark that table grid changed and should be rebuilt.
-   * @type {boolean}
-   */
-  this.shouldRedrawFills = true;
-
-  /**
-   * Internal flag used by cells to mark that cell content should be redrawn.
-   * @type {boolean}
-   */
-  this.shouldRedrawContent = true;
-
-  /**
-   * Border paths dictionary by stroke object hash.
-   * @type {Object.<string, !acgraph.vector.Path>}
-   * @private
-   */
-  this.borderPaths_ = null;
-
-  /**
-   * Cell fill paths dictionary by fill object hash.
-   * @type {Object.<string, !acgraph.vector.Path>}
-   * @private
-   */
-  this.fillPaths_ = null;
-
-  /**
-   * Pool of freed paths that can be reused.
-   * @type {Array.<acgraph.vector.Path>}
-   * @private
-   */
-  this.pathsPool_ = null;
-
-  /**
-   * Default cell fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.cellFill_ = 'none';
-
-  /**
-   * Default odd cell fill.
-   * @type {acgraph.vector.Fill|undefined}
-   * @private
-   */
-  this.cellOddFill_ = undefined;
-
-  /**
-   * Default even cell fill.
-   * @type {acgraph.vector.Fill|undefined}
-   * @private
-   */
-  this.cellEvenFill_ = undefined;
-
-  /**
-   * Default cell border.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.cellBorder_ = acgraph.vector.normalizeStroke('1 black');
-
-  /**
-   * Default cell top border.
-   * @type {acgraph.vector.Stroke|undefined}
-   * @private
-   */
-  this.cellTopBorder_ = undefined;
-
-  /**
-   * Default cell bottom border.
-   * @type {acgraph.vector.Stroke|undefined}
-   * @private
-   */
-  this.cellBottomBorder_ = undefined;
-
-  /**
-   * Default cell left border.
-   * @type {acgraph.vector.Stroke|undefined}
-   * @private
-   */
-  this.cellLeftBorder_ = undefined;
-
-  /**
-   * Default cell right border.
-   * @type {acgraph.vector.Stroke|undefined}
-   * @private
-   */
-  this.cellRightBorder_ = undefined;
-
-  /**
-   * Default cell padding.
-   * @type {anychart.core.utils.Padding}
-   * @private
-   */
-  this.cellPadding_ = null;
-
-  /**
-   * @type {Array.<anychart.core.ui.Table.CellContent>|undefined}
-   * @private
-   */
-  this.contentToDispose_ = undefined;
-
-  this.cellPadding(0);
+  this.settingsObj = {
+    'fill': 'none',
+    'cellBorder': 'black',
+    'topPadding': 0,
+    'rightPadding': 0,
+    'bottomPadding': 0,
+    'leftPadding': 0,
+    'hAlign': anychart.enums.HAlign.START,
+    'vAlign': anychart.enums.VAlign.TOP
+  };
 };
 goog.inherits(anychart.core.ui.Table, anychart.core.VisualBaseWithBounds);
 
@@ -246,18 +171,197 @@ anychart.core.ui.Table.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.ui.Table.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.APPEARANCE;
+    anychart.ConsistencyState.TABLE_CELL_BOUNDS |
+    anychart.ConsistencyState.TABLE_OVERLAP |
+    anychart.ConsistencyState.TABLE_BORDERS |
+    anychart.ConsistencyState.TABLE_FILLS |
+    anychart.ConsistencyState.TABLE_CONTENT |
+    anychart.ConsistencyState.TABLE_STRUCTURE;
+
+
+//region Private properties with null defaults
+/**
+ * Factory for cell text content wrappers.
+ * @type {anychart.core.ui.LabelsFactory}
+ * @private
+ */
+anychart.core.ui.Table.prototype.labelsFactory_ = null;
 
 
 /**
- * An instance of {@link anychart.core.ui.LabelsFactory.Label} class, {@link anychart.core.ui.MarkersFactory.Marker} class
- * or {@link anychart.core.VisualBase} class.
- * @includeDoc
- * @typedef {anychart.core.ui.LabelsFactory.Label|anychart.core.ui.MarkersFactory.Marker|anychart.core.VisualBase}
+ * Table layer.
+ * @type {acgraph.vector.Layer}
+ * @private
  */
-anychart.core.ui.Table.CellContent;
+anychart.core.ui.Table.prototype.layer_ = null;
 
 
+/**
+ * Cell contents container.
+ * @type {acgraph.vector.Layer}
+ * @private
+ */
+anychart.core.ui.Table.prototype.contentLayer_ = null;
+
+
+/**
+ * Border paths dictionary by stroke object hash.
+ * @type {Object.<string, !acgraph.vector.Path>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.borderPaths_ = null;
+
+
+/**
+ * Cell fill paths dictionary by fill object hash.
+ * @type {Object.<string, !acgraph.vector.Path>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.fillPaths_ = null;
+
+
+/**
+ * Pool of freed paths that can be reused.
+ * @type {Array.<acgraph.vector.Path>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.pathsPool_ = null;
+
+
+/**
+ * @type {Array.<anychart.core.VisualBase>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.contentToClear_ = null;
+
+
+/**
+ * Borders proxy object.
+ * @type {anychart.core.ui.table.Border}
+ * @private
+ */
+anychart.core.ui.Table.prototype.bordersProxy_ = null;
+
+
+/**
+ * Borders proxy object.
+ * @type {anychart.core.ui.table.Border}
+ * @private
+ */
+anychart.core.ui.Table.prototype.cellBordersProxy_ = null;
+
+
+/**
+ * Paddings proxy object.
+ * @type {anychart.core.ui.table.Padding}}
+ * @private
+ */
+anychart.core.ui.Table.prototype.paddingProxy_ = null;
+
+
+/**
+ * Rows array. Lazy creation, may contain undefined indexes.
+ * @type {Array.<anychart.core.ui.table.Row>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.rows_ = null;
+
+
+/**
+ * Columns array. Lazy creation, may contain undefined indexes.
+ * @type {Array.<anychart.core.ui.table.Column>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.cols_ = null;
+
+
+/**
+ * Row min height settings. Array can contain holes.
+ * @type {Array.<number|string>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.rowMinHeightSettings_ = null;
+
+
+/**
+ * Row max height settings. Array can contain holes.
+ * @type {Array.<number|string>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.rowMaxHeightSettings_ = null;
+
+
+/**
+ * Col min width settings. Array can contain holes.
+ * @type {Array.<number|string>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.colMinWidthSettings_ = null;
+
+
+/**
+ * Col max width settings. Array can contain holes.
+ * @type {Array.<number|string>}
+ * @private
+ */
+anychart.core.ui.Table.prototype.colMaxWidthSettings_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultRowHeight_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultRowMinHeight_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultRowMaxHeight_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultColWidth_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultColMinWidth_ = null;
+
+
+/**
+ * Default row height settings.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Table.prototype.defaultColMaxWidth_ = null;
+//endregion
+
+
+//region Table methods
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Public methods to setup or query table
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for table rows count.
  * @return {number} Current rows count.
@@ -283,8 +387,8 @@ anychart.core.ui.Table.prototype.rowsCount = function(opt_value) {
       if (isNaN(this.currentColsCount_)) // mark that we should rebuild the table
         this.currentColsCount_ = this.colsCount_;
       this.rowsCount_ = opt_value;
-      this.shouldDropOverlap = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TABLE_STRUCTURE | anychart.ConsistencyState.TABLE_OVERLAP,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -317,90 +421,12 @@ anychart.core.ui.Table.prototype.colsCount = function(opt_value) {
       if (isNaN(this.currentColsCount_)) // mark that we should rebuild the table
         this.currentColsCount_ = this.colsCount_;
       this.colsCount_ = opt_value;
-      this.shouldDropOverlap = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.TABLE_STRUCTURE | anychart.ConsistencyState.TABLE_OVERLAP,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
   return this.colsCount_;
-};
-
-
-/**
- * Getter for row height settings.
- * @param {number} row Row number.
- * @return {string|number|null} Current column width.
- *//**
- * Setter for row height settings. <br/>
- * <b>Note:</b> Pass <b>null</b> to set default value.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.rowHeight(1, 50);
- * table.container(stage).draw();
- * @param {number} row Row number.
- * @param {(string|number|null)=} opt_value Value to set.
- * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- *//**
- * @ignoreDoc
- * Getter and setter for row height settings. Null sets row height to the default value.
- * @param {number} row Row number.
- * @param {(string|number|null)=} opt_value Value to set.
- * @return {string|number|null|anychart.core.ui.Table}
- */
-anychart.core.ui.Table.prototype.rowHeight = function(row, opt_value) {
-  if (goog.isDef(opt_value)) {
-    row = goog.isNull(row) ? NaN : +row;
-    if (!isNaN(row) && this.rowHeightSettings_[row] != opt_value) {
-      if (goog.isNull(opt_value))
-        delete this.rowHeightSettings_[row];
-      else
-        this.rowHeightSettings_[row] = opt_value;
-      this.shouldRebuildSizes = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return row in this.rowHeightSettings_ ? this.rowHeightSettings_[row] : null;
-};
-
-
-/**
- * Getter for column width settings.
- * @param {number} col Column number.
- * @return {string|number|null} Current column width.
- *//**
- * Setter for column width settings. <br/>
- * <b>Note:</b> Pass <b>null</b> to set the default value.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.colWidth(0, 200);
- * table.container(stage).draw();
- * @param {number} col Column number.
- * @param {(string|number|null)=} opt_value Value to set.
- * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- *//**
- * @ignoreDoc
- * Getter and setter for column height settings. Null sets column width to default value.
- * @param {number} col Column number.
- * @param {(string|number|null)=} opt_value Value to set.
- * @return {string|number|null|anychart.core.ui.Table}
- */
-anychart.core.ui.Table.prototype.colWidth = function(col, opt_value) {
-  if (goog.isDef(opt_value)) {
-    col = goog.isNull(col) ? NaN : +col;
-    if (!isNaN(col) && this.colWidthSettings_[col] != opt_value) {
-      if (goog.isNull(opt_value))
-        delete this.colWidthSettings_[col];
-      else
-        this.colWidthSettings_[col] = opt_value;
-      this.shouldRebuildSizes = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return col in this.colWidthSettings_ ? this.colWidthSettings_[col] : null;
 };
 
 
@@ -412,8 +438,8 @@ anychart.core.ui.Table.prototype.colWidth = function(col, opt_value) {
  * cell.content( anychart.ui.label().text('Text element'));
  * table.container(stage).draw();
  * @param {number} row Row index.
- * @param {number} col Coumn index.
- * @return {anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
+ * @param {number} col Column index.
+ * @return {anychart.core.ui.table.Cell} {@link anychart.core.ui.table.Cell} instance for method chaining.
  */
 anychart.core.ui.Table.prototype.getCell = function(row, col) {
   this.checkTable_();
@@ -425,9 +451,177 @@ anychart.core.ui.Table.prototype.getCell = function(row, col) {
 
 
 /**
+ * Returns row instance by its number. Returns null if there is no row with passed number.
+ * @param {number} row
+ * @return {anychart.core.ui.table.Row}
+ */
+anychart.core.ui.Table.prototype.getRow = function(row) {
+  this.checkTable_();
+  // defaulting to NaN to return null when incorrect arguments are passed.
+  row = anychart.utils.normalizeToNaturalNumber(row, NaN, true);
+  if (isNaN(row) || row >= this.rowsCount_)
+    return null;
+  if (!this.rows_)
+    this.rows_ = [];
+  if (!(row in this.rows_))
+    this.rows_[row] = new anychart.core.ui.table.Row(this, row);
+  return this.rows_[row];
+};
+
+
+/**
+ * Returns column instance by its number. Returns null if there is no column with passed number.
+ * @param {number} col
+ * @return {anychart.core.ui.table.Column}
+ */
+anychart.core.ui.Table.prototype.getCol = function(col) {
+  this.checkTable_();
+  // defaulting to NaN to return null when incorrect arguments are passed.
+  col = anychart.utils.normalizeToNaturalNumber(col, NaN, true);
+  if (isNaN(col) || col >= this.colsCount_)
+    return null;
+  if (!this.cols_)
+    this.cols_ = [];
+  if (!(col in this.cols_))
+    this.cols_[col] = new anychart.core.ui.table.Column(this, col);
+  return this.cols_[col];
+};
+
+
+/**
+ * Getter and setter for default row height settings. Defaults to null - divide the rest of table height between
+ * rows with null height evenly.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowsHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultRowHeight_ != opt_value) {
+      this.defaultRowHeight_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultRowHeight_;
+};
+
+
+/**
+ * Getter and setter for default row height minimum settings. Defaults to null - no minimum height.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowsMinHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultRowMinHeight_ != opt_value) {
+      this.defaultRowMinHeight_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultRowMinHeight_;
+};
+
+
+/**
+ * Getter and setter for default row height maximum settings. Defaults to null - no maximum height.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowsMaxHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultRowMaxHeight_ != opt_value) {
+      this.defaultRowMaxHeight_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultRowMaxHeight_;
+};
+
+
+/**
+ * Getter and setter for default column width settings. Defaults to null - divide the rest of table width between
+ * columns with null width evenly.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colsWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultColWidth_ != opt_value) {
+      this.defaultColWidth_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultColWidth_;
+};
+
+
+/**
+ * Getter and setter for default column width minimum settings. Defaults to null - no minimum width.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colsMinWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultColMinWidth_ != opt_value) {
+      this.defaultColMinWidth_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultColMinWidth_;
+};
+
+
+/**
+ * Getter and setter for default column width maximum settings. Defaults to null - no maximum width.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colsMaxWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultColMaxWidth_ != opt_value) {
+      this.defaultColMaxWidth_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.defaultColMaxWidth_;
+};
+
+
+/**
+ * Border for the table (not cells). Overrides this.cellBorder() settings for the borders that are on the border of the
+ * table. :)
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.ui.Table|anychart.core.ui.table.Border} Border settings instance or this for chaining.
+ */
+anychart.core.ui.Table.prototype.border = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    if (!goog.isNull(opt_strokeOrFill))
+      opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    this.suspendSignalsDispatching();
+    this.settings('border', /** @type {acgraph.vector.Stroke|null|undefined} */(opt_strokeOrFill), anychart.ConsistencyState.TABLE_BORDERS);
+    for (var i = 0; i < 4; i++)
+      this.settings(anychart.core.ui.table.Border.propNames[i], null, anychart.ConsistencyState.TABLE_BORDERS);
+    this.resumeSignalsDispatching(true);
+    return this;
+  }
+  return this.bordersProxy_ || (this.bordersProxy_ = new anychart.core.ui.table.Border(this, false));
+};
+
+
+/**
  * Getter for table content.<br/>
  * <b>Note:</b> Returns cells content ignored rowSpan and colSpan.
- * @return {Array.<Array.<(anychart.core.ui.Table.CellContent)>>} Current table content.
+ * @return {Array.<Array.<(anychart.core.VisualBase)>>} Current table content.
  *//**
  * Setter for table content.<br/>
  * <b>Note:</b> Pass <b>null</b> to drop table content.
@@ -446,14 +640,14 @@ anychart.core.ui.Table.prototype.getCell = function(row, col) {
  * ]);
  * table.getCell(0,0).rowSpan(4);
  * table.container(stage).draw();
- * @param {Array.<Array.<(anychart.core.ui.Table.CellContent|string|number|undefined)>>=} opt_tableValues Values to set.
+ * @param {Array.<Array.<(anychart.core.VisualBase|string|number|undefined)>>=} opt_tableValues Values to set.
  * @param {boolean=} opt_demergeCells [false] Pass <b>true</b> to demerge all cells.
  * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {Array.<Array.<(anychart.core.ui.Table.CellContent|string|number|undefined)>>=} opt_tableValues
+ * @param {Array.<Array.<(anychart.core.VisualBase|string|number|undefined)>>=} opt_tableValues
  * @param {boolean=} opt_demergeCells
- * @return {Array.<Array.<(anychart.core.ui.Table.CellContent)>>|anychart.core.ui.Table}
+ * @return {Array.<Array.<(anychart.core.VisualBase)>>|anychart.core.ui.Table}
  */
 anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demergeCells) {
   var row, col, cell, rowArr;
@@ -513,6 +707,80 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
 };
 
 
+/**
+ * Draws the table.
+ * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
+ */
+anychart.core.ui.Table.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
+    return this;
+
+  if (!this.layer_) {
+    this.layer_ = acgraph.layer();
+    this.contentLayer_ = this.layer_.layer();
+  }
+
+  var stage = this.layer_.getStage();
+  var manualSuspend = stage && !stage.isSuspended();
+  if (manualSuspend) stage.suspend();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    // if sizes changed, it will be checked in drawing
+    this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS);
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+  }
+
+  if (this.labelsFactory_) // we don't want to create it if no cell use it
+    this.labelsFactory_.suspendSignalsDispatching();
+  this.checkTable_();
+  this.checkSizes_();
+  this.checkOverlap_();
+  this.checkFills_();
+  this.checkBorders_();
+  this.checkContent_();
+  if (this.labelsFactory_)
+    this.labelsFactory_.resumeSignalsDispatching(false);
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    this.layer_.zIndex(/** @type {number} */(this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    if (this.container() && this.container().getStage()) {
+      //listen resize event
+      stage = this.container().getStage();
+      if (this.bounds().dependsOnContainerSize()) {
+        this.container().getStage().listen(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      } else {
+        this.container().getStage().unlisten(
+            acgraph.vector.Stage.EventType.STAGE_RESIZE,
+            this.resizeHandler_,
+            false,
+            this
+        );
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (manualSuspend) stage.resume();
+
+  //todo(Anton Saukh): refactor this mess!
+  this.listenSignals(this.invalidateHandler_, this);
+  //end mess
+
+  return this;
+};
+//endregion
+
+
 //region Cell settings
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -520,106 +788,366 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for table cell text factory.
- * @return {!anychart.core.ui.LabelsFactory} Current table text factory.
+ * Getter for text font size.
+ * @return {string|number} Current font size.
  *//**
- * You can setup the default text appearance for entire table.
- * These settings apply to cells with content set as string or number. If you want to set text appearance
- * for the particular cell, set cell content as string first, and then feel free to get the content and tune it.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellTextFactory()
- *   .fontColor('blue')
- *   .fontWeight('bold')
- *   .fontSize(13);
- * table.container(stage).draw();
- * @shortDescription Setter for table cell text factory.
- * @param {(Object|boolean|null)=} opt_value
- * @return {!anychart.core.ui.Table}
+ * Setter for text font size.
+ * @param {string|number=} opt_value ['16px'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
  *//**
  * @ignoreDoc
- * Getter and setter for table cell text factory.
- * @param {(Object|boolean|null)=} opt_value
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ui.Table)}
+ * @param {string|number=} opt_value .
+ * @return {!anychart.core.ui.Table|string|number} .
  */
-anychart.core.ui.Table.prototype.cellTextFactory = function(opt_value) {
-  if (!this.labelsFactory_) {
-    this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    this.labelsFactory_.anchor(anychart.enums.Anchor.CENTER);
-    this.labelsFactory_.position(anychart.enums.Position.CENTER);
-    this.registerDisposable(this.labelsFactory_);
-  }
-  if (goog.isDef(opt_value)) {
-    this.labelsFactory_.setup(opt_value);
-    this.shouldRedrawContent = true;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.labelsFactory_;
+anychart.core.ui.Table.prototype.fontSize = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
+  return /** @type {!anychart.core.ui.Table|string|number} */(this.settings('fontSize', opt_value));
 };
 
 
 /**
- * Getter for the cell padding settings.
- * @return {!anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
+ * Getter for the font family.
+ * @return {string} The current font family.
  *//**
- * Setter for the cell paddings in pixels using a single value.<br/>
- * @example <t>listingOnly</t>
- * // all paddings 15px
- * table.cellPadding(15);
- * // all paddings 15px
- * table.cellPadding('15px');
- * // top and bottom 5px ,right and left 15px
- * table.cellPadding(anychart.utils.space(5,15));
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellPadding([10, 20]);
- * table.container(stage).draw();
- * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
- * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- *//**
- * Setter for the cell paddings in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
- * table.cellPadding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
- * table.cellPadding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * table.cellPadding(10, '15px', '5px', 12);
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellPadding(10, '15px', '5px', 12);
- * table.container(stage).draw();
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
+ * Setter for font family.
+ * @param {string=} opt_value ['Arial'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
  *//**
  * @ignoreDoc
- * Cell padding settings.
- * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
- * @param {(string|number)=} opt_rightOrRightAndLeft .
- * @param {(string|number)=} opt_bottom .
- * @param {(string|number)=} opt_left .
- * @return {!(anychart.core.ui.Table|anychart.core.utils.Padding)} .
+ * @param {string=} opt_value .
+ * @return {!anychart.core.ui.Table|string} .
  */
-anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  if (!this.cellPadding_) {
-    this.cellPadding_ = new anychart.core.utils.Padding();
-    this.cellPadding_.listenSignals(this.cellPaddingInvalidated_, this);
-    this.registerDisposable(this.cellPadding_);
-  }
+anychart.core.ui.Table.prototype.fontFamily = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
+  return /** @type {!anychart.core.ui.Table|string} */(this.settings('fontFamily', opt_value));
+};
 
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.cellPadding_.setup.apply(this.cellPadding_, arguments);
-    return this;
-  } else {
-    return this.cellPadding_;
+
+/**
+ * Getter for the text font color.
+ * @return {string} The current font color.
+ *//**
+ * Setter for the text font color.<br/>
+ * {@link http://www.w3schools.com/html/html_colors.asp}
+ * @param {string=} opt_value ['#000'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {string=} opt_value .
+ * @return {!anychart.core.ui.Table|string} .
+ */
+anychart.core.ui.Table.prototype.fontColor = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
+  return /** @type {!anychart.core.ui.Table|string} */(this.settings('fontColor', opt_value));
+};
+
+
+/**
+ * Getter for the text font opacity.
+ * @return {number} The current font opacity.
+ *//**
+ * Setter for the text font opacity.<br/>
+ * Double value from 0 to 1.
+ * @param {number=} opt_value [1] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {!anychart.core.ui.Table|number} .
+ */
+anychart.core.ui.Table.prototype.fontOpacity = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = goog.math.clamp(+opt_value, 0, 1);
+  return /** @type {!anychart.core.ui.Table|number} */(this.settings('fontOpacity', opt_value));
+};
+
+
+/**
+ * Getter for the text font decoration.
+ * @return {acgraph.vector.Text.Decoration|string} The current font decoration.
+ *//**
+ * Setter for the text font decoration.
+ * @param {(acgraph.vector.Text.Decoration|string)=} opt_value [{@link acgraph.vector.Text.Decoration}.NONE] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.Decoration} .
+ */
+anychart.core.ui.Table.prototype.fontDecoration = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeFontDecoration(opt_value);
   }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.Decoration} */(this.settings('fontDecoration', opt_value));
+};
+
+
+/**
+ * Getter for the text font style.
+ * @return {acgraph.vector.Text.FontStyle|string} The current font style.
+ *//**
+ * Setter for the text font style.
+ * @param {(acgraph.vector.Text.FontStyle|string)=} opt_value [{@link acgraph.vector.Text.FontStyle}.NORMAL] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.FontStyle} .
+ */
+anychart.core.ui.Table.prototype.fontStyle = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeFontStyle(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.FontStyle} */(this.settings('fontStyle', opt_value));
+};
+
+
+/**
+ * Getter for the text font variant.
+ * @return {acgraph.vector.Text.FontVariant|string} The current font variant.
+ *//**
+ * Setter for the text font variant.
+ * @param {(acgraph.vector.Text.FontVariant|string)=} opt_value [{@link acgraph.vector.Text.FontVariant}.NORMAL] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.FontVariant} .
+ */
+anychart.core.ui.Table.prototype.fontVariant = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeFontVariant(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.FontVariant} */(this.settings('fontVariant', opt_value));
+};
+
+
+/**
+ * Getter for the text font weight.
+ * @return {string|number} The current font weight.
+ *//**
+ * Setter for the text font weight.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_font_weight.asp}
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(string|number)=} opt_value .
+ * @return {!anychart.core.ui.Table|string|number} .
+ */
+anychart.core.ui.Table.prototype.fontWeight = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
+  return /** @type {!anychart.core.ui.Table|string|number} */(this.settings('fontWeight', opt_value));
+};
+
+
+/**
+ * Getter for the text letter spacing.
+ * @return {string|number} The current letter spacing.
+ *//**
+ * Setter for the text letter spacing.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.core.ui.Table|number|string} .
+ */
+anychart.core.ui.Table.prototype.letterSpacing = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
+  return /** @type {!anychart.core.ui.Table|number|string} */(this.settings('letterSpacing', opt_value));
+};
+
+
+/**
+ * Getter for the text direction.
+ * @return {acgraph.vector.Text.Direction|string} Current text direction.
+ *//**
+ * Setter for the text direction.
+ * @param {(acgraph.vector.Text.Direction|string)=} opt_value [{@link acgraph.vector.Text.Direction}.LTR] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.Direction|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.Direction} .
+ */
+anychart.core.ui.Table.prototype.textDirection = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeTextDirection(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.Direction} */(this.settings('textDirection', opt_value));
+};
+
+
+/**
+ * Getter for the text line height.
+ * @return {string|number} The current text line height.
+ *//**
+ * Setter for the text line height.<br/>
+ * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
+ * @param {(string|number)=} opt_value ['normal'] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(number|string)=} opt_value .
+ * @return {!anychart.core.ui.Table|number|string} .
+ */
+anychart.core.ui.Table.prototype.lineHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
+  return /** @type {!anychart.core.ui.Table|number|string} */(this.settings('lineHeight', opt_value));
+};
+
+
+/**
+ * Getter for the text indent.
+ * @return {number} The current text indent.
+ *//**
+ * Setter for the text indent.
+ * @param {number=} opt_value [0] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {number=} opt_value .
+ * @return {!anychart.core.ui.Table|number} .
+ */
+anychart.core.ui.Table.prototype.textIndent = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = parseFloat(anychart.utils.toNumberOrString(opt_value));
+  return /** @type {!anychart.core.ui.Table|number} */(this.settings('textIndent', opt_value));
+};
+
+
+/**
+ * Getter for the text vertical align.
+ * @return {acgraph.vector.Text.VAlign|string} The current text vertical align.
+ *//**
+ * Setter for the text vertical align.
+ * @param {(acgraph.vector.Text.VAlign|string)=} opt_value [{@link acgraph.vector.Text.VAlign}.TOP] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.VAlign|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.VAlign} .
+ */
+anychart.core.ui.Table.prototype.vAlign = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeVAlign(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.VAlign} */(this.settings('vAlign', opt_value));
+};
+
+
+/**
+ * Getter for the text horizontal align.
+ * @return {acgraph.vector.Text.HAlign|string} Th current text horizontal align.
+ *//**
+ * Setter for the text horizontal align.
+ * @param {(acgraph.vector.Text.HAlign|string)=} opt_value [{@link acgraph.vector.Text.HAlign}.START] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.HAlign|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.HAlign} .
+ */
+anychart.core.ui.Table.prototype.hAlign = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHAlign(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.HAlign} */(this.settings('hAlign', opt_value));
+};
+
+
+/**
+ * Getter for the text wrap settings.
+ * @return {acgraph.vector.Text.TextWrap|string} Th current text wrap settings.
+ *//**
+ * Setter for the text wrap settings.
+ * @param {(acgraph.vector.Text.TextWrap|string)=} opt_value [{@link acgraph.vector.Text.TextWrap}.BY_LETTER] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.TextWrap} .
+ */
+anychart.core.ui.Table.prototype.textWrap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeTextWrap(opt_value);
+  }
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.TextWrap} */(this.settings('textWrap', opt_value));
+};
+
+
+/**
+ * Getter for the text overflow settings.
+ * @return {acgraph.vector.Text.TextOverflow|string} The current text overflow settings.
+ *//**
+ * Setter for the text overflow settings.
+ * @param {(acgraph.vector.Text.TextOverflow|string)=} opt_value [{@link acgraph.vector.Text.TextOverflow}.CLIP] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {acgraph.vector.Text.TextOverflow|string=} opt_value .
+ * @return {!anychart.core.ui.Table|acgraph.vector.Text.TextOverflow} .
+ */
+anychart.core.ui.Table.prototype.textOverflow = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = String(opt_value);
+  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.TextOverflow} */(this.settings('textOverflow', opt_value));
+};
+
+
+/**
+ * Getter for the text selectable option.
+ * @return {boolean} The current text selectable option.
+ *//**
+ * Setter for the text selectable.<br/>
+ * This options defines whether the text can be selected. If set to <b>false</b> one can't select the text.
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value .
+ * @return {!anychart.core.ui.Table|boolean} .
+ */
+anychart.core.ui.Table.prototype.selectable = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
+  return /** @type {!anychart.core.ui.Table|boolean} */(this.settings('selectable', opt_value));
+};
+
+
+/**
+ * Gets current state of disablePointerEvents option.
+ * @return {boolean} If pointer events are disabled.
+ *//**
+ * Setter for the text disablePointerEvents option.<br/>
+ * This options defines whether the text should pass mouse events through.
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value .
+ * @return {!anychart.core.ui.Table|boolean} .
+ */
+anychart.core.ui.Table.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
+  return /** @type {!anychart.core.ui.Table|boolean} */(this.settings('disablePointerEvents', opt_value));
+};
+
+
+/**
+ * Getter for the useHtml flag.
+ * @return {boolean} The current value of useHTML flag.
+ *//**
+ * Setter for flag useHtml.<br/>
+ * This property defines whether HTML text should be parsed.
+ * @param {boolean=} opt_value [false] Value to set.
+ * @return {!anychart.core.ui.Table} An instance of {@link anychart.core.ui.Table} class for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {boolean=} opt_value .
+ * @return {!anychart.core.ui.Table|boolean} .
+ */
+anychart.core.ui.Table.prototype.useHtml = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = !!opt_value;
+  return /** @type {!anychart.core.ui.Table|boolean} */(this.settings('useHtml', opt_value));
 };
 
 
@@ -709,28 +1237,13 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.Table|Function} .
+ * @return {acgraph.vector.Fill|anychart.core.ui.Table} .
  */
 anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var shouldInvalidate = false;
-    if (this.cellOddFill_ || this.cellEvenFill_) {
-      this.cellOddFill_ = undefined;
-      this.cellEvenFill_ = undefined;
-      shouldInvalidate = true;
-    }
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.cellFill_) {
-      this.cellFill_ = fill;
-      shouldInvalidate = true;
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawFills = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellFill_;
+  if (goog.isDefAndNotNull(opt_fillOrColorOrKeys)) // we want to keep null first param as null, not as 'none'
+    opt_fillOrColorOrKeys = acgraph.vector.normalizeFill.apply(null, arguments);
+  return /** @type {acgraph.vector.Fill|anychart.core.ui.Table} */(this.settings('fill',
+      /** @type {acgraph.vector.Fill|null|undefined} */(opt_fillOrColorOrKeys), anychart.ConsistencyState.TABLE_FILLS));
 };
 
 
@@ -822,26 +1335,11 @@ anychart.core.ui.Table.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.Table|undefined} .
  */
-anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_fillOrColorOrKeys)) {
-      this.cellOddFill_ = undefined;
-      shouldInvalidate = true;
-    } else {
-      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-      if (fill != this.cellOddFill_) {
-        this.cellOddFill_ = fill;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawFills = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellOddFill_;
+anychart.core.ui.Table.prototype.rowOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDefAndNotNull(opt_fillOrColorOrKeys)) // we want to keep null first param as null, not as 'none'
+    opt_fillOrColorOrKeys = acgraph.vector.normalizeFill.apply(null, arguments);
+  return /** @type {acgraph.vector.Fill|anychart.core.ui.Table} */(this.settings('rowOddFill',
+      /** @type {acgraph.vector.Fill|null|undefined} */(opt_fillOrColorOrKeys), anychart.ConsistencyState.TABLE_FILLS));
 };
 
 
@@ -933,32 +1431,17 @@ anychart.core.ui.Table.prototype.cellOddFill = function(opt_fillOrColorOrKeys, o
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.Table|undefined} .
  */
-anychart.core.ui.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_fillOrColorOrKeys)) {
-      this.cellEvenFill_ = undefined;
-      shouldInvalidate = true;
-    } else {
-      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-      if (fill != this.cellEvenFill_) {
-        this.cellEvenFill_ = fill;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawFills = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellEvenFill_;
+anychart.core.ui.Table.prototype.rowEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDefAndNotNull(opt_fillOrColorOrKeys)) // we want to keep null first param as null, not as 'none'
+    opt_fillOrColorOrKeys = acgraph.vector.normalizeFill.apply(null, arguments);
+  return /** @type {acgraph.vector.Fill|anychart.core.ui.Table} */(this.settings('rowEvenFill',
+      /** @type {acgraph.vector.Fill|null|undefined} */(opt_fillOrColorOrKeys), anychart.ConsistencyState.TABLE_FILLS));
 };
 
 
 /**
  * Getter for current cell border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
+ * @return {!anychart.core.ui.table.Border} Current stroke settings.
  *//**
  * Setter for cell border settings.<br/>
  * Learn more about stroke settings:
@@ -987,347 +1470,116 @@ anychart.core.ui.Table.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, 
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table|acgraph.vector.Stroke|undefined} .
+ * @return {anychart.core.ui.Table|anychart.core.ui.table.Border} .
  */
 anychart.core.ui.Table.prototype.cellBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.cellBorder_) {
-      this.cellBorder_ = stroke;
-      this.shouldRedrawBorders = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
+    // we treat null as 'none' here because we don't want to be left without super default border
+    opt_strokeOrFill = acgraph.vector.normalizeStroke.apply(null, arguments);
+    this.suspendSignalsDispatching();
+    this.settings('cellBorder', /** @type {acgraph.vector.Stroke|undefined} */(opt_strokeOrFill), anychart.ConsistencyState.TABLE_BORDERS);
+    for (var i = 0; i < 4; i++)
+      this.settings(anychart.core.ui.table.Border.cellPropNames[i], null, anychart.ConsistencyState.TABLE_BORDERS);
+    this.resumeSignalsDispatching(true);
     return this;
   }
-  return this.cellBorder_;
+  return this.cellBordersProxy_ || (this.cellBordersProxy_ = new anychart.core.ui.table.Border(this, true));
 };
 
 
 /**
- * Getter for current cell left border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
+ * Getter for the cell padding settings.
+ * @return {!anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
  *//**
- * Setter for cell left border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
- * the border for the corresponding side.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell left border settings.
+ * Setter for the cell paddings in pixels using a single value.<br/>
+ * @example <t>listingOnly</t>
+ * // all paddings 15px
+ * table.cellPadding(15);
+ * // all paddings 15px
+ * table.cellPadding('15px');
+ * // top and bottom 5px ,right and left 15px
+ * table.cellPadding(anychart.utils.space(5,15));
  * @example <t>simple-h100</t>
  * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellLeftBorder('orange', 3, '5 2', 'round');
+ * table.cellPadding([10, 20]);
  * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
  * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
  *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.prototype.cellLeftBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.cellLeftBorder_) {
-        this.cellLeftBorder_ = undefined;
-        shouldInvalidate = true;
-      }
-    } else {
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.cellLeftBorder_) {
-        this.cellLeftBorder_ = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawBorders = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellLeftBorder_;
-};
-
-
-/**
- * Getter for current cell right border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell right border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
- * the border for the corresponding side.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell right border settings.
+ * Setter for the cell paddings in pixels using several numbers.<br/>
+ * @example <t>listingOnly</t>
+ * // 1) top and bottom 10px, left and right 15px
+ * table.cellPadding(10, '15px');
+ * // 2) top 10px, left and right 15px, bottom 5px
+ * table.cellPadding(10, '15px', 5);
+ * // 3) top 10px, right 15px, bottom 5px, left 12px
+ * table.cellPadding(10, '15px', '5px', 12);
  * @example <t>simple-h100</t>
  * var table = anychart.ui.table();
  * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellRightBorder('orange', 3, '5 2', 'round');
+ * table.cellPadding(10, '15px', '5px', 12);
  * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
+ * @param {(string|number)=} opt_value1 Top or top-bottom space.
+ * @param {(string|number)=} opt_value2 Right or right-left space.
+ * @param {(string|number)=} opt_value3 Bottom space.
+ * @param {(string|number)=} opt_value4 Left space.
+ * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table|acgraph.vector.Stroke|undefined} .
+ * Cell padding settings.
+ * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {!(anychart.core.ui.Table|anychart.core.ui.table.Padding)} .
  */
-anychart.core.ui.Table.prototype.cellRightBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.cellRightBorder_) {
-        this.cellRightBorder_ = undefined;
-        shouldInvalidate = true;
-      }
-    } else {
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.cellRightBorder_) {
-        this.cellRightBorder_ = stroke;
-        shouldInvalidate = true;
-      }
+anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    var top, right, bottom, left;
+    var argsLen;
+    if (goog.isArray(opt_spaceOrTopOrTopAndBottom)) {
+      var tmp = opt_spaceOrTopOrTopAndBottom;
+      opt_spaceOrTopOrTopAndBottom = tmp[0];
+      opt_rightOrRightAndLeft = tmp[1];
+      opt_bottom = tmp[2];
+      opt_left = tmp[3];
+      argsLen = tmp.length;
+    } else
+      argsLen = arguments.length;
+    if (argsLen == 0) {
+      left = bottom = right = top = 0;
+    } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
+      top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['top']) || 0;
+      right = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['right']) || 0;
+      bottom = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['bottom']) || 0;
+      left = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['left']) || 0;
+    } else if (argsLen == 1) {
+      left = bottom = right = top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom) || 0;
+    } else if (argsLen == 2) {
+      bottom = top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom) || 0;
+      left = right = anychart.utils.toNumberOrString(opt_rightOrRightAndLeft) || 0;
+    } else if (argsLen == 3) {
+      top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom) || 0;
+      left = right = anychart.utils.toNumberOrString(opt_rightOrRightAndLeft) || 0;
+      bottom = anychart.utils.toNumberOrString(opt_bottom) || 0;
+    } else if (argsLen >= 4) {
+      top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom) || 0;
+      right = anychart.utils.toNumberOrString(opt_rightOrRightAndLeft) || 0;
+      bottom = anychart.utils.toNumberOrString(opt_bottom) || 0;
+      left = anychart.utils.toNumberOrString(opt_left) || 0;
     }
-    if (shouldInvalidate) {
-      this.shouldRedrawBorders = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
+    this.suspendSignalsDispatching();
+    this.settings(anychart.core.ui.table.Padding.propNames[0], top, anychart.ConsistencyState.TABLE_CONTENT);
+    this.settings(anychart.core.ui.table.Padding.propNames[1], right, anychart.ConsistencyState.TABLE_CONTENT);
+    this.settings(anychart.core.ui.table.Padding.propNames[2], bottom, anychart.ConsistencyState.TABLE_CONTENT);
+    this.settings(anychart.core.ui.table.Padding.propNames[3], left, anychart.ConsistencyState.TABLE_CONTENT);
+    this.resumeSignalsDispatching(true);
     return this;
   }
-  return this.cellRightBorder_;
-};
-
-
-/**
- * Getter for current cell top border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell top border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
- * the border for the corresponding side.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell top border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellTopBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.prototype.cellTopBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.cellTopBorder_) {
-        this.cellTopBorder_ = undefined;
-        shouldInvalidate = true;
-      }
-    } else {
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.cellTopBorder_) {
-        this.cellTopBorder_ = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawBorders = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellTopBorder_;
-};
-
-
-/**
- * Getter for current cell bottom border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell bottom border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> The last usage of leftBorder(), rightBorder(), topBorder() and bottomBorder() methods determines
- * the border for the corresponding side.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell bottom border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.cellBottomBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.prototype.cellBottomBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.cellBottomBorder_) {
-        this.cellBottomBorder_ = undefined;
-        shouldInvalidate = true;
-      }
-    } else {
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.cellBottomBorder_) {
-        this.cellBottomBorder_ = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.shouldRedrawBorders = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.cellBottomBorder_;
+  return this.paddingProxy_ || (this.paddingProxy_ = new anychart.core.ui.table.Padding(this));
 };
 //endregion
-
-
-/**
- * Draws the table.
- * @return {anychart.core.ui.Table} {@link anychart.core.ui.Table} instance for method chaining.
- */
-anychart.core.ui.Table.prototype.draw = function() {
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (!this.layer_) {
-    this.layer_ = acgraph.layer();
-    this.contentLayer_ = this.layer_.layer();
-    this.registerDisposable(this.layer_);
-    this.registerDisposable(this.contentLayer_);
-  }
-
-  var stage = this.layer_.getStage();
-  var manualSuspend = stage && !stage.isSuspended();
-  if (manualSuspend) stage.suspend();
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.shouldRebuildSizes = true; // if sizes changed, it will be checked in drawing
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.labelsFactory_) // we don't want to create it if no cell use it
-      this.labelsFactory_.suspendSignalsDispatching();
-    this.checkTable_();
-    this.checkSizes_();
-    this.checkOverlap_();
-    this.checkFills_();
-    this.checkBorders_();
-    this.checkContent_();
-    if (this.labelsFactory_)
-      this.labelsFactory_.resumeSignalsDispatching(false);
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.layer_.zIndex(/** @type {number} */(this.zIndex()));
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    if (this.container() && this.container().getStage()) {
-      //listen resize event
-      stage = this.container().getStage();
-      if (this.bounds().dependsOnContainerSize()) {
-        this.container().getStage().listen(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      } else {
-        this.container().getStage().unlisten(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      }
-    }
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  if (manualSuspend) stage.resume();
-
-  //todo(Anton Saukh): refactor this mess!
-  this.listenSignals(this.invalidateHandler_, this);
-  //end mess
-
-  return this;
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Table.prototype.resizeHandler_ = function() {
-  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Table.prototype.invalidateHandler_ = function() {
-  anychart.globalLock.onUnlock(this.draw, this);
-};
 
 
 //region Drawing phases
@@ -1341,39 +1593,41 @@ anychart.core.ui.Table.prototype.invalidateHandler_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkTable_ = function() {
-  if (isNaN(this.currentColsCount_))
-    return;
-  var newCells = [];
-  var currentRowsCount = this.currentColsCount_ ? this.cells_.length / this.currentColsCount_ : 0;
-  var row, col;
-  var rowsFromCells = Math.min(currentRowsCount, this.rowsCount_);
-  var colsFromCells = Math.min(this.currentColsCount_, this.colsCount_);
-  for (row = 0; row < rowsFromCells; row++) { // processing rows that are both in current in new tables
-    for (col = 0; col < colsFromCells; col++) // adding cells from current cells_ array.
-      newCells.push(this.cells_[row * this.colsCount_ + col]);
-    for (col = colsFromCells; col < this.colsCount_; col++) // adding new cells to the row if needed.
-      newCells.push(this.allocCell_(row, col));
-    for (col = colsFromCells; col < this.currentColsCount_; col++) // clearing cells that are not needed anymore.
-      this.freeCell_(this.cells_[row * this.colsCount_ + col]);
-  }
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_STRUCTURE)) {
+    var newCells = [];
+    var currentRowsCount = this.currentColsCount_ ? this.cells_.length / this.currentColsCount_ : 0;
+    var row, col;
+    var rowsFromCells = Math.min(currentRowsCount, this.rowsCount_);
+    var colsFromCells = Math.min(this.currentColsCount_, this.colsCount_);
+    for (row = 0; row < rowsFromCells; row++) { // processing rows that are both in current in new tables
+      for (col = 0; col < colsFromCells; col++) // adding cells from current cells_ array.
+        newCells.push(this.cells_[row * this.currentColsCount_ + col]);
+      for (col = colsFromCells; col < this.colsCount_; col++) // adding new cells to the row if needed.
+        newCells.push(this.allocCell_(row, col));
+      for (col = colsFromCells; col < this.currentColsCount_; col++) // clearing cells that are not needed anymore.
+        this.freeCell_(this.cells_[row * this.currentColsCount_ + col]);
+    }
 
-  for (row = rowsFromCells; row < this.rowsCount_; row++) { // rows that should be added entirely
-    for (col = 0; col < this.colsCount_; col++) // adding new cells if needed.
-      newCells.push(this.allocCell_(row, col));
-  }
+    for (row = rowsFromCells; row < this.rowsCount_; row++) { // rows that should be added entirely
+      for (col = 0; col < this.colsCount_; col++) // adding new cells if needed.
+        newCells.push(this.allocCell_(row, col));
+    }
 
-  for (row = rowsFromCells; row < currentRowsCount; row++) { // rows that should be removed entirely
-    for (col = 0; col < this.currentColsCount_; col++) // clearing cells that are not needed anymore.
-      this.freeCell_(this.cells_[row * this.colsCount_ + col]);
-  }
+    for (row = rowsFromCells; row < currentRowsCount; row++) { // rows that should be removed entirely
+      for (col = 0; col < this.currentColsCount_; col++) // clearing cells that are not needed anymore.
+        this.freeCell_(this.cells_[row * this.currentColsCount_ + col]);
+    }
 
-  this.cells_ = newCells;
-  this.currentColsCount_ = NaN;
-  this.shouldRebuildSizes = true;
-  this.shouldDropOverlap = true;
-  this.shouldRedrawBorders = true;
-  this.shouldRedrawFills = true;
-  this.shouldRedrawContent = true;
+    this.cells_ = newCells;
+    this.currentColsCount_ = NaN;
+    this.markConsistent(anychart.ConsistencyState.TABLE_STRUCTURE);
+    this.invalidate(
+        anychart.ConsistencyState.TABLE_CELL_BOUNDS |
+        anychart.ConsistencyState.TABLE_OVERLAP |
+        anychart.ConsistencyState.TABLE_BORDERS |
+        anychart.ConsistencyState.TABLE_FILLS |
+        anychart.ConsistencyState.TABLE_CONTENT);
+  }
 };
 
 
@@ -1382,73 +1636,25 @@ anychart.core.ui.Table.prototype.checkTable_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkSizes_ = function() {
-  if (this.shouldRebuildSizes) {
-    var newColRights = new Array(this.colsCount_);
-    var newRowBottoms = new Array(this.rowsCount_);
-    var i, len, val, size, needsRedraw = false;
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_CELL_BOUNDS)) {
     var pixelBounds = this.getPixelBounds();
 
-    var distributedSize = 0;
-    var fixedSizes = [];
-    var autoSizesCount = 0;
-    var tableSize = pixelBounds.width;
-    for (i = 0, len = this.colsCount_; i < len; i++) {
-      size = anychart.utils.normalizeSize(this.colWidthSettings_[i], tableSize);
-      if (isNaN(size)) {
-        autoSizesCount++;
-      } else {
-        distributedSize += size;
-        fixedSizes[i] = size;
-      }
-    }
-    // min to 3px per autoColumn to make them visible, but not good-looking.
-    var autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
-    var current = 0;
-    for (i = 0, len = this.colsCount_; i < len; i++) {
-      if (i in fixedSizes)
-        size = fixedSizes[i];
-      else
-        size = autoSize;
-      current += size;
-      val = Math.round(current) - 1;
-      newColRights[i] = val;
-      if (val != this.colRights_[i]) needsRedraw = true;
-    }
+    var newColRights = this.countSizes_(this.colsCount_, this.colWidthSettings_, this.colMinWidthSettings_,
+        this.colMaxWidthSettings_, this.defaultColWidth_, this.defaultColMinWidth_, this.defaultColMaxWidth_,
+        pixelBounds.width, this.colRights_);
 
-    distributedSize = 0;
-    fixedSizes.length = 0;
-    autoSizesCount = 0;
-    tableSize = pixelBounds.height;
-    for (i = 0, len = this.rowsCount_; i < len; i++) {
-      size = anychart.utils.normalizeSize(this.rowHeightSettings_[i], tableSize);
-      if (isNaN(size)) {
-        autoSizesCount++;
-      } else {
-        distributedSize += size;
-        fixedSizes[i] = size;
-      }
-    }
-    // min to 3px per autorow to make them visible, but not good-looking.
-    autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
-    current = 0;
-    for (i = 0, len = this.rowsCount_; i < len; i++) {
-      if (i in fixedSizes)
-        size = fixedSizes[i];
-      else
-        size = autoSize;
-      current += size;
-      val = Math.round(current) - 1;
-      newRowBottoms[i] = val;
-      if (val != this.rowBottoms_[i]) needsRedraw = true;
-    }
+    var newRowBottoms = this.countSizes_(this.rowsCount_, this.rowHeightSettings_, this.rowMinHeightSettings_,
+        this.rowMaxHeightSettings_, this.defaultRowHeight_, this.defaultRowMinHeight_, this.defaultRowMaxHeight_,
+        pixelBounds.height, this.rowBottoms_);
 
-    this.shouldRebuildSizes = false;
-    if (needsRedraw) {
-      this.colRights_ = newColRights;
-      this.rowBottoms_ = newRowBottoms;
-      this.shouldRedrawBorders = true;
-      this.shouldRedrawFills = true;
-      this.shouldRedrawContent = true;
+    this.markConsistent(anychart.ConsistencyState.TABLE_CELL_BOUNDS);
+    if (newColRights || newRowBottoms) {
+      this.colRights_ = newColRights || this.colRights_;
+      this.rowBottoms_ = newRowBottoms || this.rowBottoms_;
+      this.invalidate(
+          anychart.ConsistencyState.TABLE_BORDERS |
+          anychart.ConsistencyState.TABLE_FILLS |
+          anychart.ConsistencyState.TABLE_CONTENT);
     }
   }
 };
@@ -1459,7 +1665,7 @@ anychart.core.ui.Table.prototype.checkSizes_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkOverlap_ = function() {
-  if (this.shouldDropOverlap) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_OVERLAP)) {
     var i, j;
     for (i = 0; i < this.cells_.length; i++) {
       this.cells_[i].overlapper = NaN;
@@ -1478,10 +1684,11 @@ anychart.core.ui.Table.prototype.checkOverlap_ = function() {
         }
       }
     }
-    this.shouldDropOverlap = false;
-    this.shouldRedrawBorders = true;
-    this.shouldRedrawFills = true;
-    this.shouldRedrawContent = true;
+    this.markConsistent(anychart.ConsistencyState.TABLE_OVERLAP);
+    this.invalidate(
+        anychart.ConsistencyState.TABLE_BORDERS |
+        anychart.ConsistencyState.TABLE_FILLS |
+        anychart.ConsistencyState.TABLE_CONTENT);
   }
 };
 
@@ -1491,7 +1698,7 @@ anychart.core.ui.Table.prototype.checkOverlap_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkFills_ = function() {
-  if (this.shouldRedrawFills) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_FILLS)) {
     this.resetFillPaths_();
     for (var row = 0; row < this.rowsCount_; row++) {
       for (var col = 0; col < this.colsCount_; col++) {
@@ -1500,7 +1707,7 @@ anychart.core.ui.Table.prototype.checkFills_ = function() {
           var bounds = this.getCellBounds(row, col,
               /** @type {number} */(cell.rowSpan()),
               /** @type {number} */(cell.colSpan()), bounds); // rect will be created one time and then reused
-          var fill = this.getCellFill_(cell, row);
+          var fill = this.getCellFill_(cell, row, col);
           if (fill) {
             var path = this.getFillPath_(fill);
             var l = bounds.getLeft(), r = bounds.getRight() + 1, t = bounds.getTop(), b = bounds.getBottom() + 1;
@@ -1513,7 +1720,7 @@ anychart.core.ui.Table.prototype.checkFills_ = function() {
         }
       }
     }
-    this.shouldRedrawFills = false;
+    this.markConsistent(anychart.ConsistencyState.TABLE_FILLS);
   }
 };
 
@@ -1523,7 +1730,7 @@ anychart.core.ui.Table.prototype.checkFills_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkBorders_ = function() {
-  if (this.shouldRedrawBorders) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_BORDERS)) {
     this.resetBorderPaths_();
     var row, col, cell1, cell2, index;
     // drawing top borders for top cells
@@ -1599,7 +1806,7 @@ anychart.core.ui.Table.prototype.checkBorders_ = function() {
         this.drawBorder_(row, col, 1, 1, this.getCellVerticalBorder_(cell1, cell2), 1);
       }
     }
-    this.shouldRedrawBorders = false;
+    this.markConsistent(anychart.ConsistencyState.TABLE_BORDERS);
   }
 };
 
@@ -1609,11 +1816,11 @@ anychart.core.ui.Table.prototype.checkBorders_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkContent_ = function() {
-  var content, bounds, label, marker;
-  if (this.shouldRedrawContent) {
-    if (this.contentToDispose_) {
-      while (this.contentToDispose_.length) {
-        content = this.contentToDispose_.pop();
+  var content, bounds, label, marker, position, positionProvider;
+  if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_CONTENT)) {
+    if (this.contentToClear_) {
+      while (this.contentToClear_.length) {
+        content = this.contentToClear_.pop();
         content.suspendSignalsDispatching();
         if (content instanceof anychart.core.ui.LabelsFactory.Label) {
           label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
@@ -1630,39 +1837,67 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
           content.remove();
           // no draw here to avoid drawing in to a null container
         }
+        content.unlistenSignals(this.handleContentInvalidation_);
         content.resumeSignalsDispatching(false);
       }
     }
 
+    // we use one Padding instance for calculations
+    var padding = new anychart.core.utils.Padding();
+    padding.suspendSignalsDispatching();
+
     for (var row = 0; row < this.rowsCount_; row++) {
       for (var col = 0; col < this.colsCount_; col++) {
         var cell = this.cells_[row * this.colsCount_ + col];
-        content = /** @type {anychart.core.ui.Table.CellContent} */(cell.content());
+        content = cell.realContent;
         if (content) {
+          var rowObj = this.rows_ && this.rows_[row];
+          var colObj = this.cols_ && this.cols_[col];
+          content.suspendSignalsDispatching();
           if (isNaN(cell.overlapper)) {
             bounds = this.getCellBounds(row, col,
                 /** @type {number} */(cell.rowSpan()), /** @type {number} */(cell.colSpan()), bounds);
-            var padding = cell.getPaddingOverride() || this.cellPadding_;
+            padding.top(this.getPaddingProp_('topPadding', cell, rowObj, colObj, this));
+            padding.right(this.getPaddingProp_('rightPadding', cell, rowObj, colObj, this));
+            padding.bottom(this.getPaddingProp_('bottomPadding', cell, rowObj, colObj, this));
+            padding.left(this.getPaddingProp_('leftPadding', cell, rowObj, colObj, this));
             bounds = padding.tightenBounds(bounds);
-            content.suspendSignalsDispatching();
             content.container(this.contentLayer_);
             if (content instanceof anychart.core.ui.LabelsFactory.Label) {
               label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
-              label.anchor(anychart.enums.Anchor.LEFT_TOP);
-              label.width(bounds.width);
-              label.height(bounds.height);
               label.positionProvider({'value': {'x': bounds.left, 'y': bounds.top}});
+              // if the label is not created by table label factory than we do not modify it's settings - only position
+              // it properly due to cell bounds.
+              if (label.parentLabelsFactory() == this.labelsFactory_) {
+                label.anchor(anychart.enums.Anchor.LEFT_TOP);
+                label.width(bounds.width);
+                label.height(bounds.height);
+                // we apply custom label settings in the next order: table < col < row < cell
+                // keeping in mind, that table-wide settings are already applied to the factory
+                // also we use direct settingsObj reference to avoid unnecessary objects creation
+                var settings = colObj && colObj.settingsObj;
+                if (settings) label.setup(settings);
+                settings = rowObj && rowObj.settingsObj;
+                if (settings) label.setup(settings);
+                settings = cell.settingsObj;
+                if (settings) label.setup(settings);
+                label.resumeSignalsDispatching(false);
+                continue; // we don't want to listen labels of table labelsFactory_.
+              } else {
+                position = /** @type {string} */(label.position() ||
+                    (label.currentLabelsFactory() && label.currentLabelsFactory().position()) ||
+                    (label.parentLabelsFactory() && label.parentLabelsFactory().position()));
+                positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+                label.positionProvider(positionProvider);
+                label.draw();
+              }
             } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
               marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
-              // here is proper label position determining. It is done in this way, because we are not sure, that
-              // the label in the cell was created by the table labels factory, so we need to use label's own
-              // methods to determine the correct behaviour. And also, as we don't use this.cellTextFactory() here,
-              // the table factory is not created if it is not used.
-              var position = /** @type {string} */(
+              position = /** @type {string} */(
                   marker.position() ||
                   (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
                   (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
-              var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+              positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
               marker.positionProvider(positionProvider);
               marker.draw();
             } else if (content instanceof anychart.core.VisualBase) {
@@ -1670,23 +1905,41 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
                 (/** @type {anychart.core.Chart} */(content)).autoRedraw(false);
               var element = /** @type {anychart.core.VisualBase} */(content);
               element.parentBounds(bounds);
-              element.draw();
+              if (element.draw)
+                element.draw();
             }
-            content.resumeSignalsDispatching(false);
           } else {
             content.enabled(false);
-            content.draw();
+            if (content.draw)
+              content.draw();
           }
+          content.resumeSignalsDispatching(false);
+          content.listenSignals(this.handleContentInvalidation_);
         }
       }
     }
+
+    padding.resumeSignalsDispatching(false);
+
     if (this.labelsFactory_) {
+      this.labelsFactory_.suspendSignalsDispatching();
+      this.labelsFactory_.setup(this.settingsObj);
       this.labelsFactory_.container(this.contentLayer_);
       this.labelsFactory_.parentBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
       this.labelsFactory_.draw();
+      this.labelsFactory_.resumeSignalsDispatching(false);
     }
-    this.shouldRedrawContent = false;
+    this.markConsistent(anychart.ConsistencyState.TABLE_CONTENT);
   }
+};
+
+
+/**
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.ui.Table.prototype.handleContentInvalidation_ = function(e) {
+  if (goog.isFunction(e.target.draw)) e.target.draw();
 };
 //endregion
 
@@ -1737,48 +1990,130 @@ anychart.core.ui.Table.prototype.drawBorder_ = function(row, col, rowSpan, colSp
 
 /**
  * Return final fill for the cell.
- * @param {anychart.core.ui.Table.Cell} cell
+ * @param {anychart.core.ui.table.Cell} cell
  * @param {number} row
+ * @param {number} col
  * @return {acgraph.vector.Fill}
  * @private
  */
-anychart.core.ui.Table.prototype.getCellFill_ = function(cell, row) {
-  var fill = /** @type {acgraph.vector.Fill|undefined} */(cell.fill());
-  if (goog.isDef(fill)) return fill;
-  fill = (row % 2) ? this.cellOddFill_ : this.cellEvenFill_;
-  if (goog.isDef(fill)) return fill;
-  return this.cellFill_;
+anychart.core.ui.Table.prototype.getCellFill_ = function(cell, row, col) {
+  // check cell fill first
+  var fill = cell.fill();
+  if (fill) return /** @type {acgraph.vector.Fill} */(fill);
+  // than check row fill
+  fill = this.rows_ && this.rows_[row] && this.rows_[row].cellFill();
+  if (fill) return /** @type {acgraph.vector.Fill} */(fill);
+  // than - column fill
+  fill = this.cols_ && this.cols_[col] && this.cols_[col].cellFill();
+  if (fill) return /** @type {acgraph.vector.Fill} */(fill);
+  // table even/odd row fill
+  fill = (row % 2) ? this.rowOddFill() : this.rowEvenFill();
+  if (fill) return /** @type {acgraph.vector.Fill} */(fill);
+  // table super default
+  return /** @type {acgraph.vector.Fill} */(this.settings('fill'));
 };
 
 
 /**
  * Returns final horizontal border stroke settings between two cells.
- * @param {anychart.core.ui.Table.Cell|undefined} topCell
- * @param {anychart.core.ui.Table.Cell|undefined} bottomCell
+ * @param {anychart.core.ui.table.Cell|undefined} topCell
+ * @param {anychart.core.ui.table.Cell|undefined} bottomCell
  * @return {acgraph.vector.Stroke}
  * @private
  */
 anychart.core.ui.Table.prototype.getCellHorizontalBorder_ = function(topCell, bottomCell) {
   if (topCell || bottomCell) {
-    var upperStroke, lowerStroke;
-    // upper cell settings have advantage on same settings level.
-    // checking specific border overrides
-    upperStroke = topCell && topCell.bottomBorder();
-    lowerStroke = bottomCell && bottomCell.topBorder();
-    if (upperStroke) return /** @type {acgraph.vector.Stroke} */(upperStroke);
-    if (lowerStroke) return /** @type {acgraph.vector.Stroke} */(lowerStroke);
-    //checking cell border overrides
-    upperStroke = topCell && topCell.border();
-    lowerStroke = bottomCell && bottomCell.border();
-    if (upperStroke) return /** @type {acgraph.vector.Stroke} */(upperStroke);
-    if (lowerStroke) return /** @type {acgraph.vector.Stroke} */(lowerStroke);
-    //checking table-level specific borders
-    upperStroke = topCell && this.cellBottomBorder_;
-    lowerStroke = bottomCell && this.cellTopBorder_;
-    if (upperStroke) return /** @type {acgraph.vector.Stroke} */(upperStroke);
-    if (lowerStroke) return /** @type {acgraph.vector.Stroke} */(lowerStroke);
-    // fallback to default table cell border
-    return this.cellBorder_;
+    var stroke;
+    var bottomBorder = 'bottomBorder';
+    var topBorder = 'topBorder';
+    var border = 'border';
+    var cellBottomBorder = 'cellBottomBorder';
+    var cellTopBorder = 'cellTopBorder';
+    var cellBorder = 'cellBorder';
+
+    // upper cell settings have advantage on same settings level
+    // we don't use *.border().*() notation to avoid unnecessary border proxy creation
+
+    // checking if specific border settings are set for the cells
+    stroke = topCell && topCell.settings(bottomBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = bottomCell && bottomCell.settings(topBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // checking if general border settings are set for the cells
+    stroke = topCell && topCell.settings(border);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = bottomCell && bottomCell.settings(border);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    if (this.rows_) {
+      var topRow = this.rows_[topCell && topCell.getRowNum()];
+      var botRow = this.rows_[bottomCell && bottomCell.getRowNum()];
+
+      // checking if specific border settings are set for the rows
+      stroke = topRow && topRow.settings(bottomBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = botRow && botRow.settings(topBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the rows
+      stroke = topRow && topRow.settings(border);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = botRow && botRow.settings(border);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if specific border settings are set for the row cells
+      stroke = topRow && topRow.settings(cellBottomBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = botRow && botRow.settings(cellTopBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the row cells
+      stroke = topRow && topRow.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = botRow && botRow.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    }
+
+    // both cells have the same column
+    var col = this.cols_ && this.cols_[(topCell || bottomCell).getColNum()];
+
+    if (col) {
+      // checking if the target border is on the top or on the bottom of the column and choosing specific and general
+      // settings for this case. The two settings do not conflict, so we check them both here.
+      stroke =
+          (!topCell && (col.settings(topBorder) || col.settings(border))) || // the top of the column
+          (!bottomCell && (col.settings(bottomBorder) || col.settings(border))); // the bottom of the column
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if specific border settings are set for the column cells
+      stroke = col.settings(cellBottomBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = col.settings(cellTopBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the column cells
+      stroke = col.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = col.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    }
+
+    // checking if the target border is on the top or on the bottom of the column and choosing specific and general
+    // settings for this case. The two settings do not conflict, so we check them both here.
+    stroke =
+        (!topCell && (this.settings(topBorder) || this.settings(border))) || // the top of the column
+        (!bottomCell && (this.settings(bottomBorder) || this.settings(border))); // the bottom of the column
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // checking if specific border settings are set for the table cells
+    stroke = topCell && this.settings(cellBottomBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = bottomCell && this.settings(cellTopBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // fallback to default table cell border and redundantly ensure that we return valid Stroke
+    return /** @type {acgraph.vector.Stroke} */(this.settings(cellBorder)) || 'none';
   }
   return 'none';
 };
@@ -1786,32 +2121,104 @@ anychart.core.ui.Table.prototype.getCellHorizontalBorder_ = function(topCell, bo
 
 /**
  * Returns final vertical border stroke settings between two cells.
- * @param {anychart.core.ui.Table.Cell|undefined} leftCell
- * @param {anychart.core.ui.Table.Cell|undefined} rightCell
+ * @param {anychart.core.ui.table.Cell|undefined} leftCell
+ * @param {anychart.core.ui.table.Cell|undefined} rightCell
  * @return {acgraph.vector.Stroke}
  * @private
  */
 anychart.core.ui.Table.prototype.getCellVerticalBorder_ = function(leftCell, rightCell) {
   if (leftCell || rightCell) {
-    var leftStroke, rightStroke;
-    // upper cell settings have advantage on same settings level.
-    // checking specific border overrides
-    leftStroke = leftCell && leftCell.rightBorder();
-    rightStroke = rightCell && rightCell.leftBorder();
-    if (leftStroke) return /** @type {acgraph.vector.Stroke} */(leftStroke);
-    if (rightStroke) return /** @type {acgraph.vector.Stroke} */(rightStroke);
-    //checking cell border overrides
-    leftStroke = leftCell && leftCell.border();
-    rightStroke = rightCell && rightCell.border();
-    if (leftStroke) return /** @type {acgraph.vector.Stroke} */(leftStroke);
-    if (rightStroke) return /** @type {acgraph.vector.Stroke} */(rightStroke);
-    //checking table-level specific borders
-    leftStroke = leftCell && this.cellRightBorder_;
-    rightStroke = rightCell && this.cellLeftBorder_;
-    if (leftStroke) return /** @type {acgraph.vector.Stroke} */(leftStroke);
-    if (rightStroke) return /** @type {acgraph.vector.Stroke} */(rightStroke);
-    // fallback to default table cell border
-    return this.cellBorder_;
+    var stroke;
+    var rightBorder = 'rightBorder';
+    var leftBorder = 'leftBorder';
+    var border = 'border';
+    var cellRightBorder = 'cellRightBorder';
+    var cellLeftBorder = 'cellLeftBorder';
+    var cellBorder = 'cellBorder';
+
+    // upper cell settings have advantage on same settings level
+    // we don't use *.border().*() notation to avoid unnecessary border proxy creation
+
+    // checking if specific border settings are set for the cells
+    stroke = leftCell && leftCell.settings(rightBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = rightCell && rightCell.settings(leftBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // checking if general border settings are set for the cells
+    stroke = leftCell && leftCell.settings(border);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = rightCell && rightCell.settings(border);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // both cells have the same column
+    var row = this.rows_ && this.rows_[(leftCell || rightCell).getRowNum()];
+
+    if (row) {
+      // checking if the target border is on the left or on the right of the column and choosing specific and general
+      // settings for this case. The two settings do not conflict, so we check them both here.
+      stroke =
+          (!leftCell && (row.settings(leftBorder) || row.settings(border))) || // the top of the column
+          (!rightCell && (row.settings(rightBorder) || row.settings(border))); // the bottom of the column
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if specific border settings are set for the column cells
+      stroke = row.settings(cellRightBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = row.settings(cellLeftBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the column cells
+      stroke = row.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = row.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    }
+
+    if (this.cols_) {
+      var leftCol = this.cols_[leftCell && leftCell.getColNum()];
+      var rightCol = this.cols_[rightCell && rightCell.getColNum()];
+
+      // checking if specific border settings are set for the rows
+      stroke = leftCol && leftCol.settings(rightBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = rightCol && rightCol.settings(leftBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the rows
+      stroke = leftCol && leftCol.settings(border);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = rightCol && rightCol.settings(border);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if specific border settings are set for the row cells
+      stroke = leftCol && leftCol.settings(cellRightBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = rightCol && rightCol.settings(cellLeftBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+      // checking if general border settings are set for the row cells
+      stroke = leftCol && leftCol.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+      stroke = rightCol && rightCol.settings(cellBorder);
+      if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    }
+
+    // checking if the target border is on the left or on the right of the column and choosing specific and general
+    // settings for this case. The two settings do not conflict, so we check them both here.
+    stroke =
+        (!leftCell && (this.settings(leftBorder) || this.settings(border))) || // the top of the column
+        (!rightCell && (this.settings(rightBorder) || this.settings(border))); // the bottom of the column
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // checking if specific border settings are set for the table cells
+    stroke = leftCell && this.settings(cellRightBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+    stroke = rightCell && this.settings(cellLeftBorder);
+    if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
+
+    // fallback to default table cell border and redundantly ensure that we return valid Stroke
+    return /** @type {acgraph.vector.Stroke} */(this.settings(cellBorder)) || 'none';
   }
   return 'none';
 };
@@ -1913,7 +2320,200 @@ anychart.core.ui.Table.prototype.getFillPath_ = function(fill) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Returns bounds for the cell. Result is placed in opt_outBounds argument, if passed.
+ * This method is internal.
+ * @param {string=} opt_name Settings object or settings name or nothing to get complete object.
+ * @param {(string|number|boolean|acgraph.vector.Fill|acgraph.vector.Stroke|null)=} opt_value Setting value if used as a setter.
+ * @param {(anychart.ConsistencyState|number)=} opt_state State to invalidate in table if value changed. Defaults to TABLE_CONTENT.
+ * @param {(anychart.Signal|number)=} opt_signal Signal to raise on table if value changed. Defaults to NEEDS_REDRAW.
+ * @return {!(anychart.core.ui.Table|Object|string|number|boolean)} A copy of settings or the Text for chaining.
+ */
+anychart.core.ui.Table.prototype.settings = function(opt_name, opt_value, opt_state, opt_signal) {
+  if (goog.isDef(opt_name)) {
+    if (goog.isDef(opt_value)) {
+      var shouldInvalidate = false;
+      if (goog.isNull(opt_value)) {
+        if (this.settingsObj[opt_name]) {
+          delete this.settingsObj[opt_name];
+          shouldInvalidate = true;
+        }
+      } else {
+        if (this.settingsObj[opt_name] != opt_value) {
+          this.settingsObj[opt_name] = opt_value;
+          shouldInvalidate = true;
+        }
+      }
+      if (shouldInvalidate)
+        this.invalidate(+opt_state || anychart.ConsistencyState.TABLE_CONTENT, +opt_signal || anychart.Signal.NEEDS_REDRAW);
+      return this;
+    } else {
+      return this.settingsObj && this.settingsObj[opt_name];
+    }
+  }
+  return this.settingsObj || {};
+};
+
+
+/**
+ * Getter and setter for row height settings. Null sets row height to the default value.
+ * @param {number} row Row number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowHeight = function(row, opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.rowHeightSettings_[row] != opt_value) {
+      if (goog.isNull(opt_value))
+        delete this.rowHeightSettings_[row];
+      else
+        this.rowHeightSettings_[row] = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return row in this.rowHeightSettings_ ? this.rowHeightSettings_[row] : null;
+};
+
+
+/**
+ * Getter and setter for row min height settings. Null sets row height to the default value.
+ * @param {number} row Row number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowMinHeight = function(row, opt_value) {
+  if (goog.isDef(opt_value)) {
+    var shouldInvalidate = false;
+    if (goog.isNull(opt_value)) {
+      if (this.rowMinHeightSettings_ && (row in this.rowMinHeightSettings_)) {
+        delete this.rowMinHeightSettings_[row];
+        shouldInvalidate = true;
+      }
+    } else {
+      if (!this.rowMinHeightSettings_) this.rowMinHeightSettings_ = [];
+      if (this.rowMinHeightSettings_[row] != opt_value) {
+        this.rowMinHeightSettings_[row] = opt_value;
+        shouldInvalidate = true;
+      }
+    }
+    if (shouldInvalidate)
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return (this.rowMinHeightSettings_ && (row in this.rowMinHeightSettings_)) ? this.rowMinHeightSettings_[row] : null;
+};
+
+
+/**
+ * Getter and setter for row max height settings. Null sets row height to the default value.
+ * @param {number} row Row number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.rowMaxHeight = function(row, opt_value) {
+  if (goog.isDef(opt_value)) {
+    var shouldInvalidate = false;
+    if (goog.isNull(opt_value)) {
+      if (this.rowMaxHeightSettings_ && (row in this.rowMaxHeightSettings_)) {
+        delete this.rowMaxHeightSettings_[row];
+        shouldInvalidate = true;
+      }
+    } else {
+      if (!this.rowMaxHeightSettings_) this.rowMaxHeightSettings_ = [];
+      if (this.rowMaxHeightSettings_[row] != opt_value) {
+        this.rowMaxHeightSettings_[row] = opt_value;
+        shouldInvalidate = true;
+      }
+    }
+    if (shouldInvalidate)
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return (this.rowMaxHeightSettings_ && (row in this.rowMaxHeightSettings_)) ? this.rowMaxHeightSettings_[row] : null;
+};
+
+
+/**
+ * Getter and setter for column height settings. Null sets column width to default value.
+ * @param {number} col Column number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colWidth = function(col, opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.colWidthSettings_[col] != opt_value) {
+      if (goog.isNull(opt_value))
+        delete this.colWidthSettings_[col];
+      else
+        this.colWidthSettings_[col] = opt_value;
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return col in this.colWidthSettings_ ? this.colWidthSettings_[col] : null;
+};
+
+
+/**
+ * Getter and setter for column min width settings. Null sets column width to the default value.
+ * @param {number} col Column number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colMinWidth = function(col, opt_value) {
+  if (goog.isDef(opt_value)) {
+    var shouldInvalidate = false;
+    if (goog.isNull(opt_value)) {
+      if (this.colMinWidthSettings_ && (col in this.colMinWidthSettings_)) {
+        delete this.colMinWidthSettings_[col];
+        shouldInvalidate = true;
+      }
+    } else {
+      if (!this.colMinWidthSettings_) this.colMinWidthSettings_ = [];
+      if (this.colMinWidthSettings_[col] != opt_value) {
+        this.colMinWidthSettings_[col] = opt_value;
+        shouldInvalidate = true;
+      }
+    }
+    if (shouldInvalidate)
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return (this.colMinWidthSettings_ && (col in this.colMinWidthSettings_)) ? this.colMinWidthSettings_[col] : null;
+};
+
+
+/**
+ * Getter and setter for column max width settings. Null sets column width to the default value.
+ * @param {number} col Column number.
+ * @param {(string|number|null)=} opt_value Value to set.
+ * @return {string|number|null|anychart.core.ui.Table}
+ */
+anychart.core.ui.Table.prototype.colMaxWidth = function(col, opt_value) {
+  if (goog.isDef(opt_value)) {
+    var shouldInvalidate = false;
+    if (goog.isNull(opt_value)) {
+      if (this.colMaxWidthSettings_ && (col in this.colMaxWidthSettings_)) {
+        delete this.colMaxWidthSettings_[col];
+        shouldInvalidate = true;
+      }
+    } else {
+      if (!this.colMaxWidthSettings_) this.colMaxWidthSettings_ = [];
+      if (this.colMaxWidthSettings_[col] != opt_value) {
+        this.colMaxWidthSettings_[col] = opt_value;
+        shouldInvalidate = true;
+      }
+    }
+    if (shouldInvalidate)
+      this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    return this;
+  }
+  return (this.colMaxWidthSettings_ && (col in this.colMaxWidthSettings_)) ? this.colMaxWidthSettings_[col] : null;
+};
+
+
+/**
+ * Returns bounds for the cell. Result is placed in opt_outBounds argument, if passed. Internal method - you should
+ * ensure table consistency before using it.
  * @param {number} row
  * @param {number} col
  * @param {number} rowSpan
@@ -1922,6 +2522,8 @@ anychart.core.ui.Table.prototype.getFillPath_ = function(fill) {
  * @return {!anychart.math.Rect}
  */
 anychart.core.ui.Table.prototype.getCellBounds = function(row, col, rowSpan, colSpan, opt_outBounds) {
+  this.checkTable_();
+  this.checkSizes_();
   var tableBounds = this.getPixelBounds();
   var outBounds = opt_outBounds instanceof anychart.math.Rect ? opt_outBounds : new anychart.math.Rect(0, 0, 0, 0);
   var start = (this.colRights_[col - 1] + 1) || 0;
@@ -1937,42 +2539,167 @@ anychart.core.ui.Table.prototype.getCellBounds = function(row, col, rowSpan, col
 
 
 /**
- * This method is used by cells to check table consistency before getting bounds.
- * These calls were not placed to Table.getCellBounds to avoid unneeded overhead.
- */
-anychart.core.ui.Table.prototype.checkConsistency = function() {
-  this.checkTable_();
-  this.checkSizes_();
-};
-
-
-/**
  * Marks content to be cleared. Used by cells.
- * @param {anychart.core.ui.Table.CellContent} content
+ * @param {anychart.core.VisualBase} content
  */
 anychart.core.ui.Table.prototype.clearContent = function(content) {
-  this.contentToDispose_ = this.contentToDispose_ || [];
-  this.contentToDispose_.push(content);
-  this.shouldRedrawContent = true;
+  this.contentToClear_ = this.contentToClear_ || [];
+  this.contentToClear_.push(content);
 };
 
 
 /**
- * Internal cellPadding invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
+ * Checks params in right order and returns the size.
+ * @param {number|string|null|undefined} rawSize - Raw size settings.
+ * @param {number|string|null|undefined} minSize - Raw min size settings.
+ * @param {number|string|null|undefined} maxSize - Raw max size settings.
+ * @param {number} defSize - NORMALIZED default size.
+ * @param {number} defMinSize - NORMALIZED default min size.
+ * @param {number} defMaxSize - NORMALIZED default max size.
+ * @param {number} tableSize - Table size.
+ * @return {number}
  * @private
  */
-anychart.core.ui.Table.prototype.cellPaddingInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.shouldRedrawContent = true;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+anychart.core.ui.Table.prototype.getSize_ = function(rawSize, minSize, maxSize,
+    defSize, defMinSize, defMaxSize, tableSize) {
+  rawSize = anychart.utils.normalizeSize(rawSize, tableSize);
+  minSize = anychart.utils.normalizeSize(minSize, tableSize);
+  maxSize = anychart.utils.normalizeSize(maxSize, tableSize);
+  if (isNaN(rawSize)) rawSize = defSize;
+  if (isNaN(minSize)) minSize = defMinSize;
+  if (isNaN(maxSize)) maxSize = defMaxSize;
+  if (!isNaN(minSize)) rawSize = Math.max(rawSize, minSize);
+  if (!isNaN(maxSize)) rawSize = Math.min(rawSize, maxSize);
+  return rawSize;
+};
+
+
+/**
+ * Calculates cumulative widths of columns or heights of rows (e.g. column right and row bottom coords).
+ * Returns null if it doesn't differ from the prevSizesArray.
+ * @param {number} sizesCount Number of columns or rows.
+ * @param {!Array.<string|number|null>} sizesSettings Size settings array. May contain holes.
+ * @param {?Array.<string|number|null>} minSizesSettings Min size settings array. May contain holes or be null.
+ * @param {?Array.<string|number|null>} maxSizesSettings Max size settings array. May contain holes or be null.
+ * @param {string|number|null} defSize Default setting for column or row size.
+ * @param {string|number|null} defMinSize Default setting for column or row min size.
+ * @param {string|number|null} defMaxSize Default setting for column or row max size.
+ * @param {number} tableSize Table size in pixels.
+ * @param {!Array.<number>} prevSizesArray Previous calculation result.
+ * @return {?Array.<number>} Array of counted cumulative sizes or null if it doesn't differ.
+ * @private
+ */
+anychart.core.ui.Table.prototype.countSizes_ = function(sizesCount, sizesSettings, minSizesSettings, maxSizesSettings,
+    defSize, defMinSize, defMaxSize, tableSize, prevSizesArray) {
+  var i, val, size, minSize, maxSize, needsRedraw = false;
+  var distributedSize = 0;
+  var fixedSizes = [];
+  var minSizes = [];
+  var maxSizes = [];
+  var autoSizesCount = 0;
+  defSize = anychart.utils.normalizeSize(defSize, tableSize);
+  defMinSize = anychart.utils.normalizeSize(defMinSize, tableSize);
+  defMaxSize = anychart.utils.normalizeSize(defMaxSize, tableSize);
+  var hardWay = false;
+  for (i = 0; i < sizesCount; i++) {
+    minSize = minSizesSettings ? anychart.utils.normalizeSize(minSizesSettings[i], tableSize) : NaN;
+    maxSize = maxSizesSettings ? anychart.utils.normalizeSize(maxSizesSettings[i], tableSize) : NaN;
+    // getting normalized size
+    size = this.getSize_(sizesSettings[i], minSize, maxSize, defSize, defMinSize, defMaxSize, tableSize);
+    // if it is NaN (not fixed)
+    if (isNaN(size)) {
+      autoSizesCount++;
+      // if there are any limitations on that non-fixed size - we are going to do it hard way:(
+      // we cache those limitations
+      if (!isNaN(minSize)) {
+        minSizes[i] = minSize;
+        hardWay = true;
+      } else if (!isNaN(defMinSize)) {
+        minSizes[i] = defMinSize;
+        hardWay = true;
+      }
+      if (!isNaN(maxSize)) {
+        maxSizes[i] = maxSize;
+        hardWay = true;
+      } else if (!isNaN(defMaxSize)) {
+        maxSizes[i] = defMaxSize;
+        hardWay = true;
+      }
+    } else {
+      distributedSize += size;
+      fixedSizes[i] = size;
+    }
   }
+
+  var autoSize;
+  var restrictedSizes;
+  if (hardWay && autoSizesCount > 0) {
+    restrictedSizes = [];
+    // we limit max cycling times to guarantee finite exec time in case my calculations are wrong
+    var maxTimes = autoSizesCount * autoSizesCount;
+    do {
+      var repeat = false;
+      // min to 3px per autoColumn to make them visible, but not good-looking.
+      autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
+      for (i = 0; i < sizesCount; i++) {
+        // if the size of the column is not fixed
+        if (!(i in fixedSizes)) {
+          // we recheck if the limitation still exist and drop it if it doesn't
+          if (i in restrictedSizes) {
+            if (restrictedSizes[i] == minSizes[i] && minSizes[i] < autoSize) {
+              distributedSize -= minSizes[i];
+              autoSizesCount++;
+              delete restrictedSizes[i];
+              repeat = true;
+              break;
+            }
+            if (restrictedSizes[i] == maxSizes[i] && maxSizes[i] > autoSize) {
+              distributedSize -= maxSizes[i];
+              autoSizesCount++;
+              delete restrictedSizes[i];
+              repeat = true;
+              break;
+            }
+          } else {
+            if ((i in minSizes) && minSizes[i] > autoSize) {
+              distributedSize += restrictedSizes[i] = minSizes[i];
+              autoSizesCount--;
+              repeat = true;
+              break;
+            }
+            if ((i in maxSizes) && maxSizes[i] < autoSize) {
+              distributedSize += restrictedSizes[i] = maxSizes[i];
+              autoSizesCount--;
+              repeat = true;
+              break;
+            }
+          }
+        }
+      }
+    } while (repeat && autoSizesCount > 0 && maxTimes--);
+  }
+  var current = 0;
+  var result = [];
+  autoSize = Math.max(3 * autoSizesCount, tableSize - distributedSize) / autoSizesCount;
+  for (i = 0; i < sizesCount; i++) {
+    if (i in fixedSizes)
+      size = fixedSizes[i];
+    else if (restrictedSizes && (i in restrictedSizes))
+      size = restrictedSizes[i];
+    else
+      size = autoSize;
+    current += size;
+    val = Math.round(current) - 1;
+    result[i] = val;
+    if (val != prevSizesArray[i]) needsRedraw = true;
+  }
+  return needsRedraw ? result : null;
 };
 
 
 /**
  * Marks the cell to be removed on next draw.
- * @param {anychart.core.ui.Table.Cell} cell Cell to free.
+ * @param {anychart.core.ui.table.Cell} cell Cell to free.
  * @private
  */
 anychart.core.ui.Table.prototype.freeCell_ = function(cell) {
@@ -1985,13 +2712,64 @@ anychart.core.ui.Table.prototype.freeCell_ = function(cell) {
  * Allocates a new cell or reuses previously freed one.
  * @param {number} row
  * @param {number} col
- * @return {anychart.core.ui.Table.Cell}
+ * @return {anychart.core.ui.table.Cell}
  * @private
  */
 anychart.core.ui.Table.prototype.allocCell_ = function(row, col) {
   return this.cellsPool_.length ? // checking if there are any cells in pool
-      /** @type {anychart.core.ui.Table.Cell} */(this.cellsPool_.pop().reset(row, col)) :
-      new anychart.core.ui.Table.Cell(this, row, col);
+      /** @type {anychart.core.ui.table.Cell} */(this.cellsPool_.pop().reset(row, col)) :
+      new anychart.core.ui.table.Cell(this, row, col);
+};
+
+
+/**
+ * @private
+ */
+anychart.core.ui.Table.prototype.resizeHandler_ = function() {
+  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * @private
+ */
+anychart.core.ui.Table.prototype.invalidateHandler_ = function() {
+  anychart.globalLock.onUnlock(this.draw, this);
+};
+
+
+/**
+ * @return {!anychart.core.ui.LabelsFactory}
+ * @private
+ */
+anychart.core.ui.Table.prototype.getLabelsFactory_ = function() {
+  if (!this.labelsFactory_) {
+    this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
+    this.labelsFactory_.anchor(anychart.enums.Anchor.CENTER);
+    this.labelsFactory_.position(anychart.enums.Position.CENTER);
+    // we do not register disposable here, cause we dispose it manually in disposeInternal
+  }
+  return this.labelsFactory_;
+};
+
+
+/**
+ * Small private stupid routine.
+ * @param {string} propName
+ * @param {...(anychart.core.ui.table.IProxyUser|undefined)} var_args
+ * @private
+ * @return {string|number}
+ */
+anychart.core.ui.Table.prototype.getPaddingProp_ = function(propName, var_args) {
+  for (var i = 1; i < arguments.length; i++) {
+    var item = arguments[i];
+    if (item) {
+      var res = item.settings(propName);
+      if (goog.isDefAndNotNull(res))
+        return /** @type {string|number} */(res);
+    }
+  }
+  return 0;
 };
 //endregion
 
@@ -2003,777 +2781,18 @@ anychart.core.ui.Table.prototype.allocCell_ = function(row, col) {
  */
 anychart.core.ui.Table.prototype.createTextCellContent = function(value) {
   value = value + '';
-  return this.cellTextFactory().add({'value': value}, {'value': {'x': 0, 'y': 0}});
+  return this.getLabelsFactory_().add({'value': value}, {'value': {'x': 0, 'y': 0}});
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Table.prototype.disposeInternal = function() {
-  goog.disposeAll(this.cells_, this.cellsPool_);
-  goog.base(this, 'disposeInternal');
-};
-
-
-
-/**
- * Table cell.
- * @param {anychart.core.ui.Table} table
- * @param {number} row
- * @param {number} col
- * @constructor
- * @includeDoc
- * @extends {goog.Disposable}
- */
-anychart.core.ui.Table.Cell = function(table, row, col) {
-  goog.base(this);
-  /**
-   * If the content_ should be disposed on reset().
-   * @type {boolean}
-   * @private
-   */
-  this.disposableContent_ = false;
-
-  /**
-   * Table reference.
-   * @type {anychart.core.ui.Table}
-   * @private
-   */
-  this.table_ = table;
-  this.reset(row, col);
-};
-goog.inherits(anychart.core.ui.Table.Cell, goog.Disposable);
-
-
-/**
- * @typedef {{
- *  fill: acgraph.vector.Fill,
- *  border: acgraph.vector.Stroke,
- *  topBorder: acgraph.vector.Stroke,
- *  rightBorder: acgraph.vector.Stroke,
- *  bottomBorder: acgraph.vector.Stroke,
- *  leftBorder: acgraph.vector.Stroke,
- *  padding: anychart.core.utils.Padding
- * }}
- */
-anychart.core.ui.Table.Cell.SettingsObj;
-
-
-/**
- * Cell settings overrides.
- * @type {!anychart.core.ui.Table.Cell.SettingsObj}
- * @private
- */
-anychart.core.ui.Table.Cell.settings_;
-
-
-/**
- * Resets Cell settings and row/col position.
- * @param {number} row
- * @param {number} col
- * @return {anychart.core.ui.Table.Cell}
- */
-anychart.core.ui.Table.Cell.prototype.reset = function(row, col) {
-  /**
-   * Number of rows the cell spans for.
-   * @type {number}
-   * @private
-   */
-  this.rowSpan_ = 1;
-  /**
-   * Number of columns the cell spans for.
-   * @type {number}
-   * @private
-   */
-  this.colSpan_ = 1;
-  /**
-   * Cell row number. Needed only for getRow() and getBounds().
-   * @type {number}
-   * @private
-   */
-  this.row_ = row;
-  /**
-   * Cell column number. Needed only for getCol() and getBounds().
-   * @type {number}
-   * @private
-   */
-  this.col_ = col;
-
-  if (this.disposableContent_)
-    goog.dispose(this.content_);
-  /**
-   * Content.
-   * @type {anychart.core.ui.Table.CellContent}
-   * @private
-   */
-  this.content_ = null;
-  this.disposableContent_ = false;
-  /**
-   * Flag used by the table. If not NaN - the cell is overlapped by other cell and shouldn't be drawn.
-   * @type {number}
-   */
-  this.overlapper = NaN;
-
-  delete this.settings_;
-
-  return this;
-};
-
-
-/**
- * Getter for cell content.
- * @return {anychart.core.ui.Table.CellContent} Current cell content.
- *//**
- * Setter for cell content.
- * @example
- * var table = anychart.ui.table(3,2);
- * // resize first column
- * table.colWidth(0, 100);
- * // set content to cell as string
- * table.getCell(0,0)
- *   .content('text');
- * // set content to another cell as number
- * table.getCell(1,0)
- *   .content(2014);
- * // set content to another cell as chart
- * table.getCell(0,1)
- *   .content(anychart.line([1.1, 1.4, 1.2, 1.6]))
- *   .rowSpan(3);
- * table.container(stage).draw();
- * @param {(anychart.core.ui.Table.CellContent|string|number)=} opt_value Value to set.<br/>
- *  <b>Note:</b> Numbers and strings are automaticaly set as instance of {@link anychart.core.ui.LabelsFactory.Label} class.
- * @return {anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {(anychart.core.ui.Table.CellContent|string|number)=} opt_value
- * @return {anychart.core.ui.Table.CellContent|anychart.core.ui.Table.Cell}
- */
-anychart.core.ui.Table.Cell.prototype.content = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.content_)
-      this.table_.clearContent(this.content_);
-    this.disposableContent_ = (goog.isNumber(opt_value) || goog.isString(opt_value));
-    if (this.disposableContent_)
-      opt_value = this.table_.createTextCellContent(opt_value);
-    this.content_ = /** @type {anychart.core.Chart|anychart.core.ui.LabelsFactory.Label} */(opt_value);
-    this.table_.shouldRedrawContent = true;
-    this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.content_;
-};
-
-
-/**
- * Returns current cell row number.
- * @return {number}
- */
-anychart.core.ui.Table.Cell.prototype.getRow = function() {
-  return this.row_;
-};
-
-
-/**
- * Returns current cell column number.
- * @return {number}
- */
-anychart.core.ui.Table.Cell.prototype.getCol = function() {
-  return this.col_;
-};
-
-
-/**
- * Returns cell bounds without padding counted (bounds which are used for borders drawing).
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.container(stage).draw();
- * stage.rect().fill('red 0.2').setBounds(
- *     table.getCell(1,1).getBounds()
- *   );
- * @return {!anychart.math.Rect}
- */
-anychart.core.ui.Table.Cell.prototype.getBounds = function() {
-  this.table_.checkConsistency();
-  return this.table_.getCellBounds(this.row_, this.col_, this.rowSpan_, this.colSpan_);
-};
-
-
-/**
- * Getter for current series fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill('green 0.2');
- * table.container(stage).draw();
- * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['green 0.2', 'yellow 0.2']);
- * table.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill('green', 0.3);
- * table.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['black', 'yellow'], 45, true, 0.5);
- * table.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
- * table.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill({
- *    src: 'http://static.anychart.com/underwater.jpg',
- *    mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * table.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.Table.Cell} .
- */
-anychart.core.ui.Table.Cell.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_fillOrColorOrKeys)) {
-      if (this.settings_ && this.settings_.fill) {
-        delete this.settings_.fill;
-        shouldInvalidate = true;
-      }
-    } else {
-      var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      if (fill != this.settings_.fill) {
-        this.settings_.fill = fill;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawFills = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.fill;
-};
-
-
-/**
- * Getter for current cell border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).border('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table.Cell|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.Cell.prototype.border = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = this.settings_ && (this.settings_.leftBorder || this.settings_.rightBorder ||
-        this.settings_.topBorder || this.settings_.bottomBorder);
-    if (shouldInvalidate) {
-      delete this.settings_.leftBorder;
-      delete this.settings_.rightBorder;
-      delete this.settings_.topBorder;
-      delete this.settings_.bottomBorder;
-    }
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.settings_ && this.settings_.border) {
-        delete this.settings_.border;
-        shouldInvalidate = true;
-      }
-    } else {
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.settings_.border) {
-        this.settings_.border = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawBorders = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.border;
-};
-
-
-/**
- * Getter for current cell left border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell left border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell left border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).leftBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table.Cell|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.Cell.prototype.leftBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.settings_ && this.settings_.leftBorder) {
-        delete this.settings_.leftBorder;
-        shouldInvalidate = true;
-      }
-    } else {
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.settings_.leftBorder) {
-        this.settings_.leftBorder = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawBorders = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.leftBorder;
-};
-
-
-/**
- * Getter for current cell right border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell right border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell right border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).rightBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table.Cell|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.Cell.prototype.rightBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.settings_ && this.settings_.rightBorder) {
-        delete this.settings_.rightBorder;
-        shouldInvalidate = true;
-      }
-    } else {
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.settings_.rightBorder) {
-        this.settings_.rightBorder = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawBorders = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.rightBorder;
-};
-
-
-/**
- * Getter for current cell top border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell top border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell top border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).topBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table.Cell|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.Cell.prototype.topBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.settings_ && this.settings_.topBorder) {
-        delete this.settings_.topBorder;
-        shouldInvalidate = true;
-      }
-    } else {
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.settings_.topBorder) {
-        this.settings_.topBorder = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawBorders = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.topBorder;
-};
-
-
-/**
- * Getter for current cell bottom border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for cell bottom border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell bottom border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).bottomBorder('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.Table.Cell|acgraph.vector.Stroke|undefined} .
- */
-anychart.core.ui.Table.Cell.prototype.bottomBorder = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var shouldInvalidate = false;
-    if (goog.isNull(opt_strokeOrFill)) {
-      if (this.settings_ && this.settings_.bottomBorder) {
-        delete this.settings_.bottomBorder;
-        shouldInvalidate = true;
-      }
-    } else {
-      if (!this.settings_) this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-      var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-      if (stroke != this.settings_.bottomBorder) {
-        this.settings_.bottomBorder = stroke;
-        shouldInvalidate = true;
-      }
-    }
-    if (shouldInvalidate) {
-      this.table_.shouldRedrawBorders = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.settings_ && this.settings_.bottomBorder;
-};
-
-
-/**
- * Getter for cell columns span.
- * @return {number} Current columns span.
- *//**
- * Setter for cell columns span.<br/>
- * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * var cell = table.getCell(1,1);
- * cell.colSpan(2);
- * table.container(stage).draw();
- * @param {number=} opt_value [1] Count of cells to merge right.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * Getter and setter for cell rows span.
- * @param {number=} opt_value
- * @return {!anychart.core.ui.Table.Cell|number}
- */
-anychart.core.ui.Table.Cell.prototype.colSpan = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.colSpan_);
-    if (opt_value != this.colSpan_) {
-      this.colSpan_ = opt_value;
-      this.table_.shouldDropOverlap = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.colSpan_;
-};
-
-
-/**
- * Getter for cell rows span.
- * @return {number} Current rows span.
- *//**
- * Setter for cell rows span.<br/>
- * <b>Note:</b> Cells that are overlapped by other cells are not drawn.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * var cell = table.getCell(1,1);
- * cell.rowSpan(2);
- * table.container(stage).draw();
- * @param {number=} opt_value [1] Count of cells to merge down.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * Getter and setter for cell rows span.
- * @param {number=} opt_value
- * @return {!anychart.core.ui.Table.Cell|number}
- */
-anychart.core.ui.Table.Cell.prototype.rowSpan = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.rowSpan_);
-    if (opt_value != this.rowSpan_) {
-      this.rowSpan_ = opt_value;
-      this.table_.shouldDropOverlap = true;
-      this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.rowSpan_;
-};
-
-
-/**
- * Getter for current cell padding settings.
- * @return {!anychart.core.utils.Padding} {@link anychart.core.utils.Padding} instance for method chaining.
- *//**
- * Setter for current cell paddings in pixels using a single value.<br/>
- * @example <t>listingOnly</t>
- * // all paddings 15px
- * cell.padding(15);
- * // all paddings 15px
- * cell.padding('15px');
- * // top and bottom 5px ,right and left 15px
- * cell.padding(anychart.utils.space(5,15));
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * table.cellTextFactory().background().enabled(true);
- * table.getCell(0,0).padding(0);
- * table.container(stage).draw();
- * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * Setter for current cell paddings in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
- * table.cellPadding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
- * table.cellPadding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * table.cellPadding(10, '15px', '5px', 12);
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * table.cellTextFactory().background().enabled(true);
- * table.getCell(0,0).padding(-5, 0, 0, -15);
- * table.container(stage).draw();
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {!anychart.core.ui.Table.Cell} {@link anychart.core.ui.Table.Cell} instance for method chaining.
- *//**
- * @ignoreDoc
- * Cell padding settings.
- * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
- * @param {(string|number)=} opt_rightOrRightAndLeft .
- * @param {(string|number)=} opt_bottom .
- * @param {(string|number)=} opt_left .
- * @return {!anychart.core.ui.Table.Cell|anychart.core.utils.Padding} .
- */
-anychart.core.ui.Table.Cell.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  if (!this.settings_)
-    this.settings_ = /** @type {anychart.core.ui.Table.Cell.SettingsObj} */({});
-
-  var makeDefault = goog.isNull(opt_spaceOrTopOrTopAndBottom);
-  if (!makeDefault && !this.settings_.padding) {
-    this.settings_.padding = new anychart.core.utils.Padding();
-    this.registerDisposable(this.settings_.padding);
-    this.settings_.padding.listenSignals(this.paddingInvalidated_, this);
-  }
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    if (makeDefault)
-      goog.dispose(this.settings_.padding);
-    else
-      this.settings_.padding.setup.apply(this.settings_.padding, arguments);
-    return this;
-  }
-  return this.settings_.padding;
-};
-
-
-/**
- * Internal padding invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.ui.Table.Cell.prototype.paddingInvalidated_ = function(event) {
-  // whatever has changed in paddings affects chart size, so we need to redraw everything
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.table_.shouldRedrawContent = true;
-    this.table_.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Return cell override of the padding.
- * @return {anychart.core.utils.Padding|undefined}
- */
-anychart.core.ui.Table.Cell.prototype.getPaddingOverride = function() {
-  return this.settings_ && this.settings_.padding;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.Table.Cell.prototype.disposeInternal = function() {
-  if (this.disposableContent_)
-    this.content_.dispose();
+  goog.disposeAll(this.cells_, this.cellsPool_, this.rows_, this.cols_,
+      this.fillPaths_, this.borderPaths_, this.pathsPool_);
+  goog.dispose(this.labelsFactory_);
+  goog.dispose(this.layer_);
+  goog.dispose(this.contentLayer_);
+  delete this.settingsObj;
   goog.base(this, 'disposeInternal');
 };
 
@@ -2781,31 +2800,49 @@ anychart.core.ui.Table.Cell.prototype.disposeInternal = function() {
 //exports
 anychart.core.ui.Table.prototype['rowsCount'] = anychart.core.ui.Table.prototype.rowsCount;//doc|ex
 anychart.core.ui.Table.prototype['colsCount'] = anychart.core.ui.Table.prototype.colsCount;//doc|ex
+
 anychart.core.ui.Table.prototype['getCell'] = anychart.core.ui.Table.prototype.getCell;//doc|ex
-anychart.core.ui.Table.prototype['draw'] = anychart.core.ui.Table.prototype.draw;//doc
+anychart.core.ui.Table.prototype['getRow'] = anychart.core.ui.Table.prototype.getRow;
+anychart.core.ui.Table.prototype['getCol'] = anychart.core.ui.Table.prototype.getCol;
+
+anychart.core.ui.Table.prototype['rowsHeight'] = anychart.core.ui.Table.prototype.rowsHeight;
+anychart.core.ui.Table.prototype['rowsMinHeight'] = anychart.core.ui.Table.prototype.rowsMinHeight;
+anychart.core.ui.Table.prototype['rowsMaxHeight'] = anychart.core.ui.Table.prototype.rowsMaxHeight;
+anychart.core.ui.Table.prototype['colsWidth'] = anychart.core.ui.Table.prototype.colsWidth;
+anychart.core.ui.Table.prototype['colsMinWidth'] = anychart.core.ui.Table.prototype.colsMinWidth;
+anychart.core.ui.Table.prototype['colsMaxWidth'] = anychart.core.ui.Table.prototype.colsMaxWidth;
+
+anychart.core.ui.Table.prototype['border'] = anychart.core.ui.Table.prototype.border;
+
 anychart.core.ui.Table.prototype['contents'] = anychart.core.ui.Table.prototype.contents;//doc|ex
-anychart.core.ui.Table.prototype['colWidth'] = anychart.core.ui.Table.prototype.colWidth;//doc|ex
-anychart.core.ui.Table.prototype['rowHeight'] = anychart.core.ui.Table.prototype.rowHeight;//doc|ex
-anychart.core.ui.Table.prototype['cellTextFactory'] = anychart.core.ui.Table.prototype.cellTextFactory;//doc|ex
+
+anychart.core.ui.Table.prototype['draw'] = anychart.core.ui.Table.prototype.draw;//doc
+
+anychart.core.ui.Table.prototype['fontSize'] = anychart.core.ui.Table.prototype.fontSize;
+anychart.core.ui.Table.prototype['fontFamily'] = anychart.core.ui.Table.prototype.fontFamily;
+anychart.core.ui.Table.prototype['fontColor'] = anychart.core.ui.Table.prototype.fontColor;
+anychart.core.ui.Table.prototype['fontOpacity'] = anychart.core.ui.Table.prototype.fontOpacity;
+anychart.core.ui.Table.prototype['fontDecoration'] = anychart.core.ui.Table.prototype.fontDecoration;
+anychart.core.ui.Table.prototype['fontStyle'] = anychart.core.ui.Table.prototype.fontStyle;
+anychart.core.ui.Table.prototype['fontVariant'] = anychart.core.ui.Table.prototype.fontVariant;
+anychart.core.ui.Table.prototype['fontWeight'] = anychart.core.ui.Table.prototype.fontWeight;
+anychart.core.ui.Table.prototype['letterSpacing'] = anychart.core.ui.Table.prototype.letterSpacing;
+anychart.core.ui.Table.prototype['textDirection'] = anychart.core.ui.Table.prototype.textDirection;
+anychart.core.ui.Table.prototype['lineHeight'] = anychart.core.ui.Table.prototype.lineHeight;
+anychart.core.ui.Table.prototype['textIndent'] = anychart.core.ui.Table.prototype.textIndent;
+anychart.core.ui.Table.prototype['vAlign'] = anychart.core.ui.Table.prototype.vAlign;
+anychart.core.ui.Table.prototype['hAlign'] = anychart.core.ui.Table.prototype.hAlign;
+anychart.core.ui.Table.prototype['textWrap'] = anychart.core.ui.Table.prototype.textWrap;
+anychart.core.ui.Table.prototype['textOverflow'] = anychart.core.ui.Table.prototype.textOverflow;
+anychart.core.ui.Table.prototype['selectable'] = anychart.core.ui.Table.prototype.selectable;
+anychart.core.ui.Table.prototype['disablePointerEvents'] = anychart.core.ui.Table.prototype.disablePointerEvents;
+anychart.core.ui.Table.prototype['useHtml'] = anychart.core.ui.Table.prototype.useHtml;
+
 anychart.core.ui.Table.prototype['cellFill'] = anychart.core.ui.Table.prototype.cellFill;//doc|ex
-anychart.core.ui.Table.prototype['cellPadding'] = anychart.core.ui.Table.prototype.cellPadding;//doc|ex
-anychart.core.ui.Table.prototype['cellEvenFill'] = anychart.core.ui.Table.prototype.cellEvenFill;//doc|ex
-anychart.core.ui.Table.prototype['cellOddFill'] = anychart.core.ui.Table.prototype.cellOddFill;//doc|ex
-anychart.core.ui.Table.prototype['cellBorder'] = anychart.core.ui.Table.prototype.cellBorder;//doc|ex
-anychart.core.ui.Table.prototype['cellLeftBorder'] = anychart.core.ui.Table.prototype.cellLeftBorder;//doc|ex
-anychart.core.ui.Table.prototype['cellRightBorder'] = anychart.core.ui.Table.prototype.cellRightBorder;//doc|ex
-anychart.core.ui.Table.prototype['cellTopBorder'] = anychart.core.ui.Table.prototype.cellTopBorder;//doc|ex
-anychart.core.ui.Table.prototype['cellBottomBorder'] = anychart.core.ui.Table.prototype.cellBottomBorder;//doc|ex
-anychart.core.ui.Table.Cell.prototype['rowSpan'] = anychart.core.ui.Table.Cell.prototype.rowSpan;//doc|ex
-anychart.core.ui.Table.Cell.prototype['colSpan'] = anychart.core.ui.Table.Cell.prototype.colSpan;//doc|ex
-anychart.core.ui.Table.Cell.prototype['content'] = anychart.core.ui.Table.Cell.prototype.content;//doc|ex|need-tr
-anychart.core.ui.Table.Cell.prototype['padding'] = anychart.core.ui.Table.Cell.prototype.padding;//doc|ex
-anychart.core.ui.Table.Cell.prototype['fill'] = anychart.core.ui.Table.Cell.prototype.fill;//doc|ex
-anychart.core.ui.Table.Cell.prototype['border'] = anychart.core.ui.Table.Cell.prototype.border;//doc|ex
-anychart.core.ui.Table.Cell.prototype['leftBorder'] = anychart.core.ui.Table.Cell.prototype.leftBorder;//doc|ex
-anychart.core.ui.Table.Cell.prototype['rightBorder'] = anychart.core.ui.Table.Cell.prototype.rightBorder;//doc|ex
-anychart.core.ui.Table.Cell.prototype['topBorder'] = anychart.core.ui.Table.Cell.prototype.topBorder;//doc|ex
-anychart.core.ui.Table.Cell.prototype['bottomBorder'] = anychart.core.ui.Table.Cell.prototype.bottomBorder;//doc|ex
-anychart.core.ui.Table.Cell.prototype['getRow'] = anychart.core.ui.Table.Cell.prototype.getRow;//doc
-anychart.core.ui.Table.Cell.prototype['getCol'] = anychart.core.ui.Table.Cell.prototype.getCol;//doc
-anychart.core.ui.Table.Cell.prototype['getBounds'] = anychart.core.ui.Table.Cell.prototype.getBounds;//doc|ex
+
+anychart.core.ui.Table.prototype['rowEvenFill'] = anychart.core.ui.Table.prototype.rowEvenFill;
+anychart.core.ui.Table.prototype['rowOddFill'] = anychart.core.ui.Table.prototype.rowOddFill;
+
+anychart.core.ui.Table.prototype['cellBorder'] = anychart.core.ui.Table.prototype.cellBorder;
+
+anychart.core.ui.Table.prototype['cellPadding'] = anychart.core.ui.Table.prototype.cellPadding;

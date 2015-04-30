@@ -234,6 +234,58 @@ anychart.core.VisualBaseWithBounds.prototype.height = function(opt_value) {
 
 
 /**
+ * @param {(number|string|null)=} opt_value .
+ * @return {(!anychart.core.VisualBase|number|string|null)} .
+ */
+anychart.core.VisualBaseWithBounds.prototype.minWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.bounds().minWidth(opt_value);
+    return this;
+  }
+  return /** @type {number|string|null} */(this.bounds().minWidth());
+};
+
+
+/**
+ * @param {(number|string|null)=} opt_value .
+ * @return {(!anychart.core.VisualBase|number|string|null)} .
+ */
+anychart.core.VisualBaseWithBounds.prototype.minHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.bounds().minHeight(opt_value);
+    return this;
+  }
+  return /** @type {number|string|null} */(this.bounds().minHeight());
+};
+
+
+/**
+ * @param {(number|string|null)=} opt_value .
+ * @return {(!anychart.core.VisualBase|number|string|null)} .
+ */
+anychart.core.VisualBaseWithBounds.prototype.maxWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.bounds().maxWidth(opt_value);
+    return this;
+  }
+  return /** @type {number|string|null} */(this.bounds().maxWidth());
+};
+
+
+/**
+ * @param {(number|string|null)=} opt_value .
+ * @return {(!anychart.core.VisualBase|number|string|null)} .
+ */
+anychart.core.VisualBaseWithBounds.prototype.maxHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.bounds().maxHeight(opt_value);
+    return this;
+  }
+  return /** @type {number|string|null} */(this.bounds().maxHeight());
+};
+
+
+/**
  * Returns pixel bounds of the element due to parent bounds and self bounds settings.
  * @return {!anychart.math.Rect} .
  */
@@ -262,4 +314,8 @@ anychart.core.VisualBaseWithBounds.prototype['bottom'] = anychart.core.VisualBas
 anychart.core.VisualBaseWithBounds.prototype['left'] = anychart.core.VisualBaseWithBounds.prototype.left;//doc|ex
 anychart.core.VisualBaseWithBounds.prototype['width'] = anychart.core.VisualBaseWithBounds.prototype.width;//doc|ex
 anychart.core.VisualBaseWithBounds.prototype['height'] = anychart.core.VisualBaseWithBounds.prototype.height;//doc|ex
+anychart.core.VisualBaseWithBounds.prototype['minWidth'] = anychart.core.VisualBaseWithBounds.prototype.minWidth;
+anychart.core.VisualBaseWithBounds.prototype['minHeight'] = anychart.core.VisualBaseWithBounds.prototype.minHeight;
+anychart.core.VisualBaseWithBounds.prototype['maxWidth'] = anychart.core.VisualBaseWithBounds.prototype.maxWidth;
+anychart.core.VisualBaseWithBounds.prototype['maxHeight'] = anychart.core.VisualBaseWithBounds.prototype.maxHeight;
 anychart.core.VisualBaseWithBounds.prototype['getPixelBounds'] = anychart.core.VisualBaseWithBounds.prototype.getPixelBounds;
