@@ -913,7 +913,7 @@ anychart.core.scatter.series.Base.prototype.onLegendItemSignal_ = function(event
 anychart.core.scatter.series.Base.prototype.drawPoint = function() {
   if (this.enabled()) {
     if (this.pointDrawn = this.drawSeriesPoint()) {
-      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
       if (this.isErrorAvailable())
         this.drawError();
     }

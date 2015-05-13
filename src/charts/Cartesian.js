@@ -1727,6 +1727,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
         isErrorAvailableForScale = anychart.core.utils.Error.isErrorAvailableForScale(scale);
         for (i = 0; i < series.length; i++) {
           aSeries = series[i];
+          if (!aSeries.enabled()) continue;
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             value = iterator.get('x');
@@ -1757,7 +1758,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
         var hasNegative = false;
         for (j = 0; j < series.length; j++) {
           aSeries = series[j];
-          if (aSeries.supportsStack()) {
+          if (aSeries.enabled() && aSeries.supportsStack()) {
             iterator = aSeries.getResetIterator();
             while (iterator.advance()) {
               values = aSeries.getReferenceScaleValues();
@@ -1780,6 +1781,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
       } else {
         for (j = 0; j < series.length; j++) {
           aSeries = series[j];
+          if (!aSeries.enabled()) continue;
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             values = aSeries.getReferenceScaleValues();
@@ -1796,6 +1798,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
       scale = this.yScales_[id];
       xScales = {};
       for (i = 0; i < series.length; i++) {
+        if (!series[i].enabled()) continue;
         xId = goog.getUid(series[i].xScale());
         if (xId in xScales)
           xScales[xId].push(series[i]);
@@ -1907,7 +1910,6 @@ anychart.charts.Cartesian.prototype.makeScaleMaps_ = function() {
   var seriesOfXScaleMap = {};
   var seriesOfYScaleMap = {};
   var scale;
-  var item;
   var series;
 
   //search for scales in series

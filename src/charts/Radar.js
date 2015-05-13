@@ -839,13 +839,16 @@ anychart.charts.Radar.prototype.calculate = function() {
     for (id in this.xScales_) {
       scale = this.xScales_[id];
       series = this.seriesOfXScaleMap_[goog.getUid(scale)];
-      for (i = 0; i < series.length; i++)
-        series[i].resetCategorisation();
+      for (i = 0; i < series.length; i++) {
+        if (series[i].enabled())
+          series[i].resetCategorisation();
+      }
       // we can crash or warn user here if the scale is stacked, if we want.
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();
         for (i = 0; i < series.length; i++) {
           aSeries = series[i];
+          if (!aSeries.enabled()) continue;
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             value = iterator.get('x');
@@ -856,8 +859,10 @@ anychart.charts.Radar.prototype.calculate = function() {
       }
       // categorise series data if needed.
       categories = scale.getCategorisation();
-      for (i = 0; i < series.length; i++)
-        series[i].categoriseData(categories);
+      for (i = 0; i < series.length; i++) {
+        if (series[i].enabled())
+          series[i].categoriseData(categories);
+      }
     }
 
     // calculate non-stacked y scales.
@@ -869,7 +874,7 @@ anychart.charts.Radar.prototype.calculate = function() {
         var hasNegative = false;
         for (j = 0; j < series.length; j++) {
           aSeries = series[j];
-          if (aSeries.supportsStack()) {
+          if (aSeries.enabled() && aSeries.supportsStack()) {
             iterator = aSeries.getResetIterator();
             while (iterator.advance()) {
               value = aSeries.getReferenceScaleValues();
@@ -890,6 +895,7 @@ anychart.charts.Radar.prototype.calculate = function() {
       } else {
         for (j = 0; j < series.length; j++) {
           aSeries = series[j];
+          if (!aSeries.enabled()) continue;
           iterator = aSeries.getResetIterator();
           while (iterator.advance()) {
             value = aSeries.getReferenceScaleValues();
@@ -906,6 +912,7 @@ anychart.charts.Radar.prototype.calculate = function() {
       scale = this.yScales_[id];
       xScales = {};
       for (i = 0; i < series.length; i++) {
+        if (!series[i].enabled()) continue;
         xId = goog.getUid(series[i].xScale());
         if (xId in xScales)
           xScales[xId].push(series[i]);

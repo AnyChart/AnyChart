@@ -1310,6 +1310,7 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
     var index = this.series_.length - 1;
@@ -1533,6 +1534,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
 
     for (i = 0, count = this.series_.length; i < count; i++) {
       aSeries = this.series_[i];
+      if (!aSeries.enabled()) continue;
       xScale = /** @type {anychart.scales.ScatterBase} */ (aSeries.xScale());
       yScale = /** @type {anychart.scales.ScatterBase} */ (aSeries.yScale());
 

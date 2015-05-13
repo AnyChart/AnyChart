@@ -961,6 +961,7 @@ anychart.charts.Polar.prototype.calculate = function() {
 
     for (i = 0, count = this.series_.length; i < count; i++) {
       aSeries = this.series_[i];
+      if (!aSeries.enabled()) continue;
       xScale = /** @type {anychart.scales.ScatterBase} */ (aSeries.xScale());
       yScale = /** @type {anychart.scales.Base} */ (aSeries.yScale());
 
