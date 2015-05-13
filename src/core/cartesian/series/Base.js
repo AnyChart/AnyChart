@@ -1036,7 +1036,7 @@ anychart.core.cartesian.series.Base.prototype.drawPoint = function() {
     else
       this.firstPointDrawn = this.drawFirstPoint();
     if (this.firstPointDrawn) {
-      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
       if (this.isErrorAvailable())
         this.drawError();
     }

@@ -865,7 +865,7 @@ anychart.core.polar.series.Base.prototype.drawPoint = function() {
     else
       this.firstPointDrawn = this.drawFirstPoint();
     if (this.firstPointDrawn) {
-      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
     }
   }
 };
@@ -2226,7 +2226,7 @@ anychart.core.polar.series.Base.prototype.getLegendIconType = function() {
 
 /** @inheritDoc */
 anychart.core.polar.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.NEED_UPDATE_LEGEND;
+  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
 

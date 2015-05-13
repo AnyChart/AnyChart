@@ -54,8 +54,8 @@ anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
     else
       pointDrawn = this.drawFirstPoint();
     if (pointDrawn) {
-      this.drawMarker(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
-      this.drawLabel(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+      this.drawMarker(this.hoverStatus == this.getIterator().getIndex());
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
       if (this.isErrorAvailable())
         this.drawError();
     }

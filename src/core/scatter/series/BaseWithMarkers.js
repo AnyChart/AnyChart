@@ -199,7 +199,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.startDrawing = function()
 anychart.core.scatter.series.BaseWithMarkers.prototype.drawPoint = function() {
   goog.base(this, 'drawPoint');
   if (this.enabled() && this.pointDrawn) {
-    this.drawMarker(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.drawMarker(this.hoverStatus == this.getIterator().getIndex());
   }
 };
 
