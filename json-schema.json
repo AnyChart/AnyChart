@@ -2688,9 +2688,7 @@
         "itemsLayout": {"$ref": "#/definitions/anychart.enums.Layout"},
         "items": {
           "type": "array",
-          "items": {
-            "type": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
-          }
+          "items": {"type": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}}
         },
         "background": {
           "oneOf": [
@@ -3560,37 +3558,43 @@
         "xError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "xUpperError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "xLowerError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "valueError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "valueUpperError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "valueLowerError": {
           "type": [
             "number",
-            "string"
+            "string",
+            "null"
           ]
         },
         "xErrorWidth": {

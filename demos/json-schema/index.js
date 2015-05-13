@@ -1,6 +1,6 @@
 var validate;
 $(document).ready(function() {
-  var json, schema, resultEditor, jsonEditor, schemaEditor;
+  var json, schema, rootSchema, resultEditor, jsonEditor, schemaEditor, chart;
 
   resultEditor = ace.edit("result");
   resultEditor.setTheme("ace/theme/monokai");
@@ -26,45 +26,71 @@ $(document).ready(function() {
     ['P16', '133.08']
   ];
 
+    var data = [
+      {x: 'East Europe', low: 1, q1: 5, median: 8, q3: 12, high: 16},
+      {x: 'West Europe', low: 1, q1: 7, median: 10, q3: 17, high: 22},
+      {x: 'Australia', low: 1, q1: 8, median: 12, q3: 19, high: 26},
+      {x: 'South America', low: 2, q1: 8, median: 12, q3: 21, high: 28},
+      {x: 'North America', low: 3, q1: 10, median: 17, q3: 28, high: 30},
+      {x: 'Oceania', low: 1, q1: 9, median: 16, q3: 22, high: 24},
+      {x: 'North Africa', low: 1, q1: 8, median: 14, q3: 18, high: 24},
+      {x: 'West Africa', low: 1, q1: 6, median: 8, q3: 13, high: 16},
+      {x: 'Central Africa', low: 2, q1: 4, median: 9, q3: 12, high: 15},
+      {x: 'Southern Africa', low: 1, q1: 4, median: 8, q3: 11, high: 14}
+    ];
 
+  chart = anychart.box();
+    chart.background(null);
 
-  var stage = acgraph.create('container');
-  anychart.licenseKey(null);
-  stage.suspend();
+    //set container id for the chart
+    chart.container('container');
 
-  var chart = anychart.sparkline(['-3',2,3,-7,6,9,8,2,5]).width(150).height(60);
-  chart.type('column');
+    //set chart title text settings
+    var colorTitle = '#929292';
+    var colorAxis = '#bebebe';
+    chart.title().text('Oceanic Airlines Delays December, 2014');
+    chart.title().hAlign('center').fontWeight('normal').fontColor(colorTitle).fontFamily('Verdana').fontSize('16px');
 
-  chart.markers().enabled(true);
-  chart.lineMarker({value: -8});
-  chart.textMarker({value: -8, fontSize: 6, anchor: 'bottom', align: 'right'});
-  chart.rangeMarker({from: -3, to: 5  });
+    //set axes settings
+    chart.xAxis().stroke(colorAxis);
+    chart.xAxis().ticks().stroke(colorAxis);
+    chart.xAxis().title('Salary Grades');
+    chart.xAxis().title().text('Directions').fontWeight('normal').fontFamily('Verdana').fontSize('14px').fontColor(colorAxis);
+    chart.xAxis().staggerMode(true);
 
-  chart.maxLabels()
-      .enabled(true)
-      .fontColor('red');
+    chart.yAxis().title().text('Delay in minutes').fontWeight('normal').fontFamily('Verdana').fontSize('14px');
+    chart.yAxis().labels().fontColor(colorAxis);
 
-  chart.minLabels()
-      .enabled(true)
-      .fontColor('green');
+    chart.yAxis().stroke(colorAxis);
+    chart.yAxis().ticks().stroke(colorAxis);
+    chart.yAxis().minorTicks().stroke(colorAxis);
+    chart.yAxis().labels().fontColor(colorTitle);
+    chart.xAxis().labels().fontColor(colorTitle);
+    chart.yAxis().title().fontColor(colorAxis);
 
-  chart.firstFill('blue');
-  chart.lastFill('red');
+    chart.grid().stroke('#DEDEDE').oddFill(null).evenFill(null).zIndex(10.1);
+    chart.minorGrid().stroke('#ECECEC').zIndex(10);
 
-  chart.clip(false);
+    //create box chart series with our data
+    var series = chart.box(data);
+    series.fill('#82BECA');
+    series.stroke(null);
 
-  chart.hatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
+    //hide whisker
+    series.whiskerWidth(0);
+    series.hoverWhiskerWidth(0);
+    series.stemStroke('#474747');
+    series.medianStroke('2 #474747');
 
-  chart.pointWidth('70%');
-  chart.padding(10);
-  chart.container('container').draw();
-  stage.resume();
+    //initiate chart drawing
+    chart.draw();
+
   var config = chart.toJson();
 
 
   validate = function() {
     json = jsonEditor.getValue();
-    schema = schemaEditor.getValue();
+    schema = JSON.parse(schemaEditor.getValue());
 
     //$.ajax({
     //  type: "POST",
@@ -79,9 +105,12 @@ $(document).ready(function() {
     //});
 
     //var validResp = tv4.validateMultiple(JSON.parse(json), JSON.parse(schema));
+    var validResp;
 
-    var validResp = tv4.validateMultiple(config, JSON.parse(schema));
-
+    validResp = tv4.validateMultiple(schema, rootSchema);
+    if (validResp.valid) {
+      validResp = tv4.validateMultiple(config, schema);
+    }
 
     resultEditor.setValue(JSON.stringify(validResp, undefined, 4), 1);
     resultEditor.clearSelection();
@@ -94,15 +123,19 @@ $(document).ready(function() {
   jsonEditor.setTheme("ace/theme/monokai");
   jsonEditor.getSession().setMode("ace/mode/json");
 
-  $.getJSON("../../json-schema.json", function(data) {
-    schema = JSON.stringify(data, undefined, 4);
-    $('#schema').html(schema);
+  $.getJSON("rootSchema.json", function(data) {
+    rootSchema = data;
 
-    schemaEditor = ace.edit("schema");
-    schemaEditor.setTheme("ace/theme/monokai");
-    schemaEditor.getSession().setMode("ace/mode/json");
+    $.getJSON("../../json-schema.json", function(data) {
+      schema = JSON.stringify(data, undefined, 4);
+      $('#schema').html(schema);
 
-    validate();
+      schemaEditor = ace.edit("schema");
+      schemaEditor.setTheme("ace/theme/monokai");
+      schemaEditor.getSession().setMode("ace/mode/json");
+
+      validate();
+    });
   });
 
 
