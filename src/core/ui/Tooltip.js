@@ -3,6 +3,8 @@ goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.TooltipItem');
 goog.require('anychart.core.utils.TooltipsContainer');
 goog.require('anychart.enums');
+goog.require('goog.dom');
+goog.require('goog.userAgent');
 
 
 
@@ -435,6 +437,20 @@ anychart.core.ui.Tooltip.prototype.processPosition_ = function(position) {
 
     if (pixelBounds.getBottom() > windowBox.height) {
       position.y -= pixelBounds.getBottom() - windowBox.height;
+    }
+
+    var document = goog.dom.getDocument();
+    if (goog.userAgent.IE && (!goog.userAgent.isVersionOrHigher('7') || document.documentMode && document.documentMode <= 6)) {
+      var html = document.documentElement;
+      var body = document.body;
+
+      var scrollTop = html.scrollTop || body && body.scrollTop || 0;
+      scrollTop -= html.clientTop;
+      var scrollLeft = html.scrollLeft || body && body.scrollLeft || 0;
+      scrollLeft -= html.clientLeft;
+
+      position.x += scrollLeft;
+      position.y += scrollTop;
     }
 
     return position;

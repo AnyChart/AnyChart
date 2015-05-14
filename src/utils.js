@@ -118,6 +118,38 @@ anychart.utils.compareNumericDesc = function(a, b) {
 
 
 /**
+ * Extracts tag from BrowserEvent target object. Used in interactivity.
+ * @param {*} target
+ * @return {anychart.core.VisualBase|number|boolean|undefined}
+ */
+anychart.utils.extractTag = function(target) {
+  var tag;
+  while (target instanceof acgraph.vector.Element) {
+    tag = target.tag;
+    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag) || goog.isBoolean(tag)) {
+      return /** @type {anychart.core.VisualBase|number|boolean} */(tag);
+    }
+    target = target.parent();
+  }
+  return undefined;
+};
+
+
+/**
+ * Checks if target is among parent child event targets.
+ * @param {!goog.events.EventTarget} parent
+ * @param {goog.events.EventTarget} target
+ * @return {boolean}
+ */
+anychart.utils.checkIfParent = function(parent, target) {
+  while (target instanceof goog.events.EventTarget && target != parent) {
+    target = target.getParentEventTarget();
+  }
+  return target == parent;
+};
+
+
+/**
  * Default hashing function for all objects. Can distinguish any two objects.
  * @param {*} value Value to get hash of.
  * @return {string} Hash value.
@@ -134,7 +166,7 @@ anychart.utils.hash = function(value) {
 /**
  * Normalizes number or string value and converts it to number.
  * Supports percent strings if opt_containerSize is defined and not NaN - calculates percentage in that case.
- * @param {string|number} value Value to normalize.
+ * @param {string|number|null|undefined} value Value to normalize.
  * @param {number=} opt_containerSize Optional container dimension to support percent option.
  * @param {boolean=} opt_invert Counts the result from the right/bottom side of the container (supported if
  *    opt_containerSize is passed).
@@ -194,6 +226,25 @@ anychart.utils.toNumber = function(value) {
   if (goog.isNull(value) || goog.isBoolean(value))
     return NaN;
   return +value;
+};
+
+
+/**
+ * Converts value of any type to number or string, according to these rules:
+ * 1) number -> number
+ * 2) string -> leaved as is
+ * 3) NaN -> NaN
+ * 4) null -> NaN
+ * 5) boolean -> NaN
+ * 6) undefined -> NaN
+ * 7) Object -> Object.valueOf
+ * @param {*} value
+ * @return {number|string}
+ */
+anychart.utils.toNumberOrString = function(value) {
+  if (goog.isString(value))
+    return value;
+  return anychart.utils.toNumber(value);
 };
 
 
@@ -649,7 +700,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1019,8 +1070,17 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return 'Scatter chart scales should be only scatter type (linear, log).';
 
+    case anychart.enums.ErrorCode.EMPTY_CONFIG:
+      return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';
+
+    case anychart.enums.ErrorCode.NO_LEGEND_IN_CHART:
+      return 'Bullet and Sparkline charts do not support Legend. Please use anychart.ui.Legend component for a group of charts instead.';
+
+    case anychart.enums.ErrorCode.NO_CREDITS_IN_CHART:
+      return 'Bullet and Sparkline charts do not support Credits.';
+
     default:
-      return 'Unknown error occured. Please, contact support team at http://support.anychart.com/.\n' +
+      return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
   }
 };

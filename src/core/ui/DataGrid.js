@@ -344,6 +344,14 @@ anychart.core.ui.DataGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.DATA_GRID_CLICK;
 
 
+//todo: SHOULD COME BACK TO GANTT
+/**
+ * Scroll bar side size.
+ * @type {number}
+ */
+anychart.core.ui.DataGrid.SCROLL_BAR_SIDE = 10;
+
+
 /**
  * Default cell height.
  * @type {number}
@@ -698,7 +706,7 @@ anychart.core.ui.DataGrid.prototype.getBase_ = function() {
 
 /**
  * Handler for mouse move.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
@@ -724,7 +732,7 @@ anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
 
       var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
       var position = tooltip.isFloating() ?
-          new acgraph.math.Coordinate(event.clientX, event.clientY) :
+          new acgraph.math.Coordinate(event['clientX'], event['clientY']) :
           new acgraph.math.Coordinate(0, 0);
       tooltip.show(item, position);
 
@@ -741,7 +749,7 @@ anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
 /**
  * Handler for mouse out.
  * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
@@ -753,11 +761,11 @@ anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
 
 /**
  * Handler for mouse click.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.ui.DataGrid.prototype.mouseClickHandler_ = function(event) {
-  var mouseHeight = event.offsetY - this.titleHeight_ - this.pixelBoundsCache_.top;
+  var mouseHeight = event['offsetY'] - this.titleHeight_ - this.pixelBoundsCache_.top;
 
   if (this.gridHeightCache_.length) {
     var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
@@ -1517,17 +1525,17 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
         horizontalScrollBar = this.getHorizontalScrollBar();
 
         verticalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.charts.Gantt.SCROLL_BAR_SIDE + 1),
-            anychart.charts.Gantt.SCROLL_BAR_SIDE,
-            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
+            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE + 1),
+            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE,
+            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 2)
         );
 
         horizontalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
-            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
-            anychart.charts.Gantt.SCROLL_BAR_SIDE
+            (this.pixelBoundsCache_.left + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
+            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.width - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
+            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE
         );
       }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd"
-        xmlns="http://anychart.com/products/anychart7/schemas/7.3.0/schema.xsd"
+        targetNamespace="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
+        xmlns="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
         elementFormDefault="qualified">
 
     <!-- Online validator http://www.utilities-online.info/xsdvalidation/#.VImqs6SsUn- -->
@@ -217,6 +217,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="error" type="utils.Error"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
             <!-- BaseWithMarkers series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
@@ -714,6 +715,12 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
+    <xsd:complexType name="LegendItemsList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="item" type="utils.LegendItemSettings" />
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="core.Legend">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
@@ -723,6 +730,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="title_separator" type="core.Separator"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="paginator" type="core.Paginator"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="items" type="LegendItemsList"/>
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
@@ -736,6 +744,9 @@
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="position" type="enums.Orientation" default="bottom"/>
         <xsd:attribute name="align" type="enums.Align" default="center"/>
+        <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="items_source_mode" type="enums.LegendItemsSourceMode" default="default"/>
+        <xsd:attribute name="hover_cursor" type="enums.Cursor" default="pointer"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -923,6 +934,30 @@
         <xsd:attribute name="value_error_width" type="xsd:double"/>
         <xsd:attribute name="x_error_stroke" type="xsd:string"/>
         <xsd:attribute name="value_error_stroke" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.LegendItemSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="icon_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="icon_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="icon_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="icon_marker_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="icon_marker_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
+        </xsd:all>
+        <xsd:attribute name="icon_fill" type="xsd:string"/>
+        <xsd:attribute name="icon_stroke" type="xsd:string"/>
+        <xsd:attribute name="icon_hatch_fill" type="xsd:string"/>
+        <xsd:attribute name="icon_marker_fill" type="xsd:string"/>
+        <xsd:attribute name="icon_marker_stroke" type="xsd:string"/>
+        <xsd:attribute name="icon_marker_type" type="xsd:string"/>
+        <xsd:attribute name="icon_type" type="xsd:string"/>
+        <xsd:attribute name="icon_text_spacing" type="xsd:double"/>
+        <xsd:attribute name="icon_enabled" type="simple.Bool"/>
+        <xsd:attribute name="text" type="xsd:string"/>
+        <xsd:attribute name="disabled" type="simple.Bool" default="false"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
     <!-- Colors -->
@@ -1494,6 +1529,26 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.Cursor">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="default"/>
+            <xsd:enumeration value="crosshair"/>
+            <xsd:enumeration value="pointer"/>
+            <xsd:enumeration value="move"/>
+            <xsd:enumeration value="text"/>
+            <xsd:enumeration value="wait"/>
+            <xsd:enumeration value="help"/>
+            <xsd:enumeration value="n-resize"/>
+            <xsd:enumeration value="ne-resize"/>
+            <xsd:enumeration value="e-resize"/>
+            <xsd:enumeration value="se-resize"/>
+            <xsd:enumeration value="s-resize"/>
+            <xsd:enumeration value="sw-resize"/>
+            <xsd:enumeration value="w-resize"/>
+            <xsd:enumeration value="nw-resize"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="enums.AnchorAndPosition">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="leftTop"/>
@@ -1797,6 +1852,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.LegendItemsSourceMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="default"/>
+            <xsd:enumeration value="categories"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <!-- Common attribute groups -->
 
     <xsd:attributeGroup name="attrs.VisualBase">
@@ -1805,12 +1867,16 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.Bounds">
-        <xsd:attribute name="left" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="right" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="top" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="bottom" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="width" type="simple.NumberOrPercent"/>
-        <xsd:attribute name="height" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="left" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="right" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="top" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="bottom" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="min_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_width" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.TextSettings">

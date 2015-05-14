@@ -278,7 +278,21 @@ anychart.core.scatter.series.Bubble.prototype.displayNegative = function(opt_val
 // ----------------------
 /** @inheritDoc */
 anychart.core.scatter.series.Bubble.prototype.hoverSeries = function() {
-  this.unhover();
+  if (this.hoverStatus == -1) return this;
+  if (this.hoverStatus >= 0) {
+    if (this.getResetIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+      this.hideTooltip();
+    }
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(true);
+      this.applyHatchFill(true);
+    }
+  }
+  this.hoverStatus = -1;
   return this;
 };
 
@@ -306,7 +320,7 @@ anychart.core.scatter.series.Bubble.prototype.hoverPoint = function(index, event
 /** @inheritDoc */
 anychart.core.scatter.series.Bubble.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
     if (goog.isDef(rect)) {
       this.colorizeShape(false);
@@ -315,6 +329,12 @@ anychart.core.scatter.series.Bubble.prototype.unhover = function() {
       this.drawLabel(false);
     }
     this.hideTooltip();
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(false);
+      this.applyHatchFill(false);
+    }
   }
   this.hoverStatus = NaN;
   return this;
@@ -510,7 +530,7 @@ anychart.core.scatter.series.Bubble.prototype.drawSeriesPoint = function() {
 
     circle.radius(Math.abs(size)).centerX(x).centerY(y);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == iterator.getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(circle);
   }

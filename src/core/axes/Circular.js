@@ -171,7 +171,7 @@ anychart.core.axes.Circular.prototype.overlapMode_ = anychart.enums.LabelsOverla
 anychart.core.axes.Circular.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      opt_value = anychart.enums.getGaugeScale(opt_value);
+      opt_value = this.getGaugeScale_(opt_value);
     }
     if (this.scale_ != opt_value) {
       if (this.scale_)
@@ -189,6 +189,25 @@ anychart.core.axes.Circular.prototype.scale = function(opt_value) {
     }
     return /** @type {anychart.scales.Linear|anychart.scales.Logarithmic}*/(this.scale_);
   }
+};
+
+
+/**
+ * @param {string} value String scale name.
+ * @return {anychart.scales.Linear|anychart.scales.Logarithmic} Scale for gauge axis.
+ * @private
+ */
+anychart.core.axes.Circular.prototype.getGaugeScale_ = function(value) {
+  switch (anychart.enums.normalizeGaugeScaleTypes(value)) {
+    case anychart.enums.GaugeScaleTypes.LINEAR:
+      return anychart.scales.linear();
+      break;
+    case anychart.enums.GaugeScaleTypes.LOG:
+      return anychart.scales.log();
+      break;
+  }
+
+  return anychart.scales.linear();
 };
 
 
@@ -214,6 +233,7 @@ anychart.core.axes.Circular.prototype.scaleInvalidated_ = function(event) {
 anychart.core.axes.Circular.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.CircularLabelsFactory();
+    this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
@@ -233,6 +253,7 @@ anychart.core.axes.Circular.prototype.minorLabels = function(opt_value) {
 anychart.core.axes.Circular.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -295,6 +316,7 @@ anychart.core.axes.Circular.prototype.drawLastLabel = function(opt_value) {
 anychart.core.axes.Circular.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.core.axes.CircularTicks();
+    this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.setAxis(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
@@ -315,6 +337,7 @@ anychart.core.axes.Circular.prototype.minorTicks = function(opt_value) {
 anychart.core.axes.Circular.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.core.axes.CircularTicks();
+    this.ticks_.setParentEventTarget(this);
     this.ticks_.setAxis(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
@@ -736,7 +759,7 @@ anychart.core.axes.Circular.prototype.getLabelBoundsWithoutTransform_ = function
   var value = scaleTicks.get()[index];
 
   var formatProvider = this.getLabelsFormatProvider_(index, value);
-  var positionProvider = {'value': {'x': 0, 'y': 0}};
+  var positionProvider = {'value': {'angle': 0, 'radius': 0}};
 
   if (label)
     boundsWTCache[index] = labels.measure(label);
@@ -992,11 +1015,13 @@ anychart.core.axes.Circular.prototype.draw = function() {
   var cx = this.gauge_.getCx();
   var cy = this.gauge_.getCy();
 
+  if (!this.line_) {
+    this.line_ = acgraph.path();
+    this.bindHandlersToGraphics(this.line_);
+    this.registerDisposable(this.line_);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (!this.line_) {
-      this.line_ = acgraph.path();
-      this.registerDisposable(this.line_);
-    }
     this.pixRadius_ = anychart.utils.normalizeSize(
         goog.isDefAndNotNull(this.radius_) ? this.radius_ : '100%', this.gauge_.getPixRadius());
     this.axisWidth_ = anychart.utils.normalizeSize(
@@ -1089,7 +1114,7 @@ anychart.core.axes.Circular.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    if (this.line_) this.line_.parent(container);
+    this.line_.parent(container);
     this.ticks().container(container);
     this.minorTicks().container(container);
     this.labels().container(container);
@@ -1298,9 +1323,9 @@ anychart.core.axes.Circular.prototype.setupByJSON = function(config) {
   var scale;
   var json = config['scale'];
   if (goog.isString(json)) {
-    scale = anychart.enums.getGaugeScale(json);
+    scale = this.getGaugeScale_(json);
   } else if (goog.isObject(json)) {
-    scale = anychart.enums.getGaugeScale(json['type']);
+    scale = this.getGaugeScale_(json['type']);
     scale.setup(json);
   } else {
     scale = null;

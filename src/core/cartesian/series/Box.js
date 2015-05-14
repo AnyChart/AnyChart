@@ -16,10 +16,6 @@ goog.require('anychart.utils');
 anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.outlierMarkers().listen(acgraph.events.EventType.MOUSEOVER, this.handleOutlierMarkerMouseOver_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.MOUSEOUT, this.handleOutlierMarkerMouseOut_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.CLICK, this.handleOutlierMarkerBrowserEvents_, false, this);
-  this.outlierMarkers().listen(acgraph.events.EventType.DBLCLICK, this.handleOutlierMarkerBrowserEvents_, false, this);
   this.outlierMarkers().anchor(anychart.enums.Position.CENTER);
 
   // Define reference fields for a series
@@ -242,7 +238,7 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     this.drawStem_(stemPath, x, low, high, q1, q3);
     this.drawWhisker_(false);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(path);
     this.makeHoverable(medianPath);
@@ -447,57 +443,6 @@ anychart.core.cartesian.series.Box.prototype.getPointIndexByMarkerIndex_ = funct
       return value == markerIndex;
     });
   }));
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseOver_ = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    if (event && goog.isDef(event['markerIndex'])) {
-      var pointIndex = this.getPointIndexByMarkerIndex_(event['markerIndex']);
-      this.hoverPoint(pointIndex, event);
-      var markerElement = this.outlierMarkers().getMarker(event['markerIndex']).getDomElement();
-      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleOutlierMarkerMouseMove_, false, this);
-    } else
-      this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseMove_ = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex'])) {
-    var pointIndex = this.getPointIndexByMarkerIndex_(event.target['__tagIndex']);
-    this.hoverPoint(pointIndex, event);
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerMouseOut_ = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    var markerElement = this.outlierMarkers().getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleOutlierMarkerMouseMove_, false, this);
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @private
- */
-anychart.core.cartesian.series.Box.prototype.handleOutlierMarkerBrowserEvents_ = function(event) {
-  this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
 };
 
 
@@ -862,6 +807,7 @@ anychart.core.cartesian.series.Box.prototype.getWhiskerWidth = function(hover) {
 anychart.core.cartesian.series.Box.prototype.outlierMarkers = function(opt_value) {
   if (!this.outlierMarkers_) {
     this.outlierMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.outlierMarkers_.setParentEventTarget(this);
     this.registerDisposable(this.outlierMarkers_);
     this.outlierMarkers_.listenSignals(this.outlierMarkersInvalidated_, this);
   }
@@ -912,6 +858,16 @@ anychart.core.cartesian.series.Box.prototype.outlierMarkersInvalidated_ = functi
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.Box.prototype.makePointEvent = function(event) {
+  if (event['target'] == this.outlierMarkers() && !isNaN(event['markerIndex']))
+    event['pointIndex'] = this.getPointIndexByMarkerIndex_(event['markerIndex']);
+  return goog.base(this, 'makePointEvent', event);
+};
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event) {
   if (this.hoverStatus == index) {
@@ -935,19 +891,50 @@ anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event)
 
 
 /** @inheritDoc */
+anychart.core.cartesian.series.Box.prototype.hoverSeries = function() {
+  if (this.hoverStatus == -1) return this;
+  if (this.hoverStatus >= 0) {
+    if (this.getResetIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+      this.hideTooltip();
+    }
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(true);
+      this.applyHatchFill(true);
+      this.drawWhisker_(true);
+      this.drawOutlierMarkers_(true);
+    }
+  }
+  this.hoverStatus = -1;
+  return this;
+};
+
+
+/** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().select(this.hoverStatus)) {
+  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
     if (goog.isDef(rect)) {
       this.colorizeShape(false);
       this.applyHatchFill(false);
+      this.drawWhisker_(false);
       this.drawMarker(false);
       this.drawOutlierMarkers_(false);
       this.drawLabel(false);
-      this.drawWhisker_(false);
     }
     this.hideTooltip();
+  } else {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.colorizeShape(false);
+      this.applyHatchFill(false);
+      this.drawWhisker_(false);
+      this.drawOutlierMarkers_(false);
+    }
   }
   this.hoverStatus = NaN;
   return this;
@@ -1076,7 +1063,7 @@ anychart.core.cartesian.series.Box.prototype.restoreDefaults = function() {
         'q1: ' + parseFloat(this['q1']).toFixed(2) + '\n' +
         'median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
         'q3: ' + parseFloat(this['q3']).toFixed(2) + '\n' +
-        'highest: ' + parseFloat(this['highest']).toFixed(2) + '\n';
+        'highest: ' + parseFloat(this['highest']).toFixed(2);
   });
 
   var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());

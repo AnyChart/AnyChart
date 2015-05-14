@@ -32,6 +32,8 @@ anychart.core.axes.Linear = function() {
   this.minorLabelsBounds_ = [];
 
   this.line_ = acgraph.path();
+  this.bindHandlersToGraphics(this.line_);
+  this.registerDisposable(this.line_);
 
   this.title()
       .suspendSignalsDispatching()
@@ -373,6 +375,7 @@ anychart.core.axes.Linear.prototype.minorLabelsBounds_ = null;
 anychart.core.axes.Linear.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.titleInvalidated_, this);
     this.registerDisposable(this.title_);
   }
@@ -425,6 +428,7 @@ anychart.core.axes.Linear.prototype.titleInvalidated_ = function(event) {
 anychart.core.axes.Linear.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -479,6 +483,7 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
 anychart.core.axes.Linear.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.minorLabels_.setParentEventTarget(this);
     this.isHorizontal() ? this.minorLabels_.rotation(0) : this.minorLabels_.rotation(-90);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
@@ -533,6 +538,7 @@ anychart.core.axes.Linear.prototype.minorLabelsInvalidated_ = function(event) {
 anychart.core.axes.Linear.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.core.axes.Ticks();
+    this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
@@ -585,6 +591,7 @@ anychart.core.axes.Linear.prototype.ticksInvalidated_ = function(event) {
 anychart.core.axes.Linear.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.core.axes.Ticks();
+    this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.minorTicksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
   }
@@ -1001,7 +1008,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
             }
 
             if (((ratio <= minorRatio && i < ticksArrLen) || j == minorTicksArrLen)) {
-              if (isLabels && i == nextDrawableLabel && this.labels().enabled()) {
+              if (isLabels && i == nextDrawableLabel) {
                 prevDrawableLabel = i;
                 nextDrawableLabel = -1;
                 labels.push(true);
@@ -2009,10 +2016,6 @@ anychart.core.axes.Linear.prototype.draw = function() {
   this.minorTicks().suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.line_) {
-      this.line_ = acgraph.path();
-      this.registerDisposable(this.line_);
-    }
     this.line_.clear();
     this.line_.stroke(this.stroke_);
 

@@ -96,6 +96,7 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.markersInternal_ = new anychart.core.ui.MarkersFactory();
+  this.markersInternal_.setParentEventTarget(this);
   this.markersInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_MARKER);
 
   /**
@@ -103,12 +104,19 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.labelsInternal_ = new anychart.core.ui.LabelsFactory();
+  this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_LABEL);
 
   this.data(opt_data || null, opt_csvSettings);
   this.type(anychart.enums.SparklineSeriesType.LINE);
 };
 goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getType = function() {
+  return anychart.enums.ChartTypes.SPARKLINE;
+};
 
 
 /**
@@ -3248,3 +3256,5 @@ anychart.charts.Sparkline.prototype['markers'] = anychart.charts.Sparkline.proto
 anychart.charts.Sparkline.prototype['labels'] = anychart.charts.Sparkline.prototype.labels;
 
 anychart.charts.Sparkline.prototype['stroke'] = anychart.charts.Sparkline.prototype.stroke;
+
+anychart.charts.Sparkline.prototype['getType'] = anychart.charts.Sparkline.prototype.getType;

@@ -17,10 +17,6 @@ goog.require('anychart.enums');
 anychart.core.polar.series.ContinuousBase = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.markers().listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
-  this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
-  this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
-  this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().position(anychart.enums.Position.CENTER);
 
   /**
@@ -125,6 +121,7 @@ anychart.core.polar.series.ContinuousBase.prototype.hasMarkers = function() {
 anychart.core.polar.series.ContinuousBase.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.core.ui.MarkersFactory();
+    this.markers_.setParentEventTarget(this);
     this.registerDisposable(this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
@@ -183,7 +180,7 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers = function(opt_
  */
 anychart.core.polar.series.ContinuousBase.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
@@ -280,7 +277,7 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(false);
+    this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -438,12 +435,10 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index,
     this.drawLabel(false);
     this.hideTooltip();
   }
-  // TODO(AntonKagakin): comment this to avoid series selection
-  // wating for a feedback. See Base.js:1206
-  /*if (isNaN(this.hoverStatus)) {
-   this.applyHatchFill(true);
-   this.colorizeShape(true);
-   }*/
+  if (isNaN(this.hoverStatus)) {
+    this.applyHatchFill(true);
+    this.colorizeShape(true);
+  }
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
@@ -469,54 +464,6 @@ anychart.core.polar.series.ContinuousBase.prototype.unhover = function() {
   this.colorizeShape(false);
   this.hoverStatus = NaN;
   return this;
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.handleMarkerMouseOver = function(event) {
-  if (this.dispatchEvent(new anychart.core.polar.series.Base.BrowserEvent(this, event))) {
-    if (event && goog.isDef(event['markerIndex'])) {
-      this.hoverPoint(event['markerIndex'], event);
-      var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    } else
-      this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.handleMarkerMouseOut = function(event) {
-  if (this.dispatchEvent(new anychart.core.polar.series.Base.BrowserEvent(this, event))) {
-    var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.handleMarkerMouseMove = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.handleMarkerBrowserEvents = function(event) {
-  this.dispatchEvent(new anychart.core.polar.series.Base.BrowserEvent(this, event));
 };
 
 
@@ -591,10 +538,16 @@ anychart.core.polar.series.ContinuousBase.prototype.getMarkerStroke = function()
 /**
  * @inheritDoc
  */
-anychart.core.polar.series.ContinuousBase.prototype.getLegendItemData = function() {
-  var data = goog.base(this, 'getLegendItemData');
-  if (this.markers().enabled())
-    data['iconMarker'] = this.markers().type() || this.autoMarkerType;
+anychart.core.polar.series.ContinuousBase.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var markers = this.markers();
+  markers.setAutoFill(this.getMarkerFill());
+  markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  if (markers.enabled()) {
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.type() || this.autoMarkerType;
+    data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
+    data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  }
   return data;
 };
 

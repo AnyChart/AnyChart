@@ -22,9 +22,10 @@ goog.require('anychart.utils');
  *  </ul>
  * @constructor
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
  */
-anychart.charts.Bullet = function(opt_data) {
+anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
   goog.base(this);
 
   /**
@@ -46,7 +47,7 @@ anychart.charts.Bullet = function(opt_data) {
    */
   this.layout_ = anychart.enums.Layout.HORIZONTAL;
 
-  this.data(opt_data || null);
+  this.data(opt_data || null, opt_csvSettings);
 
 
   //default settings
@@ -93,6 +94,12 @@ anychart.charts.Bullet.ZINDEX_RANGES = 2;
  * @type {number}
  */
 anychart.charts.Bullet.ZINDEX_AXIS = 3;
+
+
+/** @inheritDoc */
+anychart.charts.Bullet.prototype.getType = function() {
+  return anychart.enums.ChartTypes.BULLET;
+};
 
 
 /**
@@ -335,6 +342,7 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
 anychart.charts.Bullet.prototype.axis = function(opt_value) {
   if (!this.axis_) {
     this.axis_ = new anychart.core.axes.Linear();
+    this.axis_.setParentEventTarget(this);
     this.axis_.zIndex(anychart.charts.Bullet.ZINDEX_AXIS);
     this.axis_.title().enabled(false);
     this.registerDisposable(this.axis_);
@@ -824,3 +832,4 @@ anychart.charts.Bullet.prototype['axis'] = anychart.charts.Bullet.prototype.axis
 anychart.charts.Bullet.prototype['range'] = anychart.charts.Bullet.prototype.range;//doc|ex
 anychart.charts.Bullet.prototype['draw'] = anychart.charts.Bullet.prototype.draw;//inherited
 anychart.charts.Bullet.prototype['isHorizontal'] = anychart.charts.Bullet.prototype.isHorizontal;//doc
+anychart.charts.Bullet.prototype['getType'] = anychart.charts.Bullet.prototype.getType;//doc

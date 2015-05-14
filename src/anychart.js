@@ -190,20 +190,22 @@ anychart.fromJson = function(jsonConfig) {
     json = jsonConfig;
   }
 
-  if (!json) throw 'Empty json config';
+  var instance = null;
 
-  var chart = json['chart'];
-  var gauge = json['gauge'];
-  if (!(chart || gauge)) throw 'Config should contain the chart or gauge node';
-
-  var instance;
-  if (chart)
-    instance = anychart.createChartByType(chart['type']);
-  else if (gauge)
-    instance = anychart.createGaugeByType(gauge['type']);
+  if (json) {
+    var chart = json['chart'];
+    var gauge = json['gauge'];
+    if (chart)
+      instance = anychart.createChartByType(chart['type']);
+    else if (gauge)
+      instance = anychart.createGaugeByType(gauge['type']);
+  }
 
   if (instance)
     instance.setup(chart || gauge);
+  else
+    anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
+
   return instance;
 };
 
@@ -337,7 +339,7 @@ anychart.detachDomEvents_ = function() {
 
 /**
  * Function called when one of [ DOMContentLoad , onreadystatechanged ] events fired on document or onload on window.
- * @param {acgraph.events.Event} event Event object.
+ * @param {goog.events.Event} event Event object.
  * @private
  */
 anychart.completed_ = function(event) {
@@ -361,7 +363,7 @@ anychart.isReady_ = false;
 /**
  * Function called when document content loaded.
  * @private
- * @param {acgraph.events.Event} event Event object.
+ * @param {goog.events.Event} event Event object.
  * @return {*} Nothing if document already loaded or timeoutID.
  */
 anychart.ready_ = function(event) {
@@ -617,6 +619,22 @@ anychart.ganttResource = anychart.ganttResource || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.toolbar = anychart.toolbar || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.ganttToolbar = anychart.ganttToolbar || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -628,6 +646,7 @@ goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
 goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
 goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
+goog.exportSymbol('anychart.box', anychart.box);
 goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule
 goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
 goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
@@ -656,3 +675,5 @@ goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
+goog.exportSymbol('anychart.toolbar', anychart.toolbar);
+goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);

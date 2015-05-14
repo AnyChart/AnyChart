@@ -362,7 +362,7 @@ anychart.core.gauge.pointers.Needle.prototype.restoreDefaults = function() {
 anychart.core.gauge.pointers.Needle.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  json['startRadius'] = this.startRadius();
+  if (goog.isDef(this.startRadius())) json['startRadius'] = this.startRadius();
   if (goog.isDef(this.middleRadius())) json['middleRadius'] = this.middleRadius();
   if (goog.isDef(this.endRadius())) json['endRadius'] = this.endRadius();
   if (goog.isDef(this.startWidth())) json['startWidth'] = this.startWidth();

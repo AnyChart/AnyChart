@@ -440,6 +440,7 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 anychart.core.Chart.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
+    this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.onTitleSignal_, this);
     this.title_.zIndex(anychart.core.Chart.ZINDEX_TITLE);
     this.registerDisposable(this.title_);
@@ -522,6 +523,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   var label = this.chartLabels_[index];
   if (!label) {
     label = this.createChartLabel();
+    label.setParentEventTarget(this);
     label.text('Chart label');
     label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
     this.chartLabels_[index] = label;
@@ -641,6 +643,7 @@ anychart.core.Chart.prototype.draw = function() {
   //create root element only if draw is called
   if (!this.rootElement) {
     this.rootElement = acgraph.layer();
+    this.bindHandlersToGraphics(this.rootElement);
     this.registerDisposable(this.rootElement);
   }
 
@@ -793,9 +796,10 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * @return {*} Chart JSON.
  */
 anychart.core.Chart.prototype.toJson = function(opt_stringify) {
+  var data = this.isDisposed() ? {} : this.serialize();
   return opt_stringify ?
-      goog.json.hybrid.stringify(/** @type {!Object} */(this.serialize())) :
-      this.serialize();
+      goog.json.hybrid.stringify(data) :
+      data;
 };
 
 
@@ -805,7 +809,7 @@ anychart.core.Chart.prototype.toJson = function(opt_stringify) {
  * @return {string|Node} Chart configuration.
  */
 anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
-  return anychart.utils.json2xml(this.serialize(), undefined, opt_asXmlNode);
+  return anychart.utils.json2xml(this.isDisposed() ? {} : this.serialize(), '', opt_asXmlNode);
 };
 
 
@@ -886,6 +890,35 @@ anychart.core.Chart.prototype.print = function(opt_stage) {
 };
 
 
+/**
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
+ * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
+ */
+anychart.core.Chart.prototype.legend = function(opt_value) {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
+/**
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.Chart|anychart.core.ui.Credits}
+ */
+anychart.core.Chart.prototype.credits = function(opt_value) {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
+/**
+ * Returns chart or gauge type. Published in charts.
+ * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes}
+ */
+anychart.core.Chart.prototype.getType = goog.abstractMethod;
+
+
 
 /**
  * @param {anychart.core.Chart} chart
@@ -913,3 +946,5 @@ anychart.core.Chart.prototype['container'] = anychart.core.Chart.prototype.conta
 anychart.core.Chart.prototype['draw'] = anychart.core.Chart.prototype.draw;//doc
 anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;//|need-ex
 anychart.core.Chart.prototype['toXml'] = anychart.core.Chart.prototype.toXml;//|need-ex
+anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//dummy DO NOT USE
+anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//dummy DO NOT USE

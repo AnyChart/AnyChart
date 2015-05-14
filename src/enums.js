@@ -53,6 +53,82 @@ anychart.enums.GaugeTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Cursor
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Cursor enum. Defines 15 items.
+ * @enum {string}
+ */
+anychart.enums.Cursor = acgraph.vector.Cursor;
+
+
+/**
+ * Normalizes value to Cursor enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.Cursor=} opt_default Default value, if input cannot be recognized. Defaults to DEFAULT.
+ * @return {anychart.enums.Cursor}
+ */
+anychart.enums.normalizeCursor = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'default':
+    case 'def':
+    case 'd':
+      return anychart.enums.Cursor.DEFAULT;
+    case 'crosshair':
+    case 'cross':
+      return anychart.enums.Cursor.CROSSHAIR;
+    case 'pointer':
+    case 'point':
+      return anychart.enums.Cursor.POINTER;
+    case 'move':
+      return anychart.enums.Cursor.MOVE;
+    case 'text':
+      return anychart.enums.Cursor.TEXT;
+    case 'wait':
+      return anychart.enums.Cursor.WAIT;
+    case 'help':
+      return anychart.enums.Cursor.HELP;
+    case 'n-resize':
+    case 'north':
+    case 'n':
+      return anychart.enums.Cursor.N_RESIZE;
+    case 'ne-resize':
+    case 'northeast':
+    case 'ne':
+      return anychart.enums.Cursor.NE_RESIZE;
+    case 'e-resize':
+    case 'east':
+    case 'e':
+      return anychart.enums.Cursor.E_RESIZE;
+    case 'se-resize':
+    case 'southeast':
+    case 'se':
+      return anychart.enums.Cursor.SE_RESIZE;
+    case 's-resize':
+    case 'south':
+    case 's':
+      return anychart.enums.Cursor.S_RESIZE;
+    case 'sw-resize':
+    case 'southwest':
+    case 'sw':
+      return anychart.enums.Cursor.SW_RESIZE;
+    case 'w-resize':
+    case 'west':
+    case 'w':
+      return anychart.enums.Cursor.W_RESIZE;
+    case 'nw-resize':
+    case 'northwest':
+    case 'nw':
+      return anychart.enums.Cursor.NW_RESIZE;
+  }
+  return opt_default || anychart.enums.Cursor.DEFAULT;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Anchor
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1057,6 +1133,95 @@ anychart.enums.LegendItemIconType = {
 };
 
 
+/**
+ * Normalizes legend item icon type.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.LegendItemIconType=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.LegendItemIconType} normalized value.
+ */
+anychart.enums.normalizeLegendItemIconType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.LegendItemIconType.AREA;
+    case 'bar':
+      return anychart.enums.LegendItemIconType.BAR;
+    case 'bubble':
+      return anychart.enums.LegendItemIconType.BUBBLE;
+    case 'candlestick':
+      return anychart.enums.LegendItemIconType.CANDLESTICK;
+    case 'column':
+      return anychart.enums.LegendItemIconType.COLUMN;
+    case 'line':
+      return anychart.enums.LegendItemIconType.LINE;
+    case 'marker':
+      return anychart.enums.LegendItemIconType.MARKER;
+    case 'ohlc':
+      return anychart.enums.LegendItemIconType.OHLC;
+    case 'rangearea':
+      return anychart.enums.LegendItemIconType.RANGE_AREA;
+    case 'rangebar':
+      return anychart.enums.LegendItemIconType.RANGE_BAR;
+    case 'rangecolumn':
+      return anychart.enums.LegendItemIconType.RANGE_COLUMN;
+    case 'rangesplinearea':
+      return anychart.enums.LegendItemIconType.RANGE_SPLINE_AREA;
+    case 'rangesteparea':
+      return anychart.enums.LegendItemIconType.RANGE_STEP_AREA;
+    case 'spline':
+      return anychart.enums.LegendItemIconType.SPLINE;
+    case 'splinearea':
+      return anychart.enums.LegendItemIconType.SPLINE_AREA;
+    case 'stepline':
+      return anychart.enums.LegendItemIconType.STEP_LINE;
+    case 'steparea':
+      return anychart.enums.LegendItemIconType.STEP_AREA;
+    case 'circle':
+      return anychart.enums.LegendItemIconType.CIRCLE;
+    case 'square':
+      return anychart.enums.LegendItemIconType.SQUARE;
+  }
+  return opt_default || anychart.enums.LegendItemIconType.SQUARE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  LegendItemsSourceMode
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Predefined icons type.
+ * @enum {string}
+ */
+anychart.enums.LegendItemsSourceMode = {
+  DEFAULT: 'default',
+  CATEGORIES: 'categories'
+};
+
+
+/**
+ * Normalizes legend items source mode.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.LegendItemsSourceMode=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.LegendItemsSourceMode} normalized value.
+ */
+anychart.enums.normalizeLegendItemsSourceMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'd':
+    case 'def':
+    case 'default':
+      return anychart.enums.LegendItemsSourceMode.DEFAULT;
+    case 'c':
+    case 'cat':
+    case 'categories':
+      return anychart.enums.LegendItemsSourceMode.CATEGORIES;
+  }
+  return opt_default || anychart.enums.LegendItemsSourceMode.DEFAULT;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  BulletMarkerType
@@ -1202,26 +1367,31 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
  * @enum {string}
  */
 anychart.enums.EventType = {
-  POINT_MOUSE_OUT: 'pointMouseOut',
-  POINT_MOUSE_OVER: 'pointMouseOver',
-  POINT_CLICK: 'pointClick',
-  POINT_DOUBLE_CLICK: 'pointDoubleClick',
-  CHART_DRAW: 'chartDraw',
+  POINT_MOUSE_OUT: 'pointmouseout',
+  POINT_MOUSE_OVER: 'pointmouseover',
+  POINT_MOUSE_MOVE: 'pointmousemove',
+  POINT_MOUSE_DOWN: 'pointmousedown',
+  POINT_MOUSE_UP: 'pointmouseup',
+  POINT_CLICK: 'pointclick',
+  POINT_DBLCLICK: 'pointdblclick',
+  CHART_DRAW: 'chartdraw',
 
-  LEGEND_ITEM_MOUSE_OUT: 'legendItemMouseOut',
-  LEGEND_ITEM_MOUSE_OVER: 'legendItemMouseOver',
-  LEGEND_ITEM_MOUSE_MOVE: 'legendItemMouseMove',
-  LEGEND_ITEM_CLICK: 'legendItemClick',
-  LEGEND_ITEM_DOUBLE_CLICK: 'legendItemDoubleClick',
+  LEGEND_ITEM_MOUSE_OUT: 'legenditemmouseout',
+  LEGEND_ITEM_MOUSE_OVER: 'legenditemmouseover',
+  LEGEND_ITEM_MOUSE_MOVE: 'legenditemmousemove',
+  LEGEND_ITEM_MOUSE_DOWN: 'legenditemmousedown',
+  LEGEND_ITEM_MOUSE_UP: 'legenditemmouseup',
+  LEGEND_ITEM_CLICK: 'legenditemclick',
+  LEGEND_ITEM_DBLCLICK: 'legenditemdblclick',
 
-  SCROLL_CHANGE: 'scrollChange',
+  SCROLL_CHANGE: 'scrollchange',
 
-  SPLITTER_CHANGE: 'splitterChange',
+  SPLITTER_CHANGE: 'splitterchange',
 
   SIGNAL: 'signal',
 
-  ROW_HOVER: 'rowHover',
-  ROW_CLICK: 'rowClick'
+  ROW_HOVER: 'rowhover',
+  ROW_CLICK: 'rowclick'
 };
 
 
@@ -1555,24 +1725,6 @@ anychart.enums.normalizeGaugeScaleTypes = function(value) {
 };
 
 
-/**
- * @param {string} value String scale name.
- * @return {anychart.scales.Linear|anychart.scales.Logarithmic} Scale for gauge axis.
- */
-anychart.enums.getGaugeScale = function(value) {
-  switch (anychart.enums.normalizeGaugeScaleTypes(value)) {
-    case anychart.enums.GaugeScaleTypes.LINEAR:
-      return anychart.scales.linear();
-      break;
-    case anychart.enums.GaugeScaleTypes.LOG:
-      return anychart.scales.log();
-      break;
-  }
-
-  return anychart.scales.linear();
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Errors, Warnings, Info
@@ -1592,7 +1744,13 @@ anychart.enums.ErrorCode = {
 
   INCORRECT_SCALE_TYPE: 5,
 
-  SCALE_DATE_RANGE_NOT_SET: 6
+  SCALE_DATE_RANGE_NOT_SET: 6,
+
+  EMPTY_CONFIG: 7,
+
+  NO_LEGEND_IN_CHART: 8,
+
+  NO_CREDITS_IN_CHART: 9
 };
 
 
@@ -1754,7 +1912,7 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
  * Horizontal align enum.
  * @enum {string}
  */
-anychart.enums.HALIGN = acgraph.vector.Text.HAlign;
+anychart.enums.HAlign = acgraph.vector.Text.HAlign;
 
 
 /**
@@ -1767,23 +1925,23 @@ anychart.enums.normalizeHAlign = function(value) {
   switch (value) {
     case 'left':
     case 'l':
-      return anychart.enums.HALIGN.LEFT;
+      return anychart.enums.HAlign.LEFT;
     case 'right':
     case 'r':
-      return anychart.enums.HALIGN.RIGHT;
+      return anychart.enums.HAlign.RIGHT;
     case 'center':
     case 'middle':
     case 'c':
     case 'm':
-      return anychart.enums.HALIGN.CENTER;
+      return anychart.enums.HAlign.CENTER;
     case 'start':
     case 's':
-      return anychart.enums.HALIGN.START;
+      return anychart.enums.HAlign.START;
     case 'end':
     case 'e':
-      return anychart.enums.HALIGN.END;
+      return anychart.enums.HAlign.END;
   }
-  return anychart.enums.HALIGN.START;
+  return anychart.enums.HAlign.START;
 };
 
 
@@ -1791,7 +1949,7 @@ anychart.enums.normalizeHAlign = function(value) {
  * Vertical align enum.
  * @enum {string}
  */
-anychart.enums.VALIGN = acgraph.vector.Text.VAlign;
+anychart.enums.VAlign = acgraph.vector.Text.VAlign;
 
 
 /**
@@ -1804,17 +1962,169 @@ anychart.enums.normalizeVAlign = function(value) {
   switch (value) {
     case 'top':
     case 't':
-      return anychart.enums.VALIGN.TOP;
+      return anychart.enums.VAlign.TOP;
     case 'bottom':
     case 'b':
-      return anychart.enums.VALIGN.BOTTOM;
+      return anychart.enums.VAlign.BOTTOM;
     case 'center':
     case 'middle':
     case 'c':
     case 'm':
-      return anychart.enums.VALIGN.MIDDLE;
+      return anychart.enums.VAlign.MIDDLE;
   }
-  return anychart.enums.VALIGN.TOP;
+  return anychart.enums.VAlign.TOP;
+};
+
+
+/**
+ * Font decoration enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextDecoration = acgraph.vector.Text.Decoration;
+
+
+/**
+ * Normalizes font decoration.
+ * @param {*} value
+ * @return {acgraph.vector.Text.Decoration}
+ */
+anychart.enums.normalizeFontDecoration = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'blink':
+    case 'b':
+      return anychart.enums.TextDecoration.BLINK;
+    case 'line-through':
+    case 'line_through':
+    case 'linethrough':
+    case 'line':
+    case 'l':
+      return anychart.enums.TextDecoration.LINE_THROUGH;
+    case 'overline':
+    case 'over':
+    case 'o':
+      return anychart.enums.TextDecoration.OVERLINE;
+    case 'underline':
+    case 'under':
+    case 'u':
+      return anychart.enums.TextDecoration.UNDERLINE;
+    case 'none':
+    case 'n':
+      return anychart.enums.TextDecoration.NONE;
+  }
+  return anychart.enums.TextDecoration.NONE;
+};
+
+
+/**
+ * Font style enumeration.
+ * @enum {string}
+ */
+anychart.enums.FontStyle = acgraph.vector.Text.FontStyle;
+
+
+/**
+ * Normalizes font style.
+ * @param {*} value
+ * @return {acgraph.vector.Text.FontStyle}
+ */
+anychart.enums.normalizeFontStyle = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'normal':
+    case 'n':
+      return anychart.enums.FontStyle.NORMAL;
+    case 'italic':
+    case 'i':
+      return anychart.enums.FontStyle.ITALIC;
+    case 'oblique':
+    case 'o':
+      return anychart.enums.FontStyle.OBLIQUE;
+  }
+  return anychart.enums.FontStyle.NORMAL;
+};
+
+
+/**
+ * Font variant enumeration.
+ * @enum {string}
+ */
+anychart.enums.FontVariant = acgraph.vector.Text.FontVariant;
+
+
+/**
+ * Normalizes font variant.
+ * @param {*} value
+ * @return {acgraph.vector.Text.FontVariant}
+ */
+anychart.enums.normalizeFontVariant = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'normal':
+    case 'n':
+      return anychart.enums.FontVariant.NORMAL;
+    case 'small-caps':
+    case 'small_caps':
+    case 'smallcaps':
+    case 'small':
+    case 'caps':
+    case 'sc':
+    case 's':
+    case 'c':
+      return anychart.enums.FontVariant.SMALL_CAP;
+  }
+  return anychart.enums.FontVariant.NORMAL;
+};
+
+
+/**
+ * Text direction enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextDirection = acgraph.vector.Text.Direction;
+
+
+/**
+ * Normalizes text direction.
+ * @param {*} value
+ * @return {acgraph.vector.Text.Direction}
+ */
+anychart.enums.normalizeTextDirection = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'ltr':
+    case 'l':
+      return anychart.enums.TextDirection.LTR;
+    case 'rtl':
+    case 'r':
+      return anychart.enums.TextDirection.RTL;
+  }
+  return anychart.enums.TextDirection.LTR;
+};
+
+
+/**
+ * Text wrap settings enumeration.
+ * @enum {string}
+ */
+anychart.enums.TextWrap = acgraph.vector.Text.TextWrap;
+
+
+/**
+ * Normalizes font style.
+ * @param {*} value
+ * @return {acgraph.vector.Text.TextWrap}
+ */
+anychart.enums.normalizeTextWrap = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'nowrap':
+    case 'no':
+    case 'n':
+      return anychart.enums.TextWrap.NO_WRAP;
+    default:
+      return anychart.enums.TextWrap.BY_LETTER;
+  }
 };
 
 
@@ -1831,6 +2141,22 @@ goog.exportSymbol('anychart.enums.Anchor.CENTER_BOTTOM', anychart.enums.Anchor.C
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_TOP', anychart.enums.Anchor.RIGHT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_CENTER', anychart.enums.Anchor.RIGHT_CENTER);
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_BOTTOM', anychart.enums.Anchor.RIGHT_BOTTOM);
+
+goog.exportSymbol('anychart.enums.Cursor.DEFAULT', anychart.enums.Cursor.DEFAULT);
+goog.exportSymbol('anychart.enums.Cursor.CROSSHAIR', anychart.enums.Cursor.CROSSHAIR);
+goog.exportSymbol('anychart.enums.Cursor.POINTER', anychart.enums.Cursor.POINTER);
+goog.exportSymbol('anychart.enums.Cursor.MOVE', anychart.enums.Cursor.MOVE);
+goog.exportSymbol('anychart.enums.Cursor.TEXT', anychart.enums.Cursor.TEXT);
+goog.exportSymbol('anychart.enums.Cursor.WAIT', anychart.enums.Cursor.WAIT);
+goog.exportSymbol('anychart.enums.Cursor.HELP', anychart.enums.Cursor.HELP);
+goog.exportSymbol('anychart.enums.Cursor.N_RESIZE', anychart.enums.Cursor.N_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.NE_RESIZE', anychart.enums.Cursor.NE_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.E_RESIZE', anychart.enums.Cursor.E_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.SE_RESIZE', anychart.enums.Cursor.SE_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.S_RESIZE', anychart.enums.Cursor.S_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.SW_RESIZE', anychart.enums.Cursor.SW_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.W_RESIZE', anychart.enums.Cursor.W_RESIZE);
+goog.exportSymbol('anychart.enums.Cursor.NW_RESIZE', anychart.enums.Cursor.NW_RESIZE);
 
 goog.exportSymbol('anychart.enums.Position.LEFT_TOP', anychart.enums.Position.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Position.LEFT_CENTER', anychart.enums.Position.LEFT_CENTER);
@@ -1877,6 +2203,9 @@ goog.exportSymbol('anychart.enums.MarkerType.STAR5', anychart.enums.MarkerType.S
 goog.exportSymbol('anychart.enums.MarkerType.STAR6', anychart.enums.MarkerType.STAR6);
 goog.exportSymbol('anychart.enums.MarkerType.STAR7', anychart.enums.MarkerType.STAR7);
 goog.exportSymbol('anychart.enums.MarkerType.STAR10', anychart.enums.MarkerType.STAR10);
+goog.exportSymbol('anychart.enums.MarkerType.PENTAGON', anychart.enums.MarkerType.PENTAGON);
+goog.exportSymbol('anychart.enums.MarkerType.TRAPEZIUM', anychart.enums.MarkerType.TRAPEZIUM);
+goog.exportSymbol('anychart.enums.MarkerType.LINE', anychart.enums.MarkerType.LINE);
 
 goog.exportSymbol('anychart.enums.MapAsTableMode.VALUE', anychart.enums.MapAsTableMode.VALUE);//doc
 goog.exportSymbol('anychart.enums.MapAsTableMode.RANGE', anychart.enums.MapAsTableMode.RANGE);//doc
@@ -1913,6 +2242,9 @@ goog.exportSymbol('anychart.enums.LegendItemIconType.STEP_AREA', anychart.enums.
 goog.exportSymbol('anychart.enums.LegendItemIconType.CIRCLE', anychart.enums.LegendItemIconType.CIRCLE);
 goog.exportSymbol('anychart.enums.LegendItemIconType.SQUARE', anychart.enums.LegendItemIconType.SQUARE);
 
+goog.exportSymbol('anychart.enums.LegendItemsSourceMode.DEFAULT', anychart.enums.LegendItemsSourceMode.DEFAULT);
+goog.exportSymbol('anychart.enums.LegendItemsSourceMode.CATEGORIES', anychart.enums.LegendItemsSourceMode.CATEGORIES);
+
 goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
 goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/
 
@@ -1922,14 +2254,19 @@ goog.exportSymbol('anychart.enums.GaugeSidePosition.OUTSIDE', anychart.enums.Gau
 
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OUT', anychart.enums.EventType.POINT_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_OVER', anychart.enums.EventType.POINT_MOUSE_OVER);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_DOWN', anychart.enums.EventType.POINT_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_UP', anychart.enums.EventType.POINT_MOUSE_UP);
+goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.EventType.POINT_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
-goog.exportSymbol('anychart.enums.EventType.POINT_DOUBLE_CLICK', anychart.enums.EventType.POINT_DOUBLE_CLICK);
+goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE', anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_DOWN', anychart.enums.EventType.LEGEND_ITEM_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP', anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_CLICK', anychart.enums.EventType.LEGEND_ITEM_CLICK);
-goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK', anychart.enums.EventType.LEGEND_ITEM_DOUBLE_CLICK);
+goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DBLCLICK', anychart.enums.EventType.LEGEND_ITEM_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);

@@ -35,7 +35,7 @@ anychart.core.scatter.series.Line = function(opt_data, opt_csvSettings) {
     return this['sourceColor'];
   });
   this.hoverStroke(function() {
-    return anychart.color.darken(this['sourceColor']);
+    return anychart.color.lighten(this['sourceColor']);
   });
 };
 goog.inherits(anychart.core.scatter.series.Line, anychart.core.scatter.series.BaseWithMarkers);
@@ -97,7 +97,7 @@ anychart.core.scatter.series.Line.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.path.clear();
-    this.colorizeShape(false);
+    this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -221,8 +221,6 @@ anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, event) 
     this.drawLabel(false);
     this.hideTooltip();
   }
-  // TODO(AntonKagakin): comment this to avoid series selection
-  // waiting for a feedback about this action.
   if (isNaN(this.hoverStatus)) {
     this.colorizeShape(true);
   }

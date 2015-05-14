@@ -107,7 +107,7 @@ anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
         .moveTo(x + widthHalf, close)
         .lineTo(x, close);
 
-    this.colorizeShape(false);
+    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 
     this.makeHoverable(path);
   }
@@ -573,7 +573,7 @@ anychart.core.cartesian.series.OHLC.prototype.restoreDefaults = function() {
     return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
         'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
         'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-        'C: ' + parseFloat(this['close']).toFixed(4) + '\n';
+        'C: ' + parseFloat(this['close']).toFixed(4);
   });
 
   var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());

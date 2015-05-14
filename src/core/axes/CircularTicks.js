@@ -59,6 +59,7 @@ anychart.core.axes.CircularTicks = function() {
    * @private
    */
   this.ticks_ = new anychart.core.ui.MarkersFactory();
+  this.ticks_.setParentEventTarget(this);
 
   /**
    * Ticks hatch fill.

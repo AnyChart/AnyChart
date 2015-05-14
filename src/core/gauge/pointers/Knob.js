@@ -96,6 +96,7 @@ anychart.core.gauge.pointers.Knob.prototype.verticesCurvature = function(opt_val
  */
 anychart.core.gauge.pointers.Knob.prototype.topRatio = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = goog.math.clamp(opt_value, 0, 1);
     if (this.topRatio_ != opt_value) {
       this.topRatio_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -113,6 +114,7 @@ anychart.core.gauge.pointers.Knob.prototype.topRatio = function(opt_value) {
  */
 anychart.core.gauge.pointers.Knob.prototype.bottomRatio = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = goog.math.clamp(opt_value, 0, 1);
     if (this.bottomRatio_ != opt_value) {
       this.bottomRatio_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -157,6 +159,108 @@ anychart.core.gauge.pointers.Knob.prototype.bottomRadius = function(opt_value) {
     return this;
   } else
     return this.bottomRadius_;
+};
+
+
+/**
+ * Drawing vertices sides.
+ * @param {acgraph.vector.Path} path Path for drawing.
+ * @param {number} asvs AngleStartVertexSector Angle where vertex sector started.
+ * @param {number} vss VerticesSectorSweep Sweep of vertex sector.
+ * @param {number} tvs TopVerticesSweep Half sweep of vertex sector part that placed under the top radius.
+ * @param {number} bvs BottomVerticesSweep Sweep of vertex sector parts that placed under the top bottom. Sweep of one it part.
+ * @param {number} ptr PixTopRadius Pixel value of top knob radius.
+ * @param {number} pbr PixBottomRadius Pixel value of bottom knob radius.
+ * @param {number} cx X coordinate of knob center.
+ * @param {number} cy Y coordinate of knob center.
+ * @param {number} csa CurvatureSideAngle. Relative of curvature ratio.
+ * @param {number} cv CurvatureValue. Pixel value of curvature max deflection.
+ * @param {boolean} invert Invert. Whether knob bottom radius over top radius.
+ * @param {boolean} isFirstSide Vertex have 2 sides, if this is first side - true, elese - false.
+ */
+anychart.core.gauge.pointers.Knob.prototype.drawVertexSide = function(path, asvs, vss, tvs, bvs, ptr, pbr, cx, cy, csa, cv, invert, isFirstSide) {
+  var control1x, control1y, control2x, control2y;
+  var xa, ya, xb, yb, xp, yp, xo, yo, loa, lop;
+  var angleStartPointVertexSide, angleEndPointVertexSide;
+  var startVertexSidePointX, startVertexSidePointY, endVertexSidePointX, endVertexSidePointY;
+  var vertexSideCenterX, vertexSideCenterY;
+  var vertexSideTiltAngle, curvatureBasePointAngle;
+  var curveBasePointX, curveBasePointY;
+  var tangentAngleRad, controlDirection;
+
+  if (isFirstSide) {
+    angleStartPointVertexSide = goog.math.standardAngle(asvs + bvs);
+    angleEndPointVertexSide = goog.math.standardAngle(asvs + vss / 2 - tvs);
+  } else {
+    angleStartPointVertexSide = goog.math.standardAngle(asvs + vss - bvs);
+    angleEndPointVertexSide = goog.math.standardAngle(asvs + vss / 2 + tvs);
+  }
+
+  startVertexSidePointX = cx + Math.cos(goog.math.toRadians(angleStartPointVertexSide)) * pbr;
+  startVertexSidePointY = cy + Math.sin(goog.math.toRadians(angleStartPointVertexSide)) * pbr;
+
+  endVertexSidePointX = cx + Math.cos(goog.math.toRadians(angleEndPointVertexSide)) * ptr;
+  endVertexSidePointY = cy + Math.sin(goog.math.toRadians(angleEndPointVertexSide)) * ptr;
+
+  //Coordinates of the vertex side center.
+  vertexSideCenterX = (startVertexSidePointX + endVertexSidePointX) / 2;
+  vertexSideCenterY = (startVertexSidePointY + endVertexSidePointY) / 2;
+
+  //Angle of the tangent in radians.
+  tangentAngleRad = goog.math.toRadians(angleStartPointVertexSide + 90);
+
+  xa = startVertexSidePointX;
+  ya = startVertexSidePointY;
+  xb = startVertexSidePointX + Math.cos(tangentAngleRad) * 100;
+  yb = startVertexSidePointY + Math.sin(tangentAngleRad) * 100;
+  xp = endVertexSidePointX;
+  yp = endVertexSidePointY;
+
+  //the coordinates of the base perpendicular to the tangent
+  xo = (xa * Math.pow(yb - ya, 2) + xp * Math.pow(xb - xa, 2) + (xb - xa) * (yb - ya) * (yp - ya)) / (Math.pow(yb - ya, 2) + Math.pow(xb - xa, 2)) || 0;
+  yo = (((xb - xa) * (xp - xo)) / (yb - ya)) + yp || 0;
+
+  //OA length
+  loa = Math.sqrt(Math.pow(xa - xo, 2) + Math.pow(ya - yo, 2));
+  //OP length
+  lop = Math.sqrt(Math.pow(xp - xo, 2) + Math.pow(yp - yo, 2));
+
+  //Tilt angle of vertex side to the tangent in the start vertex point.
+  vertexSideTiltAngle = goog.math.toDegrees(Math.atan(lop / loa));
+  if (this.topRatio_ < 1 - this.bottomRatio_) {
+    vertexSideTiltAngle = isFirstSide ?
+        90 - vertexSideTiltAngle :
+        -(90 - vertexSideTiltAngle);
+  } else {
+    vertexSideTiltAngle = isFirstSide ?
+        -(90 - vertexSideTiltAngle) :
+        90 - vertexSideTiltAngle;
+  }
+
+  //Calc angle for curvature of the vertex side
+  curvatureBasePointAngle = angleStartPointVertexSide + (isFirstSide ? -csa : csa) + vertexSideTiltAngle;
+
+  //Base point for curvature of the vertex side
+  curveBasePointX = vertexSideCenterX + Math.cos(goog.math.toRadians(curvatureBasePointAngle)) * cv;
+  curveBasePointY = vertexSideCenterY + Math.sin(goog.math.toRadians(curvatureBasePointAngle)) * cv;
+
+  controlDirection = this.verticesCurvature_ < .5 ? 90 : -90;
+  //First control point of cubic curve
+  control1x = curveBasePointX + Math.cos(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
+  control1y = curveBasePointY + Math.sin(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
+
+  controlDirection = this.verticesCurvature_ < .5 ? -90 : 90;
+  //First control point of cubic curve
+  control2x = curveBasePointX + Math.cos(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
+  control2y = curveBasePointY + Math.sin(goog.math.toRadians(curvatureBasePointAngle + controlDirection)) * (cv * .5);
+
+  if (isFirstSide) {
+    if (invert) path.curveTo(control1x, control1y, control2x, control2y, endVertexSidePointX, endVertexSidePointY);
+    else path.curveTo(control2x, control2y, control1x, control1y, endVertexSidePointX, endVertexSidePointY);
+  } else {
+    if (invert) path.curveTo(control1x, control1y, control2x, control2y, startVertexSidePointX, startVertexSidePointY);
+    else path.curveTo(control2x, control2y, control1x, control1y, startVertexSidePointX, startVertexSidePointY);
+  }
 };
 
 
@@ -235,8 +339,6 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
 
     var valueRatio = goog.math.clamp(scale.transform(value), 0, 1);
     var startAngle = goog.math.standardAngle(axisStartAngle + valueRatio * axisSweepAngle);
-    var angle0, angle1, angle2;
-
 
     this.contextProvider['cx'] = cx;
     this.contextProvider['cy'] = cy;
@@ -245,56 +347,50 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
     //we shouldn't opening secret for mere mortals
     this.contextProvider['angle'] = goog.math.standardAngle(startAngle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
 
-
-    var r0 = Math.abs(pixTopRadius - pixBottomRadius);
-    var len0 = r0 / 2;
+    //difference between knob radius.
+    var dr = Math.abs(pixTopRadius - pixBottomRadius);
+    //half dr
+    var halfDr = dr / 2;
+    //if bottom radius more then top radius - this is invert mode.
     var invert = pixTopRadius < pixBottomRadius;
-    var r1 = invert ? pixBottomRadius - len0 : pixBottomRadius + len0;
-    var curvatureSide = this.verticesCurvature_ < .5 ? -90 : 90;
-    var curvatureValue = Math.abs(.5 - this.verticesCurvature_) * len0;
-
-    var ax, ay, ax1, ay1, control1x, control1y, control2x, control2y, endX, endY, i;
+    //We need change vector direction relative verticesCurvature value.
+    var curvatureSideAngle = this.verticesCurvature_ < .5 ? 90 : -90;
+    //Pixel value of curvature max deflection.
+    var curvatureValue = Math.abs(.5 - this.verticesCurvature_) * halfDr;
+    var angleStartVertexSector, angleStartPointVertexSide, angleEndPointVertexSide, i;
 
     this.domElement.clear();
 
     for (i = 0; i < this.verticesCount_; i++) {
-      angle0 = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
-      angle1 = goog.math.standardAngle(angle0 + (verticesSectorSweep - topVerticesSweep * 2) / 2);
-      angle2 = goog.math.standardAngle(angle0 + verticesSectorSweep - bottomVerticesSweep);
+      angleStartVertexSector = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
 
-      this.domElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angle0, bottomVerticesSweep, i != 0);
+      this.domElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartVertexSector, bottomVerticesSweep, i != 0);
 
-      ax = cx + Math.cos(goog.math.toRadians(angle1)) * r1;
-      ay = cy + Math.sin(goog.math.toRadians(angle1)) * r1;
-      ax1 = ax + Math.cos(goog.math.toRadians(angle1 + curvatureSide)) * curvatureValue;
-      ay1 = ay + Math.sin(goog.math.toRadians(angle1 + curvatureSide)) * curvatureValue;
-      control1x = ax1 + Math.cos(goog.math.toRadians(angle1 - 180)) * (curvatureValue * .5);
-      control1y = ay1 + Math.sin(goog.math.toRadians(angle1 - 180)) * (curvatureValue * .5);
-      control2x = ax1 + Math.cos(goog.math.toRadians(angle1)) * (curvatureValue * .5);
-      control2y = ay1 + Math.sin(goog.math.toRadians(angle1)) * (curvatureValue * .5);
-      endX = cx + Math.cos(goog.math.toRadians(angle1)) * pixTopRadius;
-      endY = cy + Math.sin(goog.math.toRadians(angle1)) * pixTopRadius;
+      this.drawVertexSide(
+          /** @type {acgraph.vector.Path} */(this.domElement),
+          angleStartVertexSector,
+          verticesSectorSweep,
+          topVerticesSweep,
+          bottomVerticesSweep,
+          pixTopRadius,
+          pixBottomRadius,
+          cx, cy, curvatureSideAngle, curvatureValue, invert, true);
 
-      if (invert) this.domElement.curveTo(control2x, control2y, control1x, control1y, endX, endY);
-      else this.domElement.curveTo(control1x, control1y, control2x, control2y, endX, endY);
+      angleEndPointVertexSide = goog.math.standardAngle(angleStartVertexSector + verticesSectorSweep / 2 - topVerticesSweep);
+      this.domElement.circularArc(cx, cy, pixTopRadius, pixTopRadius, angleEndPointVertexSide, topVerticesSweep * 2);
 
-      ax = cx + Math.cos(goog.math.toRadians(angle2)) * r1;
-      ay = cy + Math.sin(goog.math.toRadians(angle2)) * r1;
-      ax1 = ax + Math.cos(goog.math.toRadians(angle2 + curvatureSide * -1)) * curvatureValue;
-      ay1 = ay + Math.sin(goog.math.toRadians(angle2 + curvatureSide * -1)) * curvatureValue;
-      control1x = ax1 + Math.cos(goog.math.toRadians(angle2)) * (curvatureValue * .5);
-      control1y = ay1 + Math.sin(goog.math.toRadians(angle2)) * (curvatureValue * .5);
-      control2x = ax1 + Math.cos(goog.math.toRadians(angle2 - 180)) * (curvatureValue * .5);
-      control2y = ay1 + Math.sin(goog.math.toRadians(angle2 - 180)) * (curvatureValue * .5);
-      endX = cx + Math.cos(goog.math.toRadians(angle2)) * pixBottomRadius;
-      endY = cy + Math.sin(goog.math.toRadians(angle2)) * pixBottomRadius;
+      this.drawVertexSide(
+          /** @type {acgraph.vector.Path} */(this.domElement),
+          angleStartVertexSector,
+          verticesSectorSweep,
+          topVerticesSweep,
+          bottomVerticesSweep,
+          pixTopRadius,
+          pixBottomRadius,
+          cx, cy, curvatureSideAngle, curvatureValue, invert, false);
 
-      this.domElement.circularArc(cx, cy, pixTopRadius, pixTopRadius, angle1, topVerticesSweep * 2);
-
-      if (invert) this.domElement.curveTo(control2x, control2y, control1x, control1y, endX, endY);
-      else this.domElement.curveTo(control1x, control1y, control2x, control2y, endX, endY);
-
-      this.domElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angle2, bottomVerticesSweep);
+      angleStartPointVertexSide = goog.math.standardAngle(angleStartVertexSector + verticesSectorSweep - bottomVerticesSweep);
+      this.domElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartPointVertexSide, bottomVerticesSweep);
     }
 
     this.domElement.close();
@@ -303,43 +399,35 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
       this.hatchFillElement.clear();
 
       for (i = 0; i < this.verticesCount_; i++) {
-        angle0 = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
-        angle1 = goog.math.standardAngle(angle0 + (verticesSectorSweep - topVerticesSweep * 2) / 2);
-        angle2 = goog.math.standardAngle(angle0 + verticesSectorSweep - bottomVerticesSweep);
+        angleStartVertexSector = goog.math.standardAngle(startAngle + i * verticesSectorSweep);
 
-        this.hatchFillElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angle0, bottomVerticesSweep, i != 0);
+        this.hatchFillElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartVertexSector, bottomVerticesSweep, i != 0);
 
-        ax = cx + Math.cos(goog.math.toRadians(angle1)) * r1;
-        ay = cy + Math.sin(goog.math.toRadians(angle1)) * r1;
-        ax1 = ax + Math.cos(goog.math.toRadians(angle1 + curvatureSide)) * curvatureValue;
-        ay1 = ay + Math.sin(goog.math.toRadians(angle1 + curvatureSide)) * curvatureValue;
-        control1x = ax1 + Math.cos(goog.math.toRadians(angle1 - 180)) * (curvatureValue * .5);
-        control1y = ay1 + Math.sin(goog.math.toRadians(angle1 - 180)) * (curvatureValue * .5);
-        control2x = ax1 + Math.cos(goog.math.toRadians(angle1)) * (curvatureValue * .5);
-        control2y = ay1 + Math.sin(goog.math.toRadians(angle1)) * (curvatureValue * .5);
-        endX = cx + Math.cos(goog.math.toRadians(angle1)) * pixTopRadius;
-        endY = cy + Math.sin(goog.math.toRadians(angle1)) * pixTopRadius;
+        this.drawVertexSide(
+            /** @type {acgraph.vector.Path} */(this.hatchFillElement),
+            angleStartVertexSector,
+            verticesSectorSweep,
+            topVerticesSweep,
+            bottomVerticesSweep,
+            pixTopRadius,
+            pixBottomRadius,
+            cx, cy, curvatureSideAngle, curvatureValue, invert, true);
 
-        if (invert) this.hatchFillElement.curveTo(control2x, control2y, control1x, control1y, endX, endY);
-        else this.hatchFillElement.curveTo(control1x, control1y, control2x, control2y, endX, endY);
+        angleEndPointVertexSide = goog.math.standardAngle(angleStartVertexSector + verticesSectorSweep / 2 - topVerticesSweep);
+        this.hatchFillElement.circularArc(cx, cy, pixTopRadius, pixTopRadius, angleEndPointVertexSide, topVerticesSweep * 2);
 
-        ax = cx + Math.cos(goog.math.toRadians(angle2)) * r1;
-        ay = cy + Math.sin(goog.math.toRadians(angle2)) * r1;
-        ax1 = ax + Math.cos(goog.math.toRadians(angle2 + curvatureSide * -1)) * curvatureValue;
-        ay1 = ay + Math.sin(goog.math.toRadians(angle2 + curvatureSide * -1)) * curvatureValue;
-        control1x = ax1 + Math.cos(goog.math.toRadians(angle2)) * (curvatureValue * .5);
-        control1y = ay1 + Math.sin(goog.math.toRadians(angle2)) * (curvatureValue * .5);
-        control2x = ax1 + Math.cos(goog.math.toRadians(angle2 - 180)) * (curvatureValue * .5);
-        control2y = ay1 + Math.sin(goog.math.toRadians(angle2 - 180)) * (curvatureValue * .5);
-        endX = cx + Math.cos(goog.math.toRadians(angle2)) * pixBottomRadius;
-        endY = cy + Math.sin(goog.math.toRadians(angle2)) * pixBottomRadius;
+        this.drawVertexSide(
+            /** @type {acgraph.vector.Path} */(this.hatchFillElement),
+            angleStartVertexSector,
+            verticesSectorSweep,
+            topVerticesSweep,
+            bottomVerticesSweep,
+            pixTopRadius,
+            pixBottomRadius,
+            cx, cy, curvatureSideAngle, curvatureValue, invert, false);
 
-        this.hatchFillElement.circularArc(cx, cy, pixTopRadius, pixTopRadius, angle1, topVerticesSweep * 2);
-
-        if (invert) this.hatchFillElement.curveTo(control2x, control2y, control1x, control1y, endX, endY);
-        else this.hatchFillElement.curveTo(control1x, control1y, control2x, control2y, endX, endY);
-
-        this.hatchFillElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angle2, bottomVerticesSweep);
+        angleStartPointVertexSide = goog.math.standardAngle(angleStartVertexSector + verticesSectorSweep - bottomVerticesSweep);
+        this.hatchFillElement.circularArc(cx, cy, pixBottomRadius, pixBottomRadius, angleStartPointVertexSide, bottomVerticesSweep);
       }
 
       this.hatchFillElement.close();

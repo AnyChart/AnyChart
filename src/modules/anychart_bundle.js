@@ -1,3 +1,4 @@
 goog.provide('anychart.modules.anychart_bundle');
 goog.require('anychart.modules.anychart');
-//alias module for anychart
+goog.require('anychart.modules.anygantt');
+goog.require('anychart.modules.base');

@@ -39,7 +39,7 @@ anychart.core.ui.Credits = function() {
    * @type {string}
    * @private
    */
-  this.logoSrc_ = 'http://static.anychart.com/logo.png';
+  this.logoSrc_ = this.addProtocol_('static.anychart.com/logo.png');
 
 
   /**
@@ -97,6 +97,17 @@ anychart.core.ui.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.CREDITS_POSITION;
+
+
+/**
+ * Adds protocol to url.
+ * @param {string} url Url.
+ * @return {string} Url with protocol.
+ * @private
+ */
+anychart.core.ui.Credits.prototype.addProtocol_ = function(url) {
+  return ('https:' == goog.dom.getWindow().location.protocol ? 'https://' : 'http://') + url;
+};
 
 
 /**
@@ -348,7 +359,7 @@ anychart.core.ui.Credits.prototype.draw = function() {
       goog.dispose(imageLoader);
     }, false, this);
 
-    imageLoader.addImage('logo', 'http://static.anychart.com/logo.png');
+    imageLoader.addImage('logo', this.addProtocol_('static.anychart.com/logo.png'));
     imageLoader.start();
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
@@ -415,7 +426,7 @@ anychart.core.ui.Credits.prototype.getRemainingBounds = function() {
  */
 anychart.core.ui.Credits.prototype.getHTMLString_ = function(valid, appendImage) {
   if (appendImage) {
-    return '<img class="' + anychart.core.ui.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : 'http://static.anychart.com/logo.png') + '">';
+    return '<img class="' + anychart.core.ui.Credits.CssClass_.LOGO + '" src="' + (valid ? this.logoSrc_ : this.addProtocol_('static.anychart.com/logo.png')) + '">';
   }
   return '<span class="' + anychart.core.ui.Credits.CssClass_.TEXT + '">' + (valid ? this.text() : 'AnyChart Trial Version') + '</span>';
 };

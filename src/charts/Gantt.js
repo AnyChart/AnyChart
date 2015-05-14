@@ -4,7 +4,6 @@ goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.Splitter');
-
 goog.require('goog.i18n.DateTimeFormat');
 
 
@@ -147,6 +146,12 @@ goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
  */
 anychart.charts.Gantt.CHART_TYPE = 'gantt';
 anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt;
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.getType = function() {
+  return anychart.enums.ChartTypes.GANTT;
+};
 
 
 /**
@@ -676,7 +681,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.charts.Gantt.prototype.createLegendItemsProvider = function() {
+anychart.charts.Gantt.prototype.createLegendItemsProvider = function(sourceMode) {
   return []; //TODO (A.Kudryavtsev): Do we need any kind of standard legend here?
 };
 
@@ -841,6 +846,4 @@ anychart.charts.Gantt.prototype['expandAll'] = anychart.charts.Gantt.prototype.e
 anychart.charts.Gantt.prototype['expandTask'] = anychart.charts.Gantt.prototype.expandTask;
 anychart.charts.Gantt.prototype['collapseTask'] = anychart.charts.Gantt.prototype.collapseTask;
 anychart.charts.Gantt.prototype['splitterPosition'] = anychart.charts.Gantt.prototype.splitterPosition;
-
-
-
+anychart.charts.Gantt.prototype['getType'] = anychart.charts.Gantt.prototype.getType;

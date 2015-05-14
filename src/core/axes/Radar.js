@@ -22,6 +22,8 @@ anychart.core.axes.Radar = function() {
 
   this.labelsBounds_ = [];
   this.line_ = acgraph.path();
+  this.bindHandlersToGraphics(this.line_);
+  this.registerDisposable(this.line_);
 
   this.labels()
       .suspendSignalsDispatching()
@@ -198,6 +200,7 @@ anychart.core.axes.Radar.prototype.labelsBounds_ = null;
 anychart.core.axes.Radar.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -238,6 +241,7 @@ anychart.core.axes.Radar.prototype.labelsInvalidated_ = function(event) {
 anychart.core.axes.Radar.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.core.axes.RadialTicks();
+    this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
@@ -752,10 +756,6 @@ anychart.core.axes.Radar.prototype.draw = function() {
   this.ticks().suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.line_) {
-      this.line_ = acgraph.path();
-      this.registerDisposable(this.line_);
-    }
     this.line_.clear();
     this.line_.stroke(this.stroke_);
 

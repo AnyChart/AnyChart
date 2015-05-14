@@ -89,23 +89,14 @@ anychart.charts.Polar = function() {
    * @private
    */
   this.dataBounds_ = null;
-
-  // Add handler to listen legend item click for legend and enable/disable series.
-  var legend = /** @type {anychart.core.ui.Legend} */ (this.legend());
-  legend.listen(anychart.enums.EventType.LEGEND_ITEM_CLICK, function(event) {
-    // function that enables or disables series by index of clicked legend item
-
-    var cartesianChart = /** @type {anychart.charts.Polar} */ (this);
-    var index = event['index'];
-    var series = cartesianChart.getSeries(index);
-    if (series) {
-      series.enabled(!series.enabled());
-    }
-
-  }, false, this);
-
 };
 goog.inherits(anychart.charts.Polar, anychart.core.SeparateChart);
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.getType = function() {
+  return anychart.enums.ChartTypes.POLAR;
+};
 
 
 /**
@@ -478,10 +469,11 @@ anychart.charts.Polar.prototype.onGridSignal_ = function(event) {
 anychart.charts.Polar.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = new anychart.core.axes.Polar();
+    this.xAxis_.setParentEventTarget(this);
     this.xAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
     this.registerDisposable(this.xAxis_);
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.POLAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.POLAR_AXES | anychart.ConsistencyState.BOUNDS);
   }
 
   if (goog.isDef(opt_value)) {
@@ -518,10 +510,11 @@ anychart.charts.Polar.prototype.xAxis = function(opt_value) {
 anychart.charts.Polar.prototype.yAxis = function(opt_value) {
   if (!this.yAxis_) {
     this.yAxis_ = new anychart.core.axes.Radial();
+    this.yAxis_.setParentEventTarget(this);
     this.yAxis_.zIndex(anychart.charts.Polar.ZINDEX_AXIS);
     this.registerDisposable(this.yAxis_);
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
-    this.invalidate(anychart.ConsistencyState.POLAR_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.POLAR_AXES | anychart.ConsistencyState.BOUNDS);
   }
 
   if (goog.isDef(opt_value)) {
@@ -639,24 +632,27 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
     var index = this.series_.length - 1;
     var inc = index * anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Polar.ZINDEX_SERIES) + inc);
+    instance.labels().setAutoZIndex(anychart.charts.Polar.ZINDEX_LABEL + inc + anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER / 2);
+    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
     var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1));
+    instance.setAutoMarkerType(markerType);
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(anychart.charts.Polar.ZINDEX_MARKER + inc);
       instance.markers().setAutoType(markerType);
+      instance.markers().setAutoFill(instance.getMarkerFill());
+      instance.markers().setAutoStroke(instance.getMarkerStroke());
     } else {
       // this else would be only if instance is Marker series
       instance.type(markerType);
     }
-    instance.labels().setAutoZIndex(anychart.charts.Polar.ZINDEX_LABEL + inc + anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER / 2);
-    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoMarkerType(markerType);
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
     instance.restoreDefaults();
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(
@@ -713,6 +709,11 @@ anychart.charts.Polar.prototype.seriesInvalidated_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.POLAR_SCALES;
+  }
+  if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
+    state |= anychart.ConsistencyState.CHART_LEGEND;
+    if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+      state |= anychart.ConsistencyState.BOUNDS;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
@@ -839,7 +840,7 @@ anychart.charts.Polar.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
     this.palette_.listenSignals(this.paletteInvalidated_, this);
     this.registerDisposable(this.palette_);
     if (doDispatch)
-      this.invalidate(anychart.ConsistencyState.POLAR_PALETTE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.POLAR_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -851,7 +852,7 @@ anychart.charts.Polar.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
  */
 anychart.charts.Polar.prototype.paletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.POLAR_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.POLAR_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -863,7 +864,7 @@ anychart.charts.Polar.prototype.paletteInvalidated_ = function(event) {
  */
 anychart.charts.Polar.prototype.markerPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.POLAR_MARKER_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.POLAR_MARKER_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -875,7 +876,7 @@ anychart.charts.Polar.prototype.markerPaletteInvalidated_ = function(event) {
  */
 anychart.charts.Polar.prototype.hatchFillPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.POLAR_HATCH_FILL_PALETTE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.POLAR_HATCH_FILL_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -960,6 +961,7 @@ anychart.charts.Polar.prototype.calculate = function() {
 
     for (i = 0, count = this.series_.length; i < count; i++) {
       aSeries = this.series_[i];
+      if (!aSeries.enabled()) continue;
       xScale = /** @type {anychart.scales.ScatterBase} */ (aSeries.xScale());
       yScale = /** @type {anychart.scales.Base} */ (aSeries.yScale());
 
@@ -1211,18 +1213,63 @@ anychart.charts.Polar.prototype.invalidateSeries_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.charts.Polar.prototype.createLegendItemsProvider = function() {
+anychart.charts.Polar.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+  var i, count;
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
   var data = [];
-  for (var i = 0, count = this.series_.length; i < count; i++) {
+  // we need to calculate statistics
+  this.calculate();
+  for (i = 0, count = this.series_.length; i < count; i++) {
     /** @type {anychart.core.polar.series.Base} */
     var series = this.series_[i];
-    data.push(series.getLegendItemData());
+    var itemData = series.getLegendItemData(itemsTextFormatter);
+    itemData['sourceUid'] = goog.getUid(this);
+    itemData['sourceKey'] = series.index();
+    data.push(itemData);
   }
-
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.legendItemCanInteractInMode = function(mode) {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.legendItemClick = function(item) {
+  var sourceKey = item.sourceKey();
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.enabled(!series.enabled());
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.legendItemOver = function(item) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.hoverSeries();
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.legendItemOut = function(item) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.unhover();
+  }
 };
 
 
@@ -1506,3 +1553,4 @@ anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.pal
 anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;//doc|ex
 anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
 anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex
+anychart.charts.Polar.prototype['getType'] = anychart.charts.Polar.prototype.getType;

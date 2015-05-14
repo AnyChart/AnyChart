@@ -95,6 +95,38 @@ anychart.core.utils.Bounds.prototype.height_ = null;
 
 
 /**
+ * Min width value.
+ * @type {(number|string|null)}
+ * @private
+ */
+anychart.core.utils.Bounds.prototype.minWidth_ = null;
+
+
+/**
+ * Min height value.
+ * @type {(number|string|null)}
+ * @private
+ */
+anychart.core.utils.Bounds.prototype.minHeight_ = null;
+
+
+/**
+ * Max width value.
+ * @type {(number|string|null)}
+ * @private
+ */
+anychart.core.utils.Bounds.prototype.maxWidth_ = null;
+
+
+/**
+ * Max height value.
+ * @type {(number|string|null)}
+ * @private
+ */
+anychart.core.utils.Bounds.prototype.maxHeight_ = null;
+
+
+/**
  * Normalizes all info stored in this object and returns a standard Rect of it.
  * @param {(number|anychart.math.Rect|{left:number,top:number,width:number,height:number})=} opt_parentLeftOrRect Optional parent left coord to shift bounds if parent in shifted.
  * @param {number=} opt_parentTop Optional parent top coord to shift bounds if parent in shifted.
@@ -123,7 +155,11 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
     opt_parentHeight = anychart.utils.toNumber(opt_parentHeight);
   }
 
-  var left, top, width, height;
+  var left, top, width, height, tmp;
+  var minWidth = goog.isNull(this.minWidth_) ? NaN : anychart.utils.normalizeSize(this.minWidth_, opt_parentWidth);
+  var minHeight = goog.isNull(this.minHeight_) ? NaN : anychart.utils.normalizeSize(this.minHeight_, opt_parentHeight);
+  var maxWidth = goog.isNull(this.maxWidth_) ? NaN : anychart.utils.normalizeSize(this.maxWidth_, opt_parentWidth);
+  var maxHeight = goog.isNull(this.maxHeight_) ? NaN : anychart.utils.normalizeSize(this.maxHeight_, opt_parentHeight);
 
   if (!goog.isNull(this.left_)) {
     left = anychart.utils.normalizeSize(this.left_, opt_parentWidth);
@@ -134,13 +170,25 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
     } else {
       width = (+opt_parentWidth - left) || 0;
     }
+    if (!isNaN(minWidth))
+      width = Math.max(width, minWidth);
+    if (!isNaN(maxWidth))
+      width = Math.min(width, maxWidth);
   } else if (!goog.isNull(this.right_)) {
     if (!goog.isNull(this.width_)) {
       width = anychart.utils.normalizeSize(this.width_, opt_parentWidth);
+      if (!isNaN(minWidth))
+        width = Math.max(width, minWidth);
+      if (!isNaN(maxWidth))
+        width = Math.min(width, maxWidth);
       left = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true) - width;
     } else {
-      left = 0;
-      width = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true);
+      width = tmp = anychart.utils.normalizeSize(this.right_, opt_parentWidth, true);
+      if (!isNaN(minWidth))
+        width = Math.max(width, minWidth);
+      if (!isNaN(maxWidth))
+        width = Math.min(width, maxWidth);
+      left = tmp - width;
     }
   } else {
     left = 0;
@@ -149,6 +197,10 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
     } else {
       width = +opt_parentWidth || 0;
     }
+    if (!isNaN(minWidth))
+      width = Math.max(width, minWidth);
+    if (!isNaN(maxWidth))
+      width = Math.min(width, maxWidth);
   }
 
   if (!goog.isNull(this.top_)) {
@@ -160,13 +212,25 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
     } else {
       height = (+opt_parentHeight - top) || 0;
     }
+    if (!isNaN(minHeight))
+      height = Math.max(height, minHeight);
+    if (!isNaN(maxHeight))
+      height = Math.min(height, maxHeight);
   } else if (!goog.isNull(this.bottom_)) {
     if (!goog.isNull(this.height_)) {
       height = anychart.utils.normalizeSize(this.height_, opt_parentHeight);
+      if (!isNaN(minHeight))
+        height = Math.max(height, minHeight);
+      if (!isNaN(maxHeight))
+        height = Math.min(height, maxHeight);
       top = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true) - height;
     } else {
-      top = 0;
-      height = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true);
+      height = tmp = anychart.utils.normalizeSize(this.bottom_, opt_parentHeight, true);
+      if (!isNaN(minHeight))
+        height = Math.max(height, minHeight);
+      if (!isNaN(maxHeight))
+        height = Math.min(height, maxHeight);
+      top = tmp - height;
     }
   } else {
     top = 0;
@@ -175,6 +239,10 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
     } else {
       height = +opt_parentHeight || 0;
     }
+    if (!isNaN(minHeight))
+      height = Math.max(height, minHeight);
+    if (!isNaN(maxHeight))
+      height = Math.min(height, maxHeight);
   }
 
   if (!isNaN(opt_parentLeftOrRect))
@@ -197,12 +265,16 @@ anychart.core.utils.Bounds.prototype.toRect = function(opt_parentLeftOrRect, opt
  * @return {!anychart.core.utils.Bounds} Returns itself for method chaining.
  */
 anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_width, opt_height) {
-  var left, top, right, bottom, width, height;
+  var left, top, right, bottom, width, height, minWidth, minHeight, maxWidth, maxHeight;
   if (opt_xOrRect instanceof anychart.core.utils.Bounds) {
     left = opt_xOrRect.left_;
     top = opt_xOrRect.top_;
     width = opt_xOrRect.width_;
     height = opt_xOrRect.height_;
+    minWidth = opt_xOrRect.minWidth_;
+    minHeight = opt_xOrRect.minHeight_;
+    maxWidth = opt_xOrRect.maxWidth_;
+    maxHeight = opt_xOrRect.maxHeight_;
     right = opt_xOrRect.right_;
     bottom = opt_xOrRect.bottom_;
   } else if (opt_xOrRect instanceof anychart.math.Rect) {
@@ -212,6 +284,10 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
     height = opt_xOrRect.height;
     right = null;
     bottom = null;
+    minWidth = null;
+    minHeight = null;
+    maxWidth = null;
+    maxHeight = null;
   } else if (goog.isArray(opt_xOrRect)) {
     left = goog.isDef(opt_xOrRect[0]) ? opt_xOrRect[0] : null;
     top = goog.isDef(opt_xOrRect[1]) ? opt_xOrRect[1] : null;
@@ -219,6 +295,10 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
     height = goog.isDef(opt_xOrRect[3]) ? opt_xOrRect[3] : null;
     right = null;
     bottom = null;
+    minWidth = null;
+    minHeight = null;
+    maxWidth = null;
+    maxHeight = null;
   } else if (goog.isObject(opt_xOrRect)) {
     left = goog.isDef(opt_xOrRect['left']) ? opt_xOrRect['left'] : null;
     top = goog.isDef(opt_xOrRect['top']) ? opt_xOrRect['top'] : null;
@@ -226,6 +306,10 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
     bottom = goog.isDef(opt_xOrRect['bottom']) ? opt_xOrRect['bottom'] : null;
     width = goog.isDef(opt_xOrRect['width']) ? opt_xOrRect['width'] : null;
     height = goog.isDef(opt_xOrRect['height']) ? opt_xOrRect['height'] : null;
+    minWidth = goog.isDef(opt_xOrRect['minWidth']) ? opt_xOrRect['minWidth'] : null;
+    minHeight = goog.isDef(opt_xOrRect['minHeight']) ? opt_xOrRect['minHeight'] : null;
+    maxWidth = goog.isDef(opt_xOrRect['maxWidth']) ? opt_xOrRect['maxWidth'] : null;
+    maxHeight = goog.isDef(opt_xOrRect['maxHeight']) ? opt_xOrRect['maxHeight'] : null;
   } else {
     left = goog.isDef(opt_xOrRect) ? opt_xOrRect : null;
     top = goog.isDef(opt_y) ? opt_y : null;
@@ -233,10 +317,23 @@ anychart.core.utils.Bounds.prototype.set = function(opt_xOrRect, opt_y, opt_widt
     height = goog.isDef(opt_height) ? opt_height : null;
     right = null;
     bottom = null;
+    minWidth = null;
+    minHeight = null;
+    maxWidth = null;
+    maxHeight = null;
   }
 
   this.suspendSignalsDispatching();
-  this.left(left).top(top).right(right).bottom(bottom).width(width).height(height);
+  this.left(left)
+      .top(top)
+      .right(right)
+      .bottom(bottom)
+      .width(width)
+      .height(height)
+      .minWidth(minWidth)
+      .minHeight(minHeight)
+      .maxWidth(maxWidth)
+      .maxHeight(maxHeight);
   this.resumeSignalsDispatching(true);
 
   return this;
@@ -354,12 +451,88 @@ anychart.core.utils.Bounds.prototype.height = function(opt_value) {
 
 
 /**
+ * Gets or sets minimum width value. Returns previously set position, not the derived pixel value.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {(number|string|null|anychart.core.utils.Bounds)} Value, or itself for method chaining.
+ */
+anychart.core.utils.Bounds.prototype.minWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) || goog.isString(opt_value)) ? opt_value : null;
+    if (val != this.minWidth_) {
+      this.minWidth_ = val;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  } else
+    return this.minWidth_;
+};
+
+
+/**
+ * Gets or sets minimum height value. Returns previously set position, not the derived pixel value.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {(number|string|null|anychart.core.utils.Bounds)} Value, or itself for method chaining.
+ */
+anychart.core.utils.Bounds.prototype.minHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) || goog.isString(opt_value)) ? opt_value : null;
+    if (val != this.minHeight_) {
+      this.minHeight_ = val;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  } else
+    return this.minHeight_;
+};
+
+
+/**
+ * Gets or sets maximum height value. Returns previously set position, not the derived pixel value.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {(number|string|null|anychart.core.utils.Bounds)} Value, or itself for method chaining.
+ */
+anychart.core.utils.Bounds.prototype.maxWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) || goog.isString(opt_value)) ? opt_value : null;
+    if (val != this.maxWidth_) {
+      this.maxWidth_ = val;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  } else
+    return this.maxWidth_;
+};
+
+
+/**
+ * Gets or sets maximum height value. Returns previously set position, not the derived pixel value.
+ * @param {(number|string|null)=} opt_value Value to set.
+ * @return {(number|string|null|anychart.core.utils.Bounds)} Value, or itself for method chaining.
+ */
+anychart.core.utils.Bounds.prototype.maxHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = ((goog.isNumber(opt_value) && !isNaN(opt_value)) || goog.isString(opt_value)) ? opt_value : null;
+    if (val != this.maxHeight_) {
+      this.maxHeight_ = val;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  } else
+    return this.maxHeight_;
+};
+
+
+/**
  * Define, is one of the bounds settings set in percent.
  * @return {boolean} Is one of the bounds settings set in percent.
  */
 anychart.core.utils.Bounds.prototype.dependsOnContainerSize = function() {
   return anychart.utils.isPercent(this.width_) ||
       anychart.utils.isPercent(this.height_) ||
+      anychart.utils.isPercent(this.minWidth_) ||
+      anychart.utils.isPercent(this.minHeight_) ||
+      anychart.utils.isPercent(this.maxWidth_) ||
+      anychart.utils.isPercent(this.maxHeight_) ||
       anychart.utils.isPercent(this.left_) ||
       anychart.utils.isPercent(this.top_) ||
       this.bottom_ != null ||
@@ -384,6 +557,14 @@ anychart.core.utils.Bounds.prototype.serialize = function() {
     json['width'] = this.width_;
   if (!goog.isNull(this.height_))
     json['height'] = this.height_;
+  if (!goog.isNull(this.minWidth_))
+    json['minWidth'] = this.minWidth_;
+  if (!goog.isNull(this.minHeight_))
+    json['minHeight'] = this.minHeight_;
+  if (!goog.isNull(this.maxWidth_))
+    json['maxWidth'] = this.maxWidth_;
+  if (!goog.isNull(this.maxHeight_))
+    json['maxHeight'] = this.maxHeight_;
   return json;
 };
 
@@ -403,5 +584,9 @@ anychart.core.utils.Bounds.prototype['bottom'] = anychart.core.utils.Bounds.prot
 anychart.core.utils.Bounds.prototype['left'] = anychart.core.utils.Bounds.prototype.left;
 anychart.core.utils.Bounds.prototype['width'] = anychart.core.utils.Bounds.prototype.width;
 anychart.core.utils.Bounds.prototype['height'] = anychart.core.utils.Bounds.prototype.height;
+anychart.core.utils.Bounds.prototype['minWidth'] = anychart.core.utils.Bounds.prototype.minWidth;
+anychart.core.utils.Bounds.prototype['minHeight'] = anychart.core.utils.Bounds.prototype.minHeight;
+anychart.core.utils.Bounds.prototype['maxWidth'] = anychart.core.utils.Bounds.prototype.maxWidth;
+anychart.core.utils.Bounds.prototype['maxHeight'] = anychart.core.utils.Bounds.prototype.maxHeight;
 anychart.core.utils.Bounds.prototype['set'] = anychart.core.utils.Bounds.prototype.set;
 anychart.core.utils.Bounds.prototype['toRect'] = anychart.core.utils.Bounds.prototype.toRect;

@@ -881,7 +881,7 @@ anychart.core.gantt.Timeline.prototype.getDataLayer_ = function() {
 
 /**
  * Handler for tooltip mouse move.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseMoveTooltipHandler_ = function(event) {
@@ -897,7 +897,9 @@ anychart.core.gantt.Timeline.prototype.mouseMoveTooltipHandler_ = function(event
       'period': mapItem['period']
     } : mapItem['item'];
     if (item) {
-      var position = tooltip.isFloating() ? new acgraph.math.Coordinate(event.clientX, event.clientY) : new acgraph.math.Coordinate(0, 0);
+      var position = tooltip.isFloating() ?
+          new acgraph.math.Coordinate(event['clientX'], event['clientY']) :
+          new acgraph.math.Coordinate(0, 0);
       tooltip.show(item, position);
     }
   }
@@ -906,7 +908,7 @@ anychart.core.gantt.Timeline.prototype.mouseMoveTooltipHandler_ = function(event
 
 /**
  * Handler for tooltip mouse out.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseOutTooltipHandler_ = function(event) {
@@ -917,7 +919,7 @@ anychart.core.gantt.Timeline.prototype.mouseOutTooltipHandler_ = function(event)
 /**
  * Handler for UI element mouse click.
  * UI element is any time bar/milestone rhombus on timeline.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseClickElementHandler_ = function(event) {
@@ -1050,7 +1052,7 @@ anychart.core.gantt.Timeline.prototype.getBase_ = function() {
 
 /**
  * Handler for mouse move.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseMoveHandler_ = function(event) {
@@ -1083,7 +1085,7 @@ anychart.core.gantt.Timeline.prototype.mouseMoveHandler_ = function(event) {
 
 /**
  * Handler for mouse out.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseOutHandler_ = function(event) {
@@ -1094,7 +1096,7 @@ anychart.core.gantt.Timeline.prototype.mouseOutHandler_ = function(event) {
 
 /**
  * Handler for mouse click.
- * @param {acgraph.events.Event} event - Event.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseClickHandler_ = function(event) {

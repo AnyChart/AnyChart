@@ -1,6 +1,7 @@
 goog.provide('anychart.ui.GanttToolbar');
 goog.provide('anychart.ui.Toolbar');
 
+goog.require('anychart');
 goog.require('anychart.core.ui.toolbar.MenuItemRenderer');
 goog.require('anychart.core.ui.toolbar.SubMenu');
 goog.require('anychart.core.ui.toolbar.Toolbar');
@@ -259,7 +260,7 @@ goog.inherits(anychart.ui.GanttToolbar, anychart.ui.Toolbar);
 
 /**
  * Constructor function for default toolbar.
- * @return {!anychart.ui.Toolbar}
+ * @return {anychart.ui.Toolbar}
  */
 anychart.toolbar = function() {
   return new anychart.ui.Toolbar();
@@ -268,7 +269,7 @@ anychart.toolbar = function() {
 
 /**
  * Constructor function for gantt toolbar.
- * @return {!anychart.ui.GanttToolbar}
+ * @return {anychart.ui.GanttToolbar}
  */
 anychart.ganttToolbar = function() {
   return new anychart.ui.GanttToolbar();

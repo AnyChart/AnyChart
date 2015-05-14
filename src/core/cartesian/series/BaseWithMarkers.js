@@ -17,10 +17,6 @@ goog.require('anychart.enums');
 anychart.core.cartesian.series.BaseWithMarkers = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.markers().listen(acgraph.events.EventType.MOUSEOVER, this.handleMarkerMouseOver, false, this);
-  this.markers().listen(acgraph.events.EventType.MOUSEOUT, this.handleMarkerMouseOut, false, this);
-  this.markers().listen(acgraph.events.EventType.CLICK, this.handleMarkerBrowserEvents, false, this);
-  this.markers().listen(acgraph.events.EventType.DBLCLICK, this.handleMarkerBrowserEvents, false, this);
   this.markers().position(anychart.enums.Position.CENTER);
 };
 goog.inherits(anychart.core.cartesian.series.BaseWithMarkers, anychart.core.cartesian.series.Base);
@@ -56,54 +52,6 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hasMarkers = function()
 
 
 /**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOver = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    if (event && goog.isDef(event['markerIndex'])) {
-      this.hoverPoint(event['markerIndex'], event);
-      var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-      acgraph.events.listen(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    } else
-      this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseOut = function(event) {
-  if (this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event))) {
-    var markerElement = this.markers().getMarker(event['markerIndex']).getDomElement();
-    acgraph.events.unlisten(markerElement, acgraph.events.EventType.MOUSEMOVE, this.handleMarkerMouseMove, false, this);
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerMouseMove = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEvents = function(event) {
-  this.dispatchEvent(new anychart.core.cartesian.series.Base.BrowserEvent(this, event));
-};
-
-
-/**
  * Getter for series data markers.
  * @example <t>listingOnly</t>
  * series.markers().size(10);
@@ -123,6 +71,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.handleMarkerBrowserEven
 anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_value) {
   if (!this.markers_) {
     this.markers_ = new anychart.core.ui.MarkersFactory();
+    this.markers_.setParentEventTarget(this);
     this.registerDisposable(this.markers_);
     this.markers_.listenSignals(this.markersInvalidated_, this);
   }
@@ -176,7 +125,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.markersInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
   }
 };
 
@@ -220,7 +169,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing = function
 anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint = function() {
   goog.base(this, 'drawPoint');
   if (this.enabled() && this.firstPointDrawn) {
-    this.drawMarker(false);
+    this.drawMarker(this.hoverStatus == this.getIterator().getIndex());
   }
 };
 
@@ -337,10 +286,16 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkerStroke = funct
 /**
  * @inheritDoc
  */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = function() {
-  var data = goog.base(this, 'getLegendItemData');
-  if (this.markers().enabled())
-    data['iconMarker'] = this.markers().type();
+anychart.core.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var markers = this.markers();
+  markers.setAutoFill(this.getMarkerFill());
+  markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  if (markers.enabled()) {
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.type();
+    data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
+    data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  }
   return data;
 };
 

@@ -154,7 +154,6 @@ anychart.ConsistencyState = {
   LEGEND_TITLE: 1 << 6,
   LEGEND_SEPARATOR: 1 << 7,
   LEGEND_PAGINATOR: 1 << 8,
-  LEGEND_DATA: 1 << 9,
   //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
   MARKERS_FACTORY_HANDLERS: 1 << 5,
   //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
@@ -181,6 +180,13 @@ anychart.ConsistencyState = {
   GAUGE_HATCH_FILL: 1 << 14,
   GAUGE_AXIS_MARKERS: 1 << 15,
   GAUGE_SCALE: 1 << 16,
+  //---------------------------------- TABLE (VB) ---------------------------------------------
+  TABLE_CELL_BOUNDS: 1 << 5,
+  TABLE_OVERLAP: 1 << 6,
+  TABLE_BORDERS: 1 << 7,
+  TABLE_FILLS: 1 << 8,
+  TABLE_CONTENT: 1 << 9,
+  TABLE_STRUCTURE: 1 << 10,
   /**
    * Combination of all states.
    */
@@ -198,7 +204,8 @@ anychart.Signal = {
   NEEDS_RECALCULATION: 1 << 2,
   BOUNDS_CHANGED: 1 << 3,
   DATA_CHANGED: 1 << 4,
-  META_CHANGED: 1 << 5
+  META_CHANGED: 1 << 5,
+  NEED_UPDATE_LEGEND: 1 << 6
 };
 
 
@@ -336,12 +343,17 @@ anychart.core.Base.prototype.hasInvalidationState = function(state) {
  * NOTE: YOU CAN ONLY SEND SIGNALS FROM SUPPORTED_SIGNALS MASK!
  *
  * @param {anychart.Signal|number} state Invalidation state(s).
+ * @param {boolean=} opt_force Force to dispatch signal.
  */
-anychart.core.Base.prototype.dispatchSignal = function(state) {
+anychart.core.Base.prototype.dispatchSignal = function(state, opt_force) {
   state &= this.SUPPORTED_SIGNALS;
   if (!state) return;
-  if (isNaN(this.suspendedDispatching)) {
+  if (isNaN(this.suspendedDispatching) || !!opt_force) {
+    // Hack to prevent Signal events bubbling. May be we should use all advantages of bubbling but not now.
+    var parent = this.getParentEventTarget();
+    this.setParentEventTarget(null);
     this.dispatchEvent(new anychart.SignalEvent(this, state));
+    this.setParentEventTarget(parent);
   } else {
     this.suspendedDispatching |= state;
   }
@@ -569,6 +581,31 @@ anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
 
 
 /**
+ * Dispatches an event (or event like object) and calls all listeners
+ * listening for events of this type. The type of the event is decided by the
+ * type property on the event object.
+ *
+ * If any of the listeners returns false OR calls preventDefault then this
+ * function will return false.  If one of the capture listeners calls
+ * stopPropagation, then the bubble listeners won't fire.
+ *
+ * @param {goog.events.EventLike} e Event object.
+ * @return {boolean} If anyone called preventDefault on the event object (or
+ *     if any of the listeners returns false) this will also return false.
+ */
+anychart.core.Base.prototype.dispatchEvent = function(e) {
+  // If accepting a string or object, create a custom event object so that
+  // preventDefault and stopPropagation work with the event.
+  if (goog.isString(e)) {
+    e = e.toLowerCase();
+  } else if ('type' in e) {
+    e.type = String(e.type).toLowerCase();
+  }
+  return goog.base(this, 'dispatchEvent', e);
+};
+
+
+/**
  * Adds an event listener to an implementing object.<br/>
  * The listener can be added to an object once, and if it is added one more time,
  * its key will be returned.<br/>
@@ -591,9 +628,10 @@ anychart.SignalEvent.prototype.targetNeedsRecalculation = function() {
  * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
  *     listener.
  * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'listen', type, listener, opt_useCapture, opt_listenerScope);
+  return goog.base(this, 'listen', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -624,7 +662,7 @@ anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, o
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'listenOnce', type, listener, opt_useCapture, opt_listenerScope);
+  return goog.base(this, 'listenOnce', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -656,7 +694,7 @@ anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCaptur
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.unlisten = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'unlisten', type, listener, opt_useCapture, opt_listenerScope);
+  return goog.base(this, 'unlisten', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -708,6 +746,7 @@ anychart.core.Base.prototype.unlistenByKey = function(key) {
  * @return {number} Number of listeners removed.
  */
 anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
+  if (goog.isDef(opt_type)) opt_type = String(opt_type).toLowerCase();
   return goog.base(this, 'removeAllListeners', opt_type);
 };
 

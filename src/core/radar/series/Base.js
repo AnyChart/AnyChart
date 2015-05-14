@@ -4,6 +4,8 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.LegendContextProvider');
+goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -47,16 +49,17 @@ anychart.core.radar.series.Base = function(opt_data, opt_csvSettings) {
   this.statistics_ = {};
 
   // make label hoverable
-  this.labels().disablePointerEvents(false);
-  this.labels().listen(acgraph.events.EventType.MOUSEOVER, this.handleLabelMouseOver, false, this);
-  this.labels().listen(acgraph.events.EventType.MOUSEOUT, this.handleLabelMouseOut, false, this);
-  this.labels().position(anychart.enums.Position.CENTER);
-  this.labels().enabled(false);
+  var labels = this.labels();
+  labels.disablePointerEvents(false);
+  labels.position(anychart.enums.Position.CENTER);
+  labels.enabled(false);
   (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
 
   this.hatchFill(false);
   this.startAngle(0);
   this.resumeSignalsDispatching(false);
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove);
 };
 goog.inherits(anychart.core.radar.series.Base, anychart.core.VisualBaseWithBounds);
 
@@ -82,7 +85,8 @@ anychart.core.radar.series.Base.prototype.pixelBoundsCache;
 anychart.core.radar.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
-    anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.NEEDS_RECALCULATION |
+    anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -371,41 +375,6 @@ anychart.core.radar.series.Base.prototype.strokeInternal = (function() {
 anychart.core.radar.series.Base.prototype.hoverStroke_ = null;
 
 
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.Base.prototype.handleLabelMouseOver = function(event) {
-  if (event && goog.isDef(event['labelIndex'])) {
-    this.hoverPoint(event['labelIndex'], event);
-    var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
-    acgraph.events.listen(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
-  } else
-    this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.Base.prototype.handleLabelMouseOut = function(event) {
-  var labelElement = this.labels().getLabel(event['labelIndex']).getDomElement();
-  acgraph.events.unlisten(labelElement, acgraph.events.EventType.MOUSEMOVE, this.handleLabelMouseMove, false, this);
-  this.unhover();
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.Base.prototype.handleLabelMouseMove = function(event) {
-  if (event && goog.isDef(event.target['__tagIndex']))
-    this.hoverPoint(event.target['__tagIndex'], event);
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data
@@ -638,6 +607,42 @@ anychart.core.radar.series.Base.prototype.startAngle = function(opt_value) {
 
 
 /**
+ * Sets/Gets legend item setting for series.
+ * @param {(Object)=} opt_value Legend item settings object.
+ * @return {(anychart.core.utils.LegendItemSettings|anychart.core.radar.series.Base)} Legend item settings or self for chaining.
+ */
+anychart.core.radar.series.Base.prototype.legendItem = function(opt_value) {
+  if (!this.legendItem_) {
+    this.legendItem_ = new anychart.core.utils.LegendItemSettings();
+    this.registerDisposable(this.legendItem_);
+    this.legendItem_.listenSignals(this.onLegendItemSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.legendItem_.setup(opt_value);
+    return this;
+  }
+
+  return this.legendItem_;
+};
+
+
+/**
+ * Listener for legend item settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.radar.series.Base.prototype.onLegendItemSignal_ = function(event) {
+  var signal = anychart.Signal.NEED_UPDATE_LEGEND;
+  var force = false;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+    force = true;
+  }
+  this.dispatchSignal(signal, force);
+};
+
+
+/**
  * DO NOT PUBLISH.
  */
 anychart.core.radar.series.Base.prototype.resetCategorisation = function() {
@@ -851,7 +856,7 @@ anychart.core.radar.series.Base.prototype.drawPoint = function() {
     else
       this.firstPointDrawn = this.drawFirstPoint();
     if (this.firstPointDrawn) {
-      this.drawLabel(false);
+      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
     }
   }
 };
@@ -889,6 +894,7 @@ anychart.core.radar.series.Base.prototype.startDrawing = function() {
 
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
+    this.bindHandlersToGraphics(this.rootLayer);
     this.registerDisposable(this.rootLayer);
   }
 
@@ -1013,7 +1019,7 @@ anychart.core.radar.series.Base.prototype.drawLabel = function(hovered) {
 /**
  * Show data point tooltip.
  * @protected
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate tooltip to show.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate tooltip to show.
  */
 anychart.core.radar.series.Base.prototype.showTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
@@ -1021,7 +1027,7 @@ anychart.core.radar.series.Base.prototype.showTooltip = function(opt_event) {
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
         this.createFormatProvider(),
-        new acgraph.math.Coordinate(opt_event.clientX, opt_event.clientY));
+        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
   } else {
     tooltip.show(
         this.createFormatProvider(),
@@ -1094,93 +1100,130 @@ anychart.core.radar.series.Base.prototype.drawSubsequentPoint = goog.abstractMet
 //  Interactivity
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.radar.series.Base.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  res['pointIndex'] = this.getIndexByEvent(res);
+  return res;
+};
+
+
 /**
  * Get point index by event.
- * @param {acgraph.events.Event} event .
+ * @param {anychart.core.MouseEvent} event .
  * @protected
- * @return {?number} Point index.
+ * @return {number} Point index.
  */
 anychart.core.radar.series.Base.prototype.getIndexByEvent = function(event) {
-  if (goog.isDef(event.target['__tagIndex']))
-    return event.target['__tagIndex'];
-  else
-    return null;
+  return anychart.utils.toNumber(anychart.utils.extractTag(event['domTarget']));
 };
 
 
 /**
- * @param {acgraph.events.Event} event .
+ * @param {anychart.core.MouseEvent} event .
  * @protected
  */
-anychart.core.radar.series.Base.prototype.handleMouseOver = function(event) {
-  var res = this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event));
-  if (res) {
-    if (event && event.target) {
-      var index = this.getIndexByEvent(event);
-      if (!goog.isNull(index)) {
-        this.hoverPoint(/** @type {number} */ (index), event);
-        acgraph.events.listen(
-            event.target,
-            acgraph.events.EventType.MOUSEMOVE,
-            this.handleMouseMove,
-            false,
-            this);
-      }
-      // TODO(AntonKagakin):
-      // Due to the fact that continious series can get point index by the coordinate
-      // we comment this for now - so no series selection.
-      // Let's wait for feedback on this.
-      //else if (event.target['__tagSeriesGlobal'])
-      //  this.hoverSeries();
-      else
-        this.unhover();
-    } else
-      this.unhover();
+anychart.core.radar.series.Base.prototype.handleMouseOverAndMove = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt &&
+      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && !isNaN(this.hoverStatus)) ||
+      this.dispatchEvent(evt))) {
+    // we don't want to dispatch if this an out-over from the same point
+    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
+    this.hoverPoint(/** @type {number} */ (evt['pointIndex']), event);
   }
 };
 
 
 /**
- * @param {acgraph.events.Event} event .
- * @protected
- */
-anychart.core.radar.series.Base.prototype.handleMouseMove = function(event) {
-  var res = this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event));
-  if (res) {
-    if (event && event.target) {
-      var index = this.getIndexByEvent(event);
-      if (!goog.isNull(index)) {
-        this.hoverPoint(/** @type {number} */ (index), event);
-      }
-    }
-  }
-};
-
-
-/**
- * @param {acgraph.events.Event} event .
+ * @param {anychart.core.MouseEvent} event .
  * @protected
  */
 anychart.core.radar.series.Base.prototype.handleMouseOut = function(event) {
-  var res = this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event));
-  if (res) {
-    acgraph.events.unlisten(
-        event.target,
-        acgraph.events.EventType.MOUSEMOVE,
-        this.handleMouseMove,
-        false,
-        this);
+  var evt = this.makePointEvent(event);
+  var prevTag = anychart.utils.toNumber(anychart.utils.extractTag(event['relatedDomTarget']));
+  var index = evt['pointIndex'];
+  if (anychart.utils.checkIfParent(this, event['relatedTarget']) && (isNaN(prevTag) || prevTag == index)) {
+    // this means we got an out-over on the same point, for example - from the point to inside label
+    // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
+    this.hoverPoint(/** @type {number} */ (index), event);
+  } else if (this.dispatchEvent(evt)) {
     this.unhover();
   }
 };
 
 
 /**
- * @param {acgraph.events.Event} event
+ * @param {anychart.core.MouseEvent} event .
  * @protected
  */
-anychart.core.radar.series.Base.prototype.handleBrowserEvents = function(event) {
-  this.dispatchEvent(new anychart.core.radar.series.Base.BrowserEvent(this, event));
+anychart.core.radar.series.Base.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ * @protected
+ */
+anychart.core.radar.series.Base.prototype.makePointEvent = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  event['pointIndex'] = pointIndex;
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'series': this,
+    'iterator': iter,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
 };
 
 
@@ -1202,7 +1245,7 @@ anychart.core.radar.series.Base.prototype.hoverSeries = goog.abstractMethod;
 /**
  * Hovers a point of the series by its index.
  * @param {number} index Index of the point to hover.
- * @param {goog.events.BrowserEvent=} opt_event Event that initiate point hovering.<br/>
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
  *    <b>Note:</b> Used only to display float tooltip.
  * @return {!anychart.core.radar.series.Base}  {@link anychart.core.radar.series.Base} instance for method chaining.
  */
@@ -1225,13 +1268,9 @@ anychart.core.radar.series.Base.prototype.unhover = goog.abstractMethod;
 anychart.core.radar.series.Base.prototype.makeHoverable = function(element, opt_seriesGlobal) {
   if (!element) return;
   if (opt_seriesGlobal)
-    element['__tagSeriesGlobal'] = true;
+    element.tag = true;
   else
-    element['__tagIndex'] = this.getIterator().getIndex();
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOVER, this.handleMouseOver, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.MOUSEOUT, this.handleMouseOut, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.CLICK, this.handleBrowserEvents, false, this);
-  (/** @type {acgraph.vector.Element} */(element)).listen(acgraph.events.EventType.DBLCLICK, this.handleBrowserEvents, false, this);
+    element.tag = this.getIterator().getIndex();
 };
 
 
@@ -1394,6 +1433,7 @@ anychart.core.radar.series.Base.prototype.onTooltipSignal_ = function(event) {
 anychart.core.radar.series.Base.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.registerDisposable(this.labels_);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
   }
@@ -1556,7 +1596,7 @@ anychart.core.radar.series.Base.prototype.color = function(opt_fillOrColorOrKeys
     var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.color_ != color) {
       this.color_ = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1625,7 +1665,7 @@ anychart.core.radar.series.Base.prototype.hatchFill = function(opt_patternFillOr
 
     if (hatchFill != this.hatchFill_) {
       this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1822,7 +1862,7 @@ anychart.core.radar.series.Base.prototype.fill = function(opt_fillOrColorOrKeys,
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
       this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -1997,7 +2037,7 @@ anychart.core.radar.series.Base.prototype.stroke = function(opt_strokeOrFill, op
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.strokeInternal) {
       this.strokeInternal = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -2115,20 +2155,56 @@ anychart.core.radar.series.Base.prototype.normalizeColor = function(color, var_a
 
 
 /**
+ * Creates context provider for legend items text formatter function.
+ * @return {anychart.core.utils.LegendContextProvider} Legend context provider.
+ * @private
+ */
+anychart.core.radar.series.Base.prototype.createLegendContextProvider_ = function() {
+  if (!this.legendProvider_)
+    this.legendProvider_ = new anychart.core.utils.LegendContextProvider(this);
+  return this.legendProvider_;
+};
+
+
+/**
  * Return color for legend item.
+ * @param {Function} itemsTextFormatter Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.core.radar.series.Base.prototype.getLegendItemData = function() {
-  return /** @type {!anychart.core.ui.Legend.LegendItemProvider} */ ({
-    'index': this.index(),
-    'text': goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index(),
-    'iconType': this.getLegendIconType() || anychart.enums.LegendItemIconType.SQUARE,
-    'iconStroke': this.getFinalStroke(false, false),
-    'iconFill': this.getFinalFill(false, false),
-    'iconHatchFill': this.getFinalHatchFill(false, false),
-    'iconMarker': null,
-    'meta': this.meta()
-  });
+anychart.core.radar.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var legendItem = this.legendItem();
+  legendItem.markAllConsistent();
+  var json = legendItem.serialize();
+  var iconFill, iconStroke, iconHatchFill;
+  if (goog.isFunction(legendItem.iconFill())) {
+    iconFill = legendItem.iconFill().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconStroke())) {
+    iconStroke = legendItem.iconStroke().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconHatchFill())) {
+    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill_);
+  }
+  var itemText;
+  if (goog.isFunction(itemsTextFormatter)) {
+    var format = this.createLegendContextProvider_();
+    itemText = itemsTextFormatter.call(format, format);
+  }
+  if (!goog.isString(itemText))
+    itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
+
+  var ret = {
+    'meta': /** @type {Object} */ (this.meta()),
+    'text': /** @type {string} */ (itemText),
+    'iconEnabled': true,
+    'iconType': this.getLegendIconType(),
+    'iconStroke': iconStroke || this.getFinalStroke(false, false),
+    'iconFill': iconFill || this.getFinalFill(false, false),
+    'iconHatchFill': iconHatchFill || this.getFinalHatchFill(false, false),
+    'disabled': !this.enabled()
+  };
+  goog.object.extend(ret, json);
+  return ret;
 };
 
 
@@ -2162,6 +2238,12 @@ anychart.core.radar.series.Base.prototype.getLegendIconType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
+  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
+};
+
+
 /**
  * @inheritDoc
  */
@@ -2175,6 +2257,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
   json['tooltip'] = this.tooltip().serialize();
+  json['legendItem'] = this.legendItem().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(
@@ -2271,107 +2354,7 @@ anychart.core.radar.series.Base.prototype.setupByJSON = function(config) {
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
   this.tooltip(config['tooltip']);
-};
-
-
-
-/**
- * Encapsulates browser event for acgraph.
- * @param {anychart.core.radar.series.Base} target EventTarget to be set as a target of the event.
- * @param {goog.events.BrowserEvent=} opt_e Normalized browser event to initialize this event.
- * @constructor
- * @extends {goog.events.BrowserEvent}
- */
-anychart.core.radar.series.Base.BrowserEvent = function(target, opt_e) {
-  goog.base(this);
-  if (opt_e)
-    this.copyFrom(opt_e, target);
-
-  /**
-   * Point index.
-   * @type {number}
-   */
-  this['pointIndex'] = opt_e && opt_e.target && opt_e.target['__tagIndex'];
-  if (isNaN(this['pointIndex']))
-    this['pointIndex'] = -1;
-
-  /**
-   * Series data iterator ready for the point capturing.
-   * @type {!anychart.data.Iterator}
-   */
-  this['iterator'] = target.data().getIterator();
-  this['iterator'].select(this['pointIndex']) || this['iterator'].reset();
-
-  /**
-   * Series.
-   * @type {anychart.core.radar.series.Base}
-   */
-  this['series'] = target;
-};
-goog.inherits(anychart.core.radar.series.Base.BrowserEvent, goog.events.BrowserEvent);
-
-
-/**
- * An override of BrowserEvent.event_ field to allow compiler to treat it properly.
- * @private
- * @type {goog.events.BrowserEvent}
- */
-anychart.core.radar.series.Base.BrowserEvent.prototype.event_;
-
-
-/**
- * Copies all info from a BrowserEvent to represent a new one, rearmed event, that can be redispatched.
- * @param {goog.events.BrowserEvent} e Normalized browser event to copy the event from.
- * @param {goog.events.EventTarget=} opt_target EventTarget to be set as a target of the event.
- */
-anychart.core.radar.series.Base.BrowserEvent.prototype.copyFrom = function(e, opt_target) {
-  var type = e.type;
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.POINT_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.POINT_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.POINT_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.POINT_DOUBLE_CLICK;
-      break;
-  }
-  this.type = type;
-  // TODO (Anton Saukh): this awful typecast must be removed when it is no longer needed.
-  // In the BrowserEvent.init() method there is a TODO from Santos, asking to change typification
-  // from Node to EventTarget, which would make more sense.
-  /** @type {Node} */
-  var target = /** @type {Node} */(/** @type {Object} */(opt_target));
-  this.target = target || e.target;
-  this.currentTarget = e.currentTarget || this.target;
-  this.relatedTarget = e.relatedTarget || this.target;
-
-  this.offsetX = e.offsetX;
-  this.offsetY = e.offsetY;
-
-  this.clientX = e.clientX;
-  this.clientY = e.clientY;
-
-  this.screenX = e.screenX;
-  this.screenY = e.screenY;
-
-  this.button = e.button;
-
-  this.keyCode = e.keyCode;
-  this.charCode = e.charCode;
-  this.ctrlKey = e.ctrlKey;
-  this.altKey = e.altKey;
-  this.shiftKey = e.shiftKey;
-  this.metaKey = e.metaKey;
-  this.platformModifierKey = e.platformModifierKey;
-  this.state = e.state;
-
-  this.event_ = e;
-  delete this.propagationStopped_;
+  this.legendItem(config['legendItem']);
 };
 
 
@@ -2391,3 +2374,4 @@ anychart.core.radar.series.Base.prototype['hoverLabels'] = anychart.core.radar.s
 anychart.core.radar.series.Base.prototype['tooltip'] = anychart.core.radar.series.Base.prototype.tooltip;//doc|ex
 anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
 anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex
+anychart.core.radar.series.Base.prototype['legendItem'] = anychart.core.radar.series.Base.prototype.legendItem;

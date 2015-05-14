@@ -66,7 +66,7 @@ anychart.core.axisMarkers.CircularRange = function() {
   this.axisIndex_;
 
   /**
-   * @type {anychart.core.ui.MarkersFactory|acgraph.vector.Path}
+   * @type {acgraph.vector.Path}
    * @protected
    */
   this.domElement;

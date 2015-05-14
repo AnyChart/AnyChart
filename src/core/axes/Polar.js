@@ -23,6 +23,8 @@ anychart.core.axes.Polar = function() {
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
   this.line_ = acgraph.circle();
+  this.bindHandlersToGraphics(this.line_);
+  this.registerDisposable(this.line_);
 
   this.labels()
       .suspendSignalsDispatching()
@@ -286,6 +288,7 @@ anychart.core.axes.Polar.prototype.overlapMode = function(opt_value) {
 anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
+    this.minorLabels_.setParentEventTarget(this);
     this.minorLabels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
@@ -305,6 +308,7 @@ anychart.core.axes.Polar.prototype.minorLabels = function(opt_value) {
 anychart.core.axes.Polar.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
     this.labels_.listenSignals(this.labelsInvalidated_, this);
     this.registerDisposable(this.labels_);
   }
@@ -345,6 +349,7 @@ anychart.core.axes.Polar.prototype.labelsInvalidated_ = function(event) {
 anychart.core.axes.Polar.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicks_) {
     this.minorTicks_ = new anychart.core.axes.RadialTicks();
+    this.minorTicks_.setParentEventTarget(this);
     this.minorTicks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.minorTicks_);
   }
@@ -364,6 +369,7 @@ anychart.core.axes.Polar.prototype.minorTicks = function(opt_value) {
 anychart.core.axes.Polar.prototype.ticks = function(opt_value) {
   if (!this.ticks_) {
     this.ticks_ = new anychart.core.axes.RadialTicks();
+    this.ticks_.setParentEventTarget(this);
     this.ticks_.listenSignals(this.ticksInvalidated_, this);
     this.registerDisposable(this.ticks_);
   }
@@ -1122,10 +1128,6 @@ anychart.core.axes.Polar.prototype.draw = function() {
   this.minorTicks().suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (!this.line_) {
-      this.line_ = acgraph.circle();
-      this.registerDisposable(this.line_);
-    }
     this.line_.stroke(this.stroke_);
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);

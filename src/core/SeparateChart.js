@@ -6,6 +6,7 @@ goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.PrintHelper');
+goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
 
@@ -93,6 +94,7 @@ anychart.core.SeparateChart.prototype.legend = function(opt_value) {
     this.legend_.zIndex(anychart.core.SeparateChart.ZINDEX_LEGEND);
     this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal_, this);
+    this.legend_.setParentEventTarget(this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -127,10 +129,43 @@ anychart.core.SeparateChart.prototype.onLegendSignal_ = function(event) {
 
 /**
  * Create legend items provider specific to chart type.
- * @protected
+ * @param {string} sourceMode Items source mode (default|categories).
+ * @param {?Function} itemsTextFormatter Legend items text formatter.
  * @return {!Array.<anychart.core.ui.Legend.LegendItemProvider>} Legend items provider.
  */
 anychart.core.SeparateChart.prototype.createLegendItemsProvider = goog.abstractMethod;
+
+
+/**
+ * Identifies that legend item created by this source can interact in specified mode.
+ * By default can interact only in DEFAULT mode.
+ * @param {anychart.enums.LegendItemsSourceMode} mode Legend mode for this chart.
+ * @return {boolean} Can interact or not.
+ */
+anychart.core.SeparateChart.prototype.legendItemCanInteractInMode = function(mode) {
+  return (mode == anychart.enums.LegendItemsSourceMode.DEFAULT);
+};
+
+
+/**
+ * Calls when legend item that some how belongs to the chart was clicked.
+ * @param {anychart.core.ui.LegendItem} item Legend item that was clicked.
+ */
+anychart.core.SeparateChart.prototype.legendItemClick = goog.nullFunction;
+
+
+/**
+ * Calls when legend item that some how belongs to the chart was hovered.
+ * @param {anychart.core.ui.LegendItem} item Legend item that was hovered.
+ */
+anychart.core.SeparateChart.prototype.legendItemOver = goog.nullFunction;
+
+
+/**
+ * Calls when legend item that some how belongs to the chart was unhovered.
+ * @param {anychart.core.ui.LegendItem} item Legend item that was unhovered.
+ */
+anychart.core.SeparateChart.prototype.legendItemOut = goog.nullFunction;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -248,8 +283,10 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
     legend.suspendSignalsDispatching();
     if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
     legend.parentBounds(boundsWithoutTitle);
-    legend.itemsProvider(this.createLegendItemsProvider());
+    if (!legend.itemsSource())
+      legend.itemsSource(this);
     legend.resumeSignalsDispatching(false);
+    legend.invalidate(anychart.ConsistencyState.APPEARANCE);
     legend.draw();
     this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
   }

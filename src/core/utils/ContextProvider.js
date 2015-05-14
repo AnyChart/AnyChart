@@ -1,4 +1,5 @@
 goog.provide('anychart.core.utils.IContextProvider');
+goog.provide('anychart.core.utils.LegendContextProvider');
 goog.provide('anychart.core.utils.PiePointContextProvider');
 goog.provide('anychart.core.utils.SeriesPointContextProvider');
 
@@ -20,7 +21,7 @@ anychart.core.utils.IContextProvider.prototype.applyReferenceValues;
 
 /**
  * Fetch statistics value by key.
- * @param {string} key Key.
+ * @param {string=} opt_key Key.
  * @return {*}
  */
 anychart.core.utils.IContextProvider.prototype.getStat;
@@ -75,8 +76,8 @@ anychart.core.utils.PiePointContextProvider.prototype.applyReferenceValues = fun
 
 
 /** @inheritDoc */
-anychart.core.utils.PiePointContextProvider.prototype.getStat = function(key) {
-  return this.pie_.statistics(key);
+anychart.core.utils.PiePointContextProvider.prototype.getStat = function(opt_key) {
+  return this.pie_.statistics(opt_key);
 };
 
 
@@ -148,8 +149,8 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
 
 
 /** @inheritDoc */
-anychart.core.utils.SeriesPointContextProvider.prototype.getStat = function(key) {
-  return this.series_.statistics(key);
+anychart.core.utils.SeriesPointContextProvider.prototype.getStat = function(opt_key) {
+  return this.series_.statistics(opt_key);
 };
 
 
@@ -168,9 +169,43 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta = functio
   return this.series_.meta(opt_key);
 };
 
+
+
+/**
+ * Context provider for legend itemsTextFormatter function
+ * @param {(anychart.core.polar.series.Base|anychart.core.radar.series.Base|anychart.core.scatter.series.Base|anychart.core.cartesian.series.Base)=} opt_source Source for statistics and meta.
+ * @constructor
+ */
+anychart.core.utils.LegendContextProvider = function(opt_source) {
+  this.source_ = opt_source;
+};
+
+
+/**
+ * Fetch statistics value by key.
+ * @param {string=} opt_key Key.
+ * @return {*}
+ */
+anychart.core.utils.LegendContextProvider.prototype.getStat = function(opt_key) {
+  return this.source_.statistics(opt_key);
+};
+
+
+/**
+ * Gets meta by key.
+ * @param {string=} opt_key Key.
+ * @return {*} Meta value by key, or meta object.
+ */
+anychart.core.utils.LegendContextProvider.prototype.getMeta = function(opt_key) {
+  if (this.source_.meta)
+    return this.source_.meta(opt_key);
+};
+
 //exports
 anychart.core.utils.PiePointContextProvider.prototype['getStat'] = anychart.core.utils.PiePointContextProvider.prototype.getStat;
 anychart.core.utils.PiePointContextProvider.prototype['getDataValue'] = anychart.core.utils.PiePointContextProvider.prototype.getDataValue;
 anychart.core.utils.SeriesPointContextProvider.prototype['getStat'] = anychart.core.utils.SeriesPointContextProvider.prototype.getStat;
 anychart.core.utils.SeriesPointContextProvider.prototype['getDataValue'] = anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue;
 anychart.core.utils.SeriesPointContextProvider.prototype['getSeriesMeta'] = anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta;
+anychart.core.utils.LegendContextProvider.prototype['getStat'] = anychart.core.utils.LegendContextProvider.prototype.getStat;
+anychart.core.utils.LegendContextProvider.prototype['getMeta'] = anychart.core.utils.LegendContextProvider.prototype.getMeta;
