@@ -359,12 +359,12 @@ def __build_project(modules):
                __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
-               __get_output_file_arg(output_file)
+               __get_output_file_arg(output_file) + \
+               ['--output_wrapper "(function(){%output%})()"']
 
     #debug info
     if __should_gen_debug_files():
-        commands += ['--output_wrapper "(function(){%output%})()"',
-                     '--property_renaming_report %s' % output_file + '_prop_out.txt',
+        commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
                      '--variable_renaming_report %s' % output_file + '_var_out.txt',
                      '--create_source_map %s' % output_file + '_sourcemap.json']
 
