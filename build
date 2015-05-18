@@ -55,9 +55,9 @@ def __has_closure_compiler():
 
 
 def __need_sync_contrib():
-    return __has_closure_compiler() and \
-           os.path.exists(CLOSURE_LIBRARY_PATH) and \
-           os.path.exists(GRAPHICS_PATH)
+    return not os.path.exists(COMPILER_PATH) or \
+           not os.path.exists(CLOSURE_LIBRARY_PATH) or \
+           not os.path.exists(GRAPHICS_PATH)
 
 
 def __sync_contrib():
@@ -69,7 +69,7 @@ def __sync_contrib():
     subprocess.call(['ln', '-s', '../../update-submodules', '.git/hooks/post-checkout'])
 
     #Download closure compiler
-    if not __has_closure_compiler():
+    if not os.path.exists(COMPILER_PATH):
         print 'Download closure compiler'
         __download_and_unzip_from_http(
             'http://dl.google.com/closure-compiler/compiler-20141023.zip',
