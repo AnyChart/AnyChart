@@ -448,7 +448,9 @@ def __lint_project():
         '--flagfile',
         'gjslint.cfg',
         '-r',
-        SRC_PATH
+        SRC_PATH,
+        '-r',
+        GRAPHICS_SRC_PATH
     ])
 
     print 'Search for JSDoc continuation \n'
