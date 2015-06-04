@@ -307,8 +307,8 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
 anychart.core.ui.MarkersFactory.prototype.positionFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.positionFormatter_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     this.changedSettings['positionFormatter'] = true;
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else {
     return this.positionFormatter_;
@@ -333,9 +333,9 @@ anychart.core.ui.MarkersFactory.prototype.position = function(opt_value) {
     opt_value = String(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
+      this.changedSettings['position'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['position'] = true;
     return this;
   } else {
     return this.position_;
@@ -386,9 +386,9 @@ anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
     opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
+      this.changedSettings['anchor'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['anchor'] = true;
     return this;
   } else {
     return this.anchor_;
@@ -407,9 +407,9 @@ anychart.core.ui.MarkersFactory.prototype.rotation = function(opt_value) {
     opt_value = +opt_value;
     if (this.rotation_ != opt_value) {
       this.rotation_ = opt_value;
+      this.changedSettings['rotation'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['rotation'] = true;
     return this;
   } else {
     return this.rotation_;
@@ -465,15 +465,25 @@ anychart.core.ui.MarkersFactory.prototype.type = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!goog.isFunction(opt_value))
       opt_value = anychart.enums.normalizeMarkerType(opt_value);
+
     if (this.type_ != opt_value) {
       this.type_ = opt_value;
+      this.changedSettings['type'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['type'] = true;
     return this;
   } else {
     return this.type_ || this.autoType_ || anychart.enums.MarkerType.DIAGONAL_CROSS;
   }
+};
+
+
+/**
+ * Getter for current type value.
+ * @return {?(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)} .
+ */
+anychart.core.ui.MarkersFactory.prototype.getType = function() {
+  return this.type_;
 };
 
 
@@ -524,9 +534,9 @@ anychart.core.ui.MarkersFactory.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.size_ != opt_value) {
       this.size_ = opt_value;
+      this.changedSettings['size'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['size'] = true;
     return this;
   } else {
     return this.size_;
@@ -576,9 +586,9 @@ anychart.core.ui.MarkersFactory.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
+      this.changedSettings['offsetX'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['offsetX'] = true;
     return this;
   } else {
     return this.offsetX_;
@@ -628,9 +638,9 @@ anychart.core.ui.MarkersFactory.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
+      this.changedSettings['offsetY'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['offsetY'] = true;
     return this;
   } else {
     return this.offsetY_;
@@ -687,13 +697,22 @@ anychart.core.ui.MarkersFactory.prototype.fill = function(opt_fillOrColorOrKeys,
     var color = acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.fill_ != color) {
       this.fill_ = color;
+      this.changedSettings['fill'] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
-    this.changedSettings['fill'] = true;
     return this;
   } else {
     return this.fill_ || this.autoFill_ || 'black';
   }
+};
+
+
+/**
+ * Getter for current fill value.
+ * @return {?(string|acgraph.vector.Fill)} .
+ */
+anychart.core.ui.MarkersFactory.prototype.getFill = function() {
+  return this.fill_;
 };
 
 
@@ -758,13 +777,22 @@ anychart.core.ui.MarkersFactory.prototype.stroke = function(opt_strokeOrFill, op
     var color = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.stroke_ != color) {
       this.stroke_ = color;
+      this.changedSettings['stroke'] = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
-    this.changedSettings['stroke'] = true;
     return this;
   } else {
     return this.stroke_ || this.autoStroke_ || 'none';
   }
+};
+
+
+/**
+ * Getter for current stroke value.
+ * @return {?(string|acgraph.vector.Stroke)} .
+ */
+anychart.core.ui.MarkersFactory.prototype.getStroke = function() {
+  return this.stroke_;
 };
 
 

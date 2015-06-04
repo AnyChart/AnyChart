@@ -550,6 +550,14 @@ anychart.financial = anychart.financial || function() {
 /**
  * @ignoreDoc
  */
+anychart.funnel = anychart.funnel || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Funnel chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.line = anychart.line || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Line chart']);
 };
@@ -568,6 +576,14 @@ anychart.marker = anychart.marker || function() {
  */
 anychart.pie = anychart.pie || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pie chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.pyramid = anychart.pyramid || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
 };
 
 
@@ -652,9 +668,11 @@ goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
 goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
 goog.exportSymbol('anychart.column', anychart.column);//linkedFromModule
 goog.exportSymbol('anychart.financial', anychart.financial);//linkedFromModule
+goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
 goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
 goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
 goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
+goog.exportSymbol('anychart.pyramid', anychart.pyramid);//linkedFromModule
 goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.sparkline', anychart.sparkline);

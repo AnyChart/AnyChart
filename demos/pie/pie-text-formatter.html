@@ -24,7 +24,7 @@
         chart.legend(false);
         chart.labels().textFormatter(function() {
             console.log(this);
-            return (this.value * 100 / this.sum).toFixed(1) + '%';
+            return (this.value * 100 / this.getStat('sum')).toFixed(1) + '%';
         });
         chart.tooltip().contentFormatter(function(){
             console.log(this);

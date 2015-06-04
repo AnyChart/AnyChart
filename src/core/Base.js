@@ -69,6 +69,9 @@ anychart.ConsistencyState = {
   CARTESIAN_AXES: 1 << 15,
   CARTESIAN_AXES_MARKERS: 1 << 16,
   CARTESIAN_GRIDS: 1 << 17,
+  //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
+  PYRAMID_FUNNEL_LABELS: 1 << 10,
+  PYRAMID_FUNNEL_MARKERS: 1 << 11,
   //---------------------------------- GANTT STATES (CHART) ---------------------------------
   GANTT_DATA: 1 << 10,
   GANTT_POSITION: 1 << 11,

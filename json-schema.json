@@ -11,12 +11,14 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "oneOf": [
+        {"$ref": "#/definitions/anychart.charts.Bullet"},
         {"$ref": "#/definitions/anychart.charts.Cartesian"},
+        {"$ref": "#/definitions/anychart.charts.Funnel"},
         {"$ref": "#/definitions/anychart.charts.Pie"},
         {"$ref": "#/definitions/anychart.charts.Polar"},
+        {"$ref": "#/definitions/anychart.charts.Pyramid"},
         {"$ref": "#/definitions/anychart.charts.Radar"},
         {"$ref": "#/definitions/anychart.charts.Scatter"},
-        {"$ref": "#/definitions/anychart.charts.Bullet"},
         {"$ref": "#/definitions/anychart.charts.Sparkline"}
       ],
       "properties": {
@@ -334,6 +336,257 @@
             {"$ref": "#/definitions/anychart.scales.Logarithmic"},
             {"$ref": "#/definitions/anychart.scales.DateTime"}
           ]
+        }
+      },
+      "required": ["type"]
+    },
+    "anychart.charts.Funnel": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "properties": {
+        "type": {"enum": ["funnel"]},
+        "data": {"$ref": "#/definitions/data"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "hatchFillPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/hatchFillSet"}
+            }
+          },
+          "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+        },
+        "markerPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+            }
+          },
+          "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+        },
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        },
+        "markers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "pointsPadding": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
+        "connectorLength": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "connectorStroke": {"$ref": "#/definitions/stroke"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "baseWidth": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "neckHeight": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "neckWidth": {
+          "type": [
+            "string",
+            "number"
+          ]
+        }
+      },
+      "required": ["type"]
+    },
+    "anychart.charts.Pyramid": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "properties": {
+        "type": {"enum": ["pyramid"]},
+        "data": {"$ref": "#/definitions/data"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "hatchFillPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/hatchFillSet"}
+            }
+          },
+          "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+        },
+        "markerPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+            }
+          },
+          "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+        },
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        },
+        "markers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "pointsPadding": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
+        "connectorLength": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "connectorStroke": {"$ref": "#/definitions/stroke"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "baseWidth": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "reversed": {
+          "type": "boolean"
         }
       },
       "required": ["type"]

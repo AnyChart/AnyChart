@@ -26,11 +26,13 @@ anychart.enums.ChartTypes = {
   CARTESIAN: 'cartesian',
   COLUMN: 'column',
   FINANCIAL: 'financial',
+  FUNNEL: 'funnel',
   GANTT: 'gantt',
   LINE: 'line',
   MARKER: 'marker',
   PIE: 'pie',
   POLAR: 'polar',
+  PYRAMID: 'pyramid',
   RADAR: 'radar',
   SCATTER: 'scatter',
   SPARKLINE: 'sparkline'
@@ -1359,6 +1361,96 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  PyramidLabelsPosition (and FunnelLabelsPosition)
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Labels position (Inside|OutsideLeft|OutsideLeftInColumn|OutsideRight|OutsideRightInColumn).
+ * @enum {string}
+ */
+anychart.enums.PyramidLabelsPosition = {
+  /**
+   * Inside a point.
+   */
+  INSIDE: 'inside',
+  /**
+   * Outside of a point to the left.
+   */
+  OUTSIDE_LEFT: 'outsideLeft',
+  /**
+   * Outside of a point to the left in column.
+   */
+  OUTSIDE_LEFT_IN_COLUMN: 'outsideLeftInColumn',
+  /**
+   * Outside of a point to the right.
+   */
+  OUTSIDE_RIGHT: 'outsideRight',
+  /**
+   * Outside of a point to the right in column.
+   */
+  OUTSIDE_RIGHT_IN_COLUMN: 'outsideRightInColumn'
+};
+
+
+/**
+ * Normalizes pyramid/funnel labels position
+ * @param {*} value Labels position to normalize.
+ * @param {anychart.enums.PyramidLabelsPosition=} opt_default Custom default value (defaults to OUTSIDE_LEFT_IN_COLUMN).
+ * @return {anychart.enums.PyramidLabelsPosition}
+ */
+anychart.enums.normalizePyramidLabelsPosition = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'inside':
+    case 'in':
+    case 'i':
+    case 'inner':
+      return anychart.enums.PyramidLabelsPosition.INSIDE;
+    case 'outside':
+    case 'out':
+    case 'o':
+    case 'outer':
+    case 'l':
+    case 'left':
+    case 'outsideleft':
+    case 'outleft':
+    case 'ol':
+    case 'outerleft':
+      return anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT;
+    case 'outsideleftincolumn':
+    case 'outsideleftcolumn':
+    case 'outleftincolumn':
+    case 'outleftcolumn':
+    case 'olic':
+    case 'olc':
+    case 'lc':
+    case 'outerleftincolumn':
+    case 'outerleftcolumn':
+      return anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT_IN_COLUMN;
+    case 'r':
+    case 'right':
+    case 'outsideright':
+    case 'outright':
+    case 'or':
+    case 'outerright':
+      return anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT;
+    case 'outsiderightincolumn':
+    case 'outsiderightcolumn':
+    case 'outrightincolumn':
+    case 'outrightcolumn':
+    case 'oric':
+    case 'orc':
+    case 'rc':
+    case 'outerrightincolumn':
+    case 'outerrightcolumn':
+      return anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT_IN_COLUMN;
+  }
+  return opt_default || anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT_IN_COLUMN;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  EventType
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2247,6 +2339,12 @@ goog.exportSymbol('anychart.enums.LegendItemsSourceMode.CATEGORIES', anychart.en
 
 goog.exportSymbol('anychart.enums.SidePosition.INSIDE', anychart.enums.SidePosition.INSIDE);//in docs/
 goog.exportSymbol('anychart.enums.SidePosition.OUTSIDE', anychart.enums.SidePosition.OUTSIDE);//in docs/
+
+goog.exportSymbol('anychart.enums.PyramidLabelsPosition.INSIDE', anychart.enums.PyramidLabelsPosition.INSIDE);
+goog.exportSymbol('anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT', anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT);
+goog.exportSymbol('anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT_IN_COLUMN', anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT_IN_COLUMN);
+goog.exportSymbol('anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT', anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT);
+goog.exportSymbol('anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT_IN_COLUMN', anychart.enums.PyramidLabelsPosition.OUTSIDE_RIGHT_IN_COLUMN);
 
 goog.exportSymbol('anychart.enums.GaugeSidePosition.INSIDE', anychart.enums.GaugeSidePosition.INSIDE);
 goog.exportSymbol('anychart.enums.GaugeSidePosition.CENTER', anychart.enums.GaugeSidePosition.CENTER);

@@ -1,6 +1,6 @@
 goog.provide('anychart.core.utils.IContextProvider');
 goog.provide('anychart.core.utils.LegendContextProvider');
-goog.provide('anychart.core.utils.PiePointContextProvider');
+goog.provide('anychart.core.utils.PointContextProvider');
 goog.provide('anychart.core.utils.SeriesPointContextProvider');
 
 
@@ -38,16 +38,16 @@ anychart.core.utils.IContextProvider.prototype.getDataValue;
 
 /**
  * @implements {anychart.core.utils.IContextProvider}
- * @param {anychart.charts.Pie} pie instance.
+ * @param {anychart.charts.Pie|anychart.core.PyramidFunnelBase} chartInstance chart instance.
  * @param {Array.<string>} referenceValueNames reference value names to be applied.
  * @constructor
  */
-anychart.core.utils.PiePointContextProvider = function(pie, referenceValueNames) {
+anychart.core.utils.PointContextProvider = function(chartInstance, referenceValueNames) {
   /**
-   * @type {anychart.charts.Pie}
+   * @type {anychart.charts.Pie|anychart.core.PyramidFunnelBase}
    * @private
    */
-  this.pie_ = pie;
+  this.chartInstance_ = chartInstance;
 
   /**
    * @type {Array.<string>}
@@ -58,8 +58,8 @@ anychart.core.utils.PiePointContextProvider = function(pie, referenceValueNames)
 
 
 /** @inheritDoc */
-anychart.core.utils.PiePointContextProvider.prototype.applyReferenceValues = function() {
-  var iterator = this.pie_.getIterator();
+anychart.core.utils.PointContextProvider.prototype.applyReferenceValues = function() {
+  var iterator = this.chartInstance_.getIterator();
   var value;
   this['index'] = iterator.getIndex();
   for (var i = 0; i < this.referenceValueNames_.length; i++) {
@@ -76,14 +76,14 @@ anychart.core.utils.PiePointContextProvider.prototype.applyReferenceValues = fun
 
 
 /** @inheritDoc */
-anychart.core.utils.PiePointContextProvider.prototype.getStat = function(opt_key) {
-  return this.pie_.statistics(opt_key);
+anychart.core.utils.PointContextProvider.prototype.getStat = function(opt_key) {
+  return this.chartInstance_.statistics(opt_key);
 };
 
 
 /** @inheritDoc */
-anychart.core.utils.PiePointContextProvider.prototype.getDataValue = function(key) {
-  return this.pie_.getIterator().get(key);
+anychart.core.utils.PointContextProvider.prototype.getDataValue = function(key) {
+  return this.chartInstance_.getIterator().get(key);
 };
 
 
@@ -202,8 +202,8 @@ anychart.core.utils.LegendContextProvider.prototype.getMeta = function(opt_key) 
 };
 
 //exports
-anychart.core.utils.PiePointContextProvider.prototype['getStat'] = anychart.core.utils.PiePointContextProvider.prototype.getStat;
-anychart.core.utils.PiePointContextProvider.prototype['getDataValue'] = anychart.core.utils.PiePointContextProvider.prototype.getDataValue;
+anychart.core.utils.PointContextProvider.prototype['getStat'] = anychart.core.utils.PointContextProvider.prototype.getStat;
+anychart.core.utils.PointContextProvider.prototype['getDataValue'] = anychart.core.utils.PointContextProvider.prototype.getDataValue;
 anychart.core.utils.SeriesPointContextProvider.prototype['getStat'] = anychart.core.utils.SeriesPointContextProvider.prototype.getStat;
 anychart.core.utils.SeriesPointContextProvider.prototype['getDataValue'] = anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue;
 anychart.core.utils.SeriesPointContextProvider.prototype['getSeriesMeta'] = anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta;

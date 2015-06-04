@@ -89,16 +89,30 @@ anychart.color.fillOrStrokeToHex_ = function(fillOrStroke) {
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the lightened color, or Color if color can not be lighten.
  */
 anychart.color.lighten = function(fillOrStroke, opt_factor) {
-  var hex;
-  // if null is returned then we can't get a hex representation and return the initial color
-  if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
+  if (goog.isObject(fillOrStroke) && goog.isDef(fillOrStroke['keys'])) {
+    var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
+    var keys = newFillOrStroke['keys'];
+    var newKeys = [];
+    for (var i = 0, len = keys.length; i < len; i++) {
+      var key = goog.object.clone(keys[i]);
+      key['color'] = anychart.color.lighten(key['color']);
+      newKeys.push(key);
+    }
+    newFillOrStroke['keys'] = newKeys;
+    return newFillOrStroke;
 
-  // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.lighten)
-  var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
-  if (!goog.isDefAndNotNull(opt_factor)) {
-    opt_factor = 0.3;
+  } else {
+    var hex;
+    // if null is returned then we can't get a hex representation and return the initial color
+    if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
+
+    // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.lighten)
+    var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
+    if (!goog.isDefAndNotNull(opt_factor)) {
+      opt_factor = 0.3;
+    }
+    return goog.color.rgbArrayToHex(goog.color.lighten(rgb, +opt_factor));
   }
-  return goog.color.rgbArrayToHex(goog.color.lighten(rgb, +opt_factor));
 };
 
 
@@ -116,16 +130,30 @@ anychart.color.lighten = function(fillOrStroke, opt_factor) {
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Hex representation of the darkened color, or Color if color can't be darkened.
  */
 anychart.color.darken = function(fillOrStroke, opt_factor) {
-  var hex;
-  // if null is returned then we can't get a hex representation and return the initial color
-  if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
+  if (goog.isObject(fillOrStroke) && goog.isDef(fillOrStroke['keys'])) {
+    var newFillOrStroke = /** @type {acgraph.vector.Fill} */ (goog.object.clone(fillOrStroke));
+    var keys = newFillOrStroke['keys'];
+    var newKeys = [];
+    for (var i = 0, len = keys.length; i < len; i++) {
+      var key = goog.object.clone(keys[i]);
+      key['color'] = anychart.color.darken(key['color']);
+      newKeys.push(key);
+    }
+    newFillOrStroke['keys'] = newKeys;
+    return newFillOrStroke;
 
-  // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.darken)
-  var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
-  if (!goog.isDefAndNotNull(opt_factor)) {
-    opt_factor = 0.3;
+  } else {
+    var hex;
+    // if null is returned then we can't get a hex representation and return the initial color
+    if (goog.isNull(hex = anychart.color.fillOrStrokeToHex_(fillOrStroke))) return fillOrStroke;
+
+    // convert hex-color to goog.color.Rgb (RGB array that can be used by goog.color.darken)
+    var rgb = goog.color.hexToRgb(/** @type {string} */ (hex));
+    if (!goog.isDefAndNotNull(opt_factor)) {
+      opt_factor = 0.3;
+    }
+    return goog.color.rgbArrayToHex(goog.color.darken(rgb, +opt_factor));
   }
-  return goog.color.rgbArrayToHex(goog.color.darken(rgb, +opt_factor));
 };
 
 

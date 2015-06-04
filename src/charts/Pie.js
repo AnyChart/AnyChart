@@ -4,13 +4,11 @@ goog.require('anychart.color');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
-goog.require('anychart.core.utils.PiePointContextProvider');
+goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
 goog.require('anychart.math');
-goog.require('anychart.palettes.DistinctColors');
-goog.require('anychart.palettes.HatchFills');
-goog.require('anychart.palettes.RangeColors');
+goog.require('anychart.palettes');
 
 
 
@@ -28,7 +26,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
 
   /**
    * Pie point provider.
-   * @type {anychart.core.utils.PiePointContextProvider}
+   * @type {anychart.core.utils.PointContextProvider}
    * @private
    */
   this.pointProvider_;
@@ -178,21 +176,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.hoverFill_ = (function() {
-    var fill;
-    if (goog.isObject(this['sourceColor']) && goog.isDef(this['sourceColor']['keys'])) {
-      fill = goog.object.clone(this['sourceColor']);
-      var keys = fill['keys'];
-      var newKeys = [];
-      for (var i = 0, len = keys.length; i < len; i++) {
-        var key = goog.object.clone(keys[i]);
-        key['color'] = anychart.color.lighten(key['color']);
-        newKeys.push(key);
-      }
-      fill['keys'] = newKeys;
-    } else {
-      fill = /** @type {acgraph.vector.Fill} */ (anychart.color.lighten(this['sourceColor']));
-    }
-    return fill;
+    return anychart.color.lighten(this['sourceColor']);
   });
 
   /**
@@ -2670,7 +2654,7 @@ anychart.charts.Pie.prototype.statistics = function(opt_key, opt_value) {
  */
 anychart.charts.Pie.prototype.createFormatProvider = function() {
   if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.PiePointContextProvider(this, ['x', 'value', 'name']);
+    this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value', 'name']);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };

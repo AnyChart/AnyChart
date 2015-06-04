@@ -300,8 +300,8 @@ anychart.core.ui.LabelsFactory.prototype.background = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.background_.setup(opt_value);
     this.changedSettings['background'] = true;
+    this.background_.setup(opt_value);
     return this;
   }
   return this.background_;
@@ -338,8 +338,8 @@ anychart.core.ui.LabelsFactory.prototype.padding = function(opt_spaceOrTopOrTopA
     this.padding_.listenSignals(this.paddingInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.padding_.setup.apply(this.padding_, arguments);
     this.changedSettings['padding'] = true;
+    this.padding_.setup.apply(this.padding_, arguments);
     return this;
   }
   return this.padding_;
@@ -415,9 +415,9 @@ anychart.core.ui.LabelsFactory.prototype.position = function(opt_value) {
     opt_value = String(opt_value);
     if (this.position_ != opt_value) {
       this.position_ = opt_value;
+      this.changedSettings['position'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['position'] = true;
     return this;
   } else {
     return this.position_;
@@ -435,9 +435,9 @@ anychart.core.ui.LabelsFactory.prototype.anchor = function(opt_value) {
     opt_value = anychart.enums.normalizeAnchor(opt_value);
     if (this.anchor_ != opt_value) {
       this.anchor_ = opt_value;
+      this.changedSettings['anchor'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['anchor'] = true;
     return this;
   } else {
     return this.anchor_;
@@ -454,9 +454,9 @@ anychart.core.ui.LabelsFactory.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
+      this.changedSettings['offsetX'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['offsetX'] = true;
     return this;
   } else {
     return this.offsetX_;
@@ -473,9 +473,9 @@ anychart.core.ui.LabelsFactory.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
+      this.changedSettings['offsetY'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['offsetY'] = true;
     return this;
   } else {
     return this.offsetY_;
@@ -494,9 +494,9 @@ anychart.core.ui.LabelsFactory.prototype.rotation = function(opt_value) {
     opt_value = +opt_value;
     if (this.rotationAngle_ != opt_value) {
       this.rotationAngle_ = opt_value;
+      this.changedSettings['rotation'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['rotation'] = true;
     return this;
   } else {
     return this.rotationAngle_;
@@ -518,9 +518,9 @@ anychart.core.ui.LabelsFactory.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
+      this.changedSettings['width'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['width'] = true;
     return this;
   }
   return this.width_;
@@ -536,9 +536,9 @@ anychart.core.ui.LabelsFactory.prototype.height = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.height_ != opt_value) {
       this.height_ = opt_value;
+      this.changedSettings['height'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['height'] = true;
     return this;
   }
   return this.height_;
@@ -564,11 +564,11 @@ anychart.core.ui.LabelsFactory.prototype.minFontSize = function(opt_value) {
   if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
     if (this.minFontSize_ != +opt_value) {
       this.minFontSize_ = +opt_value;
+      this.changedSettings['minFontSize'] = true;
       // we don't need to invalidate bounds if adjusting is not enabled
       if (this.adjustEnabled_())
         this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['minFontSize'] = true;
     return this;
   }
   return this.minFontSize_;
@@ -584,11 +584,11 @@ anychart.core.ui.LabelsFactory.prototype.maxFontSize = function(opt_value) {
   if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
     if (this.maxFontSize_ != +opt_value) {
       this.maxFontSize_ = +opt_value;
+      this.changedSettings['maxFontSize'] = true;
       // we don't need to invalidate bounds if adjusting is not enabled
       if (this.adjustEnabled_())
         this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['maxFontSize'] = true;
     return this;
   }
   return this.maxFontSize_;
@@ -620,18 +620,18 @@ anychart.core.ui.LabelsFactory.prototype.adjustFontSize = function(opt_adjustOrA
       this.adjustByHeight_ = !!opt_adjustByHeight;
       stateToInvalidate |= anychart.ConsistencyState.BOUNDS;
     }
-    this.invalidate(stateToInvalidate, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     this.changedSettings['adjustByHeight'] = true;
     this.changedSettings['adjustByWidth'] = true;
+    this.invalidate(stateToInvalidate, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
     // if only one param is set -  adjusting for the both
   } else if (goog.isDef(opt_adjustOrAdjustByWidth)) {
     if (!(this.adjustByWidth_ == this.adjustByHeight_ && this.adjustByWidth_ == opt_adjustOrAdjustByWidth)) {
       this.adjustByWidth_ = this.adjustByHeight_ = /** @type {boolean} */ (opt_adjustOrAdjustByWidth);
+      this.changedSettings['adjustByHeight'] = true;
+      this.changedSettings['adjustByWidth'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
-    this.changedSettings['adjustByHeight'] = true;
-    this.changedSettings['adjustByWidth'] = true;
     return this;
   }
   return {'width': this.adjustByWidth_, 'height': this.adjustByHeight_};
@@ -652,9 +652,12 @@ anychart.core.ui.LabelsFactory.prototype.fontColor = function(opt_value) {
 /**
  * Sets labels color that parent series have set for it.
  * @param {string} value Auto color distributed by the series.
+ * @return {anychart.core.ui.LabelsFactory} Itself for chaining call.
  */
 anychart.core.ui.LabelsFactory.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
+
+  return this;
 };
 
 

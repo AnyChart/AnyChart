@@ -53,7 +53,7 @@
             <!-- charts.Polar and charts.Radar elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_axis" type="core.axes.RadarPolar"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_axis" type="core.axes.Radial"/>
-            <!-- charts.Pie elements -->
+            <!-- charts.Pie and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
@@ -64,6 +64,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
+            <!-- charts.Funnel and charts.Pyramid elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
             <!-- charts.Sparkline elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="last_fill" type="Fill"/>
@@ -86,6 +88,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_labels" type="core.LabelsFactory"/>
+            <!-- charts.Sparkline and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
         </xsd:all>
         <!-- core.Chart attrs -->
@@ -105,6 +108,13 @@
         <xsd:attribute name="bars_padding" type="xsd:double" default="0.1"/>
         <xsd:attribute name="x_scale" type="simple.ChartScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ChartScaleRef"/>
+        <!-- charts.Funnel attrs -->
+        <xsd:attribute name="neck_height" type="simple.NumberOrPercent" default="25%"/>
+        <xsd:attribute name="neck_width" type="simple.NumberOrPercent" default="25%"/>
+        <!-- charts.Funnel and charts.Pyramid attrs -->
+        <xsd:attribute name="base_width" type="simple.NumberOrPercent" default="90%"/>
+        <xsd:attribute name="points_padding" type="simple.NumberOrPercent" default="5"/>
+        <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
         <!-- chart.Polar and charts.Radar common attrs -->
         <xsd:attribute name="start_angle" type="xsd:double" default="0"/>
         <!-- also for pie -->
@@ -124,13 +134,15 @@
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
         <xsd:attribute name="connector_length" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="outside_labels_critical_angle" type="xsd:double" default="60"/>
-        <xsd:attribute name="connectorStroke" type="xsd:string" default="black 0.3"/>
+        <xsd:attribute name="connector_stroke" type="xsd:string" default="black 0.3"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill" default="false"/>
         <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill" default="false"/>
+        <!-- charts.Pyramid attrs -->
+        <xsd:attribute name="reversed" type="simple.Bool" default="false"/>
         <!-- charts.Sparkline elements -->
         <xsd:attribute name="clip" type="simple.Bool" default="true"/>
         <xsd:attribute name="series_type" type="enums.SparkSeriesTypes" default="line"/>
@@ -1513,10 +1525,12 @@
             <xsd:enumeration value="cartesian"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="financial"/>
+            <xsd:enumeration value="funnel"/>
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
             <xsd:enumeration value="polar"/>
+            <xsd:enumeration value="pyramid"/>
             <xsd:enumeration value="radar"/>
             <xsd:enumeration value="scatter"/>
             <xsd:enumeration value="sparkline"/>
