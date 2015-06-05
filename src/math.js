@@ -263,6 +263,23 @@ anychart.math.Rect.fromCoordinateBox = function(value) {
 
 
 /**
+ * @return {Array.<number>}
+ */
+anychart.math.Rect.prototype.toArray = function() {
+  return [this.left, this.top, this.width, this.height];
+};
+
+
+/**
+ * @param {Array.<number>} arr Array representing the rectangle.
+ * @return {!anychart.math.Rect} .
+ */
+anychart.math.Rect.fromArray = function(arr) {
+  return new anychart.math.Rect(arr[0], arr[1], arr[2], arr[3]);
+};
+
+
+/**
  * Serializes the rect.
  * @return {!Object}
  */

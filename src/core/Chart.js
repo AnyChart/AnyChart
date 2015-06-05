@@ -66,6 +66,20 @@ anychart.core.Chart = function() {
    */
   this.autoRedraw_ = true;
 
+  /**
+   * Animation.
+   * @type {boolean}
+   * @private
+   */
+  this.animation_ = false;
+
+  /**
+   * Duration of animation in milliseconds.
+   * @type {number}
+   * @private
+   */
+  this.animationDuration_ = 2000;
+
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
@@ -88,7 +102,8 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.ConsistencyState.CHART_LABELS |
         anychart.ConsistencyState.CHART_BACKGROUND |
-        anychart.ConsistencyState.CHART_TITLE;
+        anychart.ConsistencyState.CHART_TITLE |
+        anychart.ConsistencyState.CHART_ANIMATION;
 
 
 /**
@@ -621,6 +636,57 @@ anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Animations.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Setter/getter for animation setting.
+ * @param {boolean=} opt_value Whether to enable animation.
+ * @return {boolean|anychart.core.Chart} Is animation enabled or self for chaining.
+ */
+anychart.core.Chart.prototype.animation = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.animation_ != opt_value) {
+      this.animation_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.animation_;
+};
+
+
+/**
+ * Getter/setter for animation duration.
+ * @param {number=} opt_value Duration in milliseconds.
+ * @return {number|anychart.core.Chart} Animation duration or self for chaining.
+ */
+anychart.core.Chart.prototype.animationDuration = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (!isNaN(opt_value) && opt_value > 0 && this.animationDuration_ != opt_value) {
+      this.animationDuration_ = opt_value;
+      if (this.animationQueue_) {
+        this.animationQueue_.stop();
+        this.animationQueue_.setDuration(this.animationDuration_);
+      }
+      this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.animationDuration_;
+};
+
+
+/**
+ * Animate chart.
+ */
+anychart.core.Chart.prototype.doAnimation = goog.abstractMethod;
+
+
 /**
  * Starts the rendering of the chart into the container.
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
@@ -708,10 +774,19 @@ anychart.core.Chart.prototype.draw = function() {
 
   this.resumeSignalsDispatching(false);
 
-  this.dispatchDetachedEvent(new anychart.core.Chart.DrawEvent(this));
+  this.dispatchDetachedEvent({
+    'type': anychart.enums.EventType.CHART_DRAW,
+    'chart': this
+  });
 
   var msg = 'Chart rendering time: ' + (new Date().getTime() - startTime);
   anychart.utils.info(msg);
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+    this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
+    if (this.animation())
+      this.doAnimation();
+  }
 
   return this;
 };
@@ -828,6 +903,8 @@ anychart.core.Chart.prototype.serialize = function() {
     json['chartLabels'] = labels;
   // from VisualBaseWithBounds
   json['bounds'] = this.bounds().serialize();
+  json['animation'] = this.animation();
+  json['animationDuration'] = this.animationDuration();
   return json;
 };
 
@@ -858,6 +935,8 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   this.height(config['height']);
   this.right(config['right']);
   this.bottom(config['bottom']);
+  this.animation(config['animation']);
+  this.animationDuration(config['animationDuration']);
 };
 
 
@@ -919,24 +998,15 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 anychart.core.Chart.prototype.getType = goog.abstractMethod;
 
 
-
 /**
- * @param {anychart.core.Chart} chart
- * @constructor
- * @extends {goog.events.Event}
+ * @typedef {{chart: anychart.core.Chart}}
  */
-anychart.core.Chart.DrawEvent = function(chart) {
-  goog.base(this, anychart.enums.EventType.CHART_DRAW, chart);
-
-  /**
-   * @type {anychart.core.Chart}
-   */
-  this['chart'] = chart;
-};
-goog.inherits(anychart.core.Chart.DrawEvent, goog.events.Event);
+anychart.core.Chart.DrawEvent;
 
 
 //exports
+anychart.core.Chart.prototype['animation'] = anychart.core.Chart.prototype.animation;
+anychart.core.Chart.prototype['animationDuration'] = anychart.core.Chart.prototype.animationDuration;//doc|ex
 anychart.core.Chart.prototype['title'] = anychart.core.Chart.prototype.title;//doc|ex
 anychart.core.Chart.prototype['background'] = anychart.core.Chart.prototype.background;//doc|ex
 anychart.core.Chart.prototype['margin'] = anychart.core.Chart.prototype.margin;//doc|ex

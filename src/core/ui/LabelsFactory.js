@@ -711,6 +711,15 @@ anychart.core.ui.LabelsFactory.prototype.remove = function() {
 
 
 /**
+ * Gets labels factory root layer;
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.LabelsFactory.prototype.getRootLayer = function() {
+  return this.layer_;
+};
+
+
+/**
  * Clears an array of labels.
  * @param {number=} opt_index If set, removes only the label that is in passed index.
  * @return {anychart.core.ui.LabelsFactory} Returns itself for chaining.

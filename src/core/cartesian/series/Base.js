@@ -201,6 +201,15 @@ anychart.core.cartesian.series.Base.prototype.rootLayer;
 
 
 /**
+ * Gets root layer of series.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.cartesian.series.Base.prototype.getRootLayer = function() {
+  return this.rootLayer;
+};
+
+
+/**
  * Series meta map.
  * @type {Object}
  * @private
@@ -2706,7 +2715,8 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
   if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
   this.color(config['color']);
-  this.error(config['error']);
+  if (this.isErrorAvailable())
+    this.error(config['error']);
   this.xPointPosition(config['xPointPosition']);
   this.name(config['name']);
   this.meta(config['meta']);

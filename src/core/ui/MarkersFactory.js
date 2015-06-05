@@ -1045,6 +1045,15 @@ anychart.core.ui.MarkersFactory.prototype.remove = function() {
 };
 
 
+/**
+ * Gets markers factory root layer;
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.MarkersFactory.prototype.getRootLayer = function() {
+  return this.layer_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');

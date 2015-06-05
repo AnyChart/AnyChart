@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.modules.anychart');
+    </script>
+</head>
+<body>
+<div id="container" style="border:1px solid; width: 800px; height: 600px;"></div>
+<script>
+    var rect, myClip;
+    anychart.onDocumentReady(function() {
+        var stage = anychart.graphics.create('container');
+        rect = stage.rect().setBounds(new acgraph.math.Rect(10, 10, 100, 100)).stroke(null).fill('darkgreen');
+
+        myClip = stage.createClip();
+        //rect.clip(myClip);
+    });
+</script>
+</body>
+</html>

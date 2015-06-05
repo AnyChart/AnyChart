@@ -2491,7 +2491,8 @@ anychart.core.scatter.series.Base.prototype.setupByJSON = function(config) {
   if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
   this.color(config['color']);
-  this.error(config['error']);
+  if (this.isErrorAvailable())
+    this.error(config['error']);
   this.name(config['name']);
   this.meta(config['meta']);
   if ('data' in config)

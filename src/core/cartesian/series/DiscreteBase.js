@@ -28,6 +28,15 @@ anychart.core.cartesian.series.DiscreteBase.prototype.rootElement = null;
 
 
 /**
+ * Gets rootElement of the series.
+ * @return {anychart.core.utils.TypedLayer}
+ */
+anychart.core.cartesian.series.DiscreteBase.prototype.getRootElement = function() {
+  return this.rootElement;
+};
+
+
+/**
  * @type {anychart.core.utils.TypedLayer}
  * @protected
  */

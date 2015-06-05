@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.Cartesian');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
+goog.require('anychart.animations');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
@@ -2723,6 +2724,40 @@ anychart.charts.Cartesian.prototype.legendItemOut = function(item) {
   if (series) {
     series.unhover();
   }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Animations.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Cartesian.prototype.doAnimation = function() {
+  if (!this.animationQueue_) {
+    this.animationQueue_ = new anychart.animations.AnimationParallelQueue();
+    for (var i = 0; i < this.series_.length; i++) {
+      var series = this.series_[i];
+      var ctl = anychart.animations.AnimationBySeriesType[series.getType().toLowerCase()];
+      if (ctl === anychart.animations.ClipAnimation) {
+        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), series, this.animationDuration())));
+      } else
+        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, this.animationDuration())));
+    }
+    this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+      this.dispatchDetachedEvent({
+        'type': anychart.enums.EventType.ANIMATION_START,
+        'chart': this
+      });
+    }, false, this);
+    this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+      this.dispatchDetachedEvent({
+        'type': anychart.enums.EventType.ANIMATION_END,
+        'chart': this
+      });
+    }, false, this);
+  }
+  this.animationQueue_.play(true);
 };
 
 

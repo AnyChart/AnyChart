@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+    <!--Compiled JS-->
+    <!--<script src="../../../out/anychart.min.js"></script>-->
+
+    <!--Non Compiled JS-->
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.modules.anychart');
+        goog.require('goog.object');
+    </script>
+    <script src="items.js"></script>
+    <script>
+        var dataGrid;
+        anychart.onDocumentReady(function() {
+            var acdvfColumnFormatter = function(item) {
+                return item.get('acdvf');
+            };
+
+            var descriptionColumnFormatter = function(item) {
+                return item.get('description');
+            };
+
+            var variableColumnFormatter = function(item) {
+                return item.get('variable');
+            };
+
+            var graphicsColumnFormatter = function(item) {
+                return item.get('graphics');
+            };
+
+            var inheritedColumnFormatter = function(item) {
+                return item.get('inherited');
+            };
+
+            var drawDataGrid = function(data) {
+                var dg = anychart.ui.dataGrid();
+                dg.titleHeight(20);
+                dg.column(0).title('id');
+                dg.column(1).width(230).title('acdvf').textFormatter(acdvfColumnFormatter);
+                dg.column(2).width(200).title('description').textFormatter(descriptionColumnFormatter);
+                dg.column(3).width(200).title('variable').textFormatter(variableColumnFormatter);
+                dg.column(4).width(90).title('graphics').textFormatter(graphicsColumnFormatter);
+                dg.column(5).width(200).title('inherited from').textFormatter(inheritedColumnFormatter);
+                dg.data(data);
+                dg.listen('signal', dg.draw);
+                dg.container('container').draw();
+                return dg;
+            };
+            var stageData = [
+                {
+                    acdvf: 'none', description: 'root stage', variable: '', graphics: '<g>',
+                    children: [
+                        new charts.Pie({collapsed: true}),
+                        new charts.Bullet({collapsed: true}),
+                        new charts.Sparkline({collapsed: true}),
+                        new charts.Radar({collapsed: true}),
+                        new charts.Polar({collapsed: true}),
+                        new charts.Scatter({collapsed: true}),
+                        new charts.Cartesian({collapsed: true})
+                    ]
+                }
+            ];
+            dataGrid = drawDataGrid(anychart.data.tree(stageData, anychart.enums.TreeFillingMethod.AS_TREE));
+        });
+    </script>
+</head>
+<body>
+<div id="container" style="width: 1200px; height: 3000px;"></div>
+<div id="chart-container" style="width: 800px; height: 600px;"></div>
+</body>
+</html>

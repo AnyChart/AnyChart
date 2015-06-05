@@ -1467,6 +1467,8 @@ anychart.enums.EventType = {
   POINT_CLICK: 'pointclick',
   POINT_DBLCLICK: 'pointdblclick',
   CHART_DRAW: 'chartdraw',
+  ANIMATION_START: 'animationstart',
+  ANIMATION_END: 'animationend',
 
   LEGEND_ITEM_MOUSE_OUT: 'legenditemmouseout',
   LEGEND_ITEM_MOUSE_OVER: 'legenditemmouseover',
@@ -2358,6 +2360,8 @@ goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.Ev
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
 goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
+goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
+goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE', anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE);
