@@ -19,6 +19,13 @@ anychart.onDocumentReady(function() {
   //set start splitter position settings
   chart.splitterPosition(460);
 
+  chart.rowSelectedFill('#D4DFE8');
+  chart.rowHoverFill('#EAEFF3');
+
+  //Toolbar is rendered in the same container as chart. Toolbar displaces chart and it hides the bottom of chart.
+  //Adding a bottom margin makes the bottom of chart visible again.
+  chart.margin(28, 0, 0, 0);
+
   //get chart data grid link to set column settings
   var dataGrid = chart.dataGrid();
 
@@ -45,11 +52,110 @@ anychart.onDocumentReady(function() {
   fourthColumn.textFormatter(fourthColumnTextFormatter);
   fourthColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
+  //--------------------------------------------------
+  // Setup timeline
+  //--------------------------------------------------
+  var moccasin_border = '#B8AA96';
+  var moccasin_bottom = '#CFC0A9';
+  var moccasin_middle = '#E6D5BC';
+  var moccasin_top = '#E8D9C3';
+
+  var rosybrown_border = '#9B9292';
+  var rosybrown_bottom = '#AFA4A4';
+  var rosybrown_middle = '#C2B6B6';
+  var rosybrown_top = '#C8BDBD';
+
+  var brown_border = '#6B5D5D';
+  var brown_bottom = '#796868';
+  var brown_middle = '#867474';
+  var brown_top = '#928282';
+  var tl = chart.getTimeline();
+
+  tl.baseFill({
+    'angle': 90,
+    'keys': [
+      {'color': moccasin_bottom, 'position': 0},
+      {'color': moccasin_middle, 'position': 0.38},
+      {'color': moccasin_top, 'position': 1}
+    ]
+  });
+
+  tl.baseStroke('#000');
+
+  tl.progressFill({
+    'angle': 90,
+    'keys': [
+      {'color': rosybrown_bottom, 'position': 0},
+      {'color': rosybrown_middle, 'position': 0.38},
+      {'color': rosybrown_top, 'position': 1}
+    ]
+  });
+
+  tl.progressStroke('#000');
+
+  tl.baselineFill({
+    'angle': 90,
+    'keys': [
+      {'color': brown_bottom, 'position': 0},
+      {'color': brown_middle, 'position': 0.38},
+      {'color': brown_top, 'position': 1}
+    ]
+  });
+
+  tl.baselineStroke('#000');
+
+  tl.connectorFill(brown_border);
+  tl.connectorStroke(brown_border);
+
+  tl.selectedElementFill('#f00');
+
   //initiate chart drawing
   chart.draw();
 
   //zoom chart to specified date
   chart.zoomTo(Date.UTC(2010, 0, 8, 15), Date.UTC(2010, 3, 25, 20));
+
+  //--------------------------------------------------
+  // External events
+  //--------------------------------------------------
+  chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+    //e.preventDefault();
+    console.log('Clicked:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
+    console.log('Selected:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
+    //e.preventDefault();
+    console.log('Double clicked:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
+    //e.preventDefault();
+    console.log('Mouse over:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
+    //e.preventDefault();
+    console.log('Mouse move:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
+    //e.preventDefault();
+    console.log('Mouse out:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
+    //e.preventDefault();
+    console.log('Mouse up:', e['item'].get('name'));
+  });
+
+  chart.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
+    //e.preventDefault();
+    console.log('Mouse down:', e['item'].get('name'));
+  });
 });
 
 function getData() {

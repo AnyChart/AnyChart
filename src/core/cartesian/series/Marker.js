@@ -468,7 +468,12 @@ anychart.core.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, 
   var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
 
   var settings = {'type': pointType, 'size': pointSize, 'fill': pointFill, 'stroke': pointStroke};
-  var settingsHover = {'type': pointHoverType, 'size': pointHoverSize, 'fill': pointHoverFill, 'stroke': pointHoverStroke};
+  var settingsHover = {
+    'type': pointHoverType,
+    'size': pointHoverSize,
+    'fill': pointHoverFill,
+    'stroke': pointHoverStroke
+  };
 
   var index = this.getIterator().getIndex();
 
@@ -503,8 +508,18 @@ anychart.core.cartesian.series.Marker.prototype.applyHatchFill = function(hovere
     var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
     var hatchFill = this.hatchFillElement_.add(this.createPositionProvider(anychart.enums.Position.CENTER), index);
 
-    var settings = {'type': pointType, 'size': pointSize, 'fill': this.getFinalHatchFill(true, hovered), 'stroke': null};
-    var settingsHover = {'type': pointHoverType, 'size': pointHoverSize, 'fill': this.getFinalHatchFill(true, hovered), 'stroke': null};
+    var settings = {
+      'type': pointType,
+      'size': pointSize,
+      'fill': this.getFinalHatchFill(true, hovered),
+      'stroke': null
+    };
+    var settingsHover = {
+      'type': pointHoverType,
+      'size': pointHoverSize,
+      'fill': this.getFinalHatchFill(true, hovered),
+      'stroke': null
+    };
 
     hatchFill.resetSettings();
 

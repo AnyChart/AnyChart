@@ -1,17 +1,16 @@
 goog.provide('anychart.ui.GanttToolbar');
 goog.provide('anychart.ui.Toolbar');
 
-goog.require('anychart');
+goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.toolbar.MenuItemRenderer');
 goog.require('anychart.core.ui.toolbar.SubMenu');
 goog.require('anychart.core.ui.toolbar.Toolbar');
 goog.require('anychart.core.ui.toolbar.ToolbarButtonRenderer');
 goog.require('anychart.core.ui.toolbar.ToolbarMenuButtonRenderer');
 goog.require('anychart.core.ui.toolbar.ToolbarSeparatorRenderer');
+goog.require('anychart.utils');
 
-goog.require('goog.debug.Console');
 goog.require('goog.events');
-goog.require('goog.log');
 goog.require('goog.positioning.Corner');
 goog.require('goog.string');
 
@@ -37,57 +36,67 @@ goog.require('goog.ui.ToolbarMenuButton');
 anychart.ui.Toolbar = function() {
   goog.base(this);
 
-  /**
-   * Related logger.
-   * @type {goog.log.Logger}
-   * @protected
-   */
-  this.logger = goog.log.getLogger('toolbar');
-
-  var debugConsole = new goog.debug.Console();
-  debugConsole.setCapturing(true);
+  if (!anychart.toolbarCssEmbedded) {
+    anychart.embedCss(anychart.TOOLBAR_CSS);
+    anychart.toolbarCssEmbedded = true;
+  }
 
   // --------- PRINTING ----------
 
-  var printMenu = new goog.ui.PopupMenu(void 0,
+  /**
+   * Print menu.
+   * @type {goog.ui.PopupMenu}
+   * @private
+   */
+  this.printMenu_ = new goog.ui.PopupMenu(void 0,
       /** @type {goog.ui.MenuRenderer} */ (goog.ui.ContainerRenderer.getCustomRenderer(goog.ui.MenuRenderer, 'anychart-menu')));
 
-  var printA4 = new goog.ui.MenuItem('A4', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  printA4.setId('anychart_print_a4');
-  printMenu.addChild(printA4, true);
+  var hideHandler = function(e) {
+    e.preventDefault();
+  };
 
-  //TODO (A.Kudryavtsev): Uncomment on future implementation.
-  //var printA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //printA3.setId('anychart_print_a3');
-  //printMenu.addChild(printA3, true);
-  //
-  //var printA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //printA2.setId('anychart_print_a2');
-  //printMenu.addChild(printA2, true);
-  //
-  //var printA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //printA1.setId('anychart_print_a1');
-  //printMenu.addChild(printA1, true);
-  //
-  //var printA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //printA0.setId('anychart_print_a0');
-  //printMenu.addChild(printA0, true);
+  var ths = this;
 
-  printMenu.render(); //Create a DOM-structure to attach 'action'-event.
+  this.printMenu_.listen(goog.ui.Component.EventType.ENTER, function(e) {
+    var menuItem = e['target'];
+    if (menuItem.getId() == 'anychart_switchLayout') {
+      ths.printMenu_.listen(goog.ui.Component.EventType.HIDE, hideHandler);
+    }
+  });
+
+  this.printMenu_.listen(goog.ui.Component.EventType.LEAVE, function(e) {
+    ths.printMenu_.unlisten(goog.ui.Component.EventType.HIDE, hideHandler);
+  });
+
+
+  var switchLayout = new goog.ui.MenuItem('Switch Layout', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  switchLayout.setId('anychart_switchLayout');
+  switchLayout.setValue(true);
+
+  this.printMenu_.addChild(switchLayout, true);
+
+  var separator = new goog.ui.Separator(
+      /** @type {goog.ui.MenuSeparatorRenderer} */ (goog.ui.ControlRenderer.getCustomRenderer(
+          goog.ui.MenuSeparatorRenderer, 'anychart-menuseparator')));
+  this.printMenu_.addChild(separator, true);
+
+  this.printMenu_.render(); //Create a DOM-structure to attach 'action'-event.
 
   //TODO (A.Kudryavtsev): In current implementation (20 Feb 2015) we can't print A4-A0 formats. That's why we just call print().
   goog.events.listen(
-      printMenu,
+      ths.printMenu_,
       goog.ui.Component.EventType.ACTION,
       this.createToolbarActionHandler()
   );
 
+  this.printMenu_.setParent(this);
+
+
   var printButton = new goog.ui.ToolbarMenuButton('Print', void 0, anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.getInstance());
   this.addChild(printButton, true);
-  printMenu.attach(printButton.getElement(), goog.positioning.Corner.BOTTOM_START);
+  this.printMenu_.attach(printButton.getElement(), goog.positioning.Corner.BOTTOM_START);
 
   this.addChild(new goog.ui.Separator(anychart.core.ui.toolbar.ToolbarSeparatorRenderer.getInstance()), true);
-
 
   // --------- SAVE AS ----------
 
@@ -111,21 +120,21 @@ anychart.ui.Toolbar = function() {
   saveAsPDFA4.setId('anychart_saveAsPDF_a4');
   pdfSubMenu.addItem(saveAsPDFA4);
 
-  var saveAsPDFA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDFA3.setId('anychart_saveAsPDF_a3');
-  pdfSubMenu.addItem(saveAsPDFA3);
-
-  var saveAsPDFA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDFA2.setId('anychart_saveAsPDF_a2');
-  pdfSubMenu.addItem(saveAsPDFA2);
-
-  var saveAsPDFA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDFA1.setId('anychart_saveAsPDF_a1');
-  pdfSubMenu.addItem(saveAsPDFA1);
-
-  var saveAsPDFA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDFA0.setId('anychart_saveAsPDF_a0');
-  pdfSubMenu.addItem(saveAsPDFA0);
+  //var saveAsPDFA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //saveAsPDFA3.setId('anychart_saveAsPDF_a3');
+  //pdfSubMenu.addItem(saveAsPDFA3);
+  //
+  //var saveAsPDFA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //saveAsPDFA2.setId('anychart_saveAsPDF_a2');
+  //pdfSubMenu.addItem(saveAsPDFA2);
+  //
+  //var saveAsPDFA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //saveAsPDFA1.setId('anychart_saveAsPDF_a1');
+  //pdfSubMenu.addItem(saveAsPDFA1);
+  //
+  //var saveAsPDFA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  //saveAsPDFA0.setId('anychart_saveAsPDF_a0');
+  //pdfSubMenu.addItem(saveAsPDFA0);
 
   saveAsMenu.addChild(pdfSubMenu, true);
 
@@ -179,17 +188,23 @@ goog.inherits(anychart.ui.Toolbar, anychart.core.ui.toolbar.Toolbar);
 
 
 /**
- * Chart is not set message.
- * @type {string}
+ * @inheritDoc
  */
-anychart.ui.Toolbar.CHART_IS_NOT_SET = 'No chart is assigned for toolbar. Please set a target chart using toolbar.target() method.';
+anychart.ui.Toolbar.prototype.draw = function() {
+  var sizes = this.printPaperSizes();
+  for (var i = 0; i < sizes.length; i++) {
+    var size = sizes[i];
+    var id = 'anychart_print_' + size;
+    if (!goog.array.contains(this.printMenu_.getChildIds(), id)) {
+      var printItem = new goog.ui.MenuItem('Landscape, ' + anychart.utils.normalizePaperSizeCaption(size),
+          void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+      printItem.setId(id);
+      this.printMenu_.addChild(printItem, true);
+    }
+  }
 
-
-/**
- * Message is not defined message template.
- * @type {string}
- */
-anychart.ui.Toolbar.METHOD_IS_NOT_DEFINED = 'Target chart has not method %s(). PLease make sure that you use correct instance of chart.';
+  return goog.base(this, 'draw');
+};
 
 
 /**
@@ -200,20 +215,46 @@ anychart.ui.Toolbar.METHOD_IS_NOT_DEFINED = 'Target chart has not method %s(). P
 anychart.ui.Toolbar.prototype.createToolbarActionHandler = function() {
   var ths = this;
   return function(e) {
-    var id = e.target.getId(); //Got string like 'anychart_saveAsPDF_a3'
-    var args = id.split('_');
-    var func = args[1];
+    var item = e['target'];
+    var id = item.getId(); //Got string like 'anychart_saveAsPDF_a3' or 'anychart_switchLayout'
+    var menu = e['currentTarget'];
 
-    var chart = ths.target();
-    if (chart) {
-      var fn = chart[func];
-      if (goog.isFunction(fn)) {
-        fn.call(chart); //TODO (A.Kudryavtsev): No arguments can be passed for a while.
-      } else {
-        if (anychart.DEVELOP) goog.log.warning(ths.logger, goog.string.subs(anychart.ui.Toolbar.METHOD_IS_NOT_DEFINED, func));
-      }
+    if (id == 'anychart_switchLayout') {
+      var isLandscape = item.getValue();
+
+      menu.forEachChild(function(child, index) {
+        var childId = child.getId();
+        if (!childId.indexOf('anychart') && (childId != id)) {
+          var childValueSplit = child.getValue().split(',');
+          childValueSplit[0] = isLandscape ? 'Portrait' : 'Landscape';
+          child.setCaption(childValueSplit.join(','));
+        }
+      });
+
+      item.setValue(!isLandscape);
     } else {
-      if (anychart.DEVELOP) goog.log.warning(ths.logger, anychart.ui.Toolbar.CHART_IS_NOT_SET);
+      var args = id.split('_');
+
+      /*
+        String 'anychart_saveAsPDF_a3' will be represented as args = ['anychart', 'saveAsPDF', 'a3'].
+        goog.array.splice() will turn arr to ['a3'] and will return ['anychart', 'saveAsPDF'], where index '1' is function
+        to be called.
+      */
+      var func = goog.array.splice(args, 0, 2)[1];
+
+      if (func == 'print') args.push(!item.getCaption().indexOf('Landscape'));
+
+      var chart = ths.target();
+      if (chart) {
+        var fn = chart[func];
+        if (goog.isFunction(fn)) {
+          fn.apply(chart, args);
+        } else {
+          anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, [func]);
+        }
+      } else {
+        anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET);
+      }
     }
   }
 };
@@ -258,28 +299,5 @@ anychart.ui.GanttToolbar = function() {
 goog.inherits(anychart.ui.GanttToolbar, anychart.ui.Toolbar);
 
 
-/**
- * Constructor function for default toolbar.
- * @return {anychart.ui.Toolbar}
- */
-anychart.toolbar = function() {
-  return new anychart.ui.Toolbar();
-};
-
-
-/**
- * Constructor function for gantt toolbar.
- * @return {anychart.ui.GanttToolbar}
- */
-anychart.ganttToolbar = function() {
-  return new anychart.ui.GanttToolbar();
-};
-
-
 //exports
-goog.exportSymbol('anychart.toolbar', anychart.toolbar);
-goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
-anychart.ui.Toolbar.prototype['container'] = anychart.ui.Toolbar.prototype.container;
-anychart.ui.Toolbar.prototype['target'] = anychart.ui.Toolbar.prototype.target;
-anychart.ui.Toolbar.prototype['draw'] = anychart.ui.Toolbar.prototype.draw;
-
+anychart.ui.Toolbar.prototype['draw'] = anychart.ui.Toolbar.prototype.draw; //Overriden method - needs to be exported.

@@ -3059,8 +3059,8 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   if (goog.isFunction(this['firstFill'])) {
     if (goog.isFunction(this.firstFill())) {
       anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first fill']);
-    } else if (goog.isDef(this.lastHatchFill())) {
-      json['firstFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.lastHatchFill()));
+    } else if (goog.isDef(this.firstFill())) {
+      json['firstFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.firstFill()));
     }
   }
   if (goog.isFunction(this['firstHatchFill'])) {

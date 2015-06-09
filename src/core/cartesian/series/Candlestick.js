@@ -563,7 +563,7 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = 
  * @return {acgraph.vector.Fill|anychart.core.cartesian.series.Base|Function} .
  */
 anychart.core.cartesian.series.Candlestick.prototype.risingFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
-    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+                                                                           opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -707,9 +707,9 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingFill = functi
   return /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
-              iterator.get('hoverRisingFill') ||
-              this.hoverRisingFill() ||
-              normalColor),
+          iterator.get('hoverRisingFill') ||
+          this.hoverRisingFill() ||
+          normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -819,7 +819,7 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingFill = functi
  * @return {acgraph.vector.Fill|anychart.core.cartesian.series.Base|Function} .
  */
 anychart.core.cartesian.series.Candlestick.prototype.fallingFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
-    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+                                                                            opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -938,7 +938,7 @@ anychart.core.cartesian.series.Candlestick.prototype.fallingFill = function(opt_
  * @return {acgraph.vector.Fill|anychart.core.cartesian.series.Base|Function} .
  */
 anychart.core.cartesian.series.Candlestick.prototype.hoverFallingFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
-    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+                                                                                 opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverFallingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -964,9 +964,9 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingFill = funct
   return /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
-              iterator.get('hoverFallingFill') ||
-              this.hoverFallingFill() ||
-              normalColor),
+          iterator.get('hoverFallingFill') ||
+          this.hoverFallingFill() ||
+          normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };

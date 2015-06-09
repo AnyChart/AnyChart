@@ -3,6 +3,7 @@ goog.provide('anychart.core.gantt.Controller');
 goog.require('acgraph');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.ScrollBar');
+goog.require('anychart.data.Tree');
 
 goog.require('goog.array');
 goog.require('goog.math');
@@ -102,14 +103,12 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    */
   this.startIndex_ = NaN;
 
-
   /**
    * End index.
    * @type {number}
    * @private
    */
   this.endIndex_ = NaN;
-
 
   /**
    * Vertical offset.
@@ -127,14 +126,12 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    */
   this.availableHeight_ = 0;
 
-
   /**
    * Flag if startIndex, endIndex, vertical offset were recalculated.
    * @type {boolean}
    * @private
    */
   this.positionRecalculated_ = false;
-
 
   /**
    * Traverser that ignores children of collapsed items while passage.
@@ -143,14 +140,12 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    */
   this.expandedItemsTraverser_ = null;
 
-
   /**
    * Min date timestamp.
    * @type {number}
    * @private
    */
   this.minDate_ = NaN;
-
 
   /**
    * Max date timestamp.
@@ -159,6 +154,12 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    */
   this.maxDate_ = NaN;
 
+  /**
+   * Index for recursive linearization.
+   * @type {number}
+   * @private
+   */
+  this.linearIndex_ = 0;
 
   /**
    * Vertical scroll bar.
@@ -200,6 +201,20 @@ anychart.core.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CONTROLLER_DATA |
     anychart.ConsistencyState.CONTROLLER_VISIBILITY |
     anychart.ConsistencyState.CONTROLLER_POSITION;
+
+
+/**
+ * Henry Laurence Gantt's birth date (20 May 1861).
+ * @type {number}
+ */
+anychart.core.gantt.Controller.GANTT_BIRTH_DATE = Date.UTC(1861, 4, 20);
+
+
+/**
+ * Henry Laurence Gantt's death date (23 Nov 1919).
+ * @type {number}
+ */
+anychart.core.gantt.Controller.GANTT_DEATH_DATE = Date.UTC(1919, 10, 23);
 
 
 /**
@@ -250,35 +265,96 @@ anychart.core.gantt.Controller.prototype.itemHasChildrenCondition_ = function(it
 
 
 /**
+ * Item's values auto calculation.
+ * @param {anychart.data.Tree.DataItem} item - Current tree data item.
+ * @param {number} currentDepth - Current depth.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentDepth) {
+  item
+      .meta('depth', currentDepth)
+      .meta('index', this.linearIndex_++);
+
+  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_START)));
+  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_END)));
+  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_START)));
+  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_END)));
+
+  var resultStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
+  var resultEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+
+  var progressLength = 0;
+  var totalLength = 0;
+
+  for (var i = 0, l = item.numChildren(); i < l; i++) {
+    var child = item.getChildAt(i);
+    if (child.numChildren()) {
+      this.autoCalcItem_(child, currentDepth + 1);
+    } else {
+      child
+          .meta('depth', currentDepth + 1)
+          .meta('index', this.linearIndex_++);
+    }
+
+    if (!this.isResourceChart_) {
+      var childStart = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+          child.get(anychart.enums.GanttDataFields.ACTUAL_START) :
+          child.meta('autoStart');
+
+      var childEnd = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+          child.get(anychart.enums.GanttDataFields.ACTUAL_END) :
+          (child.meta('autoEnd') || childStart);
+
+      var childProgress = goog.isDef(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+          anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
+          (child.meta('autoProgress') || 0);
+
+      if (!goog.isDef(resultStart)) {
+        resultStart = childStart;
+      } else {
+        resultStart = Math.min(resultStart, childStart, childEnd);
+      }
+
+      if (!goog.isDef(resultEnd)) {
+        resultEnd = childEnd;
+      } else {
+        resultEnd = Math.max(resultEnd, childStart, childEnd);
+      }
+
+      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_START)));
+      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_END)));
+      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_START)));
+      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_END)));
+
+      var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
+      progressLength += /** @type {number} */(childProgress) * delta;
+      totalLength += delta;
+    }
+  }
+
+  if (!this.isResourceChart_) {
+    item.meta('autoProgress', progressLength / totalLength);
+    item.meta('autoStart', resultStart);
+    item.meta('autoEnd', resultEnd);
+  }
+
+};
+
+
+/**
  * Linearizes tree. Used to add necessary meta information to data items in a straight tree passage.
  * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  * @private
  */
 anychart.core.gantt.Controller.prototype.linearizeData_ = function() {
-  var item;
-  var linearIndex = 0;
-
+  this.linearIndex_ = 0;
   this.minDate_ = NaN;
   this.maxDate_ = NaN;
 
   this.data_.suspendSignalsDispatching();
-  var fullPassageTraverser = this.data_.getTraverser();
-
-  while (fullPassageTraverser.advance()) {
-    item = fullPassageTraverser.current();
-
-    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_START)));
-    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_END)));
-    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_START)));
-    this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_END)));
-
-    item
-        .meta('depth', fullPassageTraverser.getDepth())
-        .meta('index', linearIndex++);
-
-
-    if (item.numChildren() && goog.isDef(item.get(anychart.enums.GanttDataFields.COLLAPSED)))
-      item.meta(anychart.enums.GanttDataFields.COLLAPSED, item.get(anychart.enums.GanttDataFields.COLLAPSED));
+  for (var i = 0, l = this.data_.numChildren(); i < l; i++) {
+    var root = this.data_.getChildAt(i);
+    this.autoCalcItem_(/** @type {anychart.data.Tree.DataItem} */ (root), 0);
   }
 
   this.data_.resumeSignalsDispatching(false);
@@ -485,9 +561,44 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
     this.startIndex_ = 0;
     this.endIndex_ = 0;
     this.verticalOffset_ = 0;
+    this.setGanttLifeYears_();
   }
   this.positionRecalculated_ = true;
   this.markConsistent(anychart.ConsistencyState.CONTROLLER_POSITION);
+};
+
+
+/**
+ * Sets this.minDate_ and this.maxDate_ to Henry Gantt's life years.
+ * Calculates values to fit timeline's gaps.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.setGanttLifeYears_ = function() {
+  var minDate = anychart.core.gantt.Controller.GANTT_BIRTH_DATE;
+  var maxDate = anychart.core.gantt.Controller.GANTT_DEATH_DATE;
+
+  var minGap = 0;
+  var maxGap = 0;
+  if (this.timeline_) {
+    minGap = this.timeline_.minimumGap();
+    maxGap = this.timeline_.maximumGap();
+  }
+
+  var k = (1 + minGap + maxGap);
+
+  /*
+    To calculate this values:
+
+       minGap      maxDate_ - minDate_ = delta         maxGap
+    |---------|---------------------------------|--------------------|
+    birth     minDate_                          maxDate_             death
+
+    { minDate_ - minGap * delta = birth
+    { maxDate_ + maxGap * delta = death
+   */
+
+  this.minDate_ = Math.round((minDate + minDate * maxGap + maxDate * minGap) / k);
+  this.maxDate_ = Math.round((maxDate + maxDate * minGap + minDate * maxGap) / k);
 };
 
 
@@ -676,6 +787,13 @@ anychart.core.gantt.Controller.prototype.run = function() {
     }
 
     this.recalculate();
+
+    if (isNaN(this.minDate_)) { //In this case this.maxDate_ is NaN as well.
+      this.setGanttLifeYears_();
+    } else if (this.minDate_ == this.maxDate_) {
+      this.minDate_ -= anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
+      this.maxDate_ += anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
+    }
   }
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
@@ -690,21 +808,27 @@ anychart.core.gantt.Controller.prototype.run = function() {
     this.verticalScrollBar_.suspendSignalsDispatching();
     this.verticalScrollBar_.handlePositionChange(false);
 
-    var itemHeight = this.getHeightByIndexes(this.startIndex_, this.startIndex_);
-    var height = this.heightCache_[this.startIndex_] - itemHeight;
+    var startRatio = 0;
+    var endRatio = 1;
 
-    var start = height + this.verticalOffset_;
-    var end = start + this.availableHeight_;
+    if (this.heightCache_.length) {
+      var itemHeight = this.getHeightByIndexes(this.startIndex_, this.startIndex_);
+      var height = this.heightCache_[this.startIndex_] - itemHeight;
 
-    var totalEnd = this.heightCache_[this.heightCache_.length - 1];
+      var start = height + this.verticalOffset_;
+      var end = start + this.availableHeight_;
 
-    var contentBoundsSimulation = new acgraph.math.Rect(0, 0, 0, totalEnd);
+      var totalEnd = this.heightCache_[this.heightCache_.length - 1];
 
-    var startRatio = anychart.math.round(start / totalEnd, 4);
-    var endRatio = anychart.math.round(end / totalEnd, 4);
+      var contentBoundsSimulation = new acgraph.math.Rect(0, 0, 0, totalEnd);
+
+      startRatio = anychart.math.round(start / totalEnd, 4);
+      endRatio = anychart.math.round(end / totalEnd, 4);
+
+      this.verticalScrollBar_.contentBounds(contentBoundsSimulation);
+    }
 
     this.verticalScrollBar_
-        .contentBounds(contentBoundsSimulation)
         .setRatio(startRatio, endRatio)
         .draw()
         .handlePositionChange(true)
@@ -854,4 +978,38 @@ anychart.core.gantt.Controller.prototype.expandAll = function() {
  */
 anychart.core.gantt.Controller.prototype.collapseAll = function() {
   return this.collapseAll_(true);
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.Controller.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  json['isResourceChart'] = this.isResourceChart_;
+  json['treeData'] = this.data().serialize();
+  json['verticalOffset'] = this.verticalOffset();
+  if (!isNaN(this.startIndex()))
+    json['startIndex'] = this.startIndex();
+  else if (!isNaN(this.endIndex()))
+    json['endIndex'] = this.endIndex();
+
+  //NOTE: We do not save available height because it must be set from outside depending on size of restored element.
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.Controller.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.isResourceChart_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
+  this.data(anychart.data.Tree.fromJson(config['treeData']));
+  this.verticalOffset(config['verticalOffset']);
+  if (goog.isDef(config['startIndex']))
+    this.startIndex(config['startIndex']);
+  else if (goog.isDef(config['endIndex']))
+    this.endIndex(config['endIndex']);
+
+  //NOTE: Available height must be set from outside depending on size of restored element.
 };

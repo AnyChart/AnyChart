@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.toolbar.Toolbar');
 
-goog.require('goog.log');
+goog.require('acgraph.vector');
+goog.require('anychart.utils');
 goog.require('goog.ui.ContainerRenderer');
 goog.require('goog.ui.Toolbar');
 goog.require('goog.ui.ToolbarRenderer');
@@ -27,6 +28,23 @@ anychart.core.ui.toolbar.Toolbar = function() {
    * @type {anychart.core.Chart}
    */
   this.targetChart_;
+
+  /**
+   * Supported print paper sizes.
+   * @type {Array.<acgraph.vector.PaperSize>}
+   * @private
+   */
+  this.printPaperSizes_ = [
+    acgraph.vector.PaperSize.US_LETTER,
+    acgraph.vector.PaperSize.A0,
+    acgraph.vector.PaperSize.A0,
+    acgraph.vector.PaperSize.A1,
+    acgraph.vector.PaperSize.A2,
+    acgraph.vector.PaperSize.A3,
+    acgraph.vector.PaperSize.A4,
+    acgraph.vector.PaperSize.A5,
+    acgraph.vector.PaperSize.A6
+  ];
 };
 goog.inherits(anychart.core.ui.toolbar.Toolbar, goog.ui.Toolbar);
 
@@ -75,6 +93,21 @@ anychart.core.ui.toolbar.Toolbar.prototype.target = function(opt_value) {
 
 
 /**
+ * Sets print paper sizes.
+ * NOTE: In current implementation (21 May 2015) sizes must be set before draw() is called.
+ * @param {Array.<acgraph.vector.PaperSize>=} opt_value - Array of supported print paper sizes.
+ * @return {anychart.core.ui.toolbar.Toolbar|Array.<acgraph.vector.PaperSize>} - Current target or itself for method chaining.
+ */
+anychart.core.ui.toolbar.Toolbar.prototype.printPaperSizes = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.printPaperSizes_ = opt_value;
+    return this;
+  }
+  return this.printPaperSizes_;
+};
+
+
+/**
  * Draws toolbar.
  * @return {anychart.core.ui.toolbar.Toolbar} - Itself for method chaining.
  */
@@ -82,10 +115,7 @@ anychart.core.ui.toolbar.Toolbar.prototype.draw = function() {
   if (this.container_) {
     this.render(this.container_);
   } else {
-    if (anychart.DEVELOP) {
-      var logger = goog.log.getLogger('toolbar');
-      goog.log.warning(logger, 'Toolbar container is not specified. Please set a container using toolbar.container() method.');
-    }
+    anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_CONTAINER);
   }
   return this;
 };
@@ -95,5 +125,5 @@ anychart.core.ui.toolbar.Toolbar.prototype.draw = function() {
 //exports
 anychart.core.ui.toolbar.Toolbar.prototype['container'] = anychart.core.ui.toolbar.Toolbar.prototype.container;
 anychart.core.ui.toolbar.Toolbar.prototype['target'] = anychart.core.ui.toolbar.Toolbar.prototype.target;
+anychart.core.ui.toolbar.Toolbar.prototype['printPaperSizes'] = anychart.core.ui.toolbar.Toolbar.prototype.printPaperSizes;
 anychart.core.ui.toolbar.Toolbar.prototype['draw'] = anychart.core.ui.toolbar.Toolbar.prototype.draw;
-

@@ -154,12 +154,6 @@
     right: 6px;
 }
 
-.anychart-option-selected .anychart-menuitem-checkbox,
-.anychart-option-selected .anychart-menuitem-icon {
-    /* Client apps may override the URL at which they serve the sprite. */
-    background: url(//ssl.gstatic.com/editor/editortoolbar.png) no-repeat -512px 0;
-}
-
 /* Keyboard shortcut ("accelerator") style. */
 .anychart-menuitem-accel {
     color: #999;
@@ -207,15 +201,25 @@
 
 
 .anychart-toolbar {
-    /* Client apps may override the URL at which they serve the image. */
-    background: #fafafa url(//ssl.gstatic.com/editor/toolbar-bg.png) repeat-x bottom left;
+    background: #fafafa; /* Old browsers */
+    background: -moz-linear-gradient(top,  #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fafafa), color-stop(17%,#f8f8f8), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #fafafa 0%,#f8f8f8 17%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #fafafa 0%,#f8f8f8 17%,#e5e5e5 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #fafafa 0%,#f8f8f8 17%,#e5e5e5 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #fafafa 0%,#f8f8f8 17%,#e5e5e5 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#fafafa", endColorstr="#e5e5e5",GradientType=0 ); /* IE6-9 */
+
     border-bottom: 1px solid #d5d5d5;
     cursor: default;
     font: normal 12px Arial, sans-serif;
     margin: 0;
     outline: none;
     padding: 2px;
-    position: relative;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    top: 0;
     zoom: 1; /* The toolbar element must have layout on IE. */
 }
 
@@ -541,9 +545,11 @@
 
 /* Dropdown style. */
 .anychart-toolbar-menu-button-dropdown {
-    width: 7px;
-    /* Client apps may override the URL at which they serve the sprite. */
-    background: url(//ssl.gstatic.com/editor/editortoolbar.png) no-repeat -388px 0;
+    width:0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #000;
     vertical-align: middle;
 }
 
@@ -603,7 +609,6 @@
     position: absolute;
     right: 0;
     text-align: right;
-    /*background: url(//ssl.gstatic.com/editor/editortoolbar.png) no-repeat -290px 0;*/
     width: 0;
     height: 0;
     border-top: 5px solid transparent;

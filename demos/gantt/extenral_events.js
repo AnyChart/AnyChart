@@ -1,4 +1,3 @@
-var toolbar;
 anychart.onDocumentReady(function() {
   var newData = getNewData();
 
@@ -8,11 +7,6 @@ anychart.onDocumentReady(function() {
   //create project gantt chart
   chart = anychart.ganttResource();
 
-  toolbar = anychart.ganttToolbar();
-  toolbar.container('container');
-  toolbar.target(chart);
-  toolbar.draw();
-
   //set container id for the chart
   chart.container('container');
 
@@ -21,10 +15,6 @@ anychart.onDocumentReady(function() {
 
   //set start splitter position settings
   chart.splitterPosition(320);
-
-  //Toolbar is rendered in the same container as chart. Toolbar displaces chart and it hides the bottom of chart.
-  //Adding a bottom margin makes the bottom of chart visible again.
-  chart.margin(28, 0, 0, 0);
 
   //get chart data grid link to set column settings
   var dataGrid = chart.dataGrid();
@@ -73,10 +63,6 @@ anychart.onDocumentReady(function() {
   });
   fourthColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  var timeline = chart.getTimeline();
-  timeline.selectedElementStroke(null);
-  timeline.selectedElementFill('#c2f');
-
 
   //initiate chart drawing
   chart.draw();
@@ -87,61 +73,74 @@ anychart.onDocumentReady(function() {
   // External events
   //--------------------------------------------------
   chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Clicked:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_click').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_CLICK, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
-    console.log('Selected:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_SELECT, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Double clicked:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_dbl_click').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_DBL_CLICK, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
-    //e.preventDefault();
-    console.log('Mouse over:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_over').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_MOUSE_OVER, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
-    //e.preventDefault();
-    console.log('Mouse move:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_move').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_MOUSE_MOVE, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
-    //e.preventDefault();
-    console.log('Mouse out:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_out').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_MOUSE_OUT, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
-    //e.preventDefault();
-    console.log('Mouse up:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    if (document.getElementById('pr_up').checked) e.preventDefault();
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_MOUSE_UP, msg);
   });
 
   chart.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
-    //e.preventDefault();
-    console.log('Mouse down:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+    var msg = e['item'].get('name');
+    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    log(anychart.enums.EventType.ROW_MOUSE_DOWN, msg);
   });
 
 });
+
+
+function log(eventType, message) {
+  var logArea = document.getElementById('log');
+  logArea.innerHTML += eventType + '\n' + message + '\n\n';
+
+  //Clear textarea.
+  var lines = logArea.innerHTML.split('\n');
+  if (lines.length >= 100) lines.splice(0, 10);
+  logArea.innerHTML = lines.join('\n');
+
+  //Scroll to bottom.
+  logArea.scrollTop = logArea.scrollHeight;
+}
 
 
 function labelTextSettingsOverrider(label, item) {

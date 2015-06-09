@@ -12,12 +12,20 @@ anychart.onDocumentReady(function() {
   dataGrid.column(1).width(200);
   dataGrid.column(2).width(70).textFormatter(function(item) {
     var date = new Date(item.get('actualStart'));
-    return date.getFullYear() + '.' + date.getMonth() + '.' + date.getDay();
+    var month = date.getUTCMonth() + 1;
+    var strMonth = (month > 9) ? month : '0' + month;
+    var utcDate = date.getUTCDate();
+    var strDate = (utcDate > 9) ? utcDate : '0' + utcDate;
+    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
   }).title().text('Start Time');
 
   dataGrid.column(3).width(70).textFormatter(function(item) {
     var date = new Date(item.get('actualEnd'));
-    return date.getFullYear() + '.' + date.getMonth() + '.' + date.getDay();
+    var month = date.getUTCMonth() + 1;
+    var strMonth = (month > 9) ? month : '0' + month;
+    var utcDate = date.getUTCDate();
+    var strDate = (utcDate > 9) ? utcDate : '0' + utcDate;
+    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
   }).title().text('End Time');
 
   chart.draw();

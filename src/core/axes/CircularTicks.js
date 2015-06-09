@@ -415,22 +415,16 @@ anychart.core.axes.CircularTicks.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isDef(this.length())) json['length'] = this.length();
-  if (goog.isFunction(this.type())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Gauge axis ticks type']
-    );
-  } else {
-    json['type'] = this.type();
+  if (goog.isFunction(this['type'])) {
+    if (goog.isFunction(this.type())) {
+      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Gauge axis ticks type']);
+    } else {
+      json['type'] = this.type();
+    }
   }
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Ticks fill']
-      );
+      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Ticks fill']);
     } else {
       json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
     }

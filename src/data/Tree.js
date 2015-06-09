@@ -2,6 +2,8 @@ goog.provide('anychart.data.Tree');
 
 goog.require('anychart.core.Base');
 goog.require('anychart.data.Traverser');
+goog.require('anychart.data.csv.Parser');
+goog.require('anychart.data.csv.TreeItemsProcessor');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.array');
@@ -11,12 +13,28 @@ goog.require('goog.object');
 
 /**
  * Tree data implementation.
- * @param {Array.<Object>=} opt_data - Raw data.
- * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
+ * @param {(Array.<Object>|string)=} opt_data - Raw data or CSV-string. If string is passed, second parameter will be
+ *  interpreted as fields mapping.
+ * @param {(anychart.enums.TreeFillingMethod|Object)=} opt_fillMethodOrCsvMapping - Fill method or CSV mapping object.
+ *  This parameter is interpreted as mapping object if first parameter is string. Mapping object should have structure
+ *  like
+ *  <code>
+ *    //'nameOfField': index_of_column
+ *    mapping = {
+ *      'id': 0,
+ *      'name': 1,
+ *      'value': 15
+ *    };
+ *  </code>.
+ * @param {Object=} opt_csvSettings - CSV settings object. Should fields like
+ *  rowsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  columnsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  ignoreTrailingSpaces - boolean or undefined, if it is undefined, it will not be set.
+ *  ignoreFirstRow - boolean or undefined, if it is undefined, it will not be set.
  * @constructor
  * @extends {anychart.core.Base}
  */
-anychart.data.Tree = function(opt_data, opt_fillMethod) {
+anychart.data.Tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings) {
   goog.base(this);
 
 
@@ -50,13 +68,38 @@ anychart.data.Tree = function(opt_data, opt_fillMethod) {
    */
   this.traverserToArrayCache_ = null;
 
-  this.createIndexOn(anychart.data.Tree.DataItem.ID); //Silent ID indexing.
+  this.createIndexOn(anychart.enums.GanttDataFields.ID); //Silent ID indexing.
 
   //Filling with data.
-  if (opt_data) this.addData(opt_data, opt_fillMethod);
+  if (opt_data) this.addData(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings);
 
 };
 goog.inherits(anychart.data.Tree, anychart.core.Base);
+
+
+/**
+ * Creates new data tree by JSON config.
+ * @param {Object} config - Config.
+ * @return {?anychart.data.Tree} - Data tree created by config.
+ */
+anychart.data.Tree.fromJson = function(config) {
+  var tree = new anychart.data.Tree();
+  tree.suspendSignalsDispatching();
+  var indexData = config['index'];
+
+  //We create indexes first because it's a way faster than create index after the data is added.
+  for (var i = 0, l = indexData.length; i < l; i++) {
+    tree.createIndexOn(indexData[i]);
+  }
+
+  var rootsData = config['children'];
+  for (i = 0, l = rootsData.length; i < l; i++) {
+    tree.addChild(anychart.data.Tree.DataItem.fromSerializedItem(tree, rootsData[i]));
+  }
+
+  tree.resumeSignalsDispatching(false);
+  return tree;
+};
 
 
 /**
@@ -77,6 +120,16 @@ anychart.data.Tree.IndexKeyValue;
  * }}
  */
 anychart.data.Tree.ChangeEvent;
+
+
+/**
+ * @typedef {{
+ *    treeDataItemData: !Object,
+ *    treeDataItemMeta: !Object,
+ *    children: (Array.<anychart.data.Tree.SerializedDataItem>|undefined)
+ * }}
+ */
+anychart.data.Tree.SerializedDataItem;
 
 
 /**
@@ -129,7 +182,7 @@ anychart.data.Tree.prototype.fillAsTree_ = function(data) {
 anychart.data.Tree.prototype.createRoot = function(rawItem) {
   var treeItem = new anychart.data.Tree.DataItem(this, rawItem);
 
-  var children = rawItem[anychart.data.Tree.DataItem.CHILDREN];
+  var children = rawItem[anychart.enums.GanttDataFields.CHILDREN];
 
   if (children) {
     for (var i = 0, l = children.length; i < l; i++) {
@@ -161,7 +214,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     obj = data[i];
 
     var dataItem = new anychart.data.Tree.DataItem(this, obj);
-    var id = obj[anychart.data.Tree.DataItem.ID];
+    var id = obj[anychart.enums.GanttDataFields.ID];
     tdis.push(dataItem);
 
     if (goog.isDefAndNotNull(id)) {
@@ -169,7 +222,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
       if (index < 0) {
         var pos = ~index;
         goog.array.insertAt(uids, id, pos);
-        searchResult = this.search(anychart.data.Tree.DataItem.ID, id);
+        searchResult = this.search(anychart.enums.GanttDataFields.ID, id);
 
         if (searchResult) {
           found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
@@ -188,11 +241,11 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
   //Second passage. Building trees.
   for (i = 0; i < tdis.length; i++) {
     tdi = tdis[i]; //Tree data item.
-    parentId = data[i][anychart.data.Tree.DataItem.PARENT];
+    parentId = data[i][anychart.enums.GanttDataFields.PARENT];
     if (goog.isDefAndNotNull(parentId)) {
       index = goog.array.binarySearch(uids, parentId);
       if (index < 0) {
-        searchResult = this.search(anychart.data.Tree.DataItem.ID, parentId);
+        searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
         if (searchResult) {
           found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
           found.addChildWithoutIndexing(tdi);
@@ -220,7 +273,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
         anychart.utils.warning(
             anychart.enums.WarningCode.CYCLE_REFERENCE,
             null,
-            [tdi.get(anychart.data.Tree.DataItem.ID), tdi.getParent().get(anychart.data.Tree.DataItem.ID)]
+            [tdi.get(anychart.enums.GanttDataFields.ID), tdi.getParent().get(anychart.enums.GanttDataFields.ID)]
         );
     }
   }
@@ -233,16 +286,50 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
 
 /**
  * Adds a data.
- * @param {Array.<Object>} data - Raw data.
- * @param {(anychart.enums.TreeFillingMethod|string)=} opt_fillingMethod - Filling method.
+ * @param {(Array.<Object>|string)} data - Raw data or CSV-string. If string is passed, second parameter will be
+ *  interpreted as fields mapping.
+ * @param {(anychart.enums.TreeFillingMethod|Object)=} opt_fillMethodOrCsvMapping - Fill method or CSV mapping object.
+ *  This parameter is interpreted as mapping object if first parameter is string. Mapping object should have structure
+ *  like
+ *  <code>
+ *    //'nameOfField': index_of_column
+ *    mapping = {
+ *      'id': 0,
+ *      'name': 1,
+ *      'value': 15
+ *    };
+ *  </code>.
+ * @param {Object=} opt_csvSettings - CSV settings object. Should fields like
+ *  rowsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  columnsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  ignoreTrailingSpaces - boolean or undefined, if it is undefined, it will not be set.
+ *  ignoreFirstRow - boolean or undefined, if it is undefined, it will not be set.
  * @return {anychart.data.Tree} - Itself for method chaining.
  */
-anychart.data.Tree.prototype.addData = function(data, opt_fillingMethod) {
-  opt_fillingMethod = (String(opt_fillingMethod)).toLowerCase();
+anychart.data.Tree.prototype.addData = function(data, opt_fillMethodOrCsvMapping, opt_csvSettings) {
+  var fillingMethod = anychart.enums.TreeFillingMethod.AS_TREE;
+
+  if (goog.isString(data)) {
+    var parser = new anychart.data.csv.Parser();
+    if (goog.isObject(opt_csvSettings)) {
+      parser.rowsSeparator(/** @type {string|undefined} */(opt_csvSettings['rowsSeparator'])); // if it is undefined, it will not be set.
+      parser.columnsSeparator(/** @type {string|undefined} */(opt_csvSettings['columnsSeparator'])); // if it is undefined, it will not be set.
+      parser.ignoreTrailingSpaces(/** @type {boolean|undefined} */(opt_csvSettings['ignoreTrailingSpaces'])); // if it is undefined, it will not be set.
+      parser.ignoreFirstRow(/** @type {boolean|undefined} */(opt_csvSettings['ignoreFirstRow'])); // if it is undefined, it will not be set.
+    }
+
+    var itemsProcessor = new anychart.data.csv.TreeItemsProcessor();
+    itemsProcessor.mapping(/** @type {Object|undefined} */ (opt_fillMethodOrCsvMapping));
+    parser.parse(data, itemsProcessor);
+    data = itemsProcessor.getData();
+    fillingMethod = (String(anychart.enums.TreeFillingMethod.AS_TABLE)).toLowerCase();
+  } else {
+    fillingMethod = (String(opt_fillMethodOrCsvMapping)).toLowerCase();
+  }
 
   this.suspendSignalsDispatching();
 
-  switch (opt_fillingMethod) {
+  switch (fillingMethod) {
     case 'astable':
     case 'table':
     case 'parentid':
@@ -264,7 +351,6 @@ anychart.data.Tree.prototype.addData = function(data, opt_fillingMethod) {
       this.fillAsTree_(data);
       break;
   }
-
   this.resumeSignalsDispatching(true);
   return this;
 };
@@ -636,6 +722,26 @@ anychart.data.Tree.prototype.removeChildren = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.data.Tree.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['children'] = [];
+  for (var i = 0; i < this.numChildren(); i++) {
+    var root = this.getChildAt(i);
+    json['children'].push(root.serialize());
+  }
+
+  json['index'] = [];
+  for (var key in this.index_) {
+    json['index'].push(key);
+  }
+
+  return json;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Tree data item.
@@ -684,8 +790,8 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
 
 
   var copy = goog.object.clone(rawData);
-  delete copy[anychart.data.Tree.DataItem.CHILDREN];
-  delete copy[anychart.data.Tree.DataItem.PARENT];
+  delete copy[anychart.enums.GanttDataFields.CHILDREN];
+  delete copy[anychart.enums.GanttDataFields.PARENT];
 
 
   /**
@@ -699,24 +805,32 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
 
 
 /**
- * Children field name.
- * @type {string}
+ * Creates a data item from serialized data item.
+ * NOTE: Suspend tree's signals dispatching before calling this method.
+ * @param {anychart.data.Tree} tree - Parent tree.
+ * @param {anychart.data.Tree.SerializedDataItem} config - Serialized data item.
+ * @return {anychart.data.Tree.DataItem} - Restored tree data item.
  */
-anychart.data.Tree.DataItem.CHILDREN = 'children';
+anychart.data.Tree.DataItem.fromSerializedItem = function(tree, config) {
+  var data = config.treeDataItemData;
+  var meta = config.treeDataItemMeta;
+  var children = config.children;
 
+  var item = new anychart.data.Tree.DataItem(tree, data);
 
-/**
- * Parent field name.
- * @type {string}
- */
-anychart.data.Tree.DataItem.PARENT = 'parent';
+  for (var key in meta) { //Restoring meta.
+    item.meta(key, meta[key]);
+  }
 
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      var child = anychart.data.Tree.DataItem.fromSerializedItem(tree, children[i]);
+      item.addChild(child);
+    }
+  }
 
-/**
- * ID field name.
- * @type {string}
- */
-anychart.data.Tree.DataItem.ID = 'id';
+  return item;
+};
 
 
 /**
@@ -1034,8 +1148,8 @@ anychart.data.Tree.DataItem.prototype.treeInternal_ = function(newTree) {
  */
 anychart.data.Tree.DataItem.prototype.clone = function(tree) {
   var copy = /** @type {Object} */(anychart.utils.recursiveClone(this.data_));
-  delete copy[anychart.data.Tree.DataItem.CHILDREN];
-  delete copy[anychart.data.Tree.DataItem.PARENT];
+  delete copy[anychart.enums.GanttDataFields.CHILDREN];
+  delete copy[anychart.enums.GanttDataFields.PARENT];
 
   var clone = new anychart.data.Tree.DataItem(tree, copy);
 
@@ -1044,6 +1158,26 @@ anychart.data.Tree.DataItem.prototype.clone = function(tree) {
     clone.addChild(child.clone(tree));
   }
   return clone;
+};
+
+
+/**
+ * Serializes tree data item with its children.
+ * @return {anychart.data.Tree.SerializedDataItem} - Serialized tree data item.
+ */
+anychart.data.Tree.DataItem.prototype.serialize = function() {
+  var result = {
+    treeDataItemData: this.data_,
+    treeDataItemMeta: this.meta_
+  };
+
+  for (var i = 0, len = this.numChildren(); i < len; i++) {
+    var child = this.getChildAt(i);
+    if (!result.children) result.children = [];
+    result.children.push(child.serialize());
+  }
+
+  return result;
 };
 
 

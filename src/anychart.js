@@ -133,6 +133,12 @@ anychart.gaugeTypesMap = {};
 
 
 /**
+ * @type {Object}
+ */
+anychart.ganttTypesMap = {};
+
+
+/**
  * @param {string} type
  * @return {anychart.core.Chart}
  */
@@ -156,6 +162,20 @@ anychart.createGaugeByType = function(type) {
     return /** @type {anychart.core.Chart} */(cls());
   } else {
     throw 'Unknown gauge type: ' + type + '\nProbably it is in some other module, see module list for details.';
+  }
+};
+
+
+/**
+ * @param {string} type
+ * @return {anychart.core.Chart}
+ */
+anychart.createGanttByType = function(type) {
+  var cls = anychart.ganttTypesMap[type];
+  if (cls) {
+    return /** @type {anychart.core.Chart} */(cls());
+  } else {
+    throw 'Unknown gantt type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
 };
 
@@ -195,14 +215,17 @@ anychart.fromJson = function(jsonConfig) {
   if (json) {
     var chart = json['chart'];
     var gauge = json['gauge'];
+    var gantt = json['gantt'];
     if (chart)
       instance = anychart.createChartByType(chart['type']);
     else if (gauge)
       instance = anychart.createGaugeByType(gauge['type']);
+    else if (gantt)
+      instance = anychart.createGanttByType(gantt['type']);
   }
 
   if (instance)
-    instance.setup(chart || gauge);
+    instance.setup(chart || gauge || gantt);
   else
     anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 

@@ -1,4 +1,5 @@
 goog.provide('anychart.utils');
+
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');
@@ -768,6 +769,17 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
 
 
 /**
+ * Prettify name of paper size.
+ * @param {acgraph.vector.PaperSize} paperSize - Paper size.
+ * @return {string} - Prettified name of paper size.
+ */
+anychart.utils.normalizePaperSizeCaption = function(paperSize) {
+  if (paperSize == acgraph.vector.PaperSize.US_LETTER) return 'US Letter';
+  return goog.string.toTitleCase(paperSize);
+};
+
+
+/**
  * Unescapes strings escapes by goog.string.escapeString() method.
  * @param {string} str String to unescape.
  * @return {string} Unescaped string.
@@ -855,6 +867,12 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['chart_labels', 'label'];
     case 'items':
       return ['items', 'item'];
+    case 'columns':
+      return ['columns', 'column'];
+    case 'children':
+      return ['children', 'data_item'];
+    case 'index':
+      return ['index', 'key'];
   }
   return null;
 };
@@ -912,6 +930,12 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['chartLabels', 'label'];
     case 'items':
       return ['items', 'item'];
+    case 'columns':
+      return ['columns', 'column'];
+    case 'children':
+      return ['children', 'dataItem'];
+    case 'index':
+      return ['index', 'key'];
   }
   return null;
 };
@@ -1064,9 +1088,6 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE:
       return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
 
-    case anychart.enums.ErrorCode.SCALE_DATE_RANGE_NOT_SET:
-      return 'Dates range must be set for Gantt DateTime scale. Please, use scale.setRange(minDate, maxDate) to set it.';
-
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
       return 'Scatter chart scales should be only scatter type (linear, log).';
 
@@ -1197,6 +1218,15 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR:
       return 'Series type "' + opt_arguments[0] + '" does not support error settings - ' +
           'only Area, Bar, Column, Line, Marker, Spline, SplineArea, StepLine and StepLineArea do.';
+
+    case anychart.enums.WarningCode.TOOLBAR_CONTAINER:
+      return 'Toolbar container is not specified. Please set a container using toolbar.container() method.';
+
+    case anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED:
+      return 'Target chart has not method ' + opt_arguments[0] + '(). PLease make sure that you use correct instance of chart.';
+
+    case anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET:
+      return 'No chart is assigned for toolbar. Please set a target chart using toolbar.target() method.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

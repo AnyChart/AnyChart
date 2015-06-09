@@ -513,6 +513,8 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
   this.anchor(config['anchor']);
   this.hideDelay(config['hideDelay']);
   this.enabled('enabled' in config ? config['enabled'] : true);
+  this.titleFormatter(config['titleFormatter']);
+  this.contentFormatter(config['contentFormatter']);
 };
 
 

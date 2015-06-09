@@ -27,7 +27,8 @@ anychart.enums.ChartTypes = {
   COLUMN: 'column',
   FINANCIAL: 'financial',
   FUNNEL: 'funnel',
-  GANTT: 'gantt',
+  GANTT_RESOURCE: 'resource',
+  GANTT_PROJECT: 'project',
   LINE: 'line',
   MARKER: 'marker',
   PIE: 'pie',
@@ -1484,8 +1485,15 @@ anychart.enums.EventType = {
 
   SIGNAL: 'signal',
 
-  ROW_HOVER: 'rowhover',
-  ROW_CLICK: 'rowclick'
+  //Grid events.
+  ROW_SELECT: 'rowSelect',
+  ROW_CLICK: 'rowClick',
+  ROW_DBL_CLICK: 'rowDblClick',
+  ROW_MOUSE_OVER: 'rowMouseOver',
+  ROW_MOUSE_OUT: 'rowMouseOut',
+  ROW_MOUSE_MOVE: 'rowMouseMove',
+  ROW_MOUSE_DOWN: 'rowMouseDown',
+  ROW_MOUSE_UP: 'rowMouseUp'
 };
 
 
@@ -1838,8 +1846,6 @@ anychart.enums.ErrorCode = {
 
   INCORRECT_SCALE_TYPE: 5,
 
-  SCALE_DATE_RANGE_NOT_SET: 6,
-
   EMPTY_CONFIG: 7,
 
   NO_LEGEND_IN_CHART: 8,
@@ -1874,7 +1880,6 @@ anychart.enums.WarningCode = {
   COMPLEX_VALUE_TO_DEFAULT_FIELD: 6,
   NOT_OBJECT_OR_ARRAY: 7,
 
-
   CANT_SERIALIZE_FUNCTION: 8,
 
   //anychart.core.ui.DataGrid incorrect component usage.
@@ -1885,6 +1890,10 @@ anychart.enums.WarningCode = {
   GANTT_FIT_TO_TASK: 11,
 
   SERIES_DOESNT_SUPPORT_ERROR: 12,
+
+  TOOLBAR_CONTAINER: 13,
+  TOOLBAR_METHOD_IS_NOT_DEFINED: 14,
+  TOOLBAR_CHART_IS_NOT_SET: 15,
 
   NOT_FOUND: 404
 
@@ -2372,8 +2381,14 @@ goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DBLCLICK', anychart.enum
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);
-goog.exportSymbol('anychart.enums.EventType.ROW_HOVER', anychart.enums.EventType.ROW_HOVER);
+goog.exportSymbol('anychart.enums.EventType.ROW_SELECT', anychart.enums.EventType.ROW_SELECT);
 goog.exportSymbol('anychart.enums.EventType.ROW_CLICK', anychart.enums.EventType.ROW_CLICK);
+goog.exportSymbol('anychart.enums.EventType.ROW_DBL_CLICK', anychart.enums.EventType.ROW_DBL_CLICK);
+goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_OVER', anychart.enums.EventType.ROW_MOUSE_OVER);
+goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_OUT', anychart.enums.EventType.ROW_MOUSE_OUT);
+goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_MOVE', anychart.enums.EventType.ROW_MOUSE_MOVE);
+goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_DOWN', anychart.enums.EventType.ROW_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_UP', anychart.enums.EventType.ROW_MOUSE_UP);
 
 goog.exportSymbol('anychart.enums.ScaleStackMode.NONE', anychart.enums.ScaleStackMode.NONE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.VALUE', anychart.enums.ScaleStackMode.VALUE);

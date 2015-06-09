@@ -3,6 +3,7 @@ goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
+goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('goog.i18n.DateTimeFormat');
 
@@ -137,20 +138,20 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
 
   this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
 
+  this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
+    this.dataGrid().initMouseFeatures();
+    this.getTimeline().initMouseFeatures();
+  }, false, this);
+
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
 
-/**
- * @type {string}
- */
-anychart.charts.Gantt.CHART_TYPE = 'gantt';
-anychart.chartTypesMap[anychart.charts.Gantt.CHART_TYPE] = anychart.charts.Gantt;
-
-
 /** @inheritDoc */
 anychart.charts.Gantt.prototype.getType = function() {
-  return anychart.enums.ChartTypes.GANTT;
+  return this.isResourcesChart_ ?
+      anychart.enums.ChartTypes.GANTT_RESOURCE :
+      anychart.enums.ChartTypes.GANTT_PROJECT;
 };
 
 
@@ -199,13 +200,6 @@ anychart.charts.Gantt.Z_INDEX_DG_TL = 5;
  * @type {number}
  */
 anychart.charts.Gantt.Z_INDEX_SCROLL = 20;
-
-
-/**
- * Scroll bar side size.
- * @type {number}
- */
-anychart.charts.Gantt.SCROLL_BAR_SIDE = 10;
 
 
 /**
@@ -279,40 +273,34 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
     this.dg_ = new anychart.core.ui.DataGrid();
     this.dg_.controller(this.controller_);
     this.dg_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
+    this.dg_.interactivityHandler(this);
     this.registerDisposable(this.dg_);
     var ths = this;
     this.dg_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
 
-    this.dg_.listen(anychart.enums.EventType.ROW_HOVER, function(e) {
-      ths.tl_.highlight(e['index'], e['startY'], e['endY'], true);
-    });
-
-    this.dg_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-      ths.tl_.selectRow(e['item']); //This also deselects previous item.
-      ths.dispatchEvent(e);
-      ths.tl_.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
-    });
-
     this.dg_.tooltip().contentFormatter(function(data) {
-      //data here is always a tree data item.
+      var item = data['item'];
+      if (!item) return '';
 
-      var name = data.get(anychart.enums.GanttDataFields.NAME);
+      var name = item.get(anychart.enums.GanttDataFields.NAME);
 
       var startDate = ths.isResourcesChart_ ?
-          data.meta('minPeriodDate') :
-          data.get(anychart.enums.GanttDataFields.ACTUAL_START);
+          item.meta('minPeriodDate') :
+          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
 
       var endDate = ths.isResourcesChart_ ?
-          data.meta('maxPeriodDate') :
-          data.get(anychart.enums.GanttDataFields.ACTUAL_END);
+          item.meta('maxPeriodDate') :
+          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
 
-      var progress = ths.isResourcesChart_ ? data.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) : void 0;
+      var progress = ths.isResourcesChart_ ?
+          void 0 :
+          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
 
-      return (name ? name + '\n' : '') +
-          (startDate ? 'Start Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) + '\n' : '') +
-          (endDate ? 'End Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+      return (name ? name : '') +
+          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
+          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
           (progress ? '\nComplete: ' + progress : '');
 
     });
@@ -353,42 +341,34 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
   if (!this.tl_) {
     this.tl_ = new anychart.core.gantt.Timeline(this.controller_, this.isResourcesChart_);
     this.tl_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
+    this.tl_.interactivityHandler(this);
     this.registerDisposable(this.tl_);
     var ths = this;
     this.tl_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
 
-    this.tl_.listen(anychart.enums.EventType.ROW_HOVER, function(e) {
-      ths.dg_.highlight(e['index'], e['startY'], e['endY'], true);
-    });
-
-    this.tl_.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-      ths.dg_.selectRow(e['item']); //This also deselects previous item.
-      ths.dispatchEvent(e);
-      ths.dg_.invalidate(anychart.ConsistencyState.DATA_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
-    });
-
     this.tl_.tooltip().contentFormatter(function(data) {
-      var isTreeDataItem = data instanceof anychart.data.Tree.DataItem; //If item is tree data item.
+      var item = data['item'];
+      var period = data['period'];
 
-      var name = isTreeDataItem ?
-          data.get(anychart.enums.GanttDataFields.NAME) :
-          data['item'].get(anychart.enums.GanttDataFields.NAME);
+      var name = item.get(anychart.enums.GanttDataFields.NAME);
 
-      var startDate = isTreeDataItem ?
-          data.get(anychart.enums.GanttDataFields.ACTUAL_START) :
-          data['period'][anychart.enums.GanttDataFields.START];
+      var startDate = period ?
+          period[anychart.enums.GanttDataFields.START] :
+          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
 
-      var endDate = isTreeDataItem ?
-          data.get(anychart.enums.GanttDataFields.ACTUAL_END) :
-          data['period'][anychart.enums.GanttDataFields.END];
+      var endDate = period ?
+          period[anychart.enums.GanttDataFields.END] :
+          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
 
-      var progress = isTreeDataItem ? data.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) : void 0;
+      var progress = ths.isResourcesChart_ ?
+          void 0 :
+          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
 
-      return (name ? name + '\n' : '') +
-          (startDate ? 'Start Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) + '\n' : '') +
-          (endDate ? 'End Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+      return (name ? name : '') +
+          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
+          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
           (progress ? '\nComplete: ' + progress : '');
 
     });
@@ -665,6 +645,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
+      //TODO (A.Kudryavtsev): Save pixel position instead!
       ths.splitterPosition_ = anychart.math.round(100 * ths.splitter().position(), 2) + '%';
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
@@ -686,6 +667,98 @@ anychart.charts.Gantt.prototype.createLegendItemsProvider = function(sourceMode)
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Row click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowClick = function(event) {
+  this.rowSelect(event);
+};
+
+
+/**
+ * Row double click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowDblClick = function(event) {
+  var item = event['item'];
+  if (item && item.numChildren())
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+};
+
+
+/**
+ * Row mouse move interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
+  this.dg_.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+  this.tl_.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+
+  var tooltip;
+
+  if (event['target'] instanceof anychart.core.ui.DataGrid) {
+    tooltip = /** @type {anychart.core.ui.Tooltip} */(this.dg_.tooltip());
+  } else {
+    tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
+  }
+  var position = tooltip.isFloating() ?
+      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+      new acgraph.math.Coordinate(0, 0);
+
+  tooltip.show(event, position);
+};
+
+
+/**
+ * Row mouse over interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowMouseOver = function(event) {
+};
+
+
+/**
+ * Row mouse out interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowMouseOut = function(event) {
+  this.dg_.highlight();
+  this.tl_.highlight();
+  this.dg_.tooltip().hide();
+  this.tl_.tooltip().hide();
+};
+
+
+/**
+ * Handles row selection.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowSelect = function(event) {
+  var item = event['item'];
+  var period = event['period'];
+  var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
+  if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectRow(item, periodId))) {
+    var eventObj = {
+      'type': anychart.enums.EventType.ROW_SELECT,
+      'item': item
+    };
+    if (goog.isDef(period)) eventObj['period'] = period;
+    this.dispatchEvent(eventObj);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Draw.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Draw gantt chart content items.
  * @param {anychart.math.Rect} bounds - Bounds of gantt chart content area.
@@ -758,74 +831,73 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
       var dgBounds = this.dg_.getPixelBounds();
 
       this.dataGridHorizontalScrollBar_.bounds(
-          (dgBounds.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
-          (dgBounds.top + dgBounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-          (dgBounds.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
-          anychart.charts.Gantt.SCROLL_BAR_SIDE
+          (dgBounds.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+          (dgBounds.top + dgBounds.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+          (dgBounds.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
       );
     }
 
     var tlBounds = this.tl_.getPixelBounds();
 
     this.verticalScrollBar_.bounds(
-        (bounds.left + bounds.width - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-        (tlBounds.top + this.headerHeight_ + anychart.charts.Gantt.SCROLL_BAR_SIDE + 1),
-        anychart.charts.Gantt.SCROLL_BAR_SIDE,
-        (tlBounds.height - this.headerHeight_ - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE - 2)
+        (bounds.left + bounds.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+        (tlBounds.top + this.headerHeight_ + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
+        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
+        (tlBounds.height - this.headerHeight_ - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
     );
 
     this.timelineHorizontalScrollBar_.bounds(
-        (tlBounds.left + anychart.charts.Gantt.SCROLL_BAR_SIDE),
-        (tlBounds.top + tlBounds.height - anychart.charts.Gantt.SCROLL_BAR_SIDE - 1),
-        (tlBounds.width - 2 * anychart.charts.Gantt.SCROLL_BAR_SIDE),
-        anychart.charts.Gantt.SCROLL_BAR_SIDE
+        (tlBounds.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+        (tlBounds.top + tlBounds.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+        (tlBounds.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
     );
 
     //This line hides dataGridHorizontalScrollBar_ if is disabled and does nothing otherwise.
     this.dataGridHorizontalScrollBar_.draw();
-
   }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.controller_.setupByJSON(config['controller']);
+  this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+
+  this.headerHeight(config['headerHeight']);
+  this.rowHoverFill(config['rowHoverFill']);
+  this.rowSelectedFill(config['rowSelectedFill']);
+  this.splitterPosition(config['splitterPosition']);
+
+  this.dataGrid().setupByJSON(config['dataGrid']);
+  this.getTimeline().setupByJSON(config['timeline']);
 
 };
 
 
-/**
- * Constructor function for gantt project chart.
- * @return {!anychart.charts.Gantt}
- */
-anychart.ganttProject = function() {
-  var chart = new anychart.charts.Gantt(false);
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
 
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
+  json['type'] = this.getType();
 
-  return chart;
-};
+  json['headerHeight'] = this.headerHeight();
+  json['rowHoverFill'] = anychart.color.serialize(this.hoverFill_);
+  json['rowSelectedFill'] = anychart.color.serialize(this.rowSelectedFill_);
+  json['splitterPosition'] = this.splitterPosition();
 
+  json['controller'] = this.controller_.serialize();
+  json['dataGrid'] = this.dataGrid().serialize();
+  json['timeline'] = this.getTimeline().serialize();
 
-/**
- * Constructor function for gantt resource chart.
- * @return {!anychart.charts.Gantt}
- */
-anychart.ganttResource = function() {
-  var chart = new anychart.charts.Gantt(true);
-
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
-
-  return chart;
+  return {'gantt': json};
 };
 
 
 //exports
-goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
-goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 anychart.charts.Gantt.prototype['draw'] = anychart.charts.Gantt.prototype.draw;
 anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
 anychart.charts.Gantt.prototype['dataGrid'] = anychart.charts.Gantt.prototype.dataGrid;

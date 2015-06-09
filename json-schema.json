@@ -43,7 +43,26 @@
           "type": "string"
         }
       }
+    },
+    "gantt": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
+        {"$ref": "#/definitions/anychart.core.Chart"},
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "oneOf": [
+        {"$ref": "#/definitions/anychart.gantt.Resource"},
+        {"$ref": "#/definitions/anychart.gantt.Project"}
+      ],
+      "properties": {
+        "container": {
+          "type": "string"
+        }
+      }
     }
+
   },
   "definitions": {
     "anychart.core.VisualBase": {
@@ -1487,6 +1506,48 @@
       "required": ["type"]
     },
 
+    "anychart.gantt.Resource": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
+      "properties": {
+        "type": {"enum": ["resource"]},
+        "headerHeight": {"type": "number"},
+        "rowHoverFill": {"$ref": "#/definitions/fill"},
+        "rowSelectedFill": {"$ref": "#/definitions/fill"},
+        "splitterPosition": {
+          "type":[
+          "number",
+          "string"
+          ]
+        },
+        "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
+        "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
+        "timeline": {"$ref": "#/definitions/anychart.core.gantt.Timeline"}
+      },
+      "required": ["type"]
+    },
+
+    "anychart.gantt.Project": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
+      "properties": {
+        "type": {"enum": ["project"]},
+        "headerHeight": {"type": "number"},
+        "rowHoverFill": {"$ref": "#/definitions/fill"},
+        "rowSelectedFill": {"$ref": "#/definitions/fill"},
+        "splitterPosition": {
+          "type":[
+            "number",
+            "string"
+          ]
+        },
+        "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
+        "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
+        "timeline": {"$ref": "#/definitions/anychart.core.gantt.Timeline"}
+      },
+      "required": ["type"]
+    },
+
     "anychart.gauges.Circular": {
       "type": "object",
       "allOf": [
@@ -2581,6 +2642,45 @@
       }
     },
 
+    "anychart.core.gantt.Controller": {
+      "type": "object",
+      "properties": {
+        "treeData": {"$ref": "#/definitions/treeData"},
+        "isResourceChart": {"type": "boolean"},
+        "verticalOffset": {"type": "number"},
+        "startIndex": {"type": "number"}
+      }
+    },
+    "anychart.core.gantt.Timeline": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
+        "scale": {"$ref": "#/definitions/anychart.scales.GanttDateTime"},
+        "backgroundFill": {"$ref": "#/definitions/fill"},
+        "rowOddFill": {"$ref": "#/definitions/fill"},
+        "rowEvenFill": {"$ref": "#/definitions/fill"},
+        "rowFill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "rowSelectedFill": {"$ref": "#/definitions/fill"},
+        "baseFill": {"$ref": "#/definitions/fill"},
+        "baseStroke": {"$ref": "#/definitions/stroke"},
+        "baselineFill": {"$ref": "#/definitions/fill"},
+        "baselineStroke": {"$ref": "#/definitions/stroke"},
+        "milestoneFill": {"$ref": "#/definitions/fill"},
+        "milestoneStroke": {"$ref": "#/definitions/stroke"},
+        "parentFill": {"$ref": "#/definitions/fill"},
+        "parentStroke": {"$ref": "#/definitions/stroke"},
+        "progressFill": {"$ref": "#/definitions/fill"},
+        "progressStroke": {"$ref": "#/definitions/stroke"},
+        "connectorFill": {"$ref": "#/definitions/fill"},
+        "connectorStroke": {"$ref": "#/definitions/stroke"},
+        "selectedElementFill": {"$ref": "#/definitions/fill"},
+        "selectedElementStroke": {"$ref": "#/definitions/stroke"}
+      }
+    },
+
     "anychart.scales.Base": {
       "type": "object",
       "properties": {
@@ -2772,6 +2872,25 @@
             "number",
             "null"
           ]
+        }
+      }
+    },
+    "anychart.scales.GanttDateTime": {
+      "type": "object",
+      "properties": {
+        "range": {
+          "type": "object",
+          "properties": {
+            "min": {"type": "number"},
+            "max": {"type": "number"}
+          }
+        },
+        "totalRange": {
+          "type": "object",
+          "properties": {
+            "min": {"type": "number"},
+            "max": {"type": "number"}
+          }
         }
       }
     },
@@ -3241,6 +3360,39 @@
         "url": {"type": "string"},
         "alt": {"type": "string"},
         "logoSrc": {"type": "string"}
+      }
+    },
+    "anychart.core.ui.DataGrid": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "titleFill": {"$ref": "#/definitions/fill"},
+        "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
+        "columns": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/anychart.core.ui.DataGrid.Column"}
+        },
+        "isStandalone": {"type": "boolean"},
+        "titleHeight": {"type": "number"},
+        "horizontalOffset": {"type": "number"},
+        "backgroundFill": {"$ref": "#/definitions/fill"},
+        "rowOddFill": {"$ref": "#/definitions/fill"},
+        "rowEvenFill": {"$ref": "#/definitions/fill"},
+        "rowFill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "rowSelectedFill": {"$ref": "#/definitions/fill"}
+      }
+    },
+    "anychart.core.ui.DataGrid.Column": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
+        "width": {"type": "number"},
+        "collapseExpandButtons": {"type": "boolean"},
+        "depthPaddingMultiplier": {"type": "number"}
       }
     },
 
@@ -3910,6 +4062,30 @@
     },
     "data": {
       "type": "array"
+    },
+    "treeData": {
+      "type": "object",
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/treeDataItem"}
+        },
+        "index": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "treeDataItem": {
+      "type": "object",
+      "properties": {
+        "treeDataItemData": {"type": "object"},
+        "treeDataItemMeta": {"type": "object"},
+        "children": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/treeDataItem"}
+        }
+      }
     },
     "error": {
       "oneOf": [

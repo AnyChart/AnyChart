@@ -36,6 +36,26 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
 
 
   /**
+   * Interactivity handler.
+   * An object that has own methods
+   *  - rowClick
+   *  - rowDblClick
+   *  - rowMouseMove
+   *  - rowMouseOver
+   *  - rowMouseOut
+   *  - rowMouesDown
+   *  - rowMouseUp
+   *  - rowSelect
+   *
+   * TODO (A.Kudryavtsev): Extract this into a parent entity.
+   *
+   * @type {Object}
+   * @private
+   */
+  this.interactivityHandler_ = this;
+
+
+  /**
    * Gantt controller.
    * TODO (A.Kudryavtsev): Another one can't be set in current version.
    *
@@ -304,6 +324,14 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
 
 
   /**
+   * Selected element stroke.
+   * @type {!acgraph.vector.Stroke}
+   * @private
+   */
+  this.selectedElementStroke_ = acgraph.vector.normalizeStroke('#000000');
+
+
+  /**
    * Connector arrow fill.
    * @type {acgraph.vector.Fill}
    * @private
@@ -368,6 +396,20 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    */
   this.tooltip_ = null;
 
+  /**
+   * Minimum gap.
+   * @type {number}
+   * @private
+   */
+  this.minimumGap_ = .01;
+
+  /**
+   * Maximum gap.
+   * @type {number}
+   * @private
+   */
+  this.maximumGap_ = .01;
+
 
   /**
    * Date time scale.
@@ -391,6 +433,8 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   tooltip.isFloating(true);
   tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
   tooltip.content().hAlign(anychart.enums.Align.LEFT);
+
+  //TODO (A.Kudryavtsev): With last fixes standalone timeline can get some problems here.
   tooltip.contentFormatter(function(data) {
     /*
       Argument data is an instance of TreeDataItem (ProjectChart) or an object like this (ResourceChart):
@@ -405,6 +449,9 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
         (data['item'].get(anychart.enums.GanttDataFields.NAME) + '');
   });
   tooltip.resumeSignalsDispatching(false);
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
+      this.handleMouseOverAndMove_, this.handleAll_);
 
 };
 goog.inherits(anychart.core.gantt.Timeline, anychart.core.VisualBaseWithBounds);
@@ -697,7 +744,6 @@ anychart.core.gantt.Timeline.prototype.rowHoverFill = function(opt_fillOrColorOr
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
       //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
       this.hoverFill_ = val;
-      this.getHoverPath_().fill(this.hoverFill_);
     }
     return this;
   }
@@ -750,6 +796,378 @@ anychart.core.gantt.Timeline.prototype.backgroundFill = function(opt_fillOrColor
     return this;
   }
   return this.backgroundFill_;
+};
+
+
+/**
+ * Gets/sets base fill.
+ * Base fill is a fill of simple time bar on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.baseFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baseFill_), val)) {
+      this.baseFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.backgroundFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a base stroke.
+ * Base stroke is a stroke of simple time bar on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.baseStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.baseStroke_, val)) {
+      this.baseStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.baseStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets baseline fill.
+ * Baseline fill is a fill of baseline bar on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.baselineFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baselineFill_), val)) {
+      this.baselineFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.baselineFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a baseline stroke.
+ * Baseline stroke is a stroke of baseline bar on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.baselineStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.baselineStroke_, val)) {
+      this.baselineStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.baselineStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets progress bar fill.
+ * Progress fill is a fill of progress bar on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.progressFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.progressFill_), val)) {
+      this.progressFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.progressFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a progress bar stroke.
+ * Progress stroke is a stroke of progress bar on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.progressStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.progressStroke_, val)) {
+      this.progressStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.progressStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets a milestone fill.
+ * Milestone fill is a fill of milestone on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.milestoneFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.milestoneFill_), val)) {
+      this.milestoneFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.milestoneFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a milestone stroke.
+ * Milestone stroke is a stroke of milestone on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.milestoneStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.milestoneStroke_, val)) {
+      this.milestoneStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.milestoneStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets a parent fill.
+ * Parent fill is a fill of summary (parent) task bar on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.parentFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.parentFill_), val)) {
+      this.parentFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.parentFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a parent stroke.
+ * Parent stroke is a stroke of summary (parent) task bar on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.parentStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.parentStroke_, val)) {
+      this.parentStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.parentStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets a connector arrow fill.
+ * Connector fill is a fill of arrow of connector on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.connectorFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.connectorFill_), val)) {
+      this.connectorFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.connectorFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a connector stroke.
+ * Connector stroke is a stroke of connector's line on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.connectorStroke_, val)) {
+      this.connectorStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.connectorStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets selected element fill.
+ * Selected element fill is fill of selected element (whole data item or period) on timeline.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.Timeline|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.selectedElementFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.selectedElementFill_), val)) {
+      this.selectedElementFill_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.selectedElementFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets selected element stroke.
+ * Selected element stroke is stroke of selected element (whole data item or period) on timeline.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Timeline.prototype.selectedElementStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.selectedElementStroke_, val)) {
+      this.selectedElementStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.selectedElementStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets minimum gap.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.core.gantt.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.minimumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value || 0;
+    if (this.minimumGap_ != opt_value) {
+      this.minimumGap_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+      return this;
+    }
+  }
+  return this.minimumGap_;
+};
+
+
+/**
+ * Gets/sets maximum gap.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.core.gantt.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.maximumGap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value || 0;
+    if (this.maximumGap_ != opt_value) {
+      this.maximumGap_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+      return this;
+    }
+  }
+  return this.maximumGap_;
 };
 
 
@@ -856,6 +1274,327 @@ anychart.core.gantt.Timeline.prototype.getSeparationLayer_ = function() {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets/sets current interactivity handler (see field description).
+ * @param {Object=} opt_value - Value to be set.
+ * @return {(Object|anychart.core.gantt.Timeline)} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.interactivityHandler = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.interactivityHandler_ = opt_value;
+    return this;
+  }
+  return this.interactivityHandler_;
+};
+
+
+/**
+ * Mouse click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleMouseClick_ = function(event) {
+  var click = this.getInteractivityEvent_(event);
+  if (click) {
+    var mouseUp = goog.object.clone(click);
+    mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
+    var upDispatched = this.interactivityHandler_.dispatchEvent(mouseUp);
+    var clickDispatched = this.interactivityHandler_.dispatchEvent(click);
+    if (upDispatched && clickDispatched) this.interactivityHandler_.rowClick(click);
+  }
+
+};
+
+
+/**
+ * Mouse over and move internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleMouseOverAndMove_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowMouseMove(evt);
+  }
+};
+
+
+/**
+ * "All" internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleAll_ = function(event) {
+  if (event['type'] == acgraph.events.EventType.DBLCLICK) this.handleDblMouseClick_(event);
+  if (event['type'] == acgraph.events.EventType.MOUSEDOWN) this.handleMouseDown_(event);
+};
+
+
+/**
+ * Mouse double click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleDblMouseClick_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowDblClick(evt);
+  }
+};
+
+
+/**
+ * Mouse out internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleMouseOut_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowMouseOut(evt);
+  }
+};
+
+
+/**
+ * Mouse down internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.handleMouseDown_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt) this.interactivityHandler_.dispatchEvent(evt);
+};
+
+
+/**
+ * Row click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowClick = function(event) {
+  this.rowSelect(event);
+};
+
+
+/**
+ * Row double click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowDblClick = function(event) {
+  var item = event['item'];
+  if (item && item.numChildren())
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+};
+
+
+/**
+ * Row mouse move interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowMouseMove = function(event) {
+  this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  var position = tooltip.isFloating() ?
+      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+      new acgraph.math.Coordinate(0, 0);
+  tooltip.show(event['item'], position);
+};
+
+
+/**
+ * Row mouse over interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowMouseOver = function(event) {
+};
+
+
+/**
+ * Row mouse out interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowMouseOut = function(event) {
+  this.highlight();
+  this.tooltip().hide();
+};
+
+
+/**
+ * Handles row selection.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.gantt.Timeline.prototype.rowSelect = function(event) {
+  var item = event['item'];
+  var period = event['period'];
+  var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
+
+  if (this.selectRow(item, periodId)) {
+    var eventObj = goog.object.clone(event);
+    eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
+    this.interactivityHandler_.dispatchEvent(eventObj);
+  }
+};
+
+
+/**
+ * Creates new event object to be dispatched.
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ * @return {?Object} - New event object to be dispatched.
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.getInteractivityEvent_ = function(event) {
+  if (this.gridHeightCache_.length) {
+    var item;
+    var type = event['type'];
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.ROW_MOUSE_OUT;
+        if (this.hoveredIndex_ >= 0) item = this.visibleItems_[this.startIndex_ + this.hoveredIndex_];
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.ROW_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+        type = anychart.enums.EventType.ROW_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+        type = anychart.enums.EventType.ROW_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+        type = anychart.enums.EventType.ROW_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.ROW_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.ROW_DBL_CLICK;
+        break;
+      default:
+        return null;
+    }
+
+    var newEvent = {
+      'type': type,
+      'actualTarget': event['target'],
+      'target': this,
+      'originalEvent': event
+    };
+
+    var domTarget = event['domTarget'];
+
+    if (this.isResourceChart_ && (domTarget instanceof acgraph.vector.Path)) { //Process timeline bars
+      var id = event['domTarget'].tag;
+      if (goog.isDef(id)) {
+        var periodData = this.controller_.getPeriodsMap()[id];
+        if (periodData) {
+          newEvent['period'] = periodData['period'];
+          newEvent['periodIndex'] = periodData['index'];
+        }
+      }
+    }
+
+    var headerHeight = this.header_.getPixelBounds().height;
+    var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
+
+
+    var min = this.pixelBoundsCache_.top +
+        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x +
+        headerHeight;
+
+    var mouseHeight = event['clientY'] - min;
+
+    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
+
+    if (item) {
+      newEvent['item'] = item;
+    } else if (mouseHeight < 0 || mouseHeight > totalHeight) {
+      return null;
+    } else {
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
+      index = index >= 0 ? index : ~index; //Index of row under mouse.
+      this.hoveredIndex_ = index;
+
+      var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
+      var startY = initialTop + startHeight;
+      var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
+
+      newEvent['item'] = this.visibleItems_[this.startIndex_ + index];
+      newEvent['startY'] = startY;
+      newEvent['endY'] = endY;
+      newEvent['hoveredIndex'] = this.hoveredIndex_;
+    }
+    return newEvent;
+  }
+  return null;
+};
+
+
+/**
+ * Highlights selected vertical range.
+ * TODO (A.Kudryavtsev): Extract this method to parent  class.
+ * @param {number=} opt_index - Index of selected item.
+ * @param {number=} opt_startY - Start Y to be highlighted.
+ * @param {number=} opt_endY - End Y to be highlighted.
+ */
+anychart.core.gantt.Timeline.prototype.highlight = function(opt_index, opt_startY, opt_endY) {
+  var definedValues = goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY);
+  if (definedValues) {
+    if (this.hoverStartY_ != opt_startY || this.hoverEndY_ != opt_endY) {
+      this.hoveredIndex_ = opt_index;
+      this.hoverStartY_ = opt_startY;
+      this.hoverEndY_ = opt_endY;
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  } else {
+    if (this.hoveredIndex_ >= 0) {
+      this.hoveredIndex_ = -1;
+      this.hoverStartY_ = NaN;
+      this.hoverEndY_ = NaN;
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+};
+
+
+/**
+ * Selects row and/or period.
+ * @param {anychart.data.Tree.DataItem} item - New selected data item.
+ * @param {string=} opt_periodId - Id of period to be selected.
+ * @return {boolean} - Whether has been selected.
+ */
+anychart.core.gantt.Timeline.prototype.selectRow = function(item, opt_periodId) {
+  var itemSelected = false;
+  var periodSelected = false;
+
+  if (item && item != this.selectedItem_) {
+    item.tree().suspendSignalsDispatching();
+    item.meta('selected', true);
+    if (this.selectedItem_) this.selectedItem_.meta('selected', false); //selectedItem_ has the same tree as item.
+    this.selectedItem_ = item;
+    item.tree().resumeSignalsDispatching(false);
+    itemSelected = true;
+  }
+
+  if ((goog.isDef(opt_periodId) && this.selectedPeriodId_ != opt_periodId)) {
+    this.selectedPeriodId_ = opt_periodId;
+    periodSelected = true;
+  }
+
+  if (itemSelected || periodSelected) {
+    this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    return true;
+  }
+  return false;
+};
+
+
 /**
  * Inner getter for this.dataLayer_.
  * @return {anychart.core.utils.TypedLayer}
@@ -866,9 +1605,7 @@ anychart.core.gantt.Timeline.prototype.getDataLayer_ = function() {
     var ths = this;
     this.dataLayer_ = new anychart.core.utils.TypedLayer(function() {
       var path = acgraph.path();
-      acgraph.events.listen(path, acgraph.events.EventType.MOUSEMOVE, ths.mouseMoveTooltipHandler_, false, ths);
-      acgraph.events.listen(path, acgraph.events.EventType.MOUSEOUT, ths.mouseOutTooltipHandler_, false, ths);
-      acgraph.events.listen(path, acgraph.events.EventType.CLICK, ths.mouseClickElementHandler_, false, ths);
+      path.setParentEventTarget(ths);
       return path;
     }, function(child) {
       (/** @type {acgraph.vector.Path} */ (child)).fill(null).stroke(null).clear();
@@ -876,92 +1613,6 @@ anychart.core.gantt.Timeline.prototype.getDataLayer_ = function() {
     this.registerDisposable(this.dataLayer_);
   }
   return this.dataLayer_;
-};
-
-
-/**
- * Handler for tooltip mouse move.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseMoveTooltipHandler_ = function(event) {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-
-  var path = event['target'];
-  var id = path['__id'];
-  if (goog.isDef(id)) {
-    var map = this.isResourceChart_ ? this.controller_.getPeriodsMap() : this.controller_.getVisibleItemsMap();
-    var mapItem = map[id];
-    var item = this.isResourceChart_ ? {
-      'item': this.visibleItems_[mapItem['index']],
-      'period': mapItem['period']
-    } : mapItem['item'];
-    if (item) {
-      var position = tooltip.isFloating() ?
-          new acgraph.math.Coordinate(event['clientX'], event['clientY']) :
-          new acgraph.math.Coordinate(0, 0);
-      tooltip.show(item, position);
-    }
-  }
-};
-
-
-/**
- * Handler for tooltip mouse out.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseOutTooltipHandler_ = function(event) {
-  this.tooltip().hide();
-};
-
-
-/**
- * Handler for UI element mouse click.
- * UI element is any time bar/milestone rhombus on timeline.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseClickElementHandler_ = function(event) {
-  //This will set event.defaultPrevented to 'false'. Will be used by browser and base layer click handler.
-  event.preventDefault();
-
-  var path = event['target'];
-  var id = path['__id'];
-  if (goog.isDef(id)) {
-    var map = this.isResourceChart_ ? this.controller_.getPeriodsMap() : this.controller_.getVisibleItemsMap();
-    var mapItem = map[id];
-
-    var item, period, eventObj;
-
-    if (this.isResourceChart_) {
-      item = this.visibleItems_[mapItem['index']];
-      period = mapItem['period'];
-
-      if (item && this.selectedPeriodId_ != id) {
-        eventObj = {
-          'type': anychart.enums.EventType.ROW_CLICK,
-          'item': item,
-          'period': period
-        };
-      }
-      this.selectedPeriodId_ = id;
-    } else {
-      item = mapItem['item'];
-      if (item && !item.meta('selected')) {
-        eventObj = {
-          'type': anychart.enums.EventType.ROW_CLICK,
-          'item': item
-        };
-      }
-    }
-
-    if (eventObj) {
-      this.selectRow(item);
-      this.dispatchEvent(eventObj);
-      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
-    }
-  }
 };
 
 
@@ -1009,6 +1660,9 @@ anychart.core.gantt.Timeline.prototype.getLabelsFactory_ = function() {
         .anchor(anychart.enums.Anchor.LEFT_CENTER)
         .position(anychart.enums.Position.RIGHT_CENTER)
         .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN);
+
+    this.labelsFactory_.setParentEventTarget(this);
+
   }
   return this.labelsFactory_;
 };
@@ -1040,129 +1694,10 @@ anychart.core.gantt.Timeline.prototype.getMarkersFactory_ = function() {
 anychart.core.gantt.Timeline.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.bindHandlersToGraphics(this.base_);
     this.registerDisposable(this.base_);
-
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    acgraph.events.listen(this.base_, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
   }
   return this.base_;
-};
-
-
-/**
- * Handler for mouse move.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseMoveHandler_ = function(event) {
-  var headerHeight = this.header_.getPixelBounds().height;
-  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
-
-  var mouseHeight = event.offsetY - headerHeight - this.pixelBoundsCache_.top;
-
-  if (this.gridHeightCache_.length) {
-    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
-    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
-      index = index >= 0 ? index : ~index; //Index of row under mouse.
-
-      if (index != this.hoveredIndex_) {
-        var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
-        var startY = initialTop + startHeight;
-        var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
-        this.highlight(index, startY, endY);
-      }
-
-    } else {
-      this.highlight();
-      this.hoveredIndex_ = -1;
-    }
-
-  }
-};
-
-
-/**
- * Handler for mouse out.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseOutHandler_ = function(event) {
-  this.highlight();
-  this.hoveredIndex_ = -1;
-};
-
-
-/**
- * Handler for mouse click.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.gantt.Timeline.prototype.mouseClickHandler_ = function(event) {
-  var headerHeight = this.header_.getPixelBounds().height;
-
-  var mouseHeight = event.offsetY - headerHeight - this.pixelBoundsCache_.top;
-
-  if (this.gridHeightCache_.length) {
-    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
-    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
-      index = index >= 0 ? index : ~index; //Index of row under mouse.
-
-      var item = this.visibleItems_[this.startIndex_ + index]; //Theoretically, here must not be any exceptions.
-      if (!item.meta('selected')) {
-        this.selectRow(item);
-
-        if (!event.defaultPrevented) this.dispatchEvent({
-          'type': anychart.enums.EventType.ROW_CLICK,
-          'item': item
-        });
-
-        this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
-      }
-    }
-  }
-};
-
-
-/**
- * Highlights selected vertical range.
- * @param {number=} opt_index - Index of row.
- * @param {number=} opt_startY - Start Y to be highlighted.
- * @param {number=} opt_endY - End Y to be highlighted.
- * @param {boolean=} opt_preventDispatching - If dispatching should be prevented.
- */
-anychart.core.gantt.Timeline.prototype.highlight = function(opt_index, opt_startY, opt_endY, opt_preventDispatching) {
-  var definedValues = goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY);
-  if (definedValues || (!definedValues && this.hoveredIndex_ >= 0)) {
-    this.hoveredIndex_ = opt_index;
-    this.hoverStartY_ = opt_startY;
-    this.hoverEndY_ = opt_endY;
-
-    if (!opt_preventDispatching) this.dispatchEvent({
-      'type': anychart.enums.EventType.ROW_HOVER,
-      'index': opt_index,
-      'startY': opt_startY,
-      'endY': opt_endY
-    });
-    this.invalidate(anychart.ConsistencyState.TIMELINE_HOVER, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Method to select row from outside.
- * @param {anychart.data.Tree.DataItem} item - New selected data item.
- */
-anychart.core.gantt.Timeline.prototype.selectRow = function(item) {
-  if (item != this.selectedItem_) {
-    item.tree().suspendSignalsDispatching();
-    if (this.selectedItem_) this.selectedItem_.meta('selected', false); //selectedItem_ has the same tree as item.
-    item.meta('selected', true);
-    this.selectedItem_ = item;
-    item.tree().resumeSignalsDispatching(false);
-  }
 };
 
 
@@ -1213,6 +1748,7 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
         .close();
 
     if (item.meta('selected')) {
+      this.selectedItem_ = item; //In case of restoration from XML/JSON, this allows to save selected item state.
       this.selectedPath_
           .moveTo(this.pixelBoundsCache_.left, top)
           .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, top)
@@ -1310,16 +1846,19 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
 
   }
 
-  var stroke = settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
+  var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
       acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-      defaultStroke;
+      defaultStroke);
 
   var rawLabel = settings ? settings[anychart.enums.GanttDataFields.LABEL] : void 0;
   var textValue;
   if (rawLabel && goog.isDef(rawLabel['value'])) {
     textValue = rawLabel['value'] + '';
   } else {
-    textValue = (isTreeDataItem && !isProgress && !isBaseline) ? (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || '') : '';
+    textValue = (isTreeDataItem && !isProgress && !isBaseline) ?
+        (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) ||
+        (anychart.math.round(/** @type {number} */ (item.meta('autoProgress')) * 100, 2)) + '%') :
+        '';
   }
 
   if (textValue) {
@@ -1348,13 +1887,13 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
   }
 
   var bar = this.getDataLayer_().genNextChild();
-  bar['__id'] = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : item[anychart.enums.GanttDataFields.ID];
+  bar.tag = isTreeDataItem ? item.get(anychart.enums.GanttDataFields.ID) : item[anychart.enums.GanttDataFields.ID];
 
   var lineThickness = anychart.utils.isNone(stroke) ? 0 :
       goog.isString(stroke) ? 1 :
           stroke['thickness'] ? stroke['thickness'] : 1;
 
-  var pixelShift = (lineThickness % 2) ? 0.5 : 0;
+  var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
   var roundLeft = Math.round(bounds.left) + pixelShift;
   var roundTop = Math.round(bounds.top) + pixelShift;
@@ -1403,6 +1942,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
     var fill;
     if (selectedBar) {
       fill = this.selectedElementFill_;
+      stroke = this.selectedElementStroke_;
     } else {
       fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
           acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
@@ -1411,7 +1951,9 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
 
     bar.fill(fill).stroke(stroke);
   } else { //Default coloring.
-    bar.fill(selectedBar ? this.selectedElementFill_ : defaultFill).stroke(defaultStroke);
+    bar
+        .fill(selectedBar ? this.selectedElementFill_ : defaultFill)
+        .stroke(selectedBar ? this.selectedElementStroke_ : defaultStroke);
   }
 
   return bar;
@@ -1454,23 +1996,23 @@ anychart.core.gantt.Timeline.prototype.drawProjectTimeline_ = function() {
     var itemHeight = anychart.core.gantt.Controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-    var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
-    var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
-    if (goog.isDefAndNotNull(actualEnd) && (actualEnd != actualStart)) {
-      var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
-      var baselineEnd = item.get(anychart.enums.GanttDataFields.BASELINE_END);
+    var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
+    var baselineEnd = item.get(anychart.enums.GanttDataFields.BASELINE_END);
 
-      if (goog.isDefAndNotNull(baselineStart) && goog.isDefAndNotNull(baselineEnd)) {
-        this.drawAsBaseline_(item, totalTop, itemHeight);
+    if (goog.isDefAndNotNull(baselineStart) && goog.isDefAndNotNull(baselineEnd)) {
+      this.drawAsBaseline_(item, totalTop, itemHeight);
+    } else {
+      if (item.numChildren()) {
+        this.drawAsParent_(item, totalTop, itemHeight);
       } else {
-        if (item.numChildren()) {
-          this.drawAsParent_(item, totalTop, itemHeight);
-        } else {
+        var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
+        var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+        if (goog.isDefAndNotNull(actualEnd) && (actualEnd != actualStart)) {
           this.drawAsProgress_(item, totalTop, itemHeight);
+        } else {
+          this.drawAsMilestone_(item, totalTop, itemHeight);
         }
       }
-    } else {
-      this.drawAsMilestone_(item, totalTop, itemHeight);
     }
 
     totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
@@ -1492,15 +2034,18 @@ anychart.core.gantt.Timeline.prototype.drawAsPeriods_ = function(dataItem, total
       var period = periods[j];
       var start = period[anychart.enums.GanttDataFields.START];
       var end = period[anychart.enums.GanttDataFields.END];
-      var startRatio = this.scale_.timestampToRatio(start);
-      var endRatio = this.scale_.timestampToRatio(end);
 
-      if (endRatio > 0 && startRatio < 1) { //Is visible
-        var left = this.pixelBoundsCache_.left + this.pixelBoundsCache_.width * startRatio;
-        var right = this.pixelBoundsCache_.left + this.pixelBoundsCache_.width * endRatio;
-        var height = itemHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION;
-        var top = totalTop + (itemHeight - height) / 2;
-        this.drawBar_(new anychart.math.Rect(left, top, (right - left), height), period);
+      if (goog.isDef(start) && goog.isDef(end)) {
+        var startRatio = this.scale_.timestampToRatio(start);
+        var endRatio = this.scale_.timestampToRatio(end);
+
+        if (endRatio > 0 && startRatio < 1) { //Is visible
+          var left = this.pixelBoundsCache_.left + this.pixelBoundsCache_.width * startRatio;
+          var right = this.pixelBoundsCache_.left + this.pixelBoundsCache_.width * endRatio;
+          var height = itemHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION;
+          var top = totalTop + (itemHeight - height) / 2;
+          this.drawBar_(new anychart.math.Rect(left, top, (right - left), height), period);
+        }
       }
     }
   }
@@ -1515,8 +2060,10 @@ anychart.core.gantt.Timeline.prototype.drawAsPeriods_ = function(dataItem, total
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START) ||
+      dataItem.meta('autoStart');
+  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END) ||
+      dataItem.meta('autoEnd');
   var baselineStart = dataItem.get(anychart.enums.GanttDataFields.BASELINE_START);
   var baselineEnd = dataItem.get(anychart.enums.GanttDataFields.BASELINE_END);
   var actualStartRatio = this.scale_.timestampToRatio(actualStart);
@@ -1545,9 +2092,12 @@ anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, tota
     var progressHeight = actualHeight * anychart.core.gantt.Timeline.PROGRESS_HEIGHT_REDUCTION;
     var progressTop = actualTop + (actualHeight - progressHeight) / 2;
 
-    var progressValue = parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
+    var progressValue = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+        (parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) / 100) :
+        anychart.math.round(/** @type {number} */ (dataItem.meta('autoProgress')), 2);
+
     if (progressValue) { //Draw progress.
-      var progressWidth = progressValue * (actualRight - actualLeft) / 100;
+      var progressWidth = progressValue * (actualRight - actualLeft);
       this.drawBar_(new anychart.math.Rect(actualLeft, progressTop, progressWidth, progressHeight), dataItem,
           anychart.enums.GanttDataFields.PROGRESS);
     }
@@ -1565,8 +2115,10 @@ anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, tota
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START) ||
+      dataItem.meta('autoStart');
+  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END) ||
+      dataItem.meta('autoEnd');
   var startRatio = this.scale_.timestampToRatio(actualStart);
   var endRatio = this.scale_.timestampToRatio(actualEnd);
 
@@ -1581,9 +2133,12 @@ anychart.core.gantt.Timeline.prototype.drawAsParent_ = function(dataItem, totalT
     var progressHeight = height * anychart.core.gantt.Timeline.PROGRESS_HEIGHT_REDUCTION;
     var progressTop = top + (height - progressHeight) / 2;
 
-    var progressValue = parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE));
+    var progressValue = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+        (parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) / 100) :
+        anychart.math.round(/** @type {number} */ (dataItem.meta('autoProgress')), 2);
+
     if (progressValue) { //Draw progress.
-      var progressWidth = progressValue * (right - left) / 100;
+      var progressWidth = progressValue * (right - left);
       this.drawBar_(new anychart.math.Rect(left, progressTop, progressWidth, progressHeight), dataItem, anychart.enums.GanttDataFields.PROGRESS);
     }
 
@@ -1638,15 +2193,15 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
   if (ratio >= 0 && ratio <= 1) { //Is visible
     var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
 
-    var stroke = settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
+    var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
         acgraph.vector.normalizeStroke(settings[anychart.enums.GanttDataFields.STROKE]) :
-        this.milestoneStroke_;
+        this.milestoneStroke_);
 
     var lineThickness = anychart.utils.isNone(stroke) ? 0 :
         goog.isString(stroke) ? 1 :
             stroke['thickness'] ? stroke['thickness'] : 1;
 
-    var pixelShift = (lineThickness % 2) ? 0.5 : 0;
+    var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
 
     var halfHeight = Math.round(itemHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
@@ -1654,7 +2209,7 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
     var centerTop = Math.round(totalTop + itemHeight / 2) + pixelShift;
 
     var milestone = this.getDataLayer_().genNextChild();
-    milestone['__id'] = dataItem.get(anychart.enums.GanttDataFields.ID);
+    milestone.tag = dataItem.get(anychart.enums.GanttDataFields.ID);
 
     milestone
         .zIndex(anychart.core.gantt.Timeline.BASE_Z_INDEX)
@@ -1689,6 +2244,8 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
       var fill;
       if (isSelected) {
         fill = this.selectedElementFill_;
+        stroke = this.selectedElementStroke_;
+
       } else {
         fill = goog.isDef(settings[anychart.enums.GanttDataFields.FILL]) ?
             acgraph.vector.normalizeFill(settings[anychart.enums.GanttDataFields.FILL]) :
@@ -1697,7 +2254,9 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
 
       milestone.fill(fill).stroke(stroke);
     } else {
-      milestone.fill(isSelected ? this.selectedElementFill_ : this.milestoneFill_).stroke(this.milestoneStroke_);
+      milestone
+          .fill(isSelected ? this.selectedElementFill_ : this.milestoneFill_)
+          .stroke(isSelected ? this.selectedElementStroke_ : this.milestoneStroke_);
     }
 
   }
@@ -1776,52 +2335,55 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
         toMilestoneHalfWidth = toRowHeight * anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2;
       }
 
-      var fromLeft = this.scale_.timestampToRatio(fromStartTimestamp) * this.pixelBoundsCache_.width +
-          this.pixelBoundsCache_.left - fromMilestoneHalfWidth;
-      var fromRight = this.scale_.timestampToRatio(fromEndTimestamp) * this.pixelBoundsCache_.width +
-          this.pixelBoundsCache_.left + fromMilestoneHalfWidth;
-      var toLeft = this.scale_.timestampToRatio(toStartTimestamp) * this.pixelBoundsCache_.width +
-          this.pixelBoundsCache_.left - toMilestoneHalfWidth;
-      var toRight = this.scale_.timestampToRatio(toEndTimestamp) * this.pixelBoundsCache_.width +
-          this.pixelBoundsCache_.left + toMilestoneHalfWidth;
+      if (!isNaN(fromStartTimestamp) && !isNaN(fromEndTimestamp) && !isNaN(toStartTimestamp) && !(isNaN(toEndTimestamp))) {
 
-      var fill, stroke, connSettings;
+        var fromLeft = this.scale_.timestampToRatio(fromStartTimestamp) * this.pixelBoundsCache_.width +
+            this.pixelBoundsCache_.left - fromMilestoneHalfWidth;
+        var fromRight = this.scale_.timestampToRatio(fromEndTimestamp) * this.pixelBoundsCache_.width +
+            this.pixelBoundsCache_.left + fromMilestoneHalfWidth;
+        var toLeft = this.scale_.timestampToRatio(toStartTimestamp) * this.pixelBoundsCache_.width +
+            this.pixelBoundsCache_.left - toMilestoneHalfWidth;
+        var toRight = this.scale_.timestampToRatio(toEndTimestamp) * this.pixelBoundsCache_.width +
+            this.pixelBoundsCache_.left + toMilestoneHalfWidth;
 
-      connSettings = this.isResourceChart_ ?
-          from['period'][anychart.enums.GanttDataFields.CONNECTOR] :
-          from['item'].get(anychart.enums.GanttDataFields.CONNECTOR);
+        var fill, stroke, connSettings;
 
-      fill = (connSettings && connSettings[anychart.enums.GanttDataFields.FILL]) ?
-          acgraph.vector.normalizeFill(connSettings[anychart.enums.GanttDataFields.FILL]) :
-          this.connectorFill_;
+        connSettings = this.isResourceChart_ ?
+            from['period'][anychart.enums.GanttDataFields.CONNECTOR] :
+            from['item'].get(anychart.enums.GanttDataFields.CONNECTOR);
 
-      stroke = (connSettings && connSettings[anychart.enums.GanttDataFields.STROKE]) ?
-          acgraph.vector.normalizeStroke(connSettings[anychart.enums.GanttDataFields.STROKE]) :
-          this.connectorStroke_;
+        fill = (connSettings && connSettings[anychart.enums.GanttDataFields.FILL]) ?
+            acgraph.vector.normalizeFill(connSettings[anychart.enums.GanttDataFields.FILL]) :
+            this.connectorFill_;
+
+        stroke = (connSettings && connSettings[anychart.enums.GanttDataFields.STROKE]) ?
+            acgraph.vector.normalizeStroke(connSettings[anychart.enums.GanttDataFields.STROKE]) :
+            this.connectorStroke_;
 
 
-      if (!this.isResourceChart_) {
-        if (from['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
-            from['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
-          fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
-        } else if (from['item'].numChildren()) {
-          fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
+        if (!this.isResourceChart_) {
+          if (from['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
+              from['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
+            fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+          } else if (from['item'].numChildren()) {
+            fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
+          }
+
+          if (to['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
+              to['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
+            toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+          } else if (to['item'].numChildren()) {
+            toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
+          }
         }
 
-        if (to['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
-            to['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
-          toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
-        } else if (to['item'].numChildren()) {
-          toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
-        }
+        this.drawConnector_(
+            new anychart.math.Rect(fromLeft, actualFromTop, (fromRight - fromLeft), fromRowHeight),
+            new anychart.math.Rect(toLeft, actualToTop, (toRight - toLeft), toRowHeight),
+            connType,
+            /** @type {acgraph.vector.Fill} */ (fill),
+            /** @type {acgraph.vector.Stroke} */ (stroke));
       }
-
-      this.drawConnector_(
-          new anychart.math.Rect(fromLeft, actualFromTop, (fromRight - fromLeft), fromRowHeight),
-          new anychart.math.Rect(toLeft, actualToTop, (toRight - toLeft), toRowHeight),
-          connType,
-          /** @type {acgraph.vector.Fill} */ (fill),
-          /** @type {acgraph.vector.Stroke} */ (stroke));
 
     } else {
       /*
@@ -1874,7 +2436,7 @@ anychart.core.gantt.Timeline.prototype.drawConnector_ = function(fromBounds, toB
       goog.isString(stroke) ? 1 :
           stroke['thickness'] ? stroke['thickness'] : 1;
 
-  var pixelShift = (lineThickness % 2) ? 0.5 : 0;
+  var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
   switch ((connType + '').toLowerCase()) {
     case anychart.enums.ConnectorType.FINISH_FINISH:
@@ -1990,11 +2552,11 @@ anychart.core.gantt.Timeline.prototype.drawConnector_ = function(fromBounds, toB
 
   if (path) {
     path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
-    path['__id'] = void 0; //Tooltip will not appear on connector mouse over.
+    path.tag = void 0; //Tooltip will not appear on connector mouse over.
   }
   if (arrow) {
     arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
-    arrow['__id'] = void 0; //Tooltip will not appear on connector arrow mouse over.
+    arrow.tag = void 0; //Tooltip will not appear on connector arrow mouse over.
   }
 };
 
@@ -2170,8 +2732,12 @@ anychart.core.gantt.Timeline.prototype.draw = function() {
  * @return {anychart.core.gantt.Timeline} - Itself for method chaining.
  */
 anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, startIndex, endIndex, verticalOffset, availableHeight, totalMin, totalMax, opt_positionRecalculated) {
-  var gap = Math.round((totalMax - totalMin) / 100);
-  this.scale_.setTotalRange(totalMin - gap, totalMax + gap);
+  var minGap = this.minimumGap() * (totalMax - totalMin);
+  var maxGap = this.maximumGap() * (totalMax - totalMin);
+
+  var newScale = this.scale_.isEmpty();
+
+  this.scale_.setTotalRange(totalMin - minGap, totalMax + maxGap);
   var redrawHeader = false;
 
   this.visibleItems_ = visibleItems;
@@ -2206,8 +2772,10 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.separationPath_ = this.getSeparationLayer_().path();
       this.separationPath_.stroke('#dedede'); //TODO (A.Kudryavtsev): In current version it is not settable, that's why we color it here but not in APPEARANCE.
 
-      var range = Math.round((totalMax - totalMin) / 10);
-      this.scale_.setRange(totalMin - gap, totalMin + range); // Initial visible range: 10% of total range.
+      if (newScale) {
+        var range = Math.round((totalMax - totalMin) / 10);
+        this.scale_.setRange(totalMin - minGap, totalMin + range); // Initial visible range: 10% of total range.
+      }
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -2276,6 +2844,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
     if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HOVER)) {
       if (this.hoveredIndex_ >= 0 && goog.isDef(this.hoverStartY_) && goog.isDef(this.hoverEndY_) && goog.isDef(this.hoveredIndex_)) {
         this.getHoverPath_()
+            .fill(this.hoverFill_)//This will not be applied if fill is the same.
             .clear()
             .moveTo(this.pixelBoundsCache_.left, this.hoverStartY_)
             .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.hoverStartY_)
@@ -2309,8 +2878,6 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
     if (manualSuspend) stage.resume();
   }
 
-  this.initMouseFeatures_();
-
   return this;
 };
 
@@ -2318,9 +2885,8 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
 /**
  * Initializes mouse wheel scrolling and mouse drag scrolling.
  * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
- * @private
  */
-anychart.core.gantt.Timeline.prototype.initMouseFeatures_ = function() {
+anychart.core.gantt.Timeline.prototype.initMouseFeatures = function() {
   if (!this.mwh_) {
     var element = this.getBase_().domElement();
     if (element) {
@@ -2343,7 +2909,18 @@ anychart.core.gantt.Timeline.prototype.initMouseFeatures_ = function() {
  * @private
  */
 anychart.core.gantt.Timeline.prototype.mouseWheelHandler_ = function(e) {
-  this.scroll(e.deltaX, e.deltaY);
+  var dx = e.deltaX;
+  var dy = e.deltaY;
+
+  if (goog.userAgent.MAC) {
+    dx = dx / 4;
+    dy = dy / 4;
+  } else if (goog.userAgent.WINDOWS) {
+    dx = dx * 15;
+    dy = dy * 15;
+  }
+
+  this.scroll(dx, dy);
   e.preventDefault();
 };
 
@@ -2399,6 +2976,69 @@ anychart.core.gantt.Timeline.prototype.scroll = function(horizontalPixelOffset, 
 };
 
 
+/** @inheritDoc */
+anychart.core.gantt.Timeline.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  json['scale'] = this.scale_.serialize();
+
+  json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
+  json['rowFill'] = anychart.color.serialize(this.rowFill_);
+  if (this.rowOddFill_) json['rowOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_));
+  if (this.rowEvenFill_) json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
+  json['hoverFill'] = anychart.color.serialize(this.hoverFill_);
+  json['tooltip'] = this.tooltip().serialize();
+
+  json['baseFill'] = anychart.color.serialize(this.baseFill_);
+  json['baseStroke'] = anychart.color.serialize(this.baseStroke_);
+  json['baselineFill'] = anychart.color.serialize(this.baselineFill_);
+  json['baselineStroke'] = anychart.color.serialize(this.baselineStroke_);
+  json['milestoneFill'] = anychart.color.serialize(this.milestoneFill_);
+  json['milestoneStroke'] = anychart.color.serialize(this.milestoneStroke_);
+  json['parentFill'] = anychart.color.serialize(this.parentFill_);
+  json['parentStroke'] = anychart.color.serialize(this.parentStroke_);
+  json['progressFill'] = anychart.color.serialize(this.progressFill_);
+  json['progressStroke'] = anychart.color.serialize(this.progressStroke_);
+  json['connectorFill'] = anychart.color.serialize(this.connectorFill_);
+  json['connectorStroke'] = anychart.color.serialize(this.connectorStroke_);
+  json['selectedElementFill'] = anychart.color.serialize(this.selectedElementFill_);
+  json['selectedElementStroke'] = anychart.color.serialize(this.selectedElementStroke_);
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.Timeline.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.scale_.setupByJSON(config['scale']);
+
+  this.backgroundFill(config['backgroundFill']);
+  this.rowFill(config['rowFill']);
+  if ('rowOddFill' in config) this.rowOddFill(config['rowOddFill']);
+  if ('rowEvenFill' in config) this.rowEvenFill(config['rowEvenFill']);
+  this.rowHoverFill(config['hoverFill']);
+  this.tooltip(config['tooltip']);
+
+  this.baseFill(config['baseFill']);
+  this.baseStroke(config['baseStroke']);
+  this.baselineFill(config['baselineFill']);
+  this.baselineStroke(config['baselineStroke']);
+  this.milestoneFill(config['milestoneFill']);
+  this.milestoneStroke(config['milestoneStroke']);
+  this.parentFill(config['parentFill']);
+  this.parentStroke(config['parentStroke']);
+  this.progressFill(config['progressFill']);
+  this.progressStroke(config['progressStroke']);
+  this.connectorFill(config['connectorFill']);
+  this.connectorStroke(config['connectorStroke']);
+  this.selectedElementFill(config['selectedElementFill']);
+  this.selectedElementStroke(config['selectedElementStroke']);
+
+};
+
+
 
 //exports
 anychart.core.gantt.Timeline.prototype['cellOddFill'] = anychart.core.gantt.Timeline.prototype.cellOddFill; //deprecated
@@ -2409,4 +3049,20 @@ anychart.core.gantt.Timeline.prototype['rowEvenFill'] = anychart.core.gantt.Time
 anychart.core.gantt.Timeline.prototype['rowOddFill'] = anychart.core.gantt.Timeline.prototype.rowOddFill;
 anychart.core.gantt.Timeline.prototype['rowHoverFill'] = anychart.core.gantt.Timeline.prototype.rowHoverFill;
 anychart.core.gantt.Timeline.prototype['backgroundFill'] = anychart.core.gantt.Timeline.prototype.backgroundFill;
+anychart.core.gantt.Timeline.prototype['baseFill'] = anychart.core.gantt.Timeline.prototype.baseFill;
+anychart.core.gantt.Timeline.prototype['baseStroke'] = anychart.core.gantt.Timeline.prototype.baseStroke;
+anychart.core.gantt.Timeline.prototype['baselineFill'] = anychart.core.gantt.Timeline.prototype.baselineFill;
+anychart.core.gantt.Timeline.prototype['baselineStroke'] = anychart.core.gantt.Timeline.prototype.baselineStroke;
+anychart.core.gantt.Timeline.prototype['milestoneFill'] = anychart.core.gantt.Timeline.prototype.milestoneFill;
+anychart.core.gantt.Timeline.prototype['milestoneStroke'] = anychart.core.gantt.Timeline.prototype.milestoneStroke;
+anychart.core.gantt.Timeline.prototype['parentFill'] = anychart.core.gantt.Timeline.prototype.parentFill;
+anychart.core.gantt.Timeline.prototype['parentStroke'] = anychart.core.gantt.Timeline.prototype.parentStroke;
+anychart.core.gantt.Timeline.prototype['progressFill'] = anychart.core.gantt.Timeline.prototype.progressFill;
+anychart.core.gantt.Timeline.prototype['progressStroke'] = anychart.core.gantt.Timeline.prototype.progressStroke;
+anychart.core.gantt.Timeline.prototype['connectorFill'] = anychart.core.gantt.Timeline.prototype.connectorFill;
+anychart.core.gantt.Timeline.prototype['connectorStroke'] = anychart.core.gantt.Timeline.prototype.connectorStroke;
+anychart.core.gantt.Timeline.prototype['selectedElementFill'] = anychart.core.gantt.Timeline.prototype.selectedElementFill;
+anychart.core.gantt.Timeline.prototype['selectedElementStroke'] = anychart.core.gantt.Timeline.prototype.selectedElementStroke;
 anychart.core.gantt.Timeline.prototype['tooltip'] = anychart.core.gantt.Timeline.prototype.tooltip;
+anychart.core.gantt.Timeline.prototype['minimumGap'] = anychart.core.gantt.Timeline.prototype.minimumGap;
+anychart.core.gantt.Timeline.prototype['maximumGap'] = anychart.core.gantt.Timeline.prototype.maximumGap;

@@ -39,7 +39,7 @@ function generateTree() {
       for (var k = 0; k < CHILDREN_COUNT; k++) {
         var grandson = {
           id: 'grandson' + k,
-          name: 'Grandson #' + k + ' of Son #' + j + ' of Root # ' + i,
+          name: 'Gr #' + k + ' of Son #' + j + ' of Root # ' + i,
           value: 'More random ' + ((Math.random() * 1e9) >>> 0),
           rowHeight: 20,
           uid: ((Math.random() * 1e9) >>> 0)
@@ -66,7 +66,7 @@ anychart.onDocumentReady(function() {
 
   dataGrid.container(stage);
 
-  dataGrid.bounds(20, 20, 450, 300);
+  dataGrid.bounds(10, 10, 450, 300);
 
   dataGrid
       .data(tree)
@@ -97,6 +97,45 @@ anychart.onDocumentReady(function() {
   dataGrid.draw();
 
   dataGrid.listen('signal', dataGridRedraw, false, dataGrid);
+
+  dataGrid.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+    //e.preventDefault();
+    console.log('Clicked:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
+    console.log('Selected:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
+    //e.preventDefault();
+    console.log('Double clicked:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
+    //e.preventDefault();
+    console.log('Mouse over:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
+    //e.preventDefault();
+    console.log('Mouse move:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
+    //e.preventDefault();
+    console.log('Mouse out:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
+    //e.preventDefault();
+    console.log('Mouse up:', e['item'].get('name'));
+  });
+
+  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
+    //e.preventDefault();
+    console.log('Mouse down:', e['item'].get('name'));
+  });
 
 });
 

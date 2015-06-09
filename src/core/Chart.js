@@ -8,7 +8,6 @@ goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
-goog.require('anychart.core.utils.PrintHelper');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
 
@@ -868,6 +867,7 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * In external documentation parameter must be boolean, and method must return Object|string.
  * For the moment we have no way around this "nice feature" of the compiler.
  * @param {string=} opt_stringify Return as JSON as string.
+ *  Note: stringifying ignores this flag.
  * @return {*} Chart JSON.
  */
 anychart.core.Chart.prototype.toJson = function(opt_stringify) {
@@ -955,17 +955,6 @@ anychart.core.Chart.prototype.restoreDefaults = function() {
   var title = /** @type {anychart.core.ui.Title} */(this.title());
   title.text('Chart title');
   title.margin().bottom(15);
-};
-
-
-/**
- * Prints a chart or stage.
- * @param {acgraph.vector.Stage=} opt_stage - Stage to be printed.
- */
-anychart.core.Chart.prototype.print = function(opt_stage) {
-  var stage = opt_stage || ((this.container() && this.container().getStage) ? this.container().getStage() : this.rootElement.getStage());
-
-  anychart.core.utils.PrintHelper.getInstance().print(stage);
 };
 
 

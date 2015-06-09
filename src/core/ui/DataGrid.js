@@ -8,11 +8,13 @@ goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.data.Tree');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
 goog.require('goog.events');
 goog.require('goog.events.MouseWheelHandler');
+goog.require('goog.object');
 
 
 
@@ -30,6 +32,30 @@ anychart.core.ui.DataGrid = function() {
    * @private
    */
   this.mwh_ = null;
+
+
+  /**
+   * Interactivity handler.
+   * An object that has own methods
+   *  - rowClick
+   *  - rowDblClick
+   *  - rowMouseMove
+   *  - rowMouseOver
+   *  - rowMouseOut
+   *  - rowMouesDown
+   *  - rowMouseUp
+   *  - rowSelect
+   *
+   * By default we should not dispatch some event directly: we use this interactivity handler to provide an ability
+   * for user to prevent default event or stop propagation.
+   *
+   * For standalone case, data grid dispatches events itself. Otherwise, interactivity handler should be some higher
+   * essence like gantt chart or something else.
+   *
+   * @type {Object}
+   * @private
+   */
+  this.interactivityHandler_ = this;
 
   /**
    * Source data tree.
@@ -74,7 +100,7 @@ anychart.core.ui.DataGrid = function() {
    * @type {number}
    * @private
    */
-  this.titleHeight_ = 0;
+  this.titleHeight_ = 25;
 
   /**
    * Start index of this.visibleItems_. Actually is a first visible data item of data grid.
@@ -296,7 +322,6 @@ anychart.core.ui.DataGrid = function() {
    */
   this.tooltip_ = null;
 
-
   this.column(0).textFormatter(function(item) {
     return goog.isDefAndNotNull(item.meta('index')) ? (item.meta('index') + 1) + '' : '';
   });
@@ -320,6 +345,9 @@ anychart.core.ui.DataGrid = function() {
   });
   tooltip.resumeSignalsDispatching(false);
 
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
+      this.handleMouseOverAndMove_, this.handleAll_);
+
 };
 goog.inherits(anychart.core.ui.DataGrid, anychart.core.VisualBaseWithBounds);
 
@@ -342,14 +370,6 @@ anychart.core.ui.DataGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.DATA_GRID_POSITION |
     anychart.ConsistencyState.DATA_GRID_HOVER |
     anychart.ConsistencyState.DATA_GRID_CLICK;
-
-
-//todo: SHOULD COME BACK TO GANTT
-/**
- * Scroll bar side size.
- * @type {number}
- */
-anychart.core.ui.DataGrid.SCROLL_BAR_SIDE = 10;
 
 
 /**
@@ -571,7 +591,6 @@ anychart.core.ui.DataGrid.prototype.rowHoverFill = function(opt_fillOrColorOrKey
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
       //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
       this.hoverFill_ = val;
-      this.getHoverPath_().fill(this.hoverFill_);
     }
     return this;
   }
@@ -686,6 +705,300 @@ anychart.core.ui.DataGrid.prototype.needsReapplicationHandler_ = function(event)
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets/sets current interactivity handler (see field description).
+ * @param {Object=} opt_value - Value to be set.
+ * @return {(Object|anychart.core.ui.DataGrid)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.DataGrid.prototype.interactivityHandler = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.interactivityHandler_ = opt_value;
+    return this;
+  }
+  return this.interactivityHandler_;
+};
+
+
+/**
+ * Mouse click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleMouseClick_ = function(event) {
+  var click = this.getInteractivityEvent_(event);
+  if (click) {
+    var mouseUp = goog.object.clone(click);
+    mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
+    var upDispatched = this.interactivityHandler_.dispatchEvent(mouseUp);
+    var clickDispatched = this.interactivityHandler_.dispatchEvent(click);
+    if (upDispatched && clickDispatched) this.interactivityHandler_.rowClick(click);
+  }
+
+};
+
+
+/**
+ * Mouse over and move internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleMouseOverAndMove_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowMouseMove(evt);
+  }
+};
+
+
+/**
+ * "All" internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleAll_ = function(event) {
+  if (event['type'] == acgraph.events.EventType.DBLCLICK) this.handleDblMouseClick_(event);
+  if (event['type'] == acgraph.events.EventType.MOUSEDOWN) this.handleMouseDown_(event);
+};
+
+
+/**
+ * Mouse double click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleDblMouseClick_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowDblClick(evt);
+  }
+};
+
+
+/**
+ * Mouse out internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleMouseOut_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt && this.interactivityHandler_.dispatchEvent(evt)) {
+    this.interactivityHandler_.rowMouseOut(evt);
+  }
+};
+
+
+/**
+ * Mouse down internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.handleMouseDown_ = function(event) {
+  var evt = this.getInteractivityEvent_(event);
+  if (evt) this.interactivityHandler_.dispatchEvent(evt);
+};
+
+
+/**
+ * Row click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowClick = function(event) {
+  this.rowSelect(event);
+};
+
+
+/**
+ * Row double click interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowDblClick = function(event) {
+  var item = event['item'];
+  if (item && item.numChildren())
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+};
+
+
+/**
+ * Row mouse move interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowMouseMove = function(event) {
+  this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  var position = tooltip.isFloating() ?
+      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+      new acgraph.math.Coordinate(0, 0);
+  tooltip.show(event['item'], position);
+};
+
+
+/**
+ * Row mouse over interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowMouseOver = function(event) {
+};
+
+
+/**
+ * Row mouse out interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowMouseOut = function(event) {
+  this.highlight();
+  this.tooltip().hide();
+};
+
+
+/**
+ * Handles row selection.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.DataGrid.prototype.rowSelect = function(event) {
+  var item = event['item'];
+  if (this.selectRow(item)) {
+    var eventObj = goog.object.clone(event);
+    eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
+    this.interactivityHandler_.dispatchEvent(eventObj);
+  }
+};
+
+
+/**
+ * Creates new event object to be dispatched.
+ * @param {anychart.core.MouseEvent} event - Incoming event.
+ * @return {?Object} - New event object to be dispatched.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.getInteractivityEvent_ = function(event) {
+  if (this.gridHeightCache_.length) {
+    var item;
+    var type = event['type'];
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.ROW_MOUSE_OUT;
+        if (this.hoveredIndex_ >= 0) item = this.visibleItems_[this.startIndex_ + this.hoveredIndex_];
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.ROW_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+        type = anychart.enums.EventType.ROW_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+        type = anychart.enums.EventType.ROW_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+        type = anychart.enums.EventType.ROW_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.ROW_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.ROW_DBL_CLICK;
+        break;
+      default:
+        return null;
+    }
+
+    var newEvent = {
+      'type': type,
+      'actualTarget': event['target'],
+      'target': this,
+      'originalEvent': event
+    };
+
+    var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE);
+
+    var min = this.pixelBoundsCache_.top +
+        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x +
+        this.titleHeight_;
+
+    var mouseHeight = event['clientY'] - min;
+
+    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
+
+    if (item) {
+      newEvent['item'] = item;
+    } else if (mouseHeight < 0 || mouseHeight > totalHeight) {
+      return null;
+    } else {
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
+      index = index >= 0 ? index : ~index; //Index of row under mouse.
+      this.hoveredIndex_ = index;
+
+      var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
+      var startY = initialTop + startHeight;
+      var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
+
+      newEvent['item'] = this.visibleItems_[this.startIndex_ + index];
+      newEvent['startY'] = startY;
+      newEvent['endY'] = endY;
+      newEvent['hoveredIndex'] = this.hoveredIndex_;
+    }
+    return newEvent;
+  }
+  return null;
+};
+
+
+/**
+ * Highlights selected vertical range.
+ * TODO (A.Kudryavtsev): Extract this method to parent  class.
+ * @param {number=} opt_index - Index of selected item.
+ * @param {number=} opt_startY - Start Y to be highlighted.
+ * @param {number=} opt_endY - End Y to be highlighted.
+ */
+anychart.core.ui.DataGrid.prototype.highlight = function(opt_index, opt_startY, opt_endY) {
+  var definedValues = goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY);
+  if (definedValues) {
+    if (this.hoverStartY_ != opt_startY || this.hoverEndY_ != opt_endY) {
+      this.hoveredIndex_ = opt_index;
+      this.hoverStartY_ = opt_startY;
+      this.hoverEndY_ = opt_endY;
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  } else {
+    if (this.hoveredIndex_ >= 0) {
+      this.hoveredIndex_ = -1;
+      this.hoverStartY_ = NaN;
+      this.hoverEndY_ = NaN;
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+};
+
+
+/**
+ * Method to select row from outside.
+ * @param {anychart.data.Tree.DataItem} item - New selected data item.
+ * @return {boolean} - Whether has been selcted.
+ */
+anychart.core.ui.DataGrid.prototype.selectRow = function(item) {
+  if (item && item != this.selectedItem_) {
+    item.tree().suspendSignalsDispatching();
+    item.meta('selected', true);
+    if (this.selectedItem_) this.selectedItem_.meta('selected', false); //selectedItem_ has the same tree as item.
+    this.selectedItem_ = item;
+    item.tree().resumeSignalsDispatching(false);
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
+    return true;
+  }
+  return false;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  DOM init.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Inner getter for this.base_.
  * @return {acgraph.vector.Layer}
@@ -694,139 +1007,10 @@ anychart.core.ui.DataGrid.prototype.needsReapplicationHandler_ = function(event)
 anychart.core.ui.DataGrid.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.bindHandlersToGraphics(this.base_);
     this.registerDisposable(this.base_);
-
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);
-    acgraph.events.listen(this.base_, acgraph.events.EventType.CLICK, this.mouseClickHandler_, false, this);
   }
   return this.base_;
-};
-
-
-/**
- * Handler for mouse move.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.ui.DataGrid.prototype.mouseMoveHandler_ = function(event) {
-  var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE);
-
-  var mouseHeight = event.offsetY - this.titleHeight_ - this.pixelBoundsCache_.top;
-
-  if (this.gridHeightCache_.length) {
-    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
-    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
-      index = index >= 0 ? index : ~index; //Index of row under mouse.
-
-      if (index != this.hoveredIndex_) {
-        var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
-        var startY = initialTop + startHeight;
-        var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
-        this.highlight(index, startY, endY);
-      }
-
-      var itemIndex = this.startIndex_ + index;
-      var item = this.visibleItems_[itemIndex];
-
-      var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-      var position = tooltip.isFloating() ?
-          new acgraph.math.Coordinate(event['clientX'], event['clientY']) :
-          new acgraph.math.Coordinate(0, 0);
-      tooltip.show(item, position);
-
-    } else {
-      this.tooltip().hide();
-      this.highlight();
-      this.hoveredIndex_ = -1;
-    }
-
-  }
-};
-
-
-/**
- * Handler for mouse out.
- * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.ui.DataGrid.prototype.mouseOutHandler_ = function(event) {
-  this.tooltip().hide();
-  this.highlight();
-  this.hoveredIndex_ = -1;
-};
-
-
-/**
- * Handler for mouse click.
- * @param {acgraph.events.BrowserEvent} event - Event.
- * @private
- */
-anychart.core.ui.DataGrid.prototype.mouseClickHandler_ = function(event) {
-  var mouseHeight = event['offsetY'] - this.titleHeight_ - this.pixelBoundsCache_.top;
-
-  if (this.gridHeightCache_.length) {
-    var totalHeight = this.gridHeightCache_[this.gridHeightCache_.length - 1];
-    if (mouseHeight > 0 && mouseHeight < totalHeight) { //Triggered over the rows only.
-      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
-      index = index >= 0 ? index : ~index; //Index of row under mouse.
-
-      var item = this.visibleItems_[this.startIndex_ + index]; //Theoretically, here must not be any exceptions.
-      if (!item.meta('selected')) {
-        this.selectRow(item);
-
-        this.dispatchEvent({
-          'type': anychart.enums.EventType.ROW_CLICK,
-          'item': item
-        });
-
-        this.invalidate(anychart.ConsistencyState.DATA_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
-      }
-    }
-  }
-};
-
-
-/**
- * Highlights selected vertical range.
- * TODO (A.Kudryavtsev): I really don't like that this code is a copy of mouseMoveHandler_ if timeline.
- * @param {number=} opt_index - Index of row.
- * @param {number=} opt_startY - Start Y to be highlighted.
- * @param {number=} opt_endY - End Y to be highlighted.
- * @param {boolean=} opt_preventDispatching - If dispatching should be prevented.
- */
-anychart.core.ui.DataGrid.prototype.highlight = function(opt_index, opt_startY, opt_endY, opt_preventDispatching) {
-  var definedValues = goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY);
-  if (definedValues || (!definedValues && this.hoveredIndex_ >= 0)) {
-    this.hoveredIndex_ = opt_index;
-    this.hoverStartY_ = opt_startY;
-    this.hoverEndY_ = opt_endY;
-
-    if (!opt_preventDispatching) this.dispatchEvent({
-      'type': anychart.enums.EventType.ROW_HOVER,
-      'index': opt_index,
-      'startY': opt_startY,
-      'endY': opt_endY
-    });
-    this.invalidate(anychart.ConsistencyState.DATA_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-/**
- * Method to select row from outside.
- * @param {anychart.data.Tree.DataItem} item - New selected data item.
- */
-anychart.core.ui.DataGrid.prototype.selectRow = function(item) {
-  if (item != this.selectedItem_) {
-    item.tree().suspendSignalsDispatching();
-    item.meta('selected', true);
-    if (this.selectedItem_) this.selectedItem_.meta('selected', false); //selectedItem_ has the same tree as item.
-    this.selectedItem_ = item;
-    item.tree().resumeSignalsDispatching(false);
-  }
 };
 
 
@@ -1178,7 +1362,6 @@ anychart.core.ui.DataGrid.prototype.drawRowFills_ = function() {
   var totalTop = (header - this.verticalOffset_);
   this.highlight();
   this.gridHeightCache_.length = 0;
-  this.hoveredIndex_ = -1;
 
   this.getEvenPath_().clear();
   this.getOddPath_().clear();
@@ -1215,6 +1398,7 @@ anychart.core.ui.DataGrid.prototype.drawRowFills_ = function() {
         .close();
 
     if (item.meta('selected')) {
+      this.selectedItem_ = item; //In case of restoration from XML/JSON, this allows to save selected item state.
       this.selectedPath_
           .moveTo(this.pixelBoundsCache_.left, top)
           .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, top)
@@ -1237,10 +1421,32 @@ anychart.core.ui.DataGrid.prototype.drawRowFills_ = function() {
 
 
 /**
+ * Adds new splitter if needed.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.addSplitter_ = function() {
+  var columnsCount = 0; //Calculating how many columns are currently visible.
+  for (var i = 0, l = this.columns_.length; i < l; i++) {
+    if (this.columns_[i] && this.columns_[i].enabled()) columnsCount++;
+  }
+
+  //NOTE: We call this method on every add-new-column action, that's why
+  //(columnsCount > this.splitters_.length) is totally the same as (columnsCount - 1 == this.splitters_.length).
+  if (columnsCount > this.splitters_.length) {
+    var newSplitter = new anychart.core.ui.Splitter();
+    this.registerDisposable(newSplitter);
+    newSplitter.container(this.getSplitterLayer_());
+    newSplitter.listen(anychart.enums.EventType.SPLITTER_CHANGE, goog.bind(this.splitterChangedHandler_, this, columnsCount - 1));
+    this.splitters_.push(newSplitter);
+  }
+};
+
+
+/**
  * Gets column by index or creates a new one if column doesn't exist yet.
  * If works like setter, sets a column by index.
- * @param {(number|anychart.core.ui.DataGrid.Column)=} opt_indexOrValue - Column index or column.
- * @param {anychart.core.ui.DataGrid.Column=} opt_value - Column to be set.
+ * @param {(number|anychart.core.ui.DataGrid.Column|string)=} opt_indexOrValue - Column index or column.
+ * @param {(anychart.core.ui.DataGrid.Column|Object)=} opt_value - Column to be set.
  * @return {(anychart.core.ui.DataGrid.Column|anychart.core.ui.DataGrid)} - Column by index of itself for method chaining if used
  *  like setter.
  */
@@ -1257,53 +1463,41 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
   }
 
   var column = this.columns_[index];
-
   if (!column) {
     column = new anychart.core.ui.DataGrid.Column(this);
-    this.registerDisposable(column);
-
-    var columnWidth = index ?
-        (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
-        anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
-
-    var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
-
-    column.suspendSignalsDispatching();
-    column
-        .container(this.getColumnsLayer_())
-        .width(columnWidth)
-        .height('100%');
-
-    column.title().text(columnTitle);
-    column.title().height(this.titleHeight_);
-    column.title().width(columnWidth);
-
-    var columnsCount = 0; //Calculating how many columns are currently visible.
-    for (var i = 0, l = this.columns_.length; i < l; i++) {
-      if (this.columns_[i] && this.columns_[i].enabled()) columnsCount++;
-    }
-
-    //columnsCount is actually a number of currently visible splitters as well.
-    if (columnsCount == this.splitters_.length) { //We need N splitters for N columns.
-      var newSplitter = new anychart.core.ui.Splitter();
-      this.registerDisposable(newSplitter);
-
-      newSplitter.container(this.getSplitterLayer_());
-      newSplitter.listen(anychart.enums.EventType.SPLITTER_CHANGE, goog.bind(this.splitterChangedHandler_, this, columnsCount));
-      this.splitters_.push(newSplitter);
-    }
-
     column.listenSignals(this.columnInvalidated_, this);
-    column.resumeSignalsDispatching(true);
-    this.columns_[index] = column;
+    this.registerDisposable(column);
     newColumn = true;
   }
 
   if (goog.isDef(value)) {
-    column.setup(value);
+    column.setup(value instanceof anychart.core.ui.DataGrid.Column ? value.serialize() : value);
+    if (column.enabled()) column.container(this.getColumnsLayer_());
+    this.columns_[index] = column;
+    this.addSplitter_();
+    this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
-    if (newColumn) this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    if (newColumn) {
+      var columnWidth = index ?
+          (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
+          anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
+      var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
+      column.suspendSignalsDispatching();
+      column
+          .container(this.getColumnsLayer_())
+          .width(columnWidth)
+          .height('100%');
+      column.title().text(columnTitle);
+      column.title().height(this.titleHeight_);
+      column.title().width(columnWidth);
+
+      column.resumeSignalsDispatching(true);
+      this.columns_[index] = column;
+      this.addSplitter_();
+
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_GRIDS | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return column;
   }
 
@@ -1384,6 +1578,70 @@ anychart.core.ui.DataGrid.prototype.getHorizontalScrollBar = function() {
     });
   }
   return this.horizontalScrollBar_;
+};
+
+
+/**
+ * Initializes mouse wheel scrolling and mouse drag scrolling.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
+ */
+anychart.core.ui.DataGrid.prototype.initMouseFeatures = function() {
+  if (!this.mwh_) {
+    var element = this.getBase_().domElement();
+    if (element) {
+      this.mwh_ = new goog.events.MouseWheelHandler(element);
+      var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
+      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+      var ths = this;
+
+      goog.events.listen(window, 'unload', function(e) {
+        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+      });
+    }
+  }
+};
+
+
+/**
+ * Mouse wheel default handler.
+ * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.mouseWheelHandler_ = function(e) {
+  var dx = e.deltaX;
+  var dy = e.deltaY;
+
+  if (goog.userAgent.MAC) {
+    dx = dx / 4;
+    dy = dy / 4;
+  } else if (goog.userAgent.WINDOWS) {
+    dx = dx * 15;
+    dy = dy * 15;
+  }
+
+  this.scroll(dx, dy);
+  e.preventDefault();
+};
+
+
+/**
+ * Performs scroll to pixel offsets.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) horizontal scrolling of data grid is not available.
+ *
+ * @param {number} horizontalPixelOffset - Horizontal pixel offset.
+ * @param {number} verticalPixelOffset - Vertical pixel offset.
+ */
+anychart.core.ui.DataGrid.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset) {
+  anychart.core.Base.suspendSignalsDispatching(this, this.controller_);
+
+  this.horizontalOffset(this.horizontalOffset_ + horizontalPixelOffset);
+
+  var heightCache = this.controller_.getHeightCache();
+  var totalVerticalStartOffset = this.startIndex_ ? heightCache[this.startIndex_ - 1] : 0;
+  totalVerticalStartOffset += (this.verticalOffset_ + verticalPixelOffset);
+  this.controller_.scrollTo(totalVerticalStartOffset);
+
+  anychart.core.Base.resumeSignalsDispatchingTrue(this, this.controller_);
 };
 
 
@@ -1525,17 +1783,17 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
         horizontalScrollBar = this.getHorizontalScrollBar();
 
         verticalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE + 1),
-            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE,
-            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 2)
+            (this.pixelBoundsCache_.left + this.pixelBoundsCache_.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
+            anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
+            (this.pixelBoundsCache_.height - this.titleHeight_ - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
         );
 
         horizontalScrollBar.bounds(
-            (this.pixelBoundsCache_.left + anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
-            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.core.ui.DataGrid.SCROLL_BAR_SIDE - 1),
-            (this.pixelBoundsCache_.width - 2 * anychart.core.ui.DataGrid.SCROLL_BAR_SIDE),
-            anychart.core.ui.DataGrid.SCROLL_BAR_SIDE
+            (this.pixelBoundsCache_.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+            (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+            (this.pixelBoundsCache_.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+            anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
         );
       }
 
@@ -1567,11 +1825,15 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
 
       for (i = 0, l = this.columns_.length; i < l; i++) {
         col = this.columns_[i];
-        if (col && col.enabled()) {
-          colWidth = col.calculateBounds().width; //We need pixel value here.
-          totalWidth += (colWidth + width);
-          enabledColumns.push(col);
-          columnsWidths.push(colWidth);
+        if (col) {
+          if (col.enabled()) {
+            colWidth = col.calculateBounds().width; //We need pixel value here.
+            totalWidth += (colWidth + width);
+            enabledColumns.push(col);
+            columnsWidths.push(colWidth);
+          } else {
+            col.draw(); //Clearing cons.state "enabled".
+          }
         }
       }
 
@@ -1630,9 +1892,10 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
 
       drawRows = true;
 
-      while (++i < this.splitters_.length) { //This disables all remaining splitters.
+      while (i < this.splitters_.length) { //This disables all remaining splitters.
         if (!this.splitters_[i].enabled()) break;
         this.splitters_[i].enabled(false).draw();
+        i++;
       }
 
       if (this.horizontalScrollBar_) {
@@ -1687,6 +1950,7 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
     if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_HOVER)) {
       if (this.hoveredIndex_ >= 0 && goog.isDef(this.hoverStartY_) && goog.isDef(this.hoverEndY_) && goog.isDef(this.hoveredIndex_)) {
         this.getHoverPath_()
+            .fill(this.hoverFill_)
             .clear()
             .moveTo(this.pixelBoundsCache_.left, this.hoverStartY_)
             .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.hoverStartY_)
@@ -1713,7 +1977,7 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
     if (manualSuspend) stage.resume();
   }
 
-  this.initMouseFeatures_();
+  if (this.isStandalone_)this.initMouseFeatures();
 
   return this;
 };
@@ -1721,13 +1985,27 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
 
 /** @inheritDoc */
 anychart.core.ui.DataGrid.prototype.serialize = function() {
-  var json;
-  json = goog.base(this, 'serialize');
-  json['columns'] = [];
+  var json = goog.base(this, 'serialize');
 
   json['isStandalone'] = this.isStandalone_;
-  json['startIndex'] = this.startIndex_; //We don't need to store this.endIndex_ here;
-  json['verticalOffset'] = this.verticalOffset_;
+
+  /*
+    Note: not standalone data grid is controlled by some higher entity (e.g. gantt chart).
+    It means that controller must be serialized and restored by this entity, but not by data grid.
+   */
+  if (this.isStandalone_) {
+    if (this.controller()) {
+      json['controller'] = this.controller().serialize();
+    } else {
+      json['treeData'] = this.data().serialize();
+      json['verticalOffset'] = this.verticalOffset();
+      if (!isNaN(this.startIndex()))
+        json['startIndex'] = this.startIndex();
+      else if (!isNaN(this.endIndex()))
+        json['endIndex'] = this.endIndex();
+    }
+  }
+
   json['titleHeight'] = this.titleHeight_;
   json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
   json['cellBorder'] = anychart.color.serialize(this.cellBorder_);
@@ -1735,10 +2013,15 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
   json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
   json['rowFill'] = anychart.color.serialize(this.rowFill_);
   json['titleFill'] = anychart.color.serialize(this.titleFill_);
+  json['hoverFill'] = anychart.color.serialize(this.hoverFill_);
+  json['rowSelectedFill'] = anychart.color.serialize(this.rowSelectedFill_);
+  json['horizontalOffset'] = this.horizontalOffset();
+  json['tooltip'] = this.tooltip().serialize();
+  json['columns'] = [];
 
   for (var i = 0; i < this.columns_.length; i++) {
-    var col = this.columns_[i] ? this.columns_[i].serialize() : void 0;
-    json['columns'].push(col);
+    var col = this.columns_[i];
+    json['columns'].push(col ? col.serialize() : false);
   }
 
   return json;
@@ -1746,28 +2029,40 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.DataGrid.prototype.setupByJSON = function(json) {
-  this.suspendSignalsDispatching();
+anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
 
-  this.isStandalone_ = json['isStandalone'];
-  this
-      .startIndex(json['startIndex'])
-      .verticalOffset(json['verticalOffset'])
-      .titleHeight(json['titleHeight'])
-      .backgroundFill(json['backgroundFill'])
-      .cellBorder(json['cellBorder'])
-      .rowOddFill(json['rowOddFill'])
-      .rowEvenFill(json['rowEvenFill'])
-      .rowFill(json['rowFill'])
-      .titleFill(json['titleFill']);
+  this.isStandalone_ = config['isStandalone'];
 
-  for (var i = 0; i < json['columns'].length; i++) {
-    var col = json['columns'][i];
+  if (this.isStandalone_) {
+    var dataSource = ('controller' in config) ? config['controller'] : config;
+    this.data(anychart.data.Tree.fromJson(dataSource['treeData']));
+    this.verticalOffset(dataSource['verticalOffset']);
+    if (goog.isDef(dataSource['startIndex']))
+      this.startIndex(dataSource['startIndex']);
+    else if (goog.isDef(dataSource['endIndex']))
+      this.endIndex(dataSource['endIndex']);
+
+    this.titleHeight(config['titleHeight']);
+  }
+
+
+  this.backgroundFill(config['backgroundFill']);
+  this.cellBorder(config['cellBorder']);
+  this.rowFill(config['rowFill']);
+  this.rowOddFill(config['rowOddFill']);
+  this.rowEvenFill(config['rowEvenFill']);
+  this.titleFill(config['titleFill']);
+  this.rowHoverFill(config['hoverFill']);
+  this.rowSelectedFill(config['rowSelectedFill']);
+  this.horizontalOffset(config['horizontalOffset']);
+  this.tooltip(config['tooltip']);
+
+  for (var i = 0, l = config['columns'].length; i < l; i++) {
+    var col = config['columns'][i];
     if (col) this.column(i, col);
   }
 
-  this.resumeSignalsDispatching(true);
-  return goog.base(this, 'setupByJSON', json);
 };
 
 
@@ -1907,6 +2202,7 @@ anychart.core.ui.DataGrid.Column = function(dataGrid) {
    */
   this.cellTextSettingsOverrider_ = this.defaultCellTextSettingsOverrider_;
 
+  this.setParentEventTarget(this.dataGrid_);
 
   /*
     Enabling/disabling column makes data grid redraw.
@@ -2010,6 +2306,8 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
         .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
         .container(this.getCellsLayer_());
 
+    this.labelsFactory_.setParentEventTarget(this);
+
     this.registerDisposable(this.labelsFactory_);
   }
 
@@ -2037,16 +2335,13 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
 
 /**
  * Gets/sets cells text settings overrider.
- * @param {Object=} opt_value - Value to be set.
+ * @param {function(anychart.core.ui.LabelsFactory.Label, anychart.data.Tree.DataItem)=} opt_value - New text settings
+ *  overrider function.
  * @return {(anychart.core.ui.DataGrid.Column|function(anychart.core.ui.LabelsFactory.Label, anychart.data.Tree.DataItem))} - Current value or itself for method chaining.
  */
 anychart.core.ui.DataGrid.Column.prototype.cellTextSettingsOverrider = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isFunction(opt_value)) {
-      this.cellTextSettingsOverrider_ = opt_value;
-    } else {
-      this.cellTextSettingsOverrider_ = this.defaultCellTextSettingsOverrider_;
-    }
+    this.cellTextSettingsOverrider_ = opt_value;
     //TODO (A.Kudryavtsev): WE invalidate position because labels factory work that way: must clear and redraw all labels.
     this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -2238,60 +2533,6 @@ anychart.core.ui.DataGrid.Column.prototype.remove = function() {
 
 
 /**
- * Initializes mouse wheel scrolling and mouse drag scrolling.
- * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
- * @private
- */
-anychart.core.ui.DataGrid.prototype.initMouseFeatures_ = function() {
-  if (!this.mwh_) {
-    var element = this.getBase_().domElement();
-    if (element) {
-      this.mwh_ = new goog.events.MouseWheelHandler(element);
-      var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
-      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
-      var ths = this;
-
-      goog.events.listen(window, 'unload', function(e) {
-        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
-      });
-    }
-  }
-};
-
-
-/**
- * Mouse wheel default handler.
- * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
- * @private
- */
-anychart.core.ui.DataGrid.prototype.mouseWheelHandler_ = function(e) {
-  this.scroll(e.deltaX, e.deltaY);
-  e.preventDefault();
-};
-
-
-/**
- * Performs scroll to pixel offsets.
- * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) horizontal scrolling of data grid is not available.
- *
- * @param {number} horizontalPixelOffset - Horizontal pixel offset.
- * @param {number} verticalPixelOffset - Vertical pixel offset.
- */
-anychart.core.ui.DataGrid.prototype.scroll = function(horizontalPixelOffset, verticalPixelOffset) {
-  anychart.core.Base.suspendSignalsDispatching(this, this.controller_);
-
-  this.horizontalOffset(this.horizontalOffset_ + horizontalPixelOffset);
-
-  var heightCache = this.controller_.getHeightCache();
-  var totalVerticalStartOffset = this.startIndex_ ? heightCache[this.startIndex_ - 1] : 0;
-  totalVerticalStartOffset += (this.verticalOffset_ + verticalPixelOffset);
-  this.controller_.scrollTo(totalVerticalStartOffset);
-
-  anychart.core.Base.resumeSignalsDispatchingTrue(this, this.controller_);
-};
-
-
-/**
  * Calculates actual column bounds.
  * @return {anychart.math.Rect}
  */
@@ -2394,7 +2635,6 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         var depth = item.meta('depth') || 0;
         var padding = paddingLeft + this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
         var addButton = 0;
-        var newButton = false;
 
         if (this.collapseExpandButtons_ && item.numChildren()) {
           counter++;
@@ -2404,36 +2644,22 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
             button = new anychart.core.ui.DataGrid.Button(this.dataGrid_);
             this.buttons_.push(button);
             button.container(this.getCellsLayer_());
-            newButton = true;
           }
 
           button.suspendSignalsDispatching();
 
           var top = totalTop + ((height - anychart.core.ui.DataGrid.DEFAULT_EXPAND_COLLAPSE_BUTTON_SIDE) / 2);
 
+          var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
           button
               .enabled(true)
               .collapsed(!!item.meta('collapsed'))
               .dataItemIndex(i)
               .parentBounds(this.pixelBoundsCache_)
-              .position({'x': Math.floor(this.pixelBoundsCache_.left + padding) + .5, 'y': Math.floor(top) + 0.5});
+              .position({'x': Math.floor(this.pixelBoundsCache_.left + padding) + pixelShift, 'y': Math.floor(top) + pixelShift});
 
           button.resumeSignalsDispatching(false);
           button.draw();
-
-          /*
-            TODO (A.Kudryavtsev): Explanation.
-            In current implementation of ui.Button (2 Feb 2015) here are some troubles in click events.
-            In this case we can't stop propagation on button click.
-            Here I implement my own button click to stop event propagation and make data grid row click work correctly.
-           */
-          if (newButton) {
-            acgraph.events.listen(button.backgroundPath, acgraph.events.EventType.CLICK, function(e) {
-              e.stopPropagation();
-              this.switchState();
-            }, false, button);
-          }
-
         }
 
         var newTop = totalTop + height;
@@ -2487,15 +2713,29 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
-  var json;
-  json = goog.base(this, 'serialize');
+  var json = goog.base(this, 'serialize');
 
   json['width'] = this.width_;
-  json['height'] = this.height_;
   json['collapseExpandButtons'] = this.collapseExpandButtons_;
   json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
-  json['labelsFactory'] = this.labelsFactory_.serialize();
+  json['labelsFactory'] = this.cellTextSettings().serialize();
   json['title'] = this.title_.serialize();
+
+  if (this.textFormatter_ != this.defaultTextFormatter_) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Data Grid Column textFormatter']
+    );
+  }
+
+  if (this.cellTextSettingsOverrider_ != this.defaultCellTextSettingsOverrider_) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Data Grid Column cellTextSettingsOverrider']
+    );
+  }
 
   return json;
 };
@@ -2503,18 +2743,17 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
-  this.suspendSignalsDispatching();
+  goog.base(this, 'setupByJSON', json);
 
-  this
-      .width(json['width'])
-      .height(json['height'])
-      .collapseExpandButtons(json['collapseExpandButtons'])
-      .depthPaddingMultiplier(json['depthPaddingMultiplier'])
-      .cellTextSettings(json['labelsFactory'])
-      .title(json['title']);
+  this.width(json['width']);
+  this.collapseExpandButtons(json['collapseExpandButtons']);
+  this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
+  this.cellTextSettings(json['labelsFactory']);
+  this.title(json['title']);
 
-  this.resumeSignalsDispatching(true);
-  return goog.base(this, 'setupByJSON', json);
+  if ('textFormatter' in json) this.textFormatter(json['textFormatter']);
+  if ('cellTextSettingsOverrider' in json) this.cellTextSettingsOverrider(json['cellTextSettingsOverrider']);
+
 };
 
 
@@ -2572,6 +2811,17 @@ anychart.core.ui.DataGrid.Button = function(dataGrid) {
 
 };
 goog.inherits(anychart.core.ui.DataGrid.Button, anychart.core.ui.Button);
+
+
+/**
+ * Handler for mouse up.
+ * @param {acgraph.events.BrowserEvent} event - Event.
+ * @override
+ */
+anychart.core.ui.DataGrid.Button.prototype.handleMouseUp = function(event) {
+  goog.base(this, 'handleMouseUp', event);
+  this.switchState();
+};
 
 
 /**

@@ -698,6 +698,17 @@ anychart.core.VisualBase.prototype.toSVG = function() {
 };
 
 
+/**
+ * Print all element on related stage.
+ * @param {acgraph.vector.PaperSize=} opt_paperSize
+ * @param {boolean=} opt_landscape
+ */
+anychart.core.VisualBase.prototype.print = function(opt_paperSize, opt_landscape) {
+  var stage = this.container() && this.container().getStage();
+  if (stage) stage.print(opt_paperSize, opt_landscape);
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  JSON.
@@ -740,3 +751,4 @@ anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.proto
 anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//doc|ex
 anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;//doc|ex
 anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;
+anychart.core.VisualBase.prototype['print'] = anychart.core.VisualBase.prototype.print;

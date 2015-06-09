@@ -229,6 +229,20 @@ anychart.core.ui.ScrollBar.MAX_ROUND = 5;
 
 
 /**
+ * Default scroll bar side size.
+ * @type {number}
+ */
+anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE = 10;
+
+
+/**
+ * Minimal slider pixel size.
+ * @type {number}
+ */
+anychart.core.ui.ScrollBar.MIN_SLIDER_SIZE = 10;
+
+
+/**
  * Turns a numeric value to its integral part plus 0.5, method is used to fix a pixel coordinates to avoid a slim line blurring.
  * NOTE: For 1px line only!
  *
@@ -723,8 +737,8 @@ anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo = function(value, opt_even
     var isVertical = this.isVertical_();
 
     var diff = value - (isVertical ?
-        (this.visibleBounds_.top + this.visibleBounds_.height) :
-        (this.visibleBounds_.left + this.visibleBounds_.width)
+                (this.visibleBounds_.top + this.visibleBounds_.height) :
+                (this.visibleBounds_.left + this.visibleBounds_.width)
         );
 
     if (diff) {
@@ -1040,6 +1054,7 @@ anychart.core.ui.ScrollBar.prototype.drawWrapper_ = function(opt_dragging) {
   var sliderBounds = this.slider_.getBounds();
   var dragging = !!opt_dragging;
 
+  var sliderLength = isVertical ? sliderBounds.height : sliderBounds.width;
 
   var areaMin = isVertical ? dragArea.top : dragArea.left;
   var areaLength = isVertical ? dragArea.height : dragArea.width;
@@ -1047,8 +1062,15 @@ anychart.core.ui.ScrollBar.prototype.drawWrapper_ = function(opt_dragging) {
   var minPos = isVertical ? sliderBounds.top : sliderBounds.left;
   var maxPos = minPos + (isVertical ? sliderBounds.height : sliderBounds.width);
 
-  this.startRatio_ = anychart.math.round((minPos - areaMin) / areaLength, 5);
-  this.endRatio_ = anychart.math.round((maxPos - areaMin) / areaLength, 5);
+  if (sliderLength <= anychart.core.ui.ScrollBar.MIN_SLIDER_SIZE) {
+    var delta = this.endRatio_ - this.startRatio_; //Here we suppose that delta remains constant.
+    //This expression can be calculated mathematically.
+    this.startRatio_ = (minPos - areaMin) * (1 - delta) / (areaLength - anychart.core.ui.ScrollBar.MIN_SLIDER_SIZE);
+    this.endRatio_ = Math.min(this.startRatio_ + delta, 1);
+  } else {
+    this.startRatio_ = anychart.math.round((minPos - areaMin) / areaLength, 5);
+    this.endRatio_ = anychart.math.round((maxPos - areaMin) / areaLength, 5);
+  }
 
   this.synchronizeBoundsToRatio_();
 
@@ -1259,50 +1281,43 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
   var round = Math.min(anychart.core.ui.ScrollBar.MAX_ROUND, width / 2);
 
   this.bg_.setBounds(b).round(round);
-  var sliderLeft, sliderTop, sliderWidth, sliderHeight;
+  var sliderLeft, sliderTop;
   var drag, dragLeft, dragTop, dragWidth, dragHeight;
 
   if (this.buttonsVisible_) {
     var buttonWidth = this.forwardButton_.width();
     var buttonHeight = this.forwardButton_.height();
 
-    dragLeft = isVertical ?
-        b.left :
-        b.left + buttonWidth + 1;
-
-    dragTop = isVertical ?
-        b.top + buttonHeight + 1 :
-        b.top;
-
-    dragWidth = isVertical ?
-        b.width :
-        b.width - 2 * (buttonWidth + 1);
-
-    dragHeight = isVertical ?
-        b.height - 2 * (buttonHeight + 1) :
-        b.height;
-
+    dragLeft = isVertical ? b.left : b.left + buttonWidth + 1;
+    dragTop = isVertical ? b.top + buttonHeight + 1 : b.top;
+    dragWidth = isVertical ? b.width : b.width - 2 * (buttonWidth + 1);
+    dragHeight = isVertical ? b.height - 2 * (buttonHeight + 1) : b.height;
     drag = new acgraph.math.Rect(/** @type {number} */ (dragLeft), /** @type {number} */ (dragTop), dragWidth, dragHeight);
-
   } else {
     drag = b.clone();
   }
 
-  sliderLeft = isVertical ?
-      b.left :
-      anychart.math.round(drag.left + this.startRatio_ * drag.width, 1);
+  var dragSize = isVertical ? drag.height : drag.width;
 
-  sliderTop = isVertical ?
-      anychart.math.round(drag.top + this.startRatio_ * drag.height, 1) :
-      b.top;
+  var sliderPotentialSize = anychart.math.round(dragSize * (this.endRatio_ - this.startRatio_), 1);
+  var sliderSize = sliderPotentialSize;
+  var enlarge = false;
+  if (sliderPotentialSize < anychart.core.ui.ScrollBar.MIN_SLIDER_SIZE) {
+    enlarge = true;
+    sliderSize = anychart.core.ui.ScrollBar.MIN_SLIDER_SIZE;
+  }
 
-  sliderWidth = isVertical ?
-      b.width :
-      anychart.math.round(drag.width * (this.endRatio_ - this.startRatio_), 1);
+  if (enlarge) {
+    var sliderOffset = this.startRatio_ * (dragSize - sliderSize) / (1 + this.startRatio_ - this.endRatio_);
+    sliderLeft = isVertical ? b.left : anychart.math.round(drag.left + sliderOffset, 1);
+    sliderTop = isVertical ? anychart.math.round(drag.top + sliderOffset, 1) : b.top;
+  } else {
+    sliderLeft = isVertical ? b.left : anychart.math.round(drag.left + this.startRatio_ * drag.width, 1);
+    sliderTop = isVertical ? anychart.math.round(drag.top + this.startRatio_ * drag.height, 1) : b.top;
+  }
 
-  sliderHeight = isVertical ?
-      anychart.math.round(drag.height * (this.endRatio_ - this.startRatio_), 1) :
-      b.height;
+  var sliderWidth = isVertical ? b.width : sliderSize;
+  var sliderHeight = isVertical ? sliderSize : b.height;
 
   this.slider_
       .setX(this.halfPixel(sliderLeft))
@@ -1364,7 +1379,7 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.SCROLLBAR_POSITION)) {
-      if (this.startRatio_ <= 0 && this.endRatio_ >= 1) {
+      if ((this.startRatio_ <= 0 && this.endRatio_ >= 1) || this.startRatio_ == this.endRatio_) {
         this.getBase_().visible(false);
       } else {
         this.getBase_().visible(true);

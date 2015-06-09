@@ -5,7 +5,6 @@ goog.require('anychart.core.ui.Credits');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
-goog.require('anychart.core.utils.PrintHelper');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');

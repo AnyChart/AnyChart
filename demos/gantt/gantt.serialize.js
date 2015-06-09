@@ -1,37 +1,65 @@
-var toolbar;
+var projectChart1, resourceChart1;
+var projectChart2, resourceChart2;
+var restoredProject, restoredResource;
+
+
 anychart.onDocumentReady(function() {
-  var newData = getNewData();
+  prepareProject1();
+  prepareResource1();
+  prepareProject2();
+  prepareResource2();
+});
 
-  //create data tree on our data
-  var treeData = anychart.data.tree(newData, anychart.enums.TreeFillingMethod.AS_TABLE);
 
-  //create project gantt chart
-  chart = anychart.ganttResource();
+function prepareProject1() {
+  var treeData = anychart.data.tree(getProjectData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+  treeData.createIndexOn('name');
 
-  toolbar = anychart.ganttToolbar();
-  toolbar.container('container');
-  toolbar.target(chart);
-  toolbar.draw();
+  projectChart1 = anychart.ganttProject();
+  projectChart1.container('c1');
+  projectChart1.data(treeData);
+  projectChart1.splitterPosition('33%');
 
-  //set container id for the chart
-  chart.container('container');
+  var dataGrid = projectChart1.dataGrid();
 
-  //set data for the chart
-  chart.data(treeData);
+  var firstColumn = dataGrid.column(0);
+  firstColumn.cellTextSettings().hAlign('center');
 
-  //set start splitter position settings
-  chart.splitterPosition(320);
+  var secondColumn = dataGrid.column(1);
+  secondColumn.width(200);
+  secondColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
-  //Toolbar is rendered in the same container as chart. Toolbar displaces chart and it hides the bottom of chart.
-  //Adding a bottom margin makes the bottom of chart visible again.
-  chart.margin(28, 0, 0, 0);
+  //set third column settings
+  var thirdColumn = dataGrid.column(20);
+  thirdColumn.title('Baseline Start');
+  thirdColumn.width(100);
+  thirdColumn.textFormatter(thirdColumnTextFormatter);
+  thirdColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
 
-  //get chart data grid link to set column settings
-  var dataGrid = chart.dataGrid();
+  var fourthColumn = dataGrid.column(30);
+  fourthColumn.title().text('Baseline End');
+  fourthColumn.width(100);
+  fourthColumn.textFormatter(fourthColumnTextFormatter);
+  fourthColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
+
+  projectChart1.draw();
+
+  projectChart1.zoomTo(Date.UTC(2010, 0, 8, 15), Date.UTC(2010, 3, 25, 20));
+}
+
+
+function prepareResource1() {
+  var treeData = anychart.data.tree(getResourceData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+
+  resourceChart1 = anychart.ganttResource();
+  resourceChart1.container('c2');
+  resourceChart1.data(treeData);
+  resourceChart1.splitterPosition('33%');
+
+  var dataGrid = resourceChart1.dataGrid();
 
   dataGrid.column(0).enabled(false);
 
-  //set first column settings
   var firstColumn = dataGrid.column(1);
   firstColumn.title('Server');
   firstColumn.width(140);
@@ -41,7 +69,6 @@ anychart.onDocumentReady(function() {
   });
   firstColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  //set first column settings
   var secondColumn = dataGrid.column(2);
   secondColumn.title('Online');
   secondColumn.width(60);
@@ -52,8 +79,7 @@ anychart.onDocumentReady(function() {
   secondColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
 
-  //set first column settings
-  var thirdColumn = dataGrid.column(3);
+  var thirdColumn = dataGrid.column(30);
   thirdColumn.title('Maintenance');
   thirdColumn.width(60);
   thirdColumn.cellTextSettings().hAlign('right');
@@ -63,8 +89,7 @@ anychart.onDocumentReady(function() {
   thirdColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
 
-  //set first column settings
-  var fourthColumn = dataGrid.column(4);
+  var fourthColumn = dataGrid.column(40);
   fourthColumn.title('Offline');
   fourthColumn.width(60);
   fourthColumn.cellTextSettings().hAlign('right');
@@ -73,75 +98,142 @@ anychart.onDocumentReady(function() {
   });
   fourthColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  var timeline = chart.getTimeline();
-  timeline.selectedElementStroke(null);
+  var timeline = resourceChart1.getTimeline();
   timeline.selectedElementFill('#c2f');
+  timeline.selectedElementStroke(null);
 
+  resourceChart1.draw();
 
-  //initiate chart drawing
-  chart.draw();
+  resourceChart1.zoomTo(Date.UTC(2008, 1, 10, 15), Date.UTC(2008, 1, 20, 20));
+}
 
-  chart.zoomTo(Date.UTC(2008, 0, 31, 1, 36), Date.UTC(2008, 1, 15, 10, 3));
+function prepareProject2() {
+  var treeData = anychart.data.tree(getProjectData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+  treeData.createIndexOn('name');
 
-  //--------------------------------------------------
-  // External events
-  //--------------------------------------------------
-  chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Clicked:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+  projectChart2 = anychart.ganttProject();
+  projectChart2.container('c3');
+  projectChart2.data(treeData);
+  projectChart2.splitterPosition('33%');
+
+  var dataGrid = projectChart2.dataGrid();
+
+  var firstColumn = dataGrid.column(0);
+  firstColumn.cellTextSettings().hAlign('center');
+
+  var secondColumn = dataGrid.column(1);
+  secondColumn.width(200);
+  secondColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
+
+  //set third column settings
+  var thirdColumn = dataGrid.column(20);
+  thirdColumn.title('Baseline Start');
+  thirdColumn.width(100);
+  thirdColumn.textFormatter(thirdColumnTextFormatter);
+  thirdColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
+
+  var fourthColumn = dataGrid.column(30);
+  fourthColumn.title().text('Baseline End');
+  fourthColumn.width(100);
+  fourthColumn.textFormatter(fourthColumnTextFormatter);
+  fourthColumn.cellTextSettingsOverrider(labelTextSettingsFormatter);
+
+  projectChart2.draw();
+
+  projectChart2.zoomTo(Date.UTC(2010, 0, 8, 15), Date.UTC(2010, 3, 25, 20));
+}
+
+function prepareResource2() {
+  var treeData = anychart.data.tree(getResourceData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+
+  resourceChart2 = anychart.ganttResource();
+  resourceChart2.container('c4');
+  resourceChart2.data(treeData);
+  resourceChart2.splitterPosition('33%');
+
+  var dataGrid = resourceChart2.dataGrid();
+
+  dataGrid.column(0).enabled(false);
+
+  var firstColumn = dataGrid.column(1);
+  firstColumn.title('Server');
+  firstColumn.width(140);
+  firstColumn.cellTextSettings().hAlign('left');
+  firstColumn.textFormatter(function(item) {
+    return item.get('name');
   });
+  firstColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  chart.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
-    console.log('Selected:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+  var secondColumn = dataGrid.column(2);
+  secondColumn.title('Online');
+  secondColumn.width(60);
+  secondColumn.cellTextSettings().hAlign('right');
+  secondColumn.textFormatter(function(item) {
+    return item.get('online') || '';
   });
+  secondColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  chart.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Double clicked:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+
+  var thirdColumn = dataGrid.column(30);
+  thirdColumn.title('Maintenance');
+  thirdColumn.width(60);
+  thirdColumn.cellTextSettings().hAlign('right');
+  thirdColumn.textFormatter(function(item) {
+    return item.get('maintenance') || '';
   });
+  thirdColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
-    //e.preventDefault();
-    console.log('Mouse over:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
+
+  var fourthColumn = dataGrid.column(40);
+  fourthColumn.title('Offline');
+  fourthColumn.width(60);
+  fourthColumn.cellTextSettings().hAlign('right');
+  fourthColumn.textFormatter(function(item) {
+    return item.get('offline') || '';
   });
+  fourthColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
 
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
-    //e.preventDefault();
-    console.log('Mouse move:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
-  });
+  var timeline = resourceChart2.getTimeline();
+  timeline.selectedElementFill('#c2f');
+  timeline.selectedElementStroke(null);
 
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
-    //e.preventDefault();
-    console.log('Mouse out:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
-  });
+  resourceChart2.draw();
 
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
-    //e.preventDefault();
-    console.log('Mouse up:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
-  });
+  resourceChart2.zoomTo(Date.UTC(2008, 1, 10, 15), Date.UTC(2008, 1, 20, 20));
+}
 
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
-    //e.preventDefault();
-    console.log('Mouse down:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
-  });
+function restoreProjectXML() {
+  document.getElementById('restore1').disabled = true;
+  var projectConfig = projectChart1.toXml();
+  restoredProject = anychart.fromXml(projectConfig);
+  restoredProject.container('c1restored');
+  restoredProject.draw();
+}
 
-});
+function restoreResourceXML() {
+  document.getElementById('restore2').disabled = true;
+  var resourceConfig = resourceChart1.toXml();
+  restoredResource = anychart.fromXml(resourceConfig);
+  restoredResource.container('c2restored');
+  restoredResource.draw();
+}
+
+
+function restoreProjectJSON() {
+  document.getElementById('restore3').disabled = true;
+  var projectConfig = projectChart2.toJson(false, document.getElementById('checkJSON').checked);
+  restoredProject = anychart.fromJson(projectConfig);
+  restoredProject.container('c3restored');
+  restoredProject.draw();
+}
+
+function restoreResourceJSON() {
+  document.getElementById('restore4').disabled = true;
+  var resourceConfig = resourceChart2.toJson(false, document.getElementById('checkJSON').checked);
+  restoredResource = anychart.fromJson(resourceConfig);
+  restoredResource.container('c4restored');
+  restoredResource.draw();
+}
 
 
 function labelTextSettingsOverrider(label, item) {
@@ -159,7 +251,60 @@ function labelTextSettingsOverrider(label, item) {
 }
 
 
-function getNewData() {
+//add bold and italic text settings to all parent items
+function labelTextSettingsFormatter(label, dataItem) {
+  if (dataItem.numChildren()) {
+    label.fontWeight('bold').fontStyle('italic');
+  }
+}
+
+//do pretty formatting for dates in third column
+function thirdColumnTextFormatter(item) {
+  var field = item.get(anychart.enums.GanttDataFields.BASELINE_START);
+
+  //format base line text
+  if (field) {
+    var baselineStart = new Date(field);
+    return formatDate(baselineStart.getUTCMonth() + 1) + '/' +
+        formatDate(baselineStart.getUTCDate()) + '/' + baselineStart.getUTCFullYear() + ' ' +
+        formatDate(baselineStart.getUTCHours()) + ':' +
+        formatDate(baselineStart.getUTCMinutes());
+  } else {
+    //format milestone text
+    var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
+    var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+    if ((actualStart == actualEnd) || (actualStart && !actualEnd)) {
+      var start = new Date(actualStart);
+      return formatDate(start.getUTCMonth() + 1) + '/' +
+          formatDate(start.getUTCDate()) + '/' + start.getUTCFullYear() + ' ' +
+          formatDate(start.getUTCHours()) + ':' +
+          formatDate(start.getUTCMinutes());
+    }
+    return '';
+  }
+}
+
+//do pretty formatting for dates in fourth column
+function fourthColumnTextFormatter(item) {
+  var field = item.get(anychart.enums.GanttDataFields.BASELINE_END);
+  if (field) {
+    var baselineEnd = new Date(field);
+    return formatDate((baselineEnd.getUTCMonth() + 1)) + '/' +
+        formatDate(baselineEnd.getUTCDate()) + '/' + baselineEnd.getUTCFullYear() + ' ' +
+        formatDate(baselineEnd.getUTCHours()) + ':' +
+        formatDate(baselineEnd.getUTCMinutes());
+  } else {
+    return '';
+  }
+}
+
+//do pretty formatting for passed date unit
+function formatDate(dateUnit) {
+  if (dateUnit < 10) dateUnit = '0' + dateUnit;
+  return dateUnit + '';
+}
+
+function getResourceData() {
   return [
     {
       'id': '1',
@@ -6648,5 +6793,383 @@ function getNewData() {
       ]
     }
 
+  ];
+}
+
+function getProjectData() {
+  return [
+    {
+      'id': 'pre-planning',
+      'name': 'Pre-planning',
+      'actualStart': Date.UTC(2010, 0, 17, 8),
+      'actualEnd': Date.UTC(2010, 1, 5, 18),
+      'progressValue': '17%',
+      'baselineStart': Date.UTC(2010, 0, 10, 8),
+      'baselineEnd': Date.UTC(2010, 1, 4, 8),
+      'rowHeight': 27,
+      'qwer': {'hui': 150},
+      'asdf': [1, 2, 3]
+    },
+
+    {
+      'id': 'investigate',
+      'name': 'Investigate the task',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 17, 8),
+      'actualEnd': Date.UTC(2010, 0, 25, 12),
+      'progressValue': '15%',
+      'baselineStart': Date.UTC(2010, 0, 18, 10),
+      'baselineEnd': Date.UTC(2010, 0, 23, 16),
+      'rowHeight': 27,
+      'connectTo': 'distribute'
+    },
+
+    {
+      'id': 'distribute',
+      'name': 'Distribute roles and resources',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 25, 12),
+      'actualEnd': Date.UTC(2010, 0, 30, 16),
+      'progressValue': '0%',
+      'baselineStart': Date.UTC(2010, 0, 20, 8),
+      'baselineEnd': Date.UTC(2010, 0, 27, 20),
+      'rowHeight': 27,
+      'connectTo': 'documents'
+    },
+
+    {
+      'id': 'documents',
+      'name': 'Gather technical documentation',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 0, 27, 12),
+      'actualEnd': Date.UTC(2010, 1, 6, 10),
+      'progressValue': '65%',
+      'baselineStart': Date.UTC(2010, 0, 23, 8),
+      'baselineEnd': Date.UTC(2010, 1, 4, 20),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'planning-report',
+      'name': 'Summary planning report',
+      'parent': 'pre-planning',
+      'actualStart': Date.UTC(2010, 1, 4, 8),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'proto-impl',
+      'name': 'Prototype Implementation',
+      'actualStart': Date.UTC(2010, 0, 25, 8),
+      'actualEnd': Date.UTC(2010, 2, 21, 15),
+      'progressValue': '42%',
+      'baselineStart': Date.UTC(2010, 0, 21, 8),
+      'baselineEnd': Date.UTC(2010, 2, 19, 18),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'evaluate-phase',
+      'name': 'Evaluate development phase',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 0, 27, 8),
+      'actualEnd': Date.UTC(2010, 1, 1, 15),
+      'progressValue': '10%',
+      'baselineStart': Date.UTC(2010, 0, 21, 8),
+      'baselineEnd': Date.UTC(2010, 0, 27, 16),
+      'rowHeight': 27,
+      'actual': {
+        'label': {
+          'fontColor': '#333',
+          'value': 'Evaluating ~10%',
+          'position': 'left',
+          'anchor': 'centerRight',
+          'fontWeight': 'bold'
+        }
+      },
+      'connectTo': 'step1'
+    },
+
+    {
+      'id': 'evaluate-tech',
+      'name': 'Evaluate available technologies',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 1, 22, 15),
+      'actualEnd': Date.UTC(2010, 2, 4, 12),
+      'progressValue': '30%',
+      'baselineStart': Date.UTC(2010, 1, 18, 8),
+      'baselineEnd': Date.UTC(2010, 2, 3, 10),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'dev-kit',
+      'name': 'Choose development kit',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 2, 10, 8),
+      'actualEnd': Date.UTC(2010, 2, 21, 15),
+      'progressValue': '14%',
+      'baselineStart': Date.UTC(2010, 2, 9, 8),
+      'baselineEnd': Date.UTC(2010, 2, 21, 15),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'proto-def',
+      'name': 'Define the Architecture of the Prototype',
+      'parent': 'proto-impl',
+      'actualStart': Date.UTC(2010, 1, 2, 8),
+      'actualEnd': Date.UTC(2010, 2, 12, 18),
+      'progressValue': '68%',
+      'baselineStart': Date.UTC(2010, 0, 30, 8),
+      'baselineEnd': Date.UTC(2010, 2, 11, 18),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'step1',
+      'name': 'Step1: Build prototype',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 1, 2, 8),
+      'actualEnd': Date.UTC(2010, 1, 15, 16),
+      'progressValue': '33%',
+      'baselineStart': Date.UTC(2010, 1, 1, 10),
+      'baselineEnd': Date.UTC(2010, 1, 14, 10),
+      'rowHeight': 27,
+      'connectTo': 'step2'
+    },
+
+    {
+      'id': 'step2',
+      'name': 'Step2: Collect results',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 1, 20, 8),
+      'actualEnd': Date.UTC(2010, 1, 27, 16),
+      'progressValue': '80%',
+      'baselineStart': Date.UTC(2010, 1, 14, 10),
+      'baselineEnd': Date.UTC(2010, 1, 25, 18),
+      'rowHeight': 27,
+      'connectTo': 'step3',
+      'baseline': {
+        'label': {
+          'value': 're-evaluate'
+        }
+      }
+    },
+
+    {
+      'id': 'step3',
+      'name': 'Step3: Analyze results',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 2, 1, 8),
+      'actualEnd': Date.UTC(2010, 2, 11, 18),
+      'progressValue': '0%',
+      'baselineStart': Date.UTC(2010, 2, 1, 8),
+      'baselineEnd': Date.UTC(2010, 2, 11, 10),
+      'rowHeight': 27,
+      'connectTo': 'follow-up'
+    },
+
+    {
+      'id': 'follow-up',
+      'name': 'Follow up with stuff',
+      'parent': 'proto-def',
+      'actualStart': Date.UTC(2010, 2, 12, 8),
+      'actualEnd': Date.UTC(2010, 2, 16, 18),
+      'progressValue': '74%',
+      'baselineStart': Date.UTC(2010, 2, 12, 10),
+      'baselineEnd': Date.UTC(2010, 2, 13, 12),
+      'rowHeight': 27,
+      'connectTo': 'approval1'
+    },
+
+    {
+      'id': 'approval1',
+      'name': 'First customer approval',
+      'actualStart': Date.UTC(2010, 2, 21, 18),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'approved-impl',
+      'name': 'Approved Implementation',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '12%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 27,
+      'connectTo': 'approval2'
+    },
+
+    {
+      'id': 'parallel3',
+      'name': 'Parallel task: Engine development',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '4%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'parallel2',
+      'name': 'Parallel task: Engine debugging',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '16%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 27,
+      'connectTo': 'parallel3',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'parallel1',
+      'name': 'Parallel task: Major features documentation',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '23%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 27,
+      'connectTo': 'parallel2',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'parallel0',
+      'name': 'Paralleling the tasks',
+      'parent': 'approved-impl',
+      'actualStart': Date.UTC(2010, 2, 22, 8),
+      'actualEnd': Date.UTC(2010, 3, 17, 18),
+      'progressValue': '64%',
+      'baselineStart': Date.UTC(2010, 2, 22, 8),
+      'baselineEnd': Date.UTC(2010, 3, 17, 18),
+      'rowHeight': 27,
+      'connectTo': 'parallel1',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'approval2',
+      'name': 'Second customer approval',
+      'actualStart': Date.UTC(2010, 3, 24, 10),
+      'rowHeight': 27,
+      'connectTo': 'production'
+    },
+
+    {
+      'id': 'production',
+      'name': 'Production Phase',
+      'actualStart': Date.UTC(2010, 3, 28, 8),
+      'actualEnd': Date.UTC(2010, 5, 15, 18),
+      'progressValue': '12%',
+      'baselineStart': Date.UTC(2010, 3, 25, 10),
+      'baselineEnd': Date.UTC(2010, 5, 16, 18),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'assemble',
+      'name': 'Assemble the production resources',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 3, 28, 8),
+      'actualEnd': Date.UTC(2010, 4, 3, 18),
+      'progressValue': '50%',
+      'baselineStart': Date.UTC(2010, 3, 26, 8),
+      'baselineEnd': Date.UTC(2010, 4, 2, 12),
+      'rowHeight': 27,
+      'connectTo': 'risks'
+    },
+
+    {
+      'id': 'risks',
+      'name': 'Confirm the risks',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 4, 10, 8),
+      'actualEnd': Date.UTC(2010, 4, 21, 18),
+      'progressValue': '22%',
+      'baselineStart': Date.UTC(2010, 4, 10, 14),
+      'baselineEnd': Date.UTC(2010, 4, 20, 16),
+      'rowHeight': 27,
+      'connectTo': 'development',
+      'connectorType': 'startStart'
+    },
+
+    {
+      'id': 'development',
+      'name': 'Development',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 4, 3, 8),
+      'actualEnd': Date.UTC(2010, 6, 1, 14),
+      'progressValue': '82%',
+      'baselineStart': Date.UTC(2010, 4, 3, 8),
+      'baselineEnd': Date.UTC(2010, 5, 14, 15),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'basic-testing',
+      'name': 'Basic testing',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 5, 1, 8),
+      'actualEnd': Date.UTC(2010, 5, 24, 18),
+      'progressValue': '41%',
+      'baselineStart': Date.UTC(2010, 4, 29, 9),
+      'baselineEnd': Date.UTC(2010, 5, 27, 18),
+      'rowHeight': 27,
+      'connectTo': 'final-testing'
+    },
+
+    {
+      'id': 'final-testing',
+      'name': 'Final testing',
+      'parent': 'production',
+      'actualStart': Date.UTC(2010, 5, 25, 8),
+      'actualEnd': Date.UTC(2010, 6, 20, 18),
+      'progressValue': '5%',
+      'baselineStart': Date.UTC(2010, 5, 20, 10),
+      'baselineEnd': Date.UTC(2010, 6, 17, 18),
+      'rowHeight': 27,
+      'connectTo': 'delivery'
+    },
+
+    {
+      'id': 'perf-testing1',
+      'name': 'Phase 1: Performance testing',
+      'parent': 'final-testing',
+      'actualStart': Date.UTC(2010, 5, 25, 8),
+      'actualEnd': Date.UTC(2010, 6, 4, 18),
+      'progressValue': '15%',
+      'baselineStart': Date.UTC(2010, 5, 20, 10),
+      'baselineEnd': Date.UTC(2010, 6, 5, 18),
+      'rowHeight': 27,
+      'connectTo': 'perf-testing2'
+    },
+
+    {
+      'id': 'perf-testing2',
+      'name': 'Phase 2: Performance testing',
+      'parent': 'final-testing',
+      'actualStart': Date.UTC(2010, 6, 5, 8),
+      'actualEnd': Date.UTC(2010, 6, 27, 18),
+      'progressValue': '35%',
+      'baselineStart': Date.UTC(2010, 6, 20, 10),
+      'baselineEnd': Date.UTC(2010, 7, 2, 16),
+      'rowHeight': 27
+    },
+
+    {
+      'id': 'delivery',
+      'name': 'Product delivery',
+      'actualStart': Date.UTC(2010, 5, 26, 8),
+      'rowHeight': 27
+    }
   ];
 }

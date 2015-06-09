@@ -684,6 +684,7 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (this.changedSettings['rotation']) json['rotation'] = this.rotation();
   if (this.changedSettings['width']) json['width'] = this.width();
   if (this.changedSettings['height']) json['height'] = this.height();
+
   return json;
 };
 
@@ -700,6 +701,8 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
   this.rotation(config['rotation']);
   this.width(config['width']);
   this.height(config['height']);
+  this.textFormatter(config['textFormatter']);
+  this.positionFormatter(config['positionFormatter']);
 };
 
 
@@ -2162,6 +2165,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
   this.adjustFontSize(config['adjustFontSize']);
   this.minFontSize(config['minFontSize']);
   this.minFontSize(config['minFontSize']);
+  this.textFormatter(config['textFormatter']);
+  this.positionFormatter(config['positionFormatter']);
   if (!goog.isDef(config['enabled'])) delete this.settingsObj.enabledLabel;
 };
 

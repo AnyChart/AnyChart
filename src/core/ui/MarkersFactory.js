@@ -124,7 +124,7 @@ anychart.core.ui.MarkersFactory = function() {
    * @type {Function}
    * @private
    */
-  this.positionFormatter_ = null;
+  this.positionFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
    * Markers array.
@@ -1097,6 +1097,7 @@ anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config) {
   this.size(config['size']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
+  this.positionFormatter(config['positionFormatter']);
 };
 
 
@@ -1680,6 +1681,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   if (goog.isDef(this.fill())) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   if (goog.isDef(this.stroke())) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   if (!goog.isDef(this.enabled())) delete json['enabled'];
+
   return json;
 };
 
@@ -1695,6 +1697,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) 
   this.size(config['size']);
   this.fill(config['fill']);
   this.stroke(config['stroke']);
+  this.positionFormatter(config['positionFormatter']);
   if (!goog.isDef(config['enabled'])) delete this.settingsObj['enabled'];
 };
 

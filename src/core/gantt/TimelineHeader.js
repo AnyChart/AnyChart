@@ -29,18 +29,25 @@ anychart.core.gantt.TimelineHeader = function() {
   this.base_ = null;
 
   /**
-   * Background rect.
+   * Related scale.
+   * @type {anychart.scales.GanttDateTime}
+   * @private
+   */
+  this.scale_ = null;
+
+  /**
+   * BG rect.
    * @type {acgraph.vector.Rect}
    * @private
    */
   this.bgRect_ = null;
 
   /**
-   * Related scale.
-   * @type {anychart.scales.GanttDateTime}
+   * Background fill.
+   * @type {acgraph.vector.Fill}
    * @private
    */
-  this.scale_ = null;
+  this.backgroundFill_ = acgraph.vector.normalizeFill('#ccd7e1');
 
   /**
    * Levels of header.
@@ -98,7 +105,7 @@ anychart.core.gantt.TimelineHeader.prototype.getBase_ = function() {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.registerDisposable(this.base_);
     this.bgRect_ = this.base_.rect();
-    this.bgRect_.fill('#fff').stroke(null);
+    this.bgRect_.fill(this.backgroundFill_).stroke(null);
     this.registerDisposable(this.bgRect_);
   }
   return this.base_;
@@ -167,6 +174,30 @@ anychart.core.gantt.TimelineHeader.prototype.scale = function(opt_value) {
 
 
 /**
+ * Gets/sets background fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.gantt.TimelineHeader|string} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.TimelineHeader.prototype.backgroundFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_), val)) {
+      this.backgroundFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.backgroundFill_;
+};
+
+
+/**
  * Draws timeline header.
  * @return {anychart.core.gantt.TimelineHeader} - Itself for method chaining.
  */
@@ -192,13 +223,19 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
         if (this.levels_[i].enabled()) counter++;
       }
 
-      var height = counter ? this.pixelBoundsCache_.height / counter : 0;
+      var height = counter ? Math.floor(this.pixelBoundsCache_.height / counter) : 0;
+
+      var actualHeight = 0;
       var top = this.pixelBoundsCache_.top;
       for (i = 0, l = this.levels_.length; i < l; i++) {
         level = this.levels_[i];
         if (level.enabled()) {
+          if (i == l - 1) {
+            height = this.pixelBoundsCache_.height - actualHeight;
+          }
           level.bounds().set(this.pixelBoundsCache_.left, top, this.pixelBoundsCache_.width, height);
-          top += height;
+          top += (height + 1);
+          actualHeight += (height + 1);
         }
       }
 
@@ -225,6 +262,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+      this.bgRect_.fill(this.backgroundFill_);
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
@@ -299,7 +337,7 @@ anychart.core.gantt.TimelineHeader.Level = function(header) {
 
   /**
    * Background rect.
-   * @type {acgraph.vector.Rect}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.bgRect_ = null;
@@ -310,13 +348,6 @@ anychart.core.gantt.TimelineHeader.Level = function(header) {
    * @private
    */
   this.backgroundFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
-
-  /**
-   * Separation path.
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.separationPath_ = null;
 
   /**
    * Ticks cache.
@@ -330,8 +361,7 @@ anychart.core.gantt.TimelineHeader.Level = function(header) {
    * Takes four arguments:
    *  1) Tile start date timestamp.
    *  2) Tile end date timestamp.
-   *  3) Interval of tile.
-   *  4) Straight index of tile.
+   *  3) Straight index of tile.
    *
    * @type {function(number, number, number):string}
    * @private
@@ -519,10 +549,8 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
 
     //Ensure DOM structure is created.
     if (!this.getBase_().numChildren()) {
-      this.bgRect_ = this.getBase_().rect();
+      this.bgRect_ = this.getBase_().path();
       this.bgRect_.fill(this.backgroundFill_).stroke(null);
-      this.separationPath_ = this.getBase_().path();
-      this.separationPath_.stroke('#999');
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -538,7 +566,6 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = this.getPixelBounds();
-      this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.getBase_().clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
@@ -553,13 +580,10 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
     }
 
     if (redrawTicks) {
+      this.bgRect_.clear();
+
       this.getLabelsFactory_().suspendSignalsDispatching();
       this.getLabelsFactory_().clear();
-
-      this.separationPath_
-          .clear()
-          .moveTo(this.pixelBoundsCache_.left, (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height))
-          .lineTo((this.pixelBoundsCache_.left + this.pixelBoundsCache_.width), (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height));
 
       for (var i = 0, l = this.ticks_.length - 1; i < l; i++) { //this.ticks_.length >= 2 anyway.
         var startTick = this.ticks_[i];
@@ -568,11 +592,15 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
         var endRatio = scale.timestampToRatio(endTick);
 
         var left = this.pixelBoundsCache_.left + startRatio * this.pixelBoundsCache_.width;
-        this.separationPath_
-            .moveTo(left, this.pixelBoundsCache_.top)
-            .lineTo(left, (this.pixelBoundsCache_.top + this.pixelBoundsCache_.height));
 
         var tileActualWidth = this.pixelBoundsCache_.width * (endRatio - startRatio);
+
+        this.bgRect_
+            .moveTo(left + .5, this.pixelBoundsCache_.top)
+            .lineTo(left + tileActualWidth - .5, this.pixelBoundsCache_.top)
+            .lineTo(left + tileActualWidth - .5, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+            .lineTo(left + .5, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+            .close();
 
         var formatProvider = {'value': this.textFormatter_(startTick, endTick, i)};
         var labelWidth = this.getLabelsFactory_().measure(formatProvider).width;
