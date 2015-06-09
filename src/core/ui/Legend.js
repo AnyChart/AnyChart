@@ -1682,7 +1682,7 @@ anychart.core.ui.Legend.prototype.handleMouseOver_ = function(event) {
         source.legendItemOver(item);
       }
       item.applyHover(true);
-      this.showTooltip(event);
+      if (event) this.showTooltip(event);
     }
   }
 };
@@ -1695,7 +1695,7 @@ anychart.core.ui.Legend.prototype.handleMouseOver_ = function(event) {
 anychart.core.ui.Legend.prototype.handleMouseMove_ = function(event) {
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
-    this.showTooltip(event);
+    if (event) this.showTooltip(event);
   }
 };
 

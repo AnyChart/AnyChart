@@ -279,30 +279,35 @@ anychart.core.scatter.series.Bubble.prototype.displayNegative = function(opt_val
 /** @inheritDoc */
 anychart.core.scatter.series.Bubble.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.colorizeShape(true);
-      this.applyHatchFill(true);
-    }
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
   }
+
+  //hover all points
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.colorizeShape(true);
+    this.applyHatchFill(true);
+  }
+
   this.hoverStatus = -1;
   return this;
 };
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.Bubble.prototype.hoverPoint = function(index, event) {
+anychart.core.scatter.series.Bubble.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
@@ -310,7 +315,7 @@ anychart.core.scatter.series.Bubble.prototype.hoverPoint = function(index, event
     this.applyHatchFill(true);
     this.drawMarker(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
   }
   this.hoverStatus = index;
   return this;
@@ -320,15 +325,20 @@ anychart.core.scatter.series.Bubble.prototype.hoverPoint = function(index, event
 /** @inheritDoc */
 anychart.core.scatter.series.Bubble.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
-    if (goog.isDef(rect)) {
-      this.colorizeShape(false);
-      this.applyHatchFill(false);
-      this.drawMarker(false);
-      this.drawLabel(false);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
+      if (goog.isDef(rect)) {
+        this.colorizeShape(false);
+        this.applyHatchFill(false);
+        this.drawMarker(false);
+        this.drawLabel(false);
+      }
     }
-    this.hideTooltip();
   } else {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -596,8 +606,8 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(hover) {
       fill = this.getFinalHatchFill(true, hover);
     }
     hatchFillShape
-      .stroke(null)
-      .fill(fill);
+        .stroke(null)
+        .fill(fill);
   }
 };
 
@@ -669,7 +679,7 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(hover) {
  * @return {anychart.core.scatter.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.core.scatter.series.Bubble.prototype.negativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                        opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -746,7 +756,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeStroke = function(opt_stro
  * @return {anychart.core.scatter.series.Bubble|acgraph.vector.Stroke|Function} .
  */
 anychart.core.scatter.series.Bubble.prototype.hoverNegativeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                             opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverNegativeStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -772,9 +782,9 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
   return /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Stroke|Function} */(
-              iterator.get('hoverNegativeStroke') ||
-              this.hoverNegativeStroke() ||
-              normalColor),
+          iterator.get('hoverNegativeStroke') ||
+          this.hoverNegativeStroke() ||
+          normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -899,7 +909,7 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
  * @return {acgraph.vector.Fill|anychart.core.scatter.series.Bubble|Function} .
  */
 anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
-    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+                                                                      opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -1033,7 +1043,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
  * @return {acgraph.vector.Fill|anychart.core.scatter.series.Bubble|Function} .
  */
 anychart.core.scatter.series.Bubble.prototype.hoverNegativeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy,
-    opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+                                                                           opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     this.hoverNegativeFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
         opt_fillOrColorOrKeys :
@@ -1059,9 +1069,9 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeFill = function(ho
   return /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
-              iterator.get('hoverNegativeFill') ||
-              this.hoverNegativeFill() ||
-              normalColor),
+          iterator.get('hoverNegativeFill') ||
+          this.hoverNegativeFill() ||
+          normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -1305,9 +1315,6 @@ anychart.core.scatter.series.Bubble.prototype.restoreDefaults = function() {
 };
 
 
-//anychart.core.scatter.series.Bubble.prototype['hoverSeries'] = anychart.core.scatter.series.Bubble.prototype.hoverSeries;//inherited
-//anychart.core.scatter.series.Bubble.prototype['hoverPoint'] = anychart.core.scatter.series.Bubble.prototype.hoverPoint;//inherited
-//anychart.core.scatter.series.Bubble.prototype['unhover'] = anychart.core.scatter.series.Bubble.prototype.unhover;//inherited
 //exports
 anychart.core.scatter.series.Bubble.prototype['minimumSize'] = anychart.core.scatter.series.Bubble.prototype.minimumSize;//doc|ex
 anychart.core.scatter.series.Bubble.prototype['maximumSize'] = anychart.core.scatter.series.Bubble.prototype.maximumSize;//doc|ex
@@ -1324,3 +1331,4 @@ anychart.core.scatter.series.Bubble.prototype['stroke'] = anychart.core.scatter.
 anychart.core.scatter.series.Bubble.prototype['hoverStroke'] = anychart.core.scatter.series.Bubble.prototype.hoverStroke;//inherited
 anychart.core.scatter.series.Bubble.prototype['hatchFill'] = anychart.core.scatter.series.Bubble.prototype.hatchFill;//inherited
 anychart.core.scatter.series.Bubble.prototype['hoverHatchFill'] = anychart.core.scatter.series.Bubble.prototype.hoverHatchFill;//inherited
+anychart.core.scatter.series.Bubble.prototype['unhover'] = anychart.core.scatter.series.Bubble.prototype.unhover;

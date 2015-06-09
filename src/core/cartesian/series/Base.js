@@ -1488,6 +1488,18 @@ anychart.core.cartesian.series.Base.prototype.unhover = goog.abstractMethod;
 
 
 /**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {number=} opt_index
+ * @return {!anychart.core.cartesian.series.Base}  {@link anychart.core.cartesian.series.Base} instance for method chaining.
+ */
+anychart.core.cartesian.series.Base.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
+  else this.hoverSeries();
+  return this;
+};
+
+
+/**
  * Temporarily works only for acgraph.vector.Element.
  * @param {acgraph.vector.Element} element .
  * @param {boolean=} opt_seriesGlobal .
@@ -2751,3 +2763,4 @@ anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesia
 anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['error'] = anychart.core.cartesian.series.Base.prototype.error;
 anychart.core.cartesian.series.Base.prototype['legendItem'] = anychart.core.cartesian.series.Base.prototype.legendItem;
+anychart.core.cartesian.series.Base.prototype['hover'] = anychart.core.cartesian.series.Base.prototype.hover;

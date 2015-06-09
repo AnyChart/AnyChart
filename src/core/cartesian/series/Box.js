@@ -219,17 +219,17 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     var whiskerPath = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
 
     iterator
-      .meta('x', x)
-      .meta('low', low)
-      .meta('q1', q1)
-      .meta('median', median)
-      .meta('q3', q3)
-      .meta('high', high)
-      .meta('outliers', outliers)
-      .meta('shape', path)
-      .meta('medianPath', medianPath)
-      .meta('stemPath', stemPath)
-      .meta('whiskerPath', whiskerPath);
+        .meta('x', x)
+        .meta('low', low)
+        .meta('q1', q1)
+        .meta('median', median)
+        .meta('q3', q3)
+        .meta('high', high)
+        .meta('outliers', outliers)
+        .meta('shape', path)
+        .meta('medianPath', medianPath)
+        .meta('stemPath', stemPath)
+        .meta('whiskerPath', whiskerPath);
 
     var pointWidth = this.getPointWidth();
 
@@ -277,12 +277,12 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
  */
 anychart.core.cartesian.series.Box.prototype.drawBox_ = function(path, x, q1, q3, halfPointWidth) {
   path
-    .clear()
-    .moveTo(x - halfPointWidth, q1)
-    .lineTo(x + halfPointWidth, q1)
-    .lineTo(x + halfPointWidth, q3)
-    .lineTo(x - halfPointWidth, q3)
-    .close();
+      .clear()
+      .moveTo(x - halfPointWidth, q1)
+      .lineTo(x + halfPointWidth, q1)
+      .lineTo(x + halfPointWidth, q3)
+      .lineTo(x - halfPointWidth, q3)
+      .close();
 };
 
 
@@ -296,9 +296,9 @@ anychart.core.cartesian.series.Box.prototype.drawBox_ = function(path, x, q1, q3
  */
 anychart.core.cartesian.series.Box.prototype.drawMedian_ = function(path, x, median, halfPointWidth) {
   path
-    .clear()
-    .moveTo(x - halfPointWidth, median)
-    .lineTo(x + halfPointWidth, median);
+      .clear()
+      .moveTo(x - halfPointWidth, median)
+      .lineTo(x + halfPointWidth, median);
 };
 
 
@@ -314,11 +314,11 @@ anychart.core.cartesian.series.Box.prototype.drawMedian_ = function(path, x, med
  */
 anychart.core.cartesian.series.Box.prototype.drawStem_ = function(path, x, low, high, q1, q3) {
   path
-    .clear()
-    .moveTo(x, low)
-    .lineTo(x, q1)
-    .moveTo(x, q3)
-    .lineTo(x, high);
+      .clear()
+      .moveTo(x, low)
+      .lineTo(x, q1)
+      .moveTo(x, q3)
+      .lineTo(x, high);
 };
 
 
@@ -343,11 +343,11 @@ anychart.core.cartesian.series.Box.prototype.drawWhisker_ = function(hover) {
   var shift = path.strokeThickness() % 2 / 2;
 
   path
-    .clear()
-    .moveTo(x - whiskerWidthValue, low + shift)
-    .lineTo(x + whiskerWidthValue, low + shift)
-    .moveTo(x - whiskerWidthValue, high - shift)
-    .lineTo(x + whiskerWidthValue, high - shift);
+      .clear()
+      .moveTo(x - whiskerWidthValue, low + shift)
+      .lineTo(x + whiskerWidthValue, low + shift)
+      .moveTo(x - whiskerWidthValue, high - shift)
+      .lineTo(x + whiskerWidthValue, high - shift);
 };
 
 
@@ -470,10 +470,11 @@ anychart.core.cartesian.series.Box.prototype.createPositionProvider = function(p
 anychart.core.cartesian.series.Box.prototype.drawOutlierMarkers_ = function(hovered) {
   var iterator = this.getIterator();
   var outliers = iterator.meta('outliers');
-  var len = outliers.length;
 
-  if (!goog.isDefAndNotNull(outliers) || !goog.isArray(outliers) || len == 0)
+  if (!goog.isDefAndNotNull(outliers) || !goog.isArray(outliers) || outliers.length == 0)
     return;
+
+  var len = outliers.length;
 
   for (var i = 0; i < len; i++) {
     var pointMarker = iterator.get('outlierMarker');
@@ -604,11 +605,11 @@ anychart.core.cartesian.series.Box.prototype.getFinalMedianStroke_ = function(ho
       this.medianStroke());
   return /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
-      /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('hoverMedianStroke') ||
-      this.hoverMedianStroke() ||
-      normalColor),
-      normalColor) :
+          /** @type {acgraph.vector.Stroke|Function} */(
+          iterator.get('hoverMedianStroke') ||
+          this.hoverMedianStroke() ||
+          normalColor),
+          normalColor) :
       this.normalizeColor(normalColor));
 };
 
@@ -670,11 +671,11 @@ anychart.core.cartesian.series.Box.prototype.getFinalStemStroke_ = function(hove
       this.stemStroke());
   return /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
-      /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('hoverStemStroke') ||
-      this.hoverStemStroke() ||
-      normalColor),
-      normalColor) :
+          /** @type {acgraph.vector.Stroke|Function} */(
+          iterator.get('hoverStemStroke') ||
+          this.hoverStemStroke() ||
+          normalColor),
+          normalColor) :
       this.normalizeColor(normalColor));
 };
 
@@ -869,11 +870,11 @@ anychart.core.cartesian.series.Box.prototype.makePointEvent = function(event) {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event) {
+anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
@@ -883,7 +884,7 @@ anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event)
     this.drawOutlierMarkers_(true);
     this.drawLabel(true);
     this.drawWhisker_(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
   }
   this.hoverStatus = index;
   return this;
@@ -893,20 +894,25 @@ anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, event)
 /** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.colorizeShape(true);
-      this.applyHatchFill(true);
-      this.drawWhisker_(true);
-      this.drawOutlierMarkers_(true);
-    }
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
+  }
+
+  //hover all points
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.colorizeShape(true);
+    this.applyHatchFill(true);
+    this.drawWhisker_(true);
+    this.drawOutlierMarkers_(true);
+
   }
   this.hoverStatus = -1;
   return this;
@@ -916,17 +922,22 @@ anychart.core.cartesian.series.Box.prototype.hoverSeries = function() {
 /** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
-    if (goog.isDef(rect)) {
-      this.colorizeShape(false);
-      this.applyHatchFill(false);
-      this.drawWhisker_(false);
-      this.drawMarker(false);
-      this.drawOutlierMarkers_(false);
-      this.drawLabel(false);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
+      if (goog.isDef(rect)) {
+        this.colorizeShape(false);
+        this.applyHatchFill(false);
+        this.drawWhisker_(false);
+        this.drawMarker(false);
+        this.drawOutlierMarkers_(false);
+        this.drawLabel(false);
+      }
     }
-    this.hideTooltip();
   } else {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -1109,3 +1120,4 @@ anychart.core.cartesian.series.Box.prototype['hoverWhiskerWidth'] = anychart.cor
 
 anychart.core.cartesian.series.Box.prototype['outlierMarkers'] = anychart.core.cartesian.series.Box.prototype.outlierMarkers;
 anychart.core.cartesian.series.Box.prototype['hoverOutlierMarkers'] = anychart.core.cartesian.series.Box.prototype.hoverOutlierMarkers;
+anychart.core.cartesian.series.Box.prototype['unhover'] = anychart.core.cartesian.series.Box.prototype.unhover;

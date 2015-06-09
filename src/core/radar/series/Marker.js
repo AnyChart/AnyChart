@@ -341,19 +341,24 @@ anychart.core.radar.series.Marker.prototype.finalizeDrawing = function() {
  */
 anychart.core.radar.series.Marker.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker_(false, true);
-      this.applyHatchFill(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.drawMarker_(true, true);
-      this.applyHatchFill(true);
-    }
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker_(false, true);
+    this.applyHatchFill(false);
+    this.drawLabel(false);
+    this.hideTooltip();
+  }
+
+  //hover all points
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.drawMarker_(true, true);
+    this.applyHatchFill(true);
+
   }
   this.hoverStatus = -1;
   return this;
@@ -364,18 +369,18 @@ anychart.core.radar.series.Marker.prototype.hoverSeries = function() {
  * @inheritDoc
  * @return {!anychart.core.radar.series.Marker} {@link anychart.core.radar.series.Marker} instance for method chaining.
  */
-anychart.core.radar.series.Marker.prototype.hoverPoint = function(index, event) {
+anychart.core.radar.series.Marker.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
     this.drawMarker_(true, true);
     this.applyHatchFill(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
   }
   this.hoverStatus = index;
   return this;
@@ -388,11 +393,16 @@ anychart.core.radar.series.Marker.prototype.hoverPoint = function(index, event) 
  */
 anychart.core.radar.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker_(false, true);
-    this.applyHatchFill(false);
-    this.drawLabel(false);
-    this.hideTooltip();
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.drawMarker_(false, true);
+      this.applyHatchFill(false);
+      this.drawLabel(false);
+    }
   } else {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -550,9 +560,6 @@ anychart.core.radar.series.Marker.prototype.setupByJSON = function(config) {
 
 //anychart.core.radar.series.Marker.prototype['startDrawing'] = anychart.core.radar.series.Marker.prototype.startDrawing;
 //anychart.core.radar.series.Marker.prototype['finalizeDrawing'] = anychart.core.radar.series.Marker.prototype.finalizeDrawing;
-//anychart.core.radar.series.Marker.prototype['hoverSeries'] = anychart.core.radar.series.Marker.prototype.hoverSeries;
-//anychart.core.radar.series.Marker.prototype['hoverPoint'] = anychart.core.radar.series.Marker.prototype.hoverPoint;
-//anychart.core.radar.series.Marker.prototype['unhover'] = anychart.core.radar.series.Marker.prototype.unhover;
 //exports
 anychart.core.radar.series.Marker.prototype['stroke'] = anychart.core.radar.series.Marker.prototype.stroke;//inherited
 anychart.core.radar.series.Marker.prototype['hoverStroke'] = anychart.core.radar.series.Marker.prototype.hoverStroke;//inherited
@@ -564,3 +571,4 @@ anychart.core.radar.series.Marker.prototype['type'] = anychart.core.radar.series
 anychart.core.radar.series.Marker.prototype['hoverType'] = anychart.core.radar.series.Marker.prototype.hoverType;//doc|ex
 anychart.core.radar.series.Marker.prototype['hatchFill'] = anychart.core.radar.series.Marker.prototype.hatchFill;//inherited
 anychart.core.radar.series.Marker.prototype['hoverHatchFill'] = anychart.core.radar.series.Marker.prototype.hoverHatchFill;//inherited
+anychart.core.radar.series.Marker.prototype['unhover'] = anychart.core.radar.series.Marker.prototype.unhover;

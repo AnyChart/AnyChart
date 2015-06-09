@@ -1606,7 +1606,7 @@ anychart.charts.Pie.prototype.getFillColor = function(usePointSettings, hover) {
   return /** @type {!acgraph.vector.Fill} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Fill|Function} */(
-              (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
+          (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -1628,7 +1628,7 @@ anychart.charts.Pie.prototype.getStrokeColor = function(usePointSettings, hover)
   return /** @type {!acgraph.vector.Stroke} */(hover ?
       this.normalizeColor(
           /** @type {acgraph.vector.Stroke|Function} */(
-              (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
+          (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
           normalColor) :
       this.normalizeColor(normalColor));
 };
@@ -2140,8 +2140,8 @@ anychart.charts.Pie.prototype.applyHatchFill = function(hover) {
   var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta('hatchSlice'));
   if (goog.isDefAndNotNull(hatchSlice)) {
     hatchSlice
-      .stroke(null)
-      .fill(this.getFinalHatchFill(true, hover));
+        .stroke(null)
+        .fill(this.getFinalHatchFill(true, hover));
   }
 };
 
@@ -2207,6 +2207,34 @@ anychart.charts.Pie.prototype.hoverStatus = NaN;
 
 
 /**
+ * Hover all pie slices.
+ * @return {anychart.charts.Pie}
+ */
+anychart.charts.Pie.prototype.hoverSlices = function() {
+  if (this.hoverStatus == -1) return this;
+
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.colorizeSlice(false);
+      this.applyHatchFill(false);
+      this.drawLabel_(false, true);
+    }
+  }
+
+  var iterator = this.getIterator().reset();
+  while (iterator.advance()) {
+    this.colorizeSlice(true);
+    this.applyHatchFill(true);
+  }
+
+  this.hoverStatus = -1;
+  return this;
+};
+
+
+/**
  * Hovers pie slice by its index.
  * @param {number} index Index of the slice to hover.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate Slice hovering.
@@ -2216,15 +2244,14 @@ anychart.charts.Pie.prototype.hoverStatus = NaN;
 anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().reset().select(index))
-      this.showTooltip(opt_event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
     this.colorizeSlice(true);
     this.applyHatchFill(true);
-    if (goog.isDef(opt_event))
-      this.showTooltip(opt_event);
+    if (goog.isDef(opt_event)) this.showTooltip(opt_event);
     this.drawLabel_(true, true);
   }
   this.hoverStatus = index;
@@ -2238,13 +2265,37 @@ anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
  */
 anychart.charts.Pie.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.getIterator().select(this.hoverStatus)) {
-    this.colorizeSlice(false);
-    this.applyHatchFill(false);
-    this.hideTooltip();
-    this.drawLabel_(false, true);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.colorizeSlice(false);
+      this.applyHatchFill(false);
+      this.drawLabel_(false, true);
+    }
+  } else {
+    var iterator = this.getIterator().reset();
+    while (iterator.advance()) {
+      this.colorizeSlice(false);
+      this.applyHatchFill(false);
+      this.drawLabel_(false, true);
+    }
   }
   this.hoverStatus = NaN;
+  return this;
+};
+
+
+/**
+ * If index is passed, hovers a slice of the chart by its index, else hovers all slices of the chart.
+ * @param {number=} opt_index
+ * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Pie.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverSlice(opt_index);
+  else this.hoverSlices();
   return this;
 };
 
@@ -2783,15 +2834,13 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     var angle = (start + sweep / 2) * Math.PI / 180;
     var angleDeg = goog.math.standardAngle(goog.math.toDegrees(angle));
 
-    if (angleDeg > 270 &&
-        !switchToRightSide &&
+    if (angleDeg > 270 && !switchToRightSide &&
         (leftSideLabels.length != 0 || (leftSideLabels2 && leftSideLabels2.length != 0))) {
       switchToRightSide = true;
       rightSideLabels2 = [];
     }
 
-    if (angleDeg > 90 &&
-        !switchToLeftSide &&
+    if (angleDeg > 90 && !switchToLeftSide &&
         (rightSideLabels.length != 0 || (rightSideLabels2 && rightSideLabels2.length != 0))) {
       switchToLeftSide = true;
       leftSideLabels2 = [];
@@ -2865,7 +2914,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   domain = null;
   if (droppedLabels) {
     goog.array.sort(droppedLabels, function(a, b) {
-      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0});
+      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
+    });
 
     for (i = 0, len = droppedLabels.length; i < len; i++) {
       label = droppedLabels[i];
@@ -2949,7 +2999,8 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   domain = null;
   if (droppedLabels) {
     goog.array.sort(droppedLabels, function(a, b) {
-      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0});
+      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
+    });
 
     for (i = droppedLabels.length; i--;) {
       label = droppedLabels[i];
@@ -3685,3 +3736,5 @@ anychart.charts.Pie.prototype['outsideLabelsCriticalAngle'] = anychart.charts.Pi
 anychart.charts.Pie.prototype['connectorStroke'] = anychart.charts.Pie.prototype.connectorStroke;//doc|ex
 anychart.charts.Pie.prototype['hatchFillPalette'] = anychart.charts.Pie.prototype.hatchFillPalette;
 anychart.charts.Pie.prototype['getType'] = anychart.charts.Pie.prototype.getType;
+anychart.charts.Pie.prototype['hover'] = anychart.charts.Pie.prototype.hover;
+anychart.charts.Pie.prototype['unhover'] = anychart.charts.Pie.prototype.unhover;

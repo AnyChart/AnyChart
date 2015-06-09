@@ -1238,6 +1238,18 @@ anychart.core.polar.series.Base.prototype.unhover = goog.abstractMethod;
 
 
 /**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {number=} opt_index
+ * @return {!anychart.core.polar.series.Base}  {@link anychart.core.polar.series.Base} instance for method chaining.
+ */
+anychart.core.polar.series.Base.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
+  else this.hoverSeries();
+  return this;
+};
+
+
+/**
  * Temporarily works only for acgraph.vector.Element.
  * @param {acgraph.vector.Element} element .
  * @param {boolean=} opt_seriesGlobal .
@@ -2360,3 +2372,4 @@ anychart.core.polar.series.Base.prototype['tooltip'] = anychart.core.polar.serie
 anychart.core.polar.series.Base.prototype['xScale'] = anychart.core.polar.series.Base.prototype.xScale;//need-ex
 anychart.core.polar.series.Base.prototype['yScale'] = anychart.core.polar.series.Base.prototype.yScale;//need-ex
 anychart.core.polar.series.Base.prototype['legendItem'] = anychart.core.polar.series.Base.prototype.legendItem;
+anychart.core.polar.series.Base.prototype['hover'] = anychart.core.polar.series.Base.prototype.hover;

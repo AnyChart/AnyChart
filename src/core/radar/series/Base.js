@@ -1253,6 +1253,18 @@ anychart.core.radar.series.Base.prototype.hoverPoint = goog.abstractMethod;
 
 
 /**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {number=} opt_index
+ * @return {!anychart.core.radar.series.Base}  {@link anychart.core.radar.series.Base} instance for method chaining.
+ */
+anychart.core.radar.series.Base.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
+  else this.hoverSeries();
+  return this;
+};
+
+
+/**
  * Removes hover from the series.
  * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
  */
@@ -2375,3 +2387,4 @@ anychart.core.radar.series.Base.prototype['tooltip'] = anychart.core.radar.serie
 anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
 anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex
 anychart.core.radar.series.Base.prototype['legendItem'] = anychart.core.radar.series.Base.prototype.legendItem;
+anychart.core.radar.series.Base.prototype['hover'] = anychart.core.radar.series.Base.prototype.hover;

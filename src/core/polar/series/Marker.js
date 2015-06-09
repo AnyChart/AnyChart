@@ -340,20 +340,25 @@ anychart.core.polar.series.Marker.prototype.finalizeDrawing = function() {
  */
 anychart.core.polar.series.Marker.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker_(false, true);
-      this.applyHatchFill(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.drawMarker_(true, true);
-      this.applyHatchFill(true);
-    }
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker_(false, true);
+    this.applyHatchFill(false);
+    this.drawLabel(false);
+    this.hideTooltip();
   }
+
+  //hover all points
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.drawMarker_(true, true);
+    this.applyHatchFill(true);
+  }
+
   this.hoverStatus = -1;
   return this;
 };
@@ -363,18 +368,18 @@ anychart.core.polar.series.Marker.prototype.hoverSeries = function() {
  * @inheritDoc
  * @return {!anychart.core.polar.series.Marker} {@link anychart.core.polar.series.Marker} instance for method chaining.
  */
-anychart.core.polar.series.Marker.prototype.hoverPoint = function(index, event) {
+anychart.core.polar.series.Marker.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
     this.drawMarker_(true, true);
     this.applyHatchFill(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
   }
   this.hoverStatus = index;
   return this;
@@ -387,11 +392,16 @@ anychart.core.polar.series.Marker.prototype.hoverPoint = function(index, event) 
  */
 anychart.core.polar.series.Marker.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker_(false, true);
-    this.applyHatchFill(false);
-    this.drawLabel(false);
-    this.hideTooltip();
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.drawMarker_(false, true);
+      this.applyHatchFill(false);
+      this.drawLabel(false);
+    }
   } else {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -549,9 +559,6 @@ anychart.core.polar.series.Marker.prototype.setupByJSON = function(config) {
 
 //anychart.core.polar.series.Marker.prototype['startDrawing'] = anychart.core.polar.series.Marker.prototype.startDrawing;
 //anychart.core.polar.series.Marker.prototype['finalizeDrawing'] = anychart.core.polar.series.Marker.prototype.finalizeDrawing;
-//anychart.core.polar.series.Marker.prototype['hoverSeries'] = anychart.core.polar.series.Marker.prototype.hoverSeries;
-//anychart.core.polar.series.Marker.prototype['hoverPoint'] = anychart.core.polar.series.Marker.prototype.hoverPoint;
-//anychart.core.polar.series.Marker.prototype['unhover'] = anychart.core.polar.series.Marker.prototype.unhover;
 //exports
 anychart.core.polar.series.Marker.prototype['stroke'] = anychart.core.polar.series.Marker.prototype.stroke;//inherited
 anychart.core.polar.series.Marker.prototype['hoverStroke'] = anychart.core.polar.series.Marker.prototype.hoverStroke;//inherited
@@ -563,3 +570,4 @@ anychart.core.polar.series.Marker.prototype['type'] = anychart.core.polar.series
 anychart.core.polar.series.Marker.prototype['hoverType'] = anychart.core.polar.series.Marker.prototype.hoverType;//doc|ex
 anychart.core.polar.series.Marker.prototype['hatchFill'] = anychart.core.polar.series.Marker.prototype.hatchFill;//inherited
 anychart.core.polar.series.Marker.prototype['hoverHatchFill'] = anychart.core.polar.series.Marker.prototype.hoverHatchFill;//inherited
+anychart.core.polar.series.Marker.prototype['unhover'] = anychart.core.polar.series.Marker.prototype.unhover;

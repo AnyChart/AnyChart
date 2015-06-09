@@ -383,16 +383,21 @@ anychart.core.radar.series.ContinuousBase.prototype.applyHatchFill = function(ho
 /** @inheritDoc */
 anychart.core.radar.series.ContinuousBase.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    this.applyHatchFill(true);
-    this.colorizeShape(true);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
   }
+
+  //hover all points
+  this.applyHatchFill(true);
+  this.colorizeShape(true);
+
   this.hoverStatus = -1;
   return this;
 };
@@ -423,11 +428,11 @@ anychart.core.radar.series.ContinuousBase.prototype.getIndexByEvent = function(e
 
 
 /** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index, event) {
+anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
@@ -441,7 +446,7 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index,
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
     this.hoverStatus = index;
   } else {
     this.hoverStatus = -1;
@@ -454,11 +459,16 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index,
 anychart.core.radar.series.ContinuousBase.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
 
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+    }
   }
+
   this.applyHatchFill(false);
   this.colorizeShape(false);
   this.hoverStatus = NaN;
@@ -604,10 +614,8 @@ anychart.core.radar.series.ContinuousBase.prototype.restoreDefaults = function()
 //anychart.core.radar.series.ContinuousBase.prototype['drawPoint'] = anychart.core.radar.series.ContinuousBase.prototype.drawPoint;
 //anychart.core.radar.series.ContinuousBase.prototype['finalizeDrawing'] = anychart.core.radar.series.ContinuousBase.prototype.finalizeDrawing;
 //anychart.core.radar.series.ContinuousBase.prototype['drawMissing'] = anychart.core.radar.series.ContinuousBase.prototype.drawMissing;
-//anychart.core.radar.series.ContinuousBase.prototype['hoverSeries'] = anychart.core.radar.series.ContinuousBase.prototype.hoverSeries;
-//anychart.core.radar.series.ContinuousBase.prototype['hoverPoint'] = anychart.core.radar.series.ContinuousBase.prototype.hoverPoint;
-//anychart.core.radar.series.ContinuousBase.prototype['unhover'] = anychart.core.radar.series.ContinuousBase.prototype.unhover;
 //exports
 anychart.core.radar.series.ContinuousBase.prototype['markers'] = anychart.core.radar.series.ContinuousBase.prototype.markers;//doc|ex
 anychart.core.radar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
 anychart.core.radar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex
+anychart.core.radar.series.ContinuousBase.prototype['unhover'] = anychart.core.radar.series.ContinuousBase.prototype.unhover;

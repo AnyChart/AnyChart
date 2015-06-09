@@ -408,27 +408,32 @@ anychart.core.polar.series.ContinuousBase.prototype.applyHatchFill = function(ho
 /** @inheritDoc */
 anychart.core.polar.series.ContinuousBase.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    this.applyHatchFill(true);
-    this.colorizeShape(true);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
   }
+
+  //hover all points
+  this.applyHatchFill(true);
+  this.colorizeShape(true);
+
   this.hoverStatus = -1;
   return this;
 };
 
 
 /** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index, event) {
+anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
@@ -442,7 +447,7 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index,
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
     this.hoverStatus = index;
   } else {
     this.hoverStatus = -1;
@@ -455,11 +460,16 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index,
 anychart.core.polar.series.ContinuousBase.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
 
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+    }
   }
+
   this.applyHatchFill(false);
   this.colorizeShape(false);
   this.hoverStatus = NaN;
@@ -606,11 +616,9 @@ anychart.core.polar.series.ContinuousBase.prototype.restoreDefaults = function()
 //anychart.core.polar.series.ContinuousBase.prototype['drawPoint'] = anychart.core.polar.series.ContinuousBase.prototype.drawPoint;
 //anychart.core.polar.series.ContinuousBase.prototype['finalizeDrawing'] = anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing;
 //anychart.core.polar.series.ContinuousBase.prototype['startDrawing'] = anychart.core.polar.series.ContinuousBase.prototype.startDrawing;
-//anychart.core.polar.series.ContinuousBase.prototype['hoverSeries'] = anychart.core.polar.series.ContinuousBase.prototype.hoverSeries;
-//anychart.core.polar.series.ContinuousBase.prototype['hoverPoint'] = anychart.core.polar.series.ContinuousBase.prototype.hoverPoint;
-//anychart.core.polar.series.ContinuousBase.prototype['unhover'] = anychart.core.polar.series.ContinuousBase.prototype.unhover;
 //exports
 anychart.core.polar.series.ContinuousBase.prototype['markers'] = anychart.core.polar.series.ContinuousBase.prototype.markers;//doc|ex
 anychart.core.polar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
 anychart.core.polar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.polar.series.ContinuousBase.prototype.connectMissingPoints;
 anychart.core.polar.series.ContinuousBase.prototype['closed'] = anychart.core.polar.series.ContinuousBase.prototype.closed;//doc|ex
+anychart.core.polar.series.ContinuousBase.prototype['unhover'] = anychart.core.polar.series.ContinuousBase.prototype.unhover;

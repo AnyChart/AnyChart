@@ -145,18 +145,23 @@ anychart.core.cartesian.series.DiscreteBase.prototype.applyHatchFill = function(
 /** @inheritDoc */
 anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.colorizeShape(true);
-      this.applyHatchFill(true);
-    }
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
+  }
+
+  //hover all points
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.colorizeShape(true);
+    this.applyHatchFill(true);
+
   }
   this.hoverStatus = -1;
   return this;
@@ -164,11 +169,11 @@ anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, event) {
+anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   this.unhover();
   if (this.getIterator().select(index)) {
@@ -176,7 +181,7 @@ anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint = function(inde
     this.applyHatchFill(true);
     this.drawMarker(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
   }
   this.hoverStatus = index;
   return this;
@@ -186,15 +191,20 @@ anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint = function(inde
 /** @inheritDoc */
 anychart.core.cartesian.series.DiscreteBase.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
-    if (goog.isDef(rect)) {
-      this.colorizeShape(false);
-      this.applyHatchFill(false);
-      this.drawMarker(false);
-      this.drawLabel(false);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
+      if (goog.isDef(rect)) {
+        this.colorizeShape(false);
+        this.applyHatchFill(false);
+        this.drawMarker(false);
+        this.drawLabel(false);
+      }
     }
-    this.hideTooltip();
   } else {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -207,7 +217,5 @@ anychart.core.cartesian.series.DiscreteBase.prototype.unhover = function() {
 };
 
 
-//anychart.core.cartesian.series.DiscreteBase.prototype['hoverSeries'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries;//inherited
-//anychart.core.cartesian.series.DiscreteBase.prototype['hoverPoint'] = anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint;//inherited
-//anychart.core.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.core.cartesian.series.DiscreteBase.prototype.unhover;//inherited
 //exports
+anychart.core.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.core.cartesian.series.DiscreteBase.prototype.unhover;

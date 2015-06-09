@@ -1714,11 +1714,11 @@ anychart.core.PyramidFunnelBase.prototype.hoverPoint_ = function(index, opt_even
 
   if (this.hoverStatus == index) {
     if (iterator.select(index)) {
-      this.showTooltip(opt_event);
+      if (opt_event) this.showTooltip(opt_event);
     }
     return this;
   }
-  this.unhoverPoint_();
+  this.unhover();
 
   iterator.reset();
   while (iterator.advance()) {
@@ -1733,7 +1733,7 @@ anychart.core.PyramidFunnelBase.prototype.hoverPoint_ = function(index, opt_even
     if (goog.isDef(opt_event)) {
       // Select index again because drawLabel changes the position of the iterator if the overlap calculation was performed.
       this.getIterator().select(index);
-      this.showTooltip(opt_event);
+      if (opt_event) this.showTooltip(opt_event);
     }
   }
   this.hoverStatus = index;
@@ -1763,6 +1763,63 @@ anychart.core.PyramidFunnelBase.prototype.unhoverPoint_ = function() {
     this.hideTooltip();
   }
   this.hoverStatus = NaN;
+  return this;
+};
+
+
+/**
+ *
+ * @private
+ * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.hoverAllPoints_ = function() {
+  this.hoverStatus = -1;
+  var iterator = this.getIterator();
+
+  iterator.reset();
+  while (iterator.advance()) {
+    this.drawLabel_(true);
+    this.colorizePoint_(true);
+    this.applyHatchFill(true);
+    this.drawMarker(true);
+  }
+  this.overlapCorrection_(null, true);
+  return this;
+};
+
+
+/**
+ * If index is passed, hovers a point of the chart by its index, else hovers all points of the chart.
+ * @param {number=} opt_index
+ * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint_(opt_index);
+  else this.hoverAllPoints_();
+  return this;
+};
+
+
+/**
+ * Removes hover from all chart points.
+ * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.unhover = function() {
+  if (this.hoverStatus >= 0) {
+    this.unhoverPoint_();
+  } else {
+    var iterator = this.getIterator();
+    iterator.reset();
+    while (iterator.advance()) {
+      this.drawLabel_(false);
+      this.colorizePoint_(false);
+      this.applyHatchFill(false);
+      this.drawMarker(false);
+      this.hideTooltip();
+    }
+    this.overlapCorrection_();
+  }
+
   return this;
 };
 
@@ -2351,8 +2408,9 @@ anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, o
  * To place the labels so that they do not overlap.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
+ * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel) {
+anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel, opt_hoverAll) {
   if (this.overlapMode() != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels_() || !this.labels().enabled()) {
     return;
   }
@@ -2376,7 +2434,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
     if (!label || label.enabled() == false) {
       continue;
     }
-    labelBounds = this.getTrueLabelBounds(label, hoveredIndex == label.getIndex());
+    labelBounds = this.getTrueLabelBounds(label, opt_hoverAll || hoveredIndex == label.getIndex());
     heightTotal += labelBounds.height;
   }
 
@@ -2407,7 +2465,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
       if (!label || label.enabled() == false) {
         continue;
       }
-      labelBounds = this.getTrueLabelBounds(label, hoveredIndex == label.getIndex());
+      labelBounds = this.getTrueLabelBounds(label, opt_hoverAll || hoveredIndex == label.getIndex());
       heightTotal += labelBounds.height;
 
       comparingLabel = this.reversed_ ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
@@ -2416,7 +2474,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
       if (!comparingLabel) {
         continue;
       }
-      comparingLabelBounds = this.getTrueLabelBounds(comparingLabel, hoveredIndex == comparingLabel.getIndex());
+      comparingLabelBounds = this.getTrueLabelBounds(comparingLabel, opt_hoverAll || hoveredIndex == comparingLabel.getIndex());
 
       // if intersected
       if (comparingLabelBounds.top <= labelBounds.top + labelBounds.height) {
@@ -2427,7 +2485,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
 
   if (this.labelDomains.length) {
     goog.array.forEach(this.labelDomains, function(labelDomain) {
-      labelDomain.recalculateLabelsPosition(opt_hoveredLabel);
+      labelDomain.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
     });
   }
 };
@@ -3650,8 +3708,9 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.clear = function() {
  * To calculate the coordinates of the labels given the overlap mode.
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
+ * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel) {
+anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel, opt_hoverAll) {
   if (this.labels.length < 2) {
     this.chart.removeLabelDomain(this);
     return;
@@ -3663,7 +3722,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
 
   var firstLabel = this.labels[0];
   var lastLabel = this.labels[this.labels.length - 1];
-  var firstLabelBounds = this.getLabelBounds_(firstLabel, hoveredIndex == firstLabel.getIndex());
+  var firstLabelBounds = this.getLabelBounds_(firstLabel, opt_hoverAll || hoveredIndex == firstLabel.getIndex());
 
   var h1, y1;
   var h2, y2;
@@ -3678,7 +3737,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
   var label, labelBounds, labelPointPath, labelPointBounds;
   for (var i = 1, len = this.labels.length; i < len; i++) {
     label = this.labels[i];
-    labelBounds = this.getLabelBounds_(label, hoveredIndex == label.getIndex());
+    labelBounds = this.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
     labelPointPath = this.chart.data().meta(label.getIndex(), 'point');
     labelPointBounds = labelPointPath.getBounds();
 
@@ -3700,7 +3759,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
 
   // update
   this.height = goog.array.reduce(this.labels, function(res, label) {
-    var labelBounds = domain.getLabelBounds_(label, hoveredIndex == label.getIndex());
+    var labelBounds = domain.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
     return res + labelBounds.height;
   }, 0);
 
@@ -3714,7 +3773,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
   }
   this.y = domainTop;
 
-  this.applyLabelsPosition_(opt_hoveredLabel);
+  this.applyLabelsPosition_(opt_hoveredLabel, opt_hoverAll);
 
   var comparingLabel;
   var comparingLabelBounds;
@@ -3731,8 +3790,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
       return;
     }
 
-    comparingLabelBounds = domain.getLabelBounds_(comparingLabel, hoveredIndex == comparingLabel.getIndex());
-    labelBounds = domain.getLabelBounds_(label, hoveredIndex == label.getIndex());
+    comparingLabelBounds = domain.getLabelBounds_(comparingLabel, opt_hoverAll || hoveredIndex == comparingLabel.getIndex());
+    labelBounds = domain.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
 
     var isOverlap = this.chart.reversed_ ?
         comparingLabelBounds.top < labelBounds.top + labelBounds.height :
@@ -3742,14 +3801,14 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
       domainForPreviousLabel = domain.chart.getLabelsDomainByLabel(comparingLabel);
       if (domainForPreviousLabel) {
         unitedDomain = domain.chart.mergeLabelsDomains(domainForPreviousLabel, this);
-        unitedDomain.recalculateLabelsPosition(opt_hoveredLabel);
+        unitedDomain.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
 
       } else {
         this.chart.reversed_ ?
             this.labels.push(comparingLabel) :
             this.labels.unshift(comparingLabel);
 
-        this.recalculateLabelsPosition(opt_hoveredLabel);
+        this.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
       }
     }
   }
@@ -3760,8 +3819,9 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
  * To reposition the labels relative to the top of the domain.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
+ * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel) {
+anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel, opt_hoverAll) {
   var domain = this;
 
   var labelsHeightSum = 0;
@@ -3774,7 +3834,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
   var hoveredIndex = opt_hoveredLabel ? opt_hoveredLabel.getIndex() : null;
 
   goog.array.forEach(this.labels, function(label) {
-    var labelIsHovered = hoveredIndex == label.getIndex();
+    var labelIsHovered = opt_hoverAll || hoveredIndex == label.getIndex();
     var labelPositionProvider = label.positionProvider()['value'];
     var labelBounds = domain.getLabelBounds_(label, labelIsHovered);
     var labelNewY = domain.y + labelsHeightSum + labelsOffsetYSum + labelBounds.height / 2;

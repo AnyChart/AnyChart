@@ -195,26 +195,31 @@ anychart.core.scatter.series.Line.prototype.colorizeShape = function(hover) {
 /** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.hoverSeries = function() {
   if (this.hoverStatus == -1) return this;
-  if (this.hoverStatus >= 0) {
-    if (this.getResetIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-      this.hideTooltip();
-    }
-  } else {
-    this.colorizeShape(true);
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  //unhover current point if any
+  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
+    this.drawMarker(false);
+    this.drawLabel(false);
+    this.hideTooltip();
   }
+
+  //hover all points
+  this.colorizeShape(true);
+
   this.hoverStatus = -1;
   return this;
 };
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, event) {
+anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, opt_event) {
   if (this.hoverStatus == index) {
     if (this.getIterator().select(index))
-      this.showTooltip(event);
-    return this;
+      if (opt_event) this.showTooltip(opt_event);
+      return this;
   }
   if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
     this.drawMarker(false);
@@ -227,7 +232,7 @@ anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, event) 
   if (this.getIterator().select(index)) {
     this.drawMarker(true);
     this.drawLabel(true);
-    this.showTooltip(event);
+    if (opt_event) this.showTooltip(opt_event);
     this.hoverStatus = index;
   } else {
     this.hoverStatus = -1;
@@ -240,11 +245,16 @@ anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, event) 
 anychart.core.scatter.series.Line.prototype.unhover = function() {
   if (isNaN(this.hoverStatus)) return this;
 
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  if (this.hoverStatus >= 0) {
+    if (this.getIterator().select(this.hoverStatus)) {
+      this.drawMarker(false);
+      this.drawLabel(false);
+    }
   }
+
   this.colorizeShape(false);
   this.hoverStatus = NaN;
   return this;
@@ -325,10 +335,8 @@ anychart.core.scatter.series.Line.prototype.setupByJSON = function(config) {
 };
 
 //anychart.core.scatter.series.Line.prototype['startDrawing'] = anychart.core.scatter.series.Line.prototype.startDrawing;//inherited
-//anychart.core.scatter.series.Line.prototype['hoverSeries'] = anychart.core.scatter.series.Line.prototype.hoverSeries;//inherited
-//anychart.core.scatter.series.Line.prototype['hoverPoint'] = anychart.core.scatter.series.Line.prototype.hoverPoint;//inherited
-//anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;//inherited
 //exports
 anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.core.scatter.series.Line.prototype.connectMissingPoints;//doc|ex
 anychart.core.scatter.series.Line.prototype['stroke'] = anychart.core.scatter.series.Line.prototype.stroke;//inherited
 anychart.core.scatter.series.Line.prototype['hoverStroke'] = anychart.core.scatter.series.Line.prototype.hoverStroke;//inherited
+anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;

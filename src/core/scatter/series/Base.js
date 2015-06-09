@@ -1312,6 +1312,18 @@ anychart.core.scatter.series.Base.prototype.hoverPoint = goog.abstractMethod;
 
 
 /**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {number=} opt_index
+ * @return {!anychart.core.scatter.series.Base}  {@link anychart.core.scatter.series.Base} instance for method chaining.
+ */
+anychart.core.scatter.series.Base.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
+  else this.hoverSeries();
+  return this;
+};
+
+
+/**
  * Removes hover from the series.
  * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
  */
@@ -2523,3 +2535,4 @@ anychart.core.scatter.series.Base.prototype['xScale'] = anychart.core.scatter.se
 anychart.core.scatter.series.Base.prototype['yScale'] = anychart.core.scatter.series.Base.prototype.yScale;//doc|ex
 anychart.core.scatter.series.Base.prototype['error'] = anychart.core.scatter.series.Base.prototype.error;
 anychart.core.scatter.series.Base.prototype['legendItem'] = anychart.core.scatter.series.Base.prototype.legendItem;
+anychart.core.scatter.series.Base.prototype['hover'] = anychart.core.scatter.series.Base.prototype.hover;
