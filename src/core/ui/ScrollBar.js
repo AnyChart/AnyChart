@@ -736,10 +736,7 @@ anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo = function(value, opt_even
   if (this.visibleBounds_ && !isNaN(value)) {
     var isVertical = this.isVertical_();
 
-    var diff = value - (isVertical ?
-                (this.visibleBounds_.top + this.visibleBounds_.height) :
-                (this.visibleBounds_.left + this.visibleBounds_.width)
-        );
+    var diff = value - (isVertical ? (this.visibleBounds_.top + this.visibleBounds_.height) : (this.visibleBounds_.left + this.visibleBounds_.width));
 
     if (diff) {
       isVertical ?
