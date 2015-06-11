@@ -4061,7 +4061,17 @@
       }
     },
     "data": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": [
+          "number",
+          "boolean",
+          "null",
+          "string",
+          "object",
+          "array"
+        ]
+      }
     },
     "treeData": {
       "type": "object",
