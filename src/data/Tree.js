@@ -812,8 +812,8 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
  * @return {anychart.data.Tree.DataItem} - Restored tree data item.
  */
 anychart.data.Tree.DataItem.fromSerializedItem = function(tree, config) {
-  var data = config.treeDataItemData;
-  var meta = config.treeDataItemMeta;
+  var data = config['treeDataItemData'];
+  var meta = config['treeDataItemMeta'];
   var children = config.children;
 
   var item = new anychart.data.Tree.DataItem(tree, data);
