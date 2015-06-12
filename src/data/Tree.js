@@ -1167,8 +1167,8 @@ anychart.data.Tree.DataItem.prototype.clone = function(tree) {
  */
 anychart.data.Tree.DataItem.prototype.serialize = function() {
   var result = {
-    treeDataItemData: this.data_,
-    treeDataItemMeta: this.meta_
+    'treeDataItemData': this.data_,
+    'treeDataItemMeta': this.meta_
   };
 
   for (var i = 0, len = this.numChildren(); i < len; i++) {
