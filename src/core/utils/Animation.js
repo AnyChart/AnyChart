@@ -26,6 +26,7 @@ goog.inherits(anychart.core.utils.Animation, anychart.core.Base);
 
 
 /**
+ * Turns on animations.
  * @param {boolean=} opt_value
  * @return {boolean|anychart.core.utils.Animation}
  */
@@ -43,6 +44,7 @@ anychart.core.utils.Animation.prototype.enabled = function(opt_value) {
 
 
 /**
+ * Set animation duration.
  * @param {number=} opt_value
  * @return {number|anychart.core.utils.Animation}
  */
@@ -95,13 +97,19 @@ anychart.core.utils.Animation.prototype.setupSpecial = function(var_args) {
     return true;
   }
 
+  if (!isNaN(+arg0)) {
+    this.enabled(true);
+    this.duration(+arg0);
+    return true;
+  }
+
   return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 
 //exports
-anychart.core.utils.Animation.prototype['enabled'] = anychart.core.Chart.prototype.enabled;
-anychart.core.utils.Animation.prototype['duration'] = anychart.core.Chart.prototype.duration;
+anychart.core.utils.Animation.prototype['enabled'] = anychart.core.utils.Animation.prototype.enabled;
+anychart.core.utils.Animation.prototype['duration'] = anychart.core.utils.Animation.prototype.duration;
 
 
 

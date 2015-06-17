@@ -635,16 +635,16 @@ anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Setter/getter for animation setting.
- * @param {(boolean|Object)=} opt_enabled_or_json Whether to enable animation.
+ * @param {(boolean|Object)=} opt_enabledOrJson Whether to enable animation.
  * @param {number=} opt_duration A Duration in milliseconds.
  * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
  */
-anychart.core.Chart.prototype.animation = function(opt_enabled_or_json, opt_duration) {
+anychart.core.Chart.prototype.animation = function(opt_enabledOrJson, opt_duration) {
   if (!this.animation_) {
     this.animation_ = new anychart.core.utils.Animation();
     this.animation_.listenSignals(this.onAnimationSignal_, this);
   }
-  if (goog.isDef(opt_enabled_or_json)) {
+  if (goog.isDef(opt_enabledOrJson)) {
     this.animation_.setup.apply(this.animation_, arguments);
     return this;
   } else {

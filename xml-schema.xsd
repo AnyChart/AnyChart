@@ -1073,7 +1073,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="utils.Animation">
-        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="enabled" type="simple.Bool"/>
         <xsd:attribute name="duration" type="xsd:integer"/>
     </xsd:complexType>
 
