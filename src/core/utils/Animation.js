@@ -26,6 +26,13 @@ goog.inherits(anychart.core.utils.Animation, anychart.core.Base);
 
 
 /**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.utils.Animation.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
+
+
+/**
  * Turns on animations.
  * @param {boolean=} opt_value
  * @return {boolean|anychart.core.utils.Animation}
