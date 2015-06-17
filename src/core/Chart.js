@@ -6,6 +6,7 @@ goog.require('anychart.core.ui.Credits');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
+goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.utils');
@@ -66,18 +67,10 @@ anychart.core.Chart = function() {
   this.autoRedraw_ = true;
 
   /**
-   * Animation.
-   * @type {boolean}
+   * @type {anychart.core.utils.Animation}
    * @private
    */
-  this.animation_ = false;
-
-  /**
-   * Duration of animation in milliseconds.
-   * @type {number}
-   * @private
-   */
-  this.animationDuration_ = 2000;
+  this.animation_ = null;
 
   this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
@@ -99,10 +92,10 @@ anychart.core.Chart.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBo
  */
 anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.CHART_LABELS |
-        anychart.ConsistencyState.CHART_BACKGROUND |
-        anychart.ConsistencyState.CHART_TITLE |
-        anychart.ConsistencyState.CHART_ANIMATION;
+    anychart.ConsistencyState.CHART_LABELS |
+    anychart.ConsistencyState.CHART_BACKGROUND |
+    anychart.ConsistencyState.CHART_TITLE |
+    anychart.ConsistencyState.CHART_ANIMATION;
 
 
 /**
@@ -642,48 +635,51 @@ anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Setter/getter for animation setting.
- * @param {boolean=} opt_value Whether to enable animation.
- * @return {boolean|anychart.core.Chart} Is animation enabled or self for chaining.
+ * @param {(boolean|Object)=} opt_enabled_or_json Whether to enable animation.
+ * @param {number=} opt_duration A Duration in milliseconds.
+ * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
  */
-anychart.core.Chart.prototype.animation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.animation_ != opt_value) {
-      this.animation_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
+anychart.core.Chart.prototype.animation = function(opt_enabled_or_json, opt_duration) {
+  if (!this.animation_) {
+    this.animation_ = new anychart.core.utils.Animation();
+    this.animation_.listen(anychart.core.utils.Animation.EventType.DURATION_CHANGE, this.onAnimationDurationChange_, false, this);
+    this.animation_.listen(anychart.core.utils.Animation.EventType.ENABLED_CHANGE, this.onAnimationEnabledChange_, false, this);
   }
-  return this.animation_;
+  if (goog.isDef(opt_enabled_or_json)) {
+    this.animation_.setup.apply(this.animation_, arguments);
+    return this;
+  } else {
+    return this.animation_;
+  }
 };
 
 
 /**
- * Getter/setter for animation duration.
- * @param {number=} opt_value Duration in milliseconds.
- * @return {number|anychart.core.Chart} Animation duration or self for chaining.
+ * Animation enabled change handler.
+ * @private
  */
-anychart.core.Chart.prototype.animationDuration = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (!isNaN(opt_value) && opt_value > 0 && this.animationDuration_ != opt_value) {
-      this.animationDuration_ = opt_value;
-      if (this.animationQueue_) {
-        this.animationQueue_.stop();
-        this.animationQueue_.setDuration(this.animationDuration_);
-      }
-      this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
+anychart.core.Chart.prototype.onAnimationEnabledChange_ = function() {
+  this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Animation duration change handler.
+ * @private
+ */
+anychart.core.Chart.prototype.onAnimationDurationChange_ = function() {
+  if (this.animationQueue_) {
+    this.animationQueue_.stop();
+    this.animationQueue_.setDuration(this.animation().duration());
   }
-  return this.animationDuration_;
+  this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
 };
 
 
 /**
  * Animate chart.
  */
-anychart.core.Chart.prototype.doAnimation = goog.abstractMethod;
+anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
 
 
 /**
@@ -783,8 +779,8 @@ anychart.core.Chart.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
     this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
-    if (this.animation())
-      this.doAnimation();
+    var animation = this.animation();
+    if (animation.enabled()) this.doAnimation();
   }
 
   return this;
@@ -903,8 +899,7 @@ anychart.core.Chart.prototype.serialize = function() {
     json['chartLabels'] = labels;
   // from VisualBaseWithBounds
   json['bounds'] = this.bounds().serialize();
-  json['animation'] = this.animation();
-  json['animationDuration'] = this.animationDuration();
+  json['animation'] = this.animation().serialize();
   return json;
 };
 
@@ -936,7 +931,17 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   this.right(config['right']);
   this.bottom(config['bottom']);
   this.animation(config['animation']);
-  this.animationDuration(config['animationDuration']);
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.disposeInternal = function() {
+  if (this.animation_) {
+    this.animation_.dispose();
+    this.animation_ = null;
+  }
+
+  goog.base(this, 'disposeInternal');
 };
 
 
@@ -995,7 +1000,6 @@ anychart.core.Chart.DrawEvent;
 
 //exports
 anychart.core.Chart.prototype['animation'] = anychart.core.Chart.prototype.animation;
-anychart.core.Chart.prototype['animationDuration'] = anychart.core.Chart.prototype.animationDuration;//doc|ex
 anychart.core.Chart.prototype['title'] = anychart.core.Chart.prototype.title;//doc|ex
 anychart.core.Chart.prototype['background'] = anychart.core.Chart.prototype.background;//doc|ex
 anychart.core.Chart.prototype['margin'] = anychart.core.Chart.prototype.margin;//doc|ex

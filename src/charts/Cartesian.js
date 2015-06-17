@@ -2739,10 +2739,11 @@ anychart.charts.Cartesian.prototype.doAnimation = function() {
     for (var i = 0; i < this.series_.length; i++) {
       var series = this.series_[i];
       var ctl = anychart.animations.AnimationBySeriesType[series.getType().toLowerCase()];
+      var duration = /** @type {number} */(this.animation().duration());
       if (ctl === anychart.animations.ClipAnimation) {
-        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), series, this.animationDuration())));
+        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), series, duration)));
       } else
-        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, this.animationDuration())));
+        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
     }
     this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
       this.dispatchDetachedEvent({
