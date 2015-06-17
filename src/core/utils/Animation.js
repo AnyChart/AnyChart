@@ -1,5 +1,5 @@
 goog.provide('anychart.core.utils.Animation');
-goog.require('goog.events.EventTarget');
+goog.require('anychart.core.Base');
 
 
 
