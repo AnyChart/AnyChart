@@ -99,6 +99,11 @@ anychart.core.utils.Animation.prototype.setupSpecial = function(var_args) {
 };
 
 
+//exports
+anychart.core.utils.Animation.prototype['enabled'] = anychart.core.Chart.prototype.enabled;
+anychart.core.utils.Animation.prototype['duration'] = anychart.core.Chart.prototype.duration;
+
+
 
 
 
