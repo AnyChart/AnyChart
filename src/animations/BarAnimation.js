@@ -1,5 +1,6 @@
 goog.provide('anychart.animations.BarAnimation');
 goog.require('anychart.animations.Animation');
+goog.require('anychart.core.cartesian.series.DiscreteBase');
 
 
 

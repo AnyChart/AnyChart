@@ -5,7 +5,7 @@ goog.require('goog.events.EventTarget');
 
 /**
  * @constructor
- * @extends {goog.events.EventTarget}
+ * @extends {anychart.core.Base}
  */
 anychart.core.utils.Animation = function() {
   goog.base(this);
@@ -22,16 +22,7 @@ anychart.core.utils.Animation = function() {
    */
   this.duration_ = 1000;
 };
-goog.inherits(anychart.core.utils.Animation, goog.events.EventTarget);
-
-
-/**
- * @enum {string}
- */
-anychart.core.utils.Animation.EventType = {
-  ENABLED_CHANGE: goog.events.getUniqueId('enabledChange'),
-  DURATION_CHANGE: goog.events.getUniqueId('durationChange')
-};
+goog.inherits(anychart.core.utils.Animation, anychart.core.Base);
 
 
 /**
@@ -42,7 +33,7 @@ anychart.core.utils.Animation.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.enabled_ != opt_value) {
       this.enabled_ = opt_value;
-      this.dispatchEvent(anychart.core.utils.Animation.EventType.ENABLED_CHANGE);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else {
@@ -57,9 +48,10 @@ anychart.core.utils.Animation.prototype.enabled = function(opt_value) {
  */
 anychart.core.utils.Animation.prototype.duration = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!isNaN(opt_value) && opt_value > 0 && this.duration_ != opt_value) {
+    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.duration_, false);
+    if (this.duration_ != opt_value) {
       this.duration_ = opt_value;
-      this.dispatchEvent(anychart.core.utils.Animation.EventType.DURATION_CHANGE);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     }
     return this;
   } else {
@@ -68,9 +60,7 @@ anychart.core.utils.Animation.prototype.duration = function(opt_value) {
 };
 
 
-/**
- * @return {Object}
- */
+/** @inheritDoc */
 anychart.core.utils.Animation.prototype.serialize = function() {
   return {
     'enabled': this.enabled_,
@@ -80,22 +70,32 @@ anychart.core.utils.Animation.prototype.serialize = function() {
 
 
 /**
- * Setter/getter for animation setting.
- * @param {boolean|Object=} opt_enabled_or_json Whether to enable animation.
- * @param {number=} opt_duration A Duration in milliseconds.
- * @return {anychart.core.utils.Animation} Animations settings object or self for chaining.
+ * Setups current instance using passed JSON object.
+ * @param {!Object} json
+ * @protected
  */
-anychart.core.utils.Animation.prototype.setup = function(opt_enabled_or_json, opt_duration) {
-  if (goog.isBoolean(opt_enabled_or_json)) {
-    this.enabled(opt_enabled_or_json);
-    if (goog.isDef(opt_duration))
-      this.duration(opt_duration);
-  } else if (goog.isObject(opt_enabled_or_json)) {
-    this.enabled(opt_enabled_or_json['enabled']);
-    this.duration(opt_enabled_or_json['duration']);
+anychart.core.utils.Animation.prototype.setupByJSON = function(json) {
+  this.enabled(json['enabled']);
+  this.duration(json['duration']);
+};
+
+
+/**
+ * Special objects to setup current instance.
+ * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
+ * @return {boolean} If passed values were recognized as special setup values.
+ * @protected
+ */
+anychart.core.utils.Animation.prototype.setupSpecial = function(var_args) {
+  var arg0 = arguments[0];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    this.enabled(!!arg0);
+    var arg1 = arguments[1];
+    if (goog.isDef(arg1)) this.duration(arg1);
+    return true;
   }
 
-  return this;
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 

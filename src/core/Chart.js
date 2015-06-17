@@ -642,8 +642,7 @@ anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
 anychart.core.Chart.prototype.animation = function(opt_enabled_or_json, opt_duration) {
   if (!this.animation_) {
     this.animation_ = new anychart.core.utils.Animation();
-    this.animation_.listen(anychart.core.utils.Animation.EventType.DURATION_CHANGE, this.onAnimationDurationChange_, false, this);
-    this.animation_.listen(anychart.core.utils.Animation.EventType.ENABLED_CHANGE, this.onAnimationEnabledChange_, false, this);
+    this.animation_.listenSignals(this.onAnimationSignal_, this);
   }
   if (goog.isDef(opt_enabled_or_json)) {
     this.animation_.setup.apply(this.animation_, arguments);
@@ -658,20 +657,7 @@ anychart.core.Chart.prototype.animation = function(opt_enabled_or_json, opt_dura
  * Animation enabled change handler.
  * @private
  */
-anychart.core.Chart.prototype.onAnimationEnabledChange_ = function() {
-  this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Animation duration change handler.
- * @private
- */
-anychart.core.Chart.prototype.onAnimationDurationChange_ = function() {
-  if (this.animationQueue_) {
-    this.animationQueue_.stop();
-    this.animationQueue_.setDuration(this.animation().duration());
-  }
+anychart.core.Chart.prototype.onAnimationSignal_ = function() {
   this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -779,8 +765,7 @@ anychart.core.Chart.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
     this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
-    var animation = this.animation();
-    if (animation.enabled()) this.doAnimation();
+    if (this.animation().enabled()) this.doAnimation();
   }
 
   return this;
@@ -937,7 +922,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
   if (this.animation_) {
-    this.animation_.dispose();
+    goog.dispose(this.animation_);
     this.animation_ = null;
   }
 

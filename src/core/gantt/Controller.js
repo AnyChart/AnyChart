@@ -4,6 +4,7 @@ goog.require('acgraph');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.data.Tree');
+goog.require('anychart.scales.GanttDateTime');
 
 goog.require('goog.array');
 goog.require('goog.math');
