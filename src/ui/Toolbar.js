@@ -93,6 +93,7 @@ anychart.ui.Toolbar = function() {
 
 
   var printButton = new goog.ui.ToolbarMenuButton('Print', void 0, anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.getInstance());
+  printButton.addClassName(anychart.ui.Toolbar.CssClass.PRINT);
   this.addChild(printButton, true);
   this.printMenu_.attach(printButton.getElement(), goog.positioning.Corner.BOTTOM_START);
 
@@ -104,37 +105,26 @@ anychart.ui.Toolbar = function() {
       /** @type {goog.ui.MenuRenderer} */ (goog.ui.ContainerRenderer.getCustomRenderer(goog.ui.MenuRenderer, 'anychart-menu')));
 
   var saveAsSVG = new goog.ui.MenuItem('SVG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsSVG.setId('anychart_saveAsSVG');
+  saveAsSVG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_SVG);
+  saveAsSVG.setModel({name: 'saveAsSVG'});
   saveAsMenu.addChild(saveAsSVG, true);
 
   var saveAsPNG = new goog.ui.MenuItem('PNG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPNG.setId('anychart_saveAsPNG');
+  saveAsPNG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PNG);
+  saveAsPNG.setModel({name: 'saveAsPNG'});
   saveAsMenu.addChild(saveAsPNG, true);
 
   var saveAsJPG = new goog.ui.MenuItem('JPG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsJPG.setId('anychart_saveAsJPG');
+  saveAsJPG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_JPG);
+  saveAsJPG.setModel({name: 'saveAsJPG'});
   saveAsMenu.addChild(saveAsJPG, true);
 
   var pdfSubMenu = new anychart.core.ui.toolbar.SubMenu('PDF');
-  var saveAsPDFA4 = new goog.ui.MenuItem('A4', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDFA4.setId('anychart_saveAsPDF_a4');
-  pdfSubMenu.addItem(saveAsPDFA4);
-
-  //var saveAsPDFA3 = new goog.ui.MenuItem('A3', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //saveAsPDFA3.setId('anychart_saveAsPDF_a3');
-  //pdfSubMenu.addItem(saveAsPDFA3);
-  //
-  //var saveAsPDFA2 = new goog.ui.MenuItem('A2', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //saveAsPDFA2.setId('anychart_saveAsPDF_a2');
-  //pdfSubMenu.addItem(saveAsPDFA2);
-  //
-  //var saveAsPDFA1 = new goog.ui.MenuItem('A1', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //saveAsPDFA1.setId('anychart_saveAsPDF_a1');
-  //pdfSubMenu.addItem(saveAsPDFA1);
-  //
-  //var saveAsPDFA0 = new goog.ui.MenuItem('A0', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  //saveAsPDFA0.setId('anychart_saveAsPDF_a0');
-  //pdfSubMenu.addItem(saveAsPDFA0);
+  pdfSubMenu.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PDF);
+  var saveAsPDF = new goog.ui.MenuItem('A4', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  saveAsPDF.setModel({name: 'saveAsPDF'});
+  saveAsPDF.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PDF);
+  pdfSubMenu.addItem(saveAsPDF);
 
   saveAsMenu.addChild(pdfSubMenu, true);
 
@@ -148,6 +138,7 @@ anychart.ui.Toolbar = function() {
   );
 
   var saveAsButton = new goog.ui.ToolbarMenuButton('Save As', saveAsMenu, anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.getInstance());
+  saveAsButton.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS);
   this.addChild(saveAsButton, true);
   saveAsMenu.attach(saveAsButton.getElement(), goog.positioning.Corner.BOTTOM_START);
 
@@ -157,7 +148,8 @@ anychart.ui.Toolbar = function() {
   // --------- ZOOM IN, ZOOM OUT, FIT ALL ----------
 
   var zoomInButton = new goog.ui.ToolbarButton('Zoom In', anychart.core.ui.toolbar.ToolbarButtonRenderer.getInstance());
-  zoomInButton.setId('anychart_zoomIn');
+  zoomInButton.addClassName(anychart.ui.Toolbar.CssClass.ZOOM_IN);
+  zoomInButton.setModel({name: 'zoomIn'});
   goog.events.listen(
       zoomInButton,
       goog.ui.Component.EventType.ACTION,
@@ -166,7 +158,8 @@ anychart.ui.Toolbar = function() {
   this.addChild(zoomInButton, true);
 
   var zoomOutButton = new goog.ui.ToolbarButton('Zoom Out', anychart.core.ui.toolbar.ToolbarButtonRenderer.getInstance());
-  zoomOutButton.setId('anychart_zoomOut');
+  zoomOutButton.addClassName(anychart.ui.Toolbar.CssClass.ZOOM_OUT);
+  zoomOutButton.setModel({name: 'zoomOut'});
   goog.events.listen(
       zoomOutButton,
       goog.ui.Component.EventType.ACTION,
@@ -175,7 +168,8 @@ anychart.ui.Toolbar = function() {
   this.addChild(zoomOutButton, true);
 
   var fitAllButton = new goog.ui.ToolbarButton('Fit All', anychart.core.ui.toolbar.ToolbarButtonRenderer.getInstance());
-  fitAllButton.setId('anychart_fitAll');
+  fitAllButton.addClassName(anychart.ui.Toolbar.CssClass.FIT_ALL);
+  fitAllButton.setModel({name: 'fitAll'});
   goog.events.listen(
       fitAllButton,
       goog.ui.Component.EventType.ACTION,
@@ -185,6 +179,24 @@ anychart.ui.Toolbar = function() {
 
 };
 goog.inherits(anychart.ui.Toolbar, anychart.core.ui.toolbar.Toolbar);
+
+
+/**
+ * @enum {string}
+ */
+anychart.ui.Toolbar.CssClass = {
+  FIT_ALL: 'anychart-toolbar-fitAll',
+  ZOOM_IN: 'anychart-toolbar-zoomIn',
+  ZOOM_OUT: 'anychart-toolbar-zoomOut',
+  PRINT: 'anychart-toolbar-print',
+  SAVE_AS: 'anychart-toolbar-saveAs',
+  SAVE_AS_PNG: 'anychart-toolbar-saveAsPng',
+  SAVE_AS_PDF: 'anychart-toolbar-saveAsPdf',
+  SAVE_AS_JPG: 'anychart-toolbar-saveAsJpg',
+  SAVE_AS_SVG: 'anychart-toolbar-saveAsSvg',
+  EXPAND_ALL: 'anychart-toolbar-expandAll',
+  COLLAPSE_ALL: 'anychart-toolbar-collapseAll'
+};
 
 
 /**
@@ -199,6 +211,8 @@ anychart.ui.Toolbar.prototype.draw = function() {
       var printItem = new goog.ui.MenuItem('Landscape, ' + anychart.utils.normalizePaperSizeCaption(size),
           void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
       printItem.setId(id);
+      printItem.setModel({name: 'print', args: [size]});
+      printItem.addClassName(anychart.ui.Toolbar.CssClass.PRINT + '-' + size);
       this.printMenu_.addChild(printItem, true);
     }
   }
@@ -223,34 +237,29 @@ anychart.ui.Toolbar.prototype.createToolbarActionHandler = function() {
       var isLandscape = item.getValue();
 
       menu.forEachChild(function(child, index) {
-        var childId = child.getId();
-        if (!childId.indexOf('anychart') && (childId != id)) {
-          var childValueSplit = child.getValue().split(',');
-          childValueSplit[0] = isLandscape ? 'Portrait' : 'Landscape';
-          child.setCaption(childValueSplit.join(','));
+        if (child.getId() != 'anychart_switchLayout' && child instanceof goog.ui.MenuItem) {
+          var str = isLandscape ? 'Portrait' : 'Landscape';
+          str += ', ';
+          str += child.getCaption().split(',')[1];
+          child.setCaption(str);
         }
       });
 
       item.setValue(!isLandscape);
     } else {
-      var args = id.split('_');
+      var model = item.getModel();
+      var funcName = model.name;
+      var args = model.args || [];
 
-      /*
-        String 'anychart_saveAsPDF_a3' will be represented as args = ['anychart', 'saveAsPDF', 'a3'].
-        goog.array.splice() will turn arr to ['a3'] and will return ['anychart', 'saveAsPDF'], where index '1' is function
-        to be called.
-      */
-      var func = goog.array.splice(args, 0, 2)[1];
-
-      if (func == 'print') args.push(!item.getCaption().indexOf('Landscape'));
+      if (funcName == 'print') args.push(!item.getCaption().indexOf('Landscape'));
 
       var chart = ths.target();
       if (chart) {
-        var fn = chart[func];
+        var fn = chart[funcName];
         if (goog.isFunction(fn)) {
           fn.apply(chart, args);
         } else {
-          anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, [func]);
+          anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_METHOD_IS_NOT_DEFINED, null, [funcName]);
         }
       } else {
         anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET);
@@ -279,7 +288,8 @@ anychart.ui.GanttToolbar = function() {
   // --------- EXPAND/COLLAPSE ----------
 
   var expandAllButton = new goog.ui.ToolbarButton('Expand All', anychart.core.ui.toolbar.ToolbarButtonRenderer.getInstance());
-  expandAllButton.setId('anychart_expandAll');
+  expandAllButton.addClassName(anychart.ui.Toolbar.CssClass.EXPAND_ALL);
+  expandAllButton.setModel({name: 'expandAll'});
   goog.events.listen(
       expandAllButton,
       goog.ui.Component.EventType.ACTION,
@@ -288,7 +298,8 @@ anychart.ui.GanttToolbar = function() {
   this.addChild(expandAllButton, true);
 
   var collapseAllButton = new goog.ui.ToolbarButton('Collapse All', anychart.core.ui.toolbar.ToolbarButtonRenderer.getInstance());
-  collapseAllButton.setId('anychart_collapseAll');
+  collapseAllButton.addClassName(anychart.ui.Toolbar.CssClass.COLLAPSE_ALL);
+  collapseAllButton.setModel({name: 'collapseAll'});
   goog.events.listen(
       collapseAllButton,
       goog.ui.Component.EventType.ACTION,

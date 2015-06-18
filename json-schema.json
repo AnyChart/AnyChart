@@ -123,10 +123,10 @@
           ]
         },
         "animation": {
-          "type": "boolean"
-        },
-        "animationDuration": {
-          "type": "number"
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.utils.Animation"}
+          ]
         }
       }
     },
@@ -3952,6 +3952,16 @@
         "percent80",
         "percent90"
       ]
+    },
+  "anychart.core.utils.Animation": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "duration": {
+          "type": "number"
+        }
+      }
     },
     "anychart.core.utils.Space": {
       "properties": {

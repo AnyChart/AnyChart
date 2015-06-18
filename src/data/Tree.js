@@ -812,8 +812,8 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
  * @return {anychart.data.Tree.DataItem} - Restored tree data item.
  */
 anychart.data.Tree.DataItem.fromSerializedItem = function(tree, config) {
-  var data = config.treeDataItemData;
-  var meta = config.treeDataItemMeta;
+  var data = config['treeDataItemData'];
+  var meta = config['treeDataItemMeta'];
   var children = config.children;
 
   var item = new anychart.data.Tree.DataItem(tree, data);
@@ -1167,8 +1167,8 @@ anychart.data.Tree.DataItem.prototype.clone = function(tree) {
  */
 anychart.data.Tree.DataItem.prototype.serialize = function() {
   var result = {
-    treeDataItemData: this.data_,
-    treeDataItemMeta: this.meta_
+    'treeDataItemData': this.data_,
+    'treeDataItemMeta': this.meta_
   };
 
   for (var i = 0, len = this.numChildren(); i < len; i++) {

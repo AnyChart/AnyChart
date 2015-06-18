@@ -1758,7 +1758,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
   var value;
   var rowsCount = iterator.getRowsCount();
 
-  if (rowsCount >= 7) {
+  if (rowsCount > 7) {
     anychart.utils.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
   }
 

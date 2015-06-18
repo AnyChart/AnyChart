@@ -631,7 +631,7 @@ anychart.data.View.prototype.serialize = function() {
             val = row[map[i]];
             if (val instanceof Date)
               val = val.getTime();
-            if (!goog.isDef(val))
+            if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
               val = null;
             rowObject[key] = val;
             break;
@@ -650,7 +650,7 @@ anychart.data.View.prototype.serialize = function() {
             val = row[map[i]];
             if (val instanceof Date)
               val = val.getTime();
-            if (!goog.isDef(val))
+            if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
               val = null;
             rowObject[key] = val;
             break;
@@ -662,13 +662,13 @@ anychart.data.View.prototype.serialize = function() {
           val = row[key];
           if (val instanceof Date)
             val = val.getTime();
-          if (!goog.isDef(val))
+          if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
             val = null;
           rowObject[key] = val;
         }
       }
     } else {
-      if (!goog.isDef(row))
+      if (!goog.isDef(row) || (goog.isNumber(row) && isNaN(row)))
         row = null;
       rowObject = row;
     }

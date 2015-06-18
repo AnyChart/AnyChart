@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
-        xmlns="http://anychart.com/products/anychart7/schemas/7.4.1/schema.xsd"
+        targetNamespace="http://anychart.com/schemas/7.5.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/7.5.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <!-- Online validator http://www.utilities-online.info/xsdvalidation/#.VImqs6SsUn- -->
@@ -29,6 +29,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
@@ -100,7 +101,6 @@
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
-        <xsd:attribute name="animation_duration" type="xsd:double" default="2000"/>
         <!-- charts.Bullet attrs -->
         <xsd:attribute name="layout" type="enums.Layout" default="horizontal"/>
         <xsd:attribute name="scale" type="simple.ChartScaleRef" default="linear"/>
@@ -186,6 +186,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <!-- anychart.gauges.Circular elements -->
@@ -207,7 +208,6 @@
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
-        <xsd:attribute name="animation_duration" type="xsd:double" default="2000"/>
         <!-- anychart.gauges.Circular common attrs -->
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -227,6 +227,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <!-- Gantt elements -->
@@ -243,7 +244,7 @@
         <xsd:attribute name="container" type="xsd:string"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
-
+        <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <!-- Gantt attributes -->
 
         <xsd:attribute name="header_height" type="xsd:double"/>
@@ -1069,6 +1070,11 @@
         <xsd:attribute name="right" type="simple.NumberOrPercent"/>
         <xsd:attribute name="top" type="simple.NumberOrPercent"/>
         <xsd:attribute name="bottom" type="simple.NumberOrPercent"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.Animation">
+        <xsd:attribute name="enabled" type="simple.Bool"/>
+        <xsd:attribute name="duration" type="xsd:integer"/>
     </xsd:complexType>
 
     <xsd:complexType name="utils.Rect">
