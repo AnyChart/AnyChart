@@ -2759,7 +2759,7 @@ anychart.charts.Cartesian.prototype.doAnimation = function() {
       });
     }, false, this);
   }
-  this.animationQueue_.play(true);
+  this.animationQueue_.play(false);
 };
 
 

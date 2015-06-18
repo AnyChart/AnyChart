@@ -81,21 +81,6 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  var clip, bounds, axesLinesSpace;
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (this.clip()) {
-      if (goog.isBoolean(this.clip())) {
-        bounds = this.pixelBoundsCache;
-        axesLinesSpace = this.axesLinesSpace();
-        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-      } else {
-        clip = /** @type {!anychart.math.Rect} */(this.clip());
-      }
-      this.rootLayer.clip(clip);
-    }
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();

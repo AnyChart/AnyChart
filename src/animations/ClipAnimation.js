@@ -13,18 +13,21 @@ goog.require('anychart.animations.Animation');
  * @extends {anychart.animations.Animation}
  */
 anychart.animations.ClipAnimation = function(stage, series, duration, opt_acc) {
+  /**
+   * Stage reference.
+   * @type {acgraph.vector.Stage}
+   * @private
+   */
   this.stage_ = stage;
-  var start = series.getPixelBounds().clone();
-  var end = start.toArray();
-  start.width = 0;
-  start = start.toArray();
 
+  /**
+   * Series reference.
+   * @type {anychart.core.cartesian.series.BaseWithMarkers}
+   * @private
+   */
   this.series_ = series;
-  this.seriesRootLayer_ = series.getRootLayer();
-  this.markersRootLayer_ = series.markers().getRootLayer();
-  this.labelsRootLayer_ = series.labels().getRootLayer();
 
-  goog.base(this, start, end, duration, opt_acc);
+  goog.base(this, [0, 0, 0, 0], [0, 0, 0, 0], duration, opt_acc);
 };
 goog.inherits(anychart.animations.ClipAnimation, anychart.animations.Animation);
 
@@ -34,29 +37,39 @@ anychart.animations.ClipAnimation.prototype.onBegin = function() {
   if (!this.clip_)
     this.clip_ = this.stage_.createClip();
 
-  this.oldClipSeries_ = this.seriesRootLayer_.clip();
-  this.oldClipMarkers_ = this.markersRootLayer_.clip();
-  this.oldClipLabels_ = this.labelsRootLayer_.clip();
-  this.seriesRootLayer_.clip(this.clip_);
-  this.markersRootLayer_.clip(this.clip_);
-  this.labelsRootLayer_.clip(this.clip_);
+  this.series_.getRootLayer().clip(this.clip_);
+  this.series_.markers().getRootLayer().clip(this.clip_);
+  this.series_.labels().getRootLayer().clip(this.clip_);
+};
+
+
+/** @inheritDoc */
+anychart.animations.ClipAnimation.prototype.cycle = function(now) {
+  var bounds = this.series_.getPixelBounds();
+
+  this.startPoint[0] = bounds.left;
+  this.startPoint[1] = bounds.top;
+  this.startPoint[2] = 0;
+  this.startPoint[3] = bounds.height;
+  this.endPoint[0] = bounds.left;
+  this.endPoint[1] = bounds.top;
+  this.endPoint[2] = bounds.width;
+  this.endPoint[3] = bounds.height;
+
+  goog.base(this, 'cycle', now);
 };
 
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onAnimate = function() {
-  this.clip_.bounds(anychart.math.Rect.fromArray(this.coords));
+  this.clip_.bounds.apply(this.clip_, this.coords);
 };
 
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onEnd = function() {
-  this.seriesRootLayer_.clip(this.oldClipSeries_);
-  this.markersRootLayer_.clip(this.oldClipMarkers_);
-  this.labelsRootLayer_.clip(this.oldClipLabels_);
-  this.clip_.dispose();
+  this.series_.doClip();
+
+  goog.dispose(this.clip_);
   this.clip_ = null;
-  this.oldClipSeries_ = null;
-  this.oldClipMarkers_ = null;
-  this.oldClipLabels_ = null;
 };

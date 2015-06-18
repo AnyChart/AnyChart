@@ -439,6 +439,26 @@ anychart.core.cartesian.series.Base.prototype.strokeInternal = (function() {
 anychart.core.cartesian.series.Base.prototype.hoverStroke_ = null;
 
 
+/**
+ * Makes proper clipping. Considered internal.
+ */
+anychart.core.cartesian.series.Base.prototype.doClip = function() {
+  var clip, bounds, axesLinesSpace;
+  if (this.clip() && !(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
+    if (goog.isBoolean(this.clip())) {
+      bounds = this.pixelBoundsCache;
+      axesLinesSpace = this.axesLinesSpace();
+      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+    } else {
+      clip = /** @type {!anychart.math.Rect} */(this.clip());
+    }
+    this.rootLayer.clip(clip);
+    var labelDOM = this.labels().getDomElement();
+    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data
@@ -1140,10 +1160,9 @@ anychart.core.cartesian.series.Base.prototype.applyAxesLinesSpace = function(val
 anychart.core.cartesian.series.Base.prototype.finalizeDrawing = function() {
   this.labels().draw();
 
-  if (this.clip()) {
-    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
-    var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.doClip();
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
   this.labels().resumeSignalsDispatching(false);
