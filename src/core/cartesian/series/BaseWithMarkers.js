@@ -178,7 +178,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint = function() 
 anychart.core.cartesian.series.BaseWithMarkers.prototype.doClip = function() {
   goog.base(this, 'doClip');
 
-  if (this.clip()) {
+  if (this.clip() && !(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
     var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var markerDOM = this.markers().getDomElement();
     if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));

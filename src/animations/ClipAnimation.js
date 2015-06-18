@@ -68,6 +68,9 @@ anychart.animations.ClipAnimation.prototype.onAnimate = function() {
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onEnd = function() {
+  this.series_.getRootLayer().clip(null);
+  this.series_.markers().getRootLayer().clip(null);
+  this.series_.labels().getRootLayer().clip(null);
   this.series_.doClip();
 
   goog.dispose(this.clip_);
