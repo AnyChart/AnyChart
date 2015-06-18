@@ -298,21 +298,6 @@ anychart.core.cartesian.series.Marker.prototype.startDrawing = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  var clip, bounds, axesLinesSpace;
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (this.clip()) {
-      if (goog.isBoolean(this.clip())) {
-        bounds = this.pixelBoundsCache;
-        axesLinesSpace = this.axesLinesSpace();
-        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-      } else {
-        clip = /** @type {!anychart.math.Rect} */(this.clip());
-      }
-      this.rootLayer.clip(clip);
-    }
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.marker_.fill(this.getFinalFill(false, false));
     this.marker_.stroke(this.getFinalStroke(false, false));

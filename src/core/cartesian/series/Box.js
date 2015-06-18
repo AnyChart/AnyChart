@@ -412,14 +412,20 @@ anychart.core.cartesian.series.Box.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.finalizeDrawing = function() {
-  this.outlierMarkers().draw();
+anychart.core.cartesian.series.Box.prototype.doClip = function() {
+  goog.base(this, 'doClip');
 
   if (this.clip()) {
     var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var markerDOM = this.outlierMarkers().getDomElement();
     if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
   }
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Box.prototype.finalizeDrawing = function() {
+  this.outlierMarkers().draw();
 
   this.outlierMarkers().resumeSignalsDispatching(false);
   this.hoverOutlierMarkers().resumeSignalsDispatching(false);
