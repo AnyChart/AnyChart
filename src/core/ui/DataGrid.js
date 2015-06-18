@@ -917,7 +917,7 @@ anychart.core.ui.DataGrid.prototype.getInteractivityEvent_ = function(event) {
     var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + this.titleHeight_ + anychart.core.ui.DataGrid.ROW_SPACE);
 
     var min = this.pixelBoundsCache_.top +
-        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x +
+        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y +
         this.titleHeight_;
 
     var mouseHeight = event['clientY'] - min;

@@ -1505,7 +1505,7 @@ anychart.core.gantt.Timeline.prototype.getInteractivityEvent_ = function(event) 
 
 
     var min = this.pixelBoundsCache_.top +
-        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x +
+        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y +
         headerHeight;
 
     var mouseHeight = event['clientY'] - min;
