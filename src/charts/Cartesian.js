@@ -2742,7 +2742,7 @@ anychart.charts.Cartesian.prototype.doAnimation = function() {
       if (!ctl) continue;
       var duration = /** @type {number} */(this.animation().duration());
       if (ctl === anychart.animations.ClipAnimation) {
-        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), series, duration)));
+        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), /** @type {anychart.core.cartesian.series.BaseWithMarkers} */(series), duration)));
       } else
         this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
     }
