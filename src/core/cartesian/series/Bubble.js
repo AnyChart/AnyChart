@@ -46,6 +46,8 @@ anychart.core.cartesian.series.Bubble = function(opt_data, opt_csvSettings) {
 
   this.markers().position(anychart.enums.Position.CENTER);
   this.labels().position(anychart.enums.Position.CENTER);
+
+  this.isAnimation_ = false;
 };
 goog.inherits(anychart.core.cartesian.series.Bubble, anychart.core.cartesian.series.DiscreteBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.BUBBLE] = anychart.core.cartesian.series.Bubble;
@@ -370,6 +372,19 @@ anychart.core.cartesian.series.Bubble.prototype.calculateSize_ = function(size) 
 };
 
 
+/**
+ * Whether series in animation now.
+ * @param {boolean} value animation state.
+ */
+anychart.core.cartesian.series.Bubble.prototype.setAnimation = function(value) {
+  if (goog.isDef(value)) {
+    if (this.isAnimation_ != value) {
+      this.isAnimation_ = value;
+    }
+  }
+};
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function() {
   var referenceValues = this.getReferenceCoords();
@@ -388,8 +403,15 @@ anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function()
     var circle = /** @type {!acgraph.vector.Circle} */(this.rootElement.genNextChild());
 
     this.getIterator().meta('x', x).meta('y', y).meta('size', size).meta('shape', circle);
-
-    circle.radius(Math.abs(size)).centerX(x).centerY(y);
+    if (!this.isAnimation_)
+      circle
+        .radius(Math.abs(size))
+        .centerX(x)
+        .centerY(y);
+    else
+      circle
+        .centerX(x)
+        .centerY(y);
 
     this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 

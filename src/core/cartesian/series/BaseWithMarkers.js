@@ -201,6 +201,21 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = funct
 
 
 /**
+ * Gets marker position.
+ * @param {boolean} hovered Whether labels hovered.
+ * @return {string} Position settings.
+ */
+anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkersPosition = function(hovered) {
+  var pointMarker = this.getIterator().get('marker');
+  var hoverPointMarker = this.getIterator().get('hoverMarker');
+
+  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+};
+
+
+/**
  * Draws marker for the point.
  * @param {boolean} hovered If it is a hovered marker drawing.
  * @protected
@@ -229,10 +244,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(h
           markerEnabledState;
 
   if (isDraw) {
-    var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
-    var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
-
+    var position = this.getMarkersPosition(hovered);
     var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
       marker.positionProvider(positionProvider);

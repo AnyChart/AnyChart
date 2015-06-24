@@ -10,54 +10,66 @@
     <script>
         goog.require('anychart.modules.anychart');
     </script>
-    <script>
-        function toggleStack() {
-            var btn = document.getElementById('btn');
-            if (btn.innerText == 'none') {
-                chart.yScale().stackMode('none');
-                btn.innerText = 'value';
-                chart.animate(false).animate(true);
-            } else {
-                chart.yScale().stackMode('value');
-                btn.innerText = 'none';
-                chart.animate(false).animate(true);
-            }
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 9;
         }
-    </script>
+    </style>
 </head>
 <body>
-<button id='btn' style="float:right; font-size: 150px" onclick="toggleStack()">none</button>
-<div id="container" style="border:1px solid; width: 800px; height: 600px;"></div>
+<div id="container"></div>
 <script>
     var chart, line;
     anychart.onDocumentReady(function() {
-        var stage = anychart.graphics.create('container');
-//        chart = anychart.bar();
-//        chart.yScale().stackMode('value');
-//        chart.bar([4, 6, -2, 3]);
-//        chart.bar([3, 2, 3, 2]);
-//        chart.bar([2, 2, 3, 2]);
-        chart = anychart.line();
-        chart.line([2, 2, 0, 1]).labels(true);
-        chart.line([3, 3, 1, 2]).labels(true);
-        chart.line([4, 4, 2, 3]).labels(true);
-        chart.bubble([
-            [0, 2, 1],
-            [1, 2, 2],
-            [2, 0, 4],
-            [3, 1, 3]]);
-        chart.bubble([
-            [0, 3, 4],
-            [1, 3, 3],
-            [2, 1, 1],
-            [3, 2, 2]]);
-        chart.bubble([
-            [0, 4, 2],
-            [1, 4, 2],
-            [2, 2, 2],
-            [3, 3, 2]]);
-        chart.animation(true).animationDuration(0);
-        chart.container(stage).draw();
+        var dataSet = anychart.data.set([
+            ['P1', 128.14, 90.54, 43.76, 122.56],
+            ['P2', -112.61, -104.19, 61.34, 187.12],
+            ['P3', 163.21, 150.67, 34.17, -54.32],
+            ['P4', -229.98, 120.43, -45.72, 33.08]
+        ]);
+
+        var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+        var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+        var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+        var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
+
+        chart = anychart.column();
+
+        chart.animation(10000);
+        chart.container('container');
+        chart.title().text('Multi-Series Bar Chart');
+        var setupSeriesLabels = function(series) {
+            var seriesLabels = series.labels();
+            seriesLabels.enabled(true);
+            seriesLabels.position('lefttop');
+            seriesLabels.anchor('center');
+            seriesLabels.fontWeight('bold');
+
+            var seriesMarkers = series.markers();
+            seriesMarkers.enabled(true);
+            seriesMarkers.position('righttop');
+            seriesMarkers.anchor('center');
+        };
+
+        var series;
+
+        /*series = chart.bubble([
+            ['p1', 5, 2],
+            ['p2', 5, 2],
+            ['p3', 5, 3]
+        ]).minimumSize(50).maximumSize(70);*/
+        series = chart.column(seriesData_1);
+        setupSeriesLabels(series);
+        series = chart.column(seriesData_2);
+        setupSeriesLabels(series);
+        series = chart.column(seriesData_3);
+        setupSeriesLabels(series);
+        series = chart.column(seriesData_4);
+        setupSeriesLabels(series);
+        chart.draw();
     });
 </script>
 </body>

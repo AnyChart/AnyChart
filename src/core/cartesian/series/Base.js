@@ -1183,6 +1183,30 @@ anychart.core.cartesian.series.Base.prototype.finalizeDrawing = function() {
 
 
 /**
+ * Gets label position.
+ * @param {boolean} hovered Whether labels hovered.
+ * @return {string} Position settings.
+ */
+anychart.core.cartesian.series.Base.prototype.getLabelsPosition = function(hovered) {
+  var pointLabel = this.getIterator().get('label');
+  var hoverPointLabel = hovered ? this.getIterator().get('hoverLabel') : null;
+  var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
+  var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
+  return hovered ?
+      labelHoverPosition ?
+          labelHoverPosition :
+          this.hoverLabels().position() ?
+              this.hoverLabels().position() :
+              labelPosition ?
+                  labelPosition :
+                  this.labels().position() :
+      labelPosition ?
+          labelPosition :
+          this.labels().position();
+};
+
+
+/**
  * Draws marker for a point.
  * @param {boolean} hovered If it is a hovered marker drawing.
  * @protected
@@ -1211,19 +1235,7 @@ anychart.core.cartesian.series.Base.prototype.drawLabel = function(hovered) {
           labelEnabledState;
 
   if (isDraw) {
-    var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
-    var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
-    var position = hovered ?
-        labelHoverPosition ?
-            labelHoverPosition :
-            this.hoverLabels().position() ?
-                this.hoverLabels().position() :
-                labelPosition ?
-                    labelPosition :
-                    this.labels().position() :
-        labelPosition ?
-            labelPosition :
-            this.labels().position();
+    var position = this.getLabelsPosition(hovered);
 
     var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.createFormatProvider();

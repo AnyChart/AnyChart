@@ -20,9 +20,24 @@ anychart.core.cartesian.series.Bar = function(opt_data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value', 'value'];
   this.referenceValueMeanings = ['x', 'z', 'y'];
   this.referenceValuesSupportStack = true;
+
+  this.isAnimation_ = false;
 };
 goog.inherits(anychart.core.cartesian.series.Bar, anychart.core.cartesian.series.BarBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.BAR] = anychart.core.cartesian.series.Bar;
+
+
+/**
+ * Whether series in animation now.
+ * @param {boolean} value animation state.
+ */
+anychart.core.cartesian.series.Bar.prototype.setAnimation = function(value) {
+  if (goog.isDef(value)) {
+    if (this.isAnimation_ != value) {
+      this.isAnimation_ = value;
+    }
+  }
+};
 
 
 /** @inheritDoc */
@@ -41,7 +56,16 @@ anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
     var barWidth = this.getPointWidth();
 
     this.getIterator().meta('x', x).meta('zero', zero).meta('y', y).meta('shape', rect);
-    rect.setY(x - barWidth / 2).setX(Math.min(zero, y)).setHeight(barWidth).setWidth(Math.abs(zero - y));
+    if (!this.isAnimation_)
+      rect
+        .setX(Math.min(zero, y))
+        .setY(x - barWidth / 2)
+        .setWidth(Math.abs(zero - y))
+        .setHeight(barWidth);
+    else
+      rect
+        .setY(x - barWidth / 2)
+        .setHeight(barWidth);
 
     this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
 

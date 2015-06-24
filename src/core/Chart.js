@@ -751,6 +751,11 @@ anychart.core.Chart.prototype.draw = function() {
   //after all chart items drawn, we can clear other states
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+    this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
+    if (this.animation().enabled()) this.doAnimation();
+  }
+
   if (manualSuspend) stage.resume();
 
   this.resumeSignalsDispatching(false);
@@ -762,12 +767,6 @@ anychart.core.Chart.prototype.draw = function() {
 
   var msg = 'Chart rendering time: ' + (new Date().getTime() - startTime);
   anychart.utils.info(msg);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
-    this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
-    if (this.animation().enabled()) this.doAnimation();
-  }
-
   return this;
 };
 

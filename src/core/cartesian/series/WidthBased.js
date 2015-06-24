@@ -72,7 +72,6 @@ anychart.core.cartesian.series.WidthBased.prototype.isWidthBased = function() {
 
 /**
  * @return {number} Point width in pixels.
- * @protected
  */
 anychart.core.cartesian.series.WidthBased.prototype.getPointWidth = function() {
   // todo(Anton Saukh): fix for linear scale case.
