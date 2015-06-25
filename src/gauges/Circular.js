@@ -1164,42 +1164,48 @@ anychart.gauges.Circular.prototype.setupByJSON = function(config) {
   var axes = config['axes'];
   if (axes) {
     for (i = 0, len = axes.length; i < len; i++) {
-      this.axis(axes[i]);
+      if (axes[i])
+        this.axis(i, axes[i]);
     }
   }
 
   var bars = config['bars'];
   if (bars) {
     for (i = 0, len = bars.length; i < len; i++) {
-      this.bar(bars[i]);
+      if (bars[i])
+        this.bar(i, bars[i]);
     }
   }
 
   var markers = config['markers'];
   if (markers) {
     for (i = 0, len = markers.length; i < len; i++) {
-      this.marker(markers[i]);
+      if (markers[i])
+        this.marker(i, markers[i]);
     }
   }
 
   var needles = config['needles'];
   if (needles) {
     for (i = 0, len = needles.length; i < len; i++) {
-      this.needle(needles[i]);
+      if (needles[i])
+        this.needle(i, needles[i]);
     }
   }
 
   var knobs = config['knobs'];
   if (knobs) {
     for (i = 0, len = knobs.length; i < len; i++) {
-      this.knob(knobs[i]);
+      if (knobs[i])
+        this.knob(i, knobs[i]);
     }
   }
 
   var ranges = config['ranges'];
   if (ranges) {
     for (i = 0, len = ranges.length; i < len; i++) {
-      this.range(ranges[i]);
+      if (ranges[i])
+        this.range(i, ranges[i]);
     }
   }
 };
@@ -1224,37 +1230,43 @@ anychart.gauges.Circular.prototype.serialize = function() {
   var i, len;
   var axes = [];
   for (i = 0, len = this.axes_.length; i < len; i++) {
-    axes.push(this.axes_[i].serialize());
+    if (this.axes_[i])
+      axes[i] = this.axes_[i].serialize();
   }
   json['axes'] = axes;
 
   var bars = [];
   for (i = 0, len = this.bars_.length; i < len; i++) {
-    bars.push(this.bars_[i].serialize());
+    if (this.bars_[i])
+      bars[i] = this.bars_[i].serialize();
   }
   json['bars'] = bars;
 
   var markers = [];
   for (i = 0, len = this.markers_.length; i < len; i++) {
-    markers.push(this.markers_[i].serialize());
+    if (this.markers_[i])
+      markers[i] = this.markers_[i].serialize();
   }
   json['markers'] = markers;
 
   var needles = [];
   for (i = 0, len = this.needles_.length; i < len; i++) {
-    needles.push(this.needles_[i].serialize());
+    if (this.needles_[i])
+      needles[i] = this.needles_[i].serialize();
   }
   json['needles'] = needles;
 
   var knobs = [];
   for (i = 0, len = this.knobs_.length; i < len; i++) {
-    knobs.push(this.knobs_[i].serialize());
+    if (this.knobs_[i])
+      knobs[i] = this.knobs_[i].serialize();
   }
   json['knobs'] = knobs;
 
   var ranges = [];
   for (i = 0, len = this.ranges_.length; i < len; i++) {
-    ranges.push(this.ranges_[i].serialize());
+    if (this.ranges_[i])
+      ranges[i] = this.ranges_[i].serialize();
   }
   json['ranges'] = ranges;
 
