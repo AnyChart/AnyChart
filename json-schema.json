@@ -249,11 +249,21 @@
         },
         "barGroupsPadding": {
           "type": [
+            "number"
+          ]
+        },
+        "barsPadding": {
+          "type": [
+            "number"
+          ]
+        },
+        "minBubbleSize": {
+          "type": [
             "number",
             "string"
           ]
         },
-        "barsPadding": {
+        "maxBubbleSize": {
           "type": [
             "number",
             "string"
@@ -1109,6 +1119,18 @@
             {"$ref": "#/definitions/anychart.scales.Linear"},
             {"$ref": "#/definitions/anychart.scales.Logarithmic"},
             {"$ref": "#/definitions/anychart.scales.DateTime"}
+          ]
+        },
+        "minBubbleSize": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "maxBubbleSize": {
+          "type": [
+            "number",
+            "string"
           ]
         }
       },

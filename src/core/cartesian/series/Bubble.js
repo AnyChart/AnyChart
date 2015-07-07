@@ -23,14 +23,14 @@ anychart.core.cartesian.series.Bubble = function(opt_data, opt_csvSettings) {
    * @type {(string|number)}
    * @private
    */
-  this.minimumSizeSetting_ = '10%';
+  this.minimumSizeSetting_ = '5%';
 
   /**
    * Maximum bubble size.
    * @type {(string|number)}
    * @private
    */
-  this.maximumSizeSetting_ = '95%';
+  this.maximumSizeSetting_ = '20%';
 
   /**
    * Whether to display negative bubble or not.
@@ -155,9 +155,11 @@ anychart.core.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function
 
 /**
  * Getter for current minimum bubble size.
+ * @deprecated Use chart.minBubbleSize() instead.
  * @return {(string|number)} Minimum size of the bubble.
  *//**
  * Setter for minimum bubble size.
+ * @deprecated Use chart.minBubbleSize() instead.
  * @example
  * chart = anychart.cartesian();
  * chart.bubble([
@@ -174,16 +176,13 @@ anychart.core.cartesian.series.Bubble.prototype.hoverNegativeStroke_ = (function
  * @return {!anychart.core.cartesian.series.Bubble} {@link anychart.core.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
+ * @deprecated Use chart.minBubbleSize() instead.
  * @param {(string|number)=} opt_value Minimum size of the bubble.
  * @return {(string|number|anychart.core.cartesian.series.Bubble)} Minimum size of the bubble or self for method chaining.
  */
 anychart.core.cartesian.series.Bubble.prototype.minimumSize = function(opt_value) {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.minimumSize()', 'chart.minBubbleSize()'], true);
   if (goog.isDef(opt_value)) {
-    var val = (goog.isString(opt_value) || goog.isNumber(opt_value)) ? opt_value : NaN;
-    if (this.minimumSizeSetting_ != val) {
-      this.minimumSizeSetting_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
     return this;
   }
   return this.minimumSizeSetting_;
@@ -192,9 +191,11 @@ anychart.core.cartesian.series.Bubble.prototype.minimumSize = function(opt_value
 
 /**
  * Getter for current maximum bubble size.
+ * @deprecated Use chart.maxBubbleSize() instead.
  * @return {(string|number)} Maximum size of the bubble.
  *//**
  * Setter for maximum bubble size.
+ * @deprecated Use chart.maxBubbleSize() instead.
  * @example
  * chart = anychart.cartesian();
  * chart.bubble([
@@ -211,16 +212,13 @@ anychart.core.cartesian.series.Bubble.prototype.minimumSize = function(opt_value
  * @return {!anychart.core.cartesian.series.Bubble} {@link anychart.core.cartesian.series.Bubble} instance for method chaining.
  *//**
  * @ignoreDoc
+ * @deprecated Use chart.maxBubbleSize() instead.
  * @param {(string|number)=} opt_value maximum size of the bubble.
  * @return {(string|number|anychart.core.cartesian.series.Bubble)} maximum size of the bubble or self for method chaining.
  */
 anychart.core.cartesian.series.Bubble.prototype.maximumSize = function(opt_value) {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.maximumSize()', 'chart.maxBubbleSize()'], true);
   if (goog.isDef(opt_value)) {
-    var val = (goog.isString(opt_value) || goog.isNumber(opt_value)) ? opt_value : NaN;
-    if (this.maximumSizeSetting_ != val) {
-      this.maximumSizeSetting_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
     return this;
   }
   return this.maximumSizeSetting_;
@@ -294,32 +292,31 @@ anychart.core.cartesian.series.Bubble.prototype.rootTypedLayerInitializer = func
 anychart.core.cartesian.series.Bubble.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
 
-  var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
-      this.pixelBoundsCache.width / 2;
+  this.calculateSizeScale();
+
+  var size = Math.min(this.pixelBoundsCache.height, this.pixelBoundsCache.width);
 
   /**
    * Calculated minimum size value. For inner use.
-   * @type {!number}
+   * @type {number}
    * @private
    */
-  this.minimumSizeValue_ = anychart.utils.normalizeSize(this.minimumSizeSetting_, categoryWidth);
+  this.minimumSizeValue_ = anychart.utils.normalizeSize(this.minimumSizeSetting_, size);
 
   /**
    * Calculated maximum size value. For inner use.
-   * @type {!number}
+   * @type {number}
    * @private
    */
-  this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, categoryWidth);
-
-  this.calculateSizeScale();
+  this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, size);
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.calculateSizeScale = function(opt_minMax) {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
-    this.selfMinimumBubbleValue_ = Number.MAX_VALUE;
-    this.selfMaximumBubbleValue_ = -Number.MAX_VALUE;
+    this.selfMinimumBubbleValue_ = Number.POSITIVE_INFINITY;
+    this.selfMaximumBubbleValue_ = Number.NEGATIVE_INFINITY;
 
     var size;
     var iter = this.data().getIterator();
@@ -340,16 +337,21 @@ anychart.core.cartesian.series.Bubble.prototype.calculateSizeScale = function(op
     this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
   if (opt_minMax) {
-    opt_minMax[0] = Math.min(opt_minMax[0], this.selfMinimumBubbleValue_);
-    opt_minMax[1] = Math.max(opt_minMax[1], this.selfMaximumBubbleValue_);
+    this.minimumBubbleValue_ = opt_minMax[0] = Math.min(opt_minMax[0], this.selfMinimumBubbleValue_);
+    this.maximumBubbleValue_ = opt_minMax[1] = Math.max(opt_minMax[1], this.selfMaximumBubbleValue_);
+  } else if (isNaN(this.minimumBubbleValue_) || isNaN(this.maximumBubbleValue_)) {
+    this.minimumBubbleValue_ = this.selfMinimumBubbleValue_;
+    this.maximumBubbleValue_ = this.selfMaximumBubbleValue_;
   }
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Bubble.prototype.setAutoSizeScale = function(min, max) {
+anychart.core.cartesian.series.Bubble.prototype.setAutoSizeScale = function(min, max, minSize, maxSize) {
   this.minimumBubbleValue_ = min;
   this.maximumBubbleValue_ = max;
+  this.minimumSizeSetting_ = minSize;
+  this.maximumSizeSetting_ = maxSize;
 };
 
 
@@ -362,13 +364,11 @@ anychart.core.cartesian.series.Bubble.prototype.setAutoSizeScale = function(min,
 anychart.core.cartesian.series.Bubble.prototype.calculateSize_ = function(size) {
   var negative = size < 0;
   size = Math.abs(size);
-  var ratio;
-  if (this.maximumBubbleValue_ == this.minimumBubbleValue_)
+  var ratio = (size - this.minimumBubbleValue_) / (this.maximumBubbleValue_ - this.minimumBubbleValue_);
+  if (isNaN(ratio) || !isFinite(ratio))
     ratio = 0.5;
-  else
-    ratio = (size - this.minimumBubbleValue_) / (this.maximumBubbleValue_ - this.minimumBubbleValue_);
   size = (this.minimumSizeValue_ + ratio * (this.maximumSizeValue_ - this.minimumSizeValue_));
-  return (negative ? -size : size) || this.maximumBubbleValue_;
+  return (negative ? -size : size);
 };
 
 
@@ -1100,8 +1100,6 @@ anychart.core.cartesian.series.Bubble.prototype.getType = function() {
  */
 anychart.core.cartesian.series.Bubble.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['minimumSize'] = this.minimumSize();
-  json['maximumSize'] = this.maximumSize();
   json['displayNegative'] = this.displayNegative();
   if (goog.isFunction(this.negativeFill())) {
     anychart.utils.warning(
@@ -1166,8 +1164,6 @@ anychart.core.cartesian.series.Bubble.prototype.serialize = function() {
  */
 anychart.core.cartesian.series.Bubble.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.minimumSize(config['minimumSize']);
-  this.maximumSize(config['maximumSize']);
   this.displayNegative(config['displayNegative']);
   this.negativeFill(config['negativeFill']);
   this.hoverNegativeFill(config['hoverNegativeFill']);

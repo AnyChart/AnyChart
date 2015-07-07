@@ -134,6 +134,8 @@ anychart.core.scatter.series.Base.prototype.calculateSizeScale = goog.nullFuncti
 /**
  * @param {number} min .
  * @param {number} max .
+ * @param {number|string} minSize
+ * @param {number|string} maxSize
  */
 anychart.core.scatter.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 

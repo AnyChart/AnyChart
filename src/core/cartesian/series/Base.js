@@ -106,6 +106,8 @@ anychart.core.cartesian.series.Base.prototype.calculateSizeScale = goog.nullFunc
 /**
  * @param {number} min .
  * @param {number} max .
+ * @param {number|string} minSize
+ * @param {number|string} maxSize
  */
 anychart.core.cartesian.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 

@@ -1154,9 +1154,10 @@ anychart.utils.getInfoDescription = function(code, opt_arguments) {
  * @param {anychart.enums.WarningCode} code Warning internal code,. @see anychart.enums.WarningCode.
  * @param {*=} opt_exception Exception.
  * @param {Array.<*>=} opt_descArgs Description message arguments.
+ * @param {boolean=} opt_forceProd
  */
-anychart.utils.warning = function(code, opt_exception, opt_descArgs) {
-  if (anychart.DEVELOP) {
+anychart.utils.warning = function(code, opt_exception, opt_descArgs, opt_forceProd) {
+  if (anychart.DEVELOP || opt_forceProd) {
     anychart.utils.callLog_(
         'warn',
         ('Warning: ' + code + '\nDescription: ' + anychart.utils.getWarningDescription(code, opt_descArgs)),
@@ -1227,6 +1228,9 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
 
     case anychart.enums.WarningCode.TOOLBAR_CHART_IS_NOT_SET:
       return 'No chart is assigned for toolbar. Please set a target chart using toolbar.target() method.';
+
+    case anychart.enums.WarningCode.DEPRECATED:
+      return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead.';
 
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +

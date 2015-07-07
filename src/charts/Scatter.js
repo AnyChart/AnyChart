@@ -103,6 +103,20 @@ anychart.charts.Scatter = function() {
    * @private
    */
   this.series_ = [];
+
+  /**
+   * Max size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.maxBubbleSize_ = '20%';
+
+  /**
+   * Min size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.minBubbleSize_ = '5%';
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.SeparateChart);
 
@@ -1215,6 +1229,42 @@ anychart.charts.Scatter.prototype.onHatchFillPaletteSignal_ = function(event) {
 
 
 /**
+ * Sets max size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Scatter}
+ */
+anychart.charts.Scatter.prototype.maxBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.maxBubbleSize_ != opt_value) {
+      this.maxBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.SCATTER_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.maxBubbleSize_;
+};
+
+
+/**
+ * Sets min size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Scatter}
+ */
+anychart.charts.Scatter.prototype.minBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.minBubbleSize_ != opt_value) {
+      this.minBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.SCATTER_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.minBubbleSize_;
+};
+
+
+/**
  * Adds Bubble series.
  * @example
  * var chart = anychart.scatterChart();
@@ -1366,6 +1416,18 @@ anychart.charts.Scatter.prototype.onSeriesSignal_ = function(event) {
       state |= anychart.ConsistencyState.BOUNDS;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Invalidates APPEARANCE for all size-based series.
+ * @private
+ */
+anychart.charts.Scatter.prototype.invalidateSizeBasedSeries_ = function() {
+  for (var i = this.series_.length; i--;) {
+    if (this.series_[i].isSizeBased())
+      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+  }
 };
 
 
@@ -1862,7 +1924,7 @@ anychart.charts.Scatter.prototype.calcBubbleSizes_ = function() {
   }
   for (i = this.series_.length; i--;) {
     if (this.series_[i].isSizeBased())
-      this.series_[i].setAutoSizeScale(minMax[0], minMax[1]);
+      this.series_[i].setAutoSizeScale(minMax[0], minMax[1], this.minBubbleSize_, this.maxBubbleSize_);
   }
 };
 
@@ -1914,6 +1976,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+  json['minBubbleSize'] = this.minBubbleSize();
+  json['maxBubbleSize'] = this.maxBubbleSize();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -2083,6 +2147,8 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
+  this.minBubbleSize(config['minBubbleSize']);
+  this.maxBubbleSize(config['maxBubbleSize']);
 
   var i, json, scale;
   var grids = config['grids'];
@@ -2236,3 +2302,5 @@ anychart.charts.Scatter.prototype['palette'] = anychart.charts.Scatter.prototype
 anychart.charts.Scatter.prototype['markerPalette'] = anychart.charts.Scatter.prototype.markerPalette;
 anychart.charts.Scatter.prototype['hatchFillPalette'] = anychart.charts.Scatter.prototype.hatchFillPalette;
 anychart.charts.Scatter.prototype['getType'] = anychart.charts.Scatter.prototype.getType;
+anychart.charts.Scatter.prototype['maxBubbleSize'] = anychart.charts.Scatter.prototype.maxBubbleSize;
+anychart.charts.Scatter.prototype['minBubbleSize'] = anychart.charts.Scatter.prototype.minBubbleSize;

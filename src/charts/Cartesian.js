@@ -146,6 +146,20 @@ anychart.charts.Cartesian = function(opt_barChartMode) {
    */
   this.barsPadding_ = 0.1;
 
+  /**
+   * Max size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.maxBubbleSize_ = '20%';
+
+  /**
+   * Min size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.minBubbleSize_ = '5%';
+
   this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
@@ -1657,6 +1671,42 @@ anychart.charts.Cartesian.prototype.barsPadding = function(opt_value) {
 };
 
 
+/**
+ * Sets max size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Cartesian}
+ */
+anychart.charts.Cartesian.prototype.maxBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.maxBubbleSize_ != opt_value) {
+      this.maxBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.maxBubbleSize_;
+};
+
+
+/**
+ * Sets min size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Cartesian}
+ */
+anychart.charts.Cartesian.prototype.minBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.minBubbleSize_ != opt_value) {
+      this.minBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.minBubbleSize_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Calculation.
@@ -2120,7 +2170,7 @@ anychart.charts.Cartesian.prototype.calcBubbleSizes_ = function() {
   }
   for (i = this.series_.length; i--;) {
     if (this.series_[i].isSizeBased())
-      this.series_[i].setAutoSizeScale(minMax[0], minMax[1]);
+      this.series_[i].setAutoSizeScale(minMax[0], minMax[1], this.minBubbleSize_, this.maxBubbleSize_);
   }
 };
 
@@ -2624,6 +2674,18 @@ anychart.charts.Cartesian.prototype.invalidateWidthBasedSeries_ = function() {
 
 
 /**
+ * Invalidates APPEARANCE for all size-based series.
+ * @private
+ */
+anychart.charts.Cartesian.prototype.invalidateSizeBasedSeries_ = function() {
+  for (var i = this.series_.length; i--;) {
+    if (this.series_[i].isSizeBased())
+      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+  }
+};
+
+
+/**
  * Invalidates APPEARANCE for all width-based series.
  * @private
  */
@@ -2811,6 +2873,8 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
   this.hatchFillPalette(config['hatchFillPalette']);
   this.barGroupsPadding(config['barGroupsPadding']);
   this.barsPadding(config['barsPadding']);
+  this.minBubbleSize(config['minBubbleSize']);
+  this.maxBubbleSize(config['maxBubbleSize']);
 
   var i, json, scale;
   var grids = config['grids'];
@@ -2976,6 +3040,8 @@ anychart.charts.Cartesian.prototype.serialize = function() {
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['barGroupsPadding'] = this.barGroupsPadding();
   json['barsPadding'] = this.barsPadding();
+  json['minBubbleSize'] = this.minBubbleSize();
+  json['maxBubbleSize'] = this.maxBubbleSize();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -3216,6 +3282,8 @@ anychart.charts.Cartesian.prototype['xScale'] = anychart.charts.Cartesian.protot
 anychart.charts.Cartesian.prototype['yScale'] = anychart.charts.Cartesian.prototype.yScale;//doc|ex
 anychart.charts.Cartesian.prototype['barsPadding'] = anychart.charts.Cartesian.prototype.barsPadding;//doc|ex
 anychart.charts.Cartesian.prototype['barGroupsPadding'] = anychart.charts.Cartesian.prototype.barGroupsPadding;//doc|ex
+anychart.charts.Cartesian.prototype['maxBubbleSize'] = anychart.charts.Cartesian.prototype.maxBubbleSize;
+anychart.charts.Cartesian.prototype['minBubbleSize'] = anychart.charts.Cartesian.prototype.minBubbleSize;
 anychart.charts.Cartesian.prototype['grid'] = anychart.charts.Cartesian.prototype.grid;//doc|ex
 anychart.charts.Cartesian.prototype['minorGrid'] = anychart.charts.Cartesian.prototype.minorGrid;//doc|ex
 anychart.charts.Cartesian.prototype['xAxis'] = anychart.charts.Cartesian.prototype.xAxis;//doc|ex
