@@ -1239,6 +1239,9 @@
           ]
         },
         "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
+        "forceHoverLabels": {
+          "type": "boolean"
+        },
         "connectorLength": {
           "type": [
             "string",

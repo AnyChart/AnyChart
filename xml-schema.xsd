@@ -146,6 +146,7 @@
         <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill" default="false"/>
         <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill" default="false"/>
+        <xsd:attribute name="force_hover_labels" type="simple.Bool" default="false"/>
         <!-- charts.Pyramid attrs -->
         <xsd:attribute name="reversed" type="simple.Bool" default="false"/>
         <!-- charts.Sparkline elements -->
