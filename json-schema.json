@@ -1142,7 +1142,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["pie"]},
+        "type": {"enum": ["pie", "pie3d"]},
         "data": {"$ref": "#/definitions/data"},
         "labels": {
           "oneOf": [

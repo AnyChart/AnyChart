@@ -1721,6 +1721,7 @@
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
+            <xsd:enumeration value="pie3d"/>
             <xsd:enumeration value="polar"/>
             <xsd:enumeration value="pyramid"/>
             <xsd:enumeration value="radar"/>

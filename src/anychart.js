@@ -605,6 +605,14 @@ anychart.pie = anychart.pie || function() {
 /**
  * @ignoreDoc
  */
+anychart.pie3d = anychart.pie3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Pie chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.pyramid = anychart.pyramid || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
 };
@@ -695,6 +703,7 @@ goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
 goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
 goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
 goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
+goog.exportSymbol('anychart.pie3d', anychart.pie3d);//linkedFromModule
 goog.exportSymbol('anychart.pyramid', anychart.pyramid);//linkedFromModule
 goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);

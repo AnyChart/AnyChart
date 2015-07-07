@@ -32,6 +32,7 @@ anychart.enums.ChartTypes = {
   LINE: 'line',
   MARKER: 'marker',
   PIE: 'pie',
+  PIE_3D: 'pie3d',
   POLAR: 'polar',
   PYRAMID: 'pyramid',
   RADAR: 'radar',
