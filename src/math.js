@@ -184,9 +184,126 @@ anychart.math.isPointOnLine = function(p1x, p1y, p2x, p2y, p3x, p3y) {
 };
 
 
+/**
+ * Checks whether segment have intersection with rect.
+ * @param {number} x1 X coord of first segment point.
+ * @param {number} y1 Y coord of first segment point.
+ * @param {number} x2 X coord of second segment point.
+ * @param {number} y2 Y coord of second segment point.
+ * @param {Array.<number>=} opt_rect Array of rect coords.
+ * @return {boolean}
+ */
+anychart.math.checkRectIntersectionWithSegment = function(x1, y1, x2, y2, opt_rect) {
+  var result = false, k, k1, i, len;
+  if (!opt_rect) return false;
+
+  for (i = 0, len = opt_rect.length; i < len - 1; i = i + 2) {
+    k = i == len - 2 ? 0 : i + 2;
+    k1 = i == len - 2 ? 1 : i + 3;
+    result = result || anychart.math.checkSegmentsIntersection(
+        opt_rect[i], opt_rect[i + 1], opt_rect[k], opt_rect[k1], x1, y1, x2, y2);
+  }
+  return result;
+};
+
 
 /**
- * Define rectangle
+ * Check intersection for vertical aor horizontal segments.
+ * @param {number} a Coord of first point of first segment.
+ * @param {number} b Coord of second point of first segment.
+ * @param {number} c Coord of first point of second segment.
+ * @param {number} d Coord of second point of second segment.
+ * @return {boolean} Whether segments have intersection.
+ */
+anychart.math.intersectVerticalOrHorizontalSegments = function(a, b, c, d) {
+  var temp;
+  if (a > b) {
+    temp = a;
+    a = b;
+    b = temp;
+  }
+
+  if (c > d) {
+    temp = c;
+    c = d;
+    d = temp;
+  }
+
+  return Math.max(a, c) <= Math.min(b, d);
+};
+
+
+/**
+ * Calculates oriented area od triangle.
+ * @param {number} x1 X coord of fist point of triangle.
+ * @param {number} y1 Y coord of fist point of triangle.
+ * @param {number} x2 X coord of second point of triangle.
+ * @param {number} y2 Y coord of second point of triangle.
+ * @param {number} x3 X coord of third point of triangle.
+ * @param {number} y3 Y coord of third point of triangle.
+ * @return {number} Triangle area.
+ */
+anychart.math.calcOrientedTriangleArea = function(x1, y1, x2, y2, x3, y3) {
+  return (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+};
+
+
+/**
+ * Checks two segments intersection.
+ * @param {number} x1 X coord of first point of first segment.
+ * @param {number} y1 Y coord of first point of first segment.
+ * @param {number} x2 X coord of second point of first segment.
+ * @param {number} y2 Y coord of second point of first segment.
+ * @param {number} x3 X coord of first point of second segment.
+ * @param {number} y3 Y coord of first point of second segment.
+ * @param {number} x4 X coord of second point of second segment.
+ * @param {number} y4 Y coord of second point of second segment.
+ * @return {boolean} Whether segments have intersection.
+ */
+anychart.math.checkSegmentsIntersection = function(x1, y1, x2, y2, x3, y3, x4, y4) {
+  return anychart.math.intersectVerticalOrHorizontalSegments(x1, x2, x3, x4) &&
+      anychart.math.intersectVerticalOrHorizontalSegments(y1, y2, y3, y4) &&
+      anychart.math.calcOrientedTriangleArea(x1, y1, x2, y2, x3, y3) * anychart.math.calcOrientedTriangleArea(x1, y1, x2, y2, x4, y4) <= 0 &&
+      anychart.math.calcOrientedTriangleArea(x3, y3, x4, y4, x1, y1) * anychart.math.calcOrientedTriangleArea(x3, y3, x4, y4, x2, y2) <= 0;
+};
+
+
+/**
+ * Checks whether rect is out of circle bounds.
+ * @param {number} cx X coord of circle center.
+ * @param {number} cy Y coord of circle center.
+ * @param {number} radius Circle radius.
+ * @param {Array.<number>=} opt_rect Array of rect coords.
+ * @return {boolean}
+ */
+anychart.math.checkForRectIsOutOfCircleBounds = function(cx, cy, radius, opt_rect) {
+  var result = false, i, len;
+  if (!opt_rect) return false;
+
+  for (i = 0, len = opt_rect.length; i < len - 1; i = i + 2) {
+    result = result || anychart.math.checkForPointIsOutOfCircleBounds(opt_rect[i], opt_rect[i + 1], cx, cy, radius);
+  }
+  return result;
+};
+
+
+/**
+ * Checks whether point is out of circle bounds.
+ * @param {number} x1 X coord of point.
+ * @param {number} y1 Y coord of point.
+ * @param {number} cx X coord of circle center.
+ * @param {number} cy Y coord of circle center.
+ * @param {number} r Circle radius.
+ * @return {boolean} if point out of circle bounds then returns true.
+ */
+anychart.math.checkForPointIsOutOfCircleBounds = function(x1, y1, cx, cy, r) {
+  return Math.sqrt(Math.pow(cx - x1, 2) + Math.pow(cy - y1, 2)) > r;
+};
+
+
+
+/**
+ * Define rectangle.
  * @param {number} x X-coordinate of top-left point.
  * @param {number} y Y-coordinate of top-left point.
  * @param {number} w Width.

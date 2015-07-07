@@ -2042,27 +2042,17 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
     var ax = cx + this.radiusValue_ * Math.cos(angle);
     var ay = cy + this.radiusValue_ * Math.sin(angle);
 
-    angle = (start - 90) * Math.PI / 180;
-    var apx = cx + this.radiusValue_ * Math.cos(angle);
-    var apy = cx + this.radiusValue_ * Math.cos(angle);
-
     angle = (start + sweep) * Math.PI / 180;
     var bx = cx + this.radiusValue_ * Math.cos(angle);
     var by = cy + this.radiusValue_ * Math.sin(angle);
 
-    angle = (start + sweep - 90) * Math.PI / 180;
-    var bpx = cx + this.radiusValue_ * Math.cos(angle);
-    var bpy = cy + this.radiusValue_ * Math.sin(angle);
-
     var bounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(sliceLabel), index);
 
-    var notIntersectStartLine = anychart.math.checkPointsRelativeLine(ax, ay, cx, cy, bounds) ||
-        anychart.math.checkPointsRelativeLine(apx, apy, cx, cy, bounds);
+    var notIntersectStartLine = !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
+    var notIntersectEndLine = !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
+    var notIntersectPie = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
 
-    var notIntersectEndLine = anychart.math.checkPointsRelativeLine(cx, cy, bx, by, bounds) ||
-        anychart.math.checkPointsRelativeLine(cx, cy, bpx, bpy, bounds);
-
-    isFitToSlice = notIntersectStartLine && notIntersectEndLine;
+    isFitToSlice = notIntersectStartLine && notIntersectEndLine && notIntersectPie;
   }
 
   var isDraw = hovered ?
