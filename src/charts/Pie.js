@@ -82,6 +82,13 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.labels_ = null;
 
   /**
+   * Whether to show the label on hover event.
+   * @type {boolean}
+   * @private
+   */
+  this.forceHoverLabels_ = false;
+
+  /**
    * Pie chart default palette.
    * @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors}
    * @private
@@ -1299,6 +1306,23 @@ anychart.charts.Pie.prototype.innerRadius = function(opt_value) {
 
 
 /**
+ * Whether to show the label on hover event.
+ * @param {boolean=} opt_value .
+ * @return {boolean|anychart.charts.Pie} .
+ */
+anychart.charts.Pie.prototype.forceHoverLabels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.forceHoverLabels_ = opt_value;
+    this.invalidate(anychart.ConsistencyState.PIE_LABELS,
+        anychart.Signal.NEEDS_REDRAW);
+    return this;
+  } else {
+    return this.forceHoverLabels_;
+  }
+};
+
+
+/**
  * Getter for the pie chart center point.<br/>
  * <b>Note:</b> Works only after {@link anychart.charts.Pie#draw} is called.
  * @example
@@ -1589,6 +1613,9 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
       .sweepAngle(360)
       .parentBounds(this.pieBounds_)
       .resumeSignalsDispatching(false);
+
+  this.hoverLabels()
+      .parentBounds(this.pieBounds_);
 };
 
 
@@ -2027,16 +2054,23 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
   var positionProvider = this.createPositionProvider();
   var formatProvider = this.createFormatProvider();
 
-  var singlePoint = (iterator.getRowsCount() == 1);
-
   var isFitToSlice = true;
-  if (!hovered && !this.insideLabelsOverlap_ && !singlePoint) {
+  if ((!hovered || (hovered && !this.forceHoverLabels_)) && !this.insideLabelsOverlap_) {
     var start = /** @type {number} */ (iterator.meta('start'));
     var sweep = /** @type {number} */ (iterator.meta('sweep'));
 
     var cx = this.cx_;
     var cy = this.cy_;
+
     var angle;
+    var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
+    if (exploded) {
+      angle = (start + sweep / 2) * Math.PI / 180;
+      var ex = this.explodeValue_ * Math.cos(angle);
+      var ey = this.explodeValue_ * Math.sin(angle);
+      cx += ex;
+      cy += ey;
+    }
 
     angle = start * Math.PI / 180;
     var ax = cx + this.radiusValue_ * Math.cos(angle);
@@ -2046,13 +2080,24 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
     var bx = cx + this.radiusValue_ * Math.cos(angle);
     var by = cy + this.radiusValue_ * Math.sin(angle);
 
-    var bounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(sliceLabel), index);
+    if (!this.measureLabel_) this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
+    else this.measureLabel_.clear();
+    this.measureLabel_.formatProvider(formatProvider);
+    this.measureLabel_.positionProvider(positionProvider);
+    this.measureLabel_.resetSettings();
+    this.measureLabel_.parentLabelsFactory(this.labels());
+    this.measureLabel_.currentLabelsFactory(labelsFactory);
+    this.measureLabel_.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
 
-    var notIntersectStartLine = !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
-    var notIntersectEndLine = !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
-    var notIntersectPie = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
+    var bounds = this.labels().measureWithTransform(this.measureLabel_, null, null, index);
 
-    isFitToSlice = notIntersectStartLine && notIntersectEndLine && notIntersectPie;
+    var singlePiePoint = (iterator.getRowsCount() == 1 && this.innerRadiusValue_ == 0);
+    var notIntersectStartLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
+    var notIntersectEndLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
+    var notIntersectPieOuterRadius = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
+    var notIntersectPieInnerRadius = singlePiePoint || anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.innerRadiusValue_, bounds);
+
+    isFitToSlice = notIntersectStartLine && notIntersectEndLine && notIntersectPieOuterRadius && notIntersectPieInnerRadius;
   }
 
   var isDraw = hovered ?
@@ -3218,6 +3263,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   json['connectorLength'] = this.connectorLength();
   json['outsideLabelsCriticalAngle'] = this.outsideLabelsCriticalAngle();
   json['overlapMode'] = this.overlapMode();
+  json['forceHoverLabels'] = this.forceHoverLabels();
 
 
   // The values of group() function can be function or null or 'none'. So we don't serialize it anyway.
@@ -3341,6 +3387,7 @@ anychart.charts.Pie.prototype.setupByJSON = function(config) {
   this.hoverStroke(config['hoverStroke']);
   this.hatchFill(config['hatchFill']);
   this.hoverHatchFill(config['hoverHatchFill']);
+  this.forceHoverLabels(config['forceHoverLabels']);
 };
 
 
@@ -3728,3 +3775,4 @@ anychart.charts.Pie.prototype['hatchFillPalette'] = anychart.charts.Pie.prototyp
 anychart.charts.Pie.prototype['getType'] = anychart.charts.Pie.prototype.getType;
 anychart.charts.Pie.prototype['hover'] = anychart.charts.Pie.prototype.hover;
 anychart.charts.Pie.prototype['unhover'] = anychart.charts.Pie.prototype.unhover;
+anychart.charts.Pie.prototype['forceHoverLabels'] = anychart.charts.Pie.prototype.forceHoverLabels;
