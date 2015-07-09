@@ -733,6 +733,16 @@ anychart.core.ui.Title.prototype.getRemainingBounds = function() {
 
 
 /**
+ * Gets bounds of pure styled text of title. Ignores all another bounds like width and height set or parentBounds.
+ * NOTE: Gets original text's left and top, doesn't apply any currently calculated positioning to text.
+ * @return {?anychart.math.Rect} - Original bounds of text.
+ */
+anychart.core.ui.Title.prototype.getOriginalBounds = function() {
+  return this.text_ ? this.text_.getOriginalBounds() : null;
+};
+
+
+/**
  * Return the title content bounds.
  * @return {anychart.math.Rect} Content bounds.
  */

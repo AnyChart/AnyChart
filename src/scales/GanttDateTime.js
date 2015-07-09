@@ -113,9 +113,9 @@ anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
  * @private
  */
 anychart.scales.GanttDateTime.createTextFormatter_ = function(pattern, opt_template) {
-  var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
   if (opt_template) {
     return function(startDate, endDate) {
+      var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
       return goog.string.format(
           /** @type {string} */ (opt_template),
           dateTimeFormat.format(new goog.date.UtcDateTime(new Date(startDate))),
@@ -124,6 +124,7 @@ anychart.scales.GanttDateTime.createTextFormatter_ = function(pattern, opt_templ
     }
   } else {
     return function(startDate) {
+      var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
       return dateTimeFormat.format(new goog.date.UtcDateTime(new Date(startDate)));
     }
   }

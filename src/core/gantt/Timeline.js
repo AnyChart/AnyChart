@@ -106,7 +106,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill('#ccd7e1');
+  this.backgroundFill_ = acgraph.vector.normalizeFill('#fff');
 
   /**
    * Cells layer.
@@ -328,7 +328,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {!acgraph.vector.Stroke}
    * @private
    */
-  this.selectedElementStroke_ = acgraph.vector.normalizeStroke('#000000');
+  this.selectedElementStroke_ = this.isResourceChart_ ? acgraph.vector.normalizeStroke('none') : acgraph.vector.normalizeStroke('#000');
 
 
   /**
@@ -370,10 +370,10 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
 
   /**
    * Selected period.
-   * @type {string}
+   * @type {(string|number|undefined)}
    * @private
    */
-  this.selectedPeriodId_ = '';
+  this.selectedPeriodId_ = void 0;
 
   /**
    * Vertical upper coordinate (top) of highlighted row.
@@ -1306,8 +1306,9 @@ anychart.core.gantt.Timeline.prototype.handleMouseClick_ = function(event) {
     var upDispatched = this.interactivityHandler_.dispatchEvent(mouseUp);
     var clickDispatched = this.interactivityHandler_.dispatchEvent(click);
     if (upDispatched && clickDispatched) this.interactivityHandler_.rowClick(click);
+  } else {
+    this.interactivityHandler_.unselect();
   }
-
 };
 
 
@@ -1332,7 +1333,6 @@ anychart.core.gantt.Timeline.prototype.handleMouseOverAndMove_ = function(event)
  */
 anychart.core.gantt.Timeline.prototype.handleAll_ = function(event) {
   if (event['type'] == acgraph.events.EventType.DBLCLICK) this.handleDblMouseClick_(event);
-  if (event['type'] == acgraph.events.EventType.MOUSEDOWN) this.handleMouseDown_(event);
 };
 
 
@@ -1368,6 +1368,7 @@ anychart.core.gantt.Timeline.prototype.handleMouseOut_ = function(event) {
  * @private
  */
 anychart.core.gantt.Timeline.prototype.handleMouseDown_ = function(event) {
+  event.preventDefault();
   var evt = this.getInteractivityEvent_(event);
   if (evt) this.interactivityHandler_.dispatchEvent(evt);
 };
@@ -1439,6 +1440,21 @@ anychart.core.gantt.Timeline.prototype.rowSelect = function(event) {
     var eventObj = goog.object.clone(event);
     eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
     this.interactivityHandler_.dispatchEvent(eventObj);
+  }
+};
+
+
+/**
+ * Unselects currently selected item.
+ */
+anychart.core.gantt.Timeline.prototype.unselect = function() {
+  if (this.selectedItem_ || goog.isDefAndNotNull(this.selectedPeriodId_)) {
+    this.controller_.data().suspendSignalsDispatching();
+    this.selectedItem_.meta('selected', false);
+    this.selectedItem_ = null;
+    this.selectedPeriodId_ = void 0;
+    this.controller_.data().resumeSignalsDispatching(false);
+    this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -1694,7 +1710,8 @@ anychart.core.gantt.Timeline.prototype.getMarkersFactory_ = function() {
 anychart.core.gantt.Timeline.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
-    this.bindHandlersToGraphics(this.base_);
+    //We handle mouseDown here to prevent double click selection.
+    this.bindHandlersToGraphics(this.base_, null, null, null, null, /** @type {Function} */ (this.handleMouseDown_));
     this.registerDisposable(this.base_);
   }
   return this.base_;
@@ -2279,9 +2296,9 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
   while (l--) {
     connData = connectorsData[l];
     var to = connData['to'];
-    if (goog.isString(to)) to = map[to]; //destination becomes an object instead of string.
+    if (!goog.isObject(to)) to = map[to]; //destination becomes an object instead of string.
 
-    if (to) {
+    if (goog.isDef(to)) {
       connData['to'] = to; //Replacing a string record with link to object for further connectors draw cycles.
       var from = connData['from'];
       connType = connData['type'];

@@ -1713,6 +1713,28 @@ anychart.enums.ConnectorType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Data Grid column formatting presets.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Column formatting presets.
+ * @enum {string}
+ */
+anychart.enums.ColumnFormats = {
+  DIRECT_NUMBERING: 'directNumbering',
+  TEXT: 'text',
+  SHORT_TEXT: 'shortText',
+  PERCENT: 'percent',
+  DATE_COMMON_LOG: 'dateCommonLog',
+  DATE_ISO_8601: 'dateIso8601',
+  DATE_US_SHORT: 'dateUsShort',
+  DATE_DMY_DOTS: 'dateDmyDots',
+  FINANCIAL: 'financial'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  RadarSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2431,6 +2453,16 @@ goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR_TYPE', anychart.enum
 goog.exportSymbol('anychart.enums.GanttDataFields.START_MARKER', anychart.enums.GanttDataFields.START_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.END_MARKER', anychart.enums.GanttDataFields.END_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.LABEL', anychart.enums.GanttDataFields.LABEL);
+
+goog.exportSymbol('anychart.enums.ColumnFormats.DIRECT_NUMBERING', anychart.enums.ColumnFormats.DIRECT_NUMBERING);
+goog.exportSymbol('anychart.enums.ColumnFormats.TEXT', anychart.enums.ColumnFormats.TEXT);
+goog.exportSymbol('anychart.enums.ColumnFormats.SHORT_TEXT', anychart.enums.ColumnFormats.SHORT_TEXT);
+goog.exportSymbol('anychart.enums.ColumnFormats.PERCENT', anychart.enums.ColumnFormats.PERCENT);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_COMMON_LOG', anychart.enums.ColumnFormats.DATE_COMMON_LOG);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_ISO_8601', anychart.enums.ColumnFormats.DATE_ISO_8601);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_US_SHORT', anychart.enums.ColumnFormats.DATE_US_SHORT);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_DMY_DOTS', anychart.enums.ColumnFormats.DATE_DMY_DOTS);
+goog.exportSymbol('anychart.enums.ColumnFormats.FINANCIAL', anychart.enums.ColumnFormats.FINANCIAL);
 
 goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEARS);
 goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTHS);

@@ -404,7 +404,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
 
     var itemId = item.get(anychart.enums.GanttDataFields.ID);
     var visItem = {'item': item, 'index': this.heightCache_.length - 1};
-    if (itemId && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
+    if (goog.isDef(itemId) && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
 
     if (this.isResourceChart_) {
       var periods = item.get(anychart.enums.GanttDataFields.PERIODS);

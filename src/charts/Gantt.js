@@ -645,8 +645,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      //TODO (A.Kudryavtsev): Save pixel position instead!
-      ths.splitterPosition_ = anychart.math.round(100 * ths.splitter().position(), 2) + '%';
+      ths.splitterPosition_ = Math.round(ths.splitter().position() * this.pixelBoundsCache_.width);
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 
@@ -751,6 +750,16 @@ anychart.charts.Gantt.prototype.rowSelect = function(event) {
     if (goog.isDef(period)) eventObj['period'] = period;
     this.dispatchEvent(eventObj);
   }
+};
+
+
+/**
+ * Unselects currently selected item.
+ * TODO (A.Kudryavtsev): Do we need to export this method?
+ */
+anychart.charts.Gantt.prototype.unselect = function() {
+  this.dg_.unselect();
+  this.tl_.unselect();
 };
 
 

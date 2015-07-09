@@ -3416,6 +3416,7 @@
         "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
         "width": {"type": "number"},
+        "defaultWidth": {"type": "number"},
         "collapseExpandButtons": {"type": "boolean"},
         "depthPaddingMultiplier": {"type": "number"}
       }
