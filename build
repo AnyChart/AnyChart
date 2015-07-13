@@ -581,6 +581,7 @@ def __exec_main_script():
     compile_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
     compile_parser.add_argument('-df', '--debug_files', action='store_true',
                                 help='Create files with debug info (prop_out, var_out, sourcemap).')
+    compile_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'anychart7'", default='anychart7')
 
     # create the parser for the "compile_each" command
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
@@ -589,6 +590,7 @@ def __exec_main_script():
     compile_each_parser.add_argument('-df', '--debug_files', action='store_true',
                                      help='Create files with debug info (prop_out, var_out, sourcemap).')
     compile_each_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
+    compile_each_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'anychart7'", default='anychart7')
 
     # create the parser for the "contrib" command
     contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies')
