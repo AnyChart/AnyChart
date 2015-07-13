@@ -3049,7 +3049,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
   var formatProvider = this.createFormatProvider();
 
   var isFitToSlice = true;
-  if ((!hovered || (hovered && !this.forceHoverLabels_)) && !this.insideLabelsOverlap_ && !this.mode3d_) {
+  if ((!hovered || (hovered && !this.forceHoverLabels_)) && !this.insideLabelsOverlap_) {
     var start = /** @type {number} */ (iterator.meta('start'));
     var sweep = /** @type {number} */ (iterator.meta('sweep'));
 
@@ -3061,18 +3061,18 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
     if (exploded) {
       angle = (start + sweep / 2) * Math.PI / 180;
       var ex = this.explodeValue_ * Math.cos(angle);
-      var ey = this.explodeValue_ * Math.sin(angle);
+      var ey = (this.mode3d_ ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
       cx += ex;
       cy += ey;
     }
 
     angle = start * Math.PI / 180;
     var ax = cx + this.radiusValue_ * Math.cos(angle);
-    var ay = cy + this.radiusValue_ * Math.sin(angle);
+    var ay = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     angle = (start + sweep) * Math.PI / 180;
     var bx = cx + this.radiusValue_ * Math.cos(angle);
-    var by = cy + this.radiusValue_ * Math.sin(angle);
+    var by = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     if (!this.measureLabel_) this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
     else this.measureLabel_.clear();
