@@ -2680,7 +2680,8 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
         "scale": {"$ref": "#/definitions/anychart.scales.GanttDateTime"},
         "backgroundFill": {"$ref": "#/definitions/fill"},
@@ -3391,7 +3392,8 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "titleFill": {"$ref": "#/definitions/fill"},
         "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
         "columns": {

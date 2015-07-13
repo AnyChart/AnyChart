@@ -15,8 +15,8 @@ anychart.ganttProject = function() {
   var chart = new anychart.charts.Gantt(false);
 
   chart.title().enabled(false);
-  chart.background().enabled(false);
   chart.legend().enabled(false);
+  chart.credits().inChart(true);
   chart.margin(0);
   chart.padding(0);
 
@@ -32,8 +32,8 @@ anychart.ganttResource = function() {
   var chart = new anychart.charts.Gantt(true);
 
   chart.title().enabled(false);
-  chart.background().enabled(false);
   chart.legend().enabled(false);
+  chart.credits().inChart(true);
   chart.margin(0);
   chart.padding(0);
 

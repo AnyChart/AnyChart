@@ -70,7 +70,6 @@ anychart.onDocumentReady(function() {
 
   dataGrid
       .data(tree)
-      .cellBorder({thickness: 2, color: '#999'})
       .startIndex(0)
       .verticalOffset(0)
       .titleHeight(25);

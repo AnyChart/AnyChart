@@ -463,6 +463,17 @@ anychart.utils.isNone = function(value) {
 
 
 /**
+ * Extracts thickness of stroke. Default is 1.
+ * @param {acgraph.vector.Stroke|string} stroke - Stroke.
+ * @return {number} - Thickness.
+ */
+anychart.utils.extractThickness = function(stroke) {
+  var normalized = acgraph.vector.normalizeStroke(stroke);
+  return goog.isDef(normalized['thickness']) ? normalized['thickness'] : 1;
+};
+
+
+/**
  * Anychart default formatter.
  * @this {{value: * }}
  * @return {*}

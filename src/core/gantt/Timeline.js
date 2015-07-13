@@ -88,6 +88,28 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.pixelBoundsCache_ = null;
 
   /**
+   * Cell border settings.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.columnStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+
+  /**
+   * Row vertical line separation path.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.rowStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+
+  /**
+   * Thickness of row stroke.
+   * It is used to avoid multiple thickness extraction from rowStroke_.
+   * @type {number}
+   * @private
+   */
+  this.rowStrokeThickness_ = 1;
+
+  /**
    * Base layer.
    * @type {acgraph.vector.Layer}
    * @private
@@ -100,6 +122,13 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @private
    */
   this.bgRect_ = null;
+
+  /**
+   * Invisible background rect to handle mouse wheel when visible bg id disabled.
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.mwhRect_ = null;
 
   /**
    * Background fill.
@@ -390,6 +419,13 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.hoverEndY_ = 0;
 
   /**
+   * Row stroke path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.rowStrokePath_ = null;
+
+  /**
    * Timeline tooltip.
    * @type {anychart.core.ui.Tooltip}
    * @private
@@ -409,6 +445,13 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @private
    */
   this.maximumGap_ = .01;
+
+  /**
+   * Whether baseline bar must be placed above the actual interval bar.
+   * @type {boolean}
+   * @private
+   */
+  this.baselineAbove_ = false;
 
 
   /**
@@ -1136,6 +1179,52 @@ anychart.core.gantt.Timeline.prototype.selectedElementStroke = function(opt_stro
 
 
 /**
+ * Gets/sets column stroke.
+ * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
+ * @return {(string|acgraph.vector.Stroke|anychart.core.gantt.Timeline)} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.columnStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    var newThickness = anychart.utils.extractThickness(val);
+
+    //TODO (A.Kudryavtsev): In current moment (15 June 2015) method anychart.color.equals works pretty bad.
+    //TODO (A.Kudryavtsev): That's why here I check thickness as well.
+    if (!anychart.color.equals(this.columnStroke_, val) || newThickness != this.rowStrokeThickness_) {
+      this.columnStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.columnStroke_;
+};
+
+
+/**
+ * Gets/sets row stroke.
+ * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
+ * @return {(string|acgraph.vector.Stroke|anychart.core.gantt.Timeline)} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.rowStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    var newThickness = anychart.utils.extractThickness(val);
+
+    //TODO (A.Kudryavtsev): In current moment (15 June 2015) method anychart.color.equals works pretty bad.
+    //TODO (A.Kudryavtsev): That's why here I check thickness as well.
+    if (!anychart.color.equals(this.rowStroke_, val) || newThickness != this.rowStrokeThickness_) {
+      this.rowStroke_ = val;
+      this.rowStrokeThickness_ = newThickness;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+
+    return this;
+  }
+  return this.rowStroke_;
+};
+
+
+/**
  * Gets/sets minimum gap.
  * @param {number=} opt_value - Value to be set.
  * @return {number|anychart.core.gantt.Timeline} - Current value or itself for method chaining.
@@ -1168,6 +1257,24 @@ anychart.core.gantt.Timeline.prototype.maximumGap = function(opt_value) {
     }
   }
   return this.maximumGap_;
+};
+
+
+/**
+ * Gets/sets 'baseline above' flag.
+ * If the flag is set to 'true', baseline bar will be displayed abode an actual time bar.
+ * @param {boolean=} opt_value - Value to be set.
+ * @return {boolean|anychart.core.gantt.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Timeline.prototype.baselineAbove = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.baselineAbove_ != opt_value) {
+      this.baselineAbove_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+      return this;
+    }
+  }
+  return this.baselineAbove_;
 };
 
 
@@ -1239,7 +1346,7 @@ anychart.core.gantt.Timeline.prototype.getSelectedPath_ = function() {
 anychart.core.gantt.Timeline.prototype.getSeparationPath_ = function() {
   if (!this.separationPath_) {
     this.separationPath_ = /** @type {acgraph.vector.Path} */ (this.getSeparationLayer_().path());
-    this.separationPath_.stroke('#ccd7e1');
+    this.separationPath_.stroke(this.columnStroke_);
     this.registerDisposable(this.separationPath_);
   }
   return this.separationPath_;
@@ -1257,6 +1364,21 @@ anychart.core.gantt.Timeline.prototype.getCellsLayer_ = function() {
     this.registerDisposable(this.cellsLayer_);
   }
   return this.cellsLayer_;
+};
+
+
+/**
+ * Getter for this.rowStrokePath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.gantt.Timeline.prototype.getRowStrokePath_ = function() {
+  if (!this.rowStrokePath_) {
+    this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
+    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(20);
+    this.registerDisposable(this.rowStrokePath_);
+  }
+  return this.rowStrokePath_;
 };
 
 
@@ -1517,7 +1639,7 @@ anychart.core.gantt.Timeline.prototype.getInteractivityEvent_ = function(event) 
     }
 
     var headerHeight = this.header_.getPixelBounds().height;
-    var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
+    var initialTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + 1);
 
 
     var min = this.pixelBoundsCache_.top +
@@ -1539,7 +1661,7 @@ anychart.core.gantt.Timeline.prototype.getInteractivityEvent_ = function(event) 
 
       var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
       var startY = initialTop + startHeight;
-      var endY = startY + (this.gridHeightCache_[index] - startHeight - anychart.core.ui.DataGrid.ROW_SPACE);
+      var endY = startY + (this.gridHeightCache_[index] - startHeight - this.rowStrokeThickness_);
 
       newEvent['item'] = this.visibleItems_[this.startIndex_ + index];
       newEvent['startY'] = startY;
@@ -1724,7 +1846,7 @@ anychart.core.gantt.Timeline.prototype.getBase_ = function() {
  */
 anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
   var headerHeight = this.header_.getPixelBounds().height;
-  var header = this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE;
+  var header = this.pixelBoundsCache_.top + headerHeight + 1;
   var totalTop = (header - this.verticalOffset_);
   this.highlight();
   this.gridHeightCache_.length = 0;
@@ -1733,6 +1855,9 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
   this.getEvenPath_().clear();
   this.getOddPath_().clear();
   this.getSelectedPath_().clear();
+  this.getRowStrokePath_().clear();
+
+  var pixelShift = (this.rowStrokeThickness_ % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
 
   for (var i = this.startIndex_; i <= this.endIndex_; i++) {
     var item = this.visibleItems_[i];
@@ -1743,7 +1868,7 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
     var top = firstCell ? header : totalTop;
 
     var height = anychart.core.gantt.Controller.getItemHeight(item);
-    height = firstCell ? height - this.verticalOffset_ + anychart.core.ui.DataGrid.ROW_SPACE : height;
+    height = firstCell ? height - this.verticalOffset_ + 1 : height;
 
     /*
       Note: Straight indexing starts with 0 (this.visibleItems_[0], this.visibleItems_[1], this.visibleItems_[2]...).
@@ -1774,9 +1899,18 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
           .close();
     }
 
-    totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
+    totalTop = (newTop + this.rowStrokeThickness_);
+
+    var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness_ / 2) + pixelShift;
+    this.rowStrokePath_
+        .moveTo(this.pixelBoundsCache_.left, strokePathTop)
+        .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, strokePathTop);
+
     this.gridHeightCache_.push(totalTop - header);
   }
+
+  this.getSeparationLayer_().clip(new acgraph.math.Rect(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top,
+      this.pixelBoundsCache_.width, totalTop - this.pixelBoundsCache_.top));
 };
 
 
@@ -1983,7 +2117,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
  */
 anychart.core.gantt.Timeline.prototype.drawResourceTimeline_ = function() {
   var headerHeight = this.header_.getPixelBounds().height;
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + 1 - this.verticalOffset_);
   for (var i = this.startIndex_; i <= this.endIndex_; i++) {
     var item = this.visibleItems_[i];
     if (!item) break;
@@ -1993,7 +2127,7 @@ anychart.core.gantt.Timeline.prototype.drawResourceTimeline_ = function() {
 
     this.drawAsPeriods_(item, totalTop, itemHeight);
 
-    totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
+    totalTop = (newTop + this.rowStrokeThickness_);
   }
 };
 
@@ -2004,7 +2138,7 @@ anychart.core.gantt.Timeline.prototype.drawResourceTimeline_ = function() {
  */
 anychart.core.gantt.Timeline.prototype.drawProjectTimeline_ = function() {
   var headerHeight = this.header_.getPixelBounds().height;
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE - this.verticalOffset_);
+  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + 1 - this.verticalOffset_);
 
   for (var i = this.startIndex_; i <= this.endIndex_; i++) {
     var item = this.visibleItems_[i];
@@ -2032,7 +2166,7 @@ anychart.core.gantt.Timeline.prototype.drawProjectTimeline_ = function() {
       }
     }
 
-    totalTop = (newTop + anychart.core.ui.DataGrid.ROW_SPACE);
+    totalTop = (newTop + this.rowStrokeThickness_);
   }
 };
 
@@ -2099,6 +2233,12 @@ anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, tota
     var baselineRight = b.left + b.width * baselineEndRatio;
     var baselineTop = actualTop + actualHeight;
     var baselineHeight = actualHeight;
+
+    if (this.baselineAbove_) {
+      var tmp = actualTop;
+      actualTop = baselineTop;
+      baselineTop = tmp;
+    }
 
     this.drawBar_(new anychart.math.Rect(actualLeft, actualTop, (actualRight - actualLeft), actualHeight),
         dataItem, anychart.enums.GanttDataFields.ACTUAL);
@@ -2287,7 +2427,7 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
 anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
   var connectorsData = this.controller_.getConnectorsData();
   var headerHeight = this.header_.getPixelBounds().height;
-  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + anychart.core.ui.DataGrid.ROW_SPACE);
+  var totalTop = /** @type {number} */ (this.pixelBoundsCache_.top + headerHeight + 1);
 
   var l = connectorsData.length;
   var connData, connType;
@@ -2381,14 +2521,18 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
         if (!this.isResourceChart_) {
           if (from['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
               from['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
-            fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+            fromRowHeight = this.baselineAbove_ ?
+                (fromRowHeight * (2 + anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION) / 2) :
+                (fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2));
           } else if (from['item'].numChildren()) {
             fromRowHeight = fromRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
           }
 
           if (to['item'].get(anychart.enums.GanttDataFields.BASELINE_START) &&
               to['item'].get(anychart.enums.GanttDataFields.BASELINE_END)) {
-            toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2);
+            toRowHeight = this.baselineAbove_ ?
+                (toRowHeight * (2 + anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION) / 2) :
+                (toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION / 2));
           } else if (to['item'].numChildren()) {
             toRowHeight = toRowHeight * (1 - anychart.core.gantt.Timeline.DEFAULT_HEIGHT_REDUCTION + anychart.core.gantt.Timeline.PARENT_HEIGHT_REDUCTION);
           }
@@ -2714,6 +2858,7 @@ anychart.core.gantt.Timeline.prototype.drawArrow_ = function(left, top, orientat
 anychart.core.gantt.Timeline.prototype.drawLowTicks_ = function(ticks) {
   if (ticks.length) {
     var path = this.getSeparationPath_().clear();
+
     for (var i = 0, l = ticks.length - 1; i < l; i++) {
       var tick = ticks[i];
       var ratio = this.scale_.timestampToRatio(tick);
@@ -2776,6 +2921,9 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.bgRect_ = this.getBase_().rect();
       this.bgRect_.fill(this.backgroundFill_).stroke(null);
 
+      this.mwhRect_ = this.getBase_().rect();
+      this.mwhRect_.fill('#fff 0').stroke(null);
+
       this.getBase_()
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer_()))
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getSeparationLayer_()))
@@ -2785,9 +2933,6 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.getLabelsFactory_().container(this.getBase_());
 
       this.header_.container(this.getBase_());
-
-      this.separationPath_ = this.getSeparationLayer_().path();
-      this.separationPath_.stroke('#dedede'); //TODO (A.Kudryavtsev): In current version it is not settable, that's why we color it here but not in APPEARANCE.
 
       if (newScale) {
         var range = Math.round((totalMax - totalMin) / 10);
@@ -2809,6 +2954,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
 
       this.getBase_().clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
+      this.mwhRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 
@@ -2855,6 +3001,9 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
       this.getOddPath_().fill(this.rowOddFill_ || this.rowFill_);
       this.getEvenPath_().fill(this.rowEvenFill_ || this.rowFill_);
       this.getSelectedPath_().fill(this.rowSelectedFill_);
+      this.getSeparationPath_().stroke(this.columnStroke_);
+      this.getRowStrokePath_().stroke(this.rowStroke_);
+
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
@@ -2929,16 +3078,22 @@ anychart.core.gantt.Timeline.prototype.mouseWheelHandler_ = function(e) {
   var dx = e.deltaX;
   var dy = e.deltaY;
 
-  if (goog.userAgent.MAC) {
-    dx = dx / 4;
-    dy = dy / 4;
-  } else if (goog.userAgent.WINDOWS) {
+  if (goog.userAgent.WINDOWS) {
     dx = dx * 15;
     dy = dy * 15;
   }
 
+  var horizontalScroll = this.getHorizontalScrollBar();
+  var verticalScroll = this.controller_.getScrollBar();
+
+  var preventDefault = verticalScroll.startRatio() > 0 &&
+      verticalScroll.endRatio() < 1 &&
+      horizontalScroll.startRatio() > 0 &&
+      horizontalScroll.endRatio() < 1;
+
   this.scroll(dx, dy);
-  e.preventDefault();
+
+  if (preventDefault) e.preventDefault();
 };
 
 
@@ -3000,6 +3155,9 @@ anychart.core.gantt.Timeline.prototype.serialize = function() {
   json['scale'] = this.scale_.serialize();
 
   json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
+  json['columnStroke'] = anychart.color.serialize(this.columnStroke_);
+  json['rowStroke'] = anychart.color.serialize(this.rowStroke_);
+
   json['rowFill'] = anychart.color.serialize(this.rowFill_);
   if (this.rowOddFill_) json['rowOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_));
   if (this.rowEvenFill_) json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
@@ -3032,6 +3190,9 @@ anychart.core.gantt.Timeline.prototype.setupByJSON = function(config) {
   this.scale_.setupByJSON(config['scale']);
 
   this.backgroundFill(config['backgroundFill']);
+  this.columnStroke(config['columnStroke']);
+  this.rowStroke(config['rowStroke']);
+
   this.rowFill(config['rowFill']);
   if ('rowOddFill' in config) this.rowOddFill(config['rowOddFill']);
   if ('rowEvenFill' in config) this.rowEvenFill(config['rowEvenFill']);
@@ -3061,11 +3222,12 @@ anychart.core.gantt.Timeline.prototype.setupByJSON = function(config) {
 anychart.core.gantt.Timeline.prototype['cellOddFill'] = anychart.core.gantt.Timeline.prototype.cellOddFill; //deprecated
 anychart.core.gantt.Timeline.prototype['cellEvenFill'] = anychart.core.gantt.Timeline.prototype.cellEvenFill; //deprecated
 anychart.core.gantt.Timeline.prototype['cellFill'] = anychart.core.gantt.Timeline.prototype.cellFill; //deprecated
+anychart.core.gantt.Timeline.prototype['columnStroke'] = anychart.core.gantt.Timeline.prototype.columnStroke;
+anychart.core.gantt.Timeline.prototype['baselineAbove'] = anychart.core.gantt.Timeline.prototype.baselineAbove;
 anychart.core.gantt.Timeline.prototype['rowFill'] = anychart.core.gantt.Timeline.prototype.rowFill;
 anychart.core.gantt.Timeline.prototype['rowEvenFill'] = anychart.core.gantt.Timeline.prototype.rowEvenFill;
 anychart.core.gantt.Timeline.prototype['rowOddFill'] = anychart.core.gantt.Timeline.prototype.rowOddFill;
 anychart.core.gantt.Timeline.prototype['rowHoverFill'] = anychart.core.gantt.Timeline.prototype.rowHoverFill;
-anychart.core.gantt.Timeline.prototype['backgroundFill'] = anychart.core.gantt.Timeline.prototype.backgroundFill;
 anychart.core.gantt.Timeline.prototype['baseFill'] = anychart.core.gantt.Timeline.prototype.baseFill;
 anychart.core.gantt.Timeline.prototype['baseStroke'] = anychart.core.gantt.Timeline.prototype.baseStroke;
 anychart.core.gantt.Timeline.prototype['baselineFill'] = anychart.core.gantt.Timeline.prototype.baselineFill;

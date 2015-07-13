@@ -98,6 +98,13 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
   this.timeline_ = null;
 
   /**
+   * Row stroke thickness. Used to calculate a required number of visible data items.
+   * @type {number}
+   * @private
+   */
+  this.rowStrokeThickness_ = 1;
+
+  /**
    * Start index.
    * @type {number}
    * @private
@@ -333,7 +340,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
     }
   }
 
-  if (!this.isResourceChart_) {
+  if (item.numChildren() && !this.isResourceChart_) {
     item.meta('autoProgress', progressLength / totalLength);
     item.meta('autoStart', resultStart);
     item.meta('autoEnd', resultEnd);
@@ -399,7 +406,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   while (this.expandedItemsTraverser_.advance()) {
     item = /** @type {anychart.data.Tree.DataItem} */ (this.expandedItemsTraverser_.current());
     this.visibleData_.push(item);
-    height += (anychart.core.gantt.Controller.getItemHeight(item) + anychart.core.ui.DataGrid.ROW_SPACE);
+    height += (anychart.core.gantt.Controller.getItemHeight(item) + this.rowStrokeThickness_);
     this.heightCache_.push(height);
 
     var itemId = item.get(anychart.enums.GanttDataFields.ID);
@@ -682,13 +689,15 @@ anychart.core.gantt.Controller.prototype.verticalOffset = function(opt_value) {
 /**
  * Gets/sets start index.
  * NOTE: Calling this method sets this.endIndex_ to NaN to recalculate value correctly anew.
+ * ALSO NOTE: Resets vertical offset to 0 to show required cell all.
  * @param {number=} opt_value - Value to be set.
  * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.startIndex_ != opt_value && !isNaN(opt_value)) {
+    if (!isNaN(opt_value)) {
       this.startIndex_ = opt_value;
+      this.verticalOffset_ = 0;
       this.endIndex_ = NaN;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
@@ -706,7 +715,7 @@ anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
  */
 anychart.core.gantt.Controller.prototype.endIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.endIndex_ != opt_value && !isNaN(opt_value)) {
+    if (!isNaN(opt_value)) {
       this.endIndex_ = opt_value;
       this.startIndex_ = NaN;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
@@ -731,6 +740,23 @@ anychart.core.gantt.Controller.prototype.availableHeight = function(opt_value) {
     return this;
   }
   return this.availableHeight_;
+};
+
+
+/**
+ * Gets/sets row stroke thickness.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.core.gantt.Controller} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.rowStrokeThickness = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.rowStrokeThickness_ != opt_value) {
+      this.rowStrokeThickness_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY, anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.rowStrokeThickness_;
 };
 
 
@@ -865,8 +891,8 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
 
       if (startRatio == 0) { //This fixes JS rounding.
         controller
-            .verticalOffset(0)
-            .startIndex(0);
+            .startIndex(0)
+            .verticalOffset(0);
       } else if (endRatio == 1) { //This fixed JS rounding troubles.
         controller.endIndex(controller.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
       } else {
@@ -875,8 +901,8 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
         var previousHeight = startIndex ? controller.heightCache_[startIndex - 1] : 0;
         var verticalOffset = startHeight - previousHeight;
         controller
-            .verticalOffset(verticalOffset)
-            .startIndex(startIndex);
+            .startIndex(startIndex)
+            .verticalOffset(verticalOffset);
       }
 
       controller.resumeSignalsDispatching(false);
@@ -905,8 +931,8 @@ anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
     var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
     var verticalOffset = pxOffset - previousHeight;
     this
-        .verticalOffset(verticalOffset)
-        .startIndex(itemIndex);
+        .startIndex(itemIndex)
+        .verticalOffset(verticalOffset);
   }
   this.resumeSignalsDispatching(false);
   this.run();
