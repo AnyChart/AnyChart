@@ -1165,12 +1165,20 @@ anychart.maps.Map.prototype.setupByJSON = function(config) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
-      if (goog.isString(json)) {
-        scale = anychart.scales.Base.fromString(json, false);
-      } else {
-        scale = anychart.scales.Base.fromString(json['type'], false);
-        scale.setup(json);
+      var type = goog.isString(json) ? json : json['type'];
+      type = (type + '').toLowerCase();
+      switch (type) {
+        case 'ordinalcolor':
+          scale = new anychart.core.map.scale.OrdinalColor();
+          break;
+        case 'linearcolor':
+          scale = new anychart.core.map.scale.LinearColor();
+          break;
+        default:
+          scale = new anychart.core.map.scale.LinearColor();
       }
+      if (goog.isObject(json))
+        scale.setup(json);
       scalesInstances[i] = scale;
     }
   }
