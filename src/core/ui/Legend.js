@@ -1730,7 +1730,7 @@ anychart.core.ui.Legend.prototype.handleMouseClick_ = function(event) {
     var item = this.items_ && this.items_[evt['itemIndex']];
     var source = /** @type {anychart.core.SeparateChart} */(evt['itemSource']);
     if (item && source)
-      source.legendItemClick(item);
+      source.legendItemClick.call(source, item, event);
   }
 };
 

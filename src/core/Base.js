@@ -108,6 +108,15 @@ anychart.ConsistencyState = {
   SPARK_SCALES: 1 << 11,
   SPARK_SERIES: 1 << 12,
   SPARK_AXES_MARKERS: 1 << 13,
+  //---------------------------------- MAP STATES (CHART) ---------------------------------
+  MAP_SCALE: 1 << 11,
+  MAP_COLOR_SCALE: 1 << 12,
+  MAP_GEO_DATA: 1 << 13,
+  MAP_SERIES: 1 << 14,
+  MAP_PALETTE: 1 << 15,
+  MAP_MARKER_PALETTE: 1 << 16,
+  MAP_HATCH_FILL_PALETTE: 1 << 17,
+  MAP_COLOR_RANGE: 1 << 18,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 5,
@@ -120,6 +129,8 @@ anychart.ConsistencyState = {
   AXIS_LABELS: 1 << 6,
   AXIS_TICKS: 1 << 7,
   AXIS_OVERLAP: 1 << 8,
+  //---------------------------------- AXES STATES (AXIS) ---------------------------------
+  COLOR_RANGE_MARKER: 1 << 9,
   //---------------------------------- GANTT CONTROLLER STATES (VB) ---------------------------------
   CONTROLLER_DATA: 1 << 5,
   CONTROLLER_VISIBILITY: 1 << 6,
@@ -209,7 +220,8 @@ anychart.Signal = {
   BOUNDS_CHANGED: 1 << 3,
   DATA_CHANGED: 1 << 4,
   META_CHANGED: 1 << 5,
-  NEED_UPDATE_LEGEND: 1 << 6
+  NEED_UPDATE_LEGEND: 1 << 6,
+  NEED_UPDATE_COLOR_RANGE: 1 << 7
 };
 
 

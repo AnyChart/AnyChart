@@ -739,6 +739,20 @@ anychart.core.ui.LegendItem.prototype.sourceKey = function(opt_value) {
 
 
 /**
+ * Getter/setter for legend item meta data.
+ * @param {*=} opt_value Meta data.
+ * @return {(*|anychart.core.ui.LegendItem)} Meta data or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.meta = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.meta_ = opt_value;
+    return this;
+  }
+  return this.meta_;
+};
+
+
+/**
  * Getter/Setter for hover cursor setting.
  * @param {anychart.enums.Cursor=} opt_value Hover cursor setting.
  * @return {(anychart.enums.Cursor|anychart.core.ui.LegendItem)} Hover cursor setting or self for chaining.
@@ -1169,6 +1183,7 @@ anychart.core.ui.LegendItem.prototype.setupByJSON = function(config) {
   this.disabled(config['disabled']);
   this.sourceUid(config['sourceUid']);
   this.sourceKey(config['sourceKey']);
+  this.meta(config['meta']);
   this.hoverCursor(config['hoverCursor']);
 };
 

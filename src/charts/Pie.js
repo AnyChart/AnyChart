@@ -3564,7 +3564,7 @@ anychart.charts.Pie.prototype.legendItemCanInteractInMode = function(mode) {
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.legendItemClick = function(item) {
+anychart.charts.Pie.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var iterator = this.data().getIterator();
   if (iterator.select(/** @type {number} */ (sourceKey))) {
@@ -3945,7 +3945,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       }
     }
   }
-  leftDomains.push(domain);
+  if (domain) leftDomains.push(domain);
 
   for (i = 0, len = leftDomains.length; i < len; i++) {
     domain = leftDomains[i];
@@ -4029,7 +4029,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       }
     }
   }
-  rightDomains.push(domain);
+  if (domain) rightDomains.push(domain);
 
   if (droppedLabels) droppedLabels.length = 0;
   for (i = 0, len = rightDomains.length; i < len; i++) {

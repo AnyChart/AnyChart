@@ -2756,7 +2756,7 @@ anychart.charts.Cartesian.prototype.createLegendItemsProvider = function(sourceM
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian.prototype.legendItemClick = function(item) {
+anychart.charts.Cartesian.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var series = this.getSeries(/** @type {number} */ (sourceKey));
   if (series) {

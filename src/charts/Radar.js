@@ -1531,7 +1531,7 @@ anychart.charts.Radar.prototype.createLegendItemsProvider = function(sourceMode,
 
 
 /** @inheritDoc */
-anychart.charts.Radar.prototype.legendItemClick = function(item) {
+anychart.charts.Radar.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var series = this.getSeries(/** @type {number} */ (sourceKey));
   if (series) {

@@ -48,11 +48,11 @@ anychart.core.axes.Ticks = function() {
   /**
    * Path with ticks.
    * @type {!acgraph.vector.Path}
-   * @private
+   * @protected
    */
-  this.path_ = acgraph.path();
-  this.bindHandlersToGraphics(this.path_);
-  this.registerDisposable(this.path_);
+  this.path = acgraph.path();
+  this.bindHandlersToGraphics(this.path);
+  this.registerDisposable(this.path);
 
   this.restoreDefaults();
 };
@@ -80,7 +80,7 @@ anychart.core.axes.Ticks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.core.
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current ticks length.
- * @return {number} Length of ticks.
+ * @return {number|string} Length of ticks.
  *//**
  * Setter for ticks length.
  * @illustration <t>simple-h100</t>
@@ -110,15 +110,16 @@ anychart.core.axes.Ticks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.core.
  * stage.triangleUp(stage.width()/5, 20, 3).stroke('1 grey 1');
  * stage.triangleDown(stage.width()/5, 50, 3).stroke('1 grey 1');
  * stage.text(stage.width()/5, 57, 'length');
- * @param {number=} opt_value Value to set.
+ * @param {(number|string)=} opt_value Value to set.
  * @return {anychart.core.axes.Ticks} An instance of the {@link anychart.core.axes.Ticks} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {number=} opt_value .
+ * @param {(number|string)=} opt_value .
  * @return {(number|!anychart.core.axes.Ticks)} .
  */
 anychart.core.axes.Ticks.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
     if (this.length_ != opt_value) {
       this.length_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -279,7 +280,7 @@ anychart.core.axes.Ticks.prototype.restoreDefaults = function() {
 
 /** @inheritDoc */
 anychart.core.axes.Ticks.prototype.remove = function() {
-  if (this.path_) this.path_.parent(null);
+  if (this.path) this.path.parent(null);
 };
 
 
@@ -288,19 +289,19 @@ anychart.core.axes.Ticks.prototype.remove = function() {
  * @return {!anychart.core.axes.Ticks} {@link anychart.core.axes.Ticks} instance for method chaining.
  */
 anychart.core.axes.Ticks.prototype.draw = function() {
-  this.path_.clear();
-  this.path_.stroke(this.stroke_);
+  this.path.clear();
+  this.path.stroke(this.stroke_);
 
   if (!this.checkDrawingNeeded())
     return this;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.path_.zIndex(/** @type {number} */ (this.zIndex()));
+    this.path.zIndex(/** @type {number} */ (this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.path_.parent(/** @type {acgraph.vector.ILayer} */ (this.container()));
+    this.path.parent(/** @type {acgraph.vector.ILayer} */ (this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -316,16 +317,16 @@ anychart.core.axes.Ticks.prototype.getTicksDrawer = function() {
   if (!this.drawer_) {
     switch (this.orientation_) {
       case anychart.enums.Orientation.TOP:
-        this.drawer_ = this.drawTopTick_;
+        this.drawer_ = this.drawTopTick;
         break;
       case anychart.enums.Orientation.RIGHT:
-        this.drawer_ = this.drawRightTick_;
+        this.drawer_ = this.drawRightTick;
         break;
       case anychart.enums.Orientation.BOTTOM:
-        this.drawer_ = this.drawBottomTick_;
+        this.drawer_ = this.drawBottomTick;
         break;
       case anychart.enums.Orientation.LEFT:
-        this.drawer_ = this.drawLeftTick_;
+        this.drawer_ = this.drawLeftTick;
         break;
     }
   }
@@ -340,9 +341,9 @@ anychart.core.axes.Ticks.prototype.getTicksDrawer = function() {
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
- * @private
+ * @protected
  */
-anychart.core.axes.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+anychart.core.axes.Ticks.prototype.drawTopTick = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
   var x = Math.round(bounds.left + ratio * bounds.width);
   /** @type {number} */
@@ -356,13 +357,16 @@ anychart.core.axes.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBo
   if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
     y -= lineThickness / 2;
     dy = /** @type {number} */(-this.length_);
+  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
+    y = lineBounds.top + lineBounds.height / 2 - this.length_ / 2;
+    dy = /** @type {number} */(this.length_);
   } else {
     y += lineThickness / 2;
     dy = /** @type {number} */(this.length_);
   }
 
-  this.path_.moveTo(x, y);
-  this.path_.lineTo(x, y + dy);
+  this.path.moveTo(x, y);
+  this.path.lineTo(x, y + dy);
 };
 
 
@@ -373,9 +377,9 @@ anychart.core.axes.Ticks.prototype.drawTopTick_ = function(ratio, bounds, lineBo
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
- * @private
+ * @protected
  */
-anychart.core.axes.Ticks.prototype.drawRightTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+anychart.core.axes.Ticks.prototype.drawRightTick = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
   var x = lineBounds.left;
   /** @type {number} */
@@ -389,13 +393,16 @@ anychart.core.axes.Ticks.prototype.drawRightTick_ = function(ratio, bounds, line
   if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
     x += lineThickness / 2;
     dx = /** @type {number} */(this.length_);
+  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
+    x -= this.length_ / 2;
+    dx = /** @type {number} */(this.length_);
   } else {
     x -= lineThickness / 2;
     dx = /** @type {number} */(-this.length_);
   }
 
-  this.path_.moveTo(x, y);
-  this.path_.lineTo(x + dx, y);
+  this.path.moveTo(x, y);
+  this.path.lineTo(x + dx, y);
 };
 
 
@@ -406,9 +413,9 @@ anychart.core.axes.Ticks.prototype.drawRightTick_ = function(ratio, bounds, line
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
- * @private
+ * @protected
  */
-anychart.core.axes.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+anychart.core.axes.Ticks.prototype.drawBottomTick = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
   var x = Math.round(bounds.left + ratio * (bounds.width));
   /** @type {number} */
@@ -422,13 +429,16 @@ anychart.core.axes.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lin
   if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
     y += lineThickness / 2;
     dy = /** @type {number} */(this.length_);
+  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
+    y -= this.length_ / 2;
+    dy = /** @type {number} */(this.length_);
   } else {
     y -= lineThickness / 2;
     dy = /** @type {number} */(-this.length_);
   }
 
-  this.path_.moveTo(x, y);
-  this.path_.lineTo(x, y + dy);
+  this.path.moveTo(x, y);
+  this.path.lineTo(x, y + dy);
 };
 
 
@@ -439,9 +449,9 @@ anychart.core.axes.Ticks.prototype.drawBottomTick_ = function(ratio, bounds, lin
  * @param {anychart.math.Rect} lineBounds Axis line bounds.
  * @param {number} lineThickness Axis line thickness.
  * @param {number} pixelShift Pixel shift for a crisp display.
- * @private
+ * @protected
  */
-anychart.core.axes.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
+anychart.core.axes.Ticks.prototype.drawLeftTick = function(ratio, bounds, lineBounds, lineThickness, pixelShift) {
   /** @type {number} */
   var x = lineBounds.left;
   /** @type {number} */
@@ -455,13 +465,16 @@ anychart.core.axes.Ticks.prototype.drawLeftTick_ = function(ratio, bounds, lineB
   if (this.position_ == anychart.enums.SidePosition.OUTSIDE) {
     x -= lineThickness / 2;
     dx = /** @type {number} */(-this.length_);
+  } else if (this.position_ == anychart.enums.SidePosition.CENTER) {
+    x -= this.length_ / 2;
+    dx = /** @type {number} */(this.length_);
   } else {
     x += lineThickness / 2;
     dx = /** @type {number} */(this.length_);
   }
 
-  this.path_.moveTo(x, y);
-  this.path_.lineTo(x + dx, y);
+  this.path.moveTo(x, y);
+  this.path.lineTo(x + dx, y);
 };
 
 

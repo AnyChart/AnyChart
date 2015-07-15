@@ -1240,7 +1240,7 @@ anychart.charts.Polar.prototype.legendItemCanInteractInMode = function(mode) {
 
 
 /** @inheritDoc */
-anychart.charts.Polar.prototype.legendItemClick = function(item) {
+anychart.charts.Polar.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var series = this.getSeries(/** @type {number} */ (sourceKey));
   if (series) {

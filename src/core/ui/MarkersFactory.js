@@ -253,6 +253,9 @@ anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
  */
 anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    if (goog.isNull(this.enabledState_) && !!opt_value) {
+      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
+    }
     this.enabledState_ = opt_value;
     if (!goog.isNull(opt_value)) {
       goog.base(this, 'enabled', /** @type {boolean} */(opt_value));
@@ -1013,10 +1016,6 @@ anychart.core.ui.MarkersFactory.prototype.draw = function() {
       if (marker) {
         marker.container(this.layer_);
         marker.draw();
-        var element = marker.getDomElement();
-        if (element) {
-          element.tag = index;
-        }
       }
     }, this);
 
@@ -1546,6 +1545,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.getFinalSettings_ = function(
 anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
   var parentMarkersFactory = this.parentMarkersFactory();
   var currentMarkersFactory = this.currentMarkersFactory() ? this.currentMarkersFactory() : parentMarkersFactory;
+  var isSingleMarker = !(parentMarkersFactory && currentMarkersFactory);
   var settingsChangedStates;
   var notSelfSettings = currentMarkersFactory != parentMarkersFactory;
   if (notSelfSettings)
@@ -1555,13 +1555,13 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
   var enabled = this.getFinalSettings_(
       this.enabled(),
       this.superSettingsObj['enabled'],
-      parentMarkersFactory.enabled(),
-      currentMarkersFactory.enabled(),
-      !goog.isNull(currentMarkersFactory.enabled()));
+      !isSingleMarker && parentMarkersFactory.enabled(),
+      !isSingleMarker && currentMarkersFactory.enabled(),
+      !goog.isNull(isSingleMarker ? null : currentMarkersFactory.enabled()));
   if (goog.isNull(enabled)) enabled = true;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||
-      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
+      !isSingleMarker && currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
     if (!enabled) {
       this.markerElement_.parent(null);
       this.markConsistent(anychart.ConsistencyState.ALL);
@@ -1574,9 +1574,9 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER) ||
-      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+      !isSingleMarker && currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     if (enabled) {
-      if (parentMarkersFactory.getDomElement()) {
+      if (!isSingleMarker && parentMarkersFactory.getDomElement()) {
         if (!this.container()) this.container(/** @type {acgraph.vector.ILayer} */(parentMarkersFactory.getDomElement()));
         if (!this.container().parent()) {
           this.container().parent(/** @type {acgraph.vector.ILayer} */(parentMarkersFactory.container()));
@@ -1589,26 +1589,29 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX) ||
-      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    if (this.container()) this.container().zIndex(/** @type {number} */(parentMarkersFactory.zIndex()));
+      !isSingleMarker && currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    if (this.container() && !isSingleMarker) this.container().zIndex(/** @type {number} */(parentMarkersFactory.zIndex()));
     this.markerElement_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
-      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
-      currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+      !isSingleMarker && currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.APPEARANCE) ||
+      !isSingleMarker && currentMarkersFactory.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
 
     var settingsFields = ['anchor', 'type', 'size', 'offsetY', 'offsetX', 'fill', 'stroke', 'positionFormatter', 'rotation'];
     var settings = {};
+
+    if (isSingleMarker)
+      this.applyDefaultsForSingle_();
 
     for (var i = 0, len = settingsFields.length; i < len; i++) {
       var field = settingsFields[i];
       settings[field] = this.getFinalSettings_(
           this[field](),
           this.superSettingsObj[field],
-          parentMarkersFactory[field](),
-          currentMarkersFactory[field](),
+          isSingleMarker ? undefined : parentMarkersFactory[field](),
+          isSingleMarker ? undefined : currentMarkersFactory[field](),
           !!(settingsChangedStates && settingsChangedStates[field]));
 
     }
@@ -1662,10 +1665,28 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     this.markerElement_.setRotation(/** @type {number} */(settings['rotation']),
         position.x + anchorCoordinate.x, position.y + anchorCoordinate.y);
 
+    this.markerElement_.tag = this.getIndex();
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
   return this;
+};
+
+
+/**
+ * Defaults for standalone use.
+ * @private
+ */
+anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = function() {
+  this.suspendSignalsDispatching();
+  if (!goog.isDef(this.positionFormatter())) this.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  if (!goog.isDef(this.size())) this.size(10);
+  if (!goog.isDef(this.anchor())) this.anchor(anychart.enums.Anchor.CENTER);
+  if (!goog.isDef(this.offsetX())) this.offsetX(0);
+  if (!goog.isDef(this.offsetY())) this.offsetY(0);
+  if (!goog.isDef(this.rotation())) this.rotation(0);
+  this.resumeSignalsDispatching(false);
 };
 
 

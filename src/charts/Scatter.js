@@ -1493,7 +1493,7 @@ anychart.charts.Scatter.prototype.legendItemCanInteractInMode = function(mode) {
 
 
 /** @inheritDoc */
-anychart.charts.Scatter.prototype.legendItemClick = function(item) {
+anychart.charts.Scatter.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var series = this.getSeries(/** @type {number} */ (sourceKey));
   if (series) {

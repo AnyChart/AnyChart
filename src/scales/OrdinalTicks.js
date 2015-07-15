@@ -7,7 +7,7 @@ goog.require('goog.array');
 
 /**
  * Scale ticks settings.
- * @param {!anychart.scales.Ordinal} scale Scale to ask for a setup.
+ * @param {!(anychart.scales.Base)} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.core.Base}
  */
@@ -16,10 +16,10 @@ anychart.scales.OrdinalTicks = function(scale) {
 
   /**
    * Scale reference to get setup from in emergency situations.
-   * @type {!anychart.scales.Ordinal}
-   * @private
+   * @type {!(anychart.scales.Base)}
+   * @protected
    */
-  this.scale_ = scale;
+  this.scale = scale;
 };
 goog.inherits(anychart.scales.OrdinalTicks, anychart.core.Base);
 
@@ -176,11 +176,11 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
   }
   var values = this.get();
   if ((this.names_ && this.names_.length < values.length) || !this.autoNames_) {
-    var scaleNames = this.scale_.names();
+    var scaleNames = /** @type {anychart.scales.Ordinal} */(this.scale).names();
     this.autoNames_ = [];
     for (var i = 0; i < values.length; i++) {
       var val = goog.isArray(values[i]) ? values[i][0] : values[i];
-      var index = this.scale_.getIndexByValue(val);
+      var index = /** @type {anychart.scales.Ordinal} */(this.scale).getIndexByValue(val);
       if (!isNaN(index)) this.autoNames_.push(scaleNames[index]);
       else this.autoNames_.push(val);
     }
@@ -217,15 +217,24 @@ anychart.scales.OrdinalTicks.prototype.get = function() {
   if (this.explicit_)
     return this.explicit_;
   if (this.explicitIndexes_)
-    return this.explicit_ = this.makeValues_(this.explicitIndexes_);
-  if (!this.autoTicks_) {
-    var res = [];
-    for (var i = 0, len = this.scale_.values().length; i < len; i += this.interval_) {
-      res.push(i);
-    }
-    this.autoTicks_ = this.makeValues_(res);
-  }
+    return this.explicit_ = this.makeValues(this.explicitIndexes_);
+  if (!this.autoTicks_)
+    this.autoTicks_ = this.makeValues(this.calcAutoTicks());
   return /** @type {!Array} */(this.autoTicks_);
+};
+
+
+/**
+ * Auto calculating ticks.
+ * @protected
+ * @return {!Array.<number>}
+ */
+anychart.scales.OrdinalTicks.prototype.calcAutoTicks = function() {
+  var res = [];
+  for (var i = 0, len = this.scale.values().length; i < len; i += this.interval_) {
+    res.push(i);
+  }
+  return res;
 };
 
 
@@ -233,11 +242,11 @@ anychart.scales.OrdinalTicks.prototype.get = function() {
  * Makes an array of scale value indexes to become an array of scale values.
  * @param {!Array.<number>} indexes An array of scale value indexes.
  * @return {!Array} An array of scale values.
- * @private
+ * @protected
  */
-anychart.scales.OrdinalTicks.prototype.makeValues_ = function(indexes) {
+anychart.scales.OrdinalTicks.prototype.makeValues = function(indexes) {
   var len = indexes.length || 0;
-  var values = this.scale_.values();
+  var values = this.scale.values();
   var valuesLen = values.length;
   if (!len || !valuesLen) return [];
   var result = [], last = false;

@@ -971,7 +971,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 
 /**
  * Returns chart or gauge type. Published in charts.
- * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes}
+ * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
  */
 anychart.core.Chart.prototype.getType = goog.abstractMethod;
 

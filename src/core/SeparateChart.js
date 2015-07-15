@@ -149,6 +149,7 @@ anychart.core.SeparateChart.prototype.legendItemCanInteractInMode = function(mod
 /**
  * Calls when legend item that some how belongs to the chart was clicked.
  * @param {anychart.core.ui.LegendItem} item Legend item that was clicked.
+ * @param {anychart.core.MouseEvent} event Mouse event.
  */
 anychart.core.SeparateChart.prototype.legendItemClick = goog.nullFunction;
 

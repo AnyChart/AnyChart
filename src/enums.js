@@ -57,6 +57,20 @@ anychart.enums.GaugeTypes = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Maps types enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gauge types.
+ * @enum {string}
+ */
+anychart.enums.MapTypes = {
+  MAP: 'map'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Cursor
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1331,6 +1345,10 @@ anychart.enums.SidePosition = {
    */
   INSIDE: 'inside',
   /**
+   * Half of tick will be inside a chart, other part - outside, no matter where an axis is.
+   */
+  CENTER: 'center',
+  /**
    * Outside of a chart, no matter where an axis is.
    */
   OUTSIDE: 'outside'
@@ -1356,6 +1374,12 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
     case 'o':
     case 'outer':
       return anychart.enums.SidePosition.OUTSIDE;
+    case 'middle':
+    case 'mid':
+    case 'm':
+    case 'center':
+    case 'c':
+      return anychart.enums.SidePosition.CENTER;
   }
   return opt_default || anychart.enums.SidePosition.INSIDE;
 };
@@ -1468,6 +1492,7 @@ anychart.enums.EventType = {
   POINT_MOUSE_UP: 'pointmouseup',
   POINT_CLICK: 'pointclick',
   POINT_DBLCLICK: 'pointdblclick',
+  POINT_SELECT: 'pointselect',
   CHART_DRAW: 'chartdraw',
   ANIMATION_START: 'animationstart',
   ANIMATION_END: 'animationend',
@@ -1569,6 +1594,20 @@ anychart.enums.ScatterTicksMode = {
    * Scatter ticks go with log-linear interval, e.g. [0.1, 1, 10, 100, 1000]
    */
   LOGARITHMIC: 'logarithmic'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  CartesianSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types for Maps.
+ * @enum {string}
+ */
+anychart.enums.MapSeriesType = {
+  CHOROPLETH: 'choropleth'
 };
 
 
@@ -1829,6 +1868,22 @@ anychart.enums.GaugeScaleTypes = {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Maps scale types
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all scale types.
+ * @enum {string}
+ */
+anychart.enums.MapsScaleTypes = {
+  ORDINAL_COLOR: 'ordinalColor',
+  LINEAR_COLOR: 'linearColor',
+  GEO: 'geo'
+};
+
+
 /**
  * Normalize gauge scale type.
  * @param {string} value .
@@ -1873,7 +1928,9 @@ anychart.enums.ErrorCode = {
 
   NO_LEGEND_IN_CHART: 8,
 
-  NO_CREDITS_IN_CHART: 9
+  NO_CREDITS_IN_CHART: 9,
+
+  INVALID_GEO_JSON_OBJECT: 10
 };
 
 
@@ -2255,6 +2312,16 @@ anychart.enums.normalizeTextWrap = function(value) {
 };
 
 
+/**
+ * @enum {string}
+ */
+anychart.enums.AnyMapPointState = {
+  NORMAL: 'normal',
+  HOVER: 'hover',
+  SELECT: 'select'
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -2392,6 +2459,7 @@ goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_UP', anychart.enums.Even
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.EventType.POINT_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
 goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
+goog.exportSymbol('anychart.enums.EventType.POINT_SELECT', anychart.enums.EventType.POINT_SELECT);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);

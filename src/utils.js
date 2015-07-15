@@ -121,14 +121,14 @@ anychart.utils.compareNumericDesc = function(a, b) {
 /**
  * Extracts tag from BrowserEvent target object. Used in interactivity.
  * @param {*} target
- * @return {anychart.core.VisualBase|number|boolean|undefined}
+ * @return {*|undefined}
  */
 anychart.utils.extractTag = function(target) {
   var tag;
   while (target instanceof acgraph.vector.Element) {
     tag = target.tag;
-    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag) || goog.isBoolean(tag)) {
-      return /** @type {anychart.core.VisualBase|number|boolean} */(tag);
+    if (goog.isDef(tag)) {
+      return tag;
     }
     target = target.parent();
   }
@@ -1110,6 +1110,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
 
     case anychart.enums.ErrorCode.NO_CREDITS_IN_CHART:
       return 'Bullet and Sparkline charts do not support Credits.';
+
+    case anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT:
+      return 'Invalid GeoJSON object:';
 
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +

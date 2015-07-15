@@ -226,3 +226,7 @@ anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
 anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited
 anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited
+anychart.scales.DateTime.prototype['softMinimum'] = anychart.scales.DateTime.prototype.softMinimum;
+anychart.scales.DateTime.prototype['softMaximum'] = anychart.scales.DateTime.prototype.softMaximum;
+anychart.scales.DateTime.prototype['minimumGap'] = anychart.scales.DateTime.prototype.minimumGap;//doc|ex
+anychart.scales.DateTime.prototype['maximumGap'] = anychart.scales.DateTime.prototype.maximumGap;//doc|ex

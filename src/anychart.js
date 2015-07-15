@@ -135,6 +135,12 @@ anychart.gaugeTypesMap = {};
 /**
  * @type {Object}
  */
+anychart.mapTypesMap = {};
+
+
+/**
+ * @type {Object}
+ */
 anychart.ganttTypesMap = {};
 
 
@@ -162,6 +168,20 @@ anychart.createGaugeByType = function(type) {
     return /** @type {anychart.core.Chart} */(cls());
   } else {
     throw 'Unknown gauge type: ' + type + '\nProbably it is in some other module, see module list for details.';
+  }
+};
+
+
+/**
+ * @param {string} type
+ * @return {anychart.core.Chart}
+ */
+anychart.createMapByType = function(type) {
+  var cls = anychart.mapTypesMap[type];
+  if (cls) {
+    return /** @type {anychart.core.Chart} */(cls());
+  } else {
+    throw 'Unknown map type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
 };
 
@@ -216,16 +236,19 @@ anychart.fromJson = function(jsonConfig) {
     var chart = json['chart'];
     var gauge = json['gauge'];
     var gantt = json['gantt'];
+    var map = json['map'];
     if (chart)
       instance = anychart.createChartByType(chart['type']);
     else if (gauge)
       instance = anychart.createGaugeByType(gauge['type']);
     else if (gantt)
       instance = anychart.createGanttByType(gantt['type']);
+    else if (map)
+      instance = anychart.createMapByType(map['type']);
   }
 
   if (instance)
-    instance.setup(chart || gauge || gantt);
+    instance.setup(chart || gauge || gantt || map);
   else
     anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 
@@ -653,6 +676,14 @@ anychart.circularGauge = anychart.circularGauge || function() {
 /**
  * @ignoreDoc
  */
+anychart.map = anychart.map || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.ganttProject = anychart.ganttProject || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
 };
@@ -709,6 +740,7 @@ goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.sparkline', anychart.sparkline);
 goog.exportSymbol('anychart.scatter', anychart.scatter);
+goog.exportSymbol('anychart.map', anychart.map);
 goog.exportSymbol('anychart.areaChart', anychart.area);
 goog.exportSymbol('anychart.barChart', anychart.bar);
 goog.exportSymbol('anychart.bubbleChart', anychart.bubble);

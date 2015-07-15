@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <!--<script src="http://code.highcharts.com/maps/highmaps.src.js"></script>-->
+  <script src="highmaps.src.js"></script>
+  <script src="http://code.highcharts.com/maps/modules/exporting.js"></script>
+  <script src="http://code.highcharts.com/mapdata/countries/gb/gb-all.js"></script>
+  <style>
+    html, body, #container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+  </style>
+</head>
+<body onload="draw()">
+  <div id="container"></div>
+</body>
+</html>
+
+
+<script>
+  function draw() {
+    $(function() {
+      debugger;
+      $('#container').highcharts('Map', {
+        series: [{
+
+
+          mapData: {
+            "title": "Europe",
+            "version": "1.1.1",
+            "type": "FeatureCollection",
+            "copyright": "Copyright (c) 2014 Highsoft AS, Based on data from Natural Earth",
+            "copyrightShort": "Natural Earth",
+            "copyrightUrl": "http://www.naturalearthdata.com",
+            "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:EPSG:102014"}},
+            "hc-transform": {
+              "default": {
+                "crs": "+proj=lcc +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs",
+                "scale": 0.000169255094964,
+                "jsonres": 15.5,
+                "jsonmarginX": -999,
+                "jsonmarginY": 9851.0,
+                "xoffset": -1706316.2597,
+                "yoffset": 4824494.18154
+              }
+            },
+            "features": [{
+              "type": "Feature",
+              "id": "DK",
+              "properties": {
+                "hc-group": "admin0",
+                "hc-middle-x": 0.19,
+                "hc-middle-y": 0.44,
+                "hc-key": "dk",
+                "hc-a2": "DK",
+                "name": "Denmark",
+                "labelrank": "4",
+                "country-abbrev": "Den.",
+                "subregion": "Northern Europe",
+                "woe-id": "23424796",
+                "region-wb": "Europe & Central Asia",
+                "iso-a3": "DNK",
+                "iso-a2": "DK",
+                "region-un": "Europe",
+                "continent": "Europe"
+              },
+              "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                  [
+                    [[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],
+                    [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]
+                  ],
+                  [
+                    [[150.0, 0.0], [151.0, 0.0], [151.0, 1.0], [150.0, 1.0], [150.0, 0.0]],
+                    [[150.2, 0.2], [150.8, 0.2], [150.8, 0.8], [150.2, 0.8], [150.2, 0.2]]
+                  ]
+                ]
+              }
+            }]
+          }
+
+
+
+        }]
+      });
+    });
+  }
+</script>

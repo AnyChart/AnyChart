@@ -65,6 +65,19 @@ anychart.math.round = function(num, opt_digitsCount) {
 
 
 /**
+ * Comparison of two numbers numbers for roughly equal with some accuracy.
+ * @param {number} value First value to compare.
+ * @param {number} value2 Second value to compare.
+ * @param {number=} opt_eps Accuracy or neighborhood on which two value roughly equal.
+ * @return {boolean} Whether value1 rough equal value2.
+ */
+anychart.math.roughlyEqual = function(value, value2, opt_eps) {
+  var eps = opt_eps || 0.01;
+  return Math.abs(value - value2) < eps;
+};
+
+
+/**
  * Safe log of a value.
  * @param {number} val .
  * @param {number=} opt_base Must meet (base > 0 && base != 1).

@@ -271,6 +271,9 @@ anychart.core.ui.LabelsFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.enabledState_ = opt_value;
     if (!goog.isNull(opt_value)) {
+      if (goog.isNull(this.enabledState_) && !!opt_value) {
+        this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
+      }
       goog.base(this, 'enabled', /** @type {boolean} */(opt_value));
     } else {
       goog.base(this, 'enabled', true);
@@ -2112,6 +2115,36 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       this.suspendSignalsDispatching();
       this.fontSize(calculatedFontSize);
       this.textElement.fontSize(calculatedFontSize);
+
+      //need fix outer bounds after applying adjust font size
+      if (isWidthSet) {
+        width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.mergedSettings['width']), parentWidth));
+        outerBounds.width = width;
+      } else {
+        //we should ask text element about bounds only after text format and text settings are applied
+        textElementBounds = this.textElement.getBounds();
+        width = textElementBounds.width;
+        if (this.mergedSettings['padding']) {
+          outerBounds.width = this.mergedSettings['padding'].widenWidth(width);
+        } else {
+          outerBounds.width = width;
+        }
+      }
+
+      if (isHeightSet) {
+        height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(this.mergedSettings['height']), parentHeight));
+        outerBounds.height = height;
+      } else {
+        //we should ask text element about bounds only after text format and text settings are applied
+        textElementBounds = this.textElement.getBounds();
+        height = textElementBounds.height;
+        if (this.mergedSettings['padding']) {
+          outerBounds.height = this.mergedSettings['padding'].widenHeight(height);
+        } else {
+          outerBounds.height = height;
+        }
+      }
+
       this.resumeSignalsDispatching(false);
     }
 
