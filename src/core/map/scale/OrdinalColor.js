@@ -136,6 +136,7 @@ anychart.core.map.scale.OrdinalColor.prototype.names = function(opt_value) {
         return this;
       this.names_ = opt_value;
     }
+    this.resetDataRange();
     this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
     return this;
   }
@@ -188,7 +189,7 @@ anychart.core.map.scale.OrdinalColor.prototype.ranges = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.ranges_ != opt_value) {
       this.ranges_ = opt_value;
-      this.autoColors_ = anychart.color.singleHueProgression('#FFA100', this.ranges_.length);
+      this.autoColors_ = anychart.color.blendedHueProgression(null, null, this.ranges_.length);
       this.resetDataRange();
       this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
     }
