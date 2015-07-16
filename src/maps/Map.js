@@ -581,7 +581,7 @@ anychart.maps.Map.prototype.processGeoData = function() {
 anychart.maps.Map.prototype.calculate = function() {
   this.processGeoData();
 
-  var i;
+  var i, series;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
     var scale = this.scale();
     scale.startAutoCalc();
@@ -605,15 +605,19 @@ anychart.maps.Map.prototype.calculate = function() {
     }
     scale.finishAutoCalc();
 
+    for (i = this.series_.length; i--;) {
+      series = this.series_[i];
+      series.setGeoData(this, this.internalGeoData_);
+      series.calculate();
+    }
+
     this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
     for (i = this.series_.length; i--;) {
-      var series = this.series_[i];
+      series = this.series_[i];
       series.container(this.rootElement);
-      series.setGeoData(this, this.internalGeoData_);
-      series.calculate();
     }
   }
 };

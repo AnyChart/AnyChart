@@ -1,4 +1,4 @@
-var parser, map, map1, s1, s2, s3, s, axis, axis_lin, cs, cr, series;
+var parser, map, map1, s1, s2, s3, s, axis, axis_lin, cs, cr, series, currentColorScale;
 
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
@@ -24,9 +24,18 @@ anychart.onDocumentReady(function() {
   map.geoData(anychart.maps.australia);
 
   //var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
-  var currentColorScale = anychart.scales.ordinalColor();
-  currentColorScale.colors(["#E0F7FA", "#0097A7"]);
-  currentColorScale.ranges([{from: 10, to: 50}, {from: 50, to: 100}]);
+  //var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
+  currentColorScale = anychart.scales.ordinalColor();
+  currentColorScale.colors(anychart.color.bipolarHueProgression());
+  currentColorScale.ranges([
+    {less: 20},
+    {from: 20, to: 30},
+    {from: 30, to: 40},
+    {from: 40, to: 50},
+    {from: 50, to: 60},
+    {from: 60, to: 70},
+    {greater: 70}
+  ]);
 
   series = map.choropleth(dataSetForSeries);
   series.geoIdField("code_hasc");

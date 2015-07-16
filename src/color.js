@@ -107,23 +107,55 @@ anychart.color.singleHueProgression = function(opt_color, opt_count, opt_startOr
  * For maps with a bipolar progression we usually choose two complementary colour hues of the common colour circle
  * like blue and yellow or red and green.
  *
- * @param {?string=} opt_color1 [red] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
+ * @param {?string=} opt_color1 [blue] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
  * '#ff0000' accordingly.
- * @param {?string=} opt_color2 [blue] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
+ * @param {?string=} opt_color2 [red] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
  * '#ff0000' accordingly.
  * @param {number=} opt_count [7] Count of progression colors.
  * @return {Array.<string>} Multiple bipolar heu progression. Array of colors.
  */
 anychart.color.bipolarHueProgression = function(opt_color1, opt_color2, opt_count) {
   var count = goog.isDef(opt_count) ? opt_count : 7;
-  var arr1 = anychart.color.singleHueProgression(opt_color1 || 'red', Math.floor(count / 2) + 1, null, 1);
-  var arr2 = anychart.color.singleHueProgression(opt_color2 || 'blue', Math.floor(count / 2) + 1, 1);
+  var arr1 = anychart.color.singleHueProgression(opt_color1 || 'blue', Math.floor(count / 2) + 1, null, 1);
+  var arr2 = anychart.color.singleHueProgression(opt_color2 || 'red', Math.floor(count / 2) + 1, 1);
 
   if (count % 2 == 0)
     goog.array.splice(arr1, arr1.length - 1, 1);
   goog.array.splice(arr2, 0, 1);
 
   return arr1.concat(arr2);
+};
+
+
+/**
+ * Multiple blended heu progression.
+ *
+ * Blended hue progressions use related hues to blend together the two end point hues. This type of color progression
+ * is typically used to show elevation changes. For example from yellow through orange to brown.
+ *
+ * Magnitude variations are often represented by a progression of related hues, from which at least one hue is not
+ * part of the visible spectrum, which means that it is a so called “impure mixed colour”, which is brown. These hues
+ * must blend smoothly and change uniformly in hue, brightness, and saturation between the chosen endpoint hues.
+ *
+ * @param {?string=} opt_color1 [blue] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
+ * '#ff0000' accordingly.
+ * @param {?string=} opt_color2 [red] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or
+ * '#ff0000' accordingly.
+ * @param {number=} opt_count [7] Count of progression colors.
+ * @return {Array.<string>} Multiple blended heu progression. Array of colors.
+ */
+anychart.color.blendedHueProgression = function(opt_color1, opt_color2, opt_count) {
+  var count = goog.isDef(opt_count) ? opt_count : 7;
+  var color1 = goog.color.hexToRgb(anychart.color.parseColor(opt_color1 || 'yellow').hex);
+  var color2 = goog.color.hexToRgb(anychart.color.parseColor(opt_color2 || 'brown').hex);
+
+  var progression = [goog.color.rgbToHex.apply(null, color1)];
+  var step = 1 / count;
+  for (var i = 1; i < count - 1; i++) {
+    progression.push(goog.color.rgbToHex.apply(null, anychart.color.blend(color2, color1, step * i)));
+  }
+  progression.push(goog.color.rgbToHex.apply(null, color2));
+  return progression;
 };
 
 

@@ -84,9 +84,9 @@ anychart.core.map.scale.OrdinalColor.prototype.colors = function(opt_value) {
     else {
       if (goog.isArray(opt_value))
         this.colors_ = goog.array.clone(opt_value);
-      return this;
     }
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    this.resetDataRange();
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   }
   if (goog.isArray(this.colors_)) {
