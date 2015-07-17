@@ -102,7 +102,12 @@ anychart.core.map.scale.LinearColor.prototype.normalizeColors_ = function(var_ar
     var key = keys[i];
     if (!goog.isDef(key['offset']))
       key['offset'] = i == 0 ? 0 : i == len - 1 ? 1 : i / (len - 1);
-    key['color'] = goog.color.hexToRgb(anychart.color.parseColor(key['color']).hex);
+    var color = key['color'];
+    if (goog.isArray(color)) {
+      key['color'] = goog.array.clone(color);
+    } else if (goog.isString(color)) {
+      key['color'] = goog.color.hexToRgb(anychart.color.parseColor(color).hex);
+    }
   }
 
   goog.array.sortObjectsByKey(keys, 'offset');

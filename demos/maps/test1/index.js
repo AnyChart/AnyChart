@@ -24,18 +24,18 @@ anychart.onDocumentReady(function() {
   map.geoData(anychart.maps.australia);
 
   //var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
-  //var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
-  currentColorScale = anychart.scales.ordinalColor();
-  currentColorScale.colors(anychart.color.bipolarHueProgression());
-  currentColorScale.ranges([
-    {less: 20},
-    {from: 20, to: 30},
-    {from: 30, to: 40},
-    {from: 40, to: 50},
-    {from: 50, to: 60},
-    {from: 60, to: 70},
-    {greater: 70}
-  ]);
+  var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
+  //currentColorScale = anychart.scales.Color();
+  //currentColorScale.colors();
+  //currentColorScale.ranges([
+  //  {less: 20},
+  //  {from: 20, to: 30},
+  //  {from: 30, to: 40},
+  //  {from: 40, to: 50},
+  //  {from: 50, to: 60},
+  //  {from: 60, to: 70},
+  //  {greater: 70}
+  //]);
 
   series = map.choropleth(dataSetForSeries);
   series.geoIdField("code_hasc");
@@ -47,9 +47,8 @@ anychart.onDocumentReady(function() {
   map.container("container").draw();
 
   var json = map.toJson();
-
+  //
   map1 = anychart.fromJson(json);
   map1.geoData(anychart.maps.australia);
   map1.container("container").draw();
-
 });
