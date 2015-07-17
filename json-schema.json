@@ -244,6 +244,7 @@
             ]
           }
         },
+        "crosshair": {"$ref": "#/definitions/anychart.core.ui.Crosshair"},
         "barChartMode": {
           "type": "boolean"
         },
@@ -3072,6 +3073,31 @@
         "padding": {"$ref": "#/definitions/anychart.core.utils.Space"}
       }
     },
+    "anychart.core.ui.CrosshairLabel": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.Text"},
+        {"$ref": "#/definitions/anychart.core.ui.Label"}
+      ],
+      "properties": {
+        "axisIndex": {
+          "type": "number"
+        }
+      }
+    },
+    "anychart.core.ui.Crosshair": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "xStroke": {"$ref": "#/definitions/stroke"},
+        "yStroke": {"$ref": "#/definitions/stroke"},
+        "xLabel": {"$ref": "#/definitions/anychart.core.ui.CrosshairLabel"},
+        "yLabel": {"$ref": "#/definitions/anychart.core.ui.CrosshairLabel"}
+      }
+    },
     "anychart.core.ui.Legend": {
       "type": "object",
       "allOf": [
@@ -3981,7 +4007,7 @@
         "percent90"
       ]
     },
-  "anychart.core.utils.Animation": {
+    "anychart.core.utils.Animation": {
       "properties": {
         "enabled": {
           "type": "boolean"

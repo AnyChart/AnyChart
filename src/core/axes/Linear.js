@@ -1429,7 +1429,6 @@ anychart.core.axes.Linear.prototype.getRemainingBounds = function() {
 /**
  * Gets axis pixel bounds.
  * @return {anychart.math.Rect} Pixel bounds.
- * @protected
  */
 anychart.core.axes.Linear.prototype.getPixelBounds = function() {
   if (!this.pixelBounds || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {

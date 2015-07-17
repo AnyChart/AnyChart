@@ -82,25 +82,6 @@ anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Normalizes user input corners type to its enumeration values. Also accepts null. Defaults to opt_default or 'round'.
- *
- * @param {string} type Type to normalize.
- * @param {anychart.enums.BackgroundCornersType=} opt_default Default type.
- * @return {anychart.enums.BackgroundCornersType} Normalized type.
- */
-anychart.core.ui.Background.normalizeCornerType = function(type, opt_default) {
-  if (goog.isString(type)) {
-    type = type.toLowerCase();
-    for (var i in anychart.enums.BackgroundCornersType) {
-      if (type == anychart.enums.BackgroundCornersType[i])
-        return anychart.enums.BackgroundCornersType[i];
-    }
-  }
-  return opt_default || anychart.enums.BackgroundCornersType.NONE;
-};
-
-
-/**
  * Getter for current corner radius.
  * @return {Array.<number>} Current corner settings.
  *//** topLeft, topRight, bottomRight, bottomLeft
@@ -187,7 +168,7 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
  */
 anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.core.ui.Background.normalizeCornerType(opt_value);
+    opt_value = anychart.enums.normalizeBackgroundCornerType(opt_value);
     if (opt_value != this.cornerType_) {
       this.cornerType_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);

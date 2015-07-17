@@ -70,6 +70,7 @@ anychart.ConsistencyState = {
   CARTESIAN_AXES: 1 << 16,
   CARTESIAN_AXES_MARKERS: 1 << 17,
   CARTESIAN_GRIDS: 1 << 18,
+  CARTESIAN_CROSSHAIR: 1 << 19,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 11,
   PYRAMID_FUNNEL_MARKERS: 1 << 12,
@@ -104,6 +105,7 @@ anychart.ConsistencyState = {
   SCATTER_AXES: 1 << 16,
   SCATTER_AXES_MARKERS: 1 << 17,
   SCATTER_GRIDS: 1 << 18,
+  SCATTER_CROSSHAIR: 1 << 19,
   //---------------------------------- SPARKLINE STATES (CHART) ---------------------------------
   SPARK_SCALES: 1 << 11,
   SPARK_SERIES: 1 << 12,

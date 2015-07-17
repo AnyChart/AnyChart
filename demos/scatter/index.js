@@ -11,6 +11,8 @@ anychart.onDocumentLoad(function() {
 
   chart.legend().enabled(true);
 
+  chart.crosshair();
+
   chart.grid(0)
     .oddFill('#F9F9F9')
     .evenFill('#FFFFFF')

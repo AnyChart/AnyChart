@@ -47,6 +47,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="axis" type="core.axes.Linear"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="core.axisMarkers.SimpleRange_list"/>
             <!-- charts.Cartesian and chart.Scatter elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="crosshair" type="core.Crosshair"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_axes" type="core.axes.Linear_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_axes" type="core.axes.Linear_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="line_axes_markers" type="core.axisMarkers.Line_list"/>
@@ -754,6 +755,43 @@
             <xsd:element name="label" type="core.Label"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="core.CrosshairLabel">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+        </xsd:all>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
+        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
+        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
+        <xsd:attribute name="text" type="xsd:string"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attribute name="rotation" type="xsd:double" default="0"/>
+        <xsd:attribute name="axis_index" type="xsd:double" default="0"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.Crosshair">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_label" type="core.CrosshairLabel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_label" type="core.CrosshairLabel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="x_stroke" type="xsd:string"/>
+        <xsd:attribute name="y_stroke" type="xsd:string"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
 
     <xsd:complexType name="core.LabelsFactory">
         <xsd:all>

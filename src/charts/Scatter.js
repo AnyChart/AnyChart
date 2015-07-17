@@ -8,6 +8,7 @@ goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.grids.Linear');
 goog.require('anychart.core.scatter.series.Base');
+goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');
@@ -24,6 +25,12 @@ goog.require('anychart.scales');
  */
 anychart.charts.Scatter = function() {
   goog.base(this);
+
+  /**
+   * @type {anychart.core.ui.Crosshair}
+   * @private
+   */
+  this.crosshair_ = null;
 
   /**
    * @type {anychart.scales.ScatterBase}
@@ -148,7 +155,8 @@ anychart.charts.Scatter.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SCATTER_PALETTE |
     anychart.ConsistencyState.SCATTER_MARKER_PALETTE |
     anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE |
-    anychart.ConsistencyState.SCATTER_SERIES;
+    anychart.ConsistencyState.SCATTER_SERIES |
+    anychart.ConsistencyState.SCATTER_CROSSHAIR;
 
 
 /**
@@ -222,6 +230,13 @@ anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
 /**
+ * Crosshair z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Scatter.ZINDEX_CROSSHAIR = 41;
+
+
+/**
  * Sets default scale for layout based element.
  * @param {anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text|anychart.core.grids.Linear} item Item to set scale.
  * @private
@@ -232,6 +247,46 @@ anychart.charts.Scatter.prototype.setDefaultScaleForLayoutBasedElements_ = funct
   } else {
     item.scale(/** @type {anychart.scales.ScatterBase} */(this.xScale()));
   }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Crosshair.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ *
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.ui.Crosshair|anychart.charts.Scatter)}
+ */
+anychart.charts.Scatter.prototype.crosshair = function(opt_value) {
+  if (!this.crosshair_) {
+    this.crosshair_ = new anychart.core.ui.Crosshair();
+    this.crosshair_.enabled(false);
+    this.crosshair_.zIndex(anychart.charts.Scatter.ZINDEX_CROSSHAIR);
+    this.crosshair_.bindHandlersTo(this);
+    this.registerDisposable(this.crosshair_);
+    this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
+    this.invalidate(anychart.ConsistencyState.SCATTER_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.crosshair_.setup(opt_value);
+    return this;
+  } else {
+    return this.crosshair_;
+  }
+};
+
+
+/**
+ * Listener for crosshair invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.charts.Scatter.prototype.onCrosshairSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.SCATTER_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1832,7 +1887,8 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.SCATTER_AXES |
         anychart.ConsistencyState.SCATTER_GRIDS |
         anychart.ConsistencyState.SCATTER_AXES_MARKERS |
-        anychart.ConsistencyState.SCATTER_SERIES);
+        anychart.ConsistencyState.SCATTER_SERIES |
+        anychart.ConsistencyState.SCATTER_CROSSHAIR);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_GRIDS)) {
@@ -1907,6 +1963,22 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.SCATTER_SERIES);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_CROSSHAIR)) {
+    if (this.crosshair_) {
+      this.crosshair_.suspendSignalsDispatching();
+      this.crosshair_.parentBounds(this.dataBounds_);
+      this.crosshair_.container(this.rootElement);
+
+      this.crosshair_.xAxis(this.xAxes_[this.crosshair_.xLabel().axisIndex()]);
+      this.crosshair_.yAxis(this.yAxes_[this.crosshair_.yLabel().axisIndex()]);
+
+      this.crosshair_.draw();
+      this.crosshair_.resumeSignalsDispatching(false);
+    }
+
+    this.markConsistent(anychart.ConsistencyState.SCATTER_CROSSHAIR);
+  }
+
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
 };
 
@@ -1978,6 +2050,7 @@ anychart.charts.Scatter.prototype.serialize = function() {
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
+  json['crosshair'] = this.crosshair().serialize();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -2281,10 +2354,15 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
       }
     }
   }
+
+  if (config['crosshair']) {
+    this.crosshair(config['crosshair']);
+  }
 };
 
 
 //exports
+anychart.charts.Scatter.prototype['crosshair'] = anychart.charts.Scatter.prototype.crosshair;
 anychart.charts.Scatter.prototype['xScale'] = anychart.charts.Scatter.prototype.xScale;//doc|ex
 anychart.charts.Scatter.prototype['yScale'] = anychart.charts.Scatter.prototype.yScale;//doc|ex
 anychart.charts.Scatter.prototype['grid'] = anychart.charts.Scatter.prototype.grid;//doc|ex

@@ -1115,7 +1115,29 @@ anychart.enums.BackgroundCornersType = {
    *   .lineTo(25, 10)
    *   .stroke('3 #666')
    */
-  ROUND_INNER: 'roundinner'
+  ROUND_INNER: 'roundInner'
+};
+
+
+/**
+ * Normalizes background corner type.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.BackgroundCornersType=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.BackgroundCornersType} normalized value.
+ */
+anychart.enums.normalizeBackgroundCornerType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'none':
+      return anychart.enums.BackgroundCornersType.NONE;
+    case 'round':
+      return anychart.enums.BackgroundCornersType.ROUND;
+    case 'cut':
+      return anychart.enums.BackgroundCornersType.CUT;
+    case 'roundinner':
+      return anychart.enums.BackgroundCornersType.ROUND_INNER;
+  }
+  return opt_default || anychart.enums.BackgroundCornersType.NONE;
 };
 
 

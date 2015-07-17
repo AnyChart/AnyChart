@@ -37,6 +37,12 @@ anychart.core.Chart = function() {
   this.background_ = null;
 
   /**
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.shadowRect_;
+
+  /**
    * @type {anychart.core.utils.Margin}
    * @private
    */
@@ -718,6 +724,15 @@ anychart.core.Chart.prototype.draw = function() {
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
   var contentBounds = this.calculateContentAreaSpace(totalBounds);
   this.drawContent(contentBounds);
+
+  // used for crosshair
+  var background = this.background();
+  var fill = background.fill();
+  if ((!background.enabled() || !fill || fill == 'none') && !this.shadowRect_) {
+    this.shadowRect_ = this.rootElement.rect();
+    this.shadowRect_.fill('#fff 0.00001').stroke(null);
+    this.shadowRect_.setBounds(contentBounds);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
     for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
