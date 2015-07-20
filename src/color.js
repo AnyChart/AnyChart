@@ -420,3 +420,4 @@ goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);//in docs/fi
 goog.exportSymbol('anychart.color.darken', anychart.color.darken);//in docs/final
 goog.exportSymbol('anychart.color.singleHueProgression', anychart.color.singleHueProgression);
 goog.exportSymbol('anychart.color.bipolarHueProgression', anychart.color.bipolarHueProgression);
+goog.exportSymbol('anychart.color.blendedHueProgression', anychart.color.blendedHueProgression);
