@@ -161,6 +161,8 @@ anychart.ConsistencyState = {
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 5,
   DATA_GRID_COLUMN_POSITION: 1 << 6,
+  //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
+  BACKGROUND_POINTER_EVENTS: 1 << 5,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
   LABEL_BACKGROUND: 1 << 5,
   //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------

@@ -35,9 +35,6 @@ anychart.core.ui.CrosshairLabel = function() {
    * @private
    */
   this.textFormatter_ = null;
-
-
-
 };
 goog.inherits(anychart.core.ui.CrosshairLabel, anychart.core.ui.LabelBase);
 

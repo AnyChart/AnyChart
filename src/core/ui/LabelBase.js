@@ -758,6 +758,24 @@ anychart.core.ui.LabelBase.prototype.adjustFontSize = function(opt_adjustOrAdjus
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.LabelBase.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.disablePointerEvents_) {
+      this.disablePointerEvents_ = opt_value;
+      goog.base(this, 'disablePointerEvents', opt_value);
+      this.background().disablePointerEvents(opt_value);
+    }
+    return this;
+  } else {
+    return this.disablePointerEvents_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing.
@@ -1230,8 +1248,6 @@ anychart.core.ui.LabelBase.prototype.restoreDefaults = function() {
   this.height(null);
   this.padding(0);
   this.background(null);
-  this.position(anychart.enums.Position.LEFT_TOP);
-  this.anchor(anychart.enums.Anchor.LEFT_TOP);
   this.offsetX(0);
   this.offsetY(0);
   this.rotation(0);

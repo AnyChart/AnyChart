@@ -79,6 +79,7 @@ function load() {
   chart.yScale(anychart.scales.ordinal());
   chart.yScale().inverted(true);
   chart.yAxis().title().enabled(false);
+  chart.yAxis().orientation('right');
 
   // setting and adjusting data visualisation
   var markerSeries = chart.marker(data.mapAs({x: [1], value: [0]}));
@@ -103,6 +104,9 @@ function load() {
   chart.background().fill(null);
   //chart.background().fill('green .3').enabled(true);
 
+  //chart.crosshair().xLabel().anchor('tl')
+  //chart.crosshair().xLabel().axisIndex(1);
+
   chart.container('container');
   //chart.crosshair().enabled(false);
   chart.padding(0, 20, 0, 0).draw();
@@ -123,6 +127,7 @@ function load() {
 
   //chart.crosshair().xLabel().axisIndex(1);
   //chart.crosshair().yLabel().axisIndex(1);
+  chart.crosshair().yLabel().anchor('rc')
 
   //chart.crosshair().yLabel().textFormatter(function(value) {
   //  var date = new Date(value['rawValue']);

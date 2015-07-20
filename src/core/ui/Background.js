@@ -54,6 +54,13 @@ anychart.core.ui.Background = function() {
    */
   this.stroke_ = '#000';
 
+  /**
+   * Pointer events.
+   * @type {boolean}
+   * @private
+   */
+  this.disablePointerEvents_ = false;
+
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.ui.Background, anychart.core.VisualBaseWithBounds);
@@ -73,7 +80,8 @@ anychart.core.ui.Background.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.APPEARANCE;
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -454,6 +462,25 @@ anychart.core.ui.Background.prototype.stroke = function(opt_strokeOrFill, opt_th
 
 
 /**
+ * Pointer events.
+ * @param {boolean=} opt_value
+ * @return {!anychart.core.ui.Background|boolean}
+ */
+anychart.core.ui.Background.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.disablePointerEvents_) {
+      this.disablePointerEvents_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return this.disablePointerEvents_;
+  }
+};
+
+
+/**
  * Render background.
  * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
  */
@@ -469,6 +496,11 @@ anychart.core.ui.Background.prototype.draw = function() {
   var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS)) {
+    this.rect_.disablePointerEvents(this.disablePointerEvents_);
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var bounds = this.getPixelBounds();
