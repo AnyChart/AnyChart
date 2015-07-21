@@ -1,7 +1,4 @@
-var chart;
 anychart.onDocumentReady(function() {
-
-
   var names = ['Temazepam', 'Guaifenesin', 'Salicylic Acid', 'Fluoride', 'Zinc Oxide', 'Acetaminophen'];
   var data = [23, 34, 67, 93, 56, 100];
   var dataSet = anychart.data.set(data);

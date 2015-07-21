@@ -555,32 +555,6 @@ anychart.core.VisualBase.prototype.invalidateParentBounds = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Return data for stage export.
- * @return {Array.<string>} .
- * @protected
- */
-anychart.core.VisualBase.prototype.getExportData = function() {
-  var stage = this.container() ? this.container().getStage() : null;
-  var result = [];
-
-  if (stage) {
-    var type = acgraph.type();
-    if (type == acgraph.StageType.VML) {
-      var jsonData = stage.data() || {};
-      result = [goog.json.hybrid.stringify(jsonData), 'json', 'graphics'];
-
-    } else if (type == acgraph.StageType.SVG) {
-      var serializer = new XMLSerializer();
-      var svgNode = stage.domElement();
-      result = [serializer.serializeToString(svgNode), 'svg', 'graphics'];
-    }
-  }
-
-  return result;
-};
-
-
-/**
  * Saves the current visual state into PNG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
@@ -591,17 +565,15 @@ anychart.core.VisualBase.prototype.getExportData = function() {
  *   .padding(5)
  *   .offsetX(5)
  *   .listen('click', function(){
- *      chart.saveAsPNG();
+ *      chart.saveAsPng();
  *   });
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
  */
-anychart.core.VisualBase.prototype.saveAsPNG = function() {
-  var data = this.getExportData();
+anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, opt_quality) {
   var stage = this.container() ? this.container().getStage() : null;
-
-  if (data.length && stage) {
-    stage.saveAsPNG(data[0], data[1], data[2]);
-  }
-
+  if (stage) stage.saveAsPng(opt_width, opt_height, opt_quality);
 };
 
 
@@ -616,16 +588,16 @@ anychart.core.VisualBase.prototype.saveAsPNG = function() {
  *   .padding(5)
  *   .offsetX(5)
  *   .listen('click', function(){
- *      chart.saveAsJPG();
+ *      chart.saveAsJpg();
  *   });
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
+ * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
  */
-anychart.core.VisualBase.prototype.saveAsJPG = function() {
-  var data = this.getExportData();
+anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
   var stage = this.container() ? this.container().getStage() : null;
-
-  if (data.length && stage) {
-    stage.saveAsJPG(data[0], data[1], data[2]);
-  }
+  if (stage) stage.saveAsJpg(opt_width, opt_height, opt_quality, opt_forceTransparentWhite);
 };
 
 
@@ -640,16 +612,16 @@ anychart.core.VisualBase.prototype.saveAsJPG = function() {
  *   .padding(5)
  *   .offsetX(5)
  *   .listen('click', function(){
- *      chart.saveAsPDF();
+ *      chart.saveAsPdf();
  *   });
+ * @param {string=} opt_paperSize Any paper format like 'a0', 'tabloid', 'b4', etc.
+ * @param {boolean=} opt_landscape Define, is landscape.
+ * @param {number=} opt_x Offset X.
+ * @param {number=} opt_y Offset Y.
  */
-anychart.core.VisualBase.prototype.saveAsPDF = function() {
-  var data = this.getExportData();
+anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSize, opt_landscape, opt_x, opt_y) {
   var stage = this.container() ? this.container().getStage() : null;
-
-  if (data.length && stage) {
-    stage.saveAsPDF(data[0], data[1], data[2]);
-  }
+  if (stage) stage.saveAsPdf(opt_paperSize, opt_landscape, opt_x, opt_y);
 };
 
 
@@ -664,37 +636,26 @@ anychart.core.VisualBase.prototype.saveAsPDF = function() {
  *   .padding(5)
  *   .offsetX(5)
  *   .listen('click', function(){
- *      chart.saveAsSVG();
+ *      chart.saveAsSvg();
  *   });
+ * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
+ * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  */
-anychart.core.VisualBase.prototype.saveAsSVG = function() {
-  var data = this.getExportData();
+anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidth, opt_landscapeOrHeight) {
   var stage = this.container() ? this.container().getStage() : null;
-
-  if (data.length && stage) {
-    stage.saveAsSVG(data[0], data[1], data[2]);
-  }
+  if (stage) stage.saveAsSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight);
 };
 
 
 /**
  * Returns SVG string if type of content SVG otherwise returns empty string.
+ * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
+ * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  * @return {string}
  */
-anychart.core.VisualBase.prototype.toSVG = function() {
+anychart.core.VisualBase.prototype.toSvg = function(opt_paperSizeOrWidth, opt_landscapeOrHeight) {
   var stage = this.container() ? this.container().getStage() : null;
-  var result = '';
-
-  if (stage) {
-    var type = acgraph.type();
-    if (type == acgraph.StageType.SVG) {
-      var serializer = new XMLSerializer();
-      var svgNode = stage.domElement();
-      result = serializer.serializeToString(svgNode);
-    }
-  }
-
-  return result;
+  return stage ? stage.toSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight) : '';
 };
 
 
@@ -706,6 +667,57 @@ anychart.core.VisualBase.prototype.toSVG = function() {
 anychart.core.VisualBase.prototype.print = function(opt_paperSize, opt_landscape) {
   var stage = this.container() && this.container().getStage();
   if (stage) stage.print(opt_paperSize, opt_landscape);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Deprecated Export.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Saves the current visual state into PNG file.
+ */
+anychart.core.VisualBase.prototype.saveAsPNG = function() {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPNG()', 'saveAsPng()'], true);
+  this.saveAsPng();
+};
+
+
+/**
+ * Saves the current visual state into JPEG file.
+ */
+anychart.core.VisualBase.prototype.saveAsJPG = function() {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsJPG()', 'saveAsJpg()'], true);
+  this.saveAsJpg();
+};
+
+
+/**
+ * Saves the current visual state into PDF file.
+ */
+anychart.core.VisualBase.prototype.saveAsPDF = function() {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPDF()', 'saveAsPdf()'], true);
+  this.saveAsPdf();
+};
+
+
+/**
+ * Saves the current visual state into SVG file.
+ */
+anychart.core.VisualBase.prototype.saveAsSVG = function() {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsSVG()', 'saveAsSvg()'], true);
+  this.saveAsSvg();
+};
+
+
+/**
+ * Returns SVG string if type of content SVG otherwise returns empty string.
+ * @return {string}
+ */
+anychart.core.VisualBase.prototype.toSVG = function() {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['toSVG()', 'toSvg()'], true);
+  return this.toSvg();
 };
 
 
@@ -744,11 +756,17 @@ anychart.core.VisualBase.prototype.setupByJSON = function(config) {
 
 
 //exports
+anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//deprecated
+anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//deprecated
+anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;//deprecated
+anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//deprecated
+anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;//deprecated
+
 anychart.core.VisualBase.prototype['zIndex'] = anychart.core.VisualBase.prototype.zIndex;//in docs/final
 anychart.core.VisualBase.prototype['enabled'] = anychart.core.VisualBase.prototype.enabled;//doc|ex
-anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//doc|ex
-anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//doc|ex
-anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//doc|ex
-anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;//doc|ex
-anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;
+anychart.core.VisualBase.prototype['saveAsPng'] = anychart.core.VisualBase.prototype.saveAsPng;
+anychart.core.VisualBase.prototype['saveAsJpg'] = anychart.core.VisualBase.prototype.saveAsJpg;
+anychart.core.VisualBase.prototype['saveAsPdf'] = anychart.core.VisualBase.prototype.saveAsPdf;
+anychart.core.VisualBase.prototype['saveAsSvg'] = anychart.core.VisualBase.prototype.saveAsSvg;
+anychart.core.VisualBase.prototype['toSvg'] = anychart.core.VisualBase.prototype.toSvg;
 anychart.core.VisualBase.prototype['print'] = anychart.core.VisualBase.prototype.print;

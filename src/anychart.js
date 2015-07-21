@@ -58,6 +58,19 @@ anychart.TOOLBAR_CSS = '';
 anychart.graphics = window['acgraph'];
 
 
+/**
+ Sets and returns an address export server script, which is used to export to an image
+ or PDF.
+ @see acgraph.vector.Stage#saveAsPdf
+ @see acgraph.vector.Stage#saveAsPng
+ @see acgraph.vector.Stage#saveAsJpg
+ @see acgraph.vector.Stage#saveAsSvg
+ @param {string=} opt_address Export server script URL.
+ @return {string} Export server script URL.
+ */
+anychart.server = window['acgraph']['server'];
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Global lock
@@ -717,6 +730,7 @@ anychart.ganttToolbar = anychart.ganttToolbar || function() {
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
 goog.exportSymbol('anychart.graphics', anychart.graphics);//import
+goog.exportSymbol('anychart.server', anychart.server);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex
 goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
