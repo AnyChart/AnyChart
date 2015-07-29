@@ -1,6 +1,7 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
+goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
 goog.require('goog.json.hybrid');
@@ -304,7 +305,8 @@ goog.global['anychart'] = goog.global['anychart'] || {};
  * @type {string|number}
  *
  */
-goog.global['anychart']['fontSize'] = '12px';
+//goog.global['anychart']['fontSize'] = '12px';
+goog.global['anychart']['fontSize'] = '13px';
 
 
 /**
@@ -312,7 +314,8 @@ goog.global['anychart']['fontSize'] = '12px';
  * @type {string}
  *
  */
-goog.global['anychart']['fontColor'] = '#000';
+//goog.global['anychart']['fontColor'] = '#000';
+goog.global['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
 
 
 /**
@@ -320,7 +323,8 @@ goog.global['anychart']['fontColor'] = '#000';
  * @type {string}
  *
  */
-goog.global['anychart']['fontFamily'] = 'Arial';
+//goog.global['anychart']['fontFamily'] = 'Arial';
+goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
 
 
 /**
@@ -535,6 +539,51 @@ anychart.embedCss = function(css) {
 
 
 /**
+ * Defines the default theme.
+ * @define {string} Replaced on compile time.
+ */
+anychart.DEFAULT_THEME = 'defaultTheme';
+
+
+/**
+ * Sets the theme for anychart globally or gets current theme.
+ * @param {(string|Object)=} opt_value Object with theme settings or name of the theme.
+ * @return {Object}
+ */
+anychart.theme = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value))
+      opt_value = goog.global['anychart']['themes'][opt_value];
+    anychart.theme_ = opt_value;
+    delete anychart.compiledTheme_;
+  }
+  return anychart.theme_ ? anychart.theme_ : goog.global['anychart']['themes'][anychart.DEFAULT_THEME];
+};
+
+
+/**
+ * Returns final compiled and merged theme.
+ * @return {*}
+ */
+anychart.getFullTheme = function() {
+  if (!anychart.compiledTheme_) {
+    if (!anychart.defaultThemeCompiled_) {
+      anychart.defaultThemeCompiled_ = anychart.themes.merging.compileTheme(
+          goog.global['anychart']['themes'][anychart.DEFAULT_THEME]);
+    }
+    if (anychart.theme_) {
+      anychart.compiledTheme_ = anychart.themes.merging.merge(
+          anychart.themes.merging.compileTheme(anychart.theme_),
+          anychart.defaultThemeCompiled_);
+    } else {
+      anychart.compiledTheme_ = anychart.defaultThemeCompiled_;
+    }
+  }
+  return anychart.compiledTheme_;
+};
+
+
+/**
  * @ignoreDoc
  */
 anychart.area = anychart.area || function() {
@@ -729,6 +778,7 @@ anychart.ganttToolbar = anychart.ganttToolbar || function() {
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
+goog.exportSymbol('anychart.DEFAULT_THEME', anychart.DEFAULT_THEME);
 goog.exportSymbol('anychart.graphics', anychart.graphics);//import
 goog.exportSymbol('anychart.server', anychart.server);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex
@@ -773,3 +823,4 @@ goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
+goog.exportSymbol('anychart.theme', anychart.theme);

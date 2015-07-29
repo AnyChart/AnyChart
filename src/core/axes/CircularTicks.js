@@ -59,6 +59,12 @@ anychart.core.axes.CircularTicks = function() {
    * @private
    */
   this.ticks_ = new anychart.core.ui.MarkersFactory();
+  this.ticks_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.ticks_.size(10);
+  this.ticks_.anchor(anychart.enums.Anchor.CENTER);
+  this.ticks_.offsetX(0);
+  this.ticks_.offsetY(0);
+  this.ticks_.rotation(0);
   this.ticks_.setParentEventTarget(this);
 
   /**
@@ -73,8 +79,6 @@ anychart.core.axes.CircularTicks = function() {
    * @private
    */
   this.contextProvider_ = {};
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axes.CircularTicks, anychart.core.VisualBase);
 
@@ -301,6 +305,12 @@ anychart.core.axes.CircularTicks.prototype.startDrawing = function() {
 
   if (!this.hatchFillElement_ && !anychart.utils.isNone(this.hatchFill_)) {
     this.hatchFillElement_ = new anychart.core.ui.MarkersFactory();
+    this.hatchFillElement_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+    this.hatchFillElement_.size(10);
+    this.hatchFillElement_.anchor(anychart.enums.Anchor.CENTER);
+    this.hatchFillElement_.offsetX(0);
+    this.hatchFillElement_.offsetY(0);
+    this.hatchFillElement_.rotation(0);
     this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.hatchFillElement_.zIndex(anychart.core.axes.Circular.ZINDEX_TICK_HATCH_FILL);
   }
@@ -393,20 +403,6 @@ anychart.core.axes.CircularTicks.prototype.finalizeDrawing = function() {
  */
 anychart.core.axes.CircularTicks.prototype.setAxis = function(axis) {
   this.axis_ = axis;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.axes.CircularTicks.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.position(anychart.enums.GaugeSidePosition.CENTER);
-  this.stroke('none');
-  this.fill('red');
-  this.type(anychart.enums.MarkerType.LINE);
-  this.hatchFill(false);
-  this.resumeSignalsDispatching(true);
 };
 
 

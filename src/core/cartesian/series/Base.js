@@ -31,7 +31,6 @@ goog.require('anychart.utils');
  * @implements {anychart.core.utils.ISeriesWithError}
  */
 anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
-  this.suspendSignalsDispatching();
   /**
    * @type {anychart.core.utils.SeriesPointContextProvider}
    * @private
@@ -40,28 +39,7 @@ anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
   goog.base(this);
   this.data(opt_data || null, opt_csvSettings);
 
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'];
-  });
-  tooltip.contentFormatter(function() {
-    return this['x'] + ': ' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
   this.statistics_ = {};
-
-  // make label hoverable
-  var labels = this.labels();
-  labels.disablePointerEvents(false);
-  labels.position(anychart.enums.Position.CENTER);
-  labels.enabled(false);
-  (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
-
-  this.hatchFill(false);
-
-  this.resumeSignalsDispatching(false);
 
   /**
    * Error paths dictionary by stroke object hash.
@@ -2466,15 +2444,6 @@ anychart.core.cartesian.series.Base.prototype.getLegendItemData = function(items
 //  Series default settings.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Restore series default settings.
- * @return {anychart.core.cartesian.series.Base} Return itself for chaining call.
- */
-anychart.core.cartesian.series.Base.prototype.restoreDefaults = function() {
-  return this;
-};
-
-
 /**
  * Returns type of current series.
  * @return {anychart.enums.CartesianSeriesType} Series type.

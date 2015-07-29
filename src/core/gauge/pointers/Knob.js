@@ -48,8 +48,6 @@ anychart.core.gauge.pointers.Knob = function() {
    * @private
    */
   this.bottomRatio_;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.gauge.pointers.Knob, anychart.core.gauge.pointers.Base);
 
@@ -438,21 +436,6 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
 
   goog.base(this, 'draw');
   return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.gauge.pointers.Knob.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-
-  this.suspendSignalsDispatching();
-  this.fill(/** @type {acgraph.vector.Fill} */({'keys': ['rgb(255, 255, 255)', 'rgb(220, 220, 220)'], 'angle': 135}));
-  this.stroke('2 #ccc');
-  this.verticesCount(6);
-  this.verticesCurvature(.5);
-  this.topRatio(.5);
-  this.bottomRatio(.5);
-  this.resumeSignalsDispatching(true);
 };
 
 

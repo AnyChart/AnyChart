@@ -33,14 +33,14 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {!(string|number)}
    * @private
    */
-  this.connectorLength_ = 20;
+  this.connectorLength_;
 
 
   /**
    * @type {!acgraph.vector.Stroke}
    * @private
    */
-  this.connectorStroke_ = '#000';
+  this.connectorStroke_;
 
 
   /**
@@ -50,9 +50,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.fill_ = (function() {
-    return /** @type {acgraph.vector.Fill} */ (this['sourceColor']);
-  });
+  this.fill_;
 
 
   /**
@@ -76,7 +74,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {(string|number)}
    * @private
    */
-  this.baseWidth_ = '90%';
+  this.baseWidth_;
 
 
   /**
@@ -86,9 +84,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.hoverFill_ = (function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
+  this.hoverFill_;
 
 
   /**
@@ -113,9 +109,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.hoverStroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
-  });
+  this.hoverStroke_;
 
 
   /**
@@ -166,14 +160,14 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {!(string|number)}
    * @private
    */
-  this.neckHeight_ = 0;
+  this.neckHeight_ = NaN;
 
   /**
    * The width of the neck. (for funnel)
    * @type {!(string|number)}
    * @private
    */
-  this.neckWidth_ = 0;
+  this.neckWidth_ = NaN;
 
 
   /**
@@ -206,7 +200,7 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @type {!(string|number)}
    * @private
    */
-  this.pointsPadding_ = 5;
+  this.pointsPadding_ = 3;
 
 
   /**
@@ -239,52 +233,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
 
   this.data(opt_data || null, opt_csvSettings);
 
-  this.legend()
-      .margin(10, 0, 0, 0)
-      .zIndex(anychart.core.PyramidFunnelBase.ZINDEX_LEGEND);
-  this.legend().tooltip().contentFormatter(function() {
-    return (this['value']) + '\n' + this['meta']['pointValue'];
-  });
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'] || this['x'];
-  });
-  tooltip.contentFormatter(function() {
-    return (this['name'] || this['x']) + '\n' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
-
-  var markers = this.markers();
-  markers.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_MARKER)
-      .size(8)
-      .enabled(false);
-
-  var hoverMarkers = this.hoverMarkers();
-  hoverMarkers.size(12);
-
-  this.labels().disablePointerEvents(false);
-  var labels = this.labels();
-  labels.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_LABEL)
-      .fontSize(13)
-      .padding(1)
-      .position(anychart.enums.PyramidLabelsPosition.OUTSIDE_LEFT_IN_COLUMN)
-      .enabled(true);
-
-  labels.textFormatter(function() {
-    return this['name'] ? this['name'] : this['x'];
-  });
-  labels.positionFormatter(function() {
-    return this['value'];
-  });
-  this.hoverLabels()
-      .padding(1)
-      .enabled(null);
-
-  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
-
   this.resumeSignalsDispatching(false);
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, null, this.handleMouseOverAndMove_);
 };
@@ -310,27 +258,6 @@ anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL = 31;
  * @type {number}
  */
 anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR = 32;
-
-
-/**
- * Z-index for labelsFactory.
- * @type {number}
- */
-anychart.core.PyramidFunnelBase.ZINDEX_LABEL = 34;
-
-
-/**
- * Z-index for legend.
- * @type {number}
- */
-anychart.core.PyramidFunnelBase.ZINDEX_LEGEND = 35;
-
-
-/**
- * Z-index for markersFactory.
- * @type {number}
- */
-anychart.core.PyramidFunnelBase.ZINDEX_MARKER = 33;
 
 
 /**
@@ -1286,9 +1213,9 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     }
 
     if (this.isInsideLabels_()) {
-      this.labels().setAutoColor('#fff');
+      this.labels().setAutoColor(anychart.getFullTheme()['pyramidFunnel']['insideLabels']['autoColor']);
     } else {
-      this.labels().setAutoColor('#000');
+      this.labels().setAutoColor(anychart.getFullTheme()['pyramidFunnel']['outsideLabels']['autoColor']);
 
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
           this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
@@ -2040,7 +1967,6 @@ anychart.core.PyramidFunnelBase.prototype.labelsInvalidated_ = function(event) {
 anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.zIndex(anychart.core.PyramidFunnelBase.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
 

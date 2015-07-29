@@ -18,7 +18,9 @@ goog.inherits(anychart.grids.Linear, anychart.core.grids.Linear);
  * @return {!anychart.core.grids.Linear}
  */
 anychart.grids.linear = function() {
-  return new anychart.grids.Linear();
+  var res = new anychart.grids.Linear();
+  res.setup(anychart.getFullTheme()['standalones']['linearGrid']);
+  return res;
 };
 
 

@@ -7,6 +7,7 @@
     <script>
         //        goog.require('goog.array');
         goog.require('anychart.modules.anychart');
+        goog.require('anychart.themes.v6');
     </script>
 
     <!--<script src="../../out/anychart.min.js"></script>-->
@@ -15,7 +16,7 @@
 <div id="container" style="width: 1200px; height: 600px;"></div>
 
 <script>
-    var line;
+    var line, legend;
     anychart.onDocumentLoad(function() {
         anychart.licenseKey('test-key-32db1f79-cc9312c4');
         var stage = /** @type {acgraph.vector.ILayer} */ (anychart.graphics.create('container'));
@@ -40,9 +41,11 @@
         chart2.bounds().left('50%').top(0).width('50%').height('90%');
         chart2.container(stage).draw();
 
-        var legend = anychart.ui.legend();
+        legend = anychart.ui.legend();
         legend.title(false).titleSeparator(false);
-        legend.height('10%');
+        //legend.height('10%');
+        legend.width(330);
+        //legend.paginator().enabled(false);
         legend.itemsSource([chart1, chart2]);
         legend.itemsFormatter(function(items) {
             items.splice(0, 0, {

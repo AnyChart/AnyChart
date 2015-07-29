@@ -26,92 +26,6 @@ anychart.core.axes.Polar = function() {
   this.bindHandlersToGraphics(this.line_);
   this.registerDisposable(this.line_);
 
-  this.labels()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .offsetX(0)
-      .offsetY(0)
-      .anchor(anychart.enums.Anchor.CENTER)
-      .padding(1, 2, 1, 2)
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .resumeSignalsDispatching(false);
-
-  this.labels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .offsetX(0)
-      .offsetY(0)
-      .anchor(anychart.enums.Anchor.CENTER)
-      .padding(1, 2, 1, 2)
-      .fontFamily('Tahoma')
-      .fontSize('9')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-
-  this.ticks()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .length(5)
-      .stroke({'color': '#313131', 'lineJoin': 'round', 'lineCap': 'butt'})
-      .resumeSignalsDispatching(false);
-
-  this.minorTicks()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .length(3)
-      .stroke({'color': '#313131', 'lineJoin': 'round', 'lineCap': 'butt'})
-      .resumeSignalsDispatching(false);
-
-  this.stroke({'color': 'black', 'opacity': .1, 'lineJoin': 'round', 'lineCap': 'square'});
-  this.startAngle(0);
-
-  this.resumeSignalsDispatching(true);
-
   /**
    * Constant to save space.
    * @type {number}
@@ -121,6 +35,7 @@ anychart.core.axes.Polar = function() {
       anychart.ConsistencyState.AXIS_LABELS |
       anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS;
+  this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.axes.Polar, anychart.core.VisualBase);
 
@@ -196,7 +111,7 @@ anychart.core.axes.Polar.prototype.minorTicks_ = null;
  * @type {string|acgraph.vector.Stroke}
  * @private
  */
-anychart.core.axes.Polar.prototype.stroke_ = 'none';
+anychart.core.axes.Polar.prototype.stroke_;
 
 
 /**

@@ -21,13 +21,13 @@ anychart.core.ui.CrosshairLabel = function() {
    * @type {number}
    * @private
    */
-  this.x_ = 0;
+  this.x_ = NaN;
 
   /**
    * @type {number}
    * @private
    */
-  this.y_ = 0;
+  this.y_ = NaN;
 
   /**
    * Label text formatting function, by default we use value field of the format provider.
@@ -185,6 +185,20 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
 };
 
 
+/**
+ * Is anchor should be set automatically.
+ * @param {boolean=} opt_value Anchor auto mode.
+ * @return {boolean|anychart.core.ui.CrosshairLabel} Is anchor in auto mode or self for chaining.
+ */
+anychart.core.ui.CrosshairLabel.prototype.autoAnchor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isAutoAnchor_ = !!opt_value;
+    return this;
+  }
+  return this.isAutoAnchor_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
@@ -197,6 +211,7 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.axisIndex(config['axisIndex']);
+  this.autoAnchor(config['anchor'] == null);
   this.textFormatter(config['textFormatter']);
 };
 

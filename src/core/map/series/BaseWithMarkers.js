@@ -164,7 +164,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
     var markers = this.markers_;
 
     markers.setAutoType(this.autoMarkerType_);
-    markers.setAutoZIndex(anychart.maps.Map.ZINDEX_CHORPLETH_MARKERS);
+    markers.setAutoZIndex(anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS);
 
     var fillColor = this.getMarkerFill();
     markers.setAutoFill(fillColor);
@@ -233,11 +233,11 @@ anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointSt
   var index = iterator.getIndex();
   var markersFactory;
   if (selected) {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers_);
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
   } else if (hovered) {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers_);
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
   } else {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers_);
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
   }
 
   var marker = this.markers_.getMarker(index);

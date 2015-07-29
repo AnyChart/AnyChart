@@ -1664,6 +1664,56 @@ anychart.enums.CartesianSeriesType = {
 };
 
 
+/**
+ * Normalizes cartesian series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.CartesianSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.CartesianSeriesType}
+ */
+anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.CartesianSeriesType.AREA;
+    case 'bar':
+      return anychart.enums.CartesianSeriesType.BAR;
+    case 'box':
+      return anychart.enums.CartesianSeriesType.BOX;
+    case 'bubble':
+      return anychart.enums.CartesianSeriesType.BUBBLE;
+    case 'candlestick':
+      return anychart.enums.CartesianSeriesType.CANDLESTICK;
+    case 'column':
+      return anychart.enums.CartesianSeriesType.COLUMN;
+    case 'line':
+      return anychart.enums.CartesianSeriesType.LINE;
+    case 'marker':
+      return anychart.enums.CartesianSeriesType.MARKER;
+    case 'ohlc':
+      return anychart.enums.CartesianSeriesType.OHLC;
+    case 'rangearea':
+      return anychart.enums.CartesianSeriesType.RANGE_AREA;
+    case 'rangebar':
+      return anychart.enums.CartesianSeriesType.RANGE_BAR;
+    case 'rangecolumn':
+      return anychart.enums.CartesianSeriesType.RANGE_COLUMN;
+    case 'rangesplinearea':
+      return anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA;
+    case 'rangesteparea':
+      return anychart.enums.CartesianSeriesType.RANGE_STEP_AREA;
+    case 'spline':
+      return anychart.enums.CartesianSeriesType.SPLINE;
+    case 'splinearea':
+      return anychart.enums.CartesianSeriesType.SPLINE_AREA;
+    case 'steparea':
+      return anychart.enums.CartesianSeriesType.STEP_AREA;
+    case 'stepline':
+      return anychart.enums.CartesianSeriesType.STEP_LINE;
+  }
+  return opt_default || anychart.enums.CartesianSeriesType.LINE;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  SparklineSeriesTypes

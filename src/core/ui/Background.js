@@ -29,6 +29,7 @@ anychart.core.ui.Background = function() {
   this.rect_ = null;
 
   /**
+   * We add a default here, because too many backgrounds are created in too many places to put this default there.
    * @type {anychart.enums.BackgroundCornersType}
    * @private
    */
@@ -45,14 +46,14 @@ anychart.core.ui.Background = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = acgraph.vector.normalizeFill('#000 0.5');
+  this.fill_;
 
   /**
    * Stroke settings.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = '#000';
+  this.stroke_;
 
   /**
    * Pointer events.
@@ -183,6 +184,7 @@ anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
     }
     return this;
   } else {
+    // that is so easy to fix it like that...
     return this.cornerType_;
   }
 };

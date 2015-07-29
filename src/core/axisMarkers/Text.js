@@ -81,8 +81,6 @@ anychart.core.axisMarkers.Text = function() {
    * @private
    */
   this.height_ = null;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axisMarkers.Text, anychart.core.Text);
 
@@ -556,28 +554,6 @@ anychart.core.axisMarkers.Text.prototype.getTextPosition_ = function(ratio, shif
       break;
   }
   return new acgraph.math.Coordinate(x, y);
-};
-
-
-/**
- * Restore defaults.
- */
-anychart.core.axisMarkers.Text.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.layout(anychart.enums.Layout.HORIZONTAL);
-  this.align(anychart.enums.Align.CENTER);
-  this.anchor(anychart.enums.Anchor.CENTER);
-  this.value(0);
-  this.text('Text marker');
-  this.offsetX(0);
-  this.offsetY(0);
-  this.width(null);
-  this.height(null);
-  this.fontFamily('Tahoma');
-  this.fontSize('11');
-  this.fontWeight('bold');
-  this.fontColor('#222222');
-  this.resumeSignalsDispatching(true);
 };
 
 

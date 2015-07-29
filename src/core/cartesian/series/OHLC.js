@@ -468,6 +468,12 @@ anychart.core.cartesian.series.OHLC.prototype.getFinalFallingStroke = function(h
 };
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.OHLC.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Statistics
@@ -558,31 +564,6 @@ anychart.core.cartesian.series.OHLC.prototype.setupByJSON = function(config) {
   this.hoverRisingStroke(config['hoverRisingStroke']);
   this.fallingStroke(config['fallingStroke']);
   this.hoverFallingStroke(config['hoverFallingStroke']);
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.OHLC.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.content().hAlign('left');
-  tooltip.contentFormatter(function() {
-    return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
-        'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
-        'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-        'C: ' + parseFloat(this['close']).toFixed(4);
-  });
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.textFormatter(function() {
-    return this['x'];
-  });
-  labels.offsetY(-10);
-
-  return result;
 };
 
 

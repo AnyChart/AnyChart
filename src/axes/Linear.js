@@ -31,7 +31,9 @@ anychart.axes.Linear.prototype.draw = function() {
  * @return {!anychart.axes.Linear}
  */
 anychart.axes.linear = function() {
-  return new anychart.axes.Linear();
+  var res = new anychart.axes.Linear();
+  res.setup(anychart.getFullTheme()['standalones']['linearAxis']);
+  return res;
 };
 
 

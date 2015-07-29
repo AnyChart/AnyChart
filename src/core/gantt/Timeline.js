@@ -92,14 +92,14 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.columnStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.columnStroke_;
 
   /**
    * Row vertical line separation path.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.rowStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.rowStroke_;
 
   /**
    * Thickness of row stroke.
@@ -135,7 +135,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill('#fff');
+  this.backgroundFill_;
 
   /**
    * Cells layer.
@@ -205,35 +205,35 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.rowOddFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowOddFill_;
 
   /**
    * Even fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.rowEvenFill_ = acgraph.vector.normalizeFill('#fafafa');
+  this.rowEvenFill_;
 
   /**
    * Default rows fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowFill_;
 
   /**
    * Default hover fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
+  this.hoverFill_;
 
   /**
    * Default row selected fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#d2eafa');
+  this.rowSelectedFill_;
 
   /**
    * Start index of this.visibleItems_. Actually is a first visible data item of data grid.
@@ -275,42 +275,42 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.baseFill_ = acgraph.vector.normalizeFill(['#3CA0DE', '#3085BC'], -90);
+  this.baseFill_;
 
   /**
    * Base stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.baseStroke_ = acgraph.vector.normalizeStroke('#0C3F5F');
+  this.baseStroke_;
 
   /**
    * Baseline fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.baselineFill_ = acgraph.vector.normalizeFill(['#E1E1E1', '#A1A1A1'], -90);
+  this.baselineFill_;
 
   /**
    * Base stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.baselineStroke_ = acgraph.vector.normalizeStroke('#0C3F5F');
+  this.baselineStroke_;
 
   /**
    * Progress fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.progressFill_ = acgraph.vector.normalizeFill(['#63FF78', '#3DC351', '#188E2D'], -90);
+  this.progressFill_;
 
   /**
    * Progress stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.progressStroke_ = acgraph.vector.normalizeStroke('#006616');
+  this.progressStroke_;
 
 
   /**
@@ -318,14 +318,14 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.milestoneFill_ = acgraph.vector.normalizeFill(['#FAE096', '#EB8344'], -90);
+  this.milestoneFill_;
 
   /**
    * milestone stroke.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.milestoneStroke_ = acgraph.vector.normalizeStroke('#000000');
+  this.milestoneStroke_;
 
 
   /**
@@ -333,7 +333,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.parentFill_ = acgraph.vector.normalizeFill(['#646464', '#282828'], -90);
+  this.parentFill_;
 
 
   /**
@@ -341,7 +341,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.parentStroke_ = acgraph.vector.normalizeStroke('#000000');
+  this.parentStroke_;
 
 
   /**
@@ -349,7 +349,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.selectedElementFill_ = acgraph.vector.normalizeFill(['#f1b8b9', '#f07578'], -90);
+  this.selectedElementFill_;
 
 
   /**
@@ -357,7 +357,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {!acgraph.vector.Stroke}
    * @private
    */
-  this.selectedElementStroke_ = this.isResourceChart_ ? acgraph.vector.normalizeStroke('none') : acgraph.vector.normalizeStroke('#000');
+  this.selectedElementStroke_;
 
 
   /**
@@ -365,7 +365,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.connectorFill_ = acgraph.vector.normalizeFill('#000090');
+  this.connectorFill_;
 
 
   /**
@@ -373,7 +373,7 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.connectorStroke_ = acgraph.vector.normalizeStroke('#000090');
+  this.connectorStroke_;
 
   /**
    * Contains the sequence of heights of grid. Used to quickly calculate this.hoveredIndex_ on mouse over event
@@ -471,27 +471,26 @@ anychart.core.gantt.Timeline = function(controller, isResourcesChart) {
   this.registerDisposable(this.header_);
 
 
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
-  tooltip.content().hAlign(anychart.enums.Align.LEFT);
-
-  //TODO (A.Kudryavtsev): With last fixes standalone timeline can get some problems here.
-  tooltip.contentFormatter(function(data) {
-    /*
-      Argument data is an instance of TreeDataItem (ProjectChart) or an object like this (ResourceChart):
-      {
-        'item': TreeDataItem,
-        'period': { ..RawPeriodObject.. }
-      }
-     */
-    var isTreeDataItem = data instanceof anychart.data.Tree.DataItem; //If item is tree data item.
-    return isTreeDataItem ?
-        (data.get(anychart.enums.GanttDataFields.NAME) + '') :
-        (data['item'].get(anychart.enums.GanttDataFields.NAME) + '');
-  });
-  tooltip.resumeSignalsDispatching(false);
+  //var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  //tooltip.suspendSignalsDispatching();
+  //tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
+  //tooltip.content().hAlign(anychart.enums.Align.LEFT);
+  //
+  ////TODO (A.Kudryavtsev): With last fixes standalone timeline can get some problems here.
+  //tooltip.contentFormatter(function(data) {
+  //  /*
+  //    Argument data is an instance of TreeDataItem (ProjectChart) or an object like this (ResourceChart):
+  //    {
+  //      'item': TreeDataItem,
+  //      'period': { ..RawPeriodObject.. }
+  //    }
+  //   */
+  //  var isTreeDataItem = data instanceof anychart.data.Tree.DataItem; //If item is tree data item.
+  //  return isTreeDataItem ?
+  //      (data.get(anychart.enums.GanttDataFields.NAME) + '') :
+  //      (data['item'].get(anychart.enums.GanttDataFields.NAME) + '');
+  //});
+  //tooltip.resumeSignalsDispatching(false);
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
       this.handleMouseOverAndMove_, this.handleAll_);
@@ -1316,7 +1315,9 @@ anychart.core.gantt.Timeline.prototype.getEvenPath_ = function() {
 anychart.core.gantt.Timeline.prototype.getHoverPath_ = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.hoverPath_.stroke(null);
+    this.hoverPath_.fill(this.hoverFill_);
+    this.hoverPath_.zIndex(10);
     this.registerDisposable(this.hoverPath_);
   }
   return this.hoverPath_;
@@ -1331,7 +1332,9 @@ anychart.core.gantt.Timeline.prototype.getHoverPath_ = function() {
 anychart.core.gantt.Timeline.prototype.getSelectedPath_ = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(11);
+    this.selectedPath_.stroke(null);
+    this.selectedPath_.fill(this.rowSelectedFill_);
+    this.selectedPath_.zIndex(11);
     this.registerDisposable(this.selectedPath_);
   }
   return this.selectedPath_;
@@ -1375,7 +1378,8 @@ anychart.core.gantt.Timeline.prototype.getCellsLayer_ = function() {
 anychart.core.gantt.Timeline.prototype.getRowStrokePath_ = function() {
   if (!this.rowStrokePath_) {
     this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(20);
+    this.rowStrokePath_.stroke(this.rowStroke_);
+    this.rowStrokePath_.zIndex(20);
     this.registerDisposable(this.rowStrokePath_);
   }
   return this.rowStrokePath_;
@@ -1787,21 +1791,39 @@ anychart.core.gantt.Timeline.prototype.onTooltipSignal_ = function(event) {
 
 /**
  * Inner labels factory getter.
- * @return {anychart.core.ui.LabelsFactory}
- * @private
+ * @param {Object=} opt_value - Value to be set.
+ * @return {anychart.core.gantt.Timeline|anychart.core.ui.LabelsFactory} - Current value or itself for method chaining.
  */
-anychart.core.gantt.Timeline.prototype.getLabelsFactory_ = function() {
+anychart.core.gantt.Timeline.prototype.labelsFactory = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    this.labelsFactory_
-        .zIndex(anychart.core.gantt.Timeline.LABEL_Z_INDEX)
-        .anchor(anychart.enums.Anchor.LEFT_CENTER)
-        .position(anychart.enums.Position.RIGHT_CENTER)
-        .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN);
+    //this.labelsFactory_
+    //    .zIndex(anychart.core.gantt.Timeline.LABEL_Z_INDEX)
+    //    .anchor(anychart.enums.Anchor.LEFT_CENTER)
+    //    .position(anychart.enums.Position.RIGHT_CENTER)
+    //    .padding(3, anychart.core.gantt.Timeline.ARROW_MARGIN);
 
     this.labelsFactory_.setParentEventTarget(this);
-
   }
+
+  if (goog.isDef(opt_value)) {
+    var redraw = true;
+    if (opt_value instanceof anychart.core.ui.LabelsFactory) {
+      this.labelsFactory_.setup(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.labelsFactory_.setup(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.labelsFactory_.enabled(false);
+    } else {
+      redraw = false;
+    }
+    if (redraw) {
+
+      this.invalidate(anychart.ConsistencyState.TIMELINE_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+
   return this.labelsFactory_;
 };
 
@@ -1814,11 +1836,11 @@ anychart.core.gantt.Timeline.prototype.getLabelsFactory_ = function() {
 anychart.core.gantt.Timeline.prototype.getMarkersFactory_ = function() {
   if (!this.markersFactory_) {
     this.markersFactory_ = new anychart.core.ui.MarkersFactory();
-    this.markersFactory_
-        .anchor(anychart.enums.Anchor.CENTER_TOP)
-        .zIndex(anychart.core.gantt.Timeline.MARKER_Z_INDEX)
-        .enabled(true)
-        .type(anychart.enums.MarkerType.STAR4);
+    //this.markersFactory_
+    //    .anchor(anychart.enums.Anchor.CENTER_TOP)
+    //    .zIndex(anychart.core.gantt.Timeline.MARKER_Z_INDEX)
+    //    .enabled(true)
+    //    .type(anychart.enums.MarkerType.STAR4);
   }
   return this.markersFactory_;
 };
@@ -1920,7 +1942,7 @@ anychart.core.gantt.Timeline.prototype.drawRowFills_ = function() {
  */
 anychart.core.gantt.Timeline.prototype.drawTimelineElements_ = function() {
   this.getDataLayer_().clear();
-  this.getLabelsFactory_().clear();
+  this.labelsFactory().clear();
   this.getMarkersFactory_().clear();
 
   if (this.isResourceChart_) {
@@ -1929,7 +1951,7 @@ anychart.core.gantt.Timeline.prototype.drawTimelineElements_ = function() {
     this.drawProjectTimeline_();
   }
 
-  this.getLabelsFactory_().draw();
+  this.labelsFactory().draw();
   this.getMarkersFactory_().draw();
 
   this.drawConnectors_();
@@ -2018,7 +2040,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
     if (rawLabel && rawLabel['position']) {
       position = rawLabel['position'];
     } else {
-      position = this.getLabelsFactory_().position();
+      position = this.labelsFactory().position();
       if (isActualBaseline) {
         position = anychart.enums.Position.CENTER;
       } else if (isParent) {
@@ -2029,7 +2051,7 @@ anychart.core.gantt.Timeline.prototype.drawBar_ = function(bounds, item, opt_fie
     position = anychart.enums.normalizeAnchor(position);
     var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
     var formatProvider = {'value': textValue};
-    var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+    var label = this.labelsFactory().add(formatProvider, positionProvider);
     if (isActualBaseline) {
       label.fontColor('#fff');
       label.anchor(anychart.enums.Anchor.CENTER);
@@ -2387,11 +2409,11 @@ anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, tot
 
     if (textValue) {
       var bounds = new acgraph.math.Rect(centerLeft - halfHeight, centerTop - halfHeight, (halfHeight + halfHeight), (halfHeight + halfHeight));
-      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.getLabelsFactory_().position();
+      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.labelsFactory().position();
       position = anychart.enums.normalizeAnchor(position);
       var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
       var formatProvider = {'value': textValue};
-      var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+      var label = this.labelsFactory().add(formatProvider, positionProvider);
       if (rawLabel) label.setup(rawLabel);
     }
 
@@ -2930,7 +2952,7 @@ anychart.core.gantt.Timeline.prototype.drawInternal = function(visibleItems, sta
           .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDataLayer_()));
 
       this.getMarkersFactory_().container(this.getBase_());
-      this.getLabelsFactory_().container(this.getBase_());
+      this.labelsFactory().container(this.getBase_());
 
       this.header_.container(this.getBase_());
 
@@ -3154,6 +3176,8 @@ anychart.core.gantt.Timeline.prototype.serialize = function() {
 
   json['scale'] = this.scale_.serialize();
 
+  json['labelsFactory'] = this.labelsFactory().serialize();
+
   json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
   json['columnStroke'] = anychart.color.serialize(this.columnStroke_);
   json['rowStroke'] = anychart.color.serialize(this.rowStroke_);
@@ -3187,15 +3211,17 @@ anychart.core.gantt.Timeline.prototype.serialize = function() {
 anychart.core.gantt.Timeline.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  this.scale_.setupByJSON(config['scale']);
+  if ('scale' in config) this.scale_.setup(config['scale']);
+
+  this.labelsFactory(config['labelsFactory']);
 
   this.backgroundFill(config['backgroundFill']);
   this.columnStroke(config['columnStroke']);
   this.rowStroke(config['rowStroke']);
 
   this.rowFill(config['rowFill']);
-  if ('rowOddFill' in config) this.rowOddFill(config['rowOddFill']);
-  if ('rowEvenFill' in config) this.rowEvenFill(config['rowEvenFill']);
+  this.rowOddFill(config['rowOddFill']);
+  this.rowEvenFill(config['rowEvenFill']);
   this.rowHoverFill(config['hoverFill']);
   this.tooltip(config['tooltip']);
 

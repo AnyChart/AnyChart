@@ -13,7 +13,6 @@ goog.require('anychart.core.map.series.BaseWithMarkers');
  */
 anychart.core.map.series.Choropleth = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
-  this.suspendSignalsDispatching();
 
   // Define reference fields for a series
   this.referenceValueNames = ['id', 'value'];
@@ -25,8 +24,6 @@ anychart.core.map.series.Choropleth = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.points_ = [];
-
-  this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.map.series.Choropleth, anychart.core.map.series.BaseWithMarkers);
 anychart.core.map.series.Base.SeriesTypesMap[anychart.enums.MapSeriesType.CHOROPLETH] = anychart.core.map.series.Choropleth;
@@ -152,14 +149,15 @@ anychart.core.map.series.Choropleth.prototype.hoverSeries = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.hoverPoint = function(index, opt_event) {
+anychart.core.map.series.Choropleth.prototype.hoverPoint = function(index, opt_event, opt_showTooltip) {
   if (!this.enabled())
     return this;
 
+  var showTooltip = goog.isDef(opt_showTooltip) ? opt_showTooltip : true;
   var selected = goog.array.indexOf(this.selectStatus, index) != -1;
   var hovered = goog.array.indexOf(this.hoverStatus, index) != -1;
   if (hovered) {
-    if (this.getIterator().select(index))
+    if (this.getIterator().select(index) && showTooltip)
       this.showTooltip(opt_event);
     return this;
   }
@@ -169,9 +167,9 @@ anychart.core.map.series.Choropleth.prototype.hoverPoint = function(index, opt_e
       this.applyHatchFill(anychart.enums.AnyMapPointState.HOVER);
       this.drawMarker(anychart.enums.AnyMapPointState.HOVER);
       this.drawLabel(anychart.enums.AnyMapPointState.HOVER);
-      this.showTooltip(opt_event);
+      if (showTooltip) this.showTooltip(opt_event);
     }
-  } else {
+  } else if (showTooltip) {
     this.showTooltip(opt_event);
   }
   this.hoverStatus.push(index);
@@ -180,12 +178,13 @@ anychart.core.map.series.Choropleth.prototype.hoverPoint = function(index, opt_e
 
 
 /** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.selectPoint = function(index, opt_event) {
-  if (!this.enabled())
+anychart.core.map.series.Choropleth.prototype.selectPoint = function(index, opt_event, opt_showTooltip) {
+  if (!this.enabled() || !this.getFinalAllowPointsSelect())
     return this;
 
   var iterator = this.getIterator();
   if (iterator.select(index)) {
+    var showTooltip = goog.isDef(opt_showTooltip) ? opt_showTooltip : true;
     var selectedIndex = goog.array.indexOf(this.selectStatus, index);
     var selected = selectedIndex != -1;
     var hoveredIndex = goog.array.indexOf(this.hoverStatus, index);
@@ -210,51 +209,69 @@ anychart.core.map.series.Choropleth.prototype.selectPoint = function(index, opt_
       this.selectStatus.push(index);
     }
 
-    this.showTooltip(opt_event);
+    if (showTooltip)
+      this.showTooltip(opt_event);
   }
   return this;
 };
 
 
 /** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.unselectAll = function(event) {
+anychart.core.map.series.Choropleth.prototype.unselect = function(opt_event) {
   if (!this.enabled())
     return this;
 
-  var evt = this.makePointEvent(event);
-  if (evt && ((anychart.utils.checkIfParent(this, event['relatedTarget'])) || this.dispatchEvent(evt))) {
-    var series;
-    if (event['target'] instanceof anychart.core.ui.MarkersFactory) {
-      if (this.isMarkersInit() && this.markers() == event['target']) {
-        series = this;
+  var event = opt_event;
+  var iterator, index, i, len;
+  if (goog.isDef(event)) {
+    var evt = this.makePointEvent(/** @type {anychart.core.MouseEvent}*/ (opt_event));
+    if (evt && ((anychart.utils.checkIfParent(this, event['relatedTarget'])) || this.dispatchEvent(evt))) {
+      var series;
+      if (event['target'] instanceof anychart.core.ui.MarkersFactory) {
+        if (this.isMarkersInit() && this.markers() == event['target']) {
+          series = this;
+        }
+      } else if (event['target'] instanceof anychart.core.ui.LabelsFactory) {
+        series = event['target'].getParentEventTarget();
+      } else {
+        var tag = anychart.utils.extractTag(event['domTarget']);
+        series = tag && tag.series;
       }
-    } else if (event['target'] instanceof anychart.core.ui.LabelsFactory) {
-      series = event['target'].getParentEventTarget();
-    } else {
-      var tag = anychart.utils.extractTag(event['domTarget']);
-      series = tag && tag.series;
-    }
 
-    var isCurrentSeries = series && !series.isDisposed() && series == this;
-    for (var i = 0, len = this.selectStatus.length; i < len; i++) {
-      var index = this.selectStatus[i];
-      if (!(isCurrentSeries && index == evt['pointIndex'])) {
-        var iterator = this.getIterator();
-        if (iterator.select(index)) {
-          this.colorizeShape(anychart.enums.AnyMapPointState.NORMAL);
-          this.drawLabel(anychart.enums.AnyMapPointState.NORMAL);
-          this.drawMarker(anychart.enums.AnyMapPointState.NORMAL);
-          this.applyHatchFill(anychart.enums.AnyMapPointState.NORMAL);
+      var isCurrentSeries = series && !series.isDisposed() && series == this;
+      iterator = this.getIterator();
+      for (i = 0, len = this.selectStatus.length; i < len; i++) {
+        index = this.selectStatus[i];
+        if (!(isCurrentSeries && index == evt['pointIndex'])) {
+          if (iterator.select(index)) {
+            this.colorizeShape(anychart.enums.AnyMapPointState.NORMAL);
+            this.drawLabel(anychart.enums.AnyMapPointState.NORMAL);
+            this.drawMarker(anychart.enums.AnyMapPointState.NORMAL);
+            this.applyHatchFill(anychart.enums.AnyMapPointState.NORMAL);
+          }
         }
       }
-    }
 
-    if (isCurrentSeries && goog.array.indexOf(this.selectStatus, evt['pointIndex']) != -1) {
-      this.selectStatus.length = 0;
-      this.selectStatus.push(evt['pointIndex']);
-    } else {
-      this.selectStatus.length = 0;
+      if (isCurrentSeries && goog.array.indexOf(this.selectStatus, evt['pointIndex']) != -1) {
+        this.selectStatus.length = 0;
+        this.selectStatus.push(evt['pointIndex']);
+      } else {
+        this.selectStatus.length = 0;
+      }
     }
+    this.dispatchEvent(this.makeSelectPointEvent(event));
+  } else {
+    iterator = this.getIterator();
+    for (i = 0, len = this.selectStatus.length; i < len; i++) {
+      index = this.selectStatus[i];
+      if (iterator.select(index)) {
+        this.colorizeShape(anychart.enums.AnyMapPointState.NORMAL);
+        this.drawLabel(anychart.enums.AnyMapPointState.NORMAL);
+        this.drawMarker(anychart.enums.AnyMapPointState.NORMAL);
+        this.applyHatchFill(anychart.enums.AnyMapPointState.NORMAL);
+      }
+    }
+    this.selectStatus.length = 0;
   }
   return this;
 };
@@ -277,20 +294,10 @@ anychart.core.map.series.Choropleth.prototype.unhover = function() {
           this.drawMarker(anychart.enums.AnyMapPointState.NORMAL);
           this.drawLabel(anychart.enums.AnyMapPointState.NORMAL);
         }
-        this.hideTooltip();
-      } else {
-        var iterator = this.getResetIterator();
-        while (iterator.advance()) {
-          this.colorizeShape(anychart.enums.AnyMapPointState.NORMAL);
-          this.applyHatchFill(anychart.enums.AnyMapPointState.NORMAL);
-          this.drawMarker(anychart.enums.AnyMapPointState.NORMAL);
-          this.drawLabel(anychart.enums.AnyMapPointState.NORMAL);
-        }
       }
-    } else {
-      this.hideTooltip();
     }
   }
+  this.hideTooltip();
   this.hoverStatus.length = 0;
   return this;
 };
@@ -298,11 +305,9 @@ anychart.core.map.series.Choropleth.prototype.unhover = function() {
 
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.select = function(index) {
-  this.selectPoint(index);
-  this.hideTooltip();
-  this.dispatchEvent(this.makeSelectPointEvent({'pointIndex': index}));
+  if (this.getFinalAllowPointsSelect()) {
+    this.selectPoint(index);
+    this.hideTooltip();
+  }
   return this;
 };
-
-//exports
-anychart.core.map.series.Choropleth.prototype['select'] = anychart.core.map.series.Choropleth.prototype.select;

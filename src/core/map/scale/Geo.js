@@ -543,14 +543,15 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.core.map.scale.Geo.prototype['setBounds'] = anychart.core.map.scale.Geo.prototype.setBounds;
-anychart.core.map.scale.Geo.prototype['transform'] = anychart.core.map.scale.Geo.prototype.transform;
-anychart.core.map.scale.Geo.prototype['minimumX'] = anychart.core.map.scale.Geo.prototype.minimumX;
-anychart.core.map.scale.Geo.prototype['minimumY'] = anychart.core.map.scale.Geo.prototype.minimumY;
-anychart.core.map.scale.Geo.prototype['maximumX'] = anychart.core.map.scale.Geo.prototype.maximumX;
-anychart.core.map.scale.Geo.prototype['maximumY'] = anychart.core.map.scale.Geo.prototype.maximumY;
-anychart.core.map.scale.Geo.prototype['extendDataRangeX'] = anychart.core.map.scale.Geo.prototype.extendDataRangeX;
-anychart.core.map.scale.Geo.prototype['extendDataRangeY'] = anychart.core.map.scale.Geo.prototype.extendDataRangeY;
-anychart.core.map.scale.Geo.prototype['inverted'] = anychart.core.map.scale.Geo.prototype.inverted;
-anychart.core.map.scale.Geo.prototype['startAutoCalc'] = anychart.core.map.scale.Geo.prototype.startAutoCalc;
-anychart.core.map.scale.Geo.prototype['finishAutoCalc'] = anychart.core.map.scale.Geo.prototype.finishAutoCalc;
+//todo (blackart) Don't export yet.
+//anychart.core.map.scale.Geo.prototype['setBounds'] = anychart.core.map.scale.Geo.prototype.setBounds;
+//anychart.core.map.scale.Geo.prototype['transform'] = anychart.core.map.scale.Geo.prototype.transform;
+//anychart.core.map.scale.Geo.prototype['minimumX'] = anychart.core.map.scale.Geo.prototype.minimumX;
+//anychart.core.map.scale.Geo.prototype['minimumY'] = anychart.core.map.scale.Geo.prototype.minimumY;
+//anychart.core.map.scale.Geo.prototype['maximumX'] = anychart.core.map.scale.Geo.prototype.maximumX;
+//anychart.core.map.scale.Geo.prototype['maximumY'] = anychart.core.map.scale.Geo.prototype.maximumY;
+//anychart.core.map.scale.Geo.prototype['extendDataRangeX'] = anychart.core.map.scale.Geo.prototype.extendDataRangeX;
+//anychart.core.map.scale.Geo.prototype['extendDataRangeY'] = anychart.core.map.scale.Geo.prototype.extendDataRangeY;
+//anychart.core.map.scale.Geo.prototype['inverted'] = anychart.core.map.scale.Geo.prototype.inverted;
+//anychart.core.map.scale.Geo.prototype['startAutoCalc'] = anychart.core.map.scale.Geo.prototype.startAutoCalc;
+//anychart.core.map.scale.Geo.prototype['finishAutoCalc'] = anychart.core.map.scale.Geo.prototype.finishAutoCalc;

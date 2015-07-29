@@ -30,28 +30,28 @@ anychart.core.ui.Legend = function() {
    * @type {anychart.enums.Orientation}
    * @private
    */
-  this.position_ = anychart.enums.Orientation.BOTTOM;
+  this.position_;
 
   /**
    * Align of the legend.
    * @type {anychart.enums.Align}
    * @private
    */
-  this.align_ = anychart.enums.Align.CENTER;
+  this.align_;
 
   /**
    * Spacing between items.
    * @type {number}
    * @private
    */
-  this.itemsSpacing_ = 15;
+  this.itemsSpacing_ = NaN;
 
   /**
    * Spacing between icon and text in legend item.
    * @type {number}
    * @private
    */
-  this.iconTextSpacing_ = 5;
+  this.iconTextSpacing_ = NaN;
 
   /**
    * Width of legend element.
@@ -72,7 +72,7 @@ anychart.core.ui.Legend = function() {
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.itemsLayout_ = anychart.enums.Layout.HORIZONTAL;
+  this.itemsLayout_;
 
   /**
    * Wrapped legend items.
@@ -88,124 +88,12 @@ anychart.core.ui.Legend = function() {
    */
   this.layer_ = null;
 
+  /**
+   * @type {number}
+   * @private
+   */
   this.drawedPage_ = NaN;
 
-  this.fontFamily('Verdana')
-    .fontSize('10')
-    .fontWeight('normal')
-    .fontColor('rgb(35,35,35)')
-      // we need LegendItem text could catch mouseover and mouseclick
-      // (cause elements.Text turns disablePointerEvents() on with non-hoverable text)
-    .disablePointerEvents(false)
-    .padding(7)
-    .margin(5);
-
-  this.background()
-      .enabled(true)
-      .fill(/** @type {acgraph.vector.LinearGradientFill} */({
-        'keys': [
-          '0 rgb(255,255,255) 1',
-          '0.5 rgb(243,243,243) 1',
-          '1 rgb(255,255,255) 1'],
-        'angle': '90'
-      }))
-      .stroke({
-        'keys': [
-          '0 rgb(221,221,221) 1',
-          '1 rgb(208,208,208) 1'
-        ],
-        'angle': '90'
-      })
-      .corners(5)
-      .zIndex(0);
-  //
-  this.title()
-    .enabled(true)
-    .zIndex(10)
-    .text('Legend Title')
-    .fontFamily('Verdana')
-    .fontSize('10')
-    .fontWeight('bold')
-    .fontColor('rgb(35,35,35)')
-    .orientation('top')
-    .margin(0, 0, 3, 0)
-    .padding(0);
-  this.title().background()
-    .enabled(false)
-    .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-    .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      });
-
-  this.titleSeparator()
-    .enabled(true)
-    .zIndex(10)
-    .margin(3, 0, 3, 0)
-    .orientation('top')
-    .width('100%')
-    .height(1)
-    .fill({
-        'keys': [
-          '0 #333333 0',
-          '0.5 #333333 1',
-          '1 #333333 0'
-        ]
-      });
-  this.paginator()
-    .enabled(false)
-    .zIndex(30) // data item layer have zIndex: 20, paginator should be over than item data layer
-    .fontFamily('Verdana')
-    .fontSize('10')
-    .fontWeight('normal')
-    .fontColor('rgb(35,35,35)')
-    .orientation('right')
-    .margin(0)
-    .padding(0);
-  this.paginator().background()
-    .enabled(false)
-    .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-    .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      });
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.resumeSignalsDispatching(false);
-
-  var tooltipTitle = /** @type {anychart.core.ui.Title} */(tooltip.title());
-  tooltipTitle.enabled(false);
-  tooltipTitle.padding(0);
-  tooltipTitle.margin(3, 3, 0, 3);
-
-  this.inverted(false);
-  this.items(null);
-  this.itemsSourceMode(anychart.enums.LegendItemsSourceMode.DEFAULT);
-  this.itemsFormatter(function(items) {
-    return items;
-  });
 
   /**
    * Legend items text formatter.
@@ -223,10 +111,10 @@ anychart.core.ui.Legend = function() {
 
   /**
    * Hover cursor setting.
-   * @type {anychart.enums.Cursor}
+   * @type {?anychart.enums.Cursor}
    * @private
    */
-  this.hoverCursor_ = anychart.enums.Cursor.POINTER;
+  this.hoverCursor_;
 
   this.invalidate(anychart.ConsistencyState.ALL);
 
@@ -1215,16 +1103,28 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var orientation;
 
   if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
-    if (contentWidth > maxWidth)
-      paginator.enabled(true);
-    else
-      paginator.enabled(false);
+    if (contentWidth > maxWidth) {
+      paginator.autoEnabled(true);
+    } else {
+      paginator.autoEnabled(false);
+    }
+  }
+
+  var titleIsVertical = title.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
+  var separatorIsVertical = separator.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
+  var maxHeightForPaginator = maxHeight;
+  if (titleIsVertical) {
+    maxHeightForPaginator -= (titleBounds ? titleBounds.height : 0);
+  }
+  if (separatorIsVertical) {
+    maxHeightForPaginator -= (separatorBounds ? separatorBounds.height : 0);
   }
   if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
-    if (contentHeight > maxHeight)
-      paginator.enabled(true);
-    else
-      paginator.enabled(false);
+    if (contentHeight > maxHeightForPaginator) {
+      paginator.autoEnabled(true);
+    } else {
+      paginator.autoEnabled(false);
+    }
   }
 
   var fullAreaWidth = 0;
@@ -1245,7 +1145,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
   }
 
-  if (paginator.enabled()) {
+  if (paginator.getFinalEnabled()) {
     orientation = paginator.orientation();
     if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
       fullAreaWidth += paginatorBounds.width;
@@ -1310,7 +1210,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var pageWidth = contentAreaWidth, pageHeight = contentAreaHeight;
   orientation = paginator.orientation();
 
-  if (paginator.enabled()) {
+  if (paginator.getFinalEnabled()) {
     if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) pageHeight = contentAreaHeight - paginatorBounds.height;
     else pageWidth = contentAreaWidth - paginatorBounds.width;
   }
@@ -1508,9 +1408,9 @@ anychart.core.ui.Legend.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.LEGEND_PAGINATOR);
   }
 
-  var contentBounds = this.paginator().enabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;
+  var contentBounds = this.paginator().getFinalEnabled() ? this.paginator().getRemainingBounds() : boundsWithoutSeparator;
 
-  var pageToDraw = this.paginator().enabled() ? this.paginator().currentPage() - 1 : 0;
+  var pageToDraw = this.paginator().getFinalEnabled() ? this.paginator().currentPage() - 1 : 0;
   this.drawLegendContent_(pageToDraw, contentBounds);
 
   if (manualSuspend) stage.resume();

@@ -32,16 +32,16 @@ anychart.core.ui.Crosshair = function() {
   this.yAxis_;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {?acgraph.vector.Stroke}
    * @private
    */
-  this.xStroke_ = 'black';
+  this.xStroke_ = null;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {?acgraph.vector.Stroke}
    * @private
    */
-  this.yStroke_ = 'black';
+  this.yStroke_ = null;
 
   /**
    * @type {acgraph.vector.Path}
@@ -72,21 +72,8 @@ anychart.core.ui.Crosshair = function() {
   this.xLabel_ = new anychart.core.ui.CrosshairLabel();
   this.yLabel_ = new anychart.core.ui.CrosshairLabel();
 
-  // formatting
-  this.xLabel_.padding(6, 10);
-  this.xLabel_.background('black .85');
-  this.xLabel_.fontColor('white');
-  this.xLabel_.fontWeight(400);
-
-  this.yLabel_.padding(6, 10);
-  this.yLabel_.background('black .85');
-  this.yLabel_.fontColor('white');
-  this.yLabel_.fontWeight(400);
-
   this.xLine_.disablePointerEvents(true);
   this.yLine_.disablePointerEvents(true);
-  this.xLabel_.disablePointerEvents(true);
-  this.yLabel_.disablePointerEvents(true);
 
   this.xLabel_.markConsistent(anychart.ConsistencyState.ALL);
   this.yLabel_.markConsistent(anychart.ConsistencyState.ALL);
@@ -161,7 +148,7 @@ anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
       }
 
       // set anchor
-      if (!this.xLabel_.anchor() ||
+      if (this.xLabel_.autoAnchor() ||
           (this.xAxis_ && this.xLabel_.anchor() == this.getAnchorByAxis_(this.xAxis_))) {
 
         this.xLabel_.anchor(this.getAnchorByAxis_(opt_value));
@@ -192,7 +179,7 @@ anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
       }
 
       // set anchor
-      if (!this.yLabel_.anchor() ||
+      if (this.yLabel_.autoAnchor() ||
           (this.yAxis_ && this.yLabel_.anchor() == this.getAnchorByAxis_(this.yAxis_))) {
 
         this.yLabel_.anchor(this.getAnchorByAxis_(opt_value));

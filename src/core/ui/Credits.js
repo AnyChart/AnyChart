@@ -18,24 +18,6 @@ anychart.core.ui.Credits = function() {
   goog.base(this);
 
   /**
-   * @type {?string}
-   * @private
-   */
-  this.text_ = 'AnyChart';
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this.url_ = 'http://anychart.com';
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this.alt_ = 'AnyChart.com';
-
-  /**
    * @type {string}
    * @private
    */
@@ -46,13 +28,6 @@ anychart.core.ui.Credits = function() {
    * @private
    */
   this.domElement_ = null;
-
-  /**
-   * Flag whether credits must be placed right in chart.
-   * @type {boolean}
-   * @private
-   */
-  this.inChart_ = false;
 
   //disable by default at anychart related domains
   this.enabled(!anychart.core.ui.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
@@ -528,6 +503,7 @@ anychart.core.ui.Credits.prototype.serialize = function() {
   json['url'] = this.url();
   json['alt'] = this.alt();
   json['logoSrc'] = this.logoSrc();
+  json['inChart'] = this.inChart();
   return json;
 };
 
@@ -551,6 +527,7 @@ anychart.core.ui.Credits.prototype.setupByJSON = function(config) {
   this.url(config['url']);
   this.alt(config['alt']);
   this.logoSrc(config['logoSrc']);
+  this.inChart(config['inChart']);
 };
 
 

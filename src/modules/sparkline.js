@@ -19,13 +19,9 @@ goog.require('anychart.modules.base');
  */
 anychart.sparkline = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Sparkline(opt_data, opt_csvSettings);
+  var theme = anychart.getFullTheme();
 
-  //title default settings
-  var title = /** @type {anychart.core.ui.Title} */(chart.title());
-  title.padding(0);
-  title.margin(0);
-  title.orientation('right');
-  title.rotation(0);
+  chart.setup(theme['sparkline']);
 
   return chart;
 };

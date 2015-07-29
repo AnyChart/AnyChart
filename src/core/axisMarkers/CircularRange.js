@@ -70,8 +70,6 @@ anychart.core.axisMarkers.CircularRange = function() {
    * @protected
    */
   this.domElement;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axisMarkers.CircularRange, anychart.core.VisualBase);
 
@@ -474,17 +472,6 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
   }
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.axisMarkers.CircularRange.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.fill('green .5');
-  this.position(anychart.enums.GaugeSidePosition.CENTER);
-  this.resumeSignalsDispatching(true);
 };
 
 

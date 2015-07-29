@@ -4,7 +4,7 @@ goog.provide('anychart.core.utils.UnboundRegionsSettings');
 
 /**
  * Class for using in maps. Class is settings for regions that isn't linked to any series.
- * @param {anychart.maps.Map} parent Maps should be sets as parent.
+ * @param {anychart.charts.Map} parent Maps should be sets as parent.
  * @constructor
  */
 anychart.core.utils.UnboundRegionsSettings = function(parent) {
@@ -20,13 +20,13 @@ anychart.core.utils.UnboundRegionsSettings = function(parent) {
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = acgraph.vector.normalizeFill('#ddd 0.6');
+  this.fill_ = null;
 
   /**
    * @type {?acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = acgraph.vector.normalizeStroke('#ddd');
+  this.stroke_ = null;
 };
 
 

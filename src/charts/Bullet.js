@@ -45,19 +45,9 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_ = anychart.enums.Layout.HORIZONTAL;
+  this.layout_;
 
   this.data(opt_data || null, opt_csvSettings);
-
-
-  //default settings
-  this.axis().stroke('0 black');
-  this.background().enabled(false);
-  this.margin(10);
-  var title = /** @type {anychart.core.ui.Title} */(this.title());
-  title.text('Chart title');
-  title.enabled(true);
-  title.setDefaultRotation(0);
 };
 goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
 
@@ -76,24 +66,31 @@ anychart.charts.Bullet.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Markers z-index.
- * @type {number}
+ * Getter/setter for range marker default settings.
+ * @param {Object=} opt_value Object with range marker settings.
+ * @return {Object}
  */
-anychart.charts.Bullet.ZINDEX_MARKER = 2;
+anychart.charts.Bullet.prototype.defaultRangeSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultRangeSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultRangeSettings_ || {};
+};
 
 
 /**
- * Ranges z-index.
- * @type {number}
+ * Getter/setter for marker default settings.
+ * @param {Object=} opt_value Object with range marker settings.
+ * @return {Object}
  */
-anychart.charts.Bullet.ZINDEX_RANGES = 2;
-
-
-/**
- * Axis z-index.
- * @type {number}
- */
-anychart.charts.Bullet.ZINDEX_AXIS = 3;
+anychart.charts.Bullet.prototype.defaultMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultMarkerSettings_ || {};
+};
 
 
 /** @inheritDoc */
@@ -343,8 +340,6 @@ anychart.charts.Bullet.prototype.axis = function(opt_value) {
   if (!this.axis_) {
     this.axis_ = new anychart.core.axes.Linear();
     this.axis_.setParentEventTarget(this);
-    this.axis_.zIndex(anychart.charts.Bullet.ZINDEX_AXIS);
-    this.axis_.title().enabled(false);
     this.registerDisposable(this.axis_);
     this.axis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(
@@ -454,7 +449,7 @@ anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
   var range = this.ranges_[index];
   if (!range) {
     range = new anychart.core.axisMarkers.Range();
-    range.zIndex(anychart.charts.Bullet.ZINDEX_RANGES);
+    range.setup(this.defaultRangeSettings());
     this.ranges_[index] = range;
     this.registerDisposable(range);
     range.listenSignals(this.onRangeSignal_, this);
@@ -759,9 +754,11 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.container(this.rootElement);
 
   //defaults
-  marker.zIndex(anychart.charts.Bullet.ZINDEX_MARKER);
-  marker.setDefaultFill('black');
-  marker.setDefaultStroke('none');
+  var settings = this.defaultMarkerSettings();
+  marker.zIndex(settings['zIndex']);
+  marker.setDefaultFill(settings['fill']);
+  marker.setDefaultStroke(settings['stroke']);
+  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().markerAt(index)));
 
   //settings from data
   marker.value(/** @type {string|number} */(iterator.get('value')));
@@ -796,6 +793,13 @@ anychart.charts.Bullet.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.charts.Bullet.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+
+  if ('defaultRangeSettings' in config)
+    this.defaultRangeSettings(config['defaultRangeSettings']);
+
+  if ('defaultMarkerSettings' in config)
+    this.defaultMarkerSettings(config['defaultMarkerSettings']);
+
   this.data(config['data']);
   this.layout(config['layout']);
   this.rangePalette(config['rangePalette']);

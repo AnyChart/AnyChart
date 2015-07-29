@@ -23,29 +23,16 @@ goog.require('anychart.modules.base');
  */
 anychart.box = function(var_args) {
   var chart = new anychart.charts.Cartesian();
+  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BOX);
   chart.setType(anychart.enums.ChartTypes.BOX);
 
+  chart.setup(theme['box']);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.box(arguments[i]);
   }
-
-  chart.title().text('Chart Title').fontWeight('bold');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid(0)
-      .evenFill('white')
-      .oddFill('white')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.075')
-      .layout(anychart.enums.Layout.HORIZONTAL);
 
   return chart;
 };

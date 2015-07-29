@@ -18,7 +18,9 @@ goog.inherits(anychart.axisMarkers.Range, anychart.core.axisMarkers.Range);
  * @return {!anychart.axisMarkers.Range}
  */
 anychart.axisMarkers.range = function() {
-  return new anychart.axisMarkers.Range();
+  var res = new anychart.axisMarkers.Range();
+  res.setup(anychart.getFullTheme()['standalones']['rangeAxisMarker']);
+  return res;
 };
 
 

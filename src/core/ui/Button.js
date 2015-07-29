@@ -792,20 +792,6 @@ anychart.core.ui.Button.prototype.handleMouseUp = function(event) {
 
 
 /**
- * Restores default settings for button.
- * @protected
- */
-anychart.core.ui.Button.prototype.restoreDefaults = function() {
-  this.textSettings('vAlign', acgraph.vector.Text.VAlign.MIDDLE);
-  this.textSettings('hAlign', acgraph.vector.Text.HAlign.CENTER);
-  this.padding(3, 8, 3, 8);
-
-  // removing support for checked state
-  this.supportedStates(anychart.core.ui.Button.State.CHECKED, false);
-};
-
-
-/**
  * Sets listener fired when button clicked.
  * @param {function(anychart.core.ui.Button)=} opt_value Listener.
  * @return {*|anychart.core.ui.Button} Current listener of self for method chaining.

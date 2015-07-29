@@ -51,28 +51,28 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {number}
    * @private
    */
-  this.startAngle_ = 0;
+  this.startAngle_;
 
   /**
    * Outer radius of the pie chart.
    * @type {(string|number)}
    * @private
    */
-  this.radius_ = '45%';
+  this.radius_;
 
   /**
    * Inner radius in case of a donut chart.
    * @type {!(string|number|function(number):number)}
    * @private
    */
-  this.innerRadius_ = 0;
+  this.innerRadius_;
 
   /**
    * The value to which pie slice should expand (explode).
    * @type {(string|number)}
    * @private
    */
-  this.explode_ = 15;
+  this.explode_;
 
   /**
    * The sort type for the pie points.
@@ -167,9 +167,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.fill_ = (function() {
-    return /** @type {acgraph.vector.Fill} */ (this['sourceColor']);
-  });
+  this.fill_ = null;
 
   /**
    * Default stroke function.
@@ -178,9 +176,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.stroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
-  });
+  this.stroke_ = null;
 
   /**
    * Default fill function for hover state.
@@ -189,9 +185,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.hoverFill_ = (function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
+  this.hoverFill_ = null;
 
   /**
    * Default stroke function for hover state.
@@ -200,9 +194,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.hoverStroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
-  });
+  this.hoverStroke_ = null;
 
   /**
    * Hatch fill.
@@ -230,38 +222,8 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    */
   this.sides3D_ = [];
 
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'] || this['x'];
-  });
-  tooltip.contentFormatter(function() {
-    return (this['name'] || this['x']) + '\n' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
-
-  this.palette();
-  this.hatchFillPalette();
-  this.labels()
-      .fontSize(13)
-      .padding(1);
-  (/** @type {anychart.core.ui.CircularLabelsFactory} */(this.hoverLabels())).enabled(null);
   this.data(opt_data || null, opt_csvSettings);
-  this.legend().enabled(true);
 
-  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
-  this.outsideLabelsSpace('30');
-  this.insideLabelsOffset('50%');
-  this.connectorLength('20');
-  this.outsideLabelsCriticalAngle(60);
-  this.connectorStroke('black 0.3');
-  var title = this.title();
-  title.margin().bottom(0);
-
-  this.legend().tooltip().contentFormatter(function() {
-    return (this['value']) + '\n' + this['meta']['pointValue'];
-  });
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 
@@ -988,7 +950,6 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
 anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.labels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.labels_.textFormatter(function() {
       return (this['value'] * 100 / this.getStat('sum')).toFixed(1) + '%';
     });
@@ -1048,7 +1009,6 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
 anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.hoverLabels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
 
@@ -1945,10 +1905,10 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     }
 
     if (this.isOutsideLabels_()) {
-      this.labels().setAutoColor('#000');
+      this.labels().setAutoColor(anychart.getFullTheme()['pie']['outsideLabels']['autoColor']);
       this.calculateOutsideLabels();
     } else {
-      this.labels().setAutoColor('#fff');
+      this.labels().setAutoColor(anychart.getFullTheme()['pie']['insideLabels']['autoColor']);
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
@@ -3151,8 +3111,10 @@ anychart.charts.Pie.prototype.colorizeSlice = function(hover) {
     var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
     if (goog.isDef(slice)) {
       var fill = this.getFillColor(true, hover);
-      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
+      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode)) {
+        fill = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fill)));
         fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      }
       slice.fill(fill);
 
       fill = this.getStrokeColor(true, hover);

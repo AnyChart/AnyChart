@@ -243,7 +243,7 @@ def __get_optimized_compiler_args():
         '--jscomp_warning undefinedVars',
         '--jscomp_warning unknownDefines',
         '--jscomp_warning uselessCode',
-        #'--jscomp_warning useOfGoogBase',
+        #'--jscomp_warning useOfGoogdefaultTheme',
         '--jscomp_warning visibility',
         '--generate_exports'
         #'--jscomp_warning deprecated',
@@ -273,6 +273,7 @@ def __get_optimized_compiler_args():
 
 
 def __get_default_compiler_args():
+    global arguments
     result = [
         'java -jar',
         COMPILER_PATH,
@@ -291,6 +292,12 @@ def __get_default_compiler_args():
         '--extra_annotation_name "shortDescription"',
     ]
 
+    theme = arguments['theme'] if ('theme' in arguments) else 'defaultTheme'
+    if not (theme == 'none'):
+        if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):
+            theme = 'defaultTheme'
+        result = result + ['--define "anychart.DEFAULT_THEME=\'%s\'"' % theme]
+        result = result + ['--closure_entry_point "%s"' % 'anychart.themes.' + theme]
     return result
 
 
@@ -351,8 +358,8 @@ def __build_project(modules):
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
     print output_file
-    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s" % (
-        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']), str(arguments['gzip']))
+    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s" % (
+        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']), str(arguments['gzip']), str(arguments['theme']))
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
@@ -581,7 +588,7 @@ def __exec_main_script():
     compile_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
     compile_parser.add_argument('-df', '--debug_files', action='store_true',
                                 help='Create files with debug info (prop_out, var_out, sourcemap).')
-    compile_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'anychart7'", default='anychart7')
+    compile_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'defaultTheme'", default='defaultTheme')
 
     # create the parser for the "compile_each" command
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
@@ -590,7 +597,7 @@ def __exec_main_script():
     compile_each_parser.add_argument('-df', '--debug_files', action='store_true',
                                      help='Create files with debug info (prop_out, var_out, sourcemap).')
     compile_each_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
-    compile_each_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'anychart7'", default='anychart7')
+    compile_each_parser.add_argument('-t', '--theme', action='store', help="Specify the default theme to compile with. By default - 'defaultTheme'", default='defaultTheme')
 
     # create the parser for the "contrib" command
     contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies')

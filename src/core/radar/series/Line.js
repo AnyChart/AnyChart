@@ -17,10 +17,6 @@ anychart.core.radar.series.Line = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   this.referenceValuesSupportStack = false;
-
-  this.hoverStroke(function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
 };
 goog.inherits(anychart.core.radar.series.Line, anychart.core.radar.series.ContinuousBase);
 anychart.core.radar.series.Base.SeriesTypesMap[anychart.enums.RadarSeriesType.LINE] = anychart.core.radar.series.Line;
@@ -113,6 +109,12 @@ anychart.core.radar.series.Line.prototype.strokeInternal = (function() {
 /** @inheritDoc */
 anychart.core.radar.series.Line.prototype.getMarkerFill = function() {
   return this.getFinalStroke(false, false);
+};
+
+
+/** @inheritDoc */
+anychart.core.radar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
 

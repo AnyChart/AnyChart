@@ -106,14 +106,14 @@ anychart.core.ui.LabelBase = function() {
    * @type {number}
    * @private
    */
-  this.minFontSize_ = 8;
+  this.minFontSize_ = NaN;
 
   /**
    * Maximum font size for adjusting to.
    * @type {number}
    * @private
    */
-  this.maxFontSize_ = 72;
+  this.maxFontSize_ = NaN;
 
   /**
    * Root layer to listen events on.
@@ -122,8 +122,6 @@ anychart.core.ui.LabelBase = function() {
    */
   this.rootLayer_ = acgraph.layer();
   this.bindHandlersToGraphics(this.rootLayer_);
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.ui.LabelBase, anychart.core.Text);
 
@@ -1237,29 +1235,6 @@ anychart.core.ui.LabelBase.prototype.setupByJSON = function(config) {
   this.maxFontSize(config['maxFontSize']);
   this.adjustFontSize(config['adjustFontSize']);
   this.rotation(config['rotation']);
-};
-
-
-/**
- * Restore label default settings.
- */
-anychart.core.ui.LabelBase.prototype.restoreDefaults = function() {
-  this.width(null);
-  this.height(null);
-  this.padding(0);
-  this.background(null);
-  this.offsetX(0);
-  this.offsetY(0);
-  this.rotation(0);
-  this.adjustFontSize(false, false);
-  this.minFontSize(8);
-  this.maxFontSize(72);
-  this.text('Label text');
-  this.fontFamily('Tahoma');
-  this.fontSize('11');
-  this.fontWeight('bold');
-  this.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
-  this.invalidate(anychart.ConsistencyState.ALL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 

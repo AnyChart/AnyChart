@@ -153,6 +153,9 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
     'hAlign': anychart.enums.HAlign.START,
     'vAlign': anychart.enums.VAlign.TOP
   };
+
+  if (anychart.DEFAULT_THEME != 'v6')
+    this.settingsObj['fill'] = '#fff';
 };
 goog.inherits(anychart.core.ui.Table, anychart.core.VisualBaseWithBounds);
 
@@ -2745,6 +2748,7 @@ anychart.core.ui.Table.prototype.invalidateHandler_ = function() {
 anychart.core.ui.Table.prototype.getLabelsFactory_ = function() {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
+    this.labelsFactory_.setup(anychart.getFullTheme()['standalones']['labelsFactory']);
     this.labelsFactory_.anchor(anychart.enums.Anchor.CENTER);
     this.labelsFactory_.position(anychart.enums.Position.CENTER);
     // we do not register disposable here, cause we dispose it manually in disposeInternal

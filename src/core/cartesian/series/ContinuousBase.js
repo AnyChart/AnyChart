@@ -324,22 +324,6 @@ anychart.core.cartesian.series.ContinuousBase.prototype.setupByJSON = function(c
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.ContinuousBase.prototype.restoreDefaults = function() {
-  var res = goog.base(this, 'restoreDefaults');
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.suspendSignalsDispatching();
-  labels.enabled(false);
-  labels.anchor('bottom');
-  labels.resumeSignalsDispatching(false);
-
-  return res;
-};
-
-
 //anychart.core.cartesian.series.ContinuousBase.prototype['startDrawing'] = anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing;//inherited
 //anychart.core.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.core.cartesian.series.ContinuousBase.prototype.drawMissing;//inherited
 //exports

@@ -37,122 +37,6 @@ anychart.core.axes.Linear = function() {
    */
   this.line;
 
-  this.title()
-      .suspendSignalsDispatching()
-      .text('Axis title')
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontColor('rgb(34,34,34)')
-      .fontWeight('bold')
-      .padding(5)
-      .margin(10, 5, 10, 5)
-      .resumeSignalsDispatching(false);
-
-  this.title().background()
-      .suspendSignalsDispatching()
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle' : '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle' : '90'
-      })
-      .enabled(false)
-      .resumeSignalsDispatching(false);
-
-  this.labels()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .offsetX(0)
-      .offsetY(0)
-      .anchor(anychart.enums.Anchor.CENTER)
-      .padding(1, 2, 1, 2)
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .resumeSignalsDispatching(false);
-
-  this.labels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .offsetX(0)
-      .offsetY(0)
-      .padding(1, 1, 0, 1)
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-  this.ticks()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .length(5)
-      .stroke({'color': '#313131', 'lineJoin': 'round', 'lineCap': 'butt'})
-      .resumeSignalsDispatching(false);
-
-  this.minorTicks()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .length(2)
-      .stroke({'color': '#3C3C3C', 'lineJoin': 'round', 'lineCap': 'butt'})
-      .resumeSignalsDispatching(false);
-
-  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
-  this.stroke({'color': '#474747', 'lineJoin': 'round', 'lineCap': 'square'});
-  this.staggerMaxLines(2);
-
-  this.resumeSignalsDispatching(true);
-
   /**
    * Constant to save space.
    * @type {number}
@@ -164,6 +48,7 @@ anychart.core.axes.Linear = function() {
       anychart.ConsistencyState.AXIS_TICKS |
       anychart.ConsistencyState.BOUNDS |
       anychart.ConsistencyState.AXIS_OVERLAP;
+  this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.axes.Linear, anychart.core.VisualBase);
 
@@ -241,7 +126,7 @@ anychart.core.axes.Linear.prototype.minorTicks_ = null;
  * @type {string|acgraph.vector.Stroke}
  * @private
  */
-anychart.core.axes.Linear.prototype.stroke_ = 'none';
+anychart.core.axes.Linear.prototype.stroke_;
 
 
 /**
@@ -327,7 +212,7 @@ anychart.core.axes.Linear.prototype.padding_ = null;
  * @type {number}
  * @private
  */
-anychart.core.axes.Linear.prototype.offsetY_ = 0;
+anychart.core.axes.Linear.prototype.offsetY_;
 
 
 /**
@@ -752,8 +637,8 @@ anychart.core.axes.Linear.prototype.scale = function(opt_value) {
         this.internalScale.listenSignals(this.scaleInvalidated_, this);
       this.dropStaggeredLabelsCache_();
       this.dropBoundsCache_();
-      this.labels_.dropCallsCache();
-      this.minorLabels_.dropCallsCache();
+      this.labels().dropCallsCache();
+      this.minorLabels().dropCallsCache();
       this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1298,7 +1183,7 @@ anychart.core.axes.Linear.prototype.getSize = function(parentBounds, length) {
     if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     title.suspendSignalsDispatching();
     title.parentBounds(parentBounds);
-    title.orientation(orientation);
+    title.setDefaultOrientation(orientation);
     titleSize = this.isHorizontal() ? title.getContentBounds().height : title.getContentBounds().width;
     title.resumeSignalsDispatching(false);
   }
@@ -2147,7 +2032,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TITLE)) {
     var title = this.title();
     title.parentBounds(this.getPixelBounds());
-    title.orientation(orientation);
+    title.setDefaultOrientation(orientation);
     title.draw();
     this.markConsistent(anychart.ConsistencyState.AXIS_TITLE);
   }

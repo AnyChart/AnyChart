@@ -36,7 +36,9 @@ goog.inherits(anychart.ui.LegendItem, anychart.core.ui.LegendItem);
  * @return {!anychart.ui.Legend}
  */
 anychart.ui.legend = function() {
-  return new anychart.ui.Legend();
+  var res = new anychart.ui.Legend();
+  res.setup(anychart.getFullTheme()['standalones']['legend']);
+  return res;
 };
 
 

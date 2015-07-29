@@ -35,7 +35,9 @@ goog.inherits(anychart.ui.LabelsFactory.Label, anychart.core.ui.LabelsFactory.La
  * @return {!anychart.ui.LabelsFactory}
  */
 anychart.ui.labelsFactory = function() {
-  return new anychart.ui.LabelsFactory();
+  var res = new anychart.ui.LabelsFactory();
+  res.setup(anychart.getFullTheme()['standalones']['labelsFactory']);
+  return res;
 };
 
 

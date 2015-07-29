@@ -17,9 +17,6 @@ anychart.charts.Funnel = function(opt_data, opt_csvSettings) {
 
   // Funnel looks like reversed pyramid
   this.reversed(true);
-
-  this.neckHeight('25%');
-  this.neckWidth('30%');
 };
 goog.inherits(anychart.charts.Funnel, anychart.core.PyramidFunnelBase);
 

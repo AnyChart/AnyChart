@@ -20,11 +20,7 @@ anychart.core.ui.ColorRange = function() {
    * @type {number}
    * @private
    */
-  this.colorLineSize_ = 10;
-
-  this.align(anychart.enums.Align.CENTER);
-  this.length('40%');
-
+  this.colorLineSize_ = NaN;
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, this.handleMouseClick, this.handleMouseOverAndMove);
 
@@ -130,12 +126,7 @@ anychart.core.ui.ColorRange.prototype.length = function(opt_value) {
 anychart.core.ui.ColorRange.prototype.marker = function(opt_value) {
   if (!this.marker_) {
     this.marker_ = new anychart.core.ui.MarkersFactory.Marker();
-    this.marker_
-        .positionProvider({value: {x: 0, y: 0}})
-        .enabled(true)
-        .type(anychart.enums.MarkerType.TRIANGLE_DOWN)
-        .size(6);
-
+    this.marker_.positionProvider({value: {x: 0, y: 0}});
     this.marker_.listenSignals(this.markerInvalidated_, this);
   }
 
@@ -167,11 +158,45 @@ anychart.core.ui.ColorRange.prototype.markerInvalidated_ = function(event) {
  */
 anychart.core.ui.ColorRange.prototype.target = function(opt_series) {
   if (goog.isDef(opt_series)) {
-    if (this.targetSeries_ != opt_series)
+    if (this.targetSeries_ != opt_series) {
       this.targetSeries_ = opt_series;
+      this.calculateRangeRegions_();
+      this.targetSeries_.listenSignals(this.targetSeriesInvalidated_, this);
+    }
     return this;
   }
   return this.targetSeries_;
+};
+
+
+/**
+ * Listens to series invalidation.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.ui.ColorRange.prototype.targetSeriesInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_COLOR_RANGE)) {
+    this.calculateRangeRegions_();
+  }
+};
+
+
+/**
+ *
+ * @private
+ */
+anychart.core.ui.ColorRange.prototype.calculateRangeRegions_ = function() {
+  var scale = this.scale();
+  if (scale && scale instanceof anychart.core.map.scale.OrdinalColor) {
+    this.rangeRegions_ = {};
+    var iterator = this.targetSeries_.getResetIterator();
+    while (iterator.advance()) {
+      var pointValue = iterator.get(this.targetSeries_.referenceValueNames[1]);
+      var range = scale.getRangeByValue(/** @type {number} */(pointValue));
+      if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
+      this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
+    }
+  }
 };
 
 
@@ -407,6 +432,9 @@ anychart.core.ui.ColorRange.prototype.drawLine = function() {
     else
       fill['angle'] = 90;
     line.fill(fill);
+  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+    for (var i = 0, len = this.lines.length; i < len; i++)
+      this.lines[i].clear();
   }
 
   var orientation = /** @type {anychart.enums.Orientation} */(this.orientation());
@@ -781,17 +809,17 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
 
     value = /** @type {number} */(scale.inverseTransform(ratio));
     if (!(event.metaKey || event.shiftKey)) {
-      series.map.unselectAll(event);
+      series.map.unselect(event);
     }
     var iterator, pointValue;
     if (scale instanceof anychart.core.map.scale.OrdinalColor) {
-      iterator = series.getResetIterator();
       var range = scale.getRangeByValue(/** @type {number} */(value));
-
-      while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
-        if (range && range == scale.getRangeByValue(/** @type {number} */(pointValue)))
-          series.selectPoint(iterator.getIndex());
+      if (series) {
+        var regions = this.rangeRegions_[range.sourceIndex];
+        for (var i = 0, len = regions.length; i < len; i++)
+          series.selectPoint(regions[i], undefined, false);
+        event['pointIndex'] = regions[regions.length - 1];
+        series.dispatchEvent(series.makeSelectPointEvent(event));
       }
     } else if (scale instanceof anychart.core.map.scale.LinearColor) {
       iterator = series.getResetIterator();
@@ -846,17 +874,17 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     if (scale instanceof anychart.core.map.scale.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
       if (series) {
-        iterator = series.getResetIterator();
-        while (iterator.advance()) {
-          pointValue = iterator.get(series.referenceValueNames[1]);
-          if (range && range == scale.getRangeByValue(/** @type {number} */(pointValue)))
-            series.hoverPoint(iterator.getIndex());
-        }
+        var regions = this.rangeRegions_[range.sourceIndex];
+        for (var i = 0, len = regions.length; i < len; i++)
+          series.hoverPoint(regions[i], undefined, false);
+        event['pointIndex'] = regions[regions.length - 1];
+        series.dispatchEvent(series.makePointEvent(event));
       }
     } else if (scale instanceof anychart.core.map.scale.LinearColor && series) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
       var targetIndex = NaN;
+
       while (iterator.advance()) {
         pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
         var currLength = Math.abs(value - pointValue);
@@ -865,6 +893,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
           targetIndex = iterator.getIndex();
         }
       }
+
       iterator.select(targetIndex);
       value = iterator.get(series.referenceValueNames[1]);
       series.unhover();

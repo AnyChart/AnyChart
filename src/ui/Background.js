@@ -18,7 +18,9 @@ goog.inherits(anychart.ui.Background, anychart.core.ui.Background);
  * @return {!anychart.ui.Background}
  */
 anychart.ui.background = function() {
-  return new anychart.ui.Background();
+  var res = new anychart.ui.Background();
+  res.setup(anychart.getFullTheme()['standalones']['background']);
+  return res;
 };
 
 

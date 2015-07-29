@@ -513,22 +513,6 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.setupByJSON = funct
 };
 
 
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.content().hAlign('left');
-  tooltip.contentFormatter(function() {
-    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        'Low: ' + parseFloat(this['low']).toFixed(2);
-  });
-
-  return result;
-};
-
-
 //exports
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['fill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.fill;//inherited
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hoverFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverFill;//inherited

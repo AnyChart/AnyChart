@@ -38,19 +38,19 @@ anychart.core.grids.Polar = function() {
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.oddFill_ = acgraph.vector.normalizeFill('#FFFFFF 0.3');
+  this.oddFill_;
 
   /**
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.evenFill_ = acgraph.vector.normalizeFill('#F5F5F5 0.3');
+  this.evenFill_;
 
   /**
    * @type {string|acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = '#C1C1C1';
+  this.stroke_;
 
   /**
    * @type {anychart.scales.Base}
@@ -74,19 +74,19 @@ anychart.core.grids.Polar = function() {
    * @type {anychart.enums.RadialGridLayout}
    * @private
    */
-  this.layout_ = anychart.enums.RadialGridLayout.CIRCUIT;
+  this.layout_;
 
   /**
    * @type {number}
    * @private
    */
-  this.startAngle_ = 0;
+  this.startAngle_;
 
   /**
    * @type {boolean}
    * @private
    */
-  this.drawLastLine_ = true;
+  this.drawLastLine_;
 };
 goog.inherits(anychart.core.grids.Polar, anychart.core.VisualBase);
 

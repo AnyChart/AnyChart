@@ -2704,7 +2704,8 @@
         "connectorFill": {"$ref": "#/definitions/fill"},
         "connectorStroke": {"$ref": "#/definitions/stroke"},
         "selectedElementFill": {"$ref": "#/definitions/fill"},
-        "selectedElementStroke": {"$ref": "#/definitions/stroke"}
+        "selectedElementStroke": {"$ref": "#/definitions/stroke"},
+        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
       }
     },
 
@@ -3267,6 +3268,9 @@
         },
         "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
+        "rotation": {
+          "type": "number"
+        },
         "size": {
           "type": "number"
         },
@@ -3411,7 +3415,8 @@
         "text": {"type": "string"},
         "url": {"type": "string"},
         "alt": {"type": "string"},
-        "logoSrc": {"type": "string"}
+        "logoSrc": {"type": "string"},
+        "isChart": {"type": "boolean"}
       }
     },
     "anychart.core.ui.DataGrid": {
@@ -3441,7 +3446,7 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "cellTextSettings": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
         "width": {"type": "number"},
         "defaultWidth": {"type": "number"},

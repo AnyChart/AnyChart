@@ -414,10 +414,56 @@ anychart.color.parseColor = function(str) {
 };
 
 
+/**
+ * Sets opacity to stroke or fill.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.Fill)} strokeOrFill Stroke or fill.
+ * @param {number} opacity Opacity to set.
+ * @param {boolean=} opt_isFill is it fill or not. If emit the param - it would be stroke.
+ * @return {(acgraph.vector.Stroke|acgraph.vector.Fill)} Normalized color with new opacity.
+ */
+anychart.color.setOpacity = function(strokeOrFill, opacity, opt_isFill) {
+  var norm;
+  if (!!opt_isFill) {
+    norm = acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(strokeOrFill));
+  } else {
+    norm = acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(strokeOrFill));
+  }
+  if (goog.isString(norm)) {
+    norm = {'color': norm, 'opacity': opacity};
+  } else if (goog.isObject(norm)) {
+    norm['opacity'] = opacity;
+  }
+  return norm;
+};
+
+
+/**
+ * Sets opacity to stroke or fill.
+ * @param {acgraph.vector.Stroke} stroke Stroke.
+ * @param {number} thickness Thickness to set.
+ * @param {number=} opt_opacity optional opacity to set.
+ * @return {acgraph.vector.Stroke} Normalized color with new thickness.
+ */
+anychart.color.setThickness = function(stroke, thickness, opt_opacity) {
+  /** @type {string|acgraph.vector.Stroke} */
+  var norm = acgraph.vector.normalizeStroke(stroke);
+  if (goog.isString(norm)) {
+    norm = /** @type {acgraph.vector.Stroke} */ ({'color': norm, 'thickness': thickness});
+  } else if (goog.isObject(norm)) {
+    norm['thickness'] = thickness;
+  }
+  if (opt_opacity)
+    norm['opacity'] = opt_opacity;
+  return norm;
+};
+
+
 //exports
 goog.exportSymbol('anychart.color.blend', anychart.color.blend);//in docs/final
 goog.exportSymbol('anychart.color.lighten', anychart.color.lighten);//in docs/final
 goog.exportSymbol('anychart.color.darken', anychart.color.darken);//in docs/final
+goog.exportSymbol('anychart.color.setThickness', anychart.color.setThickness);
+goog.exportSymbol('anychart.color.setOpacity', anychart.color.setOpacity);
 goog.exportSymbol('anychart.color.singleHueProgression', anychart.color.singleHueProgression);
 goog.exportSymbol('anychart.color.bipolarHueProgression', anychart.color.bipolarHueProgression);
 goog.exportSymbol('anychart.color.blendedHueProgression', anychart.color.blendedHueProgression);

@@ -85,16 +85,21 @@ goog.inherits(anychart.data.Tree, anychart.core.Base);
 anychart.data.Tree.fromJson = function(config) {
   var tree = new anychart.data.Tree();
   tree.suspendSignalsDispatching();
-  var indexData = config['index'];
 
-  //We create indexes first because it's a way faster than create index after the data is added.
-  for (var i = 0, l = indexData.length; i < l; i++) {
-    tree.createIndexOn(indexData[i]);
+  if ('index' in config) {
+    var indexData = config['index'];
+
+    //We create indexes first because it's a way faster than create index after the data is added.
+    for (var i = 0, l = indexData.length; i < l; i++) {
+      tree.createIndexOn(indexData[i]);
+    }
   }
 
-  var rootsData = config['children'];
-  for (i = 0, l = rootsData.length; i < l; i++) {
-    tree.addChild(anychart.data.Tree.DataItem.fromSerializedItem(tree, rootsData[i]));
+  if ('children' in config) {
+    var rootsData = config['children'];
+    for (i = 0, l = rootsData.length; i < l; i++) {
+      tree.addChild(anychart.data.Tree.DataItem.fromSerializedItem(tree, rootsData[i]));
+    }
   }
 
   tree.resumeSignalsDispatching(false);
@@ -812,17 +817,19 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
  * @return {anychart.data.Tree.DataItem} - Restored tree data item.
  */
 anychart.data.Tree.DataItem.fromSerializedItem = function(tree, config) {
-  var data = config['treeDataItemData'];
-  var meta = config['treeDataItemMeta'];
-  var children = config.children;
+  var data = ('treeDataItemData' in config) ? config['treeDataItemData'] : {};
 
   var item = new anychart.data.Tree.DataItem(tree, data);
 
-  for (var key in meta) { //Restoring meta.
-    item.meta(key, meta[key]);
+  if ('treeDataItemMeta' in config) {
+    var meta = config['treeDataItemMeta'];
+    for (var key in meta) { //Restoring meta.
+      item.meta(key, meta[key]);
+    }
   }
 
-  if (children) {
+  if ('children' in config) {
+    var children = config['children'];
     for (var i = 0; i < children.length; i++) {
       var child = anychart.data.Tree.DataItem.fromSerializedItem(tree, children[i]);
       item.addChild(child);

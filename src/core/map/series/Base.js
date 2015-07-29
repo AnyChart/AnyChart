@@ -20,26 +20,9 @@ anychart.core.map.series.Base = function(opt_data, opt_csvSettings) {
 
   this.data(opt_data || null, opt_csvSettings);
   this.geoData = [];
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'];
-  });
-  tooltip.contentFormatter(function() {
-    return 'Id: ' + this['id'] + '\n' + 'Name: ' + this['name'] + '\n' + 'Value: ' + this['value'];
-  });
-  tooltip.content().hAlign('left');
-  tooltip.resumeSignalsDispatching(false);
-
-  this.labels();
-
   this.selectStatus = [];
   this.hoverStatus = [];
   this.needSelfLayer = true;
-
-  this.hatchFill(false);
 
   this.resumeSignalsDispatching(false);
 };
@@ -114,7 +97,7 @@ anychart.core.map.series.Base.prototype.geoIdField_;
 
 
 /**
- * @type {anychart.maps.Map}
+ * @type {anychart.charts.Map}
  */
 anychart.core.map.series.Base.prototype.map;
 
@@ -182,6 +165,14 @@ anychart.core.map.series.Base.prototype.autoColor_ = null;
  * @protected
  */
 anychart.core.map.series.Base.prototype.autoHatchFill_;
+
+
+/**
+ * Allow points select state from chart.
+ * @type {boolean}
+ * @protected
+ */
+anychart.core.map.series.Base.autoAllowPointsSelect_;
 
 
 /**
@@ -381,7 +372,7 @@ anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
 
 /**
  * Internal method. Sets link to geo data.
- * @param {anychart.maps.Map} map .
+ * @param {anychart.charts.Map} map .
  * @param {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} geoData Geo data to set.
  */
 anychart.core.map.series.Base.prototype.setGeoData = function(map, geoData) {
@@ -486,6 +477,15 @@ anychart.core.map.series.Base.prototype.setAutoColor = function(value) {
  */
 anychart.core.map.series.Base.prototype.setAutoHatchFill = function(value) {
   this.autoHatchFill_ = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
+};
+
+
+/**
+ * Sets series "allow points select" state that parent chart have set for it.
+ * @param {boolean} value Auto hatch fill type distributed by the chart.
+ */
+anychart.core.map.series.Base.prototype.setAutoAllowPointsSelect = function(value) {
+  this.autoAllowPointsSelect_ = value;
 };
 
 
@@ -1008,12 +1008,13 @@ anychart.core.map.series.Base.prototype.handleMouseClick = function(event) {
 
   if (evt && ((anychart.utils.checkIfParent(this, event['relatedTarget'])) || this.dispatchEvent(evt))) {
     if (!(event.metaKey || event.shiftKey)) {
-      this.map.unselectAll(event);
+      this.map.unselect(event);
     }
     // we don't want to dispatch if this an out-over from the same point
     // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
-    if (goog.array.indexOf(this.selectStatus, evt['pointIndex']) == -1)
-      this.selectPoint(/** @type {number} */ (evt['pointIndex']), event);
+    //todo (blackart) don't remove, maybe will be useful.
+    //if (goog.array.indexOf(this.selectStatus, evt['pointIndex']) == -1)
+    this.selectPoint(/** @type {number} */ (evt['pointIndex']), event);
     this.dispatchEvent(this.makeSelectPointEvent(event));
   }
 };
@@ -1032,7 +1033,6 @@ anychart.core.map.series.Base.prototype.handleMouseEvent = function(event) {
  * browser events.
  * @param {anychart.core.MouseEvent} event
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- * @protected
  */
 anychart.core.map.series.Base.prototype.makePointEvent = function(event) {
   var type = event['type'];
@@ -1095,15 +1095,16 @@ anychart.core.map.series.Base.prototype.makePointEvent = function(event) {
  * browser events.
  * @param {Object} event
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- * @protected
  */
 anychart.core.map.series.Base.prototype.makeSelectPointEvent = function(event) {
   var selectedPoints = [];
   var iterator = this.getIterator();
   for (var i = 0, len = this.selectStatus.length; i < len; i++) {
-    iterator.select(this.selectStatus[i]);
-    var prop = iterator.meta('properties');
-    selectedPoints.push({'id': prop[this.geoIdField()], 'index': iterator.getIndex(), 'properties': prop});
+    if (iterator.select(this.selectStatus[i])) {
+      var prop = iterator.meta('properties');
+      if (prop)
+        selectedPoints.push({'id': prop[this.geoIdField()], 'index': iterator.getIndex(), 'properties': prop});
+    }
   }
 
   var pointIndex;
@@ -1169,9 +1170,21 @@ anychart.core.map.series.Base.prototype.hoverSeries = goog.abstractMethod;
  * @param {number} index Index of the point to hover.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
  *    <b>Note:</b> Used only to display float tooltip.
+ * @param {boolean=} opt_showTooltip Whether shows tooltip.
  * @return {!anychart.core.map.series.Base}  {@link anychart.core.map.series.Base} instance for method chaining.
  */
 anychart.core.map.series.Base.prototype.hoverPoint = goog.abstractMethod;
+
+
+/**
+ * @param {number=} opt_index Point index.
+ * @return {!anychart.core.map.series.Base}
+ */
+anychart.core.map.series.Base.prototype.hover = function(opt_index) {
+  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
+  else this.hoverSeries();
+  return this;
+};
 
 
 /**
@@ -1185,6 +1198,7 @@ anychart.core.map.series.Base.prototype.unhover = goog.abstractMethod;
  * Selects a point of the series by its index.
  * @param {number} index Index of the point to select.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
+ * @param {boolean=} opt_showTooltip Whether shows tooltip.
  * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
  */
 anychart.core.map.series.Base.prototype.selectPoint = goog.abstractMethod;
@@ -1192,10 +1206,10 @@ anychart.core.map.series.Base.prototype.selectPoint = goog.abstractMethod;
 
 /**
  * Deselects all points.
- * @param {anychart.core.MouseEvent} event Event that initiate point selecting.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
  * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
  */
-anychart.core.map.series.Base.prototype.unselectAll = goog.abstractMethod;
+anychart.core.map.series.Base.prototype.unselect = goog.abstractMethod;
 
 
 /**
@@ -1204,6 +1218,14 @@ anychart.core.map.series.Base.prototype.unselectAll = goog.abstractMethod;
  * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
  */
 anychart.core.map.series.Base.prototype.select = goog.abstractMethod;
+
+
+/**
+ * Allow point selection if is true.
+ * @type {?boolean}
+ * @private
+ */
+anychart.core.map.series.Base.prototype.allowPointsSelect_;
 
 
 /**
@@ -1221,6 +1243,33 @@ anychart.core.map.series.Base.prototype.makeInteractive = function(element, prop
   } else {
     element.tag.index = this.getIterator().getIndex();
   }
+};
+
+
+/**
+ * Allows to select points of the series.
+ * @param {?boolean=} opt_value Allow or not.
+ * @return {null|boolean|anychart.core.map.series.Base} Returns allow points select state or current series instance for chaining.
+ */
+anychart.core.map.series.Base.prototype.allowPointsSelect = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.allowPointsSelect_ != opt_value) {
+      this.allowPointsSelect_ = opt_value;
+      if (!this.allowPointsSelect_)
+        this.unselect();
+    }
+    return this;
+  }
+  return this.allowPointsSelect_;
+};
+
+
+/**
+ * Gets final allow points select state for series.
+ * @return {boolean}
+ */
+anychart.core.map.series.Base.prototype.getFinalAllowPointsSelect = function() {
+  return goog.isDefAndNotNull(this.allowPointsSelect_) ? this.allowPointsSelect_ : !!this.autoAllowPointsSelect_;
 };
 
 
@@ -1329,7 +1378,7 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
     this.hoverLabels().suspendSignalsDispatching();
     this.selectLabels().suspendSignalsDispatching();
     labels.clear();
-    labels.setAutoZIndex(anychart.maps.Map.ZINDEX_CHORPLETH_LABELS);
+    labels.setAutoZIndex(anychart.charts.Map.ZINDEX_CHORPLETH_LABELS);
     labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(/** @type {anychart.math.Rect} */(this.container().getBounds()));
   }
@@ -1342,7 +1391,7 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
           goog.nullFunction);
 
       this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-      this.hatchFillRootElement.zIndex(anychart.maps.Map.ZINDEX_CHORPLETH_HATCH_FILL);
+      this.hatchFillRootElement.zIndex(anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL);
       this.hatchFillRootElement.disablePointerEvents(true);
     }
     if (this.hatchFillRootElement) this.hatchFillRootElement.clear();
@@ -1493,11 +1542,11 @@ anychart.core.map.series.Base.prototype.drawLabel = function(pointState) {
   var index = iterator.getIndex();
   var labelsFactory;
   if (selected) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels_);
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
   } else if (hovered) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels_);
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
   } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels_);
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
   }
 
   var label = this.labels_.getLabel(index);
@@ -1735,6 +1784,9 @@ anychart.core.map.series.Base.prototype.serialize = function() {
   if (goog.isDef(this.name()))
     json['name'] = this.name();
 
+  if (goog.isDef(this.allowPointsSelect()))
+    json['allowPointsSelect'] = this.allowPointsSelect();
+
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
@@ -1855,27 +1907,28 @@ anychart.core.map.series.Base.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   this.color(config['color']);
+  this.allowPointsSelect(config['allowPointsSelect']);
 
   if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
   if (goog.isFunction(this['hoverFill']))
     this.hoverFill(config['hoverFill']);
   if (goog.isFunction(this['selectFill']))
-    this.hoverFill(config['selectFill']);
+    this.selectFill(config['selectFill']);
 
   if (goog.isFunction(this['stroke']))
     this.stroke(config['stroke']);
   if (goog.isFunction(this['hoverStroke']))
     this.hoverStroke(config['hoverStroke']);
   if (goog.isFunction(this['selectStroke']))
-    this.hoverStroke(config['selectStroke']);
+    this.selectStroke(config['selectStroke']);
 
   if (goog.isFunction(this['hatchFill']))
     this.hatchFill(config['hatchFill']);
   if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
   if (goog.isFunction(this['selectHatchFill']))
-    this.hoverHatchFill(config['selectHatchFill']);
+    this.selectHatchFill(config['selectHatchFill']);
 
   this.labels(config['labels']);
   this.hoverLabels(config['hoverLabels']);
@@ -1916,3 +1969,9 @@ anychart.core.map.series.Base.prototype['tooltip'] = anychart.core.map.series.Ba
 anychart.core.map.series.Base.prototype['colorScale'] = anychart.core.map.series.Base.prototype.colorScale;
 anychart.core.map.series.Base.prototype['legendItem'] = anychart.core.map.series.Base.prototype.legendItem;
 anychart.core.map.series.Base.prototype['data'] = anychart.core.map.series.Base.prototype.data;
+
+anychart.core.map.series.Base.prototype['hover'] = anychart.core.map.series.Base.prototype.hover;
+anychart.core.map.series.Base.prototype['select'] = anychart.core.map.series.Base.prototype.select;
+anychart.core.map.series.Base.prototype['unhover'] = anychart.core.map.series.Base.prototype.unhover;
+anychart.core.map.series.Base.prototype['unselect'] = anychart.core.map.series.Base.prototype.unselect;
+anychart.core.map.series.Base.prototype['allowPointsSelect'] = anychart.core.map.series.Base.prototype.allowPointsSelect;

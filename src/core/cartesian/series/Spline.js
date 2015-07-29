@@ -98,6 +98,12 @@ anychart.core.cartesian.series.Spline.prototype.getMarkerFill = function() {
 
 
 /** @inheritDoc */
+anychart.core.cartesian.series.Spline.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
+};
+
+
+/** @inheritDoc */
 anychart.core.cartesian.series.Spline.prototype.finalizeSegment = function() {
   this.queue_.finalizeProcessing();
 };
@@ -113,7 +119,7 @@ anychart.core.cartesian.series.Spline.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Spline.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SPLINE);
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
 };
 
 

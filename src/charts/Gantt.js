@@ -82,42 +82,42 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    * @type {(string|number)}
    * @private
    */
-  this.splitterPosition_ = '30%';
+  this.splitterPosition_ = NaN;
 
   /**
    * Default header height.
    * @type {(number|string)}
    * @private
    */
-  this.headerHeight_ = anychart.core.gantt.Timeline.DEFAULT_HEADER_HEIGHT;
+  this.headerHeight_ = NaN;
 
   /**
    * Default hover fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
+  this.hoverFill_;
 
   /**
    * Default row selected fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#d2eafa');
+  this.rowSelectedFill_;
 
   /**
    * Cell border settings.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.columnStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.columnStroke_;
 
   /**
    * Row vertical line separation path.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.rowStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.rowStroke_;
 
   /**
    * Vertical scroll bar.
@@ -150,14 +150,11 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.dataGridHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.dataGridHorizontalScrollBar_);
   this.registerDisposable(this.dataGridHorizontalScrollBar_);
 
-  this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
-
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
     this.dataGrid().initMouseFeatures();
     this.getTimeline().initMouseFeatures();
   }, false, this);
 
-  this.background('#fff');
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
@@ -296,30 +293,30 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
       ths.controller_.run();
     }, this.controller_);
 
-    this.dg_.tooltip().contentFormatter(function(data) {
-      var item = data['item'];
-      if (!item) return '';
-
-      var name = item.get(anychart.enums.GanttDataFields.NAME);
-
-      var startDate = ths.isResourcesChart_ ?
-          item.meta('minPeriodDate') :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-
-      var endDate = ths.isResourcesChart_ ?
-          item.meta('maxPeriodDate') :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-
-      var progress = ths.isResourcesChart_ ?
-          void 0 :
-          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-
-      return (name ? name : '') +
-          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-          (progress ? '\nComplete: ' + progress : '');
-
-    });
+    //this.dg_.tooltip().contentFormatter(function(data) {
+    //  var item = data['item'];
+    //  if (!item) return '';
+    //
+    //  var name = item.get(anychart.enums.GanttDataFields.NAME);
+    //
+    //  var startDate = ths.isResourcesChart_ ?
+    //      item.meta('minPeriodDate') :
+    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
+    //
+    //  var endDate = ths.isResourcesChart_ ?
+    //      item.meta('maxPeriodDate') :
+    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
+    //
+    //  var progress = ths.isResourcesChart_ ?
+    //      void 0 :
+    //      (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
+    //
+    //  return (name ? name : '') +
+    //      (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
+    //      (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+    //      (progress ? '\nComplete: ' + progress : '');
+    //
+    //});
   }
 
   return this.dg_;
@@ -365,30 +362,30 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
       ths.controller_.run();
     }, this.controller_);
 
-    this.tl_.tooltip().contentFormatter(function(data) {
-      var item = data['item'];
-      var period = data['period'];
-
-      var name = item.get(anychart.enums.GanttDataFields.NAME);
-
-      var startDate = period ?
-          period[anychart.enums.GanttDataFields.START] :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-
-      var endDate = period ?
-          period[anychart.enums.GanttDataFields.END] :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-
-      var progress = ths.isResourcesChart_ ?
-          void 0 :
-          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-
-      return (name ? name : '') +
-          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-          (progress ? '\nComplete: ' + progress : '');
-
-    });
+    //this.tl_.tooltip().contentFormatter(function(data) {
+    //  var item = data['item'];
+    //  var period = data['period'];
+    //
+    //  var name = item.get(anychart.enums.GanttDataFields.NAME);
+    //
+    //  var startDate = period ?
+    //      period[anychart.enums.GanttDataFields.START] :
+    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
+    //
+    //  var endDate = period ?
+    //      period[anychart.enums.GanttDataFields.END] :
+    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
+    //
+    //  var progress = ths.isResourcesChart_ ?
+    //      void 0 :
+    //      (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
+    //
+    //  return (name ? name : '') +
+    //      (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
+    //      (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
+    //      (progress ? '\nComplete: ' + progress : '');
+    //
+    //});
   }
 
   return this.tl_;
@@ -929,16 +926,19 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 anychart.charts.Gantt.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  this.controller_.setupByJSON(config['controller']);
-  this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+  if ('controller' in config) {
+    config['controller']['isResourceChart'] = this.isResourcesChart_;
+    this.controller_.setup(config['controller']);
+    this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+  }
 
   this.headerHeight(config['headerHeight']);
   this.rowHoverFill(config['rowHoverFill']);
   this.rowSelectedFill(config['rowSelectedFill']);
   this.splitterPosition(config['splitterPosition']);
 
-  this.dataGrid().setupByJSON(config['dataGrid']);
-  this.getTimeline().setupByJSON(config['timeline']);
+  if ('dataGrid' in config) this.dataGrid().setup(config['dataGrid']);
+  if ('timeline' in config) this.getTimeline().setup(config['timeline']);
 
 };
 

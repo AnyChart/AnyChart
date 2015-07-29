@@ -18,7 +18,9 @@ goog.inherits(anychart.grids.Radar, anychart.core.grids.Radar);
  * @return {!anychart.grids.Radar}
  */
 anychart.grids.radar = function() {
-  return new anychart.grids.Radar();
+  var res = new anychart.grids.Radar();
+  res.setup(anychart.getFullTheme()['standalones']['radarGrid']);
+  return res;
 };
 
 

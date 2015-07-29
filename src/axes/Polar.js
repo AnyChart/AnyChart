@@ -21,13 +21,30 @@ anychart.axes.Polar.prototype.draw = function() {
 };
 
 
+/** @inheritDoc */
+anychart.axes.Polar.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.startAngle(config['startAngle']);
+};
+
+
+/** @inheritDoc */
+anychart.axes.Polar.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['startAngle'] = this.startAngle();
+  return json;
+};
+
+
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.
  * @return {!anychart.axes.Polar}
  */
 anychart.axes.polar = function() {
-  return new anychart.axes.Polar();
+  var res = new anychart.axes.Polar();
+  res.setup(anychart.getFullTheme()['standalones']['polarAxis']);
+  return res;
 };
 
 

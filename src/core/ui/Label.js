@@ -26,9 +26,6 @@ goog.require('anychart.core.ui.LabelBase');
  */
 anychart.core.ui.Label = function() {
   goog.base(this);
-
-  this.position(anychart.enums.Position.LEFT_TOP);
-  this.anchor(anychart.enums.Anchor.LEFT_TOP);
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 

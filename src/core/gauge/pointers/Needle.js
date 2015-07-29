@@ -54,8 +54,6 @@ anychart.core.gauge.pointers.Needle = function() {
    * @private
    */
   this.endRadius_;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.gauge.pointers.Needle, anychart.core.gauge.pointers.Base);
 
@@ -344,14 +342,6 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
   goog.base(this, 'draw');
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.gauge.pointers.Needle.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
 };
 
 

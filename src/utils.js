@@ -4,7 +4,9 @@ goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');
 goog.require('goog.color');
+goog.require('goog.date.UtcDateTime');
 goog.require('goog.dom.xml');
+goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.json.hybrid');
 
 
@@ -302,6 +304,21 @@ anychart.utils.normalizeTimestamp = function(value) {
 
 
 /**
+ * Formats incoming timestamp as 'yyyy.MM.dd'.
+ * @param {number|string} timestamp - Timestamp.
+ * @return {string} - Formatted date.
+ */
+anychart.utils.defaultDateFormatter = function(timestamp) {
+  if (goog.isNumber(timestamp) || goog.isString(timestamp)) {
+    var formatter = new goog.i18n.DateTimeFormat('yyyy.MM.dd');
+    return formatter.format(new goog.date.UtcDateTime(new Date(+timestamp)));
+  } else {
+    return '';
+  }
+};
+
+
+/**
  * Gets anchor coordinates by bounds.
  * @param {anychart.math.Rect} bounds Bounds rectangle.
  * @param {anychart.enums.Anchor|string} anchor Anchor.
@@ -431,22 +448,22 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
  */
 anychart.utils.recursiveClone = function(obj) {
   var res;
-
-  if (goog.isFunction(obj)) {
-    return obj;
-  } else if (goog.isArray(obj)) {
+  var type = goog.typeOf(obj);
+  if (type == 'array') {
     res = [];
     for (var i = 0; i < obj.length; i++) {
       if (i in obj)
         res[i] = anychart.utils.recursiveClone(obj[i]);
     }
-  } else if (goog.isObject(obj)) {
+  } else if (type == 'object') {
     res = {};
     for (var key in obj) {
       if (obj.hasOwnProperty(key))
         res[key] = anychart.utils.recursiveClone(obj[key]);
     }
-  } else return obj;
+  } else {
+    return obj;
+  }
 
   return res;
 };
@@ -1273,3 +1290,4 @@ anychart.utils.callLog_ = function(name, message, opt_exception) {
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
+goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);

@@ -42,15 +42,6 @@ anychart.core.ui.Title = function() {
   this.suspendSignalsDispatching();
   goog.base(this);
 
-  this.text('Title text')
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontWeight('bold')
-      .fontColor('rgb(34,34,34)')
-      .margin(5, 5, 5, 5)
-      .padding(5)
-      .background(null);
-
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.ui.Title, anychart.core.Text);
@@ -1040,7 +1031,7 @@ anychart.core.ui.Title.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['align'] = this.align();
-  json['orientation'] = this.orientation();
+  if (goog.isDef(this.orientation_)) json['orientation'] = this.orientation();
   return json;
 };
 

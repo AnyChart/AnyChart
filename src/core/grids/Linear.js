@@ -38,19 +38,19 @@ anychart.core.grids.Linear = function() {
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.oddFill_ = '#FFFFFF';
+  this.oddFill_;
 
   /**
    * @type {string|acgraph.vector.Fill}
    * @private
    */
-  this.evenFill_ = '#F5F5F5';
+  this.evenFill_;
 
   /**
    * @type {string|acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = '#C1C1C1';
+  this.stroke_;
 
   /**
    * @type {anychart.scales.Base}
@@ -68,22 +68,19 @@ anychart.core.grids.Linear = function() {
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_ = anychart.enums.Layout.HORIZONTAL;
+  this.layout_;
 
   /**
    * @type {boolean}
    * @private
    */
-  this.drawFirstLine_ = true;
+  this.drawFirstLine_;
 
   /**
    * @type {boolean}
    * @private
    */
-  this.drawLastLine_ = true;
-
-  this.suspendSignalsDispatching();
-  this.resumeSignalsDispatching(true);
+  this.drawLastLine_;
 };
 goog.inherits(anychart.core.grids.Linear, anychart.core.VisualBase);
 

@@ -43,8 +43,13 @@ anychart.core.gauge.pointers.Marker = function() {
   this.type_;
 
   this.domElement = new anychart.core.ui.MarkersFactory();
-
-  this.restoreDefaults();
+  // defaults that was deleted form MarkersFactory
+  this.domElement.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.domElement.size(10);
+  this.domElement.anchor(anychart.enums.Anchor.CENTER);
+  this.domElement.offsetX(0);
+  this.domElement.offsetY(0);
+  this.domElement.rotation(0);
 };
 goog.inherits(anychart.core.gauge.pointers.Marker, anychart.core.gauge.pointers.Base);
 
@@ -146,7 +151,12 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
     var fill = /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill} */(this.hatchFill());
     if (!this.hatchFillElement && !anychart.utils.isNone(fill)) {
       this.hatchFillElement = new anychart.core.ui.MarkersFactory();
-
+      this.hatchFillElement.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+      this.hatchFillElement.size(10);
+      this.hatchFillElement.anchor(anychart.enums.Anchor.CENTER);
+      this.hatchFillElement.offsetX(0);
+      this.hatchFillElement.offsetY(0);
+      this.hatchFillElement.rotation(0);
       this.hatchFillElement.container(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.hatchFillElement.zIndex(/** @type {number} */(this.zIndex() + 1));
     }
@@ -242,19 +252,6 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
   if (this.hatchFillElement) this.hatchFillElement.draw();
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.gauge.pointers.Marker.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-
-  this.suspendSignalsDispatching();
-  this.position(anychart.enums.GaugeSidePosition.INSIDE);
-  this.type(anychart.enums.MarkerType.TRIANGLE_UP);
-  this.resumeSignalsDispatching(true);
 };
 
 

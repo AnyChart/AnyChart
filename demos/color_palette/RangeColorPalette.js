@@ -17,7 +17,6 @@ function load() {
   stage.rect().setBounds(bounds).fill(lg);
   palette.colors(lg).count(count);
   palette.colorAt(17, 'yellow');
-//  palette.restoreDefaults();
 //  draw();
 }
 

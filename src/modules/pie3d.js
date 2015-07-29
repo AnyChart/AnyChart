@@ -16,30 +16,10 @@ goog.require('anychart.modules.base');
  */
 anychart.pie3d = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pie(opt_data, opt_csvSettings);
+  var theme = anychart.getFullTheme();
 
-  chart.title()
-      .text('3D Pie Chart')
-      .fontWeight('bold');
-
-  chart.labels()
-      .enabled(true);
-
-  chart.legend()
-      .enabled(true)
-      .position(anychart.enums.Orientation.BOTTOM)
-      .align(anychart.enums.Align.CENTER)
-      .itemsLayout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.legend().title()
-      .enabled(false);
-
-  chart.legend().titleSeparator()
-      .enabled(false)
-      .margin(3, 0);
-
+  chart.setup(theme['pie3d']);
   chart.mode3d(true);
-  chart.explode('5%');
-  chart.connectorLength('15%');
 
   return chart;
 };

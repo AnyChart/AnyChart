@@ -22,9 +22,15 @@ anychart.core.radar.series.Marker = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.marker_ = new anychart.core.ui.MarkersFactory();
+  // defaults that was deleted form MarkersFactory
+  this.marker_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.marker_.size(10);
+  this.marker_.anchor(anychart.enums.Anchor.CENTER);
+  this.marker_.offsetX(0);
+  this.marker_.offsetY(0);
+  this.marker_.rotation(0);
   this.marker_.setParentEventTarget(this);
   this.marker_.zIndex(anychart.core.radar.series.Base.ZINDEX_SERIES);
-  this.marker_.enabled(true);
   this.registerDisposable(this.marker_);
 
   this.hoverMarker_ = new anychart.core.ui.MarkersFactory();
@@ -40,7 +46,7 @@ anychart.core.radar.series.Marker = function(opt_data, opt_csvSettings) {
    * @type {number}
    * @private
    */
-  this.size_ = 10;
+  this.size_ = NaN;
 
   /**
    * @type {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
@@ -52,7 +58,7 @@ anychart.core.radar.series.Marker = function(opt_data, opt_csvSettings) {
    * @type {number}
    * @private
    */
-  this.hoverSize_ = 12;
+  this.hoverSize_ = NaN;
 
   this.referenceValuesSupportStack = false;
 };
@@ -528,21 +534,6 @@ anychart.core.radar.series.Marker.prototype.serialize = function() {
   json['size'] = this.size();
   json['hoverSize'] = this.hoverSize();
   return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.radar.series.Marker.prototype.restoreDefaults = function() {
-  var res = goog.base(this, 'restoreDefaults');
-
-  this.type_ = this.autoMarkerType || anychart.enums.MarkerType.STAR5;
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.contentFormatter(function() {
-    return parseFloat(this.value).toFixed(2);
-  });
-
-  return res;
 };
 
 

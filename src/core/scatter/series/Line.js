@@ -31,12 +31,6 @@ anychart.core.scatter.series.Line = function(opt_data, opt_csvSettings) {
   this.connectMissing = false;
 
   // --- end ContinuousBase ---
-  this.stroke(function() {
-    return this['sourceColor'];
-  });
-  this.hoverStroke(function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
 };
 goog.inherits(anychart.core.scatter.series.Line, anychart.core.scatter.series.BaseWithMarkers);
 anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesTypes.LINE] = anychart.core.scatter.series.Line;
@@ -259,22 +253,6 @@ anychart.core.scatter.series.Line.prototype.unhover = function() {
   this.hoverStatus = NaN;
   return this;
 };
-
-
-/**
- * @inheritDoc
- */
-anychart.core.scatter.series.Line.prototype.restoreDefaults = function() {
-  var res = goog.base(this, 'restoreDefaults');
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.suspendSignalsDispatching();
-  labels.enabled(false);
-  labels.anchor('bottom');
-  labels.resumeSignalsDispatching(false);
-
-  return res;
-};
 // ----------------------
 // --- end ContinuousBase ---
 // ----------------------
@@ -305,6 +283,12 @@ anychart.core.scatter.series.Line.prototype.drawSeriesPoint = function() {
 /** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.getMarkerFill = function() {
   return this.getFinalStroke(false, false);
+};
+
+
+/** @inheritDoc */
+anychart.core.scatter.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
 

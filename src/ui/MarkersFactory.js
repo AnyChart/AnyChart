@@ -35,7 +35,9 @@ goog.inherits(anychart.ui.MarkersFactory.Marker, anychart.core.ui.MarkersFactory
  * @return {!anychart.ui.MarkersFactory}
  */
 anychart.ui.markersFactory = function() {
-  return new anychart.ui.MarkersFactory();
+  var res = new anychart.ui.MarkersFactory();
+  res.setup(anychart.getFullTheme()['standalones']['markersFactory']);
+  return res;
 };
 
 

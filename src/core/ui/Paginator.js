@@ -91,13 +91,12 @@ anychart.core.ui.Paginator = function() {
    */
   this.text_ = null;
 
-  this.fontFamily('Verdana')
-      .fontSize('10')
-      .fontWeight('normal')
-      .fontColor('rgb(35,35,35)')
-      .orientation('right')
-      .margin(0)
-      .padding(2);
+  this
+    .fontColor('#545f69')
+    .fontSize('12px')
+    .orientation('right')
+    .margin(0)
+    .padding(2);
 
   this.background()
       .enabled(false)
@@ -393,6 +392,58 @@ anychart.core.ui.Paginator.prototype.remove = function() {
     this.nextButton_.invalidate(anychart.ConsistencyState.CONTAINER);
   }
   if (this.text_) this.text_.parent(null);
+};
+
+
+/**
+ * This method is used in the legend for to automatically showing paginator.
+ * @param {?boolean=} opt_value
+ * @return {!anychart.core.ui.Paginator|boolean|null}
+ */
+anychart.core.ui.Paginator.prototype.autoEnabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.autoEnabled_ != opt_value) {
+      this.autoEnabled_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
+    }
+    return this;
+  } else {
+    return this.autoEnabled_;
+  }
+};
+
+
+/**
+ * The method gives the possibility to disable paginator manually.
+ * @return {(anychart.core.VisualBase|boolean|null)}
+ */
+anychart.core.ui.Paginator.prototype.getFinalEnabled = function() {
+  return this.enabled() ? this.autoEnabled() : false;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.Paginator.prototype.checkDrawingNeeded = function() {
+  if (this.isConsistent())
+    return false;
+
+  if (!this.getFinalEnabled()) {
+    if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
+      this.remove();
+      this.markConsistent(anychart.ConsistencyState.ENABLED);
+      this.invalidate(anychart.ConsistencyState.CONTAINER);
+    }
+    return false;
+  } else if (!this.container()) {
+    this.remove(); // It should be removed if it was drawn.
+    this.invalidate(anychart.ConsistencyState.CONTAINER);
+    anychart.utils.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
+    return false;
+  }
+  this.markConsistent(anychart.ConsistencyState.ENABLED);
+  return true;
 };
 
 

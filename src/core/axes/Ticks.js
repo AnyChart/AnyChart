@@ -53,8 +53,6 @@ anychart.core.axes.Ticks = function() {
   this.path = acgraph.path();
   this.bindHandlersToGraphics(this.path);
   this.registerDisposable(this.path);
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axes.Ticks, anychart.core.VisualBase);
 
@@ -262,19 +260,6 @@ anychart.core.axes.Ticks.prototype.orientation = function(opt_value) {
   } else {
     return this.orientation_;
   }
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.axes.Ticks.prototype.restoreDefaults = function() {
-  this.orientation(anychart.enums.Orientation.TOP);
-  this.position(anychart.enums.SidePosition.OUTSIDE);
-  this.length(5);
-  this.stroke('black');
-
-  this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 

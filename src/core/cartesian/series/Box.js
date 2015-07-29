@@ -36,14 +36,14 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
    * @type {(number|string)}
    * @private
    */
-  this.whiskerWidth_ = '20%';
+  this.whiskerWidth_ = 0;
 
   /**
    * Hover width setting for whisker.
    * @type {(number|string)}
    * @private
    */
-  this.hoverWhiskerWidth_ = '20%';
+  this.hoverWhiskerWidth_ = 0;
 
   this.fill(function() {
     return anychart.color.lighten(anychart.color.lighten(this['sourceColor']));
@@ -55,7 +55,7 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.medianStroke_ = (function() {
-    return this['sourceColor'];
+    return anychart.color.darken(this['sourceColor']);
   });
 
   /**
@@ -73,7 +73,7 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.stemStroke_ = (function() {
-    return this['sourceColor'];
+    return anychart.color.darken(this['sourceColor']);
   });
 
   /**
@@ -91,7 +91,7 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.whiskerStroke_ = (function() {
-    return this['sourceColor'];
+    return anychart.color.darken(this['sourceColor']);
   });
 
   /**
@@ -246,7 +246,7 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     this.makeHoverable(whiskerPath);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_MARKERS)) {
+  if (this.outlierMarkers().enabled()) {
     this.drawOutlierMarkers_(false);
   }
 
@@ -1068,41 +1068,6 @@ anychart.core.cartesian.series.Box.prototype.getOutlierMarkerStroke = function()
   return anychart.color.darken(this.outlierMarkers().fill());
 };
 
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.content().hAlign('left');
-  tooltip.contentFormatter(function() {
-    return 'lowest: ' + parseFloat(this['lowest']).toFixed(2) + '\n' +
-        'q1: ' + parseFloat(this['q1']).toFixed(2) + '\n' +
-        'median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
-        'q3: ' + parseFloat(this['q3']).toFixed(2) + '\n' +
-        'highest: ' + parseFloat(this['highest']).toFixed(2);
-  });
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.textFormatter(function() {
-    return this['x'];
-  });
-
-  this.markers(false);
-
-  var outlierMarkers = /** @type {anychart.core.ui.MarkersFactory} */(this.outlierMarkers());
-  outlierMarkers.suspendSignalsDispatching();
-  outlierMarkers.enabled(true);
-  outlierMarkers.size(4);
-  outlierMarkers.resumeSignalsDispatching(false);
-
-  var hoverOutlierMarkers = (/** @type {anychart.core.ui.MarkersFactory} */(this.hoverOutlierMarkers()));
-  hoverOutlierMarkers.suspendSignalsDispatching();
-  hoverOutlierMarkers.size(6);
-  hoverOutlierMarkers.resumeSignalsDispatching(false);
-
-  return result;
-};
 
 //exports
 anychart.core.cartesian.series.Box.prototype['fill'] = anychart.core.cartesian.series.Box.prototype.fill;//inherited

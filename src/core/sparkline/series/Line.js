@@ -72,7 +72,14 @@ anychart.core.sparkline.series.Line.prototype.getMarkerStroke = function() {
 anychart.core.sparkline.series.Line.prototype.getDefaults = function() {
   var settings = goog.base(this, 'getDefaults');
 
-  settings['stroke'] = '#4682B4';
+  settings['stroke'] = {
+    'color': '#64b5f6',
+    'thickness': 1.5
+  };
+  settings['fill'] = {
+    'color': '#64b5f6',
+    'opacity': 0.5
+  };
 
   return settings;
 };

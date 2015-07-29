@@ -1031,11 +1031,11 @@ anychart.core.gantt.Controller.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   this.isResourceChart_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
-  this.data(anychart.data.Tree.fromJson(config['treeData']));
+  if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));
   this.verticalOffset(config['verticalOffset']);
-  if (goog.isDef(config['startIndex']))
+  if ('startIndex' in config)
     this.startIndex(config['startIndex']);
-  else if (goog.isDef(config['endIndex']))
+  else if ('endIndex' in config)
     this.endIndex(config['endIndex']);
 
   //NOTE: Available height must be set from outside depending on size of restored element.

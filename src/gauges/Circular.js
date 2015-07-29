@@ -128,13 +128,6 @@ anychart.gauges.Circular.ZINDEX_FRAME = 1;
 
 
 /**
- * Z-index axis.
- * @type {number}
- */
-anychart.gauges.Circular.ZINDEX_AXIS = 10;
-
-
-/**
  * Z-index knob.
  * @type {number}
  */
@@ -156,17 +149,57 @@ anychart.gauges.Circular.ZINDEX_POINTER = 40;
 
 
 /**
- * Z-index cap.
- * @type {number}
- */
-anychart.gauges.Circular.ZINDEX_CAP = 50;
-
-
-/**
  * Z-index multiplier.
  * @type {number}
  */
 anychart.gauges.Circular.ZINDEX_MULTIPLIER = 0.0001;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Methods to set defaults for multiple entities.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for axis default settings.
+ * @param {Object=} opt_value Object with x-axis settings.
+ * @return {Object}
+ */
+anychart.gauges.Circular.prototype.defaultAxisSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultAxisSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultAxisSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for bar pointer default settings.
+ * @param {Object=} opt_value Object with bar pointer settings.
+ * @return {Object}
+ */
+anychart.gauges.Circular.prototype.defaultPointerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultPointerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultPointerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for range marker default settings.
+ * @param {Object=} opt_value Object with range marker settings.
+ * @return {Object}
+ */
+anychart.gauges.Circular.prototype.defaultRangeSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultRangeSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultRangeSettings_ || {};
+};
 
 
 /** @inheritDoc */
@@ -232,7 +265,6 @@ anychart.gauges.Circular.prototype.dataInvalidated_ = function(e) {
 anychart.gauges.Circular.prototype.cap = function(opt_value) {
   if (!this.cap_) {
     this.cap_ = new anychart.core.gauge.Cap();
-    this.cap_.zIndex(anychart.gauges.Circular.ZINDEX_CAP);
     this.cap_.gauge(this);
     this.registerDisposable(this.cap_);
     this.cap_.listenSignals(this.onCapSignal_, this);
@@ -292,6 +324,7 @@ anychart.gauges.Circular.prototype.range = function(opt_indexOrValue, opt_value)
     this.circularRangeCounter_++;
     circularRange.gauge(this);
     circularRange.axisIndex(0);
+    circularRange.setup(this.defaultRangeSettings());
     this.registerDisposable(circularRange);
     circularRange.listenSignals(this.onCircularRangeSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -342,6 +375,8 @@ anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
     bar.dataIndex(this.pointerCounter_++);
     bar.axisIndex(0);
     bar.gauge(this);
+    //TODO(AntonKagakin): may be we should create gauge pointers (not only bar, but knob, markers too) and colorize them with default palette?
+    bar.setup(this.defaultPointerSettings()['bar']);
     this.registerDisposable(bar);
     bar.listenSignals(this.onPointersSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -382,6 +417,7 @@ anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value
     marker.dataIndex(this.pointerCounter_++);
     marker.axisIndex(0);
     marker.gauge(this);
+    marker.setup(this.defaultPointerSettings()['marker']);
     this.registerDisposable(marker);
     marker.listenSignals(this.onPointersSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -422,6 +458,7 @@ anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value
     needle.dataIndex(this.pointerCounter_++);
     needle.axisIndex(0);
     needle.gauge(this);
+    needle.setup(this.defaultPointerSettings()['needle']);
     this.registerDisposable(needle);
     needle.listenSignals(this.onPointersSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -462,6 +499,7 @@ anychart.gauges.Circular.prototype.knob = function(opt_indexOrValue, opt_value) 
     knob.dataIndex(this.knobCounter_++);
     knob.axisIndex(0);
     knob.gauge(this);
+    knob.setup(this.defaultPointerSettings()['knob']);
     this.registerDisposable(knob);
     knob.listenSignals(this.onPointersSignal_, this);
     this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
@@ -532,7 +570,7 @@ anychart.gauges.Circular.prototype.axis = function(opt_indexOrValue, opt_value) 
   var axis = this.axes_[index];
   if (!axis) {
     axis = new anychart.core.axes.Circular();
-    axis.zIndex(anychart.gauges.Circular.ZINDEX_AXIS);
+    axis.setup(this.defaultAxisSettings());
     axis.gauge(this);
     this.axes_[index] = axis;
     this.registerDisposable(axis);
@@ -1128,27 +1166,18 @@ anychart.gauges.Circular.prototype.drawContent = function(bounds) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Defaults.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.gauges.Circular.prototype.restoreDefaults = function() {
-  this.startAngle(0);
-  this.sweepAngle(360);
-  this.circularPadding('10%');
-  this.fill(/** @type {acgraph.vector.Fill} */({'keys': ['rgb(255, 255, 255)', 'rgb(220, 220, 220)'], 'angle': 315}));
-  this.encloseWithStraightLine(false);
-
-  this.title().enabled(false);
-  this.background().enabled(false);
-};
-
-
 /** @inheritDoc */
 anychart.gauges.Circular.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+
+  if ('defaultAxisSettings' in config)
+    this.defaultAxisSettings(config['defaultAxisSettings']);
+
+  if ('defaultPointerSettings' in config)
+    this.defaultPointerSettings(config['defaultPointerSettings']);
+
+  if ('defaultRangeSettings' in config)
+    this.defaultRangeSettings(config['defaultRangeSettings']);
 
   this.fill(config['fill']);
   this.stroke(config['stroke']);
@@ -1272,6 +1301,15 @@ anychart.gauges.Circular.prototype.serialize = function() {
 
 
   return {'gauge': json};
+};
+
+
+/**
+ * Returns default theme object.
+ * @return {Object}
+ */
+anychart.gauges.Circular.prototype.getDefaultThemeObj = function() {
+  return {'gauge': anychart.getFullTheme()['circularGauge']};
 };
 
 

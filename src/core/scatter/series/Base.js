@@ -25,59 +25,14 @@ goog.require('anychart.utils');
  * @implements {anychart.core.utils.ISeriesWithError}
  */
 anychart.core.scatter.series.Base = function(opt_data, opt_csvSettings) {
-  this.suspendSignalsDispatching();
   /**
    * @type {anychart.core.utils.SeriesPointContextProvider}
    * @private
    */
   this.pointProvider_;
   goog.base(this);
-  this.data(opt_data || null, opt_csvSettings);
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'];
-  });
-  tooltip.contentFormatter(function() {
-    return this['x'] + ': ' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
   this.statistics_ = {};
-
-  // make label hoverable
-  var labels = this.labels();
-  labels.disablePointerEvents(false);
-  labels.position(anychart.enums.Position.CENTER);
-  labels.enabled(false);
-  (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
-
-  /**
-   * @type {(acgraph.vector.Stroke|Function|null)}
-   * @private
-   */
-  this.stroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * @type {(acgraph.vector.Fill|Function|null)}
-   * @private
-   */
-  this.fill_ = (function() {
-    return this['sourceColor'];
-  });
-
-
-  /**
-   * @type {(acgraph.vector.Fill|Function|null)}
-   * @private
-   */
-  this.hoverFill_ = (function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
-
+  this.data(opt_data || null, opt_csvSettings);
 
   /**
    * Hatch fill.
@@ -109,8 +64,6 @@ anychart.core.scatter.series.Base = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.pathsPool_ = null;
-
-  this.resumeSignalsDispatching(false);
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove);
 };
@@ -2368,13 +2321,6 @@ anychart.core.scatter.series.Base.prototype.getLegendItemData = function(itemsTe
 //  Series default settings.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Restore series default settings.
- * @return {anychart.core.scatter.series.Base} Return itself for chaining call.
- */
-anychart.core.scatter.series.Base.prototype.restoreDefaults = function() {
-  return this;
-};
 
 
 /**

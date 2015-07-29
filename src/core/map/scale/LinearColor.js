@@ -33,7 +33,7 @@ anychart.core.map.scale.LinearColor = function() {
    */
   this.logBaseVal = 10;
 
-  this.colors('white', 'black');
+  this.setupByJSON(anychart.getFullTheme()['map']['linearColor']);
 };
 goog.inherits(anychart.core.map.scale.LinearColor, anychart.scales.ScatterBase);
 
@@ -350,8 +350,8 @@ anychart.core.map.scale.LinearColor.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.map.scale.LinearColor.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.ticks(config['inverted']);
-  this.minorTicks(config['inverted']);
+  this.ticks(config['ticks']);
+  this.minorTicks(config['minorTicks']);
   this.colors(config['colors']);
 };
 

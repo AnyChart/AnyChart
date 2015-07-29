@@ -102,7 +102,7 @@ anychart.core.ui.DataGrid = function() {
    * @type {number}
    * @private
    */
-  this.titleHeight_ = 25;
+  this.titleHeight_ = NaN;
 
   /**
    * Start index of this.visibleItems_. Actually is a first visible data item of data grid.
@@ -180,7 +180,7 @@ anychart.core.ui.DataGrid = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill('#fff');
+  this.backgroundFill_;
 
   /**
    * Columns layer.
@@ -215,14 +215,14 @@ anychart.core.ui.DataGrid = function() {
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.columnStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.columnStroke_;
 
   /**
    * Row vertical line separation path.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.rowStroke_ = acgraph.vector.normalizeStroke('#ccd7e1', 1);
+  this.rowStroke_;
 
   /**
    * Thickness of row stroke.
@@ -230,7 +230,7 @@ anychart.core.ui.DataGrid = function() {
    * @type {number}
    * @private
    */
-  this.rowStrokeThickness_ = 1;
+  this.rowStrokeThickness_ = NaN;
 
   /**
    * Row stroke path.
@@ -272,42 +272,42 @@ anychart.core.ui.DataGrid = function() {
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.rowOddFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowOddFill_;
 
   /**
    * Even fill.
    * @type {?acgraph.vector.Fill}
    * @private
    */
-  this.rowEvenFill_ = acgraph.vector.normalizeFill('#fafafa');
+  this.rowEvenFill_;
 
   /**
    * Default rows fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowFill_ = acgraph.vector.normalizeFill('#fff');
+  this.rowFill_;
 
   /**
    * Default hover fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
+  this.hoverFill_;
 
   /**
    * Default row selected fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#d2eafa');
+  this.rowSelectedFill_;
 
   /**
    * Default title fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.titleFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
+  this.titleFill_;
 
   /**
    * Contains the sequence of heights of grid. Used to quickly calculate this.hoveredIndex_ on mouse over event
@@ -359,28 +359,26 @@ anychart.core.ui.DataGrid = function() {
    */
   this.tooltip_ = null;
 
-  this.column(0).textFormatter(function(item) {
-    return goog.isDefAndNotNull(item.meta('index')) ? (item.meta('index') + 1) + '' : '';
-  });
+  //this.column(0).textFormatter(function(item) {
+  //  return goog.isDefAndNotNull(item.meta('index')) ? (item.meta('index') + 1) + '' : '';
+  //});
+  //
+  //this
+  //    .column(1)
+  //    .collapseExpandButtons(true)
+  //    .textFormatter(function(item) {
+  //      return goog.isDefAndNotNull(item.get('name')) ? item.get('name') + '' : '';
+  //    })
+  //    .depthPaddingMultiplier(3 * anychart.core.ui.DataGrid.DEFAULT_PADDING);
 
-  this
-      .column(1)
-      .collapseExpandButtons(true)
-      .textFormatter(function(item) {
-        return goog.isDefAndNotNull(item.get('name')) ? item.get('name') + '' : '';
-      })
-      .depthPaddingMultiplier(3 * anychart.core.ui.DataGrid.DEFAULT_PADDING);
-
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
-  tooltip.content().hAlign(anychart.enums.Align.LEFT);
-  tooltip.contentFormatter(function(data) {
-    return data.get(anychart.enums.GanttDataFields.NAME) + '';
-  });
-  tooltip.resumeSignalsDispatching(false);
+  //var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  //tooltip.suspendSignalsDispatching();
+  //tooltip.anchor(anychart.enums.Anchor.LEFT_TOP);
+  //tooltip.content().hAlign(anychart.enums.Align.LEFT);
+  //tooltip.contentFormatter(function(data) {
+  //  return data.get(anychart.enums.GanttDataFields.NAME) + '';
+  //});
+  //tooltip.resumeSignalsDispatching(false);
 
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
       this.handleMouseOverAndMove_, this.handleAll_);
@@ -823,6 +821,20 @@ anychart.core.ui.DataGrid.prototype.backgroundFill = function(opt_fillOrColorOrK
     return this;
   }
   return this.backgroundFill_;
+};
+
+
+/**
+ * Getter/setter for default column settings.
+ * @param {Object=} opt_val - Object with settings.
+ * @return {Object} - Current value or empty object.
+ */
+anychart.core.ui.DataGrid.prototype.defaultColumnSettings = function(opt_val) {
+  if (goog.isDef(opt_val)) {
+    this.defaultColumnSettings_ = opt_val;
+    return this;
+  }
+  return this.defaultColumnSettings_ || {};
 };
 
 
@@ -1288,7 +1300,9 @@ anychart.core.ui.DataGrid.prototype.getEvenPath_ = function() {
 anychart.core.ui.DataGrid.prototype.getHoverPath_ = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.hoverPath_.stroke(null);
+    this.hoverPath_.fill(this.hoverFill_);
+    this.hoverPath_.zIndex(10);
     this.registerDisposable(this.hoverPath_);
   }
   return this.hoverPath_;
@@ -1303,7 +1317,9 @@ anychart.core.ui.DataGrid.prototype.getHoverPath_ = function() {
 anychart.core.ui.DataGrid.prototype.getSelectedPath_ = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(11);
+    this.selectedPath_.stroke(null);
+    this.selectedPath_.fill(this.rowSelectedFill_);
+    this.selectedPath_.zIndex(11);
     this.registerDisposable(this.selectedPath_);
   }
   return this.selectedPath_;
@@ -1318,7 +1334,8 @@ anychart.core.ui.DataGrid.prototype.getSelectedPath_ = function() {
 anychart.core.ui.DataGrid.prototype.getRowStrokePath_ = function() {
   if (!this.rowStrokePath_) {
     this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer_().path());
-    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(20);
+    this.rowStrokePath_.stroke(this.rowStroke_);
+    this.rowStrokePath_.zIndex(20);
     this.registerDisposable(this.rowStrokePath_);
   }
   return this.rowStrokePath_;
@@ -1717,6 +1734,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
   var column = this.columns_[index];
   if (!column) {
     column = new anychart.core.ui.DataGrid.Column(this);
+    column.setup(this.defaultColumnSettings());
     column.listenSignals(this.columnInvalidated_, this);
     this.registerDisposable(column);
     newColumn = true;
@@ -1731,15 +1749,15 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
     return this;
   } else {
     if (newColumn) {
-      var columnWidth = index ?
-          (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
-          anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
+      //var columnWidth = index ?
+      //    (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
+      //    anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
 
       var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
       column.suspendSignalsDispatching();
       column
           .container(this.getColumnsLayer_())
-          .width(columnWidth)
+          //.width(columnWidth)
           .height('100%');
 
       column.title().text(columnTitle);
@@ -2037,6 +2055,7 @@ anychart.core.ui.DataGrid.prototype.drawInternal = function(visibleItems, startI
                 Not standalone scrolls are controlled by chart.
          */
         scrollsLayer = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+        scrollsLayer.zIndex(10);
         this.registerDisposable(scrollsLayer);
 
         verticalScrollBar = this.controller_.getScrollBar();
@@ -2336,16 +2355,18 @@ anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
 
   if (this.isStandalone_) {
     var dataSource = ('controller' in config) ? config['controller'] : config;
-    this.data(anychart.data.Tree.fromJson(dataSource['treeData']));
+    if ('treeData' in config) this.data(anychart.data.Tree.fromJson(dataSource['treeData']));
     this.verticalOffset(dataSource['verticalOffset']);
-    if (goog.isDef(dataSource['startIndex']))
+    if ('startIndex' in config)
       this.startIndex(dataSource['startIndex']);
-    else if (goog.isDef(dataSource['endIndex']))
+    else if ('endIndex' in config)
       this.endIndex(dataSource['endIndex']);
 
     this.titleHeight(config['titleHeight']);
   }
 
+  if ('defaultColumnSettings' in config)
+    this.defaultColumnSettings(config['defaultColumnSettings']);
 
   this.backgroundFill(config['backgroundFill']);
   this.columnStroke(config['columnStroke']);
@@ -2359,9 +2380,11 @@ anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
   this.horizontalOffset(config['horizontalOffset']);
   this.tooltip(config['tooltip']);
 
-  for (var i = 0, l = config['columns'].length; i < l; i++) {
-    var col = config['columns'][i];
-    if (col) this.column(i, col);
+  if ('columns' in config) {
+    for (var i = 0, l = config['columns'].length; i < l; i++) {
+      var col = config['columns'][i];
+      if (col) this.column(i, col);
+    }
   }
 
 };
@@ -2636,13 +2659,8 @@ anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
 anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    this.labelsFactory_
-        .anchor(anychart.enums.Anchor.LEFT_TOP)
-        .vAlign(acgraph.vector.Text.VAlign.MIDDLE)
-        .padding(0, anychart.core.ui.DataGrid.DEFAULT_PADDING)
-        .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-        .container(this.getCellsLayer_());
 
+    this.labelsFactory_.container(this.getCellsLayer_());
     this.labelsFactory_.setParentEventTarget(this);
     this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
 
@@ -2803,7 +2821,8 @@ anychart.core.ui.DataGrid.Column.prototype.getTitlePath_ = function() {
   if (!this.titlePath_) {
     this.titlePath_ = acgraph.path();
     this.getTitleLayer_().addChildAt(this.titlePath_, 0);
-    this.titlePath_.fill(/** @type {acgraph.vector.Fill} */ (this.dataGrid_.titleFill())).stroke(null);
+    this.titlePath_.fill(/** @type {acgraph.vector.Fill} */ (this.dataGrid_.titleFill()));
+    this.titlePath_.stroke(null);
     this.registerDisposable(this.titlePath_);
   }
   return this.titlePath_;
@@ -3089,7 +3108,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
   if (goog.isDef(this.defaultWidth_)) json['defaultWidth'] = this.defaultWidth_;
   json['collapseExpandButtons'] = this.collapseExpandButtons_;
   json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
-  json['labelsFactory'] = this.cellTextSettings().serialize();
+  json['cellTextSettings'] = this.cellTextSettings().serialize();
   json['title'] = this.title_.serialize();
 
   if (this.textFormatter_ != this.defaultTextFormatter_) {
@@ -3120,7 +3139,7 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
   this.defaultWidth(json['defaultWidth']);
   this.collapseExpandButtons(json['collapseExpandButtons']);
   this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
-  this.cellTextSettings(json['labelsFactory']);
+  this.cellTextSettings(json['cellTextSettings']);
   this.title(json['title']);
 
   if ('textFormatter' in json) this.textFormatter(json['textFormatter']);

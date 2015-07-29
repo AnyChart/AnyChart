@@ -51,13 +51,6 @@ anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CHART_CREDITS;
 
 
-/**
- * Legend z-index in chart root layer.
- * @type {number}
- */
-anychart.core.SeparateChart.ZINDEX_LEGEND = 20;
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Legend.
@@ -90,7 +83,6 @@ anychart.core.SeparateChart.ZINDEX_LEGEND = 20;
 anychart.core.SeparateChart.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
-    this.legend_.zIndex(anychart.core.SeparateChart.ZINDEX_LEGEND);
     this.registerDisposable(this.legend_);
     this.legend_.listenSignals(this.onLegendSignal_, this);
     this.legend_.setParentEventTarget(this);
@@ -320,41 +312,6 @@ anychart.core.SeparateChart.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.legend(config['legend']);
   this.credits(config['credits']);
-};
-
-
-/**
- * Restore default chart settings.
- */
-anychart.core.SeparateChart.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  legend.enabled(false);
-  legend.itemsLayout('horizontal');
-  legend.position('bottom');
-  legend.margin(0, 0, 0, 10);
-  legend.align(anychart.enums.Align.CENTER);
-  legend.fontSize(11);
-  legend.fontFamily('Tahoma');
-  legend.fontColor('rgb(34,34,34)');
-
-  var legendSeparator = /** @type {anychart.core.ui.Separator} */(legend.titleSeparator());
-  legendSeparator.enabled(false);
-  legendSeparator.height(1);
-  legendSeparator.fill(['#000000 0', '#000000 1', '#000000 0']);
-
-  var legendTitle = /** @type {anychart.core.ui.Title} */(legend.title());
-  legendTitle.enabled(false);
-  legendTitle.text('Legend title');
-  legendTitle.fontSize(10);
-  legendTitle.fontWeight('bold');
-  legendTitle.fontFamily('verdana');
-  legendTitle.fontColor('rgb(35,35,35)');
-
-  var legendBackground = /** @type {anychart.core.ui.Background} */(legend.background());
-  legendBackground.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
-  legendBackground.stroke('rgb(221,221,221)');
 };
 
 

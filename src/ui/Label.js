@@ -18,7 +18,9 @@ goog.inherits(anychart.ui.Label, anychart.core.ui.Label);
  * @return {!anychart.ui.Label}
  */
 anychart.ui.label = function() {
-  return new anychart.ui.Label();
+  var res = new anychart.ui.Label();
+  res.setup(anychart.getFullTheme()['standalones']['label']);
+  return res;
 };
 
 

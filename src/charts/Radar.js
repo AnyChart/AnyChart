@@ -32,7 +32,7 @@ anychart.charts.Radar = function() {
    * @type {(string|number)}
    * @private
    */
-  this.startAngle_ = 0;
+  this.startAngle_;
 
   /**
    * @type {anychart.scales.Ordinal}
@@ -115,13 +115,6 @@ anychart.charts.Radar.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Grid z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Radar.ZINDEX_GRID = 10;
-
-
-/**
  * Series z-index in chart root layer.
  * @type {number}
  */
@@ -133,13 +126,6 @@ anychart.charts.Radar.ZINDEX_SERIES = 30;
  * @type {number}
  */
 anychart.charts.Radar.ZINDEX_LINE_SERIES = 31;
-
-
-/**
- * Axis z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Radar.ZINDEX_AXIS = 35;
 
 
 /**
@@ -161,6 +147,53 @@ anychart.charts.Radar.ZINDEX_LABEL = 40;
  * @type {number}
  */
 anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Methods to set defaults for multiple entities.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for series default settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
+ */
+anychart.charts.Radar.prototype.defaultSeriesSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultSeriesSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for grid default settings.
+ * @param {Object=} opt_value Object with grid settings.
+ * @return {Object}
+ */
+anychart.charts.Radar.prototype.defaultGridSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultGridSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultGridSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for minor grid default settings.
+ * @param {Object=} opt_value Object with minor grid settings.
+ * @return {Object}
+ */
+anychart.charts.Radar.prototype.defaultMinorGridSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultMinorGridSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultMinorGridSettings_ || {};
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -402,8 +435,7 @@ anychart.charts.Radar.prototype.grid = function(opt_indexOrValue, opt_value) {
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Radar();
-    grid.drawLastLine(false);
-    grid.zIndex(anychart.charts.Radar.ZINDEX_GRID);
+    grid.setup(this.defaultGridSettings());
     this.grids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -469,9 +501,7 @@ anychart.charts.Radar.prototype.minorGrid = function(opt_indexOrValue, opt_value
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Radar();
-    grid.drawLastLine(false);
-    grid.zIndex(anychart.charts.Radar.ZINDEX_GRID);
-    grid.isMinor(true);
+    grid.setup(this.defaultMinorGridSettings());
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
     grid.listenSignals(this.onGridSignal_, this);
@@ -528,7 +558,6 @@ anychart.charts.Radar.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
     this.xAxis_ = new anychart.core.axes.Radar();
     this.xAxis_.setParentEventTarget(this);
-    this.xAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.xAxis_);
     this.xAxis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS);
@@ -569,7 +598,6 @@ anychart.charts.Radar.prototype.yAxis = function(opt_value) {
   if (!this.yAxis_) {
     this.yAxis_ = new anychart.core.axes.Radial();
     this.yAxis_.setParentEventTarget(this);
-    this.yAxis_.zIndex(anychart.charts.Radar.ZINDEX_AXIS);
     this.registerDisposable(this.yAxis_);
     this.yAxis_.listenSignals(this.onAxisSignal_, this);
     this.invalidate(anychart.ConsistencyState.RADAR_AXES | anychart.ConsistencyState.BOUNDS);
@@ -711,7 +739,9 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
       // this else would be only if instance is Marker series
       instance.type(markerType);
     }
-    instance.restoreDefaults();
+    if (anychart.DEFAULT_THEME != 'v6')
+      instance.labels().setAutoColor(anychart.color.darken(instance.color()));
+    instance.setup(this.defaultSeriesSettings()[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(
         anychart.ConsistencyState.RADAR_SERIES |
@@ -1564,17 +1594,6 @@ anychart.charts.Radar.prototype.legendItemOut = function(item) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Defaults.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.charts.Radar.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-};
-
-
 /** @inheritDoc */
 anychart.charts.Radar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
@@ -1727,6 +1746,15 @@ anychart.charts.Radar.prototype.serialize = function() {
 anychart.charts.Radar.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
+  if ('defaultSeriesSettings' in config)
+    this.defaultSeriesSettings(config['defaultSeriesSettings']);
+
+  if ('defaultGridSettings' in config)
+    this.defaultGridSettings(config['defaultGridSettings']);
+
+  if ('defaultMinorGridSettings' in config)
+    this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
+
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
@@ -1783,19 +1811,19 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
 
   json = config['xAxis'];
   this.xAxis(json);
-  if (goog.isObject(json) && 'scale' in json) this.xAxis().scale(scalesInstances[json['scale']]);
+  if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.xAxis().scale(scalesInstances[json['scale']]);
 
   json = config['yAxis'];
   this.yAxis(json);
-  if (goog.isObject(json) && 'scale' in json) this.yAxis().scale(scalesInstances[json['scale']]);
+  if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yAxis().scale(scalesInstances[json['scale']]);
 
   if (goog.isArray(grids)) {
     for (i = 0; i < grids.length; i++) {
       json = grids[i];
       this.grid(i, json);
       if (goog.isObject(json)) {
-        if ('xScale' in json) this.grid(i).xScale(scalesInstances[json['xScale']]);
-        if ('yScale' in json) this.grid(i).yScale(scalesInstances[json['yScale']]);
+        if ('xScale' in json && json['xScale'] > 1) this.grid(i).xScale(scalesInstances[json['xScale']]);
+        if ('yScale' in json && json['yScale'] > 1) this.grid(i).yScale(scalesInstances[json['yScale']]);
       }
     }
   }
@@ -1805,8 +1833,8 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
       json = minorGrids[i];
       this.minorGrid(i, json);
       if (goog.isObject(json)) {
-        if ('xScale' in json) this.minorGrid(i).xScale(scalesInstances[json['xScale']]);
-        if ('yScale' in json) this.minorGrid(i).yScale(scalesInstances[json['yScale']]);
+        if ('xScale' in json && json['xScale'] > 1) this.minorGrid(i).xScale(scalesInstances[json['xScale']]);
+        if ('yScale' in json && json['yScale'] > 1) this.minorGrid(i).yScale(scalesInstances[json['yScale']]);
       }
     }
   }
@@ -1822,8 +1850,8 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
           seriesInst.zIndex(anychart.charts.Radar.ZINDEX_LINE_SERIES);
         seriesInst.setup(json);
         if (goog.isObject(json)) {
-          if ('xScale' in json) seriesInst.xScale(scalesInstances[json['xScale']]);
-          if ('yScale' in json) seriesInst.yScale(scalesInstances[json['yScale']]);
+          if ('xScale' in json && json['xScale'] > 1) seriesInst.xScale(scalesInstances[json['xScale']]);
+          if ('yScale' in json && json['yScale'] > 1) seriesInst.yScale(scalesInstances[json['yScale']]);
         }
       }
     }

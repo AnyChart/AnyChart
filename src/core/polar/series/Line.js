@@ -119,6 +119,12 @@ anychart.core.polar.series.Line.prototype.getMarkerFill = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.polar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
+};
+
+
 /**
  * @inheritDoc
  */

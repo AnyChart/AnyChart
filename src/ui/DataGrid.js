@@ -18,7 +18,11 @@ goog.inherits(anychart.ui.DataGrid, anychart.core.ui.DataGrid);
  * @return {!anychart.ui.DataGrid}
  */
 anychart.ui.dataGrid = function() {
-  return new anychart.ui.DataGrid();
+  var dataGrid = new anychart.ui.DataGrid();
+  var theme = anychart.getFullTheme();
+  dataGrid.setup(theme['standalones']['dataGrid']);
+
+  return dataGrid;
 };
 
 

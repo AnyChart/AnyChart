@@ -59,8 +59,6 @@ anychart.core.gauge.Cap = function() {
    * @private
    */
   this.domElement_ = acgraph.circle();
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.gauge.Cap, anychart.core.VisualBase);
 
@@ -259,19 +257,6 @@ anychart.core.gauge.Cap.prototype.draw = function() {
   }
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.gauge.Cap.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.radius('15%');
-  this.stroke('none');
-  this.fill(/** @type {acgraph.vector.Fill} */({'keys': ['#D3D3D3', '#6F6F6F'], 'angle': -45}));
-  this.hatchFill(false);
-  this.resumeSignalsDispatching(true);
 };
 
 
