@@ -1190,12 +1190,28 @@ anychart.data.Tree.DataItem.prototype.serialize = function() {
 
 /**
  * Constructor function
- * @param {Array.<Object>=} opt_data - Raw data.
- * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
+ * @param {(Array.<Object>|string)=} opt_data - Raw data or CSV-string. If string is passed, second parameter will be
+ *  interpreted as fields mapping.
+ * @param {(anychart.enums.TreeFillingMethod|Object)=} opt_fillMethodOrCsvMapping - Fill method or CSV mapping object.
+ *  This parameter is interpreted as mapping object if first parameter is string. Mapping object should have structure
+ *  like
+ *  <code>
+ *    //'nameOfField': index_of_column
+ *    mapping = {
+ *      'id': 0,
+ *      'name': 1,
+ *      'value': 15
+ *    };
+ *  </code>.
+ * @param {Object=} opt_csvSettings - CSV settings object. Should be fields like
+ *  rowsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  columnsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  ignoreTrailingSpaces - boolean or undefined, if it is undefined, it will not be set.
+ *  ignoreFirstRow - boolean or undefined, if it is undefined, it will not be set.
  * @return {!anychart.data.Tree}
  */
-anychart.data.tree = function(opt_data, opt_fillMethod) {
-  return new anychart.data.Tree(opt_data, opt_fillMethod);
+anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings) {
+  return new anychart.data.Tree(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings);
 };
 
 

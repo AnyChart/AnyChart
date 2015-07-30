@@ -292,31 +292,6 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
     this.dg_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
-
-    //this.dg_.tooltip().contentFormatter(function(data) {
-    //  var item = data['item'];
-    //  if (!item) return '';
-    //
-    //  var name = item.get(anychart.enums.GanttDataFields.NAME);
-    //
-    //  var startDate = ths.isResourcesChart_ ?
-    //      item.meta('minPeriodDate') :
-    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-    //
-    //  var endDate = ths.isResourcesChart_ ?
-    //      item.meta('maxPeriodDate') :
-    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-    //
-    //  var progress = ths.isResourcesChart_ ?
-    //      void 0 :
-    //      (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-    //
-    //  return (name ? name : '') +
-    //      (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-    //      (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-    //      (progress ? '\nComplete: ' + progress : '');
-    //
-    //});
   }
 
   return this.dg_;
@@ -361,31 +336,6 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
     this.tl_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
-
-    //this.tl_.tooltip().contentFormatter(function(data) {
-    //  var item = data['item'];
-    //  var period = data['period'];
-    //
-    //  var name = item.get(anychart.enums.GanttDataFields.NAME);
-    //
-    //  var startDate = period ?
-    //      period[anychart.enums.GanttDataFields.START] :
-    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-    //
-    //  var endDate = period ?
-    //      period[anychart.enums.GanttDataFields.END] :
-    //      (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-    //
-    //  var progress = ths.isResourcesChart_ ?
-    //      void 0 :
-    //      (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-    //
-    //  return (name ? name : '') +
-    //      (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-    //      (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-    //      (progress ? '\nComplete: ' + progress : '');
-    //
-    //});
   }
 
   return this.tl_;
@@ -539,8 +489,8 @@ anychart.charts.Gantt.prototype.fitToTask = function(taskId) {
   var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
   if (foundTasks.length) {
     var task = foundTasks[0];
-    var actualStart = task.get(anychart.enums.GanttDataFields.ACTUAL_START);
-    var actualEnd = task.get(anychart.enums.GanttDataFields.ACTUAL_END);
+    var actualStart = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_START));
+    var actualEnd = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_END));
     if (actualStart && actualEnd) { //no range for milestone.
       this.getTimeline().getScale().setRange(actualStart, actualEnd);
     } else {

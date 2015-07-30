@@ -283,13 +283,13 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_START)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_END)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_START)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_END)));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_START))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_END))));
 
-  var resultStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var resultEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var resultStart = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
+  var resultEnd = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
 
   var progressLength = 0;
   var totalLength = 0;
@@ -306,33 +306,33 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
 
     if (!this.isResourceChart_) {
       var childStart = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-          child.get(anychart.enums.GanttDataFields.ACTUAL_START) :
+          anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
           child.meta('autoStart');
 
       var childEnd = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-          child.get(anychart.enums.GanttDataFields.ACTUAL_END) :
+          anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
           (child.meta('autoEnd') || childStart);
 
       var childProgress = goog.isDef(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
           anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
           (child.meta('autoProgress') || 0);
 
-      if (!goog.isDef(resultStart)) {
-        resultStart = childStart;
-      } else {
+      if (goog.isDef(resultStart) && !isNaN(resultStart)) {
         resultStart = Math.min(resultStart, childStart, childEnd);
-      }
-
-      if (!goog.isDef(resultEnd)) {
-        resultEnd = childEnd;
       } else {
-        resultEnd = Math.max(resultEnd, childStart, childEnd);
+        resultStart = childStart;
       }
 
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_START)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_END)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_START)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_END)));
+      if (goog.isDef(resultEnd) && !isNaN(resultEnd)) {
+        resultEnd = Math.max(resultEnd, childStart, childEnd);
+      } else {
+        resultEnd = childEnd;
+      }
+
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_START))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_END))));
 
       var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
       progressLength += /** @type {number} */(childProgress) * delta;
@@ -440,8 +440,8 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             this.connectorsData_.push(connectorsMapItem);
           }
 
-          var periodStart = period[anychart.enums.GanttDataFields.START];
-          var periodEnd = period[anychart.enums.GanttDataFields.END];
+          var periodStart = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
+          var periodEnd = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
 
           if (periodStart && periodEnd) {
             minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);

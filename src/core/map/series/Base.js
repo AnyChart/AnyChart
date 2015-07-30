@@ -1217,7 +1217,13 @@ anychart.core.map.series.Base.prototype.unselect = goog.abstractMethod;
  * @param {number} index Index of the point to select.
  * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
  */
-anychart.core.map.series.Base.prototype.select = goog.abstractMethod;
+anychart.core.map.series.Base.prototype.select = function(index) {
+  if (this.getFinalAllowPointsSelect()) {
+    this.selectPoint(index);
+    this.hideTooltip();
+  }
+  return this;
+};
 
 
 /**
@@ -1972,6 +1978,4 @@ anychart.core.map.series.Base.prototype['data'] = anychart.core.map.series.Base.
 
 anychart.core.map.series.Base.prototype['hover'] = anychart.core.map.series.Base.prototype.hover;
 anychart.core.map.series.Base.prototype['select'] = anychart.core.map.series.Base.prototype.select;
-anychart.core.map.series.Base.prototype['unhover'] = anychart.core.map.series.Base.prototype.unhover;
-anychart.core.map.series.Base.prototype['unselect'] = anychart.core.map.series.Base.prototype.unselect;
 anychart.core.map.series.Base.prototype['allowPointsSelect'] = anychart.core.map.series.Base.prototype.allowPointsSelect;

@@ -113,7 +113,8 @@ anychart.data.csv.TreeItemsProcessor.prototype.processRow = function() {
 anychart.data.csv.TreeItemsProcessor.prototype.processRowItem = function(colIndex, item) {
   var mapValue = this.mapping_[colIndex];
   var field = goog.isDef(mapValue) ? mapValue : 'column' + colIndex;
-  this.row_[field] = item;
+  if (!goog.isNull(item))
+    this.row_[field] = item;
   this.hasRow_ = true;
 };
 

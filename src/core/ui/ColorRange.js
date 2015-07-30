@@ -193,8 +193,10 @@ anychart.core.ui.ColorRange.prototype.calculateRangeRegions_ = function() {
     while (iterator.advance()) {
       var pointValue = iterator.get(this.targetSeries_.referenceValueNames[1]);
       var range = scale.getRangeByValue(/** @type {number} */(pointValue));
-      if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
-      this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
+      if (range) {
+        if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
+        this.rangeRegions_[range.sourceIndex].push(iterator.getIndex());
+      }
     }
   }
 };
@@ -873,8 +875,8 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     value = /** @type {number} */(scale.inverseTransform(ratio));
     if (scale instanceof anychart.core.map.scale.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
-      if (series) {
-        var regions = this.rangeRegions_[range.sourceIndex];
+      var regions = range && this.rangeRegions_[range.sourceIndex];
+      if (series && regions) {
         for (var i = 0, len = regions.length; i < len; i++)
           series.hoverPoint(regions[i], undefined, false);
         event['pointIndex'] = regions[regions.length - 1];

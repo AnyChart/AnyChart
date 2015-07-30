@@ -429,7 +429,7 @@ window['anychart']['themes']['defaultTheme'] = {
       }
     },
     'title': {
-      'enabled': 'false',
+      'enabled': false,
       'text': 'Chart Title',
       'margin': {
         'top': 0,
@@ -460,7 +460,7 @@ window['anychart']['themes']['defaultTheme'] = {
     },
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     },
@@ -488,10 +488,10 @@ window['anychart']['themes']['defaultTheme'] = {
         'left': 0
       },
       'padding': {
-        'top': 0,
-        'right': 0,
-        'bottom': 20,
-        'left': 0
+        'top': 10,
+        'right': 10,
+        'bottom': 10,
+        'left': 10
       },
       'background': {
         'enabled': false,
@@ -1704,7 +1704,7 @@ window['anychart']['themes']['defaultTheme'] = {
       }
     },
     'defaultGridSettings': {
-      'enabled': false,
+      'enabled': true,
       'isMinor': false,
       'layout': 'horizontal',
       'drawFirstLine': true,
@@ -1716,7 +1716,7 @@ window['anychart']['themes']['defaultTheme'] = {
       'zIndex': 11
     },
     'defaultMinorGridSettings': {
-      'enabled': false,
+      'enabled': true,
       'isMinor': true,
       'layout': 'horizontal',
       'drawFirstLine': true,
@@ -1833,9 +1833,6 @@ window['anychart']['themes']['defaultTheme'] = {
       'scale': 1
     },
 
-    'title': {
-      'enabled': false
-    },
     'background': {
       'enabled': false
     },
@@ -2010,15 +2007,12 @@ window['anychart']['themes']['defaultTheme'] = {
     'minorGrids': [],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
   },
   'bar': {
-    'title': {
-      'enabled': true
-    },
     'background': {
       'enabled': true
     },
@@ -2115,15 +2109,12 @@ window['anychart']['themes']['defaultTheme'] = {
     ],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
   },
   'box': {
-    'title': {
-      'enabled': true
-    },
     'background': {
       'enabled': true
     },
@@ -2133,15 +2124,12 @@ window['anychart']['themes']['defaultTheme'] = {
     'minorGrids': [],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
   },
   'column': {
-    'title': {
-      'enabled': true
-    },
     'background': {
       'enabled': true
     },
@@ -2151,15 +2139,12 @@ window['anychart']['themes']['defaultTheme'] = {
     'minorGrids': [],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
   },
   'financial': {
-    'title': {
-      'enabled': true
-    },
     'background': {
       'enabled': true
     },
@@ -2253,15 +2238,12 @@ window['anychart']['themes']['defaultTheme'] = {
     ],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
   },
   'line': {
-    'title': {
-      'enabled': true
-    },
     'background': {
       'enabled': true
     },
@@ -2271,7 +2253,7 @@ window['anychart']['themes']['defaultTheme'] = {
     'minorGrids': [],
     'padding': {
       'top': 30,
-      'right': 50,
+      'right': 20,
       'bottom': 20,
       'left': 20
     }
@@ -2515,7 +2497,7 @@ window['anychart']['themes']['defaultTheme'] = {
     },
 
     'defaultGridSettings': {
-      'enabled': false,
+      'enabled': true,
       'isMinor': false,
       'layout': 'horizontal',
       'drawFirstLine': true,
@@ -2527,7 +2509,7 @@ window['anychart']['themes']['defaultTheme'] = {
       'zIndex': 11
     },
     'defaultMinorGridSettings': {
-      'enabled': false,
+      'enabled': true,
       'isMinor': true,
       'layout': 'horizontal',
       'drawFirstLine': true,
@@ -2888,8 +2870,6 @@ window['anychart']['themes']['defaultTheme'] = {
       'left': 10
     },
     'title': {
-      'enabled': true,
-      'text': 'Chart title',
       'rotation': 0
     }
   },

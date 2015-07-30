@@ -303,11 +303,6 @@ anychart.core.map.series.Choropleth.prototype.unhover = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.select = function(index) {
-  if (this.getFinalAllowPointsSelect()) {
-    this.selectPoint(index);
-    this.hideTooltip();
-  }
-  return this;
-};
+//exports
+anychart.core.map.series.Choropleth.prototype['unhover'] = anychart.core.map.series.Choropleth.prototype.unhover;
+anychart.core.map.series.Choropleth.prototype['unselect'] = anychart.core.map.series.Choropleth.prototype.unselect;

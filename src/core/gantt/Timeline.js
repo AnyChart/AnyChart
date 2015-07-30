@@ -2169,18 +2169,18 @@ anychart.core.gantt.Timeline.prototype.drawProjectTimeline_ = function() {
     var itemHeight = anychart.core.gantt.Controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
-    var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
-    var baselineEnd = item.get(anychart.enums.GanttDataFields.BASELINE_END);
+    var baselineStart = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_START));
+    var baselineEnd = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_END));
 
-    if (goog.isDefAndNotNull(baselineStart) && goog.isDefAndNotNull(baselineEnd)) {
+    if (!isNaN(baselineStart) && !isNaN(baselineEnd)) {
       this.drawAsBaseline_(item, totalTop, itemHeight);
     } else {
       if (item.numChildren()) {
         this.drawAsParent_(item, totalTop, itemHeight);
       } else {
-        var actualStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
-        var actualEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
-        if (goog.isDefAndNotNull(actualEnd) && (actualEnd != actualStart)) {
+        var actualStart = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
+        var actualEnd = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
+        if (!isNaN(actualEnd) && (actualEnd != actualStart)) {
           this.drawAsProgress_(item, totalTop, itemHeight);
         } else {
           this.drawAsMilestone_(item, totalTop, itemHeight);
@@ -2205,8 +2205,8 @@ anychart.core.gantt.Timeline.prototype.drawAsPeriods_ = function(dataItem, total
   if (periods) {
     for (var j = 0; j < periods.length; j++) {
       var period = periods[j];
-      var start = period[anychart.enums.GanttDataFields.START];
-      var end = period[anychart.enums.GanttDataFields.END];
+      var start = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
+      var end = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
 
       if (goog.isDef(start) && goog.isDef(end)) {
         var startRatio = this.scale_.timestampToRatio(start);
@@ -2233,12 +2233,12 @@ anychart.core.gantt.Timeline.prototype.drawAsPeriods_ = function(dataItem, total
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START) ||
+  var actualStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ||
       dataItem.meta('autoStart');
-  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END) ||
+  var actualEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ||
       dataItem.meta('autoEnd');
-  var baselineStart = dataItem.get(anychart.enums.GanttDataFields.BASELINE_START);
-  var baselineEnd = dataItem.get(anychart.enums.GanttDataFields.BASELINE_END);
+  var baselineStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_START));
+  var baselineEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_END));
   var actualStartRatio = this.scale_.timestampToRatio(actualStart);
   var actualEndRatio = this.scale_.timestampToRatio(actualEnd);
   var baselineStartRatio = this.scale_.timestampToRatio(baselineStart);
@@ -2294,9 +2294,9 @@ anychart.core.gantt.Timeline.prototype.drawAsBaseline_ = function(dataItem, tota
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START) ||
+  var actualStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ||
       dataItem.meta('autoStart');
-  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END) ||
+  var actualEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ||
       dataItem.meta('autoEnd');
   var startRatio = this.scale_.timestampToRatio(actualStart);
   var endRatio = this.scale_.timestampToRatio(actualEnd);
@@ -2333,8 +2333,8 @@ anychart.core.gantt.Timeline.prototype.drawAsParent_ = function(dataItem, totalT
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsProgress_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var actualEnd = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var actualStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
+  var actualEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
   var startRatio = this.scale_.timestampToRatio(actualStart);
   var endRatio = this.scale_.timestampToRatio(actualEnd);
 
@@ -2367,7 +2367,7 @@ anychart.core.gantt.Timeline.prototype.drawAsProgress_ = function(dataItem, tota
  * @private
  */
 anychart.core.gantt.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START);
+  var actualStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
   var ratio = this.scale_.timestampToRatio(actualStart);
   if (ratio >= 0 && ratio <= 1) { //Is visible
     var settings = dataItem.get(anychart.enums.GanttDataFields.MILESTONE);
@@ -2487,20 +2487,20 @@ anychart.core.gantt.Timeline.prototype.drawConnectors_ = function() {
       var toRowHeight = anychart.core.gantt.Controller.getItemHeight(endItem);
 
       var fromStartTimestamp = this.isResourceChart_ ?
-          from['period'][anychart.enums.GanttDataFields.START] :
-          from['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
+          anychart.utils.normalizeTimestamp(from['period'][anychart.enums.GanttDataFields.START]) :
+          anychart.utils.normalizeTimestamp(from['item'].get(anychart.enums.GanttDataFields.ACTUAL_START));
 
       var fromEndTimestamp = this.isResourceChart_ ?
-          from['period'][anychart.enums.GanttDataFields.END] :
-          from['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
+          anychart.utils.normalizeTimestamp(from['period'][anychart.enums.GanttDataFields.END]) :
+          anychart.utils.normalizeTimestamp(from['item'].get(anychart.enums.GanttDataFields.ACTUAL_END));
 
       var toStartTimestamp = this.isResourceChart_ ?
-          to['period'][anychart.enums.GanttDataFields.START] :
-          to['item'].get(anychart.enums.GanttDataFields.ACTUAL_START);
+          anychart.utils.normalizeTimestamp(to['period'][anychart.enums.GanttDataFields.START]) :
+          anychart.utils.normalizeTimestamp(to['item'].get(anychart.enums.GanttDataFields.ACTUAL_START));
 
       var toEndTimestamp = this.isResourceChart_ ?
-          to['period'][anychart.enums.GanttDataFields.END] :
-          to['item'].get(anychart.enums.GanttDataFields.ACTUAL_END);
+          anychart.utils.normalizeTimestamp(to['period'][anychart.enums.GanttDataFields.END]) :
+          anychart.utils.normalizeTimestamp(to['item'].get(anychart.enums.GanttDataFields.ACTUAL_END));
 
       var fromMilestoneHalfWidth = 0;
       var toMilestoneHalfWidth = 0;
