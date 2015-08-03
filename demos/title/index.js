@@ -1,7 +1,7 @@
 var title, rect, rect2, bg;
 
 function load() {
-  title = new anychart.core.ui.Title();
+  title = anychart.ui.title();
   title.text('Some text')
       .container('container').background().enabled(false).fill('red 0.3').corners(10);
   title.margin(10).padding(10);
