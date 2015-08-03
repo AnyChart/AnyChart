@@ -40,32 +40,39 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.groupedPointFilter_ = null;
 
   /**
+   * 3D mode flag.
+   * @type {boolean}
+   * @private
+   */
+  this.mode3d_ = false;
+
+  /**
    * Start angle for the first slice of a pie chart.
    * @type {number}
    * @private
    */
-  this.startAngle_ = 0;
+  this.startAngle_;
 
   /**
    * Outer radius of the pie chart.
    * @type {(string|number)}
    * @private
    */
-  this.radius_ = '45%';
+  this.radius_;
 
   /**
    * Inner radius in case of a donut chart.
    * @type {!(string|number|function(number):number)}
    * @private
    */
-  this.innerRadius_ = 0;
+  this.innerRadius_;
 
   /**
    * The value to which pie slice should expand (explode).
    * @type {(string|number)}
    * @private
    */
-  this.explode_ = 15;
+  this.explode_;
 
   /**
    * The sort type for the pie points.
@@ -160,9 +167,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.fill_ = (function() {
-    return /** @type {acgraph.vector.Fill} */ (this['sourceColor']);
-  });
+  this.fill_ = null;
 
   /**
    * Default stroke function.
@@ -171,9 +176,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.stroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
-  });
+  this.stroke_ = null;
 
   /**
    * Default fill function for hover state.
@@ -182,9 +185,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Fill|Function}
    * @private
    */
-  this.hoverFill_ = (function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
+  this.hoverFill_ = null;
 
   /**
    * Default stroke function for hover state.
@@ -193,9 +194,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    * @type {acgraph.vector.Stroke|Function}
    * @private
    */
-  this.hoverStroke_ = (function() {
-    return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor']));
-  });
+  this.hoverStroke_ = null;
 
   /**
    * Hatch fill.
@@ -216,38 +215,15 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    */
   this.iterator_;
 
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'] || this['x'];
-  });
-  tooltip.contentFormatter(function() {
-    return (this['name'] || this['x']) + '\n' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
+  /**
+   * All (top, front, back, start, end) sides of the 3d pie.
+   * @type {Array.<anychart.charts.Pie.Side3D>}
+   * @private
+   */
+  this.sides3D_ = [];
 
-  this.palette();
-  this.hatchFillPalette();
-  this.labels()
-      .fontSize(13)
-      .padding(1);
-  (/** @type {anychart.core.ui.CircularLabelsFactory} */(this.hoverLabels())).enabled(null);
   this.data(opt_data || null, opt_csvSettings);
-  this.legend().enabled(true);
 
-  this.overlapMode(anychart.enums.LabelsOverlapMode.NO_OVERLAP);
-  this.outsideLabelsSpace('30');
-  this.insideLabelsOffset('50%');
-  this.connectorLength('20');
-  this.outsideLabelsCriticalAngle(60);
-  this.connectorStroke('black 0.3');
-  var title = this.title();
-  title.margin().bottom(0);
-
-  this.legend().tooltip().contentFormatter(function() {
-    return (this['value']) + '\n' + this['meta']['pointValue'];
-  });
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 
@@ -259,8 +235,45 @@ goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.getType = function() {
-  return anychart.enums.ChartTypes.PIE;
+  return this.mode3d_ ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
 };
+
+
+/**
+ * @typedef {{
+ *   index: number,
+ *   type: anychart.charts.Pie.Side3DType,
+ *   start: number,
+ *   end: number,
+ *   sweep: number,
+ *   angle: number,
+ *   ex: number,
+ *   ey: number,
+ *   isInFront: boolean
+ * }}
+ */
+anychart.charts.Pie.Side3D;
+
+
+/**
+ * The height of the ellipse relative to its width.
+ * @type {number}
+ */
+anychart.charts.Pie.ASPECT_3D = .45;
+
+
+/**
+ * The thickness of the pie (For 3D).
+ * @type {number}
+ */
+anychart.charts.Pie.PIE_THICKNESS = .2;
+
+
+/**
+ * Connectors z-index. 3D pie slices upper then this connectors.
+ * @type {number}
+ */
+anychart.charts.Pie.ZINDEX_CONNECTOR_LOWER_LAYER = 29;
 
 
 /**
@@ -303,6 +316,19 @@ anychart.charts.Pie.OUTSIDE_LABELS_MAX_WIDTH_ = 150;
  * @private
  */
 anychart.charts.Pie.OUTSIDE_LABELS_CONNECTOR_SIZE_ = 5;
+
+
+/**
+ * 3D sides type.
+ * @enum {string}
+ */
+anychart.charts.Pie.Side3DType = {
+  TOP: 'top',
+  FRONT: 'front',
+  BACK: 'back',
+  START: 'start',
+  END: 'end'
+};
 
 
 /**
@@ -618,6 +644,11 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
       isAqua = opt_fillOrColorOrKeys == 'aquastyle';
     }
 
+    // 3d mode does not have aqua style.
+    if (this.mode3d_ && isAqua) {
+      return this;
+    }
+
     var fill = goog.isFunction(opt_fillOrColorOrKeys) || isAqua ?
         opt_fillOrColorOrKeys :
         acgraph.vector.normalizeFill.apply(null, arguments);
@@ -919,7 +950,6 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
 anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.labels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.labels_.textFormatter(function() {
       return (this['value'] * 100 / this.getStat('sum')).toFixed(1) + '%';
     });
@@ -979,7 +1009,6 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
 anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   if (!this.hoverLabels_) {
     this.hoverLabels_ = new anychart.core.ui.CircularLabelsFactory();
-    this.hoverLabels_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
     this.registerDisposable(this.hoverLabels_);
   }
 
@@ -1664,10 +1693,10 @@ anychart.charts.Pie.prototype.getStrokeColor = function(usePointSettings, hover)
 /**
  * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the hatch fill should be a hover hatch fill.
+ * @param {boolean=} opt_hover If the hatch fill should be a hover hatch fill.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
  */
-anychart.charts.Pie.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.charts.Pie.prototype.getFinalHatchFill = function(usePointSettings, opt_hover) {
   var iterator = this.getIterator();
 
   var normalHatchFill;
@@ -1678,7 +1707,7 @@ anychart.charts.Pie.prototype.getFinalHatchFill = function(usePointSettings, hov
   }
 
   var hatchFill;
-  if (hover) {
+  if (opt_hover) {
     if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
       hatchFill = iterator.get('hoverHatchFill');
     } else if (goog.isDef(this.hoverHatchFill())) {
@@ -1821,6 +1850,10 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       this.hatchLayer_.zIndex(/** @type {number} */(anychart.charts.Pie.ZINDEX_HATCH_FILL)).disablePointerEvents(true);
     }
 
+    if (this.mode3d_) {
+      this.sides3D_.length = 0;
+    }
+
     var start = /** @type {number} */ (this.getStartAngle());
     var sweep = 0;
 
@@ -1837,9 +1870,19 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
         iterator.meta('exploded', exploded);
       }
 
-      this.drawSlice_();
+
+      if (this.mode3d_) {
+        this.prepare3DSlice_();
+      } else {
+        this.drawSlice_();
+      }
       start += sweep;
     }
+
+    if (this.mode3d_) {
+      this.draw3DSlices_();
+    }
+
     if (this.drawnConnectors_) {
       for (var i in this.drawnConnectors_) {
         this.drawnConnectors_[i].stroke(this.connectorStroke_);
@@ -1856,14 +1899,16 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.PIE_LABELS)) {
     if (!this.labels().container()) this.labels_.container(this.rootElement);
     this.labels().clear();
-    if (this.connectorsLayer_)
+    if (this.connectorsLayer_) {
       this.connectorsLayer_.clear();
+      if (this.mode3d_) this.connectorsLowerLayer_.clear();
+    }
 
     if (this.isOutsideLabels_()) {
-      this.labels().setAutoColor('#000');
+      this.labels().setAutoColor(anychart.getFullTheme()['pie']['outsideLabels']['autoColor']);
       this.calculateOutsideLabels();
     } else {
-      this.labels().setAutoColor('#fff');
+      this.labels().setAutoColor(anychart.getFullTheme()['pie']['insideLabels']['autoColor']);
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
@@ -1927,8 +1972,8 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
 
   if (exploded) {
     var angle = start + sweep / 2;
-    var cos = Math.cos(angle * Math.PI / 180);
-    var sin = Math.sin(angle * Math.PI / 180);
+    var cos = Math.cos(goog.math.toRadians(angle));
+    var sin = Math.sin(goog.math.toRadians(angle));
     var ex = this.explodeValue_ * cos;
     var ey = this.explodeValue_ * sin;
     slice = acgraph.vector.primitives.donut(slice, this.cx_ + ex, this.cy_ + ey, this.radiusValue_, this.innerRadiusValue_, start, sweep);
@@ -1946,6 +1991,915 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
   }
 
   return true;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  3D mode.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Enable 3d mode
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.charts.Pie}
+ */
+anychart.charts.Pie.prototype.mode3d = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.mode3d_ != opt_value) {
+      this.mode3d_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
+          anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return this.mode3d_;
+  }
+};
+
+
+/**
+ * Get minor semi-axes (minor radius) value.
+ * @param {number} majorRadius
+ * @return {number}
+ * @protected
+ */
+anychart.charts.Pie.prototype.get3DYRadius = function(majorRadius) {
+  return majorRadius * anychart.charts.Pie.ASPECT_3D;
+};
+
+
+/**
+ * Get the thickness of the pie.
+ * @return {number}
+ * @protected
+ */
+anychart.charts.Pie.prototype.get3DHeight = function() {
+  return this.radiusValue_ * anychart.charts.Pie.PIE_THICKNESS;
+};
+
+
+/**
+ * To prepare 3D slice.
+ * @private
+ */
+anychart.charts.Pie.prototype.prepare3DSlice_ = function() {
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var end = start + sweep;
+  // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
+  if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return;
+
+  var angle = start + sweep / 2;
+  var cos = Math.cos(goog.math.toRadians(angle));
+  var sin = Math.sin(goog.math.toRadians(angle));
+  var ex = this.explodeValue_ * cos;
+  var ey = this.get3DYRadius(this.explodeValue_) * sin;
+
+  this.sides3D_.push({
+    index: index,
+    type: anychart.charts.Pie.Side3DType.TOP,
+    start: start,
+    sweep: sweep,
+    ex: ex,
+    ey: ey
+  });
+
+  if (Math.abs(sweep) != 360) {
+    this.sides3D_.push({
+      index: index,
+      type: anychart.charts.Pie.Side3DType.START,
+      angle: start,
+      ex: ex,
+      ey: ey
+    });
+
+    this.sides3D_.push({
+      index: index,
+      type: anychart.charts.Pie.Side3DType.END,
+      angle: end,
+      ex: ex,
+      ey: ey
+    });
+  }
+
+  var len1;
+  var len2;
+  var j;
+
+  if (this.hasFrontSide_(start, end)) {
+    var frontSides = this.getFrontSides_(start, end);
+
+    len1 = this.sides3D_.length;
+    len2 = frontSides.length;
+    this.sides3D_.length = len1 + len2;
+    for (j = 0; j < len2; j++) {
+      frontSides[j].index = index;
+      frontSides[j].type = anychart.charts.Pie.Side3DType.FRONT;
+      frontSides[j].sweep = sweep;
+      frontSides[j].ex = ex;
+      frontSides[j].ey = ey;
+
+      this.sides3D_[len1 + j] = frontSides[j];
+    }
+  }
+
+  if (this.hasBackSide_(start, end)) {
+    var backSides = this.getBackSides_(start, end);
+
+    len1 = this.sides3D_.length;
+    len2 = backSides.length;
+    this.sides3D_.length = len1 + len2;
+    for (j = 0; j < len2; j++) {
+      backSides[j].index = index;
+      backSides[j].type = anychart.charts.Pie.Side3DType.BACK;
+      backSides[j].sweep = sweep;
+      backSides[j].ex = ex;
+      backSides[j].ey = ey;
+
+      this.sides3D_[len1 + j] = backSides[j];
+    }
+  }
+};
+
+
+/**
+ * Draw whole 3D slice.
+ * @param {number=} opt_sliceIndex
+ * @param {boolean=} opt_update
+ * @private
+ */
+anychart.charts.Pie.prototype.draw3DSlices_ = function(opt_sliceIndex, opt_update) {
+  var i = 0, length = this.sides3D_.length;
+  var side;
+
+  if (goog.isDef(opt_sliceIndex)) {
+    for (i = 0; i < length; i++) {
+      side = this.sides3D_[i];
+      if (side.index == opt_sliceIndex) {
+        this.draw3DSlice_(side, opt_update);
+      }
+    }
+
+  } else {
+    for (i = 0; i < length; i++) {
+      side = this.sides3D_[i];
+
+      switch (side.type) {
+        case anychart.charts.Pie.Side3DType.TOP:
+          side.sortWeight = 1;
+          break;
+        case anychart.charts.Pie.Side3DType.FRONT:
+          side.sortWeight = (side.isInFront ?
+              1 :
+              anychart.math.round(Math.sin(goog.math.toRadians(this.getCenterAngle_(side.start, side.end))), 7));
+          break;
+        case anychart.charts.Pie.Side3DType.BACK:
+          side.sortWeight = (side.isInFront ?
+              -1 :
+              anychart.math.round(Math.sin(goog.math.toRadians(this.getCenterAngle_(side.start, side.end))), 7));
+          break;
+        // for start or end side
+        default:
+          side.sortWeight = anychart.math.round(Math.sin(goog.math.toRadians(side.angle)), 7);
+          break;
+      }
+    }
+
+    this.sides3D_.sort(function(a, b) {
+      return a.sortWeight - b.sortWeight;
+    });
+
+    for (i = 0; i < length; i++) {
+      this.draw3DSlice_(this.sides3D_[i]);
+    }
+  }
+};
+
+
+/**
+ * Draw 3D slice by side settings.
+ * @param {Object} side
+ * @param {boolean=} opt_update
+ * @private
+ */
+anychart.charts.Pie.prototype.draw3DSlice_ = function(side, opt_update) {
+  var iterator = this.getIterator();
+  iterator.select(side.index);
+  var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
+
+  var cx = this.cx_;
+  var cy = this.cy_;
+  if (exploded) {
+    cx += side.ex;
+    cy += side.ey;
+  }
+
+  var outerR = this.radiusValue_;
+  var innerR = this.innerRadiusValue_;
+
+  var hover = (this.hoverStatus == side.index);
+
+  switch (side.type) {
+    case anychart.charts.Pie.Side3DType.TOP:
+      this.drawTopSide_(cx, cy, outerR, innerR, side.start, side.sweep, opt_update, hover);
+      break;
+    case anychart.charts.Pie.Side3DType.FRONT:
+      this.drawFrontSide_(cx, cy, outerR, side.start, side.end, side.sweep, opt_update, hover);
+      break;
+    case anychart.charts.Pie.Side3DType.BACK:
+      this.drawBackSide_(cx, cy, innerR, side.start, side.end, side.sweep, opt_update, hover);
+      break;
+    case anychart.charts.Pie.Side3DType.START:
+      this.drawSimpleSide_('startPath', cx, cy, outerR, innerR, side.angle, opt_update, hover);
+      break;
+    case anychart.charts.Pie.Side3DType.END:
+      this.drawSimpleSide_('endPath', cx, cy, outerR, innerR, side.angle, opt_update, hover);
+      break;
+  }
+};
+
+
+/**
+ * Draw top side.
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} innerR
+ * @param {number} start Start angle in degrees.
+ * @param {number} sweep Sweep angle in degrees.
+ * @param {boolean=} opt_update
+ * @param {boolean=} opt_hover
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Pie.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, start, sweep, opt_update, opt_hover) {
+  if (outerR < 0) outerR = 0;
+  if (innerR < 0) innerR = 0;
+  if (outerR < innerR) {
+    var tmp = outerR;
+    outerR = innerR;
+    innerR = tmp;
+  }
+
+  sweep = goog.math.clamp(sweep, -360, 360);
+
+  var path = this.createPath_('topPath', opt_update);
+
+  // draw pie
+  if (innerR <= 0) {
+    if (Math.abs(sweep) == 360) {
+      path.circularArc(cx, cy, outerR, this.get3DYRadius(outerR), start, sweep, false);
+    } else {
+      path.moveTo(cx, cy).circularArc(cx, cy, outerR, this.get3DYRadius(outerR), start, sweep, true).close();
+    }
+
+    this.colorize3DPath_('topPath', opt_hover);
+    return path;
+  }
+
+  var drawSides = Math.abs(sweep) < 360;
+
+  path.circularArc(cx, cy, outerR, this.get3DYRadius(outerR), start, sweep)
+      .circularArc(cx, cy, innerR, this.get3DYRadius(innerR), start + sweep, -sweep, drawSides);
+
+  if (drawSides) {
+    path.close();
+  }
+
+  this.colorize3DPath_('topPath', opt_hover);
+  return path;
+};
+
+
+/**
+ * Get path name for hatchPath.
+ * @param {string} pathName
+ * @return {string}
+ * @private
+ */
+anychart.charts.Pie.prototype.get3DHatchPathName_ = function(pathName) {
+  // capitalize
+  return 'hatch' + String(pathName.charAt(0)).toUpperCase() + pathName.substr(1);
+};
+
+
+/**
+ *
+ * @param {string} pathName
+ * @param {boolean=} opt_update
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Pie.prototype.createPath_ = function(pathName, opt_update) {
+  var iterator = this.getIterator();
+  var hatchName = this.get3DHatchPathName_(pathName);
+
+  /** @type {!acgraph.vector.Path} */
+  var path;
+  /** @type {!acgraph.vector.Path} */
+  var hatchPath;
+  if (opt_update) {
+    path = /** @type {!acgraph.vector.Path} */ (iterator.meta(pathName));
+    hatchPath = /** @type {!acgraph.vector.Path} */ (iterator.meta(hatchName));
+
+    path.clear();
+    if (hatchPath) hatchPath.clear();
+
+  } else {
+    path = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
+    iterator.meta(pathName, path);
+
+    hatchPath = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
+    iterator.meta(hatchName, hatchPath);
+  }
+
+  return path;
+};
+
+
+/**
+ * Colorize and apply hatchFill for all path of slice.
+ * @param {boolean} hover
+ * @private
+ */
+anychart.charts.Pie.prototype.colorize3DSlice_ = function(hover) {
+  var i, length = this.sides3D_.length;
+  var side;
+  var index = this.getIterator().getIndex();
+
+  for (i = 0; i < length; i++) {
+    side = this.sides3D_[i];
+    if (side.index == index) {
+      var uniqueValue = side.type == anychart.charts.Pie.Side3DType.FRONT ||
+                        side.type == anychart.charts.Pie.Side3DType.BACK ? side.start : '';
+      this.colorize3DPath_(side.type + 'Path' + uniqueValue, hover);
+    }
+  }
+};
+
+
+/**
+ * Get fill color for 3D mode.
+ * Compute named colors (from point data) and fallback if rawColor is not hex.
+ * @param {boolean=} opt_hover
+ * @return {string}
+ * @private
+ */
+anychart.charts.Pie.prototype.get3DFillColor_ = function(opt_hover) {
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */(iterator.get('fill') || this.fill());
+  var rawColor = /** @type {!acgraph.vector.Fill} */(opt_hover ?
+      this.normalizeColor(
+          /** @type {acgraph.vector.Fill|Function} */(iterator.get('hoverFill') || normalColor), normalColor) :
+      this.normalizeColor(normalColor));
+
+  var parsedColor;
+  if (goog.isString(rawColor)) {
+    parsedColor = anychart.color.parseColor(rawColor);
+  }
+
+  var paletteColor = this.palette().colorAt(index);
+  var parsedPaletteColor;
+  // extract color
+  if (goog.isObject(paletteColor)) {
+    if (paletteColor.color) {
+      parsedPaletteColor = anychart.color.parseColor(paletteColor.color);
+    } else if (paletteColor.keys && paletteColor.keys.length) {
+      parsedPaletteColor = anychart.color.parseColor(paletteColor.keys[0].color);
+    }
+  }
+  var finalPaletteColor = parsedPaletteColor ? parsedPaletteColor.hex : paletteColor;
+
+  return parsedColor ? parsedColor.hex : finalPaletteColor;
+};
+
+
+/**
+ * Get stroke color for 3D mode for legend.
+ * @return {acgraph.vector.Stroke}
+ */
+anychart.charts.Pie.prototype.get3DStrokeColor = function() {
+  return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this.get3DFillColor_(), .2));
+};
+
+
+/**
+ * Colorize and apply hatchFill for path.
+ * @param {!string} pathName
+ * @param {boolean=} opt_hover
+ * @private
+ */
+anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, opt_hover) {
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+
+  var color = this.get3DFillColor_(opt_hover);
+  var rgbColor = goog.color.hexToRgb(color);
+
+  var path = iterator.meta(pathName);
+  path.tag = index;
+
+  var fill;
+
+  var rgbDarken = goog.color.darken(rgbColor, .3);
+  var rgbLighten = goog.color.lighten(rgbColor, .1);
+
+  var topPathSecondColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .7));
+  var frontSecondColor = goog.color.rgbArrayToHex(goog.color.blend(rgbDarken, rgbLighten, .1));
+  var frontThirdColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .8));
+  var darkPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .2));
+  var darkSidesPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
+
+  if (pathName == 'topPath') {
+    fill = {
+      'angle': -50,
+      'keys': [{
+        'position': 0,
+        'opacity': 1,
+        'color': opt_hover ? anychart.color.lighten(color, .3) : color
+      }, {
+        'position': 1,
+        'opacity': 1,
+        'color': opt_hover ? anychart.color.lighten(topPathSecondColor, .2) : topPathSecondColor
+      }]
+    };
+
+  } else if (goog.string.startsWith(pathName, 'frontPath')) {
+    fill = {
+      'angle': 45,
+      'keys': [{
+        'position': 0,
+        'opacity': 1,
+        'color': opt_hover ? anychart.color.lighten(color, .2) : anychart.color.lighten(color, .1)
+      }, {
+        'position': .19,
+        'opacity': 1,
+        'color': opt_hover ? anychart.color.lighten(frontSecondColor, .2) : frontSecondColor
+      }, {
+        'position': 1,
+        'opacity': 1,
+        'color': opt_hover ? anychart.color.lighten(frontThirdColor, .2) : frontThirdColor
+      }]
+    };
+
+  } else if (goog.string.startsWith(pathName, 'backPath')) {
+    fill = opt_hover ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
+
+  // sides (start, end)
+  } else {
+    fill = opt_hover ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
+  }
+
+  path.fill(fill);
+  // use stroke with some fill for white space compensation between paths of slice
+  path.stroke(fill);
+
+  var hatchPathName = this.get3DHatchPathName_(pathName);
+  var hatchPath = iterator.meta(hatchPathName);
+  if (hatchPath) {
+    hatchPath.deserialize(path.serialize());
+    hatchPath.tag = index;
+    this.applyHatchFill(opt_hover, hatchPathName);
+  }
+};
+
+
+/**
+ * True if slice has front side.
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @return {boolean}
+ * @private
+ */
+anychart.charts.Pie.prototype.hasFrontSide_ = function(startAngle, endAngle) {
+  if (startAngle == endAngle) return false;
+
+  startAngle = goog.math.toRadians(startAngle);
+  endAngle = goog.math.toRadians(endAngle);
+
+  var startCos = anychart.math.round(Math.cos(startAngle), 7);
+  var endCos = anychart.math.round(Math.cos(endAngle), 7);
+
+  var startQuadrant = this.getQuadrant_(startCos, Math.sin(startAngle));
+  var endQuadrant = this.getQuadrant_(endCos, Math.sin(endAngle));
+
+  if (startQuadrant == 1 || startQuadrant == 2) return true;
+
+  if (startQuadrant == 3) {
+    if (endQuadrant == 1 || endQuadrant == 2) return true;
+    if (endQuadrant == 3) return (startCos >= endCos);
+    return false;
+  }
+
+  if (startQuadrant == 4) {
+    if (endQuadrant == 4) return (startCos >= endCos);
+    return true;
+  }
+
+  return false;
+};
+
+
+/**
+ * True if slice has back side.
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @return {boolean}
+ * @private
+ */
+anychart.charts.Pie.prototype.hasBackSide_ = function(startAngle, endAngle) {
+  if (startAngle == endAngle) return false;
+
+  startAngle = goog.math.toRadians(startAngle);
+  endAngle = goog.math.toRadians(endAngle);
+
+  var startCos = anychart.math.round(Math.cos(startAngle), 7);
+  var endCos = anychart.math.round(Math.cos(endAngle), 7);
+
+  var startQuadrant = this.getQuadrant_(startCos, Math.sin(startAngle));
+  var endQuadrant = this.getQuadrant_(endCos, Math.sin(endAngle));
+
+  if (startQuadrant == 3 || startQuadrant == 4) return true;
+
+  if (startQuadrant == 1) {
+    if (endQuadrant == 3 || endQuadrant == 4) return true;
+    if (endQuadrant == 1) return (startCos <= endCos);
+    return false;
+  }
+
+  if (startQuadrant == 2) {
+    if (endQuadrant == 2) return (startCos <= endCos);
+    return true;
+  }
+  return false;
+};
+
+
+/**
+ * Get quadrant (from 1st to 4th).
+ * @param {number} cos
+ * @param {number} sin
+ * @return {number}
+ * @private
+ */
+anychart.charts.Pie.prototype.getQuadrant_ = function(cos, sin) {
+  if (cos >= 0 && sin >= 0)
+    return 1;
+  if (cos <= 0 && sin >= 0)
+    return 2;
+  if (cos <= 0 && sin < 0)
+    return 3;
+  return 4;
+};
+
+
+/**
+ * Get all (one or two) paths of front side.
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @return {Array.<anychart.charts.Pie.Side3D>}
+ * @private
+ */
+anychart.charts.Pie.prototype.getFrontSides_ = function(startAngle, endAngle) {
+  var startSin = Math.sin(goog.math.toRadians(startAngle));
+  var endSin = Math.sin(goog.math.toRadians(endAngle));
+
+  var startCos = anychart.math.round(Math.cos(goog.math.toRadians(startAngle)), 7);
+  var endCos = anychart.math.round(Math.cos(goog.math.toRadians(endAngle)), 7);
+
+  var startQuadrant = this.getQuadrant_(startCos, startSin);
+  var endQuadrant = this.getQuadrant_(endCos, endSin);
+
+  var sides = [];
+
+  if (startQuadrant == 1) {
+    switch (endQuadrant) {
+      case 1:
+        if (startCos >= endCos) {
+          sides.push({start: startAngle, end: endAngle});
+        } else {
+          sides.push({start: startAngle, end: 180, isInFront: true});
+          sides.push({start: 360, end: endAngle});
+        }
+        break;
+      case 2:
+        sides.push({start: startAngle, end: endAngle, isInFront: true});
+        break;
+      case 3:
+      case 4:
+        sides.push({start: startAngle, end: 180, isInFront: true});
+        break;
+    }
+  } else if (startQuadrant == 2) {
+    switch (endQuadrant) {
+      case 1:
+        sides.push({start: startAngle, end: 180});
+        sides.push({start: 360, end: endAngle});
+        break;
+      case 2:
+        if (startCos >= endCos) {
+          sides.push({start: startAngle, end: endAngle});
+        } else {
+          sides.push({start: startAngle, end: 180});
+          sides.push({start: 360, end: endAngle, isInFront: true});
+        }
+        break;
+      case 3:
+      case 4:
+        sides.push({start: startAngle, end: 180});
+        break;
+    }
+  } else if (startQuadrant == 3) {
+    switch (endQuadrant) {
+      case 1:
+        sides.push({start: 360, end: endAngle});
+        break;
+      case 2:
+        sides.push({start: 360, end: endAngle, isInFront: true});
+        break;
+      case 3:
+        if (startCos >= endCos) {
+          sides.push({start: 0, end: 180, isInFront: true});
+        }
+        break;
+    }
+  } else if (startQuadrant == 4) {
+    switch (endQuadrant) {
+      case 1:
+        sides.push({start: 360, end: endAngle});
+        break;
+      case 2:
+        sides.push({start: 360, end: endAngle, isInFront: true});
+        break;
+      case 3:
+        sides.push({start: 360, end: 180, isInFront: true});
+        break;
+      case 4:
+        if (startCos >= endCos) {
+          sides.push({start: 0, end: 180, isInFront: true});
+        }
+        break;
+    }
+  }
+
+  return sides;
+};
+
+
+/**
+ * Get all (one or two) paths of back side.
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @return {Array.<anychart.charts.Pie.Side3D>}
+ * @private
+ */
+anychart.charts.Pie.prototype.getBackSides_ = function(startAngle, endAngle) {
+  var startSin = Math.sin(goog.math.toRadians(startAngle));
+  var endSin = Math.sin(goog.math.toRadians(endAngle));
+
+  var startCos = anychart.math.round(Math.cos(goog.math.toRadians(startAngle)), 7);
+  var endCos = anychart.math.round(Math.cos(goog.math.toRadians(endAngle)), 7);
+
+  var startQuadrant = this.getQuadrant_(startCos, startSin);
+  var endQuadrant = this.getQuadrant_(endCos, endSin);
+
+  var sides = [];
+
+  if (startQuadrant == 1) {
+    switch (endQuadrant) {
+      case 1:
+        if (startCos <= endCos) {
+          sides.push({start: 180, end: 360});
+        }
+        break;
+      case 3:
+        sides.push({start: 180, end: endAngle});
+        break;
+      case 4:
+        sides.push({start: 180, end: endAngle, isInFront: true});
+        break;
+    }
+  } else if (startQuadrant == 2) {
+    switch (endQuadrant) {
+      case 1:
+        sides.push({start: 180, end: 360, isInFront: true});
+        break;
+      case 2:
+        if (startCos <= endCos) {
+          sides.push({start: 180, end: 360, isInFront: true});
+        }
+        break;
+      case 3:
+        sides.push({start: 180, end: endAngle});
+        break;
+      case 4:
+        sides.push({start: 180, end: endAngle, isInFront: true});
+        break;
+    }
+  } else if (startQuadrant == 3) {
+    switch (endQuadrant) {
+      case 1:
+      case 2:
+        sides.push({start: startAngle, end: 360, isInFront: true});
+        break;
+      case 3:
+        if (startCos >= endCos) {
+          sides.push({start: startAngle, end: 360});
+          sides.push({start: 180, end: endAngle});
+        } else {
+          sides.push({start: startAngle, end: endAngle});
+        }
+        break;
+      case 4:
+        sides.push({start: startAngle, end: endAngle, isInFront: true});
+        break;
+    }
+  } else if (startQuadrant == 4) {
+    switch (endQuadrant) {
+      case 1:
+      case 2:
+        sides.push({start: startAngle, end: 360});
+        break;
+      case 3:
+        sides.push({start: startAngle, end: 360});
+        sides.push({start: 180, end: endAngle});
+        break;
+      case 4:
+        if (startCos >= endCos) {
+          sides.push({start: startAngle, end: 360});
+          sides.push({start: 180, end: endAngle});
+        } else {
+          sides.push({start: startAngle, end: endAngle});
+        }
+        break;
+    }
+  }
+
+  return sides;
+};
+
+
+/**
+ * Draw front side.
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @param {number} sweep
+ * @param {boolean=} opt_update
+ * @param {boolean=} opt_hover
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Pie.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, opt_update, opt_hover) {
+  // there may be two front sides
+  var uniqueValue = '' + startAngle;
+  var pathName = 'frontPath' + uniqueValue;
+  var path = this.createPath_(pathName, opt_update);
+
+  var outerXR = outerR;
+  var outerYR = this.get3DYRadius(outerR);
+
+  var h = this.get3DHeight();
+
+  if (endAngle < startAngle) endAngle += 360;
+
+  if (Math.abs(sweep) == 360) {
+    startAngle = 0;
+    endAngle = 180;
+  }
+
+  var radStartAngle = goog.math.toRadians(startAngle);
+  var radEndAngle = goog.math.toRadians(endAngle);
+
+  var startX = cx + outerXR * +Math.cos(radStartAngle).toFixed(5);
+  var startY = cy + outerYR * +Math.sin(radStartAngle).toFixed(5);
+
+  var endX = cx + outerXR * +Math.cos(radEndAngle).toFixed(5);
+  var endY = cy + outerYR * +Math.sin(radEndAngle).toFixed(5);
+
+  path.moveTo(startX, startY);
+  path.arcToByEndPoint(endX, endY, outerXR, outerYR, false, true);
+  path.lineTo(endX, endY + h);
+  path.arcToByEndPoint(startX, startY + h, outerXR, outerYR, false, false);
+  path.lineTo(startX, startY);
+  path.close();
+
+  this.colorize3DPath_(pathName, opt_hover);
+  return path;
+};
+
+
+/**
+ * Draw back side.
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} innerR
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @param {number} sweep
+ * @param {boolean=} opt_update
+ * @param {boolean=} opt_hover
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Pie.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, opt_update, opt_hover) {
+  // there may be two back sides
+  var uniqueValue = '' + startAngle;
+  var pathName = 'backPath' + uniqueValue;
+  var path = this.createPath_(pathName, opt_update);
+
+  var innerXR = innerR;
+  var innerYR = this.get3DYRadius(innerR);
+
+  var h = this.get3DHeight();
+
+  if (endAngle < startAngle) endAngle += 360;
+
+  if (Math.abs(sweep) == 360) {
+    startAngle = 180;
+    endAngle = 0;
+  }
+
+  var radStartAngle = goog.math.toRadians(startAngle);
+  var radEndAngle = goog.math.toRadians(endAngle);
+
+  var innerStartX = cx + innerXR * Math.cos(radStartAngle);
+  var innerStartY = cy + innerYR * Math.sin(radStartAngle);
+
+  var innerEndX = cx + innerXR * Math.cos(radEndAngle);
+  var innerEndY = cy + innerYR * Math.sin(radEndAngle);
+
+  path.moveTo(innerStartX, innerStartY);
+  path.arcToByEndPoint(innerEndX, innerEndY, innerXR, innerYR, false, true);
+  path.lineTo(innerEndX, innerEndY + h);
+  path.arcToByEndPoint(innerStartX, innerStartY + h, innerXR, innerYR, false, false);
+  path.lineTo(innerStartX, innerStartY);
+  path.close();
+
+  this.colorize3DPath_(pathName, opt_hover);
+  return path;
+};
+
+
+/**
+ * Draw simple (rect) side (start and end sides of pie).
+ * @param {!string} pathName
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} innerR
+ * @param {number} angle
+ * @param {boolean=} opt_update
+ * @param {boolean=} opt_hover
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Pie.prototype.drawSimpleSide_ = function(pathName, cx, cy, outerR, innerR, angle, opt_update, opt_hover) {
+  var outerXR = outerR;
+  var outerYR = this.get3DYRadius(outerR);
+  var innerXR = innerR;
+  var innerYR = this.get3DYRadius(innerR);
+
+  var radAngle = goog.math.toRadians(angle);
+
+  var h = this.get3DHeight();
+  var x1 = cx + innerXR * Math.cos(radAngle);
+  var x2 = cx + outerXR * Math.cos(radAngle);
+  var y1 = cy + innerYR * Math.sin(radAngle);
+  var y2 = cy + outerYR * Math.sin(radAngle);
+
+  var path = this.createPath_(pathName, opt_update);
+  path.moveTo(x1, y1);
+  path.lineTo(x2, y2);
+  path.lineTo(x2, y2 + h);
+  path.lineTo(x1, y1 + h);
+  path.lineTo(x1, y1);
+  path.close();
+
+  this.colorize3DPath_(pathName, opt_hover);
+  return path;
+};
+
+
+/**
+ * Get center angle.
+ * @param {number} startAngle
+ * @param {number} endAngle
+ * @return {number}
+ * @private
+ */
+anychart.charts.Pie.prototype.getCenterAngle_ = function(startAngle, endAngle) {
+  if (endAngle < startAngle) endAngle += 360;
+
+  return (startAngle + endAngle) / 2;
 };
 
 
@@ -2067,18 +3021,18 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
     if (exploded) {
       angle = (start + sweep / 2) * Math.PI / 180;
       var ex = this.explodeValue_ * Math.cos(angle);
-      var ey = this.explodeValue_ * Math.sin(angle);
+      var ey = (this.mode3d_ ? this.get3DYRadius(this.explodeValue_) : this.explodeValue_) * Math.sin(angle);
       cx += ex;
       cy += ey;
     }
 
     angle = start * Math.PI / 180;
     var ax = cx + this.radiusValue_ * Math.cos(angle);
-    var ay = cy + this.radiusValue_ * Math.sin(angle);
+    var ay = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     angle = (start + sweep) * Math.PI / 180;
     var bx = cx + this.radiusValue_ * Math.cos(angle);
-    var by = cy + this.radiusValue_ * Math.sin(angle);
+    var by = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
     if (!this.measureLabel_) this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
     else this.measureLabel_.clear();
@@ -2150,17 +3104,26 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
  * @protected
  */
 anychart.charts.Pie.prototype.colorizeSlice = function(hover) {
-  var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
-  if (goog.isDef(slice)) {
-    var fill = this.getFillColor(true, hover);
-    if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
-      fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
-    slice.fill(fill);
+  if (this.mode3d_) {
+    this.colorize3DSlice_(hover);
 
-    fill = this.getStrokeColor(true, hover);
-    if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
-      fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
-    slice.stroke(fill);
+  } else {
+    var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
+    if (goog.isDef(slice)) {
+      var fill = this.getFillColor(true, hover);
+      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode)) {
+        fill = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fill)));
+        fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      }
+      slice.fill(fill);
+
+      fill = this.getStrokeColor(true, hover);
+      if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
+        fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
+      slice.stroke(fill);
+
+      this.applyHatchFill(hover);
+    }
   }
 };
 
@@ -2168,15 +3131,16 @@ anychart.charts.Pie.prototype.colorizeSlice = function(hover) {
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {boolean=} opt_hover If the point is hovered.
+ * @param {string=} opt_pathName
  * @protected
  */
-anychart.charts.Pie.prototype.applyHatchFill = function(hover) {
-  var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta('hatchSlice'));
+anychart.charts.Pie.prototype.applyHatchFill = function(opt_hover, opt_pathName) {
+  var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta(opt_pathName || 'hatchSlice'));
   if (goog.isDefAndNotNull(hatchSlice)) {
     hatchSlice
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, hover));
+        .fill(this.getFinalHatchFill(true, opt_hover));
   }
 };
 
@@ -2253,7 +3217,6 @@ anychart.charts.Pie.prototype.hoverSlices = function() {
   if (this.hoverStatus >= 0) {
     if (this.getIterator().select(this.hoverStatus)) {
       this.colorizeSlice(false);
-      this.applyHatchFill(false);
       this.drawLabel_(false, true);
     }
   }
@@ -2261,7 +3224,6 @@ anychart.charts.Pie.prototype.hoverSlices = function() {
   var iterator = this.getIterator().reset();
   while (iterator.advance()) {
     this.colorizeSlice(true);
-    this.applyHatchFill(true);
   }
 
   this.hoverStatus = -1;
@@ -2285,7 +3247,6 @@ anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
   this.unhover();
   if (this.getIterator().select(index)) {
     this.colorizeSlice(true);
-    this.applyHatchFill(true);
     if (goog.isDef(opt_event)) this.showTooltip(opt_event);
     this.drawLabel_(true, true);
   }
@@ -2307,14 +3268,12 @@ anychart.charts.Pie.prototype.unhover = function() {
   if (this.hoverStatus >= 0) {
     if (this.getIterator().select(this.hoverStatus)) {
       this.colorizeSlice(false);
-      this.applyHatchFill(false);
       this.drawLabel_(false, true);
     }
   } else {
     var iterator = this.getIterator().reset();
     while (iterator.advance()) {
       this.colorizeSlice(false);
-      this.applyHatchFill(false);
       this.drawLabel_(false, true);
     }
   }
@@ -2351,8 +3310,13 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
     var exploded = iterator.meta('exploded');
     iterator.meta('exploded', !exploded);
   }
-  this.drawSlice_(true);
+
   var index = iterator.getIndex();
+  if (this.mode3d_) {
+    this.draw3DSlices_(index, true);
+  } else {
+    this.drawSlice_(true);
+  }
   if (this.isOutsideLabels_()) {
     this.labels().suspendSignalsDispatching();
     this.labels().clear();
@@ -2540,8 +3504,8 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': this.getStrokeColor(true, false),
-      'iconFill': this.getFillColor(true, false),
+      'iconStroke': this.mode3d_ ? this.get3DStrokeColor() : this.getStrokeColor(true, false),
+      'iconFill': this.mode3d_ ? this.get3DFillColor_(false) : this.getFillColor(true, false),
       'iconHatchFill': this.getFinalHatchFill(true, false)
     };
     goog.object.extend(obj, legendItem);
@@ -2562,7 +3526,7 @@ anychart.charts.Pie.prototype.legendItemCanInteractInMode = function(mode) {
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.legendItemClick = function(item) {
+anychart.charts.Pie.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   var iterator = this.data().getIterator();
   if (iterator.select(/** @type {number} */ (sourceKey))) {
@@ -2884,10 +3848,17 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     isRightSide = angleDeg < 90 || angleDeg > 270;
 
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
+    var dR1 = this.mode3d_ ?
+        this.get3DYRadius(this.radiusValue_) + (exploded ? this.get3DYRadius(this.explodeValue_) : 0) :
+        dR0;
 
     // coordinates of the point where the connector touches a pie
     x0 = this.cx_ + dR0 * Math.cos(angle);
-    y0 = this.cy_ + dR0 * Math.sin(angle);
+    y0 = this.cy_ + dR1 * Math.sin(angle);
+
+    if (this.mode3d_) {
+      y0 += this.get3DHeight() / 2;
+    }
 
     connector = isRightSide ?
         anychart.charts.Pie.OUTSIDE_LABELS_CONNECTOR_SIZE_ :
@@ -2936,11 +3907,11 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       }
     }
   }
-  leftDomains.push(domain);
+  if (domain) leftDomains.push(domain);
 
   for (i = 0, len = leftDomains.length; i < len; i++) {
     domain = leftDomains[i];
-    if (domain.droppedLabels) {
+    if (domain && domain.droppedLabels) {
       if (!droppedLabels) droppedLabels = [];
       droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
     }
@@ -3020,7 +3991,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
       }
     }
   }
-  rightDomains.push(domain);
+  if (domain) rightDomains.push(domain);
 
   if (droppedLabels) droppedLabels.length = 0;
   for (i = 0, len = rightDomains.length; i < len; i++) {
@@ -3089,6 +4060,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
   if (this.connectorsLayer_) {
     this.connectorsLayer_.clear();
+    if (this.mode3d_) this.connectorsLowerLayer_.clear();
   } else {
     this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
       return acgraph.path();
@@ -3097,6 +4069,16 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     });
     this.connectorsLayer_.parent(this.rootElement);
     this.connectorsLayer_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
+
+    if (this.mode3d_) {
+      this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.connectorsLowerLayer_.parent(this.rootElement);
+      this.connectorsLowerLayer_.zIndex(anychart.charts.Pie.ZINDEX_CONNECTOR_LOWER_LAYER);
+    }
   }
   this.drawnConnectors_ = [];
   if (!this.hoveredLabelConnectorPath_) {
@@ -3120,7 +4102,13 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
           index = label.getIndex();
 
           if (!this.drawnConnectors_[index]) {
-            this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+            if (this.mode3d_ && y0 < this.cy_) {
+              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+            } else {
+              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            }
+            this.drawnConnectors_[index] = connectorPath;
             connectorPath.stroke(this.connectorStroke_);
             this.drawConnectorLine(label, connectorPath);
           }
@@ -3142,7 +4130,13 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
           index = label.getIndex();
 
           if (!this.drawnConnectors_[index]) {
-            this.drawnConnectors_[index] = connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+            if (this.mode3d_ && y0 < this.cy_) {
+              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+            } else {
+              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            }
+            this.drawnConnectors_[index] = connectorPath;
             connectorPath.stroke(this.connectorStroke_);
             this.drawConnectorLine(label, connectorPath);
           }
@@ -3229,23 +4223,68 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
   var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !singlePoint;
   var angle = start + sweep / 2;
   var dR;
+  var outerXR;
+  var outerYR;
+  var innerXR;
+  var innerYR;
+  var xRadius;
+  var yRadius;
 
-  if (outside)
-    dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
-  else {
-    var radius = singlePoint && !this.innerRadiusValue_ ? 0 : this.radiusValue_ - this.innerRadiusValue_;
-    dR = anychart.utils.normalizeSize(this.insideLabelsOffset_, radius) +
-        this.innerRadiusValue_ + (exploded ? this.explodeValue_ : 0);
+  if (this.mode3d_) {
+    if (outside) {
+      xRadius = this.radiusValue_ + this.connectorLengthValue_;
+      yRadius = this.get3DYRadius(this.radiusValue_) + this.connectorLengthValue_;
+
+      if (exploded) {
+        xRadius += this.explodeValue_;
+        yRadius += this.get3DYRadius(this.explodeValue_);
+      }
+
+    } else {
+      outerXR = this.radiusValue_;
+      outerYR = this.get3DYRadius(this.radiusValue_);
+      innerXR = this.innerRadiusValue_;
+      innerYR = this.get3DYRadius(this.innerRadiusValue_);
+
+      if (singlePoint && innerXR == 0) {
+        xRadius = 0;
+        yRadius = 0;
+      } else {
+        xRadius = anychart.utils.normalizeSize(this.insideLabelsOffset_, (innerXR + outerXR));
+        // support pixels value
+        if (anychart.utils.isPercent(this.insideLabelsOffset_)) {
+          yRadius = anychart.utils.normalizeSize(this.insideLabelsOffset_, (innerYR + outerYR));
+        } else {
+          yRadius = this.get3DYRadius(anychart.utils.normalizeSize(this.insideLabelsOffset_, (innerYR + outerYR)));
+        }
+
+        if (exploded) {
+          xRadius += this.explodeValue_;
+          yRadius += this.get3DYRadius(this.explodeValue_);
+        }
+      }
+    }
+
+    return {'value': {'angle': angle, 'radius': xRadius, 'radiusY': yRadius}};
+
+  } else {
+    if (outside) {
+      dR = (this.radiusValue_ + this.connectorLengthValue_) + (exploded ? this.explodeValue_ : 0);
+    } else {
+      var radius = singlePoint && !this.innerRadiusValue_ ? 0 : this.radiusValue_ - this.innerRadiusValue_;
+      dR = anychart.utils.normalizeSize(this.insideLabelsOffset_, radius) +
+          this.innerRadiusValue_ + (exploded ? this.explodeValue_ : 0);
+    }
+
+    return {'value': {'angle': angle, 'radius': dR}};
   }
-
-  return {'value': {'angle': angle, 'radius': dR}};
 };
 
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['type'] = anychart.enums.ChartTypes.PIE;
+  json['type'] = this.getType();
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
@@ -3561,13 +4600,15 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.applyPositions = function()
   for (var j = 0, len = this.labels.length; j < len; j++) {
     var label = this.labels[j];
 
-    var angle = this.labelsPositions[j * 2];
-    var radius = this.labelsPositions[j * 2 + 1];
+    var angle = this.labelsPositions[j * 3];
+    var radius = this.labelsPositions[j * 3 + 1];
+    var radiusY = this.labelsPositions[j * 3 + 2];
 
     var positionProviderValue = label.positionProvider()['value'];
 
     positionProviderValue['angle'] = angle;
     positionProviderValue['radius'] = radius;
+    positionProviderValue['radiusY'] = radiusY;
 
     this.pie.dropLabelBoundsCache(label);
   }
@@ -3585,8 +4626,15 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
 
   var pieCenter = this.pie.getCenterPoint();
   var cx = pieCenter['x'], cy = pieCenter['y'];
-  var bottomLabelsYLimit = cy + this.pie.getPixelRadius() + this.pie.connectorLengthValue_ - .1;
-  var topLabelsYLimit = cy - (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + .1;
+  var bottomLabelsYLimit, topLabelsYLimit;
+
+  if (this.pie.mode3d_) {
+    bottomLabelsYLimit = cy + this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_ - .1 + this.pie.get3DHeight() / 2;
+    topLabelsYLimit = cy - (this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_) + .1 - this.pie.get3DHeight() / 2;
+  } else {
+    bottomLabelsYLimit = cy + this.pie.getPixelRadius() + this.pie.connectorLengthValue_ - .1;
+    topLabelsYLimit = cy - (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + .1;
+  }
 
   for (var j = 0, len = this.labels.length; j < len; j++) {
     label = this.labels[j];
@@ -3654,20 +4702,41 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     dRPie = this.pie.radiusValue_ + (exploded ? this.pie.explodeValue_ : 0);
     dR = (this.pie.getPixelRadius() + this.pie.connectorLengthValue_) + (exploded ? this.pie.explodeValue_ : 0) + offsetRadius;
 
+    var dRYPie, dRY;
+    if (this.pie.mode3d_) {
+      dRYPie = this.pie.get3DYRadius(this.pie.radiusValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0);
+      dRY = (this.pie.get3DYRadius(this.pie.getPixelRadius()) + this.pie.connectorLengthValue_) + (exploded ? this.pie.get3DYRadius(this.pie.explodeValue_) : 0) + this.pie.get3DYRadius(offsetRadius);
+    } else {
+      dRYPie = dRPie;
+      dRY = dR;
+    }
+
     // new coordinates of the point where connector touches a label
     y = startLabelsDrawingYPos;
-    var leg = dR * dR - Math.pow(y - cy, 2);
-    x = cx + (this.isRightSide ? 1 : -1) * Math.sqrt(Math.abs(leg));
+
+    var a = dRPie + this.pie.connectorLengthValue_;
+    var b = dRYPie + this.pie.connectorLengthValue_;
+
+    // 3d pie hard fix (but works fine). (y - cy) should not be less than `b` by equation below.
+    if (Math.abs(y - cy) > b) {
+      b += Math.abs(y - cy) - b;
+    }
+    // use canonical equation of ellipse for solve X coord
+    // https://www.wolframalpha.com/input/?i=solve+x%5E2%2Fa%5E2%2By%5E2%2Fb%5E2%3D1+for+x
+    var leg = (a * Math.sqrt(Math.pow(b, 2) - Math.pow(y - cy, 2))) / b;
+    x = cx + (this.isRightSide ? 1 : -1) * Math.abs(leg);
 
     // coordinates of the point where connector touches a pie
     x0 = cx + dRPie * Math.cos(angle);
-    y0 = cy + dRPie * Math.sin(angle);
+    y0 = cy + dRYPie * Math.sin(angle);
 
-    // normal (before transformation) coordinate of the point where connector touches a label.
+    // normal (before transformation (overlap correction)) coordinate of the point where connector touches a label.
     x1 = cx + dR * Math.cos(angle);
-    y1 = cy + dR * Math.sin(angle);
+    y1 = cy + dRY * Math.sin(angle);
 
+    // get connector radius before overlap correction
     var normalConnector = (Math.sqrt(Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2))).toFixed(3);
+    // get connector radius after overlap correction
     var txConnector = (Math.sqrt(Math.pow(x0 - x, 2) + Math.pow(y0 - y, 2))).toFixed(3);
     var dAngle = goog.math.toDegrees(Math.acos(normalConnector / txConnector));
 
@@ -3688,7 +4757,12 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     var x_ = labelXCoord - cx;
     var y_ = y - cy;
 
-    var radius_ = Math.sqrt(Math.pow(labelXCoord - cx, 2) + Math.pow(y - cy, 2)) - offsetRadius;
+    if (this.pie.mode3d_) {
+      y_ += this.pie.get3DHeight() / 2;
+    }
+
+    var radius_ = Math.sqrt(Math.pow(x_, 2) + Math.pow(y_, 2)) - offsetRadius;
+    var radiusY_ = Math.sqrt(Math.pow(x_, 2) + Math.pow(y_, 2)) - offsetRadius;
 
     var angle_ = NaN;
     if (x_ > 0 && y_ >= 0) {
@@ -3705,7 +4779,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
 
     angle_ -= offsetAngle;
 
-    this.labelsPositions.push(angle_, radius_);
+    this.labelsPositions.push(angle_, radius_, radiusY_);
 
     startLabelsDrawingYPos -= labelBounds.height / 2 + nextLabelHeight / 2;
   }

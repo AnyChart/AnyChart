@@ -282,6 +282,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatP
   var formattedPosition = goog.object.clone(this.positionFormatter().call(positionProvider, positionProvider));
   var angle = formattedPosition['angle'];
   var radius = formattedPosition['radius'];
+  var radiusY = goog.isDef(formattedPosition['radiusY']) ? formattedPosition['radiusY'] : radius;
 
   var cx = 0;
   var cy = 0;
@@ -304,10 +305,11 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatP
 
     angle += anychart.utils.normalizeSize(offsetX, sweepAngle);
     radius += offsetRadius;
+    radiusY += offsetRadius;
   }
 
-  var x = cx + Math.cos(goog.math.toRadians(angle)) * radius;
-  var y = cy + Math.sin(goog.math.toRadians(angle)) * radius;
+  var x = cx + goog.math.angleDx(angle, radius);
+  var y = cy + goog.math.angleDy(angle, radiusY);
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, outerBounds.width, outerBounds.height),
@@ -407,6 +409,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
   var angle = formattedPosition['angle'];
   var radius = formattedPosition['radius'];
+  var radiusY = goog.isDef(formattedPosition['radiusY']) ? formattedPosition['radiusY'] : radius;
   var cx = 0;
   var cy = 0;
 
@@ -430,10 +433,11 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
 
     angle += anychart.utils.normalizeSize(offsetX, sweepAngle);
     radius += offsetRadius;
+    radiusY += offsetRadius;
   }
 
-  var x = cx + Math.cos(goog.math.toRadians(angle)) * radius;
-  var y = cy + Math.sin(goog.math.toRadians(angle)) * radius;
+  var x = cx + goog.math.angleDx(angle, radius);
+  var y = cy + goog.math.angleDy(angle, radiusY);
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, bounds.width, bounds.height),

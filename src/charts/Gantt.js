@@ -82,28 +82,42 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    * @type {(string|number)}
    * @private
    */
-  this.splitterPosition_ = '30%';
+  this.splitterPosition_ = NaN;
 
   /**
    * Default header height.
    * @type {(number|string)}
    * @private
    */
-  this.headerHeight_ = anychart.core.gantt.Timeline.DEFAULT_HEADER_HEIGHT;
+  this.headerHeight_ = NaN;
 
   /**
    * Default hover fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.hoverFill_ = acgraph.vector.normalizeFill('#edf8ff');
+  this.hoverFill_;
 
   /**
    * Default row selected fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.rowSelectedFill_ = acgraph.vector.normalizeFill('#d2eafa');
+  this.rowSelectedFill_;
+
+  /**
+   * Cell border settings.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.columnStroke_;
+
+  /**
+   * Row vertical line separation path.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.rowStroke_;
 
   /**
    * Vertical scroll bar.
@@ -135,8 +149,6 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.dataGridHorizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
   this.dataGridHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.dataGridHorizontalScrollBar_);
   this.registerDisposable(this.dataGridHorizontalScrollBar_);
-
-  this.defaultDateTimeFormatter_ = new goog.i18n.DateTimeFormat(anychart.charts.Gantt.DEFAULT_DATE_TIME_PATTERN);
 
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
     this.dataGrid().initMouseFeatures();
@@ -272,6 +284,7 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
   if (!this.dg_) {
     this.dg_ = new anychart.core.ui.DataGrid();
     this.dg_.controller(this.controller_);
+    this.dg_.backgroundFill(null);
     this.dg_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
     this.dg_.interactivityHandler(this);
     this.registerDisposable(this.dg_);
@@ -279,31 +292,6 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
     this.dg_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
-
-    this.dg_.tooltip().contentFormatter(function(data) {
-      var item = data['item'];
-      if (!item) return '';
-
-      var name = item.get(anychart.enums.GanttDataFields.NAME);
-
-      var startDate = ths.isResourcesChart_ ?
-          item.meta('minPeriodDate') :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-
-      var endDate = ths.isResourcesChart_ ?
-          item.meta('maxPeriodDate') :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-
-      var progress = ths.isResourcesChart_ ?
-          void 0 :
-          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-
-      return (name ? name : '') +
-          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-          (progress ? '\nComplete: ' + progress : '');
-
-    });
   }
 
   return this.dg_;
@@ -340,6 +328,7 @@ anychart.charts.Gantt.prototype.dataGrid = function(opt_enabled) {
 anychart.charts.Gantt.prototype.getTimeline = function() {
   if (!this.tl_) {
     this.tl_ = new anychart.core.gantt.Timeline(this.controller_, this.isResourcesChart_);
+    this.tl_.backgroundFill(null);
     this.tl_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
     this.tl_.interactivityHandler(this);
     this.registerDisposable(this.tl_);
@@ -347,31 +336,6 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
     this.tl_.listenSignals(function() {
       ths.controller_.run();
     }, this.controller_);
-
-    this.tl_.tooltip().contentFormatter(function(data) {
-      var item = data['item'];
-      var period = data['period'];
-
-      var name = item.get(anychart.enums.GanttDataFields.NAME);
-
-      var startDate = period ?
-          period[anychart.enums.GanttDataFields.START] :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_START) || item.meta('autoStart'));
-
-      var endDate = period ?
-          period[anychart.enums.GanttDataFields.END] :
-          (item.get(anychart.enums.GanttDataFields.ACTUAL_END) || item.meta('autoEnd'));
-
-      var progress = ths.isResourcesChart_ ?
-          void 0 :
-          (item.get(anychart.enums.GanttDataFields.PROGRESS_VALUE) || (anychart.math.round(item.meta('autoProgress') * 100, 2) + '%'));
-
-      return (name ? name : '') +
-          (startDate ? '\nStart Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(startDate))) : '') +
-          (endDate ? '\nEnd Date: ' + ths.defaultDateTimeFormatter_.format(new goog.date.UtcDateTime(new Date(endDate))) : '') +
-          (progress ? '\nComplete: ' + progress : '');
-
-    });
   }
 
   return this.tl_;
@@ -417,14 +381,53 @@ anychart.charts.Gantt.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_), val)) {
       this.rowSelectedFill_ = val;
-      anychart.core.Base.suspendSignalsDispatching(this.dg_, this.tl_);
-      this.getTimeline().rowSelectedFill(this.rowSelectedFill_);
-      this.getDataGrid_().rowSelectedFill(this.rowSelectedFill_);
+      anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+      this.tl_.rowSelectedFill(this.rowSelectedFill_);
+      this.dg_.rowSelectedFill(this.rowSelectedFill_);
       anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
     }
     return this;
   }
   return this.rowSelectedFill_;
+};
+
+
+/**
+ * Gets/sets column stroke.
+ * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
+ * @return {(string|acgraph.vector.Stroke|anychart.charts.Gantt)} - Current value or itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.columnStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_());
+    this.columnStroke_ = val;
+    this.dg_.columnStroke(val);
+    this.tl_.columnStroke(val);
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_);
+    return this;
+  }
+  return this.columnStroke_;
+};
+
+
+/**
+ * Gets/sets row stroke.
+ * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
+ * @return {(string|acgraph.vector.Stroke|anychart.charts.Gantt)} - Current value or itself for method chaining.
+ */
+anychart.charts.Gantt.prototype.rowStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    anychart.core.Base.suspendSignalsDispatching(this.getTimeline(), this.getDataGrid_(), this.controller_);
+    this.rowStroke_ = val;
+    this.dg_.rowStroke(val);
+    this.tl_.rowStroke(val);
+    this.controller_.rowStrokeThickness(anychart.utils.extractThickness(val));
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.controller_);
+    return this;
+  }
+  return this.rowStroke_;
 };
 
 
@@ -486,8 +489,8 @@ anychart.charts.Gantt.prototype.fitToTask = function(taskId) {
   var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
   if (foundTasks.length) {
     var task = foundTasks[0];
-    var actualStart = task.get(anychart.enums.GanttDataFields.ACTUAL_START);
-    var actualEnd = task.get(anychart.enums.GanttDataFields.ACTUAL_END);
+    var actualStart = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_START));
+    var actualEnd = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_END));
     if (actualStart && actualEnd) { //no range for milestone.
       this.getTimeline().getScale().setRange(actualStart, actualEnd);
     } else {
@@ -645,8 +648,7 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
     this.splitter_.listen(anychart.enums.EventType.SPLITTER_CHANGE, function() {
       //This also stores current position for case if dg is being disabled.
       //Here we don't check if newPosition == oldPosition because it is handled by splitter.
-      //TODO (A.Kudryavtsev): Save pixel position instead!
-      ths.splitterPosition_ = anychart.math.round(100 * ths.splitter().position(), 2) + '%';
+      ths.splitterPosition_ = Math.round(ths.splitter().position() * this.pixelBoundsCache_.width);
       ths.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     });
 
@@ -754,6 +756,16 @@ anychart.charts.Gantt.prototype.rowSelect = function(event) {
 };
 
 
+/**
+ * Unselects currently selected item.
+ * TODO (A.Kudryavtsev): Do we need to export this method?
+ */
+anychart.charts.Gantt.prototype.unselect = function() {
+  this.dg_.unselect();
+  this.tl_.unselect();
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Draw.
@@ -795,7 +807,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
       this.tl_.bounds().set(bounds);
     }
 
-    var newAvailableHeight = bounds.height - this.headerHeight_;
+    var newAvailableHeight = bounds.height - this.headerHeight_ - 1;
     if (this.controller_.availableHeight() != newAvailableHeight) {
       this.controller_.availableHeight(newAvailableHeight);
       //This will apply changes in title height.
@@ -864,16 +876,19 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 anychart.charts.Gantt.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  this.controller_.setupByJSON(config['controller']);
-  this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+  if ('controller' in config) {
+    config['controller']['isResourceChart'] = this.isResourcesChart_;
+    this.controller_.setup(config['controller']);
+    this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+  }
 
   this.headerHeight(config['headerHeight']);
   this.rowHoverFill(config['rowHoverFill']);
   this.rowSelectedFill(config['rowSelectedFill']);
   this.splitterPosition(config['splitterPosition']);
 
-  this.dataGrid().setupByJSON(config['dataGrid']);
-  this.getTimeline().setupByJSON(config['timeline']);
+  if ('dataGrid' in config) this.dataGrid().setup(config['dataGrid']);
+  if ('timeline' in config) this.getTimeline().setup(config['timeline']);
 
 };
 
@@ -904,6 +919,8 @@ anychart.charts.Gantt.prototype['dataGrid'] = anychart.charts.Gantt.prototype.da
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;
 anychart.charts.Gantt.prototype['rowHoverFill'] = anychart.charts.Gantt.prototype.rowHoverFill;
 anychart.charts.Gantt.prototype['rowSelectedFill'] = anychart.charts.Gantt.prototype.rowSelectedFill;
+anychart.charts.Gantt.prototype['columnStroke'] = anychart.charts.Gantt.prototype.columnStroke;
+anychart.charts.Gantt.prototype['rowStroke'] = anychart.charts.Gantt.prototype.rowStroke;
 anychart.charts.Gantt.prototype['zoomIn'] = anychart.charts.Gantt.prototype.zoomIn;
 anychart.charts.Gantt.prototype['zoomOut'] = anychart.charts.Gantt.prototype.zoomOut;
 anychart.charts.Gantt.prototype['zoomTo'] = anychart.charts.Gantt.prototype.zoomTo;

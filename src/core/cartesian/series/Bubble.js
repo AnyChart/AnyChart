@@ -23,14 +23,14 @@ anychart.core.cartesian.series.Bubble = function(opt_data, opt_csvSettings) {
    * @type {(string|number)}
    * @private
    */
-  this.minimumSizeSetting_ = '5%';
+  this.minimumSizeSetting_;
 
   /**
    * Maximum bubble size.
    * @type {(string|number)}
    * @private
    */
-  this.maximumSizeSetting_ = '20%';
+  this.maximumSizeSetting_;
 
   /**
    * Whether to display negative bubble or not.
@@ -1171,21 +1171,6 @@ anychart.core.cartesian.series.Bubble.prototype.setupByJSON = function(config) {
   this.hoverNegativeStroke(config['hoverNegativeStroke']);
   this.negativeHatchFill(config['negativeHatchFill']);
   this.hoverNegativeHatchFill(config['hoverNegativeHatchFill']);
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Bubble.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.contentFormatter(function() {
-    return parseFloat(this.value).toFixed(2);
-  });
-
-  return result;
 };
 
 

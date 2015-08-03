@@ -18,37 +18,13 @@ goog.require('anychart.modules.base');
  */
 anychart.scatter = function(var_args) {
   var chart = new anychart.charts.Scatter();
+  var theme = anychart.getFullTheme();
+
+  chart.setup(theme['scatter']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);
   }
-
-  chart.title().text('Chart Title');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid(0)
-      .oddFill('#F9F9F9')
-      .evenFill('#FFFFFF')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.minorGrid(0)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.grid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .layout(anychart.enums.Layout.VERTICAL);
-
-  chart.minorGrid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };
@@ -65,37 +41,13 @@ anychart.scatter = function(var_args) {
  */
 anychart.marker = function(var_args) {
   var chart = new anychart.charts.Scatter();
+  var theme = anychart.getFullTheme();
+
+  chart.setup(theme['marker']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);
   }
-
-  chart.title().text('Chart Title');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid(0)
-      .oddFill('#F9F9F9')
-      .evenFill('#FFFFFF')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.minorGrid(0)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.grid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .layout(anychart.enums.Layout.VERTICAL);
-
-  chart.minorGrid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };
@@ -116,37 +68,13 @@ anychart.marker = function(var_args) {
  */
 anychart.bubble = function(var_args) {
   var chart = new anychart.charts.Scatter();
+  var theme = anychart.getFullTheme();
+
+  chart.setup(theme['bubble']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.bubble(arguments[i]);
   }
-
-  chart.title().text('Chart Title');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid(0)
-      .oddFill('#F9F9F9')
-      .evenFill('#FFFFFF')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.minorGrid(0)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.grid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .layout(anychart.enums.Layout.VERTICAL);
-
-  chart.minorGrid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };

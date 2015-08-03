@@ -89,21 +89,6 @@ anychart.core.cartesian.series.RangeColumn.prototype.isErrorAvailable = function
 };
 
 
-/** @inheritDoc */
-anychart.core.cartesian.series.RangeColumn.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.content().hAlign('left');
-  tooltip.contentFormatter(function() {
-    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        'Low: ' + parseFloat(this['low']).toFixed(2);
-  });
-
-  return result;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Statistics

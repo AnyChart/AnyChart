@@ -978,6 +978,20 @@ anychart.core.ui.Splitter.prototype.mouseMoveHandler_ = function() {
 
 
 /**
+ * Default mouse dbl click handler.
+ * @param {acgraph.events.BrowserEvent} e - Event.
+ * @private
+ */
+anychart.core.ui.Splitter.prototype.mouseDblClickHandler_ = function(e) {
+  var evt = {
+    'type': acgraph.events.EventType.DBLCLICK,
+    'originalEvent': e
+  };
+  this.dispatchEvent(evt);
+};
+
+
+/**
  * Default mouse out handler.
  * @private
  */
@@ -997,6 +1011,8 @@ anychart.core.ui.Splitter.prototype.getDragArea_ = function() {
     this.dragArea_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect()
         .stroke(this.dragAreaStroke_)
         .fill(this.dragAreaFill_));
+
+    acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DBLCLICK, this.mouseDblClickHandler_, false, this);
 
     acgraph.events.listen(this.dragArea_, acgraph.events.EventType.MOUSEMOVE, this.mouseMoveHandler_, false, this);
     acgraph.events.listen(this.dragArea_, acgraph.events.EventType.MOUSEOUT, this.mouseOutHandler_, false, this);

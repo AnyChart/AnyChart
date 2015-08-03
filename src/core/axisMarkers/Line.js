@@ -31,20 +31,19 @@ anychart.core.axisMarkers.Line = function() {
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_;
+  this.layout_ = anychart.enums.Layout.HORIZONTAL;
 
   /**
    * @type {number}
    * @private
    */
-  this.value_;
+  this.value_ = 0;
 
   /**
    * @type {acgraph.vector.Stroke}
    * @private
    */
   this.stroke_;
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axisMarkers.Line, anychart.core.VisualBase);
 
@@ -287,25 +286,6 @@ anychart.core.axisMarkers.Line.prototype.draw = function() {
   }
 
   return this;
-};
-
-
-/**
- * Restore defaults.
- */
-anychart.core.axisMarkers.Line.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.layout(anychart.enums.Layout.HORIZONTAL);
-  this.value(0);
-  this.stroke({
-    'color': '#DC0A0A',
-    'thickness': 1,
-    'opacity': 1,
-    'dash': '',
-    'lineJoin': 'miter',
-    'lineCap': 'square'
-  });
-  this.resumeSignalsDispatching(true);
 };
 
 

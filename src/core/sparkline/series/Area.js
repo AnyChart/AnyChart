@@ -133,8 +133,14 @@ anychart.core.sparkline.series.Area.prototype.finalizeSegment = function() {
 anychart.core.sparkline.series.Area.prototype.getDefaults = function() {
   var settings = goog.base(this, 'getDefaults');
 
-  settings['stroke'] = '#1E90FF';
-  settings['fill'] = '#D2E9FF';
+  settings['stroke'] = {
+    'color': '#64b5f6',
+    'thickness': 1.5
+  };
+  settings['fill'] = {
+    'color': '#64b5f6',
+    'opacity': 0.5
+  };
 
   return settings;
 };

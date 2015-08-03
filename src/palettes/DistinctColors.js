@@ -121,48 +121,7 @@ anychart.palettes.DistinctColors.prototype.colors = function(opt_value) {
  * @param {boolean=} opt_doNotDispatch Define, should dispatch invalidation event after default settings will be restored.
  */
 anychart.palettes.DistinctColors.prototype.restoreDefaults = function(opt_doNotDispatch) {
-  this.colors_ = [
-    '#1D8BD1',
-    '#F1683C',
-    '#2AD62A',
-    '#DBDC25',
-    '#8FBC8B',
-    '#D2B48C',
-    '#FAF0E6',
-    '#20B2AA',
-    '#B0C4DE',
-    '#DDA0DD',
-    '#9C9AFF',
-    '#9C3063',
-    '#FFFFCE',
-    '#CEFFFF',
-    '#630063',
-    '#FF8284',
-    '#0065CE',
-    '#CECFFF',
-    '#000084',
-    '#FF00FF',
-    '#FFFF00',
-    '#00FFFF',
-    '#840084',
-    '#840000',
-    '#008284',
-    '#0000FF',
-    '#00CFFF',
-    '#CEFFFF',
-    '#CEFFCE',
-    '#FFFF9C',
-    '#9CCFFF',
-    '#FF9ACE',
-    '#CE9AFF',
-    '#FFCF9C',
-    '#3165FF',
-    '#31CFCE',
-    '#9CCF00',
-    '#FFCF00',
-    '#FF9A00',
-    '#FF6500'
-  ];
+  this.colors_ = goog.array.clone(anychart.getFullTheme()['palette']['items']);
   if (opt_doNotDispatch) this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 

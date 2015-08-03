@@ -13,12 +13,8 @@ goog.require('anychart.modules.toolbar');
  */
 anychart.ganttProject = function() {
   var chart = new anychart.charts.Gantt(false);
-
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
+  var theme = anychart.getFullTheme();
+  chart.setup(theme['gantt']['ganttProject']);
 
   return chart;
 };
@@ -30,12 +26,8 @@ anychart.ganttProject = function() {
  */
 anychart.ganttResource = function() {
   var chart = new anychart.charts.Gantt(true);
-
-  chart.title().enabled(false);
-  chart.background().enabled(false);
-  chart.legend().enabled(false);
-  chart.margin(0);
-  chart.padding(0);
+  var theme = anychart.getFullTheme();
+  chart.setup(theme['gantt']['ganttResource']);
 
   return chart;
 };

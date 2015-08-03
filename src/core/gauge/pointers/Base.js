@@ -304,18 +304,6 @@ anychart.core.gauge.pointers.Base.prototype.draw = function() {
 };
 
 
-/**
- * Restore labels default settings.
- */
-anychart.core.gauge.pointers.Base.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.stroke('rgb(242,41,34)');
-  this.fill('rgb(242,41,34)');
-  this.hatchFill(false);
-  this.resumeSignalsDispatching(true);
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------

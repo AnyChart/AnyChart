@@ -288,7 +288,10 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(
  * @return {!acgraph.vector.Fill} Marker color for series.
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, false);
+  if (anychart.DEFAULT_THEME != 'v6')
+    return anychart.color.setOpacity(this.getFinalFill(false, false), 1, false);
+  else
+    return this.getFinalFill(false, false);
 };
 
 
@@ -315,25 +318,6 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = fun
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
   }
   return data;
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var markers = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
-  markers.suspendSignalsDispatching();
-  markers.enabled(true);
-  markers.size(4);
-  markers.resumeSignalsDispatching(false);
-
-  var hoverMarkers = (/** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers()));
-  hoverMarkers.suspendSignalsDispatching();
-  hoverMarkers.size(6);
-  hoverMarkers.resumeSignalsDispatching(false);
-
-  return result;
 };
 
 

@@ -93,7 +93,24 @@ anychart.core.ui.Separator = function() {
    */
   this.orientation_;
 
-  this.restoreDefaults();
+  var drawer = goog.bind(function(path, bounds) {
+    bounds = bounds.clone().round();
+
+    if (!this.isHorizontal()) {
+      var shift = bounds.width == 1 ? 0.5 : 0;
+      bounds.left -= shift;
+      bounds.width += 2 * shift;
+    }
+
+    path
+        .moveTo(bounds.left, bounds.top)
+        .lineTo(bounds.left + bounds.width, bounds.top)
+        .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
+        .lineTo(bounds.left, bounds.top + bounds.height)
+        .close();
+  }, this);
+
+  this.drawer(drawer);
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -522,47 +539,6 @@ anychart.core.ui.Separator.prototype.marginInvalidated_ = function(event) {
  */
 anychart.core.ui.Separator.prototype.isHorizontal = function() {
   return (this.orientation_ == anychart.enums.Orientation.TOP || this.orientation_ == anychart.enums.Orientation.BOTTOM);
-};
-
-
-/**
- * Restore separator default settings.
- */
-anychart.core.ui.Separator.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.enabled(true)
-      .margin(0, 3, 3, 3)
-      .orientation(anychart.enums.Orientation.TOP)
-      .width('100%')
-      .height(1)
-      .fill({
-        'keys': [
-          '0 #333333 0',
-          '0.5 #333333 1',
-          '1 #333333 0'
-        ]
-      })
-      .stroke('none');
-
-  var drawer = goog.bind(function(path, bounds) {
-    bounds = bounds.clone().round();
-
-    if (!this.isHorizontal()) {
-      var shift = bounds.width == 1 ? 0.5 : 0;
-      bounds.left -= shift;
-      bounds.width += 2 * shift;
-    }
-
-    path
-        .moveTo(bounds.left, bounds.top)
-        .lineTo(bounds.left + bounds.width, bounds.top)
-        .lineTo(bounds.left + bounds.width, bounds.top + bounds.height)
-        .lineTo(bounds.left, bounds.top + bounds.height)
-        .close();
-  }, this);
-
-  this.drawer(drawer);
-  this.resumeSignalsDispatching(true);
 };
 
 

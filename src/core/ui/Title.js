@@ -42,15 +42,6 @@ anychart.core.ui.Title = function() {
   this.suspendSignalsDispatching();
   goog.base(this);
 
-  this.text('Title text')
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontWeight('bold')
-      .fontColor('rgb(34,34,34)')
-      .margin(5, 5, 5, 5)
-      .padding(5)
-      .background(null);
-
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.ui.Title, anychart.core.Text);
@@ -74,10 +65,10 @@ anychart.core.ui.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * Text element.
- * @type {acgraph.vector.Text}
+ * @type {!acgraph.vector.Text}
  * @private
  */
-anychart.core.ui.Title.prototype.text_ = null;
+anychart.core.ui.Title.prototype.text_;
 
 
 /**
@@ -565,9 +556,12 @@ anychart.core.ui.Title.prototype.draw = function() {
 
   // We will need the text element anyway, so we should create it if it is missing.
   var isInitial;
-  if (isInitial = !this.text_) {
-    this.text_ = acgraph.text();
-    this.registerDisposable(this.text_);
+  if (isInitial = !this.layer_) {
+    this.layer_ = acgraph.layer();
+    this.text_ = this.layer_.text();
+    this.text_.zIndex(1);
+    this.registerDisposable(this.layer_);
+    this.bindHandlersToGraphics(this.layer_);
   }
   // Getting the stage and suspending it to make the change.
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
@@ -582,93 +576,47 @@ anychart.core.ui.Title.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
-  var background = this.background();
-  // Checking if we have to draw background. We don't draw it if it is totally transparent.
-  var hasBackground = background.enabled() && (background.fill() != 'none' || background.stroke() != 'none');
-
-  background.suspendSignalsDispatching();
-
-  var needsPositionReset = false;
-
-  // We should render a layer that has a background path and a text element in it.
-  // So checking if there is a layer
-  if (hasBackground && !this.layer_) {
-    // and creating it if there is not.
-    this.layer_ = acgraph.layer();
-    // super-silently resetting background container to the newly created layer and drawing it to have the background go first
-    background.container(this.layer_).draw();
-    // settings text parent
-    this.text_.parent(this.layer_);
-    this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.registerDisposable(this.layer_);
-    this.invalidate(anychart.ConsistencyState.CONTAINER);
-    needsPositionReset = true;
-  } else if (!hasBackground && this.layer_) {
-    // Else we should render only the text element, so if there is a layer then we should remove the background
-    // from it and dispose the layer. And also silently invalidate the CONTAINER to rerender the text to the proper
-    // container later in this method
-    if (background.container() == this.layer_)
-      background.container(null).draw();
-    this.text_.parent(container);
-    goog.dispose(this.layer_);
-    this.layer_ = null;
-    this.invalidate(anychart.ConsistencyState.CONTAINER);
-    needsPositionReset = true;
-  }
-
-  var elementToPosition = hasBackground ? this.layer_ : this.text_;
-  this.bindHandlersToGraphics(elementToPosition);
-
   // Checking BOUNDS state. If it is inconsistent, we need to recalculate title bounds.
   // But we don't need to mark it consistent here, because we don't know where to apply that new bounds yet.
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calcActualBounds_();
-    if (background) {
-      // settings proper bounds to the background
-      background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
-      background.draw();
-      this.markConsistent(anychart.ConsistencyState.TITLE_BACKGROUND);
-    }
     // settings text offset for
     this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.backgroundWidth_));
     this.text_.y(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().top()), this.backgroundHeight_));
 
-    needsPositionReset = true;
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
-  if (needsPositionReset) {
-    elementToPosition.setTransformationMatrix(
+    this.layer_.setTransformationMatrix(
         this.transformation_.getScaleX(),
         this.transformation_.getShearY(),
         this.transformation_.getShearX(),
         this.transformation_.getScaleY(),
         this.transformation_.getTranslateX(),
         this.transformation_.getTranslateY());
+    this.invalidate(anychart.ConsistencyState.TITLE_BACKGROUND);
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
   // If background appearance changed, we should do something about that.
   if (this.hasInvalidationState(anychart.ConsistencyState.TITLE_BACKGROUND)) {
+    var background = this.background();
+    background.suspendSignalsDispatching();
     background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
+    background.container(this.layer_);
+    background.zIndex(0);
     background.draw();
+    background.resumeSignalsDispatching(false);
     this.markConsistent(anychart.ConsistencyState.TITLE_BACKGROUND);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    elementToPosition.zIndex(/** @type {number} */(this.zIndex()));
+    this.layer_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    if (hasBackground)
-      this.layer_.parent(container);
-    else
-      this.text_.parent(container);
+    this.layer_.parent(container);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (background)
-    background.resumeSignalsDispatching(false);
 
   if (manualSuspend) stage.resume();
   return this;
@@ -729,6 +677,16 @@ anychart.core.ui.Title.prototype.getRemainingBounds = function() {
       break;
   }
   return parentBounds;
+};
+
+
+/**
+ * Gets bounds of pure styled text of title. Ignores all another bounds like width and height set or parentBounds.
+ * NOTE: Gets original text's left and top, doesn't apply any currently calculated positioning to text.
+ * @return {?anychart.math.Rect} - Original bounds of text.
+ */
+anychart.core.ui.Title.prototype.getOriginalBounds = function() {
+  return this.text_ ? this.text_.getOriginalBounds() : null;
 };
 
 
@@ -811,9 +769,12 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   }
 
   var isInitial;
-  if (isInitial = !this.text_) {
-    this.text_ = acgraph.text();
-    this.registerDisposable(this.text_);
+  if (isInitial = !this.layer_) {
+    this.layer_ = acgraph.layer();
+    this.text_ = this.layer_.text();
+    this.text_.zIndex(1);
+    this.registerDisposable(this.layer_);
+    this.bindHandlersToGraphics(this.layer_);
   }
   if (isInitial || this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.applyTextSettings(this.text_, isInitial);
@@ -1030,7 +991,7 @@ anychart.core.ui.Title.prototype.serialize = function() {
   json['width'] = this.width();
   json['height'] = this.height();
   json['align'] = this.align();
-  json['orientation'] = this.orientation();
+  if (goog.isDef(this.orientation_)) json['orientation'] = this.orientation();
   return json;
 };
 

@@ -17,27 +17,7 @@ anychart.core.Text = function() {
    * @type {!Object}
    * @protected
    */
-  this.settingsObj = {
-    'fontSize': goog.global['anychart']['fontSize'],
-    'fontFamily': goog.global['anychart']['fontFamily'],
-    'fontColor': goog.global['anychart']['fontColor'],
-    'fontOpacity': 1,
-    'fontDecoration': acgraph.vector.Text.Decoration.NONE,
-    'fontStyle': acgraph.vector.Text.FontStyle.NORMAL,
-    'fontVariant': acgraph.vector.Text.FontVariant.NORMAL,
-    'fontWeight': 'normal',
-    'letterSpacing': 'normal',
-    'textDirection': goog.global['anychart']['textDirection'],
-    'lineHeight': 'normal',
-    'textIndent': 0,
-    'vAlign': acgraph.vector.Text.VAlign.TOP,
-    'hAlign': acgraph.vector.Text.HAlign.START,
-    'textWrap': acgraph.vector.Text.TextWrap.BY_LETTER,
-    'textOverflow': acgraph.vector.Text.TextOverflow.CLIP,
-    'selectable': false,
-    'disablePointerEvents': false,
-    'useHtml': false
-  };
+  this.settingsObj = {};
 
   /**
    * Contains the flags for all settings that were changed.

@@ -18,7 +18,9 @@ goog.inherits(anychart.ui.Title, anychart.core.ui.Title);
  * @return {!anychart.ui.Title}
  */
 anychart.ui.title = function() {
-  return new anychart.ui.Title();
+  var res = new anychart.ui.Title();
+  res.setup(anychart.getFullTheme()['standalones']['title']);
+  return res;
 };
 
 

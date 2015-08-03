@@ -1,55 +1,81 @@
-var chart, dataSet, axis1;
 anychart.onDocumentReady(function() {
-  chart = anychart.circularGauge();
-  chart.data([0, 7, 15 ,20]);
-  //chart.padding(50);
+  var stage = acgraph.create('container', 500, 500);
+  stage.suspend();
 
-  //chart.needle()
-  //    .startRadius(0)
-  //    .middleWidth(0)
-  //    .startWidth(0);
-
-  //chart.marker();
-  //var knob = chart.knob();
-  //knob
-  //    .bottomRadius(80)
-  //    .topRadius(40)
-      //.verticesCount(10)
-      //.verticesCurvature(.001)
-      //.bottomRatio(1)
-      //.topRatio(0.6);
-  //chart.bar();
-
-
-  var firstAxis = chart.axis();
-  firstAxis.fill('#4DB6AC');
-
-
-  chart.axis()
-      .startAngle(90)
+  var dataSet = anychart.data.set([1,5,15,20]);
+  var chart1 = anychart.circularGauge();
+  chart1.data(dataSet);
+  chart1.axis()
       .scale()
       .minimum(0)
       .maximum(20);
+  chart1.axis()
+      .startAngle(90)
+      .sweepAngle(90)
+      .radius('70');
+  chart1.title().enabled(true).text("startAngle(90) sweepAngle(90)\n radius('70')");
+  chart1.bounds(0,0,'50%', '50%');
+  chart1.container(stage).draw();
 
-  chart.knob()
-      .bottomRatio(1)
-      .topRatio(4.1)//Я знаю что ratio не может быть больше 1
-      //.stroke('blue .6', 2, '6', acgraph.vector.StrokeLineJoin.ROUND, acgraph.vector.StrokeLineCap.ROUND);
-  chart.title('bottomRatio(1)\ntopRatio(4.1)');
-  chart.bounds('50%','50%','50%', '50%');
+  var chart2 = anychart.circularGauge();
+  chart2.data(dataSet);
+  chart2.axis()
+      .scale()
+      .minimum(0)
+      .maximum(20);
+  chart2.axis()
+      .startAngle(45)
+      .sweepAngle(330)
+      .radius(50);
+  chart2.title().enabled(true).text('startAngle(45) sweepAngle(330)\nradius(50)');
+  chart2.bounds('50%',0,'50%', '50%');
+  chart2.container(stage).draw();
+
+  var chart3 = anychart.circularGauge();
+  chart3.data(dataSet);
+  chart3.axis()
+      .scale()
+      .minimum(0)
+      .maximum(20);
+  chart3.axis()
+      .startAngle(0)
+      .sweepAngle(30)
+      .radius(92);
+  chart3.title().enabled(true).text('startAngle(0) sweepAngle(30)\nradius(92)');
+  chart3.bounds(0,'50%','50%', '50%');
+  chart3.container(stage).draw();
+
+  var chart4 = anychart.circularGauge();
+  chart4.data(dataSet);
+  chart4.axis()
+      .scale()
+      .minimum(0)
+      .maximum(20);
+  chart4.axis()
+      .startAngle(-45)
+      .sweepAngle(-60)
+      .radius('60');
+  chart4.title().enabled(true).text('startAngle(-45) sweepAngle(-60)\nradius(60)');
+  //chart4.axis()
+  //    .startAngle(71)
+  //    .radius(65)
+  //    .sweepAngle(-70);
+  //chart4.title('startAngle(71) sweepAngle(-70)\nradius(65)');
+  chart4.bounds('50%', '50%', '50%', '50%');
 
 
-  //
-  //var secondAxis = chart.axis(1);
-  //secondAxis.radius('50%');
-  //secondAxis.fill('#FF8A65');
-  //
-  //chart.range().from(0).to(2.2).axisIndex(1);
+  //anytest.stageListen(function() {
+  //  anytest.CAT.getScreen();
+  //  chart4.axis()
+  //      .startAngle(71)
+  //      .radius(65)
+  //      .sweepAngle(-70);
+  //  chart4.title('startAngle(71) sweepAngle(-70)\nradius(65)');
+  //  anytest.CAT.getScreen('afterDraw', -1);
+  //  anytest.exit();
+  //});
 
-  //var sweep = 270;
-  //chart.startAngle(-180 + (360 - sweep) / 2).sweepAngle(sweep).encloseWithStraightLine(true);
-  //chart.startAngle(70).sweepAngle(sweep).encloseWithStraightLine(true);
+  chart4.container(stage).draw();
 
-  chart.container('container');
-  chart.draw();
+  stage.resume();
 });

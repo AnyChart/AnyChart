@@ -43,8 +43,6 @@ anychart.core.axes.Circular = function() {
    */
   this.minorLabelsBoundsWithoutTransform_ = [];
 
-  this.restoreDefaults();
-
   /**
    * Constant to save space.
    * @type {number}
@@ -160,7 +158,7 @@ anychart.core.axes.Circular.prototype.scale_;
  * @type {anychart.enums.LabelsOverlapMode}
  * @private
  */
-anychart.core.axes.Circular.prototype.overlapMode_ = anychart.enums.LabelsOverlapMode.NO_OVERLAP;
+anychart.core.axes.Circular.prototype.overlapMode_;
 
 
 /**
@@ -819,9 +817,9 @@ anychart.core.axes.Circular.prototype.getLabelBounds_ = function(index, isMajor)
 
   var anchor = label && goog.isDef(label.anchor()) ?
       label.anchor() :
-      (labels.isDefault('anchor') && !autoRotate) ?
-          this.getAnchorForLabel_(/** @type {number} */(angle)) :
-          labels.anchor();
+      autoRotate ?
+          labels.anchor() :
+          this.getAnchorForLabel_(/** @type {number} */(angle));
 
   bounds.left = x;
   bounds.top = y;
@@ -948,20 +946,7 @@ anychart.core.axes.Circular.prototype.drawLabel_ = function(index, angle, isMajo
   var positionProvider = {'value': {'angle': angle, 'radius': radius}};
   label = labels.add(formatProvider, positionProvider, index);
 
-  var rotation = goog.isDef(label.rotation()) ?
-      label.rotation() :
-      labels.rotation();
-
-  if (autoRotate)
-    rotation += this.getLabelAngle_(angle);
-
   if (!autoRotate) {
-    var anchor = goog.isDef(label.anchor()) ?
-        label.anchor() :
-        labels.isDefault('anchor') ?
-            this.getAnchorForLabel_(/** @type {number} */(rotation)) :
-            labels.anchor();
-
     var sweepAngle = goog.isDef(this.sweepAngle_) ? this.sweepAngle_ : this.gauge_.sweepAngle();
     var offsetX = label && goog.isDef(label.offsetX()) ? label.offsetX() : labels.offsetX();
     angle += anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), sweepAngle);
@@ -1196,89 +1181,6 @@ anychart.core.axes.Circular.prototype.draw = function() {
   this.minorTicks().resumeSignalsDispatching(false);
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.axes.Circular.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.labels()
-      .suspendSignalsDispatching()
-      .enabled(true)
-      .offsetX(0)
-      .offsetY(0)
-      .position(anychart.enums.GaugeSidePosition.INSIDE)
-      .padding(1, 2, 1, 2)
-      .fontFamily('Tahoma')
-      .fontSize('11')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .adjustFontSize(true)
-      .resumeSignalsDispatching(false);
-
-  this.labels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .offsetX(0)
-      .offsetY(0)
-      .position(anychart.enums.GaugeSidePosition.INSIDE)
-      .padding(1, 2, 1, 2)
-      .fontFamily('Tahoma')
-      .fontSize('9')
-      .fontColor('rgb(34,34,34)')
-      .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-      .adjustFontSize(true)
-      .resumeSignalsDispatching(false);
-
-  this.minorLabels().background()
-      .suspendSignalsDispatching()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle': '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle': '90'
-      })
-      .resumeSignalsDispatching(false);
-
-  this.overlapMode('nooverlap');
-  this.minorTicks(false);
-  this.fill('black .3');
-  this.drawFirstLabel(true);
-  this.drawLastLabel(true);
-
-  this.resumeSignalsDispatching(true);
 };
 
 

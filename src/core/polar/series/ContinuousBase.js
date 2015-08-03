@@ -587,31 +587,6 @@ anychart.core.polar.series.ContinuousBase.prototype.setupByJSON = function(confi
 };
 
 
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var markers = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
-  markers.suspendSignalsDispatching();
-  markers.enabled(true);
-  markers.size(4);
-  markers.resumeSignalsDispatching(false);
-
-  var hoverMarkers = (/** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers()));
-  hoverMarkers.suspendSignalsDispatching();
-  hoverMarkers.size(6);
-  hoverMarkers.resumeSignalsDispatching(false);
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.suspendSignalsDispatching();
-  labels.enabled(false);
-  labels.anchor('bottom');
-  labels.resumeSignalsDispatching(false);
-
-  return result;
-};
-
-
 //anychart.core.polar.series.ContinuousBase.prototype['startDrawing'] = anychart.core.polar.series.ContinuousBase.prototype.startDrawing;
 //anychart.core.polar.series.ContinuousBase.prototype['drawPoint'] = anychart.core.polar.series.ContinuousBase.prototype.drawPoint;
 //anychart.core.polar.series.ContinuousBase.prototype['finalizeDrawing'] = anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing;

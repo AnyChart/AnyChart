@@ -155,7 +155,6 @@ anychart.core.ui.TooltipItem = function() {
 
 
   this.createTimerObject_();
-  this.restoreDefaults();
   this.invalidate(this.SUPPORTED_CONSISTENCY_STATES);
 };
 goog.inherits(anychart.core.ui.TooltipItem, anychart.core.VisualBase);
@@ -199,7 +198,6 @@ anychart.core.ui.TooltipItem.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.ui.TooltipItem.prototype.title = function(opt_value) {
   if (!this.title_) {
     this.title_ = new anychart.core.ui.Title();
-    this.title_.zIndex(1);
     this.title_.listenSignals(this.onTitleSignal_, this);
     this.title_.setParentEventTarget(this);
     this.registerDisposable(this.title_);
@@ -248,7 +246,6 @@ anychart.core.ui.TooltipItem.prototype.onTitleSignal_ = function(event) {
 anychart.core.ui.TooltipItem.prototype.separator = function(opt_value) {
   if (!this.separator_) {
     this.separator_ = new anychart.core.ui.Separator();
-    this.separator_.zIndex(1);
     this.separator_.listenSignals(this.onSeparatorSignal_, this);
     this.registerDisposable(this.separator_);
   }
@@ -296,7 +293,6 @@ anychart.core.ui.TooltipItem.prototype.onSeparatorSignal_ = function(event) {
 anychart.core.ui.TooltipItem.prototype.content = function(opt_value) {
   if (!this.label_) {
     this.label_ = new anychart.core.ui.Label();
-    this.label_.zIndex(1);
     this.label_.listenSignals(this.onContentSignal_, this);
     this.label_.setParentEventTarget(this);
     this.registerDisposable(this.label_);
@@ -345,7 +341,6 @@ anychart.core.ui.TooltipItem.prototype.onContentSignal_ = function(event) {
 anychart.core.ui.TooltipItem.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.background_.zIndex(0);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
     this.registerDisposable(this.background_);
   }
@@ -784,68 +779,6 @@ anychart.core.ui.TooltipItem.prototype.getPixelBounds = function() {
 anychart.core.ui.TooltipItem.prototype.getContentBounds = function() {
   this.calculateContentBounds_();
   return this.contentBounds_;
-};
-
-
-/**
- * Restore tooltip item default settings.
- */
-anychart.core.ui.TooltipItem.prototype.restoreDefaults = function() {
-  this.zIndex(100);
-  this.anchor(anychart.enums.Anchor.CENTER_BOTTOM);
-  this.offsetX(5);
-  this.offsetY(5);
-  this.hideDelay(0);
-
-  var title = /** @type {anychart.core.ui.Title}*/(this.title());
-  title.text('Tooltip Title');
-  title.fontFamily('Verdana');
-  title.fontSize(10);
-  title.fontWeight('bold');
-  title.fontColor('rgb(35,35,35)');
-  title.hAlign(acgraph.vector.Text.HAlign.CENTER);
-  title.vAlign(acgraph.vector.Text.VAlign.TOP);
-  title.margin(0);
-  title.padding(5, 10, 5, 10);
-  title.background(null);
-  title.enabled(false);
-
-  var separator = /** @type {anychart.core.ui.Separator} */(this.separator());
-  separator.orientation(anychart.enums.Orientation.TOP);
-  separator.width('100%');
-  separator.height(1);
-  separator.margin(0, 5, 0, 5);
-  separator.enabled(false);
-
-  var content = /** @type {anychart.core.ui.Label}*/(this.content());
-  content.text('Content Text');
-  content.fontFamily('Verdana');
-  content.fontSize(10);
-  content.fontWeight('bold');
-  content.fontColor('rgb(35,35,35)');
-  content.hAlign(acgraph.vector.Text.HAlign.CENTER);
-  content.vAlign(acgraph.vector.Text.VAlign.TOP);
-  content.padding(5, 10, 5, 10);
-  content.background(null);
-  content.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
-  content.enabled(true);
-
-  var background = /** @type {anychart.core.ui.Background}*/(this.background());
-  background.fill(/** @type {acgraph.vector.Fill} */ ({
-    'keys': [
-      '0 rgb(255,255,255) 1',
-      '0.5 rgb(243,243,243) 1',
-      '1 rgb(255,255,255) 1'
-    ]
-  }));
-  background.stroke(/** @type {acgraph.vector.Stroke} */ ({
-    'keys': [
-      '0 rgb(221,221,221) 1',
-      '1 rgb(208,208,208) 1'
-    ]
-  }));
-  background.corners(10);
-  background.cornerType('none');
 };
 
 

@@ -20,10 +20,6 @@ anychart.core.cartesian.series.Line = function(opt_data, opt_csvSettings) {
   this.referenceValueNames = ['x', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.referenceValuesSupportStack = false;
-
-  this.hoverStroke(function() {
-    return anychart.color.lighten(this['sourceColor']);
-  });
 };
 goog.inherits(anychart.core.cartesian.series.Line, anychart.core.cartesian.series.ContinuousBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.LINE] = anychart.core.cartesian.series.Line;
@@ -83,6 +79,12 @@ anychart.core.cartesian.series.Line.prototype.getMarkerFill = function() {
     delete stroke['lineJoin'];
   }
   return stroke;
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
 

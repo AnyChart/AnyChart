@@ -1,6 +1,7 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
+goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
 goog.require('goog.json.hybrid');
@@ -56,6 +57,19 @@ anychart.TOOLBAR_CSS = '';
  * @name anychart.graphics
  */
 anychart.graphics = window['acgraph'];
+
+
+/**
+ Sets and returns an address export server script, which is used to export to an image
+ or PDF.
+ @see acgraph.vector.Stage#saveAsPdf
+ @see acgraph.vector.Stage#saveAsPng
+ @see acgraph.vector.Stage#saveAsJpg
+ @see acgraph.vector.Stage#saveAsSvg
+ @param {string=} opt_address Export server script URL.
+ @return {string} Export server script URL.
+ */
+anychart.server = window['acgraph']['server'];
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -135,6 +149,12 @@ anychart.gaugeTypesMap = {};
 /**
  * @type {Object}
  */
+anychart.mapTypesMap = {};
+
+
+/**
+ * @type {Object}
+ */
 anychart.ganttTypesMap = {};
 
 
@@ -162,6 +182,20 @@ anychart.createGaugeByType = function(type) {
     return /** @type {anychart.core.Chart} */(cls());
   } else {
     throw 'Unknown gauge type: ' + type + '\nProbably it is in some other module, see module list for details.';
+  }
+};
+
+
+/**
+ * @param {string} type
+ * @return {anychart.core.Chart}
+ */
+anychart.createMapByType = function(type) {
+  var cls = anychart.mapTypesMap[type];
+  if (cls) {
+    return /** @type {anychart.core.Chart} */(cls());
+  } else {
+    throw 'Unknown map type: ' + type + '\nProbably it is in some other module, see module list for details.';
   }
 };
 
@@ -216,16 +250,19 @@ anychart.fromJson = function(jsonConfig) {
     var chart = json['chart'];
     var gauge = json['gauge'];
     var gantt = json['gantt'];
+    var map = json['map'];
     if (chart)
       instance = anychart.createChartByType(chart['type']);
     else if (gauge)
       instance = anychart.createGaugeByType(gauge['type']);
     else if (gantt)
       instance = anychart.createGanttByType(gantt['type']);
+    else if (map)
+      instance = anychart.createMapByType(map['type']);
   }
 
   if (instance)
-    instance.setup(chart || gauge || gantt);
+    instance.setup(chart || gauge || gantt || map);
   else
     anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 
@@ -268,7 +305,8 @@ goog.global['anychart'] = goog.global['anychart'] || {};
  * @type {string|number}
  *
  */
-goog.global['anychart']['fontSize'] = '12px';
+//goog.global['anychart']['fontSize'] = '12px';
+goog.global['anychart']['fontSize'] = '13px';
 
 
 /**
@@ -276,7 +314,8 @@ goog.global['anychart']['fontSize'] = '12px';
  * @type {string}
  *
  */
-goog.global['anychart']['fontColor'] = '#000';
+//goog.global['anychart']['fontColor'] = '#000';
+goog.global['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
 
 
 /**
@@ -284,7 +323,8 @@ goog.global['anychart']['fontColor'] = '#000';
  * @type {string}
  *
  */
-goog.global['anychart']['fontFamily'] = 'Arial';
+//goog.global['anychart']['fontFamily'] = 'Arial';
+goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
 
 
 /**
@@ -499,6 +539,51 @@ anychart.embedCss = function(css) {
 
 
 /**
+ * Defines the default theme.
+ * @define {string} Replaced on compile time.
+ */
+anychart.DEFAULT_THEME = 'defaultTheme';
+
+
+/**
+ * Sets the theme for anychart globally or gets current theme.
+ * @param {(string|Object)=} opt_value Object with theme settings or name of the theme.
+ * @return {Object}
+ */
+anychart.theme = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value))
+      opt_value = goog.global['anychart']['themes'][opt_value];
+    anychart.theme_ = opt_value;
+    delete anychart.compiledTheme_;
+  }
+  return anychart.theme_ ? anychart.theme_ : goog.global['anychart']['themes'][anychart.DEFAULT_THEME];
+};
+
+
+/**
+ * Returns final compiled and merged theme.
+ * @return {*}
+ */
+anychart.getFullTheme = function() {
+  if (!anychart.compiledTheme_) {
+    if (!anychart.defaultThemeCompiled_) {
+      anychart.defaultThemeCompiled_ = anychart.themes.merging.compileTheme(
+          goog.global['anychart']['themes'][anychart.DEFAULT_THEME]);
+    }
+    if (anychart.theme_) {
+      anychart.compiledTheme_ = anychart.themes.merging.merge(
+          anychart.themes.merging.compileTheme(anychart.theme_),
+          anychart.defaultThemeCompiled_);
+    } else {
+      anychart.compiledTheme_ = anychart.defaultThemeCompiled_;
+    }
+  }
+  return anychart.compiledTheme_;
+};
+
+
+/**
  * @ignoreDoc
  */
 anychart.area = anychart.area || function() {
@@ -605,6 +690,14 @@ anychart.pie = anychart.pie || function() {
 /**
  * @ignoreDoc
  */
+anychart.pie3d = anychart.pie3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Pie chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.pyramid = anychart.pyramid || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
 };
@@ -645,6 +738,14 @@ anychart.circularGauge = anychart.circularGauge || function() {
 /**
  * @ignoreDoc
  */
+anychart.map = anychart.map || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.ganttProject = anychart.ganttProject || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
 };
@@ -677,7 +778,9 @@ anychart.ganttToolbar = anychart.ganttToolbar || function() {
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
+goog.exportSymbol('anychart.DEFAULT_THEME', anychart.DEFAULT_THEME);
 goog.exportSymbol('anychart.graphics', anychart.graphics);//import
+goog.exportSymbol('anychart.server', anychart.server);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex
 goog.exportSymbol('anychart.fromXml', anychart.fromXml);//doc|ex
 goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need-ex
@@ -695,11 +798,13 @@ goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
 goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
 goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
 goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
+goog.exportSymbol('anychart.pie3d', anychart.pie3d);//linkedFromModule
 goog.exportSymbol('anychart.pyramid', anychart.pyramid);//linkedFromModule
 goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.sparkline', anychart.sparkline);
 goog.exportSymbol('anychart.scatter', anychart.scatter);
+goog.exportSymbol('anychart.map', anychart.map);
 goog.exportSymbol('anychart.areaChart', anychart.area);
 goog.exportSymbol('anychart.barChart', anychart.bar);
 goog.exportSymbol('anychart.bubbleChart', anychart.bubble);
@@ -718,3 +823,4 @@ goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
+goog.exportSymbol('anychart.theme', anychart.theme);

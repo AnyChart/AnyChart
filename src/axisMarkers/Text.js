@@ -18,7 +18,9 @@ goog.inherits(anychart.axisMarkers.Text, anychart.core.axisMarkers.Text);
  * @return {!anychart.axisMarkers.Text}
  */
 anychart.axisMarkers.text = function() {
-  return new anychart.axisMarkers.Text();
+  var res = new anychart.axisMarkers.Text();
+  res.setup(anychart.getFullTheme()['standalones']['textAxisMarker']);
+  return res;
 };
 
 

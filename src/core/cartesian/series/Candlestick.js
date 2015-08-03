@@ -972,6 +972,12 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingFill = funct
 };
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.Candlestick.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
+};
+
+
 /**
  * @inheritDoc
  */

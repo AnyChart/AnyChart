@@ -85,16 +85,21 @@ goog.inherits(anychart.data.Tree, anychart.core.Base);
 anychart.data.Tree.fromJson = function(config) {
   var tree = new anychart.data.Tree();
   tree.suspendSignalsDispatching();
-  var indexData = config['index'];
 
-  //We create indexes first because it's a way faster than create index after the data is added.
-  for (var i = 0, l = indexData.length; i < l; i++) {
-    tree.createIndexOn(indexData[i]);
+  if ('index' in config) {
+    var indexData = config['index'];
+
+    //We create indexes first because it's a way faster than create index after the data is added.
+    for (var i = 0, l = indexData.length; i < l; i++) {
+      tree.createIndexOn(indexData[i]);
+    }
   }
 
-  var rootsData = config['children'];
-  for (i = 0, l = rootsData.length; i < l; i++) {
-    tree.addChild(anychart.data.Tree.DataItem.fromSerializedItem(tree, rootsData[i]));
+  if ('children' in config) {
+    var rootsData = config['children'];
+    for (i = 0, l = rootsData.length; i < l; i++) {
+      tree.addChild(anychart.data.Tree.DataItem.fromSerializedItem(tree, rootsData[i]));
+    }
   }
 
   tree.resumeSignalsDispatching(false);
@@ -812,17 +817,19 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
  * @return {anychart.data.Tree.DataItem} - Restored tree data item.
  */
 anychart.data.Tree.DataItem.fromSerializedItem = function(tree, config) {
-  var data = config['treeDataItemData'];
-  var meta = config['treeDataItemMeta'];
-  var children = config.children;
+  var data = ('treeDataItemData' in config) ? config['treeDataItemData'] : {};
 
   var item = new anychart.data.Tree.DataItem(tree, data);
 
-  for (var key in meta) { //Restoring meta.
-    item.meta(key, meta[key]);
+  if ('treeDataItemMeta' in config) {
+    var meta = config['treeDataItemMeta'];
+    for (var key in meta) { //Restoring meta.
+      item.meta(key, meta[key]);
+    }
   }
 
-  if (children) {
+  if ('children' in config) {
+    var children = config['children'];
     for (var i = 0; i < children.length; i++) {
       var child = anychart.data.Tree.DataItem.fromSerializedItem(tree, children[i]);
       item.addChild(child);
@@ -1183,12 +1190,28 @@ anychart.data.Tree.DataItem.prototype.serialize = function() {
 
 /**
  * Constructor function
- * @param {Array.<Object>=} opt_data - Raw data.
- * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
+ * @param {(Array.<Object>|string)=} opt_data - Raw data or CSV-string. If string is passed, second parameter will be
+ *  interpreted as fields mapping.
+ * @param {(anychart.enums.TreeFillingMethod|Object)=} opt_fillMethodOrCsvMapping - Fill method or CSV mapping object.
+ *  This parameter is interpreted as mapping object if first parameter is string. Mapping object should have structure
+ *  like
+ *  <code>
+ *    //'nameOfField': index_of_column
+ *    mapping = {
+ *      'id': 0,
+ *      'name': 1,
+ *      'value': 15
+ *    };
+ *  </code>.
+ * @param {Object=} opt_csvSettings - CSV settings object. Should be fields like
+ *  rowsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  columnsSeparator - string or undefined, if it is undefined, it will not be set.
+ *  ignoreTrailingSpaces - boolean or undefined, if it is undefined, it will not be set.
+ *  ignoreFirstRow - boolean or undefined, if it is undefined, it will not be set.
  * @return {!anychart.data.Tree}
  */
-anychart.data.tree = function(opt_data, opt_fillMethod) {
-  return new anychart.data.Tree(opt_data, opt_fillMethod);
+anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings) {
+  return new anychart.data.Tree(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings);
 };
 
 

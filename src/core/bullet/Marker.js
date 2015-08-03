@@ -39,7 +39,7 @@ anychart.core.bullet.Marker = function() {
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
+  this.defaultLayout_;
 
   /**
    * Type for bullet marker.
@@ -52,7 +52,7 @@ anychart.core.bullet.Marker = function() {
    * @type {anychart.enums.BulletMarkerType}
    * @private
    */
-  this.defaultType_ = anychart.enums.BulletMarkerType.BAR;
+  this.defaultType_;
 
   /**
    * Fill of bullet marker.

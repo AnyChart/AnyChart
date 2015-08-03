@@ -18,7 +18,9 @@ goog.inherits(anychart.grids.Polar, anychart.core.grids.Polar);
  * @return {!anychart.grids.Polar}
  */
 anychart.grids.polar = function() {
-  return new anychart.grids.Polar();
+  var res = new anychart.grids.Polar();
+  res.setup(anychart.getFullTheme()['standalones']['polarGrid']);
+  return res;
 };
 
 

@@ -253,16 +253,6 @@ anychart.core.radar.series.Area.prototype.finalizeHatchFill = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.radar.series.Area.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  return result;
-};
-
-
 //anychart.core.radar.series.Area.prototype['startDrawing'] = anychart.core.radar.series.Area.prototype.startDrawing;
 //anychart.core.radar.series.Area.prototype['finalizeDrawing'] = anychart.core.radar.series.Area.prototype.finalizeDrawing;
 //exports

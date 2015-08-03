@@ -18,29 +18,10 @@ anychart.core.ui.Credits = function() {
   goog.base(this);
 
   /**
-   * @type {?string}
-   * @private
-   */
-  this.text_ = 'AnyChart';
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this.url_ = 'http://anychart.com';
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this.alt_ = 'AnyChart.com';
-
-  /**
    * @type {string}
    * @private
    */
   this.logoSrc_ = this.addProtocol_('static.anychart.com/logo.png');
-
 
   /**
    * @type {Element}
@@ -238,6 +219,24 @@ anychart.core.ui.Credits.prototype.logoSrc = function(opt_value) {
 };
 
 
+/**
+ * Gets/sets 'in chart' flag. If is set to true, credits will be located right on a chart. Otherwise, credits will take
+ * an area below the chart to be located.
+ * @param {boolean=} opt_value - Value to be set.
+ * @return {boolean|anychart.core.ui.Credits} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Credits.prototype.inChart = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.inChart_ != opt_value) {
+      this.inChart_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.CREDITS_POSITION, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.inChart_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.Credits.prototype.invalidateParentBounds = function() {
   this.invalidate(anychart.ConsistencyState.CREDITS_POSITION, anychart.Signal.NEEDS_REDRAW);
@@ -410,9 +409,11 @@ anychart.core.ui.Credits.prototype.getRemainingBounds = function() {
 
   if (!this.enabled()) return parentBounds;
 
-  var creditsSize = goog.style.getBorderBoxSize(this.divElement_);
-  // chart height - credits height - bottom
-  parentBounds.height = parentBounds.height - creditsSize.height - anychart.core.ui.Credits.BOTTOM;
+  if (!this.inChart_) {
+    var creditsSize = goog.style.getBorderBoxSize(this.divElement_);
+    // chart height - credits height - bottom
+    parentBounds.height = parentBounds.height - creditsSize.height - anychart.core.ui.Credits.BOTTOM;
+  }
 
   return parentBounds;
 };
@@ -502,6 +503,7 @@ anychart.core.ui.Credits.prototype.serialize = function() {
   json['url'] = this.url();
   json['alt'] = this.alt();
   json['logoSrc'] = this.logoSrc();
+  json['inChart'] = this.inChart();
   return json;
 };
 
@@ -525,6 +527,7 @@ anychart.core.ui.Credits.prototype.setupByJSON = function(config) {
   this.url(config['url']);
   this.alt(config['alt']);
   this.logoSrc(config['logoSrc']);
+  this.inChart(config['inChart']);
 };
 
 
@@ -542,3 +545,4 @@ anychart.core.ui.Credits.prototype['text'] = anychart.core.ui.Credits.prototype.
 anychart.core.ui.Credits.prototype['url'] = anychart.core.ui.Credits.prototype.url;//doc|ex
 anychart.core.ui.Credits.prototype['alt'] = anychart.core.ui.Credits.prototype.alt;//doc|ex
 anychart.core.ui.Credits.prototype['logoSrc'] = anychart.core.ui.Credits.prototype.logoSrc;//doc|ex
+anychart.core.ui.Credits.prototype['inChart'] = anychart.core.ui.Credits.prototype.inChart;

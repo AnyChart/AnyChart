@@ -34,8 +34,6 @@ anychart.core.gauge.pointers.Bar = function() {
    * @private
    */
   this.radius_;
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.gauge.pointers.Bar, anychart.core.gauge.pointers.Base);
 
@@ -238,18 +236,6 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
   goog.base(this, 'draw');
 
   return this;
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.gauge.pointers.Bar.prototype.restoreDefaults = function() {
-  goog.base(this, 'restoreDefaults');
-
-  this.suspendSignalsDispatching();
-  this.position(anychart.enums.GaugeSidePosition.CENTER);
-  this.resumeSignalsDispatching(true);
 };
 
 

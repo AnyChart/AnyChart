@@ -70,6 +70,7 @@ anychart.ConsistencyState = {
   CARTESIAN_AXES: 1 << 16,
   CARTESIAN_AXES_MARKERS: 1 << 17,
   CARTESIAN_GRIDS: 1 << 18,
+  CARTESIAN_CROSSHAIR: 1 << 19,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 11,
   PYRAMID_FUNNEL_MARKERS: 1 << 12,
@@ -104,10 +105,20 @@ anychart.ConsistencyState = {
   SCATTER_AXES: 1 << 16,
   SCATTER_AXES_MARKERS: 1 << 17,
   SCATTER_GRIDS: 1 << 18,
+  SCATTER_CROSSHAIR: 1 << 19,
   //---------------------------------- SPARKLINE STATES (CHART) ---------------------------------
   SPARK_SCALES: 1 << 11,
   SPARK_SERIES: 1 << 12,
   SPARK_AXES_MARKERS: 1 << 13,
+  //---------------------------------- MAP STATES (CHART) ---------------------------------
+  MAP_SCALE: 1 << 11,
+  MAP_COLOR_SCALE: 1 << 12,
+  MAP_GEO_DATA: 1 << 13,
+  MAP_SERIES: 1 << 14,
+  MAP_PALETTE: 1 << 15,
+  MAP_MARKER_PALETTE: 1 << 16,
+  MAP_HATCH_FILL_PALETTE: 1 << 17,
+  MAP_COLOR_RANGE: 1 << 18,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 5,
@@ -120,6 +131,8 @@ anychart.ConsistencyState = {
   AXIS_LABELS: 1 << 6,
   AXIS_TICKS: 1 << 7,
   AXIS_OVERLAP: 1 << 8,
+  //---------------------------------- AXES STATES (AXIS) ---------------------------------
+  COLOR_RANGE_MARKER: 1 << 9,
   //---------------------------------- GANTT CONTROLLER STATES (VB) ---------------------------------
   CONTROLLER_DATA: 1 << 5,
   CONTROLLER_VISIBILITY: 1 << 6,
@@ -148,6 +161,8 @@ anychart.ConsistencyState = {
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 5,
   DATA_GRID_COLUMN_POSITION: 1 << 6,
+  //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
+  BACKGROUND_POINTER_EVENTS: 1 << 5,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
   LABEL_BACKGROUND: 1 << 5,
   //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------
@@ -209,7 +224,8 @@ anychart.Signal = {
   BOUNDS_CHANGED: 1 << 3,
   DATA_CHANGED: 1 << 4,
   META_CHANGED: 1 << 5,
-  NEED_UPDATE_LEGEND: 1 << 6
+  NEED_UPDATE_LEGEND: 1 << 6,
+  NEED_UPDATE_COLOR_RANGE: 1 << 7
 };
 
 

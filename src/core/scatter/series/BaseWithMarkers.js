@@ -16,8 +16,6 @@ goog.require('anychart.enums');
  */
 anychart.core.scatter.series.BaseWithMarkers = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
-
-  this.markers().position(anychart.enums.Position.CENTER);
 };
 goog.inherits(anychart.core.scatter.series.BaseWithMarkers, anychart.core.scatter.series.Base);
 
@@ -327,25 +325,6 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.getLegendItemData = funct
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
   }
   return data;
-};
-
-
-/** @inheritDoc */
-anychart.core.scatter.series.BaseWithMarkers.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var markers = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
-  markers.suspendSignalsDispatching();
-  markers.enabled(true);
-  markers.size(4);
-  markers.resumeSignalsDispatching(false);
-
-  var hoverMarkers = (/** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers()));
-  hoverMarkers.suspendSignalsDispatching();
-  hoverMarkers.size(6);
-  hoverMarkers.resumeSignalsDispatching(false);
-
-  return result;
 };
 
 

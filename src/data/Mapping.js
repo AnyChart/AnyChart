@@ -173,7 +173,10 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     'median': [3],
     'q3': [4],
     'highest': [5],
-    'outliers': [6]
+    'outliers': [6],
+
+    // maps
+    'id': [0]
   };
 
   /**

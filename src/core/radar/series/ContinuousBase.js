@@ -17,8 +17,6 @@ goog.require('anychart.enums');
 anychart.core.radar.series.ContinuousBase = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  this.markers().position(anychart.enums.Position.CENTER);
-
   /**
    * @type {!acgraph.vector.Path}
    * @protected
@@ -582,31 +580,6 @@ anychart.core.radar.series.ContinuousBase.prototype.setupByJSON = function(confi
   this.markers(config['markers']);
   this.hoverMarkers(config['hoverMarkers']);
   this.connectMissingPoints(config['connectMissingPoints']);
-};
-
-
-/** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  var markers = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
-  markers.suspendSignalsDispatching();
-  markers.enabled(true);
-  markers.size(4);
-  markers.resumeSignalsDispatching(false);
-
-  var hoverMarkers = (/** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers()));
-  hoverMarkers.suspendSignalsDispatching();
-  hoverMarkers.size(6);
-  hoverMarkers.resumeSignalsDispatching(false);
-
-  var labels = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  labels.suspendSignalsDispatching();
-  labels.enabled(false);
-  labels.anchor('bottom');
-  labels.resumeSignalsDispatching(false);
-
-  return result;
 };
 
 

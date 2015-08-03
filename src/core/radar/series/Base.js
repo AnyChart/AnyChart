@@ -27,38 +27,14 @@ goog.require('anychart.enums');
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.radar.series.Base = function(opt_data, opt_csvSettings) {
-  this.suspendSignalsDispatching();
   goog.base(this);
   /**
    * @type {anychart.core.utils.SeriesPointContextProvider}
    * @private
    */
   this.pointProvider_;
-  this.data(opt_data || null, opt_csvSettings);
-
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.suspendSignalsDispatching();
-  tooltip.isFloating(true);
-  tooltip.titleFormatter(function() {
-    return this['name'];
-  });
-  tooltip.contentFormatter(function() {
-    return this['x'] + ': ' + this['value'];
-  });
-  tooltip.resumeSignalsDispatching(false);
   this.statistics_ = {};
-
-  // make label hoverable
-  var labels = this.labels();
-  labels.disablePointerEvents(false);
-  labels.position(anychart.enums.Position.CENTER);
-  labels.enabled(false);
-  (/** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels())).enabled(null);
-
-  this.hatchFill(false);
-  this.startAngle(0);
-  this.resumeSignalsDispatching(false);
-
+  this.data(opt_data || null, opt_csvSettings);
   this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove);
 };
 goog.inherits(anychart.core.radar.series.Base, anychart.core.VisualBaseWithBounds);
@@ -2225,15 +2201,6 @@ anychart.core.radar.series.Base.prototype.getLegendItemData = function(itemsText
 //  Series default settings.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Restore series default settings.
- * @return {anychart.core.radar.series.Base} Return itself for chaining call.
- */
-anychart.core.radar.series.Base.prototype.restoreDefaults = function() {
-  return this;
-};
-
-
 /**
  * Returns type of current series.
  * @return {anychart.enums.CartesianSeriesType} Series type.

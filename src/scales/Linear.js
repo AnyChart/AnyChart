@@ -230,3 +230,7 @@ anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.tic
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex
 anychart.scales.Linear.prototype['stackMode'] = anychart.scales.Linear.prototype.stackMode;//inherited
 anychart.scales.Linear.prototype['stickToZero'] = anychart.scales.Linear.prototype.stickToZero;
+anychart.scales.Linear.prototype['softMinimum'] = anychart.scales.Linear.prototype.softMinimum;
+anychart.scales.Linear.prototype['softMaximum'] = anychart.scales.Linear.prototype.softMaximum;
+anychart.scales.Linear.prototype['minimumGap'] = anychart.scales.Linear.prototype.minimumGap;//doc|ex
+anychart.scales.Linear.prototype['maximumGap'] = anychart.scales.Linear.prototype.maximumGap;//doc|ex

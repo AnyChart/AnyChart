@@ -29,6 +29,7 @@ anychart.core.ui.Background = function() {
   this.rect_ = null;
 
   /**
+   * We add a default here, because too many backgrounds are created in too many places to put this default there.
    * @type {anychart.enums.BackgroundCornersType}
    * @private
    */
@@ -45,14 +46,21 @@ anychart.core.ui.Background = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = acgraph.vector.normalizeFill('#000 0.5');
+  this.fill_;
 
   /**
    * Stroke settings.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = '#000';
+  this.stroke_;
+
+  /**
+   * Pointer events.
+   * @type {boolean}
+   * @private
+   */
+  this.disablePointerEvents_ = false;
 
   this.resumeSignalsDispatching(false);
 };
@@ -73,7 +81,8 @@ anychart.core.ui.Background.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.APPEARANCE;
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,25 +90,6 @@ anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Corners.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Normalizes user input corners type to its enumeration values. Also accepts null. Defaults to opt_default or 'round'.
- *
- * @param {string} type Type to normalize.
- * @param {anychart.enums.BackgroundCornersType=} opt_default Default type.
- * @return {anychart.enums.BackgroundCornersType} Normalized type.
- */
-anychart.core.ui.Background.normalizeCornerType = function(type, opt_default) {
-  if (goog.isString(type)) {
-    type = type.toLowerCase();
-    for (var i in anychart.enums.BackgroundCornersType) {
-      if (type == anychart.enums.BackgroundCornersType[i])
-        return anychart.enums.BackgroundCornersType[i];
-    }
-  }
-  return opt_default || anychart.enums.BackgroundCornersType.NONE;
-};
-
-
 /**
  * Getter for current corner radius.
  * @return {Array.<number>} Current corner settings.
@@ -187,13 +177,14 @@ anychart.core.ui.Background.prototype.corners = function(opt_value) {
  */
 anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.core.ui.Background.normalizeCornerType(opt_value);
+    opt_value = anychart.enums.normalizeBackgroundCornerType(opt_value);
     if (opt_value != this.cornerType_) {
       this.cornerType_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
+    // that is so easy to fix it like that...
     return this.cornerType_;
   }
 };
@@ -473,6 +464,25 @@ anychart.core.ui.Background.prototype.stroke = function(opt_strokeOrFill, opt_th
 
 
 /**
+ * Pointer events.
+ * @param {boolean=} opt_value
+ * @return {!anychart.core.ui.Background|boolean}
+ */
+anychart.core.ui.Background.prototype.disablePointerEvents = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.disablePointerEvents_) {
+      this.disablePointerEvents_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return this.disablePointerEvents_;
+  }
+};
+
+
+/**
  * Render background.
  * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
  */
@@ -488,6 +498,11 @@ anychart.core.ui.Background.prototype.draw = function() {
   var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS)) {
+    this.rect_.disablePointerEvents(this.disablePointerEvents_);
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var bounds = this.getPixelBounds();

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsd:schema
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://anychart.com/schemas/7.5.1/xml-schema.xsd"
-        xmlns="http://anychart.com/schemas/7.5.1/xml-schema.xsd"
+        targetNamespace="http://anychart.com/schemas/7.6.0/xml-schema.xsd"
+        xmlns="http://anychart.com/schemas/7.6.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
     <!-- Online validator http://www.utilities-online.info/xsdvalidation/#.VImqs6SsUn- -->
@@ -47,6 +47,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="axis" type="core.axes.Linear"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="core.axisMarkers.SimpleRange_list"/>
             <!-- charts.Cartesian and chart.Scatter elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="crosshair" type="core.Crosshair"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_axes" type="core.axes.Linear_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_axes" type="core.axes.Linear_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="line_axes_markers" type="core.axisMarkers.Line_list"/>
@@ -718,11 +719,13 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="url" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="alt" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="logo_src" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="in_chart" type="simple.Bool"/>
         </xsd:all>
         <xsd:attribute name="text" type="xsd:string"/>
         <xsd:attribute name="url" type="xsd:string"/>
         <xsd:attribute name="alt" type="xsd:string"/>
         <xsd:attribute name="logo_src" type="xsd:string"/>
+        <xsd:attribute name="in_chart" type="xsd:boolean"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -754,6 +757,43 @@
             <xsd:element name="label" type="core.Label"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="core.CrosshairLabel">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+        </xsd:all>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
+        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
+        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
+        <xsd:attribute name="text" type="xsd:string"/>
+        <xsd:attribute name="min_font_size" type="xsd:string"/>
+        <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <xsd:attribute name="rotation" type="xsd:double" default="0"/>
+        <xsd:attribute name="axis_index" type="xsd:double" default="0"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.Crosshair">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_label" type="core.CrosshairLabel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_label" type="core.CrosshairLabel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="x_stroke" type="xsd:string"/>
+        <xsd:attribute name="y_stroke" type="xsd:string"/>
+        <xsd:attributeGroup ref="attrs.TextSettings"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
 
     <xsd:complexType name="core.LabelsFactory">
         <xsd:all>
@@ -845,6 +885,7 @@
         <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
         <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
         <xsd:attribute name="type" type="enums.MarkerType"/>
+        <xsd:attribute name="rotation" type="xsd:double"/>
         <xsd:attribute name="size" type="xsd:double"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -918,7 +959,8 @@
 
     <xsd:complexType name="core.DataGrid">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="cell_border" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="column_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="title_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="columns" type="Columns_list"/>
@@ -932,6 +974,8 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
         <xsd:attribute name="title_height" type="xsd:double"/>
+        <xsd:attribute name="row_stroke" type="xsd:string"/>
+        <xsd:attribute name="column_stroke" type="xsd:string"/>
         <xsd:attribute name="background_fill" type="xsd:string"/>
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
@@ -949,11 +993,12 @@
 
     <xsd:complexType name="core.DataGrid.Column">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="labels_factory" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="cell_text_settings" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="width" type="xsd:double"/>
+        <xsd:attribute name="defaultWidth" type="xsd:double"/>
         <xsd:attribute name="collapse_expand_buttons" type="simple.Bool"/>
         <xsd:attribute name="depth_padding_multiplier" type="xsd:double"/>
 
@@ -961,7 +1006,8 @@
 
     <xsd:complexType name="core.Timeline">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="cell_border" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="column_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="GanttDateTimeScale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="background_fill" type="Fill"/>
@@ -984,8 +1030,12 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels_factory" type="core.LabelsFactory"/>
+
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attribute name="row_stroke" type="xsd:string"/>
+        <xsd:attribute name="column_stroke" type="xsd:string"/>
         <xsd:attribute name="background_fill" type="xsd:string"/>
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
@@ -1006,6 +1056,7 @@
         <xsd:attribute name="connector_stroke" type="xsd:string"/>
         <xsd:attribute name="selected_element_fill" type="xsd:string"/>
         <xsd:attribute name="selected_element_stroke" type="xsd:string"/>
+        <xsd:attribute name="labels_factory" type="simple.BoolOrNull"/>
     </xsd:complexType>
 
 
@@ -1172,7 +1223,7 @@
         <xsd:attribute name="line_join" type="enums.LineJoin"/>
         <xsd:attribute name="line_cap" type="enums.LineCap"/>
         <xsd:attribute name="angle" type="xsd:double"/>
-        <xsd:attribute name="mode" type="simple.Bool" default="false"/>
+        <xsd:attribute name="mode" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="cx" type="xsd:double"/>
         <xsd:attribute name="cy" type="xsd:double"/>
         <xsd:attribute name="fx" type="xsd:double"/>
@@ -1722,6 +1773,7 @@
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
+            <xsd:enumeration value="pie3d"/>
             <xsd:enumeration value="polar"/>
             <xsd:enumeration value="pyramid"/>
             <xsd:enumeration value="radar"/>

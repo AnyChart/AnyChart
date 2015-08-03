@@ -69,7 +69,7 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @type {boolean}
    * @protected
    */
-  this.connectMissing = false;
+  this.connectMissing;
 
   /**
    * @type {Object}
@@ -82,7 +82,7 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @type {boolean|anychart.math.Rect}
    * @private
    */
-  this.clip_ = true;
+  this.clip_;
 
   /**
    * Series default settings.
@@ -96,6 +96,13 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.markersInternal_ = new anychart.core.ui.MarkersFactory();
+  // defaults that was deleted form MarkersFactory
+  this.markersInternal_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.markersInternal_.size(10);
+  this.markersInternal_.anchor(anychart.enums.Anchor.CENTER);
+  this.markersInternal_.offsetX(0);
+  this.markersInternal_.offsetY(0);
+  this.markersInternal_.rotation(0);
   this.markersInternal_.setParentEventTarget(this);
   this.markersInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_MARKER);
 
@@ -104,11 +111,20 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.labelsInternal_ = new anychart.core.ui.LabelsFactory();
+  // defaults that was deleted form LabelsFactory
+  this.labelsInternal_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.labelsInternal_.textFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.labelsInternal_.background(null);
+  this.labelsInternal_.rotation(0);
+  this.labelsInternal_.width(null);
+  this.labelsInternal_.height(null);
+  this.labelsInternal_.fontSize(11);
+  this.labelsInternal_.minFontSize(8);
+  this.labelsInternal_.maxFontSize(72);
   this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_LABEL);
 
   this.data(opt_data || null, opt_csvSettings);
-  this.type(anychart.enums.SparklineSeriesType.LINE);
 };
 goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
 
@@ -131,27 +147,6 @@ anychart.charts.Sparkline.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Axis range marker z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Sparkline.ZINDEX_AXIS_RANGE_MARKER = 25.1;
-
-
-/**
- * Axis line marker z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Sparkline.ZINDEX_AXIS_LINE_MARKER = 25.2;
-
-
-/**
- * Axis text marker z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Sparkline.ZINDEX_AXIS_TEXT_MARKER = 25.3;
-
-
-/**
  * Series z-index in chart root layer.
  * @type {number}
  */
@@ -170,6 +165,90 @@ anychart.charts.Sparkline.ZINDEX_MARKER = 40;
  * @type {number}
  */
 anychart.charts.Sparkline.ZINDEX_LABEL = 40;
+
+
+/**
+ * Getter/setter for marker default settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for label default settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultLabelSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultLabelSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultLabelSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for series default settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultSeriesSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultSeriesSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for line marker default settings.
+ * @param {Object=} opt_value Object with line marker settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultLineMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultLineMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultLineMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for text marker default settings.
+ * @param {Object=} opt_value Object with text marker settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultTextMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultTextMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultTextMarkerSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for range marker default settings.
+ * @param {Object=} opt_value Object with range marker settings.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.defaultRangeMarkerSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultRangeMarkerSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultRangeMarkerSettings_ || {};
+};
 
 
 /**
@@ -220,7 +299,7 @@ anychart.charts.Sparkline.prototype.type_;
  * @private
  * @type {(number|string|null)}
  */
-anychart.charts.Sparkline.prototype.barWidth_ = '90%';
+anychart.charts.Sparkline.prototype.barWidth_ = '95%';
 
 
 /**
@@ -390,8 +469,7 @@ anychart.charts.Sparkline.prototype.lineMarker = function(opt_indexOrValue, opt_
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.core.axisMarkers.Line();
-    lineMarker.layout(anychart.enums.Layout.HORIZONTAL);
-    lineMarker.zIndex(anychart.charts.Sparkline.ZINDEX_AXIS_LINE_MARKER);
+    lineMarker.setup(this.defaultLineMarkerSettings());
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal_, this);
@@ -459,8 +537,7 @@ anychart.charts.Sparkline.prototype.rangeMarker = function(opt_indexOrValue, opt
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = new anychart.core.axisMarkers.Range();
-    rangeMarker.layout(anychart.enums.Layout.HORIZONTAL);
-    rangeMarker.zIndex(anychart.charts.Sparkline.ZINDEX_AXIS_RANGE_MARKER);
+    rangeMarker.setup(this.defaultRangeMarkerSettings());
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal_, this);
@@ -527,8 +604,7 @@ anychart.charts.Sparkline.prototype.textMarker = function(opt_indexOrValue, opt_
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.core.axisMarkers.Text();
-    textMarker.layout(anychart.enums.Layout.HORIZONTAL);
-    textMarker.zIndex(anychart.charts.Sparkline.ZINDEX_AXIS_TEXT_MARKER);
+    textMarker.setup(this.defaultTextMarkerSettings());
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal_, this);
@@ -727,7 +803,7 @@ anychart.charts.Sparkline.prototype.createSeriesByType_ = function(type) {
     instance.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_SERIES);
     instance.listenSignals(this.seriesInvalidated_, this);
 
-    this.seriesDefaults_ = this.series_.getDefaults();
+    this.seriesDefaults_ = this.defaultSeriesSettings()[type] || this.series_.getDefaults();
 
     this.invalidate(anychart.ConsistencyState.SPARK_SERIES | anychart.ConsistencyState.SPARK_SCALES,
         anychart.Signal.NEEDS_REDRAW);
@@ -1992,20 +2068,48 @@ anychart.charts.Sparkline.prototype.getFinalHatchFill = function(usePointSetting
 anychart.charts.Sparkline.prototype.mergeFactorySettings_ = function(settings, fields) {
   var res = {};
 
-  var isDefinedEnabledState = false;
+  //var isDefinedEnabledState = false;
   for (var i = settings.length; i--;) {
     var setting = settings[i];
     if (setting) {
       var isJson = !(setting instanceof anychart.core.VisualBase);
       var enabled = isJson ? setting['enabled'] : setting['enabled']();
-      if (!isDefinedEnabledState) isDefinedEnabledState = goog.isBoolean(enabled);
-      if (enabled || (!isDefinedEnabledState && !goog.isBoolean(enabled))) {
+      //if (!isDefinedEnabledState) isDefinedEnabledState = goog.isBoolean(enabled);
+      if (enabled /*|| (isDefinedEnabledState && !goog.isBoolean(enabled))*/) {
         for (var j = 0, fieldsCount = fields.length; j < fieldsCount; j++) {
           var field = fields[j];
           var value = isJson ? setting[field] : setting[field]();
           if (goog.isDef(value))
             res[field] = value instanceof anychart.core.Base ? value.serialize() : value;
         }
+      }
+    }
+  }
+
+  return res;
+};
+
+
+/**
+ * Merge factory settings.
+ * @param {Array.<anychart.core.ui.MarkersFactory|anychart.core.ui.MarkersFactory.Marker|
+ * anychart.core.ui.LabelsFactory|anychart.core.ui.LabelsFactory.Label|Object>} settings Array of marker settings.
+ * @param {Array.<string>} fields Entries fields to merge.
+ * @return {Object} Object with merged settings.
+ * @private
+ */
+anychart.charts.Sparkline.prototype.mergeFactorySettingsEasy_ = function(settings, fields) {
+  var res = {};
+
+  for (var i = settings.length; i--;) {
+    var setting = settings[i];
+    if (setting) {
+      var isJson = !(setting instanceof anychart.core.VisualBase);
+      for (var j = 0, fieldsCount = fields.length; j < fieldsCount; j++) {
+        var field = fields[j];
+        var value = isJson ? setting[field] : setting[field]();
+        if (goog.isDef(value))
+          res[field] = value instanceof anychart.core.Base ? value.serialize() : value;
       }
     }
   }
@@ -2311,11 +2415,15 @@ anychart.charts.Sparkline.prototype.getFinalMarker = function(usePointSettings) 
   var autoFill = this.getFinalFill(true);
   var autoColor = {'fill': autoFill, 'stroke': anychart.color.darken(autoFill)};
 
-  var defaultSettings = [defaultFirstOrLastMarkers, defaultMaxOrMinMarkers, defaultNegativeMarkers, defaultMarkers];
-  var finalDefaultMarkers = this.mergeFactorySettings_(defaultSettings, anychart.charts.Sparkline.MARKERS_FIELD_NAMES_FOR_MERGE_);
+  var defaultSettings = [defaultFirstOrLastMarkers, defaultMaxOrMinMarkers, defaultNegativeMarkers, defaultMarkers, autoColor];
+  var finalDefaultSettings = this.mergeFactorySettingsEasy_(defaultSettings, anychart.charts.Sparkline.MARKERS_FIELD_NAMES_FOR_MERGE_);
 
-  var settings = [customMarker, firstOrLastMarkers, maxOrMinMarkers, negativeMarkers, markers, autoColor, finalDefaultMarkers];
+  var settings = [customMarker, firstOrLastMarkers, maxOrMinMarkers, negativeMarkers, markers];
+
   var finalSettings = this.mergeFactorySettings_(settings, anychart.charts.Sparkline.MARKERS_FIELD_NAMES_FOR_MERGE_);
+
+  finalSettings = this.mergeFactorySettingsEasy_([finalSettings, finalDefaultSettings],
+      anychart.charts.Sparkline.MARKERS_FIELD_NAMES_FOR_MERGE_);
 
   var marker = this.markersInternal_.getMarker(index);
   var res = null;
@@ -2648,10 +2756,14 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
   var defaultLabels = this.seriesDefaults_['labels'];
 
   var defaultSettings = [defaultFirstOrLastLabels, defaultMaxOrMinLabels, defaultNegativeLabels, defaultLabels];
-  var finalDefaultLabels = this.mergeFactorySettings_(defaultSettings, anychart.charts.Sparkline.LABELS_FIELD_NAMES_FOR_MERGE_);
+  var finalDefaultSettings = this.mergeFactorySettingsEasy_(defaultSettings, anychart.charts.Sparkline.LABELS_FIELD_NAMES_FOR_MERGE_);
 
-  var settings = [customLabel, firstOrLastLabels, maxOrMinLabels, negativeLabels, labels, finalDefaultLabels];
+  var settings = [customLabel, firstOrLastLabels, maxOrMinLabels, negativeLabels, labels];
+
   var finalSettings = this.mergeFactorySettings_(settings, anychart.charts.Sparkline.LABELS_FIELD_NAMES_FOR_MERGE_);
+
+  finalSettings = this.mergeFactorySettingsEasy_([finalSettings, finalDefaultSettings],
+      anychart.charts.Sparkline.LABELS_FIELD_NAMES_FOR_MERGE_);
 
   var label = this.labelsInternal_.getLabel(index);
   var res = null;
@@ -2861,38 +2973,27 @@ anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Defaults.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.charts.Sparkline.prototype.restoreDefaults = function() {
-  this.title().enabled(false);
-  this.background().enabled(false);
-  this.margin(0);
-  this.padding(0);
-
-  this.pointWidth('95%');
-
-  this.markers(null);
-  this.maxMarkers().fill('red');
-  this.minMarkers().fill('blue');
-
-  this.labels().enabled(false).background().enabled(false);
-  this.negativeLabels().enabled(false).background().enabled(false);
-  this.firstLabels().enabled(false).background().enabled(false);
-  this.lastLabels().enabled(false).background().enabled(false);
-  this.minLabels().enabled(false).background().enabled(false);
-  this.maxLabels().enabled(false).background().enabled(false);
-
-  this.hatchFill(null);
-};
-
-
 /** @inheritDoc */
 anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+
+  if ('defaultLabelSettings' in config)
+    this.defaultLabelSettings(config['defaultLabelSettings']);
+
+  if ('defaultMarkerSettings' in config)
+    this.defaultMarkerSettings(config['defaultMarkerSettings']);
+
+  if ('defaultSeriesSettings' in config)
+    this.defaultSeriesSettings(config['defaultSeriesSettings']);
+
+  if ('defaultLineMarkerSettings' in config)
+    this.defaultLineMarkerSettings(config['defaultLineMarkerSettings']);
+
+  if ('defaultTextMarkerSettings' in config)
+    this.defaultTextMarkerSettings(config['defaultTextMarkerSettings']);
+
+  if ('defaultRangeMarkerSettings' in config)
+    this.defaultRangeMarkerSettings(config['defaultRangeMarkerSettings']);
 
   var i, json, scale;
   var lineAxesMarkers = config['lineAxesMarkers'];
@@ -2959,7 +3060,7 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
     for (i = 0; i < lineAxesMarkers.length; i++) {
       json = lineAxesMarkers[i];
       this.lineMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json) this.lineMarker(i).scale(scalesInstances[json['scale']]);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.lineMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -2967,7 +3068,7 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
     for (i = 0; i < rangeAxesMarkers.length; i++) {
       json = rangeAxesMarkers[i];
       this.rangeMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.rangeMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -2975,7 +3076,7 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
     for (i = 0; i < textAxesMarkers.length; i++) {
       json = textAxesMarkers[i];
       this.textMarker(i, json);
-      if (goog.isObject(json) && 'scale' in json) this.textMarker(i).scale(scalesInstances[json['scale']]);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.textMarker(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -2987,21 +3088,18 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
   this.minFill(config['minFill']);
   this.negativeFill(config['negativeFill']);
   this.fill(config['fill']);
-
   this.lastHatchFill(config['lastHatchFill']);
   this.firstHatchFill(config['firstHatchFill']);
   this.maxHatchFill(config['maxHatchFill']);
   this.minHatchFill(config['minHatchFill']);
   this.negativeHatchFill(config['negativeHatchFill']);
   this.hatchFill(config['hatchFill']);
-
   if (config['lastMarkers']) this.lastMarkers().setupByJSON(config['lastMarkers']);
   if (config['firstMarkers']) this.firstMarkers().setupByJSON(config['firstMarkers']);
   if (config['maxMarkers']) this.maxMarkers().setupByJSON(config['maxMarkers']);
   if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
   if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
   if (config['markers']) this.markers().setupByJSON(config['markers']);
-
   if (config['firstLabels']) this.firstLabels().setupByJSON(config['firstLabels']);
   if (config['lastLabels']) this.lastLabels().setupByJSON(config['lastLabels']);
   if (config['maxLabels']) this.maxLabels().setupByJSON(config['maxLabels']);

@@ -98,6 +98,13 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
   this.timeline_ = null;
 
   /**
+   * Row stroke thickness. Used to calculate a required number of visible data items.
+   * @type {number}
+   * @private
+   */
+  this.rowStrokeThickness_ = 1;
+
+  /**
    * Start index.
    * @type {number}
    * @private
@@ -276,13 +283,13 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_START)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.ACTUAL_END)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_START)));
-  this.checkDate_(/** @type {number} */ (item.get(anychart.enums.GanttDataFields.BASELINE_END)));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_START))));
+  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_END))));
 
-  var resultStart = item.get(anychart.enums.GanttDataFields.ACTUAL_START);
-  var resultEnd = item.get(anychart.enums.GanttDataFields.ACTUAL_END);
+  var resultStart = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
+  var resultEnd = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
 
   var progressLength = 0;
   var totalLength = 0;
@@ -299,33 +306,33 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
 
     if (!this.isResourceChart_) {
       var childStart = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-          child.get(anychart.enums.GanttDataFields.ACTUAL_START) :
+          anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
           child.meta('autoStart');
 
       var childEnd = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-          child.get(anychart.enums.GanttDataFields.ACTUAL_END) :
+          anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
           (child.meta('autoEnd') || childStart);
 
       var childProgress = goog.isDef(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
           anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
           (child.meta('autoProgress') || 0);
 
-      if (!goog.isDef(resultStart)) {
-        resultStart = childStart;
-      } else {
+      if (goog.isDef(resultStart) && !isNaN(resultStart)) {
         resultStart = Math.min(resultStart, childStart, childEnd);
-      }
-
-      if (!goog.isDef(resultEnd)) {
-        resultEnd = childEnd;
       } else {
-        resultEnd = Math.max(resultEnd, childStart, childEnd);
+        resultStart = childStart;
       }
 
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_START)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.ACTUAL_END)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_START)));
-      this.checkDate_(/** @type {number} */ (child.get(anychart.enums.GanttDataFields.BASELINE_END)));
+      if (goog.isDef(resultEnd) && !isNaN(resultEnd)) {
+        resultEnd = Math.max(resultEnd, childStart, childEnd);
+      } else {
+        resultEnd = childEnd;
+      }
+
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_START))));
+      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_END))));
 
       var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
       progressLength += /** @type {number} */(childProgress) * delta;
@@ -333,7 +340,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
     }
   }
 
-  if (!this.isResourceChart_) {
+  if (item.numChildren() && !this.isResourceChart_) {
     item.meta('autoProgress', progressLength / totalLength);
     item.meta('autoStart', resultStart);
     item.meta('autoEnd', resultEnd);
@@ -399,12 +406,12 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   while (this.expandedItemsTraverser_.advance()) {
     item = /** @type {anychart.data.Tree.DataItem} */ (this.expandedItemsTraverser_.current());
     this.visibleData_.push(item);
-    height += (anychart.core.gantt.Controller.getItemHeight(item) + anychart.core.ui.DataGrid.ROW_SPACE);
+    height += (anychart.core.gantt.Controller.getItemHeight(item) + this.rowStrokeThickness_);
     this.heightCache_.push(height);
 
     var itemId = item.get(anychart.enums.GanttDataFields.ID);
     var visItem = {'item': item, 'index': this.heightCache_.length - 1};
-    if (itemId && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
+    if (goog.isDef(itemId) && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
 
     if (this.isResourceChart_) {
       var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
@@ -433,8 +440,8 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             this.connectorsData_.push(connectorsMapItem);
           }
 
-          var periodStart = period[anychart.enums.GanttDataFields.START];
-          var periodEnd = period[anychart.enums.GanttDataFields.END];
+          var periodStart = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
+          var periodEnd = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
 
           if (periodStart && periodEnd) {
             minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
@@ -682,13 +689,15 @@ anychart.core.gantt.Controller.prototype.verticalOffset = function(opt_value) {
 /**
  * Gets/sets start index.
  * NOTE: Calling this method sets this.endIndex_ to NaN to recalculate value correctly anew.
+ * ALSO NOTE: Resets vertical offset to 0 to show required cell all.
  * @param {number=} opt_value - Value to be set.
  * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.startIndex_ != opt_value && !isNaN(opt_value)) {
+    if (!isNaN(opt_value)) {
       this.startIndex_ = opt_value;
+      this.verticalOffset_ = 0;
       this.endIndex_ = NaN;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
     }
@@ -706,7 +715,7 @@ anychart.core.gantt.Controller.prototype.startIndex = function(opt_value) {
  */
 anychart.core.gantt.Controller.prototype.endIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.endIndex_ != opt_value && !isNaN(opt_value)) {
+    if (!isNaN(opt_value)) {
       this.endIndex_ = opt_value;
       this.startIndex_ = NaN;
       this.invalidate(anychart.ConsistencyState.CONTROLLER_POSITION, anychart.Signal.NEEDS_REAPPLICATION);
@@ -731,6 +740,23 @@ anychart.core.gantt.Controller.prototype.availableHeight = function(opt_value) {
     return this;
   }
   return this.availableHeight_;
+};
+
+
+/**
+ * Gets/sets row stroke thickness.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.core.gantt.Controller} - Current value or itself for method chaining.
+ */
+anychart.core.gantt.Controller.prototype.rowStrokeThickness = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.rowStrokeThickness_ != opt_value) {
+      this.rowStrokeThickness_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY, anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.rowStrokeThickness_;
 };
 
 
@@ -865,8 +891,8 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
 
       if (startRatio == 0) { //This fixes JS rounding.
         controller
-            .verticalOffset(0)
-            .startIndex(0);
+            .startIndex(0)
+            .verticalOffset(0);
       } else if (endRatio == 1) { //This fixed JS rounding troubles.
         controller.endIndex(controller.heightCache_.length); //This exceeds MAX index (max is length-1). That's why it will set visual appearance correctly.
       } else {
@@ -875,8 +901,8 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
         var previousHeight = startIndex ? controller.heightCache_[startIndex - 1] : 0;
         var verticalOffset = startHeight - previousHeight;
         controller
-            .verticalOffset(verticalOffset)
-            .startIndex(startIndex);
+            .startIndex(startIndex)
+            .verticalOffset(verticalOffset);
       }
 
       controller.resumeSignalsDispatching(false);
@@ -905,8 +931,8 @@ anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
     var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
     var verticalOffset = pxOffset - previousHeight;
     this
-        .verticalOffset(verticalOffset)
-        .startIndex(itemIndex);
+        .startIndex(itemIndex)
+        .verticalOffset(verticalOffset);
   }
   this.resumeSignalsDispatching(false);
   this.run();
@@ -1005,11 +1031,11 @@ anychart.core.gantt.Controller.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   this.isResourceChart_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
-  this.data(anychart.data.Tree.fromJson(config['treeData']));
+  if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));
   this.verticalOffset(config['verticalOffset']);
-  if (goog.isDef(config['startIndex']))
+  if ('startIndex' in config)
     this.startIndex(config['startIndex']);
-  else if (goog.isDef(config['endIndex']))
+  else if ('endIndex' in config)
     this.endIndex(config['endIndex']);
 
   //NOTE: Available height must be set from outside depending on size of restored element.

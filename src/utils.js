@@ -4,7 +4,9 @@ goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');
 goog.require('goog.color');
+goog.require('goog.date.UtcDateTime');
 goog.require('goog.dom.xml');
+goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.json.hybrid');
 
 
@@ -121,14 +123,14 @@ anychart.utils.compareNumericDesc = function(a, b) {
 /**
  * Extracts tag from BrowserEvent target object. Used in interactivity.
  * @param {*} target
- * @return {anychart.core.VisualBase|number|boolean|undefined}
+ * @return {*|undefined}
  */
 anychart.utils.extractTag = function(target) {
   var tag;
   while (target instanceof acgraph.vector.Element) {
     tag = target.tag;
-    if (tag instanceof anychart.core.VisualBase || !anychart.utils.isNaN(tag) || goog.isBoolean(tag)) {
-      return /** @type {anychart.core.VisualBase|number|boolean} */(tag);
+    if (goog.isDef(tag)) {
+      return tag;
     }
     target = target.parent();
   }
@@ -302,6 +304,21 @@ anychart.utils.normalizeTimestamp = function(value) {
 
 
 /**
+ * Formats incoming timestamp as 'yyyy.MM.dd'.
+ * @param {number|string} timestamp - Timestamp.
+ * @return {string} - Formatted date.
+ */
+anychart.utils.defaultDateFormatter = function(timestamp) {
+  if (goog.isNumber(timestamp) || goog.isString(timestamp)) {
+    var formatter = new goog.i18n.DateTimeFormat('yyyy.MM.dd');
+    return formatter.format(new goog.date.UtcDateTime(new Date(+timestamp)));
+  } else {
+    return '';
+  }
+};
+
+
+/**
  * Gets anchor coordinates by bounds.
  * @param {anychart.math.Rect} bounds Bounds rectangle.
  * @param {anychart.enums.Anchor|string} anchor Anchor.
@@ -431,22 +448,22 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
  */
 anychart.utils.recursiveClone = function(obj) {
   var res;
-
-  if (goog.isFunction(obj)) {
-    return obj;
-  } else if (goog.isArray(obj)) {
+  var type = goog.typeOf(obj);
+  if (type == 'array') {
     res = [];
     for (var i = 0; i < obj.length; i++) {
       if (i in obj)
         res[i] = anychart.utils.recursiveClone(obj[i]);
     }
-  } else if (goog.isObject(obj)) {
+  } else if (type == 'object') {
     res = {};
     for (var key in obj) {
       if (obj.hasOwnProperty(key))
         res[key] = anychart.utils.recursiveClone(obj[key]);
     }
-  } else return obj;
+  } else {
+    return obj;
+  }
 
   return res;
 };
@@ -459,6 +476,17 @@ anychart.utils.recursiveClone = function(obj) {
  */
 anychart.utils.isNone = function(value) {
   return value === null || (goog.isString(value) && value.toLowerCase() == 'none');
+};
+
+
+/**
+ * Extracts thickness of stroke. Default is 1.
+ * @param {acgraph.vector.Stroke|string} stroke - Stroke.
+ * @return {number} - Thickness.
+ */
+anychart.utils.extractThickness = function(stroke) {
+  var normalized = acgraph.vector.normalizeStroke(stroke);
+  return goog.isDef(normalized['thickness']) ? normalized['thickness'] : 1;
 };
 
 
@@ -701,7 +729,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.5.1/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.6.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1100,6 +1128,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.NO_CREDITS_IN_CHART:
       return 'Bullet and Sparkline charts do not support Credits.';
 
+    case anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT:
+      return 'Invalid GeoJSON object:';
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
@@ -1259,3 +1290,4 @@ anychart.utils.callLog_ = function(name, message, opt_exception) {
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
+goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);

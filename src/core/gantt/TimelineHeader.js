@@ -488,14 +488,11 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getTicks = function() {
 anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function() {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = anychart.ui.labelsFactory();
-    this.labelsFactory_
-        .anchor(anychart.enums.Anchor.LEFT_TOP)
-        .padding(0, 2, 0, 2)
-        .vAlign(acgraph.vector.Text.VAlign.MIDDLE)
-        .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-        .textOverflow('...')
-        .container(this.getBase_());
+    var theme = anychart.getFullTheme();
+    var lfGlobalConfig = theme['gantt']['base']['timeline']['header']['labelsFactory'];
+    this.labelsFactory_.setup(lfGlobalConfig);
 
+    this.labelsFactory_.container(this.getBase_());
     this.registerDisposable(this.labelsFactory_);
   }
   return this.labelsFactory_;

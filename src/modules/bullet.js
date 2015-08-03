@@ -16,7 +16,12 @@ goog.require('anychart.modules.base');
  * @return {!anychart.charts.Bullet} Bullet chart.
  */
 anychart.bullet = function(opt_data, opt_csvSettings) {
-  return new anychart.charts.Bullet(opt_data, opt_csvSettings);
+  var chart = new anychart.charts.Bullet(opt_data, opt_csvSettings);
+  var theme = anychart.getFullTheme();
+
+  chart.setup(theme['bullet']);
+
+  return chart;
 };
 
 

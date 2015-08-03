@@ -7,7 +7,7 @@ goog.require('goog.array');
 
 /**
  * Scale ticks.
- * @param {!anychart.scales.Linear} scale Scale to ask for a setup.
+ * @param {!anychart.scales.ScatterBase} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.core.Base}
  */
@@ -16,7 +16,7 @@ anychart.scales.ScatterTicks = function(scale) {
 
   /**
    * Scale reference to get setup from in emergency situations.
-   * @type {!anychart.scales.Linear}
+   * @type {!anychart.scales.ScatterBase}
    * @private
    */
   this.scale_ = scale;

@@ -103,6 +103,12 @@ anychart.core.cartesian.series.StepLine.prototype.getMarkerFill = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.StepLine.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
+};
+
+
 /**
  * @inheritDoc
  */
@@ -113,7 +119,7 @@ anychart.core.cartesian.series.StepLine.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.StepLine.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.STEP_LINE);
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
 };
 
 

@@ -104,27 +104,27 @@ anychart.ui.Toolbar = function() {
   var saveAsMenu = new goog.ui.PopupMenu(void 0,
       /** @type {goog.ui.MenuRenderer} */ (goog.ui.ContainerRenderer.getCustomRenderer(goog.ui.MenuRenderer, 'anychart-menu')));
 
-  var saveAsSVG = new goog.ui.MenuItem('SVG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsSVG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_SVG);
-  saveAsSVG.setModel({name: 'saveAsSVG'});
-  saveAsMenu.addChild(saveAsSVG, true);
+  var saveAsSvg = new goog.ui.MenuItem('SVG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  saveAsSvg.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_SVG);
+  saveAsSvg.setModel({name: 'saveAsSvg'});
+  saveAsMenu.addChild(saveAsSvg, true);
 
-  var saveAsPNG = new goog.ui.MenuItem('PNG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPNG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PNG);
-  saveAsPNG.setModel({name: 'saveAsPNG'});
-  saveAsMenu.addChild(saveAsPNG, true);
+  var saveAsPng = new goog.ui.MenuItem('PNG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  saveAsPng.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PNG);
+  saveAsPng.setModel({name: 'saveAsPng'});
+  saveAsMenu.addChild(saveAsPng, true);
 
-  var saveAsJPG = new goog.ui.MenuItem('JPG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsJPG.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_JPG);
-  saveAsJPG.setModel({name: 'saveAsJPG'});
-  saveAsMenu.addChild(saveAsJPG, true);
+  var saveAsJpg = new goog.ui.MenuItem('JPG', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  saveAsJpg.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_JPG);
+  saveAsJpg.setModel({name: 'saveAsJpg'});
+  saveAsMenu.addChild(saveAsJpg, true);
 
   var pdfSubMenu = new anychart.core.ui.toolbar.SubMenu('PDF');
   pdfSubMenu.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PDF);
-  var saveAsPDF = new goog.ui.MenuItem('A4', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
-  saveAsPDF.setModel({name: 'saveAsPDF'});
-  saveAsPDF.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PDF);
-  pdfSubMenu.addItem(saveAsPDF);
+  var saveAsPdf = new goog.ui.MenuItem('A4', void 0, void 0, anychart.core.ui.toolbar.MenuItemRenderer.getInstance());
+  saveAsPdf.setModel({name: 'saveAsPdf'});
+  saveAsPdf.addClassName(anychart.ui.Toolbar.CssClass.SAVE_AS_PDF);
+  pdfSubMenu.addItem(saveAsPdf);
 
   saveAsMenu.addChild(pdfSubMenu, true);
 
@@ -230,7 +230,7 @@ anychart.ui.Toolbar.prototype.createToolbarActionHandler = function() {
   var ths = this;
   return function(e) {
     var item = e['target'];
-    var id = item.getId(); //Got string like 'anychart_saveAsPDF_a3' or 'anychart_switchLayout'
+    var id = item.getId(); //Got string like 'anychart_saveAsPdf_a3' or 'anychart_switchLayout'
     var menu = e['currentTarget'];
 
     if (id == 'anychart_switchLayout') {

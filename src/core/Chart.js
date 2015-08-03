@@ -9,6 +9,7 @@ goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
 
@@ -35,6 +36,12 @@ anychart.core.Chart = function() {
    * @private
    */
   this.background_ = null;
+
+  /**
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.shadowRect_;
 
   /**
    * @type {anychart.core.utils.Margin}
@@ -72,7 +79,6 @@ anychart.core.Chart = function() {
    */
   this.animation_ = null;
 
-  this.restoreDefaults();
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -98,25 +104,26 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CHART_ANIMATION;
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Methods to set defaults for multiple entities.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
- * Background z-index in chart root layer.
- * @type {number}
+ * Getter/setter for axis default settings.
+ * @param {Object=} opt_value Object with x-axis settings.
+ * @return {Object}
  */
-anychart.core.Chart.ZINDEX_BACKGROUND = 1;
-
-
-/**
- * Chart label z-index in chart root layer.
- * @type {number}
- */
-anychart.core.Chart.ZINDEX_LABEL = 50;
-
-
-/**
- * Title z-index in chart root layer.
- * @type {number}
- */
-anychart.core.Chart.ZINDEX_TITLE = 80;
+anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!this.defaultLabelSettings_)
+      this.defaultLabelSettings_ = goog.object.clone(opt_value);
+    else
+      goog.object.extend(this.defaultLabelSettings_, opt_value);
+    return this;
+  }
+  return this.defaultLabelSettings_ || {};
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -391,7 +398,6 @@ anychart.core.Chart.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
-    this.background_.zIndex(anychart.core.Chart.ZINDEX_BACKGROUND);
     this.registerDisposable(this.background_);
   }
 
@@ -449,7 +455,6 @@ anychart.core.Chart.prototype.title = function(opt_value) {
     this.title_ = new anychart.core.ui.Title();
     this.title_.setParentEventTarget(this);
     this.title_.listenSignals(this.onTitleSignal_, this);
-    this.title_.zIndex(anychart.core.Chart.ZINDEX_TITLE);
     this.registerDisposable(this.title_);
   }
 
@@ -531,8 +536,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
   if (!label) {
     label = this.createChartLabel();
     label.setParentEventTarget(this);
-    label.text('Chart label');
-    label.zIndex(anychart.core.Chart.ZINDEX_LABEL);
+    label.setup(this.defaultLabelSettings());
     this.chartLabels_[index] = label;
     this.registerDisposable(label);
     label.listenSignals(this.onLabelSignal_, this);
@@ -719,6 +723,15 @@ anychart.core.Chart.prototype.draw = function() {
   var contentBounds = this.calculateContentAreaSpace(totalBounds);
   this.drawContent(contentBounds);
 
+  // used for crosshair
+  var background = this.background();
+  var fill = background.fill();
+  if ((!background.enabled() || !fill || fill == 'none') && !this.shadowRect_) {
+    this.shadowRect_ = this.rootElement.rect();
+    this.shadowRect_.fill('#fff 0.00001').stroke(null);
+    this.shadowRect_.setBounds(contentBounds);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
     for (var i = 0, count = this.chartLabels_.length; i < count; i++) {
       var label = this.chartLabels_[i];
@@ -846,12 +859,17 @@ anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
  * To avoid this we have to put in the "wrong" params.
  * In external documentation parameter must be boolean, and method must return Object|string.
  * For the moment we have no way around this "nice feature" of the compiler.
- * @param {string=} opt_stringify Return as JSON as string.
+ * @param {boolean=} opt_stringify Return as JSON as string.
  *  Note: stringifying ignores this flag.
+ * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {*} Chart JSON.
  */
-anychart.core.Chart.prototype.toJson = function(opt_stringify) {
+anychart.core.Chart.prototype.toJson = function(opt_stringify, opt_includeTheme) {
   var data = this.isDisposed() ? {} : this.serialize();
+  if (!opt_includeTheme) {
+    data = /** @type {!Object} */(anychart.themes.merging.demerge(
+        data, this.getDefaultThemeObj())) || {};
+  }
   return opt_stringify ?
       goog.json.hybrid.stringify(data) :
       data;
@@ -861,10 +879,25 @@ anychart.core.Chart.prototype.toJson = function(opt_stringify) {
 /**
  * Return chart configuration as XML string or XMLNode.
  * @param {boolean=} opt_asXmlNode Return XML as XMLNode.
+ * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
  * @return {string|Node} Chart configuration.
  */
-anychart.core.Chart.prototype.toXml = function(opt_asXmlNode) {
-  return anychart.utils.json2xml(this.isDisposed() ? {} : this.serialize(), '', opt_asXmlNode);
+anychart.core.Chart.prototype.toXml = function(opt_asXmlNode, opt_includeTheme) {
+  var data = this.isDisposed() ? {} : this.serialize();
+  if (!opt_includeTheme) {
+    data = /** @type {!Object} */(anychart.themes.merging.demerge(
+        data, this.getDefaultThemeObj())) || {};
+  }
+  return anychart.utils.json2xml(data, '', opt_asXmlNode);
+};
+
+
+/**
+ * Returns default theme object.
+ * @return {Object}
+ */
+anychart.core.Chart.prototype.getDefaultThemeObj = function() {
+  return {'chart': anychart.getFullTheme()[this.getType()]};
 };
 
 
@@ -891,6 +924,10 @@ anychart.core.Chart.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.Chart.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+
+  if ('defaultLabelSettings' in config)
+    this.defaultLabelSettings(config['defaultLabelSettings']);
+
   this.title(config['title']);
   this.background(config['background']);
   this.margin(config['margin']);
@@ -930,24 +967,6 @@ anychart.core.Chart.prototype.disposeInternal = function() {
 
 
 /**
- * Restore default chart settings.
- */
-anychart.core.Chart.prototype.restoreDefaults = function() {
-  this.bounds().set(null, null, null, null);
-  this.margin(0);
-  this.padding(10, 20);
-
-  var background = /** @type {anychart.core.ui.Background} */(this.background());
-  background.fill(['rgb(255,255,255)', 'rgb(243,243,243)', 'rgb(255,255,255)']);
-  background.stroke('none');
-
-  var title = /** @type {anychart.core.ui.Title} */(this.title());
-  title.text('Chart title');
-  title.margin().bottom(15);
-};
-
-
-/**
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value Legend settings.
  * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
@@ -971,7 +990,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 
 /**
  * Returns chart or gauge type. Published in charts.
- * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes}
+ * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
  */
 anychart.core.Chart.prototype.getType = goog.abstractMethod;
 

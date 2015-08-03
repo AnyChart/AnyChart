@@ -76,14 +76,5 @@ anychart.core.cartesian.series.AreaBase.prototype.finalizeHatchFill = function()
 };
 
 
-/** @inheritDoc */
-anychart.core.cartesian.series.AreaBase.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  return result;
-};
-
 //anychart.core.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.core.cartesian.series.AreaBase.prototype.startDrawing;//inherited
 //exports

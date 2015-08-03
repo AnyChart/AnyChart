@@ -443,7 +443,7 @@ anychart.core.sparkline.series.Base.prototype.getMarkerStroke = function() {
  * @return {Object} Return settings object.
  */
 anychart.core.sparkline.series.Base.prototype.getDefaults = function() {
-  this.chart.getMarkersInternal().type('circle').size(1.5).position(anychart.enums.Position.CENTER);
+  this.chart.getMarkersInternal().type('circle').size(1.8).position(anychart.enums.Position.CENTER);
   return {
     'labels': {
       'background': {

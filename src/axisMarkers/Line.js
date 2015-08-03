@@ -18,7 +18,9 @@ goog.inherits(anychart.axisMarkers.Line, anychart.core.axisMarkers.Line);
  * @return {!anychart.axisMarkers.Line}
  */
 anychart.axisMarkers.line = function() {
-  return new anychart.axisMarkers.Line();
+  var res = new anychart.axisMarkers.Line();
+  res.setup(anychart.getFullTheme()['standalones']['lineAxisMarker']);
+  return res;
 };
 
 

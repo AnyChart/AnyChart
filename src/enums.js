@@ -32,6 +32,7 @@ anychart.enums.ChartTypes = {
   LINE: 'line',
   MARKER: 'marker',
   PIE: 'pie',
+  PIE_3D: 'pie3d',
   POLAR: 'polar',
   PYRAMID: 'pyramid',
   RADAR: 'radar',
@@ -51,6 +52,20 @@ anychart.enums.ChartTypes = {
  */
 anychart.enums.GaugeTypes = {
   CIRCULAR: 'circular'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Maps types enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gauge types.
+ * @enum {string}
+ */
+anychart.enums.MapTypes = {
+  MAP: 'map'
 };
 
 
@@ -1100,7 +1115,29 @@ anychart.enums.BackgroundCornersType = {
    *   .lineTo(25, 10)
    *   .stroke('3 #666')
    */
-  ROUND_INNER: 'roundinner'
+  ROUND_INNER: 'roundInner'
+};
+
+
+/**
+ * Normalizes background corner type.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.BackgroundCornersType=} opt_default Custom default value (defaults to DEFAULT).
+ * @return {anychart.enums.BackgroundCornersType} normalized value.
+ */
+anychart.enums.normalizeBackgroundCornerType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'none':
+      return anychart.enums.BackgroundCornersType.NONE;
+    case 'round':
+      return anychart.enums.BackgroundCornersType.ROUND;
+    case 'cut':
+      return anychart.enums.BackgroundCornersType.CUT;
+    case 'roundinner':
+      return anychart.enums.BackgroundCornersType.ROUND_INNER;
+  }
+  return opt_default || anychart.enums.BackgroundCornersType.NONE;
 };
 
 
@@ -1330,6 +1367,10 @@ anychart.enums.SidePosition = {
    */
   INSIDE: 'inside',
   /**
+   * Half of tick will be inside a chart, other part - outside, no matter where an axis is.
+   */
+  CENTER: 'center',
+  /**
    * Outside of a chart, no matter where an axis is.
    */
   OUTSIDE: 'outside'
@@ -1355,6 +1396,12 @@ anychart.enums.normalizeSidePosition = function(value, opt_default) {
     case 'o':
     case 'outer':
       return anychart.enums.SidePosition.OUTSIDE;
+    case 'middle':
+    case 'mid':
+    case 'm':
+    case 'center':
+    case 'c':
+      return anychart.enums.SidePosition.CENTER;
   }
   return opt_default || anychart.enums.SidePosition.INSIDE;
 };
@@ -1467,6 +1514,7 @@ anychart.enums.EventType = {
   POINT_MOUSE_UP: 'pointmouseup',
   POINT_CLICK: 'pointclick',
   POINT_DBLCLICK: 'pointdblclick',
+  POINT_SELECT: 'pointselect',
   CHART_DRAW: 'chartdraw',
   ANIMATION_START: 'animationstart',
   ANIMATION_END: 'animationend',
@@ -1577,6 +1625,20 @@ anychart.enums.ScatterTicksMode = {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * List of all series types for Maps.
+ * @enum {string}
+ */
+anychart.enums.MapSeriesType = {
+  CHOROPLETH: 'choropleth'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  CartesianSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
  * List of all series types.
  * @enum {string}
  */
@@ -1599,6 +1661,56 @@ anychart.enums.CartesianSeriesType = {
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
   STEP_LINE: 'stepLine'
+};
+
+
+/**
+ * Normalizes cartesian series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.CartesianSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.CartesianSeriesType}
+ */
+anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.CartesianSeriesType.AREA;
+    case 'bar':
+      return anychart.enums.CartesianSeriesType.BAR;
+    case 'box':
+      return anychart.enums.CartesianSeriesType.BOX;
+    case 'bubble':
+      return anychart.enums.CartesianSeriesType.BUBBLE;
+    case 'candlestick':
+      return anychart.enums.CartesianSeriesType.CANDLESTICK;
+    case 'column':
+      return anychart.enums.CartesianSeriesType.COLUMN;
+    case 'line':
+      return anychart.enums.CartesianSeriesType.LINE;
+    case 'marker':
+      return anychart.enums.CartesianSeriesType.MARKER;
+    case 'ohlc':
+      return anychart.enums.CartesianSeriesType.OHLC;
+    case 'rangearea':
+      return anychart.enums.CartesianSeriesType.RANGE_AREA;
+    case 'rangebar':
+      return anychart.enums.CartesianSeriesType.RANGE_BAR;
+    case 'rangecolumn':
+      return anychart.enums.CartesianSeriesType.RANGE_COLUMN;
+    case 'rangesplinearea':
+      return anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA;
+    case 'rangesteparea':
+      return anychart.enums.CartesianSeriesType.RANGE_STEP_AREA;
+    case 'spline':
+      return anychart.enums.CartesianSeriesType.SPLINE;
+    case 'splinearea':
+      return anychart.enums.CartesianSeriesType.SPLINE_AREA;
+    case 'steparea':
+      return anychart.enums.CartesianSeriesType.STEP_AREA;
+    case 'stepline':
+      return anychart.enums.CartesianSeriesType.STEP_LINE;
+  }
+  return opt_default || anychart.enums.CartesianSeriesType.LINE;
 };
 
 
@@ -1712,6 +1824,28 @@ anychart.enums.ConnectorType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Data Grid column formatting presets.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Column formatting presets.
+ * @enum {string}
+ */
+anychart.enums.ColumnFormats = {
+  DIRECT_NUMBERING: 'directNumbering',
+  TEXT: 'text',
+  SHORT_TEXT: 'shortText',
+  PERCENT: 'percent',
+  DATE_COMMON_LOG: 'dateCommonLog',
+  DATE_ISO_8601: 'dateIso8601',
+  DATE_US_SHORT: 'dateUsShort',
+  DATE_DMY_DOTS: 'dateDmyDots',
+  FINANCIAL: 'financial'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  RadarSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1806,6 +1940,22 @@ anychart.enums.GaugeScaleTypes = {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Maps scale types
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all scale types.
+ * @enum {string}
+ */
+anychart.enums.MapsScaleTypes = {
+  ORDINAL_COLOR: 'ordinalColor',
+  LINEAR_COLOR: 'linearColor',
+  GEO: 'geo'
+};
+
+
 /**
  * Normalize gauge scale type.
  * @param {string} value .
@@ -1850,7 +2000,9 @@ anychart.enums.ErrorCode = {
 
   NO_LEGEND_IN_CHART: 8,
 
-  NO_CREDITS_IN_CHART: 9
+  NO_CREDITS_IN_CHART: 9,
+
+  INVALID_GEO_JSON_OBJECT: 10
 };
 
 
@@ -2232,6 +2384,16 @@ anychart.enums.normalizeTextWrap = function(value) {
 };
 
 
+/**
+ * @enum {string}
+ */
+anychart.enums.AnyMapPointState = {
+  NORMAL: 'normal',
+  HOVER: 'hover',
+  SELECT: 'select'
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -2369,6 +2531,7 @@ goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_UP', anychart.enums.Even
 goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.EventType.POINT_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
 goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
+goog.exportSymbol('anychart.enums.EventType.POINT_SELECT', anychart.enums.EventType.POINT_SELECT);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);
@@ -2430,6 +2593,16 @@ goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR_TYPE', anychart.enum
 goog.exportSymbol('anychart.enums.GanttDataFields.START_MARKER', anychart.enums.GanttDataFields.START_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.END_MARKER', anychart.enums.GanttDataFields.END_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.LABEL', anychart.enums.GanttDataFields.LABEL);
+
+goog.exportSymbol('anychart.enums.ColumnFormats.DIRECT_NUMBERING', anychart.enums.ColumnFormats.DIRECT_NUMBERING);
+goog.exportSymbol('anychart.enums.ColumnFormats.TEXT', anychart.enums.ColumnFormats.TEXT);
+goog.exportSymbol('anychart.enums.ColumnFormats.SHORT_TEXT', anychart.enums.ColumnFormats.SHORT_TEXT);
+goog.exportSymbol('anychart.enums.ColumnFormats.PERCENT', anychart.enums.ColumnFormats.PERCENT);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_COMMON_LOG', anychart.enums.ColumnFormats.DATE_COMMON_LOG);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_ISO_8601', anychart.enums.ColumnFormats.DATE_ISO_8601);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_US_SHORT', anychart.enums.ColumnFormats.DATE_US_SHORT);
+goog.exportSymbol('anychart.enums.ColumnFormats.DATE_DMY_DOTS', anychart.enums.ColumnFormats.DATE_DMY_DOTS);
+goog.exportSymbol('anychart.enums.ColumnFormats.FINANCIAL', anychart.enums.ColumnFormats.FINANCIAL);
 
 goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEARS);
 goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTHS);

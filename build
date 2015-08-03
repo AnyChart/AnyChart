@@ -23,6 +23,7 @@ SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
 CSS_PATH = os.path.join(PROJECT_PATH, 'css', 'anychart.css')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
+THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
 #graphics
 GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphics')
@@ -243,7 +244,7 @@ def __get_optimized_compiler_args():
         '--jscomp_warning undefinedVars',
         '--jscomp_warning unknownDefines',
         '--jscomp_warning uselessCode',
-        #'--jscomp_warning useOfGoogBase',
+        #'--jscomp_warning useOfGoogdefaultTheme',
         '--jscomp_warning visibility',
         '--generate_exports'
         #'--jscomp_warning deprecated',
@@ -273,6 +274,7 @@ def __get_optimized_compiler_args():
 
 
 def __get_default_compiler_args():
+    global arguments
     result = [
         'java -jar',
         COMPILER_PATH,
@@ -291,6 +293,12 @@ def __get_default_compiler_args():
         '--extra_annotation_name "shortDescription"',
     ]
 
+    theme = arguments['theme'] if ('theme' in arguments) else 'defaultTheme'
+    if not (theme == 'none'):
+        if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):
+            theme = 'defaultTheme'
+        result = result + ['--define "anychart.DEFAULT_THEME=\'%s\'"' % theme]
+        result = result + ['--closure_entry_point "%s"' % 'anychart.themes.' + theme]
     return result
 
 
@@ -339,7 +347,7 @@ def __build_project_sources(modules):
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file)
-    __call_compiler(commands)
+    __call_console_commands(commands)
 
     if 'gzip' in arguments:
         __gzip(output_file)
@@ -351,8 +359,9 @@ def __build_project(modules):
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
     print output_file
-    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s" % (
-        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']), str(arguments['gzip']))
+    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s" % (
+        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']),
+        str(arguments['gzip']), str(arguments['theme']))
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
@@ -368,7 +377,7 @@ def __build_project(modules):
                      '--variable_renaming_report %s' % output_file + '_var_out.txt',
                      '--create_source_map %s' % output_file + '_sourcemap.json']
 
-    __call_compiler(commands)
+    __call_console_commands(commands)
 
     if __should_gen_gzip():
         __gzip(output_file)
@@ -380,7 +389,7 @@ def __apply_specific_file_name_rule(file_name, modules):
     return file_name
 
 
-def __call_compiler(commands):
+def __call_console_commands(commands):
     commands = " ".join(commands).replace('\\', '\\\\')
     commands = shlex.split(commands)
     #print commands
@@ -500,6 +509,86 @@ def __autofix_project():
 
 
 #=======================================================================================================================
+#                            Themes.
+#=======================================================================================================================
+def __get_themes_list():
+    themes_list = []
+    for f in os.listdir(THEMES_PATH):
+        if f.endswith('.js') and not f.startswith('merging') and not f.startswith('template'):
+            themes_list.append(f[:-3])
+    return themes_list
+
+
+@sync_required
+def __build_theme():
+    global arguments
+    theme = arguments['name']
+
+    if theme in __get_themes_list():
+        print "Compile standalone theme %s" % theme
+        commands = [
+            'java -jar',
+            COMPILER_PATH,
+            '--charset UTF-8',
+            '--only_closure_dependencies',
+            '--warning_level VERBOSE',
+            '--compilation_level ADVANCED_OPTIMIZATIONS',
+            "--closure_entry_point anychart.themes.%s" % theme,
+            "--js_output_file %s" % os.path.join(OUT_PATH, theme + '.min.js')
+        ] + __get_roots()
+        __call_console_commands(commands)
+        print "Complete"
+    else:
+        print "Wrong theme name %s" % theme
+
+#=======================================================================================================================
+#                            Build release.
+#=======================================================================================================================
+@sync_required
+def __build_release():
+
+    #bubdle
+    print "Compile AnyChart Bundle"
+    __call_console_commands(['./build compile -gz'])
+    __call_console_commands(['./build compile -gz -d'])
+
+    #charts
+    print "Compile AnyChart"
+    __call_console_commands(['./build compile -m anychart -gz'])
+    __call_console_commands(['./build compile -m anychart -gz -d'])
+
+    #map
+    print "Compile AnyMap"
+    __call_console_commands(['./build compile -m anymap -gz'])
+    __call_console_commands(['./build compile -m anymap -gz -d'])
+
+    #gantt
+    print "Compile AnyGantt"
+    __call_console_commands(['./build compile -m anygantt -gz'])
+    __call_console_commands(['./build compile -m anygantt -gz -d'])
+
+    print "Compile Themes"
+    for theme in __get_themes_list():
+        __call_console_commands(['./build theme -n %s' % theme])
+
+
+def __print_gz_stat():
+    result = []
+
+    for f in os.listdir(OUT_PATH):
+        if f.endswith('.gz'):
+            full_path = os.path.join(OUT_PATH, f)
+            stat = os.stat(full_path)
+            result.append("%s size is %s" % (f, str(stat.st_size/1024) + "Kb"))
+
+    if len(result):
+        print "Looking for gzip files size in out directory:"
+        print "    " + "\n    ".join(result)
+    else:
+        print "No gzip files found in out directory"
+
+
+#=======================================================================================================================
 #                            Logging.
 #=======================================================================================================================
 warnings_list = []
@@ -581,6 +670,9 @@ def __exec_main_script():
     compile_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
     compile_parser.add_argument('-df', '--debug_files', action='store_true',
                                 help='Create files with debug info (prop_out, var_out, sourcemap).')
+    compile_parser.add_argument('-t', '--theme', action='store',
+                                help="Specify the default theme to compile with. By default - 'defaultTheme'",
+                                default='defaultTheme')
 
     # create the parser for the "compile_each" command
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
@@ -589,11 +681,14 @@ def __exec_main_script():
     compile_each_parser.add_argument('-df', '--debug_files', action='store_true',
                                      help='Create files with debug info (prop_out, var_out, sourcemap).')
     compile_each_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
+    compile_each_parser.add_argument('-t', '--theme', action='store',
+                                     help="Specify the default theme to compile with. By default - 'defaultTheme'",
+                                     default='defaultTheme')
 
     # create the parser for the "contrib" command
     contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies')
     contrib_parser.add_argument('-l', '--linter', action='store_true',
-                                     help='Install closure linter with others contributions.')
+                                help='Install closure linter with others contributions.')
 
     # create the parser for the "deps" command
     subparsers.add_parser('deps', help='Generate deps.js file')
@@ -603,6 +698,19 @@ def __exec_main_script():
 
     # create the parser for the "contrib" command
     subparsers.add_parser('autofix', help='Try to autofix linter warnings and errors')
+
+    # create the parser for the "theme" command
+    themes_parser = subparsers.add_parser('theme',
+                                          help='Build standalone theme file by name. Default value is "defaultTheme"')
+    themes_parser.add_argument('-n', '--name', action='store',
+                               help="Name of the theme, default value is 'defaultTheme'.\nPossible values are: %s"
+                                    % ", ".join(__get_themes_list()), default='defaultTheme')
+    # create files for release
+    subparsers.add_parser('release', help='Creates release files in output directory.')
+
+    # create files for release
+    subparsers.add_parser('gz_stat', help='Print into console size of all gzip files in out directory,'
+                                          ' very useful on release day.')
 
     global arguments
     arguments = vars(parser.parse_args())
@@ -621,6 +729,12 @@ def __exec_main_script():
         __lint_project()
     elif command == 'autofix':
         __autofix_project()
+    elif command == 'theme':
+        __build_theme()
+    elif command == 'release':
+        __build_release()
+    elif command == 'gz_stat':
+        __print_gz_stat()
 
     __print_warnings_list()
 

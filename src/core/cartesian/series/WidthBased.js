@@ -100,15 +100,5 @@ anychart.core.cartesian.series.WidthBased.prototype.setupByJSON = function(confi
 };
 
 
-/** @inheritDoc */
-anychart.core.cartesian.series.WidthBased.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  return result;
-};
-
-
 //exports
 anychart.core.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.core.cartesian.series.WidthBased.prototype.pointWidth;//doc|ex

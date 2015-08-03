@@ -44,13 +44,13 @@ anychart.core.axisMarkers.Range = function() {
    * @type {number}
    * @private
    */
-  this.from_;
+  this.from_ = 0;
 
   /**
    * @type {number}
    * @private
    */
-  this.to_;
+  this.to_ = 0;
 
   /**
    * @type {string|acgraph.vector.Fill}
@@ -64,7 +64,8 @@ anychart.core.axisMarkers.Range = function() {
    */
   this.defaultFill_ = 'black';
 
-  this.restoreDefaults();
+  this.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+  this.setDefaultFill('#c1c1c1 0.4');
 };
 goog.inherits(anychart.core.axisMarkers.Range, anychart.core.VisualBase);
 
@@ -378,19 +379,6 @@ anychart.core.axisMarkers.Range.prototype.draw = function() {
   }
 
   return this;
-};
-
-
-/**
- * Restore defaults.
- */
-anychart.core.axisMarkers.Range.prototype.restoreDefaults = function() {
-  this.suspendSignalsDispatching();
-  this.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
-  this.from(0);
-  this.to(0);
-  this.setDefaultFill('black 0.3');
-  this.resumeSignalsDispatching(true);
 };
 
 

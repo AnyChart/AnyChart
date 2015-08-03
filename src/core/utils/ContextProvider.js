@@ -173,7 +173,8 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta = functio
 
 /**
  * Context provider for legend itemsTextFormatter function
- * @param {(anychart.core.polar.series.Base|anychart.core.radar.series.Base|anychart.core.scatter.series.Base|anychart.core.cartesian.series.Base)=} opt_source Source for statistics and meta.
+ * @param {(anychart.core.polar.series.Base|anychart.core.radar.series.Base|anychart.core.scatter.series.Base|
+ *    anychart.core.cartesian.series.Base|anychart.core.map.series.Base)=} opt_source Source for statistics and meta.
  * @constructor
  */
 anychart.core.utils.LegendContextProvider = function(opt_source) {

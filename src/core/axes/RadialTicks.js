@@ -39,8 +39,6 @@ anychart.core.axes.RadialTicks = function() {
   this.path_ = acgraph.path();
   this.bindHandlersToGraphics(this.path_);
   this.registerDisposable(this.path_);
-
-  this.restoreDefaults();
 };
 goog.inherits(anychart.core.axes.RadialTicks, anychart.core.VisualBase);
 
@@ -180,17 +178,6 @@ anychart.core.axes.RadialTicks.prototype.stroke = function(opt_strokeOrFill, opt
   } else {
     return this.stroke_;
   }
-};
-
-
-/**
- * Restore labels default settings.
- */
-anychart.core.axes.RadialTicks.prototype.restoreDefaults = function() {
-  this.length(5);
-  this.stroke('black');
-
-  this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 

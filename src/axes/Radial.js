@@ -21,13 +21,30 @@ anychart.axes.Radial.prototype.draw = function() {
 };
 
 
+/** @inheritDoc */
+anychart.axes.Radial.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.startAngle(config['startAngle']);
+};
+
+
+/** @inheritDoc */
+anychart.axes.Radial.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['startAngle'] = this.startAngle();
+  return json;
+};
+
+
 /**
  * Returns axis instance.<br/>
  * <b>Note:</b> Any axis must be bound to a scale.
  * @return {!anychart.axes.Radial}
  */
 anychart.axes.radial = function() {
-  return new anychart.axes.Radial();
+  var res = new anychart.axes.Radial();
+  res.setup(anychart.getFullTheme()['standalones']['radialAxis']);
+  return res;
 };
 
 

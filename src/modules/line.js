@@ -18,32 +18,16 @@ goog.require('anychart.modules.base');
  */
 anychart.line = function(var_args) {
   var chart = new anychart.charts.Cartesian();
+  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE);
 
+  chart.setup(theme['line']);
+
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);
   }
-
-  chart.title().text('Chart Title');
-
-  chart.xAxis();
-  chart.yAxis();
-
-  chart.grid(0)
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.minorGrid()
-      .evenFill('none')
-      .oddFill('none')
-      .stroke('black 0.1')
-      .layout(anychart.enums.Layout.HORIZONTAL);
-
-  chart.grid(1)
-      .evenFill('none')
-      .oddFill('none')
-      .layout(anychart.enums.Layout.VERTICAL);
 
   return chart;
 };

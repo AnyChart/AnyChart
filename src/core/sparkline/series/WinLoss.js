@@ -73,8 +73,18 @@ anychart.core.sparkline.series.WinLoss.prototype.getDefaults = function() {
   settings['negativeLabels']['position'] = anychart.enums.Position.CENTER_BOTTOM;
   settings['negativeLabels']['anchor'] = anychart.enums.Position.CENTER_BOTTOM;
 
-  settings['fill'] = '#305374';
-  settings['negativeFill'] = '#cb6762';
+  settings['stroke'] = {
+    'color': '#64b5f6',
+    'thickness': 1.5
+  };
+  settings['fill'] = {
+    'color': '#64b5f6',
+    'opacity': 0.7
+  };
+  settings['negativeFill'] = {
+    'color': '#ef6c00',
+    'opacity': 0.7
+  };
 
   return settings;
 };

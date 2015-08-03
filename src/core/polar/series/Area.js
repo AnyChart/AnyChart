@@ -146,16 +146,6 @@ anychart.core.polar.series.Area.prototype.finalizeHatchFill = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.polar.series.Area.prototype.restoreDefaults = function() {
-  var result = goog.base(this, 'restoreDefaults');
-
-  this.markers(null);
-
-  return result;
-};
-
-
 /**
  * @inheritDoc
  */

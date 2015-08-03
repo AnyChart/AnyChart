@@ -70,7 +70,6 @@ anychart.onDocumentReady(function() {
 
   dataGrid
       .data(tree)
-      .cellBorder({thickness: 2, color: '#999'})
       .startIndex(0)
       .verticalOffset(0)
       .titleHeight(25);
@@ -98,44 +97,44 @@ anychart.onDocumentReady(function() {
 
   dataGrid.listen('signal', dataGridRedraw, false, dataGrid);
 
-  dataGrid.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Clicked:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
-    console.log('Selected:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
-    //e.preventDefault();
-    console.log('Double clicked:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
-    //e.preventDefault();
-    console.log('Mouse over:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
-    //e.preventDefault();
-    console.log('Mouse move:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
-    //e.preventDefault();
-    console.log('Mouse out:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
-    //e.preventDefault();
-    console.log('Mouse up:', e['item'].get('name'));
-  });
-
-  dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
-    //e.preventDefault();
-    console.log('Mouse down:', e['item'].get('name'));
-  });
+  //dataGrid.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Clicked:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
+  //  console.log('Selected:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Double clicked:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Mouse over:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Mouse move:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Mouse out:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Mouse up:', e['item'].get('name'));
+  //});
+  //
+  //dataGrid.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
+  //  //e.preventDefault();
+  //  console.log('Mouse down:', e['item'].get('name'));
+  //});
 
 });
 

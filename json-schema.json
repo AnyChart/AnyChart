@@ -244,6 +244,7 @@
             ]
           }
         },
+        "crosshair": {"$ref": "#/definitions/anychart.core.ui.Crosshair"},
         "barChartMode": {
           "type": "boolean"
         },
@@ -1142,7 +1143,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["pie"]},
+        "type": {"enum": ["pie", "pie3d"]},
         "data": {"$ref": "#/definitions/data"},
         "labels": {
           "oneOf": [
@@ -2680,7 +2681,8 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
         "scale": {"$ref": "#/definitions/anychart.scales.GanttDateTime"},
         "backgroundFill": {"$ref": "#/definitions/fill"},
@@ -2702,7 +2704,8 @@
         "connectorFill": {"$ref": "#/definitions/fill"},
         "connectorStroke": {"$ref": "#/definitions/stroke"},
         "selectedElementFill": {"$ref": "#/definitions/fill"},
-        "selectedElementStroke": {"$ref": "#/definitions/stroke"}
+        "selectedElementStroke": {"$ref": "#/definitions/stroke"},
+        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
       }
     },
 
@@ -3071,6 +3074,31 @@
         "padding": {"$ref": "#/definitions/anychart.core.utils.Space"}
       }
     },
+    "anychart.core.ui.CrosshairLabel": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.Text"},
+        {"$ref": "#/definitions/anychart.core.ui.Label"}
+      ],
+      "properties": {
+        "axisIndex": {
+          "type": "number"
+        }
+      }
+    },
+    "anychart.core.ui.Crosshair": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "xStroke": {"$ref": "#/definitions/stroke"},
+        "yStroke": {"$ref": "#/definitions/stroke"},
+        "xLabel": {"$ref": "#/definitions/anychart.core.ui.CrosshairLabel"},
+        "yLabel": {"$ref": "#/definitions/anychart.core.ui.CrosshairLabel"}
+      }
+    },
     "anychart.core.ui.Legend": {
       "type": "object",
       "allOf": [
@@ -3240,6 +3268,9 @@
         },
         "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
+        "rotation": {
+          "type": "number"
+        },
         "size": {
           "type": "number"
         },
@@ -3384,14 +3415,16 @@
         "text": {"type": "string"},
         "url": {"type": "string"},
         "alt": {"type": "string"},
-        "logoSrc": {"type": "string"}
+        "logoSrc": {"type": "string"},
+        "isChart": {"type": "boolean"}
       }
     },
     "anychart.core.ui.DataGrid": {
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "cellBorder": {"$ref": "#/definitions/stroke"},
+        "rowStroke": {"$ref": "#/definitions/stroke"},
+        "columnStroke": {"$ref": "#/definitions/stroke"},
         "titleFill": {"$ref": "#/definitions/fill"},
         "tooltip": {"$ref": "#/definitions/anychart.core.ui.Tooltip"},
         "columns": {
@@ -3413,9 +3446,10 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
-        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "cellTextSettings": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "title": {"$ref": "#/definitions/anychart.core.ui.Title"},
         "width": {"type": "number"},
+        "defaultWidth": {"type": "number"},
         "collapseExpandButtons": {"type": "boolean"},
         "depthPaddingMultiplier": {"type": "number"}
       }
@@ -3978,7 +4012,7 @@
         "percent90"
       ]
     },
-  "anychart.core.utils.Animation": {
+    "anychart.core.utils.Animation": {
       "properties": {
         "enabled": {
           "type": "boolean"
