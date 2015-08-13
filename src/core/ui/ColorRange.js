@@ -953,6 +953,7 @@ anychart.core.ui.ColorRange.prototype.setupByJSON = function(config) {
 };
 
 
+//exports
 anychart.core.ui.ColorRange.prototype['marker'] = anychart.core.ui.ColorRange.prototype.marker;
 anychart.core.ui.ColorRange.prototype['colorLineSize'] = anychart.core.ui.ColorRange.prototype.colorLineSize;
 anychart.core.ui.ColorRange.prototype['length'] = anychart.core.ui.ColorRange.prototype.length;

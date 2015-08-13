@@ -750,7 +750,6 @@ anychart.core.map.series.Base.prototype.stroke = function(opt_strokeOrFill, opt_
 
 
 /**
- * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -772,7 +771,6 @@ anychart.core.map.series.Base.prototype.hoverStroke = function(opt_strokeOrFill,
 
 
 /**
- * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
