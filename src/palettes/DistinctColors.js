@@ -163,10 +163,14 @@ anychart.palettes.DistinctColors.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function.
+ * @param {Array.<acgraph.vector.Fill>=} opt_value Array of colors.
  * @return {!anychart.palettes.DistinctColors}
  */
-anychart.palettes.distinctColors = function() {
-  return new anychart.palettes.DistinctColors();
+anychart.palettes.distinctColors = function(opt_value) {
+  var palette = new anychart.palettes.DistinctColors();
+  if (goog.isDef(opt_value))
+    palette.colors(opt_value);
+  return palette;
 };
 
 
