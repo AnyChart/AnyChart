@@ -7,7 +7,7 @@ window['anychart']['themes']['defaultTheme'] = {
   // default font settings
   'defaultFontSettings': {
     'fontSize': 13,
-    'fontFamily': '\'Verdana\', Helvetica, Arial, sans-serif',
+    'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
     'fontColor': '#7c868e',
     'textDirection': 'ltr',
     'fontOpacity': 1,
