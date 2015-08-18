@@ -1750,13 +1750,13 @@ anychart.charts.Pie.prototype.normalizeColor = function(color, var_args) {
   if (goog.isString(color) && color == 'aquastyle') {
     scope = {
       'aquaStyleObj': this.aquaStyleObj_,
-      'sourceColor': this.palette().colorAt(index)
+      'sourceColor': this.palette().itemAt(index)
     };
     fill = this.aquaStylfill_.call(scope);
   } else if (goog.isFunction(color)) {
     sourceColor = arguments.length > 1 ?
         this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.palette().colorAt(index);
+        this.palette().itemAt(index);
     scope = {
       'index': index,
       'sourceColor': sourceColor,
@@ -1780,7 +1780,7 @@ anychart.charts.Pie.prototype.normalizeHatchFill = function(hatchFill) {
   var index = this.getIterator().getIndex();
   if (goog.isFunction(hatchFill)) {
     var sourceHatchFill = acgraph.vector.normalizeHatchFill(
-        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)));
+        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     var scope = {
       'index': index,
       'sourceHatchFill': sourceHatchFill,
@@ -1788,7 +1788,7 @@ anychart.charts.Pie.prototype.normalizeHatchFill = function(hatchFill) {
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
   } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)) : null;
+    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)) : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;
@@ -2364,7 +2364,7 @@ anychart.charts.Pie.prototype.get3DFillColor_ = function(opt_hover) {
     parsedColor = anychart.color.parseColor(rawColor);
   }
 
-  var paletteColor = this.palette().colorAt(index);
+  var paletteColor = this.palette().itemAt(index);
   var parsedPaletteColor;
   // extract color
   if (goog.isObject(paletteColor)) {

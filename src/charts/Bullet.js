@@ -498,7 +498,7 @@ anychart.charts.Bullet.prototype.onRangeSignal_ = function(event) {
 anychart.charts.Bullet.prototype.rangePalette = function(opt_value) {
   if (!this.rangePalette_) {
     this.rangePalette_ = new anychart.palettes.DistinctColors();
-    this.rangePalette_.colors(['#828282', '#a8a8a8', '#c2c2c2', '#d4d4d4', '#e1e1e1']);
+    this.rangePalette_.items(['#828282', '#a8a8a8', '#c2c2c2', '#d4d4d4', '#e1e1e1']);
     this.rangePalette_.listenSignals(this.onRangePaletteSignal_, this);
     this.registerDisposable(this.rangePalette_);
   }
@@ -547,7 +547,7 @@ anychart.charts.Bullet.prototype.onRangePaletteSignal_ = function(event) {
 anychart.charts.Bullet.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
-    this.markerPalette_.markers(['bar', 'line', 'x', 'ellipse']);
+    this.markerPalette_.items(['bar', 'line', 'x', 'ellipse']);
     this.markerPalette_.listenSignals(this.onPaletteSignal_, this);
     this.registerDisposable(this.markerPalette_);
   }
@@ -685,7 +685,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
                 anychart.enums.Layout.VERTICAL :
                 anychart.enums.Layout.HORIZONTAL
         );
-        range.setDefaultFill(/** @type {acgraph.vector.Fill} */(this.rangePalette().colorAt(i)));
+        range.setDefaultFill(/** @type {acgraph.vector.Fill} */(this.rangePalette().itemAt(i)));
         range.parentBounds(boundsWithoutAxis);
         range.container(this.rootElement);
         range.axesLinesSpace(0);
@@ -704,7 +704,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
       marker.parentBounds(boundsWithoutAxis);
-      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().markerAt(i)));
+      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
       marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.layout()));
       marker.draw();
       marker.resumeSignalsDispatching(false);
@@ -758,7 +758,7 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.zIndex(settings['zIndex']);
   marker.setDefaultFill(settings['fill']);
   marker.setDefaultStroke(settings['stroke']);
-  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().markerAt(index)));
+  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
 
   //settings from data
   marker.value(/** @type {string|number} */(iterator.get('value')));

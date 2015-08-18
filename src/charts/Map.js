@@ -475,9 +475,9 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     var index = this.series_.length - 1;
     instance.index(index);
     instance.setGeoData(this, this.internalGeoData_);
-    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
+    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
     instance.setAutoAllowPointsSelect(this.allowPointsSelect_);
     instance.setup(this.defaultSeriesSettings()[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
@@ -877,10 +877,10 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-      series.setAutoColor(this.palette().colorAt(i));
-      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
+      series.setAutoColor(this.palette().itemAt(i));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
       series.setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
       series.draw();
     }
     this.markConsistent(anychart.ConsistencyState.MAP_PALETTE | anychart.ConsistencyState.MAP_MARKER_PALETTE |
@@ -890,7 +890,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_PALETTE)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.setAutoColor(this.palette().colorAt(i));
+      series.setAutoColor(this.palette().itemAt(i));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
@@ -900,7 +900,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
@@ -911,7 +911,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
       series.setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);

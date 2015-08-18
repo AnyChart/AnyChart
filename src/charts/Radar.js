@@ -726,9 +726,9 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.index(index);
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Radar.ZINDEX_SERIES) + inc);
     instance.labels().setAutoZIndex(anychart.charts.Radar.ZINDEX_LABEL + inc + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
-    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
-    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1));
+    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
+    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1));
     instance.setAutoMarkerType(markerType);
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(anychart.charts.Radar.ZINDEX_MARKER + inc);
@@ -1322,7 +1322,7 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoColor(this.palette().colorAt(i));
+      this.series_[i].setAutoColor(this.palette().itemAt(i));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
@@ -1331,7 +1331,7 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
+      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
@@ -1341,7 +1341,7 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.RADAR_SERIES);

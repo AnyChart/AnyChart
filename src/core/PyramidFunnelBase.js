@@ -907,7 +907,7 @@ anychart.core.PyramidFunnelBase.prototype.normalizeHatchFill = function(hatchFil
   var index = this.getIterator().getIndex();
   if (goog.isFunction(hatchFill)) {
     var sourceHatchFill = acgraph.vector.normalizeHatchFill(
-        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)));
+        /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     var scope = {
       'index': index,
       'sourceHatchFill': sourceHatchFill,
@@ -915,7 +915,7 @@ anychart.core.PyramidFunnelBase.prototype.normalizeHatchFill = function(hatchFil
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
   } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(index)) : null;
+    fill = hatchFill ? /** @type {acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)) : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);
   return fill;
@@ -3173,7 +3173,7 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(hovered) {
     }
 
     var markerType = pointMarker && pointMarker['type'];
-    var finalMarkerType = goog.isDef(markerType) ? markerType : (this.markers().getType() || this.markerPalette().markerAt(index));
+    var finalMarkerType = goog.isDef(markerType) ? markerType : (this.markers().getType() || this.markerPalette().itemAt(index));
     var markerHoverType = hoverPointMarker && hoverPointMarker['type'];
     var finalMarkerHoverType = goog.isDef(markerHoverType) ? markerHoverType : this.hoverMarkers().getType();
     markerSettings.type = hovered && goog.isDef(finalMarkerHoverType) ? finalMarkerHoverType : finalMarkerType;

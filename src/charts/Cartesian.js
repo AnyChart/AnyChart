@@ -1621,9 +1621,9 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Cartesian.ZINDEX_SERIES) + inc);
     instance.labels().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_LABEL + inc + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
-    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
+    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
       instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
@@ -2476,7 +2476,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoColor(this.palette().colorAt(i));
+      this.series_[i].setAutoColor(this.palette().itemAt(i));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
@@ -2485,7 +2485,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
+      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
@@ -2495,7 +2495,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       this.series_[i].setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
