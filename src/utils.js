@@ -1236,7 +1236,7 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
           opt_arguments[2];
 
     case anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE:
-      return 'Bullet Chart point value: ' + arguments[0] + ' is out of scale range. Check minimum and maximum scale settings.';
+      return 'Bullet Chart point value: ' + opt_arguments[0] + ' is out of scale range. Check minimum and maximum scale settings.';
 
     case anychart.enums.WarningCode.NOT_FOUND:
       //TODO (A.Kudryavtsev): Make another suggestion what to do.
