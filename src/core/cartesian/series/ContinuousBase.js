@@ -268,17 +268,19 @@ anychart.core.cartesian.series.ContinuousBase.prototype.hoverPoint = function(in
     this.drawLabel(false);
     this.hideTooltip();
   }
-  if (isNaN(this.hoverStatus)) {
-    this.applyHatchFill(true);
-    this.colorizeShape(true);
-  }
   if (this.getIterator().select(index)) {
+    if (isNaN(this.hoverStatus)) {
+      this.applyHatchFill(true);
+      this.colorizeShape(true);
+    }
     this.drawMarker(true);
     this.drawLabel(true);
     if (opt_event) this.showTooltip(opt_event);
     this.hoverStatus = index;
   } else {
-    this.hoverStatus = -1;
+    this.applyHatchFill(false);
+    this.colorizeShape(false);
+    this.hoverStatus = NaN;
   }
   return this;
 };
