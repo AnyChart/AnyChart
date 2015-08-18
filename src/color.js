@@ -293,7 +293,7 @@ anychart.color.equals = function(color1, color2) {
 /**
  * Serializes fill or stroke.
  * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color
- * @return {Object|string}
+ * @return {Object|string|boolean}
  */
 anychart.color.serialize = function(color) {
   var result;
@@ -309,6 +309,8 @@ anychart.color.serialize = function(color) {
     result = color.serialize();
   } else if (goog.isObject(color)) {
     result = /** @type {Object} */(anychart.utils.recursiveClone(color));
+  } else if (goog.isBoolean(color)) {
+    result = color;
   } else {
     result = String(color || 'none');
   }
