@@ -280,6 +280,14 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
     legend.resumeSignalsDispatching(false);
     legend.invalidate(anychart.ConsistencyState.APPEARANCE);
     legend.draw();
+
+    // DVF-1518
+    var legendBounds = legend.getRemainingBounds();
+    if (!goog.math.Rect.equals(this.legendBoundsCache_, legendBounds)) {
+      this.legendBoundsCache_ = legendBounds;
+      this.invalidate(anychart.ConsistencyState.BOUNDS);
+    }
+
     this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
   }
   boundsWithoutLegend = legend.enabled() ? legend.getRemainingBounds() : boundsWithoutTitle;
