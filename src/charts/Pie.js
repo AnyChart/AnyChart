@@ -1800,6 +1800,7 @@ anychart.charts.Pie.prototype.normalizeHatchFill = function(hatchFill) {
  */
 anychart.charts.Pie.prototype.remove = function() {
   if (this.dataLayer_) this.dataLayer_.parent(null);
+  if (this.hatchLayer_) this.hatchLayer_.parent(null);
 };
 
 
@@ -1840,7 +1841,9 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       this.dataLayer_.parent(this.rootElement);
     }
 
-    if (!this.hatchLayer_) {
+    if (this.hatchLayer_) {
+      this.hatchLayer_.clear();
+    } else {
       this.hatchLayer_ = new anychart.core.utils.TypedLayer(function() {
         return acgraph.path();
       }, function(child) {
@@ -1963,11 +1966,8 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
   } else {
     slice = /** @type {!acgraph.vector.Path} */(this.dataLayer_.genNextChild());
     iterator.meta('slice', slice);
-    hatchSlice = /** @type {acgraph.vector.Path} */(iterator.meta('hatchSlice'));
-    if (!hatchSlice) {
-      hatchSlice = /** @type {acgraph.vector.Path} */(this.hatchLayer_.genNextChild());
-      iterator.meta('hatchSlice', hatchSlice);
-    }
+    hatchSlice = /** @type {acgraph.vector.Path} */(this.hatchLayer_.genNextChild());
+    iterator.meta('hatchSlice', hatchSlice);
   }
 
   if (exploded) {
