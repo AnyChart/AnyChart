@@ -3494,7 +3494,11 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
       itemText = itemsTextFormatter.call(format, format);
     }
     if (!goog.isString(itemText)) {
-      itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
+      var isGrouped = !!iterator.meta('groupedPoint');
+      if (isGrouped)
+        itemText = 'Other points';
+      else
+        itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
     }
     var obj = {
       'enabled': true,
