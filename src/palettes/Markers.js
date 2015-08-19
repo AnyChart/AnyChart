@@ -85,12 +85,13 @@ anychart.palettes.Markers.prototype.itemAt = function(index, opt_item) {
  * palette.markers(); // ['star4', 'star5', 'star6', ...]
  * palette.markers(['cross', 'diagonalcross']).markers(); // ['cross', 'diagonalcross']
  * palette.markers('diamond', 'circle', 'square').markers(); // ['diamond', 'circle', 'square']
- * @param {(Array.<string>)=} opt_markers
+ * @param {(Array.<string>|string)=} opt_markers
+ * @param {...string} var_args .
  * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
  * @deprecated use items.
  */
-anychart.palettes.Markers.prototype.markers = function(opt_markers) {
-  return this.items(opt_markers);
+anychart.palettes.Markers.prototype.markers = function(opt_markers, var_args) {
+  return this.items.apply(this, arguments);
 };
 
 
@@ -101,19 +102,18 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
  * palette.items(); // ['star4', 'star5', 'star6', ...]
  * palette.items(['cross', 'diagonalcross']).items(); // ['cross', 'diagonalcross']
  * palette.items('diamond', 'circle', 'square').items(); // ['diamond', 'circle', 'square']
- * @param {(Array.<string>)=} opt_items
+ * @param {(Array.<string>|string)=} opt_items .
+ * @param {...string} var_args .
  * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
  */
-anychart.palettes.Markers.prototype.items = function(opt_items) {
+anychart.palettes.Markers.prototype.items = function(opt_items, var_args) {
   if (goog.isDef(opt_items)) {
-    if (arguments.length > 1) {
+    if (!goog.isArray(opt_items)) {
       opt_items = goog.array.slice(arguments, 0);
     }
-    if (goog.isArray(opt_items)) {
-      this.markers_ = goog.array.map(opt_items, function(marker) {
-        return anychart.enums.normalizeAnyMarkerType(marker);
-      });
-    }
+    this.markers_ = goog.array.map(opt_items, function(marker) {
+      return anychart.enums.normalizeAnyMarkerType(marker);
+    });
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
@@ -158,10 +158,16 @@ anychart.palettes.Markers.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function.
+ * @param {(Array.<string>|string)=} opt_value Array of markers.
+ * @param {...string} var_args Markers enumeration.
  * @return {!anychart.palettes.Markers}
  */
-anychart.palettes.markers = function() {
-  return new anychart.palettes.Markers();
+anychart.palettes.markers = function(opt_value, var_args) {
+  var palette = new anychart.palettes.Markers();
+  if (goog.isDef(opt_value)) {
+    palette.items.apply(palette, arguments);
+  }
+  return palette;
 };
 
 

@@ -25,7 +25,7 @@ anychart.palettes.RangeColors = function() {
 
   /**
    * Color palette colors list.
-   * @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+   * @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
    * Array.<acgraph.vector.GradientKey>|Array.<string>}
    * @private
    */
@@ -68,32 +68,42 @@ anychart.palettes.RangeColors.prototype.colorPalette_;
 
 /**
  * Getter/setter for the color palette colors list.
- * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value .
- * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value Color palette colors list to set.
+ * @param {...(acgraph.vector.SolidFill|string)} var_args .
+ * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
  * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
  * @deprecated use items.
  */
-anychart.palettes.RangeColors.prototype.colors = function(opt_value) {
-  return this.items(opt_value);
+anychart.palettes.RangeColors.prototype.colors = function(opt_value, var_args) {
+  return this.items.apply(this, arguments);
 };
 
 
 /**
  * Getter/setter for the color palette colors list.
- * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value .
- * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value .
+ * @param {...(acgraph.vector.SolidFill|string)} var_args .
+ * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
  * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
  */
-anychart.palettes.RangeColors.prototype.items = function(opt_value) {
+anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
   if (goog.isDef(opt_value)) {
-    this.colors_ = opt_value;
+    if (goog.isObject(opt_value) && opt_value.keys)
+      this.colors_ = /** @type {acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (opt_value);
+    else if (!goog.isArray(opt_value)) {
+      opt_value = goog.array.slice(arguments, 0);
+    }
+    if (goog.isArray(opt_value))
+      this.colors_ = goog.array.map(opt_value, function(element) {
+        return acgraph.vector.normalizeFill(element);
+      });
     this.processColorRange_();
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
-    return this.colors_;
+    return /** @type {Array|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (this.colors_);
   }
 };
 
@@ -329,10 +339,17 @@ anychart.palettes.RangeColors.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function.
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value Array of colors or gradient.
+ * @param {...(acgraph.vector.SolidFill|string)} var_args Colors enumeration.
  * @return {!anychart.palettes.RangeColors}
  */
-anychart.palettes.rangeColors = function() {
-  return new anychart.palettes.RangeColors();
+anychart.palettes.rangeColors = function(opt_value, var_args) {
+  var palette = new anychart.palettes.RangeColors();
+  if (goog.isDef(opt_value)) {
+    palette.setup.apply(palette, arguments);
+  }
+  return palette;
 };
 
 

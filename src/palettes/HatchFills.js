@@ -82,30 +82,31 @@ anychart.palettes.HatchFills.prototype.itemAt = function(index, opt_patternFillO
 
 /**
  * Getter/setter for hatchFills list of palette.
- * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>)=} opt_hatchFills .
+ * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|
+ * acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)=} opt_hatchFills .
+ * @param {...(acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)} var_args .
  * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
  * @deprecated use items.
  */
-anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills) {
-  return this.items(opt_hatchFills);
+anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills, var_args) {
+  return this.items.apply(this, arguments);
 };
 
 
 /**
  * Getter/setter for hatchFills list of palette.
  * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>)=} opt_hatchFills .
+ * @param {...(acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)} var_args .
  * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
  */
-anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills) {
+anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args) {
   if (goog.isDef(opt_hatchFills)) {
-    if (arguments.length > 1) {
+    if (!goog.isArray(opt_hatchFills)) {
       opt_hatchFills = goog.array.slice(arguments, 0);
     }
-    if (goog.isArray(opt_hatchFills)) {
-      this.hatchFills_ = goog.array.map(opt_hatchFills, function(hatchFill) {
-        return acgraph.vector.normalizeHatchFill.call(null, hatchFill);
-      });
-    }
+    this.hatchFills_ = goog.array.map(opt_hatchFills, function(hatchFill) {
+      return acgraph.vector.normalizeHatchFill.call(null, hatchFill);
+    });
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
@@ -154,10 +155,17 @@ anychart.palettes.HatchFills.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function.
+ * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|
+ * acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)=} opt_value Array of hatch fills.
+ * @param {...(acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)} var_args Hatch fills enumeration.
  * @return {!anychart.palettes.HatchFills}
  */
-anychart.palettes.hatchFills = function() {
-  return new anychart.palettes.HatchFills();
+anychart.palettes.hatchFills = function(opt_value, var_args) {
+  var palette = new anychart.palettes.HatchFills();
+  if (goog.isDef(opt_value)) {
+    palette.items.apply(palette, arguments);
+  }
+  return palette;
 };
 
 

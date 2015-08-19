@@ -78,22 +78,27 @@ anychart.palettes.DistinctColors.prototype.itemAt = function(index, opt_item) {
 
 /**
  * Getter/setter for color palette colors list.
- * @param {Array.<acgraph.vector.Fill>=} opt_value .
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value .
+ * @param {...acgraph.vector.Fill} var_args .
  * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
  * @deprecated use items.
  */
-anychart.palettes.DistinctColors.prototype.colors = function(opt_value) {
-  return this.items(opt_value);
+anychart.palettes.DistinctColors.prototype.colors = function(opt_value, var_args) {
+  return this.items.apply(this, arguments);
 };
 
 
 /**
  * Getter/setter for color palette colors list.
- * @param {Array.<acgraph.vector.Fill>=} opt_value .
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value .
+ * @param {...acgraph.vector.Fill} var_args .
  * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
  */
-anychart.palettes.DistinctColors.prototype.items = function(opt_value) {
+anychart.palettes.DistinctColors.prototype.items = function(opt_value, var_args) {
   if (goog.isDef(opt_value)) {
+    if (!goog.isArray(opt_value)) {
+      opt_value = goog.array.slice(arguments, 0);
+    }
     this.colors_ = goog.array.map(opt_value, function(element) {
       return acgraph.vector.normalizeFill(element);
     });
@@ -152,13 +157,15 @@ anychart.palettes.DistinctColors.prototype.setupByJSON = function(config) {
 
 /**
  * Constructor function.
- * @param {Array.<acgraph.vector.Fill>=} opt_value Array of colors.
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value Array of colors.
+ * @param {...acgraph.vector.Fill} var_args Colors enumeration.
  * @return {!anychart.palettes.DistinctColors}
  */
-anychart.palettes.distinctColors = function(opt_value) {
+anychart.palettes.distinctColors = function(opt_value, var_args) {
   var palette = new anychart.palettes.DistinctColors();
-  if (goog.isDef(opt_value))
-    palette.items(opt_value);
+  if (goog.isDef(opt_value)) {
+    palette.items.apply(palette, arguments);
+  }
   return palette;
 };
 
