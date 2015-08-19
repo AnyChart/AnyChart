@@ -269,6 +269,7 @@ anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
       this.recreateItems_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
+    return this;
   }
   return this.itemsFormatter_;
 };
@@ -286,6 +287,7 @@ anychart.core.ui.Legend.prototype.itemsTextFormatter = function(opt_value) {
       this.recreateItems_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
+    return this;
   }
   return this.itemsTextFormatter_;
 };
@@ -1748,6 +1750,8 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
   this.inverted(config['inverted']);
   this.itemsSourceMode(config['itemsSourceMode']);
   this.items(config['items']);
+  this.itemsTextFormatter(config['itemsTextFormatter']);
+  this.itemsFormatter(config['itemsFormatter']);
   this.iconTextSpacing(config['iconTextSpacing']);
   this.width(config['width']);
   this.height(config['height']);
