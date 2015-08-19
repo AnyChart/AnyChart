@@ -120,7 +120,7 @@ anychart.core.SeparateChart.prototype.onLegendSignal_ = function(event) {
 
 /**
  * Create legend items provider specific to chart type.
- * @param {string} sourceMode Items source mode (default|categories).
+ * @param {string|anychart.enums.LegendItemsSourceMode} sourceMode Items source mode (default|categories).
  * @param {?Function} itemsTextFormatter Legend items text formatter.
  * @return {!Array.<anychart.core.ui.Legend.LegendItemProvider>} Legend items provider.
  */

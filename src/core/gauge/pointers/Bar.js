@@ -59,8 +59,8 @@ anychart.core.gauge.pointers.Bar.prototype.width = function(opt_value) {
 
 /**
  * Bar position relative axis - inside, center, outside.
- * @param {(anychart.enums.SidePosition|string)=} opt_value [center].
- * @return {(anychart.enums.SidePosition|string|!anychart.core.gauge.pointers.Bar)} .
+ * @param {(anychart.enums.GaugeSidePosition|string)=} opt_value [center].
+ * @return {(anychart.enums.GaugeSidePosition|string|!anychart.core.gauge.pointers.Bar)} .
  */
 anychart.core.gauge.pointers.Bar.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {

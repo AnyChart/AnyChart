@@ -64,8 +64,8 @@ anychart.core.utils.LegendItemSettings.prototype.iconEnabled = function(opt_valu
 
 /**
  * Getter/setter for icon type.
- * @param {(string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
- * @return {(string|function(acgraph.vector.Path, number)|anychart.core.utils.LegendItemSettings)} icon type or drawer function or self for method chaining.
+ * @param {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
+ * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number)|anychart.core.utils.LegendItemSettings)} icon type or drawer function or self for method chaining.
  */
 anychart.core.utils.LegendItemSettings.prototype.iconType = function(opt_value) {
   if (goog.isDef(opt_value)) {

@@ -181,8 +181,8 @@ anychart.core.ui.Legend.prototype.inverted = function(opt_value) {
 
 /**
  * Getter/setter for custom items.
- * @param {?Array.<Object>=} opt_value Items.
- * @return {(?Array.<Object>|anychart.core.ui.Legend)} Custom items or self for chaining.
+ * @param {Array.<anychart.core.ui.Legend.LegendItemProvider>=} opt_value Items.
+ * @return {(Array.<anychart.core.ui.Legend.LegendItemProvider>|anychart.core.ui.Legend)} Custom items or self for chaining.
  */
 anychart.core.ui.Legend.prototype.items = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -240,8 +240,8 @@ anychart.core.ui.Legend.prototype.itemsSource = function(opt_value) {
 
 /**
  * Getter/setter for items source mode.
- * @param {string=} opt_value Items source mode.
- * @return {(string|anychart.core.ui.Legend)} Items source mode or self for chaining.
+ * @param {(anychart.enums.LegendItemsSourceMode|string)=} opt_value Items source mode.
+ * @return {anychart.enums.LegendItemsSourceMode|anychart.core.ui.Legend} Items source mode or self for chaining.
  */
 anychart.core.ui.Legend.prototype.itemsSourceMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -259,8 +259,8 @@ anychart.core.ui.Legend.prototype.itemsSourceMode = function(opt_value) {
 
 /**
  * Getter/setter for items formatter
- * @param {function(Array.<Object>):Array.<Object>=} opt_value Formatter function.
- * @return {(function(Array.<Object>):Array.<Object>|anychart.core.ui.Legend)} Formatter function or self for chaining.
+ * @param {function(Array.<anychart.core.ui.Legend.LegendItemProvider>):Array.<anychart.core.ui.Legend.LegendItemProvider>=} opt_value Formatter function.
+ * @return {(function(Array.<anychart.core.ui.Legend.LegendItemProvider>):Array.<anychart.core.ui.Legend.LegendItemProvider>|anychart.core.ui.Legend)} Formatter function or self for chaining.
  */
 anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -937,7 +937,7 @@ anychart.core.ui.Legend.prototype.createItem = function() {
 
 /**
  * Getter/Setter for hover cursor setting.
- * @param {anychart.enums.Cursor=} opt_value hover cursor setting.
+ * @param {(string|anychart.enums.Cursor)=} opt_value hover cursor setting.
  * @return {(anychart.enums.Cursor|anychart.core.ui.Legend)} Hover cursor setting or self for chaining.
  */
 anychart.core.ui.Legend.prototype.hoverCursor = function(opt_value) {

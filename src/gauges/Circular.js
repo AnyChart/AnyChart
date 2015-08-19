@@ -302,8 +302,8 @@ anychart.gauges.Circular.prototype.onCapSignal_ = function(event) {
 
 /**
  * Circular range..
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.axisMarkers.CircularRange|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.range = function(opt_indexOrValue, opt_value) {
@@ -353,8 +353,8 @@ anychart.gauges.Circular.prototype.onCircularRangeSignal_ = function(event) {
 
 /**
  * Bar pointer.
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.gauge.pointers.Bar|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
@@ -395,8 +395,8 @@ anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
 
 /**
  * Marker pointer.
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.gauge.pointers.Marker|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value) {
@@ -436,8 +436,8 @@ anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value
 
 /**
  * Needle pointer.
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.gauge.pointers.Needle|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value) {
@@ -477,8 +477,8 @@ anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value
 
 /**
  * Knob pointer.
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.gauge.pointers.Knob|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.knob = function(opt_indexOrValue, opt_value) {
@@ -553,8 +553,8 @@ anychart.gauges.Circular.prototype.onPointersSignal_ = function(event) {
 
 /**
  * Axis.
- * @param {number|Object=} opt_indexOrValue .
- * @param {Object=} opt_value .
+ * @param {?(boolean|number|Object)=} opt_indexOrValue .
+ * @param {?(boolean|Object)=} opt_value .
  * @return {!anychart.core.axes.Circular|anychart.gauges.Circular} .
  */
 anychart.gauges.Circular.prototype.axis = function(opt_indexOrValue, opt_value) {

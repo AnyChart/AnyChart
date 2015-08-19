@@ -890,7 +890,7 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
 
 /**
  * Defines show label if it don't fit to bounds slice or not show. ONLY for inside labels.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value .
+ * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value .
  * @return {anychart.enums.LabelsOverlapMode|anychart.charts.Pie} .
  */
 anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
@@ -899,8 +899,8 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
     if (this.insideLabelsOverlap_ != val) {
       this.insideLabelsOverlap_ = val;
       this.invalidate(anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
-      return this;
     }
+    return this;
   }
   return this.insideLabelsOverlap_ ?
       anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
@@ -1188,7 +1188,7 @@ anychart.charts.Pie.prototype.outsideLabelsCriticalAngle = function(opt_value) {
  *   .position('outside');
  * chart.connectorStroke('orange', 3, '5 2', 'round');
  * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
@@ -1197,13 +1197,13 @@ anychart.charts.Pie.prototype.outsideLabelsCriticalAngle = function(opt_value) {
  * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.charts.Pie|acgraph.vector.Stroke|Function} .
+ * @return {anychart.charts.Pie|acgraph.vector.Stroke} .
  */
 anychart.charts.Pie.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {

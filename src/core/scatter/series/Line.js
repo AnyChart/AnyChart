@@ -159,7 +159,7 @@ anychart.core.scatter.series.Line.prototype.createPositionProvider = function() 
  *//**
  * @ignoreDoc
  * @param {boolean=} opt_value The value to be set.
- * @return {!anychart.core.scatter.series.Base|boolean} The setting, or itself for method chaining.
+ * @return {anychart.core.scatter.series.Line|boolean} The setting, or itself for method chaining.
  */
 anychart.core.scatter.series.Line.prototype.connectMissingPoints = function(opt_value) {
   if (goog.isDef(opt_value)) {
