@@ -451,12 +451,12 @@ anychart.core.cartesian.series.Marker.prototype.unhover = function() {
 anychart.core.cartesian.series.Marker.prototype.drawMarker_ = function(hovered, opt_updateMarker) {
   var pointType = this.getIterator().get('type');
   var pointSize = this.getIterator().get('markerSize');
-  var pointFill = this.getIterator().get('fill');
-  var pointStroke = this.getIterator().get('stroke');
+  var pointFill = this.getFinalFill(true, false);
+  var pointStroke = this.getFinalStroke(true, false);
   var pointHoverType = this.getIterator().get('hoverType');
   var pointHoverSize = this.getIterator().get('hoverMarkerSize');
-  var pointHoverFill = this.getIterator().get('hoverFill');
-  var pointHoverStroke = this.getIterator().get('hoverStroke');
+  var pointHoverFill = this.getFinalFill(true, true);
+  var pointHoverStroke = this.getFinalStroke(true, true);
   var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
 
   var settings = {'type': pointType, 'size': pointSize, 'fill': pointFill, 'stroke': pointStroke};

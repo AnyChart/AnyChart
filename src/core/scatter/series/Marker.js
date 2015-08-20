@@ -414,12 +414,12 @@ anychart.core.scatter.series.Marker.prototype.drawMarker_ = function(hovered, op
   var iterator = this.getIterator();
   var pointType = iterator.get('type');
   var pointSize = iterator.get('markerSize');
-  var pointFill = iterator.get('fill');
-  var pointStroke = iterator.get('stroke');
+  var pointFill = this.getFinalFill(true, false);
+  var pointStroke = this.getFinalStroke(true, false);
   var pointHoverType = iterator.get('hoverType');
   var pointHoverSize = iterator.get('hoverMarkerSize');
-  var pointHoverFill = iterator.get('hoverFill');
-  var pointHoverStroke = iterator.get('hoverStroke');
+  var pointHoverFill = this.getFinalFill(true, true);
+  var pointHoverStroke = this.getFinalStroke(true, true);
   var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarker_ : this.marker_);
 
   var settings = {'type': pointType, 'size': pointSize, 'fill': pointFill, 'stroke': pointStroke};
