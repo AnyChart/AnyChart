@@ -590,8 +590,15 @@ anychart.core.ui.Background.prototype.remove = function() {
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+
+  if (this.fill_) {
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  }
+
+  if (this.stroke_) {
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  }
+
   json['cornerType'] = this.cornerType();
   var corners = /** @type {Array} */(this.corners());
   if (corners.length >= 4) {

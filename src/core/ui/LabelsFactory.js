@@ -680,8 +680,8 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.background(config['background']);
-  this.padding(config['padding']);
+  if (config['background']) this.background(config['background']);
+  if (config['padding']) this.padding(config['padding']);
   this.position(config['position']);
   this.anchor(config['anchor']);
   this.offsetX(config['offsetX']);
