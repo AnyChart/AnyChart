@@ -3014,7 +3014,8 @@ window['anychart']['themes']['v6'] = {
       'ticks': {
         'stroke': '#333333'
       },
-      'scale': 0
+      'scale': 0,
+      'zIndex': 25
     },
     'yAxis': {
       'stroke': '#333333',
@@ -3174,7 +3175,8 @@ window['anychart']['themes']['v6'] = {
       'ticks': {
         'stroke': '#333333'
       },
-      'scale': 0
+      'scale': 0,
+      'zIndex': 25
     },
     'yAxis': {
       'stroke': '#333333',

@@ -1,6 +1,13 @@
 var chart;
 anychart.onDocumentReady(function() {
-  var chart = anychart.radar();
-  chart.line([6,4,3,6, 'miss']).connectMissingPoints(true).markers(true).labels(true);
+  chart = anychart.polar();
+  chart.marker(['4', 10, -1, 10, 4]).size(55);
+  chart.grid()
+      .oddFill('none')
+      .evenFill('none')
+      .stroke('2 blue .5')
+      .layout('circuit');
+  chart.xAxis().stroke('5 red');
+  chart.legend(false);
   chart.container('container').draw();
 });

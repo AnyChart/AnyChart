@@ -3333,7 +3333,8 @@ window['anychart']['themes']['defaultTheme'] = {
         },
         'fontSize': 12
       },
-      'scale': 0
+      'scale': 0,
+      'zIndex': 25
     },
     'yAxis': {
       'stroke': '#b9b9b9',
@@ -3538,7 +3539,8 @@ window['anychart']['themes']['defaultTheme'] = {
         },
         'fontSize': 12
       },
-      'scale': 0
+      'scale': 0,
+      'zIndex': 25
     },
     'yAxis': {
       'stroke': '#b9b9b9',
