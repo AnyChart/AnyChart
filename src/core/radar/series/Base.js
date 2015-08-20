@@ -936,6 +936,7 @@ anychart.core.radar.series.Base.prototype.finalizeDrawing = function() {
  * @protected
  */
 anychart.core.radar.series.Base.prototype.drawLabel = function(hovered) {
+  var value = anychart.utils.toNumber(this.getIterator().get('value'));
   var pointLabel = this.getIterator().get('label');
   var hoverPointLabel = hovered ? this.getIterator().get('hoverLabel') : null;
   var index = this.getIterator().getIndex();
@@ -958,7 +959,7 @@ anychart.core.radar.series.Base.prototype.drawLabel = function(hovered) {
           this.labels().enabled() :
           labelEnabledState;
 
-  if (isDraw) {
+  if (isDraw && !isNaN(value)) {
     var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
     var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
     var position = hovered ?

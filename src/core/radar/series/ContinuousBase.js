@@ -480,6 +480,7 @@ anychart.core.radar.series.ContinuousBase.prototype.unhover = function() {
  * @protected
  */
 anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(hovered) {
+  var value = anychart.utils.toNumber(this.getIterator().get('value'));
   var pointMarker = this.getIterator().get('marker');
   var hoverPointMarker = this.getIterator().get('hoverMarker');
   var index = this.getIterator().getIndex();
@@ -502,7 +503,7 @@ anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(hovere
           this.markers().enabled() :
           markerEnabledState;
 
-  if (isDraw) {
+  if (isDraw && !isNaN(value)) {
     var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
     var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
     var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
