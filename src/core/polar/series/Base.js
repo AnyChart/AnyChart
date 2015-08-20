@@ -629,10 +629,11 @@ anychart.core.polar.series.Base.prototype.getReferenceScaleValues = function() {
  * Approximate curve.
  * @param {Array.<number>} startPoint .
  * @param {Array.<number>} endPoint .
+ * @param {boolean} newSegment .
  * @protected
  * @return {Array.<number>} .
  */
-anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint, endPoint) {
+anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint, endPoint, newSegment) {
   //x coord, y coord, angle, raduis
   var Ax, Ay, Aa, Ar;
   var Bx, By, Ba, Br;
@@ -666,7 +667,25 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
     Da = NaN;
   }
 
-  var sweep;
+  var zeroAngle = goog.math.modulo(goog.math.toRadians(this.startAngle_ - 90), Math.PI * 2);
+
+  //Angle of point A relative zero angle.
+  var AaRZ = goog.math.modulo(Aa - zeroAngle, Math.PI * 2);
+  var rounded2Pi = anychart.math.round(Math.PI * 2, 4);
+  var roundedARZ = anychart.math.round(AaRZ, 4);
+
+  if (roundedARZ == rounded2Pi || roundedARZ == 0)
+    AaRZ = 0;
+
+  //Angle of point D relative zero angle.
+  var DaRZ = goog.math.modulo(Da - zeroAngle, Math.PI * 2);
+  var roundedDRZ = anychart.math.round(DaRZ, 4);
+  if (roundedDRZ == rounded2Pi || roundedDRZ == 0)
+    DaRZ = 0;
+
+  var isAcrossZeroLine = xScale.inverted() ? AaRZ < DaRZ && AaRZ > 0 : AaRZ > DaRZ && DaRZ > 0;
+
+  var sweep, i;
   if (xScale.inverted()) {
     if (Da > Aa) Da -= Math.PI * 2;
     sweep = Aa - Da;
@@ -678,23 +697,61 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
   sweep = isNaN(sweep) ? sweep : anychart.math.round(sweep, 4);
   if (sweep == 0) return null;
 
-
   var a90 = Math.PI / 2;
   a90 = anychart.math.round(a90, 4);
 
   var parts = Math.ceil(sweep / a90);
-  var res = [];
-  var angleStep, P2x, P2y, P3x, P3y, P4x, P4y;
+  var isSegmentOverA90 = parts > 1;
 
-  if (parts > 1) {
-    var i;
+  var angles, angle, angleStep, segments;
+
+  if (isAcrossZeroLine) {
+    angles = [];
+    segments = [];
+    var firstSweep, secondSweep;
+    if (isAcrossZeroLine) {
+      if (xScale.inverted()) {
+        firstSweep = AaRZ;
+        secondSweep = Math.PI * 2 - DaRZ;
+      } else {
+        firstSweep = Math.PI * 2 - AaRZ;
+        secondSweep = DaRZ;
+      }
+    }
+
+    parts = firstSweep ? Math.ceil(firstSweep / a90) : 0;
+    for (i = 0; i < parts; i++) {
+      angleStep = (i == parts - 1 && firstSweep % a90 != 0) ? firstSweep % a90 : a90;
+      angle = xScale.inverted() ? -angleStep : angleStep;
+      angles.push(angle);
+      segments.push(false);
+    }
+
+    parts = secondSweep ? Math.ceil(secondSweep / a90) : 0;
+    for (i = 0; i < parts; i++) {
+      angleStep = (i == parts - 1 && secondSweep % a90 != 0) ? secondSweep % a90 : a90;
+      angle = xScale.inverted() ? -angleStep : angleStep;
+      angles.push(angle);
+      segments.push(i == 0);
+    }
+  } else if (isSegmentOverA90) {
+    angles = [];
+    for (i = 0; i < parts; i++) {
+      angleStep = (i == parts - 1 && sweep % a90 != 0) ? sweep % a90 : a90;
+      angle = xScale.inverted() ? -angleStep : angleStep;
+      angles.push(angle);
+    }
+  }
+
+  var res = [];
+  var P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y;
+  if (angles) {
     var Sx = Ax, Sy = Ay, Sa = Aa, Sr = Ar;
     var Ex, Ey, Ea, Er;
     var sPoint, ePoint;
 
-    for (i = 0; i < parts; i++) {
-      angleStep = (i == parts - 1 && sweep % a90 != 0) ? sweep % a90 : a90;
-      Ea = Sa + (xScale.inverted() ? -angleStep : angleStep);
+    for (i = 0; i < angles.length; i++) {
+      Ea = Sa + angles[i];
       Er = (Ea - Sa) * (Dr - Sr) / (Da - Sa) + Sr;
       Ex = this.cx + Er * Math.cos(Ea);
       Ey = this.cy + Er * Math.sin(Ea);
@@ -702,7 +759,7 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
       sPoint = [Sx, Sy, Sa, Sr];
       ePoint = [Ex, Ey, Ea, Er];
 
-      res.push.apply(res, this.approximateCurve(sPoint, ePoint));
+      res.push.apply(res, this.approximateCurve(sPoint, ePoint, segments ? segments[i] : false));
 
       Sx = Ex; Sy = Ey; Sa = Ea; Sr = Er;
     }
@@ -743,10 +800,13 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
       P3y = (2 * Ay - 9 * By + 18 * Cy - 5 * Dy) / 6;
     }
 
+    P1x = Ax;
+    P1y = Ay;
+
     P4x = Dx;
     P4y = Dy;
 
-    res.push(P2x, P2y, P3x, P3y, P4x, P4y);
+    res.push(Aa == zeroAngle || newSegment, P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y);
   }
 
   return res;
@@ -788,15 +848,14 @@ anychart.core.polar.series.Base.prototype.getValuePointCoords = function() {
   var xRatio = xScale.transform(xVal, 0);
   var yRatio = yScale.transform(yVal, .5);
 
-  Dr = this.radius * yRatio;
   Da = goog.math.modulo(goog.math.toRadians(this.startAngle_ - 90 + 360 * xRatio), Math.PI * 2);
+  Dr = this.radius * yRatio;
   Dx = xScale.isMissing(xVal) ? NaN : this.cx + Dr * Math.cos(Da);
   Dy = this.cy + Dr * Math.sin(Da);
 
   if (isNaN(Dx) || isNaN(Dy)) fail = true;
 
-  var res = this.approximateCurve(this.prevValuePointCoords, [Dx, Dy, Da, Dr]);
-  //var res = this.approximateCurve([Dx, Dy, Da, Dr], this.prevValuePointCoords);
+  var res = this.approximateCurve(this.prevValuePointCoords, [Dx, Dy, Da, Dr], false);
 
   if (!fail) {
     if (!this.prevValuePointCoords)
@@ -883,7 +942,6 @@ anychart.core.polar.series.Base.prototype.startDrawing = function() {
   }
 
   this.checkDrawingNeeded();
-
 
   this.labels().suspendSignalsDispatching();
   this.hoverLabels().suspendSignalsDispatching();

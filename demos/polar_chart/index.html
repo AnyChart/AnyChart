@@ -5,14 +5,45 @@
   <script src="../../src/deps.js"></script>
   <meta charset="utf-8">
   <script>
-    goog.require('anychart.modules.radar');
-    goog.require('anychart.modules.polar');
+//    goog.require('anychart.modules.polar');
+    goog.require('anychart.modules.anychart_bundle');
+    goog.require('anychart.themes.defaultTheme');
   </script>
   <script src="index.js"></script>
+  <style>
+    html, body {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    #container {
+      padding: 0;
+      margin: 0 auto 0 auto;
+      display: block;
+      width: 100%;
+      height: 600px;
+      /*border: 1px solid #000000;*/
+    }
+
+    .controlPanel {
+      width: 100%;
+      padding: 5px 0 5px 0;
+    }
+
+    .label {
+      margin: 0 0 0 10px;
+    }
+  </style>
 </head>
 
 
 <body>
-<div id="container" style="position: absolute; left: 0; top: 0; border: 0 solid; width: 100%; height: 100%; float: left;"></div>
+<div class="controlPanel">
+  <span class="label">Start Angle:</span>
+  <input type="range" min="0" max="720" id="startAngle" oninput="startAngle(this.value);" style="width: 85%;">
+  <input type="text" id="startAngleInp" onchange="startAngleInp(this.value);" style="width: 30px; "/>
+</div>
+<div id="container"></div>
 </body>
 </html>

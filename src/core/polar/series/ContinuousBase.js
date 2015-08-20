@@ -20,23 +20,10 @@ anychart.core.polar.series.ContinuousBase = function(opt_data, opt_csvSettings) 
   this.markers().position(anychart.enums.Position.CENTER);
 
   /**
-   * @type {!acgraph.vector.Path}
-   * @protected
-   */
-  this.path = acgraph.path();
-  this.path.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES);
-
-  /**
-   * @type {acgraph.vector.Path}
-   * @protected
-   */
-  this.hatchFillPath = null;
-
-  /**
    * @type {Array.<!acgraph.vector.Path>}
    * @protected
    */
-  this.paths = [this.path];
+  this.paths = [];
 
   /**
    * @type {boolean}
@@ -260,14 +247,12 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   markers.parentBounds(this.pixelBoundsCache);
+};
 
+
+/** @inheritDoc */
+anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function() {
   if (this.isConsistent() || !this.enabled()) return;
-
-  var i;
-  var len = this.paths.length;
-  for (i = 0; i < len; i++) {
-    this.makeHoverable(this.paths[i], true);
-  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
@@ -275,34 +260,15 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    for (i = 0; i < len; i++)
-      this.paths[i].clear();
     this.colorizeShape(!isNaN(this.hoverStatus));
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     this.rootLayer.parent(container);
-    for (i = 0; i < len; i++)
-      this.paths[i].parent(this.rootLayer);
-    if (this.hatchFillPath)
-      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    if (!this.hatchFillPath) {
-      this.hatchFillPath = acgraph.path();
-      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillPath.zIndex(anychart.core.polar.series.Base.ZINDEX_HATCH_FILL);
-      this.hatchFillPath.disablePointerEvents(true);
-    }
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function() {
   this.finalizeSegment();
   this.finalizeHatchFill();
 
@@ -313,7 +279,6 @@ anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function()
 
   this.markers().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverMarkers().markConsistent(anychart.ConsistencyState.ALL);
-
 
   goog.base(this, 'finalizeDrawing');
 };
@@ -376,32 +341,6 @@ anychart.core.polar.series.ContinuousBase.prototype.connectMissingPoints = funct
     return this;
   }
   return this.connectMissing;
-};
-
-
-/**
- * Colorizes shape in accordance to current point colorization settings.
- * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.colorizeShape = function(hover) {
-  this.path.stroke(this.getFinalStroke(false, hover), 2);
-  this.path.fill(null);
-};
-
-
-/**
- * Apply hatch fill to shape in accordance to current point colorization settings.
- * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
-  if (this.hatchFillPath) {
-    this.hatchFillPath.stroke(null);
-    this.hatchFillPath.fill(this.getFinalHatchFill(false, hover));
-  }
 };
 
 

@@ -18,9 +18,44 @@ anychart.core.polar.series.Line = function(opt_data, opt_csvSettings) {
   this.hoverStroke(function() {
     return anychart.color.lighten(this['sourceColor']);
   });
+
+
+  /**
+   * @type {acgraph.vector.Path}
+   * @protected
+   */
+  this.currentStrokePath;
+
+  /**
+   * @type {anychart.core.utils.TypedLayer}
+   * @protected
+   */
+  this.strokeLayer;
 };
 goog.inherits(anychart.core.polar.series.Line, anychart.core.polar.series.ContinuousBase);
 anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.LINE] = anychart.core.polar.series.Line;
+
+
+/** @inheritDoc */
+anychart.core.polar.series.Line.prototype.startDrawing = function() {
+  goog.base(this, 'startDrawing');
+
+  this.currentStrokePath = null;
+
+  if (this.strokeLayer) {
+    this.strokeLayer.clear();
+  } else {
+    this.strokeLayer = new anychart.core.utils.TypedLayer(function() {
+      var path = acgraph.path();
+      this.makeHoverable(path, true);
+      return path;
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    }, undefined, this);
+    this.strokeLayer.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES + .1);
+    this.strokeLayer.parent(this.rootLayer);
+  }
+};
 
 
 /** @inheritDoc */
@@ -38,10 +73,17 @@ anychart.core.polar.series.Line.prototype.drawFirstPoint = function() {
       this.firstPointIsMissing = false;
     }
 
-    var x = valuePoint[4];
-    var y = valuePoint[5];
+    for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+      if (valuePoint[i]) {
+        this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+      }
+    }
 
-    this.path.moveTo(x, y);
+    var x = valuePoint[valuePoint.length - 2];
+    var y = valuePoint[valuePoint.length - 1];
+
+    if (!this.currentStrokePath) this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+    this.currentStrokePath.moveTo(x, y);
 
     this.getIterator().meta('x', x).meta('y', y);
   }
@@ -57,18 +99,24 @@ anychart.core.polar.series.Line.prototype.drawSubsequentPoint = function() {
     return false;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    var P2x, P2y, P3x, P3y, P4x, P4y;
+    for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+      if (valuePoint[i]) {
+        var startX = valuePoint[i + 1];
+        var startY = valuePoint[i + 2];
 
-    for (var i = 0, len = valuePoint.length; i < len; i += 6) {
-      var P2x = valuePoint[i];
-      var P2y = valuePoint[i + 1];
-      var P3x = valuePoint[i + 2];
-      var P3y = valuePoint[i + 3];
-      var P4x = valuePoint[i + 4];
-      var P4y = valuePoint[i + 5];
+        this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+        this.currentStrokePath.moveTo(startX, startY);
+      }
+      P2x = valuePoint[i + 3];
+      P2y = valuePoint[i + 4];
+      P3x = valuePoint[i + 5];
+      P3y = valuePoint[i + 6];
+      P4x = valuePoint[i + 7];
+      P4y = valuePoint[i + 8];
 
-      this.path.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+      this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
     }
-
     this.getIterator().meta('x', P4x).meta('y', P4y);
   }
 
@@ -84,26 +132,50 @@ anychart.core.polar.series.Line.prototype.finalizeDrawing = function() {
         goog.isDefAndNotNull(this.prevValuePointCoords) &&
         goog.isDefAndNotNull(this.firstValuePointCoords)) {
 
-      var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords);
+      var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords, false);
 
       if (!valuePoint) {
-        this.path.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
+        this.currentStrokePath.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
       } else {
-        for (var i = 0, len = valuePoint.length; i < len; i += 6) {
-          var P2x = valuePoint[i];
-          var P2y = valuePoint[i + 1];
-          var P3x = valuePoint[i + 2];
-          var P3y = valuePoint[i + 3];
-          var P4x = valuePoint[i + 4];
-          var P4y = valuePoint[i + 5];
+        var P2x, P2y, P3x, P3y, P4x, P4y;
+        for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+          if (valuePoint[i]) {
+            var startX = valuePoint[i + 1];
+            var startY = valuePoint[i + 2];
 
-          this.path.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+            this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+            this.currentStrokePath.moveTo(startX, startY);
+          }
+          P2x = valuePoint[i + 3];
+          P2y = valuePoint[i + 4];
+          P3x = valuePoint[i + 5];
+          P3y = valuePoint[i + 6];
+          P4x = valuePoint[i + 7];
+          P4y = valuePoint[i + 8];
+
+          this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
         }
       }
     }
   }
 
   goog.base(this, 'finalizeDrawing');
+};
+
+
+/**
+ * Colorizes shape in accordance to current point colorization settings.
+ * Shape is get from current meta 'shape'.
+ * @param {boolean} hover If the point is hovered.
+ * @protected
+ */
+anychart.core.polar.series.Line.prototype.colorizeShape = function(hover) {
+  var stroke = this.getFinalStroke(false, hover);
+
+  this.strokeLayer.forEachChild(function(path) {
+    path.stroke(stroke);
+    path.fill(null);
+  }, this);
 };
 
 
