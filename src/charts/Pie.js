@@ -412,7 +412,6 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
 
       //drop data cache
       goog.dispose(this.parentViewToDispose_);
-      delete this.iterator_;
 
       this.statistics_ = null;
 
@@ -435,6 +434,7 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
     }
 
     goog.dispose(this.view_);
+    delete this.iterator_;
     this.view_ = this.prepareData_(this.parentView_);
     this.view_.listenSignals(this.dataInvalidated_, this);
     this.registerDisposable(this.view_);
@@ -1282,8 +1282,7 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
 anychart.charts.Pie.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.radius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-        anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.radius_;
@@ -1326,8 +1325,7 @@ anychart.charts.Pie.prototype.radius = function(opt_value) {
 anychart.charts.Pie.prototype.innerRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.innerRadius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS,
-        anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.innerRadius_;
