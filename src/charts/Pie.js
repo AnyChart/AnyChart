@@ -442,7 +442,8 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.CHART_LEGEND,
-        anychart.Signal.NEEDS_REDRAW
+        anychart.Signal.NEEDS_REDRAW |
+        anychart.Signal.DATA_CHANGED
     );
     return this;
   }

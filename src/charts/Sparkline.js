@@ -709,7 +709,7 @@ anychart.charts.Sparkline.prototype.data = function(opt_value, opt_csvSettings) 
     this.data_.listenSignals(this.dataInvalidated_, this);
     if (this.series_)
       this.series_.invalidate(anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
     return this;
   }
   return this.data_;

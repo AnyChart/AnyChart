@@ -337,7 +337,8 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
         anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
         anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
         anychart.ConsistencyState.CHART_LEGEND,
-        anychart.Signal.NEEDS_REDRAW
+        anychart.Signal.NEEDS_REDRAW |
+        anychart.Signal.DATA_CHANGED
     );
     return this;
   }

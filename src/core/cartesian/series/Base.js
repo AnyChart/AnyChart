@@ -681,7 +681,7 @@ anychart.core.cartesian.series.Base.prototype.data = function(opt_value, opt_csv
     this.data_.listenSignals(this.dataInvalidated_, this);
     // DATA is supported only in Bubble, so we invalidate only for it.
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
-        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
     return this;
   }
   return this.data_;
