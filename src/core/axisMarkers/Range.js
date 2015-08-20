@@ -336,21 +336,15 @@ anychart.core.axisMarkers.Range.prototype.draw = function() {
 
     if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
 
-    var shiftMinValue = -.5;
-    var shiftMaxValue = -.5;
-
     var bounds = this.parentBounds();
     var axesLinesSpace = this.axesLinesSpace();
     this.markerElement().clear();
 
     if (layout == anychart.enums.Layout.HORIZONTAL) {
-      var y_max = Math.round(bounds.getBottom() - bounds.height * ratioMaxValue);
-      var y_min = Math.round(bounds.getBottom() - bounds.height * ratioMinValue);
+      var y_max = Math.floor(bounds.getBottom() - bounds.height * ratioMaxValue);
+      var y_min = Math.ceil(bounds.getBottom() - bounds.height * ratioMinValue);
       var x_start = bounds.getLeft();
       var x_end = bounds.getRight();
-
-      ratioMaxValue == 1 ? y_max -= shiftMaxValue : y_max += shiftMaxValue;
-      ratioMinValue == 1 ? y_min -= shiftMinValue : y_min += shiftMinValue;
 
       this.markerElement()
           .moveTo(x_start, y_max)
@@ -361,10 +355,8 @@ anychart.core.axisMarkers.Range.prototype.draw = function() {
     } else if (layout == anychart.enums.Layout.VERTICAL) {
       var y_start = bounds.getBottom();
       var y_end = bounds.getTop();
-      var x_min = bounds.getLeft() + (bounds.width * ratioMinValue);
-      var x_max = bounds.getLeft() + (bounds.width * ratioMaxValue);
-      ratioMaxValue == 1 ? x_max += shiftMaxValue : x_max -= shiftMaxValue;
-      ratioMinValue == 1 ? x_min += shiftMinValue : x_min -= shiftMinValue;
+      var x_min = Math.floor(bounds.getLeft() + (bounds.width * ratioMinValue));
+      var x_max = Math.ceil(bounds.getLeft() + (bounds.width * ratioMaxValue));
 
       this.markerElement()
           .moveTo(x_min, y_start)
