@@ -307,8 +307,9 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
           });
           goog.dom.appendChild(/** @type {Element} */
               ((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
-          this.container_.container(innerDom);
           this.container_.wrapped_ = true;
+          this.container_.container(innerDom);
+
         }
       }
 
