@@ -409,10 +409,14 @@ anychart.core.radar.series.ContinuousBase.prototype.getIndexByEvent = function(e
   var y = event['clientY'];
   var value, index;
 
+  var stageClientPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var cx = stageClientPosition.x + this.cx;
+  var cy = stageClientPosition.y + this.cy;
+
   var startAngle = goog.math.toRadians(this.startAngle() - 90);
-  var currRadius = Math.sqrt(Math.pow(x - this.cx, 2) + Math.pow(y - this.cy, 2));
-  var angle = Math.acos((x - this.cx) / currRadius);
-  if (y < this.cy) angle = 2 * Math.PI - startAngle - angle;
+  var currRadius = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
+  var angle = Math.acos((x - cx) / currRadius);
+  if (y < cy) angle = 2 * Math.PI - startAngle - angle;
   else angle = angle - startAngle;
 
   angle = goog.math.modulo(angle, Math.PI * 2);

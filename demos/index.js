@@ -1,27 +1,33 @@
 var chart;
 anychart.onDocumentReady(function() {
-  chart = anychart.line([
-    {x: 'p1', value: 123},
-    {x: 'p2', value: 512},
-    {x: 'p3', value: 345},
-    {x: 'p4', value: 645},
-    {x: 'p5', value: 145},
-    {x: 'p6', value: 245}
+  var dataSet = anychart.data.set([
+    {x: 1, value: 1},
+    {x: 2, value: 2},
+    {x: 3, value: 3},
+    {x: 4, value: 4},
+    {x: 5, value: 5, marker: {size: 10}}
   ]);
-  chart.container('container').draw();
-  chart.xScale().values(['p1', 'p2', 'p3']);
-  chart.xScale().names(['p10', 'p20', 'p30']);
 
-  //chart = anychart.radar([
-  //  {x: 'p1', value: 123},
-  //  {x: 'p2', value: 512},
-  //  {x: 'p3', value: 345},
-  //  {x: 'p4', value: 645},
-  //  {x: 'p5', value: 145},
-  //  {x: 'p6', value: 245}
-  //]);
-  //chart.container('container').draw();
-  //chart.xScale().values(['p1', 'p2', 'p3']);
-  //chart.xScale().names(['p10', 'p20', 'p30']);
+  var dataSet2 = anychart.data.set([
+    {x: 1, value: 1},
+    {x: 2, value: 2},
+    {x: 3, value: 3},
+    {x: 4, value: 4},
+    {x: 5, value: 5}
+  ]);
 
+  chart = anychart.radar();
+
+  chart.container('container');
+
+  var line = chart.line(dataSet)
+      .tooltip(null)
+      .stroke('blue')
+      .hoverMarkers({size: 10})
+      .hoverStroke('blue');
+
+
+  chart.draw();
+
+  //line.data(dataSet2);
 });
