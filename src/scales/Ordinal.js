@@ -233,7 +233,9 @@ anychart.scales.Ordinal.prototype.names = function(opt_value) {
         return this;
       this.names_ = opt_value;
     }
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    this.resultNames_ = null;
+    this.ticks().markInvalid();
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   }
   if (goog.isArray(this.names_)) {
