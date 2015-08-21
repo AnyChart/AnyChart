@@ -1581,7 +1581,7 @@ anychart.charts.Pie.prototype.sort = function(opt_value) {
 anychart.charts.Pie.prototype.calculate_ = function(bounds) {
   var minWidthHeight = Math.min(bounds.width, bounds.height);
 
-  this.outsideLabelsOffsetValue_ = this.isOutsideLabels_() ?
+  this.outsideLabelsOffsetValue_ = this.isOutsideLabels_() && this.labels().enabled() ?
       anychart.utils.normalizeSize(this.outsideLabelsSpace_, minWidthHeight) : 0;
   this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight - this.outsideLabelsOffsetValue_);
   this.connectorLengthValue_ = anychart.utils.normalizeSize(this.connectorLength_, this.radiusValue_);
