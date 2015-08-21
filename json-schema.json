@@ -3112,6 +3112,9 @@
             "string"
           ]
         },
+        "iconSize": {
+          "type": "number"
+        },
         "itemsSpacing": {
           "type": [
             "number",
@@ -4106,6 +4109,9 @@
       "properties": {
         "iconTextSpacing": {
           "type": ["number", "string"]
+        },
+        "iconSize": {
+          "type": "number"
         },
         "iconEnabled": {
           "type": "boolean"

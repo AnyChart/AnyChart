@@ -240,6 +240,24 @@ anychart.core.utils.LegendItemSettings.prototype.iconMarkerStroke = function(opt
 
 
 /**
+ * Getter/setter for icon size of legend item.
+ * @param {(number|string)=} opt_value Icon size setting.
+ * @return {(number|anychart.core.utils.LegendItemSettings)} Icon size or self for method chaining.
+ */
+anychart.core.utils.LegendItemSettings.prototype.iconSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.iconSize_ != opt_value) {
+      this.iconSize_ = /** @type {number} */ (opt_value);
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconSize_;
+};
+
+
+/**
  * Getter/setter for legend item text.
  * @param {string=} opt_value Legend item text.
  * @return {(string|anychart.core.utils.LegendItemSettings)} Legend item text or self for method chaining.
@@ -309,6 +327,8 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
     json['text'] = this.text();
   if (goog.isDef(this.iconEnabled()))
     json['iconEnabled'] = this.iconEnabled();
+  if (goog.isDef(this.iconSize()))
+    json['iconSize'] = this.iconSize();
 
   if (goog.isFunction(this.iconType())) {
     anychart.utils.warning(
@@ -390,6 +410,7 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config) 
   this.iconMarkerType(config['iconMarkerType']);
   this.iconMarkerFill(config['iconMarkerFill']);
   this.iconMarkerStroke(config['iconMarkerStroke']);
+  this.iconSize(config['iconSize']);
   this.text(config['text']);
   this.disabled(config['disabled']);
   this.resumeSignalsDispatching(true);
@@ -405,5 +426,6 @@ anychart.core.utils.LegendItemSettings.prototype['iconHatchFill'] = anychart.cor
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerType'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerType;
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerFill'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerFill;
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerStroke'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerStroke;
+anychart.core.utils.LegendItemSettings.prototype['iconSize'] = anychart.core.utils.LegendItemSettings.prototype.iconSize;
 anychart.core.utils.LegendItemSettings.prototype['text'] = anychart.core.utils.LegendItemSettings.prototype.text;
 anychart.core.utils.LegendItemSettings.prototype['disabled'] = anychart.core.utils.LegendItemSettings.prototype.disabled;

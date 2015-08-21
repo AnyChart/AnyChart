@@ -801,6 +801,24 @@ anychart.core.ui.LegendItem.prototype.maxHeight = function(opt_value) {
 
 
 /**
+ * Getter/setter for icon size of legend item.
+ * @param {(number|string)=} opt_value Icon size setting.
+ * @return {(number|anychart.core.ui.LegendItem)} Icon size or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.iconSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.iconSize_ != opt_value) {
+      this.iconSize_ = /** @type {number} */ (opt_value);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.iconSize_;
+};
+
+
+/**
  * Getter/setter for legend item text.
  * @param {string=} opt_value Legend item text.
  * @return {(string|anychart.core.ui.LegendItem)} Legend item text or self for method chaining.
@@ -869,8 +887,6 @@ anychart.core.ui.LegendItem.prototype.getHeight = function() {
  * @return {anychart.math.Rect} pixelBounds of legend item.
  */
 anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
-  var container = /** @type {acgraph.vector.ILayer} */ (this.container());
-  var stage = container ? container.getStage() : null;
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   var parentWidth, parentHeight;
 
@@ -881,19 +897,23 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
     parentWidth = parentHeight = undefined;
   }
 
-  /** @type {acgraph.math.Rect} */
-  var textBounds = this.textElement_.getBounds();
-  this.iconSize_ = textBounds.height;
-  var width = (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + textBounds.width;
-  var height = textBounds.height;
+  var legendItemMaxWidth = anychart.utils.normalizeSize(this.maxWidth_, parentWidth);
+  var legendItemMaxHeight = anychart.utils.normalizeSize(this.maxHeight_, parentHeight);
+
   var x = parentWidth ? anychart.utils.normalizeSize(this.x_, parentWidth) : 0;
   var y = parentHeight ? anychart.utils.normalizeSize(this.y_, parentHeight) : 0;
+  if (legendItemMaxWidth) {
+    var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0);
+    this.textElement_.width(maxTextWidth);
+  }
+  if (legendItemMaxHeight)
+    this.textElement_.height(legendItemMaxHeight);
 
-  var textWidth = anychart.utils.normalizeSize(this.maxWidth_, parentWidth) - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0);
-  var textHeight = anychart.utils.normalizeSize(this.maxHeight_, parentWidth);
+  /** @type {acgraph.math.Rect} */
+  var textBounds = this.textElement_.getBounds();
+  var width = (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + textBounds.width;
+  var height = textBounds.height;
 
-  this.textElement_.width(textWidth);
-  this.textElement_.height(textHeight);
   if (parentBounds) {
     this.pixelBounds_ = new anychart.math.Rect(
         parentBounds.getLeft() + x,
@@ -1185,6 +1205,9 @@ anychart.core.ui.LegendItem.prototype.setupByJSON = function(config) {
   this.sourceKey(config['sourceKey']);
   this.meta(config['meta']);
   this.hoverCursor(config['hoverCursor']);
+  this.maxWidth(config['maxWidth']);
+  this.maxHeight(config['maxHeight']);
+  this.iconSize(config['iconSize']);
 };
 
 

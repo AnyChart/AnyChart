@@ -414,6 +414,7 @@ window['anychart']['themes']['v6'] = {
       'fontFamily': 'Tahoma',
       'itemsLayout': 'horizontal',
       'itemsSpacing': 15,
+      'iconSize': 13,
       'items': null,
       'itemsFormatter': null, // effectively equals current settings
       'itemsTextFormatter': null,
@@ -4090,6 +4091,7 @@ window['anychart']['themes']['v6'] = {
       'align': 'center',
       'itemsSpacing': 15,
       'iconTextSpacing': 5,
+      'iconSize': 13,
       'width': null,
       'height': null,
       'itemsLayout': 'horizontal',

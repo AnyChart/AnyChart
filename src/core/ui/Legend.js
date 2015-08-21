@@ -349,6 +349,29 @@ anychart.core.ui.Legend.prototype.iconTextSpacing = function(opt_value) {
 
 
 /**
+ * Getter/setter for icon size.
+ * @param {(number|string)=} opt_value Icon size setting.
+ * @return {(number|anychart.core.ui.Legend)} Icon size setting or self for method chaining.
+ */
+anychart.core.ui.Legend.prototype.iconSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.iconSize_ != opt_value) {
+      this.iconSize_ = opt_value;
+      if (goog.isDefAndNotNull(this.items_)) {
+        for (var i = 0, len = this.items_.length; i < len; i++) {
+          this.items_[i].iconSize(this.iconSize_);
+        }
+      }
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.iconSize_;
+};
+
+
+/**
  * Legend margin setting.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
@@ -847,8 +870,11 @@ anychart.core.ui.Legend.prototype.prepareItems_ = function(items) {
   var config;
   var textSettings = /** @type {Object} */ (this.textSettings());
   for (var i = 0; i < items.length; i++) {
+    if (isNaN(items[i]['iconSize']))
+      items[i]['iconSize'] = this.iconSize_;
     config = {
       'iconTextSpacing': this.iconTextSpacing_,
+      'iconSize': this.iconSize_,
       'hoverCursor': this.hoverCursor_
     };
     goog.object.extend(config, textSettings, items[i]);
@@ -1726,6 +1752,7 @@ anychart.core.ui.Legend.prototype.serialize = function() {
   if (goog.isDef(this.items()))
     json['items'] = this.items();
   json['iconTextSpacing'] = this.iconTextSpacing();
+  json['iconSize'] = this.iconSize();
   json['width'] = this.width();
   json['height'] = this.height();
   json['position'] = this.position();
@@ -1753,6 +1780,7 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
   this.itemsTextFormatter(config['itemsTextFormatter']);
   this.itemsFormatter(config['itemsFormatter']);
   this.iconTextSpacing(config['iconTextSpacing']);
+  this.iconSize(config['iconSize']);
   this.width(config['width']);
   this.height(config['height']);
   this.position(config['position']);
@@ -1793,6 +1821,7 @@ anychart.core.ui.Legend.prototype['itemsSourceMode'] = anychart.core.ui.Legend.p
 anychart.core.ui.Legend.prototype['inverted'] = anychart.core.ui.Legend.prototype.inverted;
 anychart.core.ui.Legend.prototype['hoverCursor'] = anychart.core.ui.Legend.prototype.hoverCursor;
 anychart.core.ui.Legend.prototype['iconTextSpacing'] = anychart.core.ui.Legend.prototype.iconTextSpacing;
+anychart.core.ui.Legend.prototype['iconSize'] = anychart.core.ui.Legend.prototype.iconSize;
 anychart.core.ui.Legend.prototype['margin'] = anychart.core.ui.Legend.prototype.margin;
 anychart.core.ui.Legend.prototype['padding'] = anychart.core.ui.Legend.prototype.padding;
 anychart.core.ui.Legend.prototype['background'] = anychart.core.ui.Legend.prototype.background;
