@@ -91,12 +91,22 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
       /** @type {Array.<number>} */
       var indexes = this.arrayMapping_[fieldName];
       if (indexes) {
+        var minIndex = indexes[0];
         for (var i = 0; i < indexes.length; i++) {
           if (indexes[i] < row.length) {
             row[indexes[i]] = value;
             return row;
+
+          // select min index
+          } else if (indexes[i] < minIndex) {
+            minIndex = indexes[i];
           }
         }
+
+        // DVF-1357 set value by min index
+        row[minIndex] = value;
+        return row;
+
       }
       anychart.utils.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
     } else if (rowType == 'object') {
