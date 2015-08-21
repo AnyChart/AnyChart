@@ -2945,6 +2945,20 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
       }
 
       this.series_.finalizeDrawing();
+
+      this.markers().markConsistent(anychart.ConsistencyState.ALL);
+      this.minMarkers().markConsistent(anychart.ConsistencyState.ALL);
+      this.maxMarkers().markConsistent(anychart.ConsistencyState.ALL);
+      this.negativeMarkers().markConsistent(anychart.ConsistencyState.ALL);
+      this.firstMarkers().markConsistent(anychart.ConsistencyState.ALL);
+      this.lastMarkers().markConsistent(anychart.ConsistencyState.ALL);
+
+      this.labels().markConsistent(anychart.ConsistencyState.ALL);
+      this.minLabels().markConsistent(anychart.ConsistencyState.ALL);
+      this.maxLabels().markConsistent(anychart.ConsistencyState.ALL);
+      this.negativeLabels().markConsistent(anychart.ConsistencyState.ALL);
+      this.firstLabels().markConsistent(anychart.ConsistencyState.ALL);
+      this.lastLabels().markConsistent(anychart.ConsistencyState.ALL);
     }
     this.markConsistent(anychart.ConsistencyState.SPARK_SERIES);
   }
