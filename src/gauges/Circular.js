@@ -87,6 +87,16 @@ goog.inherits(anychart.gauges.Circular, anychart.core.Chart);
 
 
 /**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.gauges.Circular.prototype.rawData_;
+
+
+/**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
  */
@@ -216,23 +226,26 @@ anychart.gauges.Circular.prototype.createChartLabel = function() {
  */
 anychart.gauges.Circular.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-    if (opt_value instanceof anychart.data.View)
-      this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-    else if (opt_value instanceof anychart.data.Set)
-      this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
-    else
-      this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
-          (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-    this.registerDisposable(this.parentViewToDispose_);
-    this.data_ = this.parentView_;
-    this.data_.listenSignals(this.dataInvalidated_, this);
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
+      goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
+      if (opt_value instanceof anychart.data.View)
+        this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
+      else if (opt_value instanceof anychart.data.Set)
+        this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
+      else
+        this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
+            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
+      this.registerDisposable(this.parentViewToDispose_);
+      this.data_ = this.parentView_;
+      this.data_.listenSignals(this.dataInvalidated_, this);
 
-    this.invalidatePointerBounds();
-    this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
-        anychart.ConsistencyState.GAUGE_SCALE,
-        anychart.Signal.NEEDS_REDRAW |
-        anychart.Signal.NEEDS_RECALCULATION);
+      this.invalidatePointerBounds();
+      this.invalidate(anychart.ConsistencyState.GAUGE_POINTERS |
+          anychart.ConsistencyState.GAUGE_SCALE,
+          anychart.Signal.NEEDS_REDRAW |
+          anychart.Signal.NEEDS_RECALCULATION);
+    }
 
     return this;
   }

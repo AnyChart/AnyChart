@@ -772,9 +772,9 @@ anychart.core.Chart.prototype.draw = function() {
     if (this.animation().enabled()) this.doAnimation();
   }
 
-  if (manualSuspend) stage.resume();
-
   this.resumeSignalsDispatching(false);
+
+  if (manualSuspend) stage.resume();
 
   this.dispatchDetachedEvent({
     'type': anychart.enums.EventType.CHART_DRAW,

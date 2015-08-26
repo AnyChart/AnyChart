@@ -240,6 +240,16 @@ goog.inherits(anychart.core.PyramidFunnelBase, anychart.core.SeparateChart);
 
 
 /**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.core.PyramidFunnelBase.prototype.rawData_;
+
+
+/**
  * Series element z-index in series root layer.
  * @type {number}
  */
@@ -301,45 +311,48 @@ anychart.core.PyramidFunnelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
+      if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
 
-      // drop data cache
-      goog.dispose(this.parentViewToDispose_);
-      delete this.iterator_;
+        // drop data cache
+        goog.dispose(this.parentViewToDispose_);
+        delete this.iterator_;
 
-      this.statistics_ = null;
+        this.statistics_ = null;
 
-      /**
-       * @type {anychart.data.View}
-       */
-      var parentView;
-      if (opt_value instanceof anychart.data.View) {
-        parentView = opt_value;
-        this.parentViewToDispose_ = null;
-      } else {
-        if (opt_value instanceof anychart.data.Set)
-          parentView = (this.parentViewToDispose_ = opt_value).mapAs();
-        else if (goog.isArray(opt_value) || goog.isString(opt_value))
-          parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value, opt_csvSettings)).mapAs();
-        else
-          parentView = (this.parentViewToDispose_ = new anychart.data.Set(null)).mapAs();
-        this.registerDisposable(this.parentViewToDispose_);
+        /**
+         * @type {anychart.data.View}
+         */
+        var parentView;
+        if (opt_value instanceof anychart.data.View) {
+          parentView = opt_value;
+          this.parentViewToDispose_ = null;
+        } else {
+          if (opt_value instanceof anychart.data.Set)
+            parentView = (this.parentViewToDispose_ = opt_value).mapAs();
+          else if (goog.isArray(opt_value) || goog.isString(opt_value))
+            parentView = (this.parentViewToDispose_ = new anychart.data.Set(opt_value, opt_csvSettings)).mapAs();
+          else
+            parentView = (this.parentViewToDispose_ = new anychart.data.Set(null)).mapAs();
+          this.registerDisposable(this.parentViewToDispose_);
+        }
+        this.parentView_ = parentView.derive();
       }
-      this.parentView_ = parentView.derive();
-    }
 
-    goog.dispose(this.view_);
-    this.view_ = this.parentView_;
-    this.view_.listenSignals(this.dataInvalidated_, this);
-    this.registerDisposable(this.view_);
-    this.invalidate(
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
-        anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
-        anychart.ConsistencyState.CHART_LEGEND,
-        anychart.Signal.NEEDS_REDRAW |
-        anychart.Signal.DATA_CHANGED
-    );
+      goog.dispose(this.view_);
+      this.view_ = this.parentView_;
+      this.view_.listenSignals(this.dataInvalidated_, this);
+      this.registerDisposable(this.view_);
+      this.invalidate(
+          anychart.ConsistencyState.APPEARANCE |
+          anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
+          anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
+          anychart.ConsistencyState.CHART_LEGEND,
+          anychart.Signal.NEEDS_REDRAW |
+          anychart.Signal.DATA_CHANGED
+      );
+    }
     return this;
   }
   return this.view_;

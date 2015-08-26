@@ -53,6 +53,16 @@ goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
 
 
 /**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.charts.Bullet.prototype.rawData_;
+
+
+/**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.Chart states.
  * @type {number}
  */
@@ -129,23 +139,26 @@ anychart.charts.Bullet.prototype.getType = function() {
  */
 anychart.charts.Bullet.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.data.View) {
-      this.data_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-    } else if (opt_value instanceof anychart.data.Set) {
-      this.data_ = opt_value.mapAs();
-    } else {
-      opt_value = goog.isArray(opt_value) || goog.isString(opt_value) ? opt_value : null;
-      this.data_ = new anychart.data.Set(opt_value, opt_csvSettings).mapAs();
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
+      if (opt_value instanceof anychart.data.View) {
+        this.data_ = opt_value.derive(); // deriving a view to avoid interference with other view users
+      } else if (opt_value instanceof anychart.data.Set) {
+        this.data_ = opt_value.mapAs();
+      } else {
+        opt_value = goog.isArray(opt_value) || goog.isString(opt_value) ? opt_value : null;
+        this.data_ = new anychart.data.Set(opt_value, opt_csvSettings).mapAs();
+      }
+      this.data_.listenSignals(this.dataInvalidated_, this);
+      this.invalidate(
+          anychart.ConsistencyState.BULLET_DATA |
+          anychart.ConsistencyState.BULLET_SCALES |
+          anychart.ConsistencyState.BULLET_AXES |
+          anychart.ConsistencyState.BULLET_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES_MARKERS,
+          anychart.Signal.NEEDS_REDRAW
+      );
     }
-    this.data_.listenSignals(this.dataInvalidated_, this);
-    this.invalidate(
-        anychart.ConsistencyState.BULLET_DATA |
-            anychart.ConsistencyState.BULLET_SCALES |
-            anychart.ConsistencyState.BULLET_AXES |
-            anychart.ConsistencyState.BULLET_MARKERS |
-            anychart.ConsistencyState.BULLET_AXES_MARKERS,
-        anychart.Signal.NEEDS_REDRAW
-    );
     return this;
   }
   return this.data_;

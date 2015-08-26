@@ -233,6 +233,16 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
 goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
 
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.charts.Pie.prototype.rawData_;
+
+
 /** @inheritDoc */
 anychart.charts.Pie.prototype.getType = function() {
   return this.mode3d_ ? anychart.enums.ChartTypes.PIE_3D : anychart.enums.ChartTypes.PIE;
@@ -408,46 +418,59 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
  */
 anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
+      if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
 
-      //drop data cache
-      goog.dispose(this.parentViewToDispose_);
+        //drop data cache
+        goog.dispose(this.parentViewToDispose_);
 
-      this.statistics_ = null;
+        this.statistics_ = null;
 
-      /**
-       * @type {anychart.data.View}
-       */
-      var parentView;
-      if (opt_value instanceof anychart.data.View) {
-        parentView = opt_value;
-        this.parentViewToDispose_ = null;
-      } else {
-        if (opt_value instanceof anychart.data.Set)
-          parentView = (this.parentViewToDispose_ = opt_value).mapAs();
-        else
-          parentView = (this.parentViewToDispose_ = new anychart.data.Set(
-              (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-        this.registerDisposable(this.parentViewToDispose_);
+        /**
+         * @type {anychart.data.View}
+         */
+        var parentView;
+        if (opt_value instanceof anychart.data.View) {
+          parentView = opt_value;
+          this.parentViewToDispose_ = null;
+        } else {
+          if (opt_value instanceof anychart.data.Set)
+            parentView = (this.parentViewToDispose_ = opt_value).mapAs();
+          else
+            parentView = (this.parentViewToDispose_ = new anychart.data.Set(
+                (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
+          this.registerDisposable(this.parentViewToDispose_);
+        }
+        this.parentView_ = parentView.derive();
       }
-      this.parentView_ = parentView.derive();
-    }
 
-    goog.dispose(this.view_);
-    delete this.iterator_;
-    this.view_ = this.prepareData_(this.parentView_);
-    this.view_.listenSignals(this.dataInvalidated_, this);
-    this.registerDisposable(this.view_);
-    this.invalidate(
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.PIE_LABELS |
-        anychart.ConsistencyState.CHART_LEGEND,
-        anychart.Signal.NEEDS_REDRAW |
-        anychart.Signal.DATA_CHANGED
-    );
+      this.redefineView_();
+
+    }
     return this;
   }
   return this.view_;
+};
+
+
+/**
+ * Sets new value of this.view_ depending on current grouping and sorting settings.
+ * @private
+ */
+anychart.charts.Pie.prototype.redefineView_ = function() {
+  goog.dispose(this.view_);
+  delete this.iterator_;
+  this.view_ = this.prepareData_(this.parentView_);
+  this.view_.listenSignals(this.dataInvalidated_, this);
+  this.registerDisposable(this.view_);
+  this.invalidate(
+      anychart.ConsistencyState.APPEARANCE |
+      anychart.ConsistencyState.PIE_LABELS |
+      anychart.ConsistencyState.CHART_LEGEND,
+      anychart.Signal.NEEDS_REDRAW |
+      anychart.Signal.DATA_CHANGED
+  );
 };
 
 
@@ -1241,10 +1264,10 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isFunction(opt_value) && opt_value != this.groupedPointFilter_) {
       this.groupedPointFilter_ = opt_value;
-      this.data(this.parentView_);
+      this.redefineView_();
     } else if (anychart.utils.isNone(opt_value)) {
       this.groupedPointFilter_ = null;
-      this.data(this.parentView_);
+      this.redefineView_();
     }
     return this;
   } else {
@@ -1564,7 +1587,7 @@ anychart.charts.Pie.prototype.sort = function(opt_value) {
     opt_value = anychart.enums.normalizeSort(opt_value);
     if (this.sort_ != opt_value) {
       this.sort_ = opt_value;
-      this.data(this.parentView_);
+      this.redefineView_();
     }
     return this;
   } else {
