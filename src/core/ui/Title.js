@@ -719,9 +719,8 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(textElement, isIni
 /**
  * Internal getter for the title rotation (orientation wise).
  * @return {number} Rotation degree.
- * @private
  */
-anychart.core.ui.Title.prototype.getRotation_ = function() {
+anychart.core.ui.Title.prototype.getRotation = function() {
   var rotation = /** @type {number} */(this.rotation());
   if (!goog.isDef(rotation)) {
     switch (this.orientation()) {
@@ -754,10 +753,12 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
 
   var parentWidth, parentHeight;
   var orientation = this.orientation();
+
+  var isRLYHorizontal = this.getRotation() % 180 == 0;
   if (parentBounds) {
     if (orientation == anychart.enums.Orientation.TOP ||
         orientation == anychart.enums.Orientation.BOTTOM ||
-        this.rotation() % 180 == 0) {
+        isRLYHorizontal) {
       parentWidth = parentBounds.width;
       parentHeight = parentBounds.height;
     } else {
@@ -822,7 +823,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
     this.text_.height(this.textHeight_);
 
   this.pixelBounds_ = new anychart.math.Rect(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2, this.backgroundWidth_, this.backgroundHeight_);
-  var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(this.getRotation_()), 0, 0);
+  var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(this.getRotation()), 0, 0);
   /** @type {!anychart.math.Rect} */
   var bounds = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, transform);
 
@@ -838,10 +839,10 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   var x = leftMargin + wHalf;
   var y = topMargin + hHalf;
 
+  var isHorizontal = orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM;
   if (parentBounds) {
-    switch (orientation) {
-      case anychart.enums.Orientation.TOP:
-      case anychart.enums.Orientation.BOTTOM:
+    if (isHorizontal || isRLYHorizontal) {
+      if (isHorizontal) {
         switch (this.align_) {
           case anychart.enums.Align.LEFT:
             x = parentBounds.getLeft() + leftMargin + wHalf;
@@ -853,81 +854,77 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
             x = (parentBounds.getLeft() + parentBounds.getRight() + leftMargin - rightMargin) / 2;
             break;
         }
-        break;
-      case anychart.enums.Orientation.LEFT:
-        switch (this.align_) {
-          case anychart.enums.Align.TOP:
-          case anychart.enums.Align.RIGHT:
-            y = parentBounds.getTop() + rightMargin + hHalf;
-            break;
-          case anychart.enums.Align.BOTTOM:
-          case anychart.enums.Align.LEFT:
-            y = parentBounds.getBottom() - leftMargin - hHalf;
-            break;
-          default:
-            y = (parentBounds.getTop() + parentBounds.getBottom() - leftMargin + rightMargin) / 2;
-            break;
+        if (orientation == anychart.enums.Orientation.TOP) {
+          y = parentBounds.getTop() + topMargin + hHalf;
+        } else if (orientation == anychart.enums.Orientation.BOTTOM) {
+          y = parentBounds.getBottom() - bottomMargin - hHalf;
         }
-        break;
-      case anychart.enums.Orientation.RIGHT:
+      } else {
+        if (orientation == anychart.enums.Orientation.RIGHT) {
+          x = parentBounds.getRight() - rightMargin - wHalf;
+        } else if (orientation == anychart.enums.Orientation.LEFT) {
+          x = parentBounds.getLeft() + leftMargin + wHalf;
+        }
         switch (this.align_) {
           case anychart.enums.Align.TOP:
           case anychart.enums.Align.LEFT:
-            y = parentBounds.getTop() + leftMargin + hHalf;
+            y = parentBounds.getTop() + topMargin + hHalf;
             break;
           case anychart.enums.Align.BOTTOM:
           case anychart.enums.Align.RIGHT:
-            y = parentBounds.getBottom() - rightMargin - hHalf;
+            y = parentBounds.getBottom() - bottomMargin - hHalf;
             break;
           default:
-            y = (parentBounds.getTop() + parentBounds.getBottom() + leftMargin - rightMargin) / 2;
+            y = (parentBounds.getTop() + parentBounds.getBottom() + topMargin - bottomMargin) / 2;
             break;
         }
-        break;
-    }
-    switch (orientation) {
-      case anychart.enums.Orientation.TOP:
-        y = parentBounds.getTop() + topMargin + hHalf;
-        break;
-      case anychart.enums.Orientation.RIGHT:
-        x = parentBounds.getRight() - topMargin - wHalf;
-        break;
-      case anychart.enums.Orientation.BOTTOM:
-        y = parentBounds.getBottom() - bottomMargin - hHalf;
-        break;
-      case anychart.enums.Orientation.LEFT:
-        x = parentBounds.getLeft() + topMargin + wHalf;
-        break;
+      }
+    } else if (orientation == anychart.enums.Orientation.LEFT) {
+      switch (this.align_) {
+        case anychart.enums.Align.TOP:
+        case anychart.enums.Align.RIGHT:
+          y = parentBounds.getTop() + rightMargin + hHalf;
+          break;
+        case anychart.enums.Align.BOTTOM:
+        case anychart.enums.Align.LEFT:
+          y = parentBounds.getBottom() - leftMargin - hHalf;
+          break;
+        default:
+          y = (parentBounds.getTop() + parentBounds.getBottom() - leftMargin + rightMargin) / 2;
+          break;
+      }
+      x = parentBounds.getLeft() + topMargin + wHalf;
+    } else {
+      switch (this.align_) {
+        case anychart.enums.Align.TOP:
+        case anychart.enums.Align.LEFT:
+          y = parentBounds.getTop() + leftMargin + hHalf;
+          break;
+        case anychart.enums.Align.BOTTOM:
+        case anychart.enums.Align.RIGHT:
+          y = parentBounds.getBottom() - rightMargin - hHalf;
+          break;
+        default:
+          y = (parentBounds.getTop() + parentBounds.getBottom() + leftMargin - rightMargin) / 2;
+          break;
+      }
+      x = parentBounds.getRight() - topMargin - wHalf;
     }
   }
   this.transformation_ = this.helperPlacer_(transform, x, y);
   this.pixelBounds_ = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, this.transformation_);
   this.transformation_.translate(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2);
-  switch (orientation) {
-    case anychart.enums.Orientation.TOP:
-      this.pixelBounds_.left -= leftMargin;
-      this.pixelBounds_.top -= topMargin;
-      this.pixelBounds_.width += leftMargin + rightMargin;
-      this.pixelBounds_.height += topMargin + bottomMargin;
-      break;
-    case anychart.enums.Orientation.RIGHT:
-      this.pixelBounds_.left -= bottomMargin;
-      this.pixelBounds_.top -= leftMargin;
-      this.pixelBounds_.width += topMargin + bottomMargin;
-      this.pixelBounds_.height += leftMargin + rightMargin;
-      break;
-    case anychart.enums.Orientation.BOTTOM:
-      this.pixelBounds_.left -= leftMargin;
-      this.pixelBounds_.top -= topMargin;
-      this.pixelBounds_.width += leftMargin + rightMargin;
-      this.pixelBounds_.height += topMargin + bottomMargin;
-      break;
-    case anychart.enums.Orientation.LEFT:
-      this.pixelBounds_.left -= topMargin;
-      this.pixelBounds_.top -= rightMargin;
-      this.pixelBounds_.width += topMargin + bottomMargin;
-      this.pixelBounds_.height += leftMargin + rightMargin;
-      break;
+
+  if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM || isRLYHorizontal) {
+    this.pixelBounds_.left -= leftMargin;
+    this.pixelBounds_.top -= topMargin;
+    this.pixelBounds_.width += leftMargin + rightMargin;
+    this.pixelBounds_.height += topMargin + bottomMargin;
+  } else {
+    this.pixelBounds_.left -= topMargin;
+    this.pixelBounds_.top -= rightMargin;
+    this.pixelBounds_.width += topMargin + bottomMargin;
+    this.pixelBounds_.height += leftMargin + rightMargin;
   }
 };
 

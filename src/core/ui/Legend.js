@@ -1100,20 +1100,46 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var paginator = /** @type {anychart.core.ui.Paginator} */(this.paginator());
   var title = /** @type {anychart.core.ui.Title} */(this.title());
 
+  var legendIsHorizontal = this.position() == anychart.enums.Orientation.BOTTOM || this.position() == anychart.enums.Orientation.TOP;
+  var titleIsHorizontal = title.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
+  var separatorIsVertical = separator.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
+
+  var contentWidth = this.calculateContentWidth_();
+  var contentHeight = this.calculateContentHeight_();
+
+  var fullAreaWidth = 0;
+  var fullAreaHeight = 0;
+
+  // calculating area width and height
+  fullAreaWidth += contentWidth;
+  fullAreaHeight += contentHeight;
+
   separator.suspendSignalsDispatching();
   paginator.suspendSignalsDispatching();
   title.suspendSignalsDispatching();
 
   if (title.enabled()) {
     title.parentBounds(null);
-    title.width(null);
-    title.height(null);
+    var orientation = title.orientation();
+    title.width(/** @type {null|number|string} */(goog.isDefAndNotNull(title.width()) ? title.width() : null));
+    title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ? title.height() : null));
     titleBounds = title.getContentBounds();
+
+
+    if (titleIsHorizontal) {
+      fullAreaWidth = Math.min(Math.max(fullAreaWidth, titleBounds.width), maxWidth);
+      if (legendIsHorizontal) {
+        title.width(/** @type {null|number|string} */(goog.isDefAndNotNull(title.width()) ? title.width() : fullAreaWidth));
+        title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ? title.height() : null));
+        titleBounds = title.getContentBounds();
+      }
+      fullAreaHeight += titleBounds.height;
+    } else {
+      fullAreaWidth += titleBounds.width;
+      fullAreaHeight = Math.max(fullAreaHeight, titleBounds.height);
+    }
   } else
     titleBounds = null;
-
-  var contentWidth = this.calculateContentWidth_();
-  var contentHeight = this.calculateContentHeight_();
 
   if (separator.enabled()) {
     separator.parentBounds(null);
@@ -1128,8 +1154,6 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   paginator.parentBounds(null);
   paginatorBounds = paginator.getPixelBounds();
 
-  var orientation;
-
   if (this.itemsLayout_ == anychart.enums.Layout.HORIZONTAL) {
     if (contentWidth > maxWidth) {
       paginator.autoEnabled(true);
@@ -1138,10 +1162,8 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
   }
 
-  var titleIsVertical = title.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
-  var separatorIsVertical = separator.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM;
   var maxHeightForPaginator = maxHeight;
-  if (titleIsVertical) {
+  if (titleIsHorizontal) {
     maxHeightForPaginator -= (titleBounds ? titleBounds.height : 0);
   }
   if (separatorIsVertical) {
@@ -1154,13 +1176,6 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
       paginator.autoEnabled(false);
     }
   }
-
-  var fullAreaWidth = 0;
-  var fullAreaHeight = 0;
-
-  // calculating area width and height
-  fullAreaWidth += contentWidth;
-  fullAreaHeight += contentHeight;
 
   if (separator.enabled()) {
     orientation = separator.orientation();
@@ -1184,41 +1199,62 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
   }
 
-  if (title.enabled()) {
-    orientation = title.orientation();
-    if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
-      fullAreaWidth += titleBounds.width;
-      fullAreaHeight = Math.max(fullAreaHeight, titleBounds.height);
-    } else {
-      fullAreaWidth = Math.max(fullAreaWidth, titleBounds.width);
-      fullAreaHeight += titleBounds.height;
-    }
-  }
-
   var contentAreaWidth = fullAreaWidth > maxWidth ? maxWidth : fullAreaWidth;
   var contentAreaHeight = fullAreaHeight > maxHeight ? maxHeight : fullAreaHeight;
   width = margin.widenWidth(padding.widenWidth(contentAreaWidth));
   height = margin.widenHeight(padding.widenHeight(contentAreaHeight));
   if (title.enabled()) {
+    var titleIsRLYHorizontal = title.getRotation() % 180 == 0;
     var titleWidth = titleBounds.width;
     var titleHeight = titleBounds.height;
     orientation = title.orientation();
-    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) {
-      title.width(title.margin().tightenWidth(contentAreaWidth));
+    if (titleIsHorizontal || titleIsRLYHorizontal) {
+      if (titleIsRLYHorizontal && !titleIsHorizontal) {
+        var minimalContentAreaWidth;
+        var oneItemANdPaginatorWidth = (this.items_ && this.items_.length ? this.items_[0].getWidth() : 0) +
+            (paginator.getFinalEnabled() ? paginatorBounds.width : 0);
+        if (contentWidth >= maxWidth) {
+          minimalContentAreaWidth = oneItemANdPaginatorWidth;
+        } else {
+          minimalContentAreaWidth = contentWidth;
+        }
+        var widthToSet;
+        if (goog.isDefAndNotNull(title.width())) {
+          widthToSet = title.width();
+        } else {
+          widthToSet = title.margin().tightenWidth(contentAreaWidth - titleWidth <= minimalContentAreaWidth ? contentAreaWidth - minimalContentAreaWidth : titleWidth);
+        }
+        title.width(/** @type {null|number|string} */(widthToSet));
+      } else {
+        if (fullAreaHeight > maxHeight) {
+          title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
+              title.height() :
+              title.margin().tightenHeight(titleBounds.height - (fullAreaHeight - maxHeight))));
+        }
+        title.width(/** @type {null|number|string} */(goog.isDefAndNotNull(title.width()) ?
+            title.width() :
+            title.margin().tightenWidth(contentAreaWidth)));
+      }
       titleBounds = title.getContentBounds();
-      separator.width(titleBounds.width);
+      separator.width(width);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.height != titleHeight) {
-        title.height(title.margin().tightenHeight(titleHeight));
+        title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
+            title.height() :
+            title.margin().tightenHeight(titleHeight)));
         titleBounds = title.getContentBounds();
       }
     } else {
-      title.width(title.margin().tightenWidth(contentAreaHeight));
+      title.width(/** @type {null|number|string} */(goog.isDefAndNotNull(title.width()) ?
+          title.width() :
+          title.margin().tightenWidth(contentAreaHeight)));
       titleBounds = title.getContentBounds();
-      separator.width(titleBounds.height);
+      separator.width(height);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.width != titleWidth) {
-        title.height(title.margin().tightenHeight(titleWidth));
+        title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
+            title.height() :
+            title.margin().tightenHeight(titleWidth)));
         titleBounds = title.getContentBounds();
       }
     }
