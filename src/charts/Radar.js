@@ -1289,6 +1289,49 @@ anychart.charts.Radar.prototype.hatchFillPaletteInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * @inheritDoc
+ */
+anychart.charts.Radar.prototype.beforeDraw = function() {
+  if (this.isConsistent())
+    return;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_);
+
+  var i;
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoColor(this.palette().itemAt(i));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_PALETTE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_MARKER_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_MARKER_PALETTE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
+    this.markConsistent(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE);
+  }
+
+  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
+};
+
+
+/**
  * Draw cartesian chart content items.
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
@@ -1319,34 +1362,6 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     return;
 
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxis_, this.yAxis_);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoColor(this.palette().itemAt(i));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
-    this.markConsistent(anychart.ConsistencyState.RADAR_PALETTE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_MARKER_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
-    this.markConsistent(anychart.ConsistencyState.RADAR_MARKER_PALETTE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.RADAR_SERIES);
-    this.markConsistent(anychart.ConsistencyState.RADAR_HATCH_FILL_PALETTE);
-  }
 
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.RADAR_AXES)) {

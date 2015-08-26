@@ -1795,19 +1795,15 @@ anychart.charts.Scatter.prototype.calculate = function() {
 
 
 /**
- * Draw scatter chart content items.
- * @param {anychart.math.Rect} bounds Bounds of scatter content area.
+ * @inheritDoc
  */
-anychart.charts.Scatter.prototype.drawContent = function(bounds) {
-  var i;
-  var count;
-
-  this.calculate();
-
+anychart.charts.Scatter.prototype.beforeDraw = function() {
   if (this.isConsistent())
     return;
 
-  anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
+  anychart.core.Base.suspendSignalsDispatching(this.series_);
+
+  var i;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_PALETTE)) {
     for (i = this.series_.length; i--;) {
@@ -1836,6 +1832,25 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.SCATTER_SERIES);
     this.markConsistent(anychart.ConsistencyState.SCATTER_HATCH_FILL_PALETTE);
   }
+
+  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
+};
+
+
+/**
+ * Draw scatter chart content items.
+ * @param {anychart.math.Rect} bounds Bounds of scatter content area.
+ */
+anychart.charts.Scatter.prototype.drawContent = function(bounds) {
+  var i;
+  var count;
+
+  this.calculate();
+
+  if (this.isConsistent())
+    return;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.SCATTER_AXES)) {

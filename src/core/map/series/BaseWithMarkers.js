@@ -343,6 +343,10 @@ anychart.core.map.series.BaseWithMarkers.prototype.getLegendItemData = function(
     data['iconMarkerType'] = data['iconMarkerType'] || markers.type();
     data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  } else {
+    data['iconMarkerType'] = null;
+    data['iconMarkerFill'] = null;
+    data['iconMarkerStroke'] = null;
   }
   return data;
 };

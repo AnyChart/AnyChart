@@ -316,6 +316,10 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = fun
     data['iconMarkerType'] = data['iconMarkerType'] || markers.type();
     data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  } else {
+    data['iconMarkerType'] = null;
+    data['iconMarkerFill'] = null;
+    data['iconMarkerStroke'] = null;
   }
   return data;
 };

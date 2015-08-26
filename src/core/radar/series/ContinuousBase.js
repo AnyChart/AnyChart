@@ -557,9 +557,13 @@ anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function
   markers.setAutoFill(this.getMarkerFill());
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
   if (markers.enabled()) {
-    data['iconMarkerType'] = data['iconMarkerType'] || markers.type() || this.autoMarkerType;
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.getType() || this.autoMarkerType;
     data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  } else {
+    data['iconMarkerType'] = null;
+    data['iconMarkerFill'] = null;
+    data['iconMarkerStroke'] = null;
   }
   return data;
 };

@@ -1080,18 +1080,15 @@ anychart.charts.Polar.prototype.calculate = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Draw cartesian chart content items.
- * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
+ * @inheritDoc
  */
-anychart.charts.Polar.prototype.drawContent = function(bounds) {
-  var i, count;
-
-  this.calculate();
-
+anychart.charts.Polar.prototype.beforeDraw = function() {
   if (this.isConsistent())
     return;
 
-  anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxis_, this.yAxis_);
+  anychart.core.Base.suspendSignalsDispatching(this.series_);
+
+  var i;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.POLAR_PALETTE)) {
     for (i = this.series_.length; i--;) {
@@ -1120,6 +1117,24 @@ anychart.charts.Polar.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.POLAR_SERIES);
     this.markConsistent(anychart.ConsistencyState.POLAR_HATCH_FILL_PALETTE);
   }
+
+  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
+};
+
+
+/**
+ * Draw cartesian chart content items.
+ * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
+ */
+anychart.charts.Polar.prototype.drawContent = function(bounds) {
+  var i, count;
+
+  this.calculate();
+
+  if (this.isConsistent())
+    return;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxis_, this.yAxis_);
 
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.POLAR_AXES)) {

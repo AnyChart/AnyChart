@@ -557,6 +557,7 @@ anychart.core.ui.LegendItem.prototype.iconFill = function(opt_fillOrColorOrKeys,
     var fill = acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.iconFill_) {
       this.iconFill_ = fill;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -580,6 +581,7 @@ anychart.core.ui.LegendItem.prototype.iconStroke = function(opt_strokeOrFill, op
     var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.iconStroke_) {
       this.iconStroke_ = stroke;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -613,6 +615,7 @@ anychart.core.ui.LegendItem.prototype.iconHatchFill = function(opt_patternFillOr
     var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
     if (hatchFill != this.iconHatchFill_) {
       this.iconHatchFill_ = hatchFill;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -632,6 +635,7 @@ anychart.core.ui.LegendItem.prototype.iconMarkerType = function(opt_value) {
       opt_value = anychart.enums.normalizeMarkerType(opt_value);
     if (this.iconMarkerType_ != opt_value) {
       this.iconMarkerType_ = opt_value;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -656,6 +660,7 @@ anychart.core.ui.LegendItem.prototype.iconMarkerFill = function(opt_fillOrColorO
     var color = acgraph.vector.normalizeFill.apply(null, arguments);
     if (this.iconMarkerFill_ != color) {
       this.iconMarkerFill_ = color;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -683,6 +688,7 @@ anychart.core.ui.LegendItem.prototype.iconMarkerStroke = function(opt_strokeOrFi
     var color = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.iconMarkerStroke_ != color) {
       this.iconMarkerStroke_ = color;
+      this.redrawIcon_ = true;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;

@@ -718,6 +718,9 @@ anychart.core.Chart.prototype.draw = function() {
   }
   //end clear container consistency states
 
+  // DVF-1648
+  this.beforeDraw();
+
   //total chart area bounds, do not override, it can be useful later
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
   var contentBounds = this.calculateContentAreaSpace(totalBounds);
@@ -782,6 +785,12 @@ anychart.core.Chart.prototype.draw = function() {
   anychart.utils.info(msg);
   return this;
 };
+
+
+/**
+ * Extension point do before draw chart content.
+ */
+anychart.core.Chart.prototype.beforeDraw = goog.nullFunction;
 
 
 /**

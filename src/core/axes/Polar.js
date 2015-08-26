@@ -1249,7 +1249,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
           j++;
         }
       }
-      if (needDrawMinorLabels) this.minorLabels().draw();
+      this.minorLabels().draw();
     }
     this.labels().draw();
   }

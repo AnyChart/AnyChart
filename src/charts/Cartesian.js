@@ -2443,6 +2443,49 @@ anychart.charts.Cartesian.prototype.hatchFillPaletteInvalidated_ = function(even
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * @inheritDoc
+ */
+anychart.charts.Cartesian.prototype.beforeDraw = function() {
+  if (this.isConsistent())
+    return;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_);
+
+  var i;
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoColor(this.palette().itemAt(i));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_PALETTE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
+    for (i = this.series_.length; i--;) {
+      this.series_[i].setAutoHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
+    }
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE);
+  }
+
+  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
+};
+
+
+/**
  * Draw cartesian chart content items.
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
@@ -2473,34 +2516,6 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     return;
 
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoColor(this.palette().itemAt(i));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_PALETTE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
-    }
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE);
-  }
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
 
