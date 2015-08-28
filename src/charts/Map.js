@@ -540,6 +540,9 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_COLOR_RANGE)) {
     state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
+    var colorRange = this.colorRange();
+    colorRange.dropBoundsCache();
+    colorRange.invalidate(colorRange.ALL_VISUAL_STATES);
   }
 
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);

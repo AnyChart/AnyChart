@@ -344,7 +344,7 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropStaggeredLabelsCache_();
-  this.dropBoundsCache_();
+  this.dropBoundsCache();
   this.invalidate(state, signal);
 };
 
@@ -399,7 +399,7 @@ anychart.core.axes.Linear.prototype.minorLabelsInvalidated_ = function(event) {
     state = anychart.ConsistencyState.AXIS_LABELS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
-  this.dropBoundsCache_();
+  this.dropBoundsCache();
   this.invalidate(state, signal);
 };
 
@@ -636,7 +636,7 @@ anychart.core.axes.Linear.prototype.scale = function(opt_value) {
       if (this.internalScale)
         this.internalScale.listenSignals(this.scaleInvalidated_, this);
       this.dropStaggeredLabelsCache_();
-      this.dropBoundsCache_();
+      this.dropBoundsCache();
       this.labels().dropCallsCache();
       this.minorLabels().dropCallsCache();
       this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -656,7 +656,7 @@ anychart.core.axes.Linear.prototype.scale = function(opt_value) {
 anychart.core.axes.Linear.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
-    this.dropBoundsCache_();
+    this.dropBoundsCache();
     this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
@@ -707,7 +707,7 @@ anychart.core.axes.Linear.prototype.padding = function(opt_spaceOrTopOrTopAndBot
 anychart.core.axes.Linear.prototype.paddingInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
-    this.dropBoundsCache_();
+    this.dropBoundsCache();
     this.invalidate(this.ALL_VISUAL_STATES,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
@@ -718,15 +718,15 @@ anychart.core.axes.Linear.prototype.paddingInvalidated_ = function(event) {
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.invalidateParentBounds = function() {
   this.dropStaggeredLabelsCache_();
-  this.dropBoundsCache_();
+  this.dropBoundsCache();
   this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 
 /**
- * @private
+ * Drop bounds cache.
  */
-anychart.core.axes.Linear.prototype.dropBoundsCache_ = function() {
+anychart.core.axes.Linear.prototype.dropBoundsCache = function() {
   if (this.labelsBoundingRects_) this.labelsBoundingRects_.length = 0;
   this.labelsBounds_.length = 0;
   this.minorLabelsBounds_.length = 0;

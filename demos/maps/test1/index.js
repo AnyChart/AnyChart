@@ -8,13 +8,13 @@ var min = 0, max = 350;
 
 anychart.onDocumentReady(function() {
   var dataSet = anychart.data.set([
-    {id: "AU.CT", value: 15, title: "Australian Capital Territory"},
+    {id: "AU.CT", value: '15', title: "Australian Capital Territory"},
     {id: "AU.VI", value: 23, title: "Victoria"},
-    {id: "AU.WA", value: 86, title: "Western Australia"},
-    {id: "AU.QL", value: 16, title: "Queensland"},
+    {id: "AU.WA", value: -86, title: "Western Australia"},
+    {id: "AU.QL", value: 90, title: "Queensland"},
     {id: "AU.NS", value: 32, title: "New South Wales"},
     {id: "AU.NT", value: 64, title: "Northern Territory"},
-    {id: "AU.TS", value: 28, title: "Tasmania"},
+    {id: "AU.TS", value: 98, title: "Tasmania"},
     {id: "AU.SA", value: 45, title: "South Australian"}
   ]);
 
@@ -22,33 +22,35 @@ anychart.onDocumentReady(function() {
 
   map = anychart.map();
   map.geoData(anychart.maps.australia);
+  map.colorRange(true);
 
-  //var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
-  var currentColorScale = anychart.scales.linearColor("#E0F7FA", "#0097A7");
-  //currentColorScale = anychart.scales.Color();
-  //currentColorScale.colors();
-  //currentColorScale.ranges([
-  //  {less: 20},
-  //  {from: 20, to: 30},
-  //  {from: 30, to: 40},
-  //  {from: 40, to: 50},
-  //  {from: 50, to: 60},
-  //  {from: 60, to: 70},
-  //  {greater: 70}
-  //]);
+  var currentColorScale = anychart.scales.ordinalColor();
+  currentColorScale.ranges([
+    {from: -100, to: 30},
+    {from: 30, to: 65},
+    {from: 65, to: 90}
+  ]);
 
-  series = map.choropleth(dataSetForSeries);
-  series.geoIdField("code_hasc");
-  series.colorScale(currentColorScale);
+  map.choropleth(dataSetForSeries)
+      .geoIdField("code_hasc")
+      .colorScale(currentColorScale);
+  map.container('container').draw();
 
-  // Sets settings for the color range.
-  map.colorRange({orientation: "left"});
-  //australiaMap.colorRange().orientation('left');
-  map.container("container").draw();
 
-  var json = map.toJson();
-  //
-  map1 = anychart.fromJson(json);
-  map1.geoData(anychart.maps.australia);
-  map1.container("container").draw();
+  //var json = map.toJson();
+  //map1 = anychart.fromJson(json);
+  //map1.geoData(anychart.maps.australia);
+  //map1.container("container").draw();
+
+  currentColorScale.ranges([
+    {from: -100, to: 0},
+    {from: 0, to: 30},
+    {from: 30, to: 65},
+    {from: 65, to: 98}
+  ]);
+
+  //map.width(100);
+  //map.height(100);
+  //map.height(300);
+  //map.width(400);
 });
