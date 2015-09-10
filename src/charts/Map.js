@@ -390,7 +390,7 @@ anychart.charts.Map.prototype.hatchFillPaletteInvalidated_ = function(event) {
 /**
  * Getter/setter for color range.
  * @param {(anychart.core.ui.ColorRange|Object)=} opt_value Chart marker palette settings to set.
- * @return {!(anychart.palettes.Markers|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
+ * @return {!(anychart.core.ui.ColorRange|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
  */
 anychart.charts.Map.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
