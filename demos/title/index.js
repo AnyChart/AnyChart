@@ -16,7 +16,7 @@ function load() {
   rect2.setBounds(title.getRemainingBounds());
   bg = title.background();
   bg.fill('red 0.5').enabled(false);
-  // РµС‰Рµ РјРѕР¶РЅРѕ РїРѕР»РѕРјР°С‚СЊ РІСЃРµ РјРµРЅСЏСЏ РѕСЂРёРµРЅС‚Р°С†РёСЋ Рё РїРѕР»РѕР¶РµРЅРёРµ С‚Р°Р№С‚Р»Р°, РµСЃР»Рё РµРіРѕ С€РёСЂРёРЅР° РЅРµ С„РёРєСЃРёСЂРѕРІР°РЅР°
+  // еще можно поломать все меняя ориентацию и положение тайтла, если его ширина не фиксирована
   title.listen('signal', function() {
     title.draw();
     rect.setBounds(title.getContentBounds());

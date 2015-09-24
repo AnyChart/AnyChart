@@ -136,7 +136,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.finalizeDrawing = functi
 /** @inheritDoc */
 anychart.core.sparkline.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
 };
 
 

@@ -27,6 +27,12 @@ anychart.charts.Funnel.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Funnel.prototype.getProperThemePart = function() {
+  return anychart.getFullTheme()['funnel'];
+};
+
+
 /**
  * @inheritDoc
  */
@@ -58,25 +64,40 @@ anychart.charts.Funnel.prototype['neckWidth'] = anychart.charts.Funnel.prototype
 
 // from PyramidFunnelBase
 anychart.charts.Funnel.prototype['baseWidth'] = anychart.charts.Funnel.prototype.baseWidth;
-anychart.charts.Funnel.prototype['connectorLength'] = anychart.charts.Funnel.prototype.connectorLength;//doc
-anychart.charts.Funnel.prototype['connectorStroke'] = anychart.charts.Funnel.prototype.connectorStroke;//doc
-anychart.charts.Funnel.prototype['data'] = anychart.charts.Funnel.prototype.data;//doc|ex
-anychart.charts.Funnel.prototype['fill'] = anychart.charts.Funnel.prototype.fill;//doc|ex
+anychart.charts.Funnel.prototype['connectorLength'] = anychart.charts.Funnel.prototype.connectorLength;
+anychart.charts.Funnel.prototype['connectorStroke'] = anychart.charts.Funnel.prototype.connectorStroke;
+anychart.charts.Funnel.prototype['data'] = anychart.charts.Funnel.prototype.data;
 anychart.charts.Funnel.prototype['getType'] = anychart.charts.Funnel.prototype.getType;
-anychart.charts.Funnel.prototype['hatchFill'] = anychart.charts.Funnel.prototype.hatchFill;//doc|ex
-anychart.charts.Funnel.prototype['hatchFillPalette'] = anychart.charts.Funnel.prototype.hatchFillPalette;//doc|ex
-anychart.charts.Funnel.prototype['hoverFill'] = anychart.charts.Funnel.prototype.hoverFill;//doc|ex
-anychart.charts.Funnel.prototype['hover'] = anychart.charts.Funnel.prototype.hover;
-anychart.charts.Funnel.prototype['hoverHatchFill'] = anychart.charts.Funnel.prototype.hoverHatchFill;//doc|ex
-anychart.charts.Funnel.prototype['hoverLabels'] = anychart.charts.Funnel.prototype.hoverLabels;//doc|ex
-anychart.charts.Funnel.prototype['hoverMarkers'] = anychart.charts.Funnel.prototype.hoverMarkers;
-anychart.charts.Funnel.prototype['hoverStroke'] = anychart.charts.Funnel.prototype.hoverStroke;//doc|ex
-anychart.charts.Funnel.prototype['labels'] = anychart.charts.Funnel.prototype.labels;//doc|ex
-anychart.charts.Funnel.prototype['markerPalette'] = anychart.charts.Funnel.prototype.markerPalette;//doc|ex
-anychart.charts.Funnel.prototype['markers'] = anychart.charts.Funnel.prototype.markers;
-anychart.charts.Funnel.prototype['overlapMode'] = anychart.charts.Funnel.prototype.overlapMode;//doc
-anychart.charts.Funnel.prototype['palette'] = anychart.charts.Funnel.prototype.palette;//doc|ex
-anychart.charts.Funnel.prototype['pointsPadding'] = anychart.charts.Funnel.prototype.pointsPadding;//doc
-anychart.charts.Funnel.prototype['stroke'] = anychart.charts.Funnel.prototype.stroke;//doc|ex
+anychart.charts.Funnel.prototype['overlapMode'] = anychart.charts.Funnel.prototype.overlapMode;
+anychart.charts.Funnel.prototype['palette'] = anychart.charts.Funnel.prototype.palette;
+anychart.charts.Funnel.prototype['pointsPadding'] = anychart.charts.Funnel.prototype.pointsPadding;
 anychart.charts.Funnel.prototype['tooltip'] = anychart.charts.Funnel.prototype.tooltip;
+
+anychart.charts.Funnel.prototype['hatchFillPalette'] = anychart.charts.Funnel.prototype.hatchFillPalette;
+anychart.charts.Funnel.prototype['markerPalette'] = anychart.charts.Funnel.prototype.markerPalette;
+
+anychart.charts.Funnel.prototype['fill'] = anychart.charts.Funnel.prototype.fill;
+anychart.charts.Funnel.prototype['hoverFill'] = anychart.charts.Funnel.prototype.hoverFill;
+anychart.charts.Funnel.prototype['selectFill'] = anychart.charts.Funnel.prototype.selectFill;
+
+anychart.charts.Funnel.prototype['hatchFill'] = anychart.charts.Funnel.prototype.hatchFill;
+anychart.charts.Funnel.prototype['hoverHatchFill'] = anychart.charts.Funnel.prototype.hoverHatchFill;
+anychart.charts.Funnel.prototype['selectHatchFill'] = anychart.charts.Funnel.prototype.selectHatchFill;
+
+anychart.charts.Funnel.prototype['labels'] = anychart.charts.Funnel.prototype.labels;
+anychart.charts.Funnel.prototype['hoverLabels'] = anychart.charts.Funnel.prototype.hoverLabels;
+anychart.charts.Funnel.prototype['selectLabels'] = anychart.charts.Funnel.prototype.selectLabels;
+
+anychart.charts.Funnel.prototype['markers'] = anychart.charts.Funnel.prototype.markers;
+anychart.charts.Funnel.prototype['hoverMarkers'] = anychart.charts.Funnel.prototype.hoverMarkers;
+anychart.charts.Funnel.prototype['selectMarkers'] = anychart.charts.Funnel.prototype.selectMarkers;
+
+anychart.charts.Funnel.prototype['stroke'] = anychart.charts.Funnel.prototype.stroke;
+anychart.charts.Funnel.prototype['hoverStroke'] = anychart.charts.Funnel.prototype.hoverStroke;
+anychart.charts.Funnel.prototype['selectStroke'] = anychart.charts.Funnel.prototype.selectStroke;
+
 anychart.charts.Funnel.prototype['unhover'] = anychart.charts.Funnel.prototype.unhover;
+anychart.charts.Funnel.prototype['hover'] = anychart.charts.Funnel.prototype.hover;
+
+anychart.charts.Funnel.prototype['unselect'] = anychart.charts.Funnel.prototype.unselect;
+anychart.charts.Funnel.prototype['select'] = anychart.charts.Funnel.prototype.select;

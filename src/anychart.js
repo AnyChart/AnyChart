@@ -746,6 +746,22 @@ anychart.map = anychart.map || function() {
 /**
  * @ignoreDoc
  */
+anychart.choropleth = anychart.choropleth || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Choropleth map']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.bubbleMap = anychart.bubbleMap || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble map']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.ganttProject = anychart.ganttProject || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
 };
@@ -756,6 +772,14 @@ anychart.ganttProject = anychart.ganttProject || function() {
  */
 anychart.ganttResource = anychart.ganttResource || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Resource chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.stock = anychart.stock || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Stock chart']);
 };
 
 
@@ -821,6 +845,7 @@ goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
+goog.exportSymbol('anychart.stock', anychart.stock);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.theme', anychart.theme);

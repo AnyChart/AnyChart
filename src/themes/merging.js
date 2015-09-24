@@ -344,20 +344,15 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTitle',
       'defaultLabelFactory',
       'defaultTooltip.content',
-      'chart.legend',
-      'chart.legend.paginator',
+      'defaultLegend',
+      'defaultLegend.paginator',
       'chart.defaultLabelSettings',
       'cartesian.defaultTextMarkerSettings',
-      'cartesian.crosshair.xLabel',
-      'cartesian.crosshair.yLabel',
       'scatter.defaultTextMarkerSettings',
-      'scatter.crosshair.xLabel',
-      'scatter.crosshair.yLabel',
       'standalones.label',
-      'standalones.legend',
-      'standalones.legend.paginator',
       'standalones.table',
       'standalones.textAxisMarker'
+
     ]
   },
   {
@@ -368,16 +363,13 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTooltip.content.background',
       'defaultLabelFactory.background',
       'chart.background',
-      'chart.legend.background',
-      'chart.legend.paginator.background',
+      'defaultLegend.background',
+      'defaultLegend.paginator.background',
       'chart.defaultLabelSettings.background',
-      'cartesian.crosshair.xLabel.background',
-      'cartesian.crosshair.yLabel.background',
-      'scatter.crosshair.xLabel.background',
-      'scatter.crosshair.yLabel.background',
+      'stock.defaultPlotSettings.xAxis.background',
+      'stock.scroller.xAxis.background',
       'standalones.background',
-      'standalones.label.background',
-      'standalones.legend.paginator.background'
+      'standalones.label.background'
     ]
   },
   {
@@ -385,13 +377,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'defaultAxis.labels',
       'defaultAxis.minorLabels',
-      'cartesian.defaultSeriesSettings.base.labels',
-      'scatter.defaultSeriesSettings.base.labels',
-      'pie.labels',
-      'pyramidFunnel.labels',
-      'radar.defaultSeriesSettings.base.labels',
-      'polar.defaultSeriesSettings.base.labels',
-      'sparkline.defaultSeriesSettings.base.labels',
+      'chart.defaultSeriesSettings.base.labels',
+      'pieFunnelPyramidBase.labels',
       'gantt.base.timeline.labelsFactory',
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
       'gantt.base.timeline.header.labelsFactory',
@@ -400,11 +387,20 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'defaultCrosshairLabel',
+    targets: [
+      'cartesian.crosshair.xLabel',
+      'cartesian.crosshair.yLabel',
+      'scatter.crosshair.xLabel',
+      'scatter.crosshair.yLabel'
+    ]
+  },
+  {
     defaultObj: 'defaultMarkerFactory',
     targets: [
       'cartesian.defaultSeriesSettings.base.markers',
       'scatter.defaultSeriesSettings.base.markers',
-      'pyramidFunnel.markers',
+      'pieFunnelPyramidBase.markers',
       'radar.defaultSeriesSettings.base.markers',
       'polar.defaultSeriesSettings.base.markers',
       'sparkline.defaultSeriesSettings.base.markers',
@@ -419,22 +415,34 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTooltip.title',
       'defaultAxis.title',
       'chart.title',
-      'chart.legend.title',
+      'defaultLegend.title',
       'defaultDataGrid.defaultColumnSettings.title',
-      'standalones.title',
-      'standalones.legend.title'
+      'standalones.title'
+    ]
+  },
+  {
+    defaultObj: 'defaultSeparator',
+    targets: [
+      'defaultTooltip.separator',
+      'defaultLegend.titleSeparator'
     ]
   },
   {
     defaultObj: 'defaultTooltip',
     targets: [
-      'chart.legend.tooltip',
+      'defaultLegend.tooltip',
+      'chart.tooltip',
       'chart.defaultSeriesSettings.base.tooltip',
-      'pie.tooltip',
-      'pyramidFunnel.tooltip',
+      'pieFunnelPyramidBase.tooltip',
       'defaultDataGrid.tooltip',
-      'gantt.base.timeline.tooltip',
-      'standalones.legend.tooltip'
+      'gantt.base.timeline.tooltip'
+    ]
+  },
+  {
+    defaultObj: 'defaultLegend',
+    targets: [
+      'chart.legend',
+      'standalones.legend'
     ]
   },
   {
@@ -456,30 +464,54 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
-    defaultObj: 'chart',
+    defaultObj: 'defaultGridSettings',
     targets: [
-      'cartesian',
-      'scatter',
-      'bullet',
-      'pie',
-      'pyramidFunnel',
-      'radar',
-      'polar',
-      'circularGauge',
-      'map',
-      'sparkline',
-      'gantt.base'
+      'defaultMinorGridSettings',
+      'cartesian.defaultGridSettings',
+      'scatter.defaultGridSettings',
+      'polar.defaultGridSettings',
+      'radar.defaultGridSettings',
+      'stock.defaultPlotSettings.defaultGridSettings',
+      'standalones.linearGrid',
+      'standalones.radarGrid',
+      'standalones.polarGrid'
     ]
   },
   {
-    defaultObj: 'pie',
-    targets: ['pie3d']
+    defaultObj: 'defaultMinorGridSettings',
+    targets: [
+      'cartesian.defaultMinorGridSettings',
+      'scatter.defaultMinorGridSettings',
+      'polar.defaultMinorGridSettings',
+      'radar.defaultMinorGridSettings',
+      'stock.defaultPlotSettings.defaultMinorGridSettings'
+    ]
   },
   {
-    defaultObj: 'pyramidFunnel',
+    defaultObj: 'defaultLineMarkerSettings',
     targets: [
-      'pyramid',
-      'funnel'
+      'cartesian.defaultLineMarkerSettings',
+      'scatter.defaultLineMarkerSettings',
+      'sparkline.defaultLineMarkerSettings',
+      'standalones.lineAxisMarker'
+    ]
+  },
+  {
+    defaultObj: 'defaultTextMarkerSettings',
+    targets: [
+      'cartesian.defaultTextMarkerSettings',
+      'scatter.defaultTextMarkerSettings',
+      'sparkline.defaultTextMarkerSettings',
+      'standalones.textAxisMarker'
+    ]
+  },
+  {
+    defaultObj: 'defaultRangeMarkerSettings',
+    targets: [
+      'cartesian.defaultRangeMarkerSettings',
+      'scatter.defaultRangeMarkerSettings',
+      'sparkline.defaultRangeMarkerSettings',
+      'standalones.rangeAxisMarker'
     ]
   },
   {
@@ -495,6 +527,9 @@ anychart.themes.merging.mergingMap_ = [
       'polar.xAxis',
       'polar.yAxis',
       'circularGauge.defaultAxisSettings',
+      'stock.defaultPlotSettings.defaultYAxisSettings',
+      'stock.defaultPlotSettings.xAxis',
+      'stock.scroller.xAxis',
       'map.colorRange',
       'standalones.linearAxis',
       'standalones.polarAxis',
@@ -503,26 +538,88 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'chart',
+    targets: [
+      'cartesian',
+      'pieFunnelPyramidBase',
+      'scatter',
+      'radar',
+      'polar',
+
+      'bullet',
+      'circularGauge',
+      'map',
+      'sparkline',
+      'gantt.base',
+      'stock',
+      'stock.defaultPlotSettings'
+    ]
+  },
+  {
+    defaultObj: 'chart.defaultSeriesSettings',
+    targets: [
+      'stock.scroller.defaultSeriesSettings'
+    ]
+  },
+  {
+    defaultObj: 'chart.tooltip',
+    targets: [
+      'stock.tooltip'
+    ]
+  },
+  {
+    defaultObj: 'pieFunnelPyramidBase',
+    targets: [
+      'pie',
+      'pyramid',
+      'funnel'
+    ]
+  },
+  {
+    defaultObj: 'pie',
+    targets: ['pie3d']
+  },
+
+  {
     defaultObj: 'cartesian.defaultSeriesSettings.base',
     targets: [
-      'cartesian.defaultSeriesSettings.area',
-      'cartesian.defaultSeriesSettings.bar',
-      'cartesian.defaultSeriesSettings.box',
-      'cartesian.defaultSeriesSettings.bubble',
-      'cartesian.defaultSeriesSettings.candlestick',
-      'cartesian.defaultSeriesSettings.column',
-      'cartesian.defaultSeriesSettings.line',
+      'cartesian.defaultSeriesSettings.areaLike',
+      'cartesian.defaultSeriesSettings.barLike',
+      'cartesian.defaultSeriesSettings.lineLike',
+      'cartesian.defaultSeriesSettings.pieLike',
       'cartesian.defaultSeriesSettings.marker',
-      'cartesian.defaultSeriesSettings.ohlc',
+      'cartesian.defaultSeriesSettings.bubble'
+    ]
+  },
+  {
+    defaultObj: 'cartesian.defaultSeriesSettings.areaLike',
+    targets: [
+      'cartesian.defaultSeriesSettings.area',
+      'cartesian.defaultSeriesSettings.splineArea',
+      'cartesian.defaultSeriesSettings.stepArea',
       'cartesian.defaultSeriesSettings.rangeArea',
+      'cartesian.defaultSeriesSettings.rangeSplineArea',
+      'cartesian.defaultSeriesSettings.rangeStepArea'
+    ]
+  },
+  {
+    defaultObj: 'cartesian.defaultSeriesSettings.barLike',
+    targets: [
+      'cartesian.defaultSeriesSettings.bar',
+      'cartesian.defaultSeriesSettings.column',
+      'cartesian.defaultSeriesSettings.box',
       'cartesian.defaultSeriesSettings.rangeBar',
       'cartesian.defaultSeriesSettings.rangeColumn',
-      'cartesian.defaultSeriesSettings.rangeSplineArea',
-      'cartesian.defaultSeriesSettings.rangeStepArea',
+      'cartesian.defaultSeriesSettings.candlestick'
+    ]
+  },
+  {
+    defaultObj: 'cartesian.defaultSeriesSettings.lineLike',
+    targets: [
+      'cartesian.defaultSeriesSettings.line',
       'cartesian.defaultSeriesSettings.spline',
-      'cartesian.defaultSeriesSettings.splineArea',
       'cartesian.defaultSeriesSettings.stepLine',
-      'cartesian.defaultSeriesSettings.stepArea'
+      'cartesian.defaultSeriesSettings.ohlc'
     ]
   },
   {
@@ -554,17 +651,41 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'radar.defaultSeriesSettings.base',
     targets: [
-      'radar.defaultSeriesSettings.area',
-      'radar.defaultSeriesSettings.line',
+      'radar.defaultSeriesSettings.areaLike',
+      'radar.defaultSeriesSettings.lineLike',
       'radar.defaultSeriesSettings.marker'
+    ]
+  },
+  {
+    defaultObj: 'radar.defaultSeriesSettings.areaLike',
+    targets: [
+      'radar.defaultSeriesSettings.area'
+    ]
+  },
+  {
+    defaultObj: 'radar.defaultSeriesSettings.lineLike',
+    targets: [
+      'radar.defaultSeriesSettings.line'
     ]
   },
   {
     defaultObj: 'polar.defaultSeriesSettings.base',
     targets: [
-      'polar.defaultSeriesSettings.area',
-      'polar.defaultSeriesSettings.line',
+      'polar.defaultSeriesSettings.areaLike',
+      'polar.defaultSeriesSettings.lineLike',
       'polar.defaultSeriesSettings.marker'
+    ]
+  },
+  {
+    defaultObj: 'polar.defaultSeriesSettings.areaLike',
+    targets: [
+      'polar.defaultSeriesSettings.area'
+    ]
+  },
+  {
+    defaultObj: 'polar.defaultSeriesSettings.lineLike',
+    targets: [
+      'polar.defaultSeriesSettings.line'
     ]
   },
   {
@@ -588,7 +709,23 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'map.defaultSeriesSettings.base',
     targets: [
-      'map.defaultSeriesSettings.choropleth'
+      'map.defaultSeriesSettings.choropleth',
+      'map.defaultSeriesSettings.bubble'
+    ]
+  },
+  {
+    defaultObj: 'map',
+    targets: [
+      'choropleth',
+      'bubbleMap'
+    ]
+  },
+  {
+    defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.base',
+    targets: [
+      'stock.defaultPlotSettings.defaultSeriesSettings.line',
+      'stock.defaultPlotSettings.defaultSeriesSettings.column',
+      'stock.defaultPlotSettings.defaultSeriesSettings.ohlc'
     ]
   },
   {

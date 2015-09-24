@@ -49,15 +49,15 @@ anychart.animations.BarAnimation.prototype.cycle = function(now) {
   var barHeight = this.series_.getPointWidth();
   while (iterator.advance()) {
     var x = /** @type {number} */ (iterator.meta('x'));
-    var y = /** @type {number} */ (iterator.meta('y'));
+    var y = /** @type {number} */ (iterator.meta('value'));
     var zero = /** @type {number} */ (iterator.meta('zero'));
 
     var shapeBounds = anychart.math.rect(Math.min(zero, y), x - barHeight / 2, Math.abs(zero - y), barHeight);
 
-    var labelsPosition = this.series_.getLabelsPosition(false);
+    var labelsPosition = this.series_.getLabelsPosition(anychart.PointState.NORMAL);
     var labelProvider = this.createPositionProvider(shapeBounds, labelsPosition)['value'];
 
-    var markersPosition = this.series_.getMarkersPosition(false);
+    var markersPosition = this.series_.getMarkersPosition(anychart.PointState.NORMAL);
     var markerProvider = this.createPositionProvider(shapeBounds, markersPosition)['value'];
 
     this.startPoint.push(0);    // rect

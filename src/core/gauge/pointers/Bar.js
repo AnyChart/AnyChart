@@ -135,7 +135,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.data().getIterator();
+    var iterator = gauge.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
     var value = parseFloat(iterator.get('value'));
 
@@ -205,6 +205,8 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
         -sweepAngle, true);
 
     this.domElement.close();
+
+    this.makeInteractive(/** @type {acgraph.vector.Path} */(this.domElement));
 
     if (this.hatchFillElement) {
       this.hatchFillElement.clear();

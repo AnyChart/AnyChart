@@ -31,7 +31,7 @@ anychart.core.ui.Tooltip = function() {
    * @type {Function}
    * @private
    */
-  this.contentFormatter_ = anychart.utils.DEFAULT_FORMATTER;
+  this.textFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
    * @type {boolean}
@@ -58,6 +58,18 @@ anychart.core.ui.Tooltip = function() {
    * @private
    */
   this.positionCache_ = null;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.valuePrefix_;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.valuePostfix_;
 };
 goog.inherits(anychart.core.ui.Tooltip, anychart.core.Base);
 
@@ -99,15 +111,58 @@ anychart.core.ui.Tooltip.prototype.titleFormatter = function(opt_value) {
  * @param {Function=} opt_value Function to format content text.
  * @return {Function|anychart.core.ui.Tooltip} Function to format content text or itself for method chaining.
  */
-anychart.core.ui.Tooltip.prototype.contentFormatter = function(opt_value) {
+anychart.core.ui.Tooltip.prototype.textFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.contentFormatter_ != opt_value) {
-      this.contentFormatter_ = opt_value;
+    if (this.textFormatter_ != opt_value) {
+      this.textFormatter_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
-    return this.contentFormatter_;
+    return this.textFormatter_;
+  }
+};
+
+
+/**
+ * Function to format content text.
+ * @param {Function=} opt_value Function to format content text.
+ * @return {Function|anychart.core.ui.Tooltip} Function to format content text or itself for method chaining.
+ * @deprecated It shouldn't be used ever.
+ */
+anychart.core.ui.Tooltip.prototype.contentFormatter = anychart.core.ui.Tooltip.prototype.textFormatter;
+
+
+/**
+ * Gets/Sets value prefix.
+ * @param {string=} opt_value
+ * @return {string|anychart.core.ui.Tooltip}
+ */
+anychart.core.ui.Tooltip.prototype.valuePrefix = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.valuePrefix_ != opt_value) {
+      this.valuePrefix_ = opt_value;
+    }
+    return this;
+  } else {
+    return this.valuePrefix_;
+  }
+};
+
+
+/**
+ * Gets/Sets value postfix.
+ * @param {string=} opt_value
+ * @return {string|anychart.core.ui.Tooltip}
+ */
+anychart.core.ui.Tooltip.prototype.valuePostfix = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.valuePostfix_ != opt_value) {
+      this.valuePostfix_ = opt_value;
+    }
+    return this;
+  } else {
+    return this.valuePostfix_;
   }
 };
 
@@ -192,7 +247,7 @@ anychart.core.ui.Tooltip.prototype.separator = function(opt_value) {
  * @param {(Object|boolean|null|string)=} opt_value Content settings.
  * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} Labels instance or itself for method chaining.
  */
-anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
+anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
   this.maybeCreateTooltipItem_();
 
   if (goog.isDef(opt_value)) {
@@ -202,6 +257,14 @@ anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
     return /** @type {!anychart.core.ui.Label}*/ (this.item_.content());
   }
 };
+
+
+/**
+ * Tooltip content.
+ * @param {(Object|boolean|null|string)=} opt_value Content settings.
+ * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} Labels instance or itself for method chaining.
+ */
+anychart.core.ui.Tooltip.prototype.content = anychart.core.ui.Tooltip.prototype.contentInternal;
 
 
 /**
@@ -328,7 +391,8 @@ anychart.core.ui.Tooltip.prototype.enabled = function(opt_value) {
  */
 anychart.core.ui.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
   if (!this.item_) {
-    this.item_ = anychart.core.utils.TooltipsContainer.getInstance().alloc();
+    this.item_ = new anychart.core.ui.TooltipItem();
+    anychart.core.utils.TooltipsContainer.getInstance().allocTooltip(this.item_);
     this.item_.suspendSignalsDispatching();
     this.item_.visible(false);
     this.registerDisposable(this.item_);
@@ -354,8 +418,11 @@ anychart.core.ui.Tooltip.prototype.show = function(textInfo, position) {
   this.textInfoCache_ = textInfo;
   this.positionCache_ = position;
 
+  this.textInfoCache_['valuePrefix'] = this.valuePrefix_ ? this.valuePrefix_ : '';
+  this.textInfoCache_['valuePostfix'] = this.valuePostfix_ ? this.valuePostfix_ : '';
+
   var titleText = this.titleFormatter_.call(textInfo, textInfo);
-  var contentText = this.contentFormatter_.call(textInfo, textInfo);
+  var contentText = this.textFormatter_.call(textInfo, textInfo);
 
   this.item_.suspendSignalsDispatching();
   this.item_.content().text(contentText);
@@ -395,7 +462,7 @@ anychart.core.ui.Tooltip.prototype.redraw = function() {
   if (this.item_ && this.item_.visible() && this.item_.enabled()) {
     this.item_.suspendSignalsDispatching();
     var titleText = this.titleFormatter_.call(this.textInfoCache_, this.textInfoCache_);
-    var contentText = this.contentFormatter_.call(this.textInfoCache_, this.textInfoCache_);
+    var contentText = this.textFormatter_.call(this.textInfoCache_, this.textInfoCache_);
     var realPosition = this.processPosition_(this.positionCache_);
 
     this.item_.x(realPosition.x);
@@ -473,9 +540,11 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
+  json['valuePrefix'] = this.valuePrefix();
+  json['valuePostfix'] = this.valuePostfix();
   json['title'] = this.title().serialize();
   json['separator'] = this.separator().serialize();
-  json['content'] = this.content().serialize();
+  json['content'] = this.contentInternal().serialize();
   json['background'] = this.background().serialize();
   json['padding'] = this.padding().serialize();
   json['allowLeaveScreen'] = this.allowLeaveScreen();
@@ -502,10 +571,12 @@ anychart.core.ui.Tooltip.prototype.setupSpecial = function(var_args) {
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+  this.valuePrefix(config['valuePrefix']);
+  this.valuePostfix(config['valuePostfix']);
   this.allowLeaveScreen(config['allowLeaveScreen']);
   this.title(config['title']);
   this.separator(config['separator']);
-  this.content(config['content']);
+  this.contentInternal(config['content']);
   this.background(config['background']);
   this.padding(config['padding']);
   this.offsetX(config['offsetX']);
@@ -514,7 +585,7 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
   this.hideDelay(config['hideDelay']);
   this.enabled('enabled' in config ? config['enabled'] : true);
   this.titleFormatter(config['titleFormatter']);
-  this.contentFormatter(config['contentFormatter']);
+  this.textFormatter(config['textFormatter'] || config['contentFormatter']);
 };
 
 
@@ -522,7 +593,10 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
 //anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
 //anychart.core.ui.Tooltip.prototype['redraw'] = anychart.core.ui.Tooltip.prototype.redraw;
 //exports
+anychart.core.ui.Tooltip.prototype['valuePrefix'] = anychart.core.ui.Tooltip.prototype.valuePrefix;
+anychart.core.ui.Tooltip.prototype['valuePostfix'] = anychart.core.ui.Tooltip.prototype.valuePostfix;
 anychart.core.ui.Tooltip.prototype['titleFormatter'] = anychart.core.ui.Tooltip.prototype.titleFormatter;
+anychart.core.ui.Tooltip.prototype['textFormatter'] = anychart.core.ui.Tooltip.prototype.textFormatter;
 anychart.core.ui.Tooltip.prototype['contentFormatter'] = anychart.core.ui.Tooltip.prototype.contentFormatter;
 anychart.core.ui.Tooltip.prototype['isFloating'] = anychart.core.ui.Tooltip.prototype.isFloating;
 anychart.core.ui.Tooltip.prototype['allowLeaveScreen'] = anychart.core.ui.Tooltip.prototype.allowLeaveScreen;

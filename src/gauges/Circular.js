@@ -10,6 +10,7 @@ goog.require('anychart.core.gauge.pointers.Knob');
 goog.require('anychart.core.gauge.pointers.Marker');
 goog.require('anychart.core.gauge.pointers.Needle');
 goog.require('anychart.core.ui.CircularLabel');
+goog.require('anychart.core.utils.InteractivityState');
 
 goog.require('anychart.scales');
 
@@ -81,19 +82,13 @@ anychart.gauges.Circular = function(opt_data, opt_csvSettings) {
   this.knobCounter_ = 0;
 
   this.data(opt_data || null, opt_csvSettings);
+
+  if (this.supportsBaseHighlight)
+    this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
+
   this.resumeSignalsDispatching(true);
 };
 goog.inherits(anychart.gauges.Circular, anychart.core.Chart);
-
-
-/**
- * Link to incoming raw data.
- * Used to avoid data reapplication on same data sets.
- * NOTE: If is disposable entity, should be disposed from the source, not from this class.
- * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
- * @private
- */
-anychart.gauges.Circular.prototype.rawData_;
 
 
 /**
@@ -108,6 +103,24 @@ anychart.gauges.Circular.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.GAUGE_AXES |
     anychart.ConsistencyState.GAUGE_SCALE |
     anychart.ConsistencyState.GAUGE_AXIS_MARKERS;
+
+
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.gauges.Circular.prototype.rawData_;
+
+
+/**
+ *
+ * @type {!anychart.data.Iterator}
+ * @private
+ */
+anychart.gauges.Circular.prototype.iterator_;
 
 
 /** @inheritDoc */
@@ -163,6 +176,30 @@ anychart.gauges.Circular.ZINDEX_POINTER = 40;
  * @type {number}
  */
 anychart.gauges.Circular.ZINDEX_MULTIPLIER = 0.0001;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.gauges.Circular.prototype.getAllSeries = function() {
+  return goog.array.concat(this.bars_, this.markers_, this.needles_, this.knobs_);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.gauges.Circular.prototype.getSeriesStatus = function() {
+  return [];
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.gauges.Circular.prototype.useUnionTooltipAsSingle = function() {
+  return true;
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -267,6 +304,24 @@ anychart.gauges.Circular.prototype.dataInvalidated_ = function(e) {
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.NEEDS_RECALCULATION);
   }
+};
+
+
+/**
+ * Returns current mapping iterator.
+ * @return {!anychart.data.Iterator} Current series iterator.
+ */
+anychart.gauges.Circular.prototype.getIterator = function() {
+  return this.iterator_ || this.getResetIterator();
+};
+
+
+/**
+ * Returns new default iterator for the current mapping.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.gauges.Circular.prototype.getResetIterator = function() {
+  return this.iterator_ = this.data().getIterator();
 };
 
 
@@ -1057,7 +1112,7 @@ anychart.gauges.Circular.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_SCALE)) {
 
-    var iterator = this.data().getIterator();
+    var iterator = this.getIterator();
 
     var needAutoCalc = false;
     goog.array.forEach(this.axes_, function(axis) {
@@ -1153,9 +1208,11 @@ anychart.gauges.Circular.prototype.drawContent = function(bounds) {
     for (i = 0, len = pointers.length; i < len; i++) {
       pointer = pointers[i];
       if (pointer) {
+        pointer.setParentEventTarget(this);
         pointer
             .container(this.rootElement)
             .draw();
+
       }
     }
 
@@ -1201,6 +1258,7 @@ anychart.gauges.Circular.prototype.setupByJSON = function(config) {
     this.cap(config['cap']);
   this.circularPadding(config['circularPadding']);
   this.encloseWithStraightLine(config['encloseWithStraightLine']);
+  this.interactivity(config['interactivity']);
 
   var i, len;
   var axes = config['axes'];
@@ -1268,6 +1326,7 @@ anychart.gauges.Circular.prototype.serialize = function() {
     json['cap'] = this.cap().serialize();
   json['circularPadding'] = this.circularPadding();
   json['encloseWithStraightLine'] = this.encloseWithStraightLine();
+  json['interactivity'] = this.interactivity().serialize();
 
   var i, len;
   var axes = [];

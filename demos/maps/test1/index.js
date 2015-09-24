@@ -33,7 +33,8 @@ anychart.onDocumentReady(function() {
 
   map.choropleth(dataSetForSeries)
       .geoIdField("code_hasc")
-      .colorScale(currentColorScale);
+      .colorScale(currentColorScale)
+      .labels(true);
   map.container('container').draw();
 
 

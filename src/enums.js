@@ -65,7 +65,87 @@ anychart.enums.GaugeTypes = {
  * @enum {string}
  */
 anychart.enums.MapTypes = {
-  MAP: 'map'
+  MAP: 'map',
+  CHOROPLETH: 'choropleth',
+  BUBBLE: 'bubble'
+};
+
+
+/**
+ * Hover mode enumeration.
+ * @enum {string}
+ */
+anychart.enums.HoverMode = {
+  BY_SPOT: 'bySpot',
+  BY_X: 'byX',
+  SINGLE: 'single'
+};
+
+
+/**
+ * Normalizes value to HoverMode enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.HoverMode=} opt_default Default value, if input cannot be recognized. Defaults to BY_X.
+ * @return {anychart.enums.HoverMode}
+ */
+anychart.enums.normalizeHoverMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'byspot':
+    case 'spot':
+    case 'sp':
+      return anychart.enums.HoverMode.BY_SPOT;
+    case 'byx':
+    case 'x':
+      return anychart.enums.HoverMode.BY_X;
+    case 'single':
+    case 's':
+      return anychart.enums.HoverMode.SINGLE;
+  }
+  return opt_default || anychart.enums.HoverMode.BY_X;
+};
+
+
+/**
+ * Select mode enumeration.
+ * @enum {string}
+ */
+anychart.enums.SelectionMode = {
+  NONE: 'none',
+  SINGLE_SELECT: 'singleSelect',
+  MULTI_SELECT: 'multiSelect'
+};
+
+
+/**
+ * Normalizes value to SelectionMode enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.SelectionMode=} opt_default Default value, if input cannot be recognized. Defaults to NONE.
+ * @return {anychart.enums.SelectionMode}
+ */
+anychart.enums.normalizeSelectMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'none':
+    case 'null':
+    case 'false':
+    case 'n':
+    case 'no':
+      return anychart.enums.SelectionMode.NONE;
+    case 'singleselect':
+    case 'single':
+    case 'single_select':
+    case 's':
+    case 'ss':
+      return anychart.enums.SelectionMode.SINGLE_SELECT;
+    case 'multiselect':
+    case 'multi_select':
+    case 'multi':
+    case 'm':
+    case 'ms':
+      return anychart.enums.SelectionMode.MULTI_SELECT;
+  }
+  return opt_default || anychart.enums.SelectionMode.NONE;
 };
 
 
@@ -1041,6 +1121,75 @@ anychart.enums.normalizeLabelsOverlapMode = function(value, opt_default) {
 };
 
 
+/**
+ * Overlap mods.
+ * @enum {string}
+ */
+anychart.enums.StockLabelsOverlapMode = {
+  /**
+   * Forbids labels overlapping.
+   */
+  NO_OVERLAP: 'noOverlap',
+  /**
+   * Minor labels can overlap other minor labels, but major labels cannot overlap.
+   */
+  ALLOW_MINOR_OVERLAP: 'allowMinorOverlap',
+  /**
+   * Minor labels cannot overlap other minor or major labels, but major labels can overlap major labels.
+   */
+  ALLOW_MAJOR_OVERLAP: 'allowMajorOverlap',
+  /**
+   * Allows labels to overlap.
+   */
+  ALLOW_OVERLAP: 'allowOverlap'
+};
+
+
+/**
+ * Normalizes labels overlap mode to enum values.
+ * @param {*} value Mode to normalize.
+ * @param {anychart.enums.StockLabelsOverlapMode=} opt_default Default value. Defaults to ALLOW_OVERLAP.
+ * @return {anychart.enums.StockLabelsOverlapMode}
+ */
+anychart.enums.normalizeStockLabelsOverlapMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'no':
+    case 'false':
+    case 'nooverlap':
+    case 'none':
+    case 'null':
+    case 'forbid':
+    case '0':
+      return anychart.enums.StockLabelsOverlapMode.NO_OVERLAP;
+    case 'min':
+    case 'minor':
+    case 'nomajor':
+    case 'notmajor':
+    case 'forbidmajor':
+    case 'allowminor':
+    case 'allowminoroverlap':
+      return anychart.enums.StockLabelsOverlapMode.ALLOW_MINOR_OVERLAP;
+    case 'maj':
+    case 'major':
+    case 'nominor':
+    case 'notminor':
+    case 'forbidminor':
+    case 'allowmajor':
+    case 'allowmajoroverlap':
+      return anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP;
+    case 'yes':
+    case 'allow':
+    case 'overlap':
+    case 'allowoverlap':
+    case 'true':
+    case '1':
+      return anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP;
+  }
+  return opt_default || anychart.enums.StockLabelsOverlapMode.NO_OVERLAP;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  BackgroundCornersType
@@ -1514,7 +1663,12 @@ anychart.enums.EventType = {
   POINT_MOUSE_UP: 'pointmouseup',
   POINT_CLICK: 'pointclick',
   POINT_DBLCLICK: 'pointdblclick',
+  //deprecated
   POINT_SELECT: 'pointselect',
+  //deprecated
+  POINT_HOVER: 'pointhover',
+  POINTS_SELECT: 'pointsselect',
+  POINTS_HOVER: 'pointshover',
   CHART_DRAW: 'chartdraw',
   ANIMATION_START: 'animationstart',
   ANIMATION_END: 'animationend',
@@ -1530,6 +1684,18 @@ anychart.enums.EventType = {
   SCROLL_CHANGE: 'scrollchange',
 
   SPLITTER_CHANGE: 'splitterchange',
+
+  SCROLLER_CHANGE_START: 'scrollerchangestart',
+  SCROLLER_CHANGE: 'scrollerchange',
+  SCROLLER_CHANGE_FINISH: 'scrollerchangefinish',
+
+  SELECTED_RANGE_CHANGE_START: 'selectedrangechangestart',
+  SELECTED_RANGE_BEFORE_CHANGE: 'selectedrangebeforechange',
+  SELECTED_RANGE_CHANGE: 'selectedrangechange',
+  SELECTED_RANGE_CHANGE_FINISH: 'selectedrangechangefinish',
+
+  //HIGHLIGHT: 'highlight',
+  //UNHIGHLIGHT: 'unhighlight',
 
   SIGNAL: 'signal',
 
@@ -1629,7 +1795,8 @@ anychart.enums.ScatterTicksMode = {
  * @enum {string}
  */
 anychart.enums.MapSeriesType = {
-  CHOROPLETH: 'choropleth'
+  CHOROPLETH: 'choropleth',
+  BUBBLE: 'bubble'
 };
 
 
@@ -1711,6 +1878,37 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
       return anychart.enums.CartesianSeriesType.STEP_LINE;
   }
   return opt_default || anychart.enums.CartesianSeriesType.LINE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  StockSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.StockSeriesType = {
+  //AREA: 'area',
+  //BAR: 'bar',
+  //BOX: 'box',
+  //BUBBLE: 'bubble',
+  //CANDLESTICK: 'candlestick',
+  COLUMN: 'column',
+  LINE: 'line',
+  //MARKER: 'marker',
+  OHLC: 'ohlc'
+  //RANGE_AREA: 'rangeArea',
+  //RANGE_BAR: 'rangeBar',
+  //RANGE_COLUMN: 'rangeColumn',
+  //RANGE_SPLINE_AREA: 'rangeSplineArea',
+  //RANGE_STEP_AREA: 'rangeStepArea',
+  //SPLINE: 'spline',
+  //SPLINE_AREA: 'splineArea',
+  //STEP_AREA: 'stepArea',
+  //STEP_LINE: 'stepLine'
 };
 
 
@@ -2002,7 +2200,11 @@ anychart.enums.ErrorCode = {
 
   NO_CREDITS_IN_CHART: 9,
 
-  INVALID_GEO_JSON_OBJECT: 10
+  INVALID_GEO_JSON_OBJECT: 10,
+
+  CSV_DOUBLE_QUOTE_IN_SEPARATOR: 100,
+
+  CSV_PARSING_FAILED: 101
 };
 
 
@@ -2047,6 +2249,10 @@ anychart.enums.WarningCode = {
   TOOLBAR_METHOD_IS_NOT_DEFINED: 14,
   TOOLBAR_CHART_IS_NOT_SET: 15,
 
+  TABLE_ALREADY_IN_TRANSACTION: 101,
+
+  STOCK_WRONG_MAPPING: 201,
+
   NOT_FOUND: 404,
   DEPRECATED: 405
 
@@ -2058,16 +2264,49 @@ anychart.enums.WarningCode = {
 //  DateTimeTicks Interval
 //
 //----------------------------------------------------------------------------------------------------------------------
+///**
+// * Returns human readable
+// * @param {anychart.enums.Interval} value
+// * @return {string}
+// */
+//anychart.enums.denormalizeInterval = function(value) {
+//  switch (value) {
+//    case anychart.enums.Interval.YEAR:
+//      return 'years';
+//    case anychart.enums.Interval.MONTH:
+//      return 'months';
+//    case anychart.enums.Interval.DAY:
+//      return 'days';
+//    case anychart.enums.Interval.HOUR:
+//      return 'hours';
+//    case anychart.enums.Interval.MINUTE:
+//      return 'minutes';
+//    case anychart.enums.Interval.SECOND:
+//      return 'seconds';
+//    case anychart.enums.Interval.MILLISECOND:
+//      return 'milliseconds';
+//  }
+//  return 'unknown';
+//};
+
+
 /**
+ * Additional intervals used in stock. Should merge with main intervals, when the DateTimeTicks will work with
+ * DateTimeIntervalGenerator instead of goog.date.Interval.
  * @enum {string}
  */
 anychart.enums.Interval = {
-  YEARS: 'y',
-  MONTHS: 'm',
-  DAYS: 'd',
-  HOURS: 'h',
-  MINUTES: 'n',
-  SECONDS: 's'
+  YEAR: 'year',
+  SEMESTER: 'semester',
+  QUARTER: 'quarter',
+  MONTH: 'month',
+  THIRD_OF_MONTH: 'thirdofmonth',
+  WEEK: 'week',
+  DAY: 'day',
+  HOUR: 'hour',
+  MINUTE: 'minute',
+  SECOND: 'second',
+  MILLISECOND: 'millisecond'
 };
 
 
@@ -2085,35 +2324,60 @@ anychart.enums.normalizeInterval = function(value, opt_default) {
     case 'yyyy':
     case 'yy':
     case 'y':
-      return anychart.enums.Interval.YEARS;
+      return anychart.enums.Interval.YEAR;
+    case 'semesters':
+    case 'semester':
+    case 'sem':
+      return anychart.enums.Interval.SEMESTER;
+    case 'quarters':
+    case 'quarter':
+    case 'q':
+      return anychart.enums.Interval.QUARTER;
     case 'months':
     case 'month':
     case 'mm':
     case 'm':
-      return anychart.enums.Interval.MONTHS;
+      return anychart.enums.Interval.MONTH;
+    case 'thirdofmonths':
+    case 'thirdofmonth':
+    case 'decades':
+    case 'decade':
+    case 'tom':
+    case 'dec':
+      return anychart.enums.Interval.THIRD_OF_MONTH;
+    case 'weeks':
+    case 'week':
+    case 'w':
+      return anychart.enums.Interval.WEEK;
     case 'days':
     case 'day':
     case 'dd':
     case 'd':
-      return anychart.enums.Interval.DAYS;
+      return anychart.enums.Interval.DAY;
     case 'hours':
     case 'hour':
     case 'hh':
     case 'h':
-      return anychart.enums.Interval.HOURS;
+      return anychart.enums.Interval.HOUR;
     case 'minutes':
     case 'minute':
     case 'min':
     case 'n':
-      return anychart.enums.Interval.MINUTES;
+      return anychart.enums.Interval.MINUTE;
     case 'seconds':
     case 'second':
     case 'secs':
     case 'sec':
     case 's':
-      return anychart.enums.Interval.SECONDS;
+      return anychart.enums.Interval.SECOND;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'millis':
+    case 'milli':
+    case 'ms':
+      return anychart.enums.Interval.MILLISECOND;
   }
-  return opt_default || anychart.enums.Interval.YEARS;
+  return opt_default || anychart.enums.Interval.YEAR;
 };
 
 
@@ -2384,19 +2648,302 @@ anychart.enums.normalizeTextWrap = function(value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Stock
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Aggregation type for table columns.
+ * @enum {string}
+ */
+anychart.enums.AggregationType = {
+  /**
+   * Choose the first non-NaN value in a group as a value of a point.
+   */
+  FIRST: 'first',
+
+  /**
+   * Choose the last non-NaN value in a group as a value of a point.
+   */
+  LAST: 'last',
+
+  /**
+   * Choose the biggest non-NaN value in a group as a value of a point.
+   */
+  MAX: 'max',
+
+  /**
+   * Choose the lowest non-NaN value in a group as a value of a point.
+   */
+  MIN: 'min',
+
+  /**
+   * Calculate average value in a group and use it as a value of a point.
+   */
+  AVERAGE: 'average',
+
+  /**
+   * Calculate average value in a group using other column values as weights and use it as a value of a point.
+   */
+  WEIGHTED_AVERAGE: 'weightedAverage',
+
+  /**
+   * Choose the first non-undefined value as a value of a point.
+   */
+  FIRST_VALUE: 'firstValue',
+
+  /**
+   * Choose the last non-undefined value as a value of a point.
+   */
+  LAST_VALUE: 'lastValue',
+
+  /**
+   * Calculate the sum of values in a group and use it as a value of a point.
+   */
+  SUM: 'sum',
+
+  /**
+   * Put all non-undefined values in a group to an array and us it as a value of a point.
+   */
+  LIST: 'list'
+};
+
+
+/**
+ * Normalizes passed value to a normal aggregation type.
+ * @param {*} value
+ * @return {anychart.enums.AggregationType}
+ */
+anychart.enums.normalizeAggregationType = function(value) {
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'first':
+    case 'open':
+      return anychart.enums.AggregationType.FIRST;
+    case 'last':
+    case 'close':
+      return anychart.enums.AggregationType.LAST;
+    case 'max':
+    case 'high':
+    case 'maximum':
+    case 'highest':
+      return anychart.enums.AggregationType.MAX;
+    case 'min':
+    case 'low':
+    case 'minimum':
+    case 'lowest':
+      return anychart.enums.AggregationType.MIN;
+    case 'average':
+    case 'avg':
+      return anychart.enums.AggregationType.AVERAGE;
+    case 'weightedaverage':
+    case 'weightedavg':
+    case 'wavg':
+    case 'weights':
+    case 'weighted':
+      return anychart.enums.AggregationType.WEIGHTED_AVERAGE;
+    case 'firstvalue':
+    case 'firstval':
+    case 'openvalue':
+    case 'openval':
+      return anychart.enums.AggregationType.FIRST_VALUE;
+    case 'lastvalue':
+    case 'lastval':
+    case 'closevalue':
+    case 'closeval':
+      return anychart.enums.AggregationType.LAST_VALUE;
+    case 'sum':
+    case 'add':
+      return anychart.enums.AggregationType.SUM;
+    case 'list':
+    case 'group':
+    case 'array':
+      return anychart.enums.AggregationType.LIST;
+    default:
+      return anychart.enums.AggregationType.LAST;
+  }
+};
+
+
+/**
+ * Enum for data table search modes.
+ * @enum {string}
+ */
+anychart.enums.TableSearchMode = {
+  EXACT_OR_PREV: 'exactOrPrev',
+  EXACT: 'exact',
+  EXACT_OR_NEXT: 'exactOrNext',
+  NEAREST: 'nearest'
+};
+
+
+/**
+ * Normalization for data table search mode.
+ * @param {*} value
+ * @return {anychart.enums.TableSearchMode}
+ */
+anychart.enums.normalizeTableSearchMode = function(value) {
+  if (!value) return anychart.enums.TableSearchMode.EXACT;
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'exact':
+    case 'e':
+    default:
+      return anychart.enums.TableSearchMode.EXACT;
+    case 'exactornext':
+    case 'next':
+    case 'n':
+      return anychart.enums.TableSearchMode.EXACT_OR_NEXT;
+    case 'exactorprev':
+    case 'prev':
+    case 'p':
+      return anychart.enums.TableSearchMode.EXACT_OR_PREV;
+    case 'nearest':
+    case 'near':
+    case 'closest':
+    case 'close':
+    case 'c':
+      return anychart.enums.TableSearchMode.NEAREST;
+  }
+};
+
+
+/**
+ * Scroller range changing possible initiators.
+ * @enum {string}
+ */
+anychart.enums.ScrollerRangeChangeSource = {
+  THUMB_DRAG: 'thumbDrag',
+  SELECTED_RANGE_DRAG: 'selectedRangeDrag',
+  BACKGROUND_CLICK: 'backgroundClick'
+};
+
+
+/**
+ * Stock range changing possible initiators.
+ * @enum {string}
+ */
+anychart.enums.StockRangeChangeSource = {
+  SCROLLER_THUMB_DRAG: 'scrollerThumbDrag',
+  SCROLLER_DRAG: 'scrollerDrag',
+  SCROLLER_CLICK: 'scrollerClick',
+  PLOT_DRAG: 'plotDrag',
+  DATA_CHANGE: 'dataUpdate'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @enum {string}
  */
-anychart.enums.AnyMapPointState = {
-  NORMAL: 'normal',
-  HOVER: 'hover',
-  SELECT: 'select'
+anychart.enums.TooltipDisplayMode = {
+  UNION: 'union',
+  SEPARATED: 'separated',
+  SINGLE: 'single'
+};
+
+
+/**
+ * Normalizes tooltips display mode.
+ * @param {*} value
+ * @return {anychart.enums.TooltipDisplayMode}
+ */
+anychart.enums.normalizeTooltipDisplayMode = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'union':
+    case 'u':
+      return anychart.enums.TooltipDisplayMode.UNION;
+    case 'separated':
+    case 'sp':
+      return anychart.enums.TooltipDisplayMode.SEPARATED;
+    case 'single':
+    case 's':
+      return anychart.enums.TooltipDisplayMode.SINGLE;
+  }
+  return anychart.enums.TooltipDisplayMode.SINGLE;
+};
+
+
+/**
+ * @enum {string}
+ */
+anychart.enums.TooltipPositionMode = {
+  FLOAT: 'float',
+  POINT: 'point',
+  CHART: 'chart'
+};
+
+
+/**
+ * Normalizes tooltips position mode.
+ * @param {*} value
+ * @return {anychart.enums.TooltipPositionMode}
+ */
+anychart.enums.normalizeTooltipPositionMode = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'float':
+    case 'fl':
+      return anychart.enums.TooltipPositionMode.FLOAT;
+    case 'point':
+    case 'pt':
+    case 'p':
+      return anychart.enums.TooltipPositionMode.POINT;
+    case 'chart':
+    case 'ch':
+    case 'c':
+      return anychart.enums.TooltipPositionMode.CHART;
+  }
+  return anychart.enums.TooltipPositionMode.FLOAT;
+};
+
+
+/**
+ * @enum {string}
+ */
+anychart.enums.CrosshairDisplayMode = {
+  FLOAT: 'float',
+  STICKY: 'sticky'
+};
+
+
+/**
+ * Normalizes tooltips position mode.
+ * @param {*} value
+ * @return {anychart.enums.CrosshairDisplayMode}
+ */
+anychart.enums.normalizeCrosshairDisplayMode = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'float':
+    case 'fl':
+    case 'f':
+      return anychart.enums.CrosshairDisplayMode.FLOAT;
+    case 'sticky':
+    case 'st':
+    case 's':
+      return anychart.enums.CrosshairDisplayMode.STICKY;
+  }
+  return anychart.enums.CrosshairDisplayMode.FLOAT;
 };
 
 
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
+
+goog.exportSymbol('anychart.enums.HoverMode.BY_SPOT', anychart.enums.HoverMode.BY_SPOT);
+goog.exportSymbol('anychart.enums.HoverMode.BY_X', anychart.enums.HoverMode.BY_X);
+
+goog.exportSymbol('anychart.enums.SelectionMode.NONE', anychart.enums.SelectionMode.NONE);
+goog.exportSymbol('anychart.enums.SelectionMode.SINGLE_SELECT', anychart.enums.SelectionMode.SINGLE_SELECT);
+goog.exportSymbol('anychart.enums.SelectionMode.MULTI_SELECT', anychart.enums.SelectionMode.MULTI_SELECT);
 
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);
@@ -2532,6 +3079,9 @@ goog.exportSymbol('anychart.enums.EventType.POINT_MOUSE_MOVE', anychart.enums.Ev
 goog.exportSymbol('anychart.enums.EventType.POINT_CLICK', anychart.enums.EventType.POINT_CLICK);
 goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.EventType.POINT_DBLCLICK);
 goog.exportSymbol('anychart.enums.EventType.POINT_SELECT', anychart.enums.EventType.POINT_SELECT);
+goog.exportSymbol('anychart.enums.EventType.POINT_HOVER', anychart.enums.EventType.POINT_HOVER);
+goog.exportSymbol('anychart.enums.EventType.POINTS_SELECT', anychart.enums.EventType.POINTS_SELECT);
+goog.exportSymbol('anychart.enums.EventType.POINTS_HOVER', anychart.enums.EventType.POINTS_HOVER);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);
@@ -2604,12 +3154,24 @@ goog.exportSymbol('anychart.enums.ColumnFormats.DATE_US_SHORT', anychart.enums.C
 goog.exportSymbol('anychart.enums.ColumnFormats.DATE_DMY_DOTS', anychart.enums.ColumnFormats.DATE_DMY_DOTS);
 goog.exportSymbol('anychart.enums.ColumnFormats.FINANCIAL', anychart.enums.ColumnFormats.FINANCIAL);
 
-goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEARS);
-goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTHS);
-goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAYS);
-goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOURS);
-goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTES);
-goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECONDS);
+goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAY);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOUR);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTE);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECOND);//deprecated since >7.6.0
+
+goog.exportSymbol('anychart.enums.Interval.YEAR', anychart.enums.Interval.YEAR);
+goog.exportSymbol('anychart.enums.Interval.SEMESTER', anychart.enums.Interval.SEMESTER);
+goog.exportSymbol('anychart.enums.Interval.QUARTER', anychart.enums.Interval.QUARTER);
+goog.exportSymbol('anychart.enums.Interval.MONTH', anychart.enums.Interval.MONTH);
+goog.exportSymbol('anychart.enums.Interval.THIRD_OF_MONTH', anychart.enums.Interval.THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.Interval.WEEK', anychart.enums.Interval.WEEK);
+goog.exportSymbol('anychart.enums.Interval.DAY', anychart.enums.Interval.DAY);
+goog.exportSymbol('anychart.enums.Interval.HOUR', anychart.enums.Interval.HOUR);
+goog.exportSymbol('anychart.enums.Interval.MINUTE', anychart.enums.Interval.MINUTE);
+goog.exportSymbol('anychart.enums.Interval.SECOND', anychart.enums.Interval.SECOND);
+goog.exportSymbol('anychart.enums.Interval.MILLISECOND', anychart.enums.Interval.MILLISECOND);
 
 goog.exportSymbol('anychart.enums.ErrorMode.NONE', anychart.enums.ErrorMode.NONE);
 goog.exportSymbol('anychart.enums.ErrorMode.X', anychart.enums.ErrorMode.X);
@@ -2627,3 +3189,35 @@ goog.exportSymbol('anychart.enums.ScatterScaleTypes.DATE_TIME', anychart.enums.S
 
 goog.exportSymbol('anychart.enums.GaugeScaleTypes.LINEAR', anychart.enums.GaugeScaleTypes.LINEAR);
 goog.exportSymbol('anychart.enums.GaugeScaleTypes.LOG', anychart.enums.GaugeScaleTypes.LOG);
+
+goog.exportSymbol('anychart.enums.AggregationType.AVERAGE', anychart.enums.AggregationType.AVERAGE);
+goog.exportSymbol('anychart.enums.AggregationType.FIRST', anychart.enums.AggregationType.FIRST);
+goog.exportSymbol('anychart.enums.AggregationType.FIRST_VALUE', anychart.enums.AggregationType.FIRST_VALUE);
+goog.exportSymbol('anychart.enums.AggregationType.LAST', anychart.enums.AggregationType.LAST);
+goog.exportSymbol('anychart.enums.AggregationType.LAST_VALUE', anychart.enums.AggregationType.LAST_VALUE);
+goog.exportSymbol('anychart.enums.AggregationType.LIST', anychart.enums.AggregationType.LIST);
+goog.exportSymbol('anychart.enums.AggregationType.MAX', anychart.enums.AggregationType.MAX);
+goog.exportSymbol('anychart.enums.AggregationType.MIN', anychart.enums.AggregationType.MIN);
+goog.exportSymbol('anychart.enums.AggregationType.SUM', anychart.enums.AggregationType.SUM);
+goog.exportSymbol('anychart.enums.AggregationType.WEIGHTED_AVERAGE', anychart.enums.AggregationType.WEIGHTED_AVERAGE);
+
+goog.exportSymbol('anychart.enums.TooltipDisplayMode.UNION', anychart.enums.TooltipDisplayMode.UNION);
+goog.exportSymbol('anychart.enums.TooltipDisplayMode.SEPARATED', anychart.enums.TooltipDisplayMode.SEPARATED);
+goog.exportSymbol('anychart.enums.TooltipDisplayMode.SINGLE', anychart.enums.TooltipDisplayMode.SINGLE);
+
+goog.exportSymbol('anychart.enums.TooltipPositionMode.FLOAT', anychart.enums.TooltipPositionMode.FLOAT);
+goog.exportSymbol('anychart.enums.TooltipPositionMode.POINT', anychart.enums.TooltipPositionMode.POINT);
+goog.exportSymbol('anychart.enums.TooltipPositionMode.CHART', anychart.enums.TooltipPositionMode.CHART);
+
+goog.exportSymbol('anychart.enums.CrosshairDisplayMode.FLOAT', anychart.enums.CrosshairDisplayMode.FLOAT);
+goog.exportSymbol('anychart.enums.CrosshairDisplayMode.STICKY', anychart.enums.CrosshairDisplayMode.STICKY);
+
+goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.NO_OVERLAP', anychart.enums.StockLabelsOverlapMode.NO_OVERLAP);
+goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP);
+goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP);
+goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_MINOR_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_MINOR_OVERLAP);
+
+goog.exportSymbol('anychart.enums.TableSearchMode.EXACT_OR_PREV', anychart.enums.TableSearchMode.EXACT_OR_PREV);
+goog.exportSymbol('anychart.enums.TableSearchMode.EXACT', anychart.enums.TableSearchMode.EXACT);
+goog.exportSymbol('anychart.enums.TableSearchMode.EXACT_OR_NEXT', anychart.enums.TableSearchMode.EXACT_OR_NEXT);
+goog.exportSymbol('anychart.enums.TableSearchMode.NEAREST', anychart.enums.TableSearchMode.NEAREST);

@@ -44,64 +44,6 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.hoverWhiskerWidth_ = 0;
-
-  this.fill(function() {
-    return anychart.color.lighten(anychart.color.lighten(this['sourceColor']));
-  });
-
-  /**
-   * Median stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.medianStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * Hover median stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverMedianStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * Stem stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.stemStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * Hover stem stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverStemStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * Whisker stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.whiskerStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
-
-  /**
-   * Hover whisker stroke setting.
-   * @type {acgraph.vector.Stroke|Function}
-   * @private
-   */
-  this.hoverWhiskerStroke_ = (function() {
-    return anychart.color.darken(this['sourceColor']);
-  });
 };
 goog.inherits(anychart.core.cartesian.series.Box, anychart.core.cartesian.series.WidthBased);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.BOX] = anychart.core.cartesian.series.Box;
@@ -196,7 +138,7 @@ anychart.core.cartesian.series.Box.prototype.getReferenceCoords = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -220,11 +162,11 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
 
     iterator
         .meta('x', x)
-        .meta('low', low)
+        .meta('lowest', low)
         .meta('q1', q1)
         .meta('median', median)
         .meta('q3', q3)
-        .meta('high', high)
+        .meta('highest', high)
         .meta('outliers', outliers)
         .meta('shape', path)
         .meta('medianPath', medianPath)
@@ -236,18 +178,18 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     this.drawBox_(path, x, q1, q3, pointWidth / 2);
     this.drawMedian_(medianPath, x, median, pointWidth / 2);
     this.drawStem_(stemPath, x, low, high, q1, q3);
-    this.drawWhisker_(false);
+    this.drawWhisker_(pointState);
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(path);
-    this.makeHoverable(medianPath);
-    this.makeHoverable(stemPath);
-    this.makeHoverable(whiskerPath);
+    this.makeInteractive(path);
+    this.makeInteractive(medianPath);
+    this.makeInteractive(stemPath);
+    this.makeInteractive(whiskerPath);
   }
 
   if (this.outlierMarkers().enabled()) {
-    this.drawOutlierMarkers_(false);
+    this.drawOutlierMarkers_(pointState);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -259,7 +201,7 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function() {
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(false);
+    this.applyHatchFill(pointState);
   }
 
   return true;
@@ -324,18 +266,18 @@ anychart.core.cartesian.series.Box.prototype.drawStem_ = function(path, x, low, 
 
 /**
  * Draws whisker.
- * @param {boolean} hover Whether whisker is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @private
  */
-anychart.core.cartesian.series.Box.prototype.drawWhisker_ = function(hover) {
+anychart.core.cartesian.series.Box.prototype.drawWhisker_ = function(pointState) {
   var iterator = this.getIterator();
   var path = iterator.meta('whiskerPath');
   if (!goog.isDef(path))
     return;
   var x = /** @type {number} */ (iterator.meta('x'));
-  var low = anychart.math.round(anychart.utils.toNumber(iterator.meta('low')), 0);
-  var high = anychart.math.round(anychart.utils.toNumber(iterator.meta('high')), 0);
-  var whiskerWidthValue = this.getWhiskerWidth(hover);
+  var low = anychart.math.round(anychart.utils.toNumber(iterator.meta('lowest')), 0);
+  var high = anychart.math.round(anychart.utils.toNumber(iterator.meta('highest')), 0);
+  var whiskerWidthValue = this.getWhiskerWidth(pointState);
 
   if (isNaN(whiskerWidthValue) || isNaN(low) || isNaN(high))
     return;
@@ -352,30 +294,30 @@ anychart.core.cartesian.series.Box.prototype.drawWhisker_ = function(hover) {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.Box.prototype.colorizeShape = function(pointState) {
   var iterator = this.getIterator();
 
   var shape = /** @type {acgraph.vector.Path} */(iterator.meta('shape'));
   if (goog.isDef(shape)) {
-    shape.stroke(this.getFinalStroke(true, hover));
-    shape.fill(this.getFinalFill(true, hover));
+    shape.stroke(this.getFinalStroke(true, pointState));
+    shape.fill(this.getFinalFill(true, pointState));
   }
 
   var medianPath = /** @type {acgraph.vector.Path} */(iterator.meta('medianPath'));
   if (goog.isDef(medianPath)) {
-    medianPath.stroke(this.getFinalMedianStroke_(hover));
+    medianPath.stroke(this.getFinalMedianStroke_(pointState));
     medianPath.fill('none');
   }
 
   var stemPath = /** @type {acgraph.vector.Path} */(iterator.meta('stemPath'));
   if (goog.isDef(stemPath)) {
-    stemPath.stroke(this.getFinalStemStroke_(hover));
+    stemPath.stroke(this.getFinalStemStroke_(pointState));
     stemPath.fill('none');
   }
 
   var whiskerPath = /** @type {acgraph.vector.Path} */(iterator.meta('whiskerPath'));
   if (goog.isDef(whiskerPath)) {
-    whiskerPath.stroke(this.getFinalWhiskerStroke_(hover));
+    whiskerPath.stroke(this.getFinalWhiskerStroke_(pointState));
     whiskerPath.fill('none');
   }
 };
@@ -395,9 +337,11 @@ anychart.core.cartesian.series.Box.prototype.startDrawing = function() {
 
   var outlierMarkers = this.outlierMarkers();
   var hoverOutlierMarkers = this.hoverOutlierMarkers();
+  var selectOutlierMarkers = this.selectOutlierMarkers();
 
   outlierMarkers.suspendSignalsDispatching();
   hoverOutlierMarkers.suspendSignalsDispatching();
+  selectOutlierMarkers.suspendSignalsDispatching();
 
   var fillColor = this.getOutlierMarkerFill();
   outlierMarkers.setAutoFill(fillColor);
@@ -429,9 +373,11 @@ anychart.core.cartesian.series.Box.prototype.finalizeDrawing = function() {
 
   this.outlierMarkers().resumeSignalsDispatching(false);
   this.hoverOutlierMarkers().resumeSignalsDispatching(false);
+  this.selectOutlierMarkers().resumeSignalsDispatching(false);
 
   this.outlierMarkers().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverOutlierMarkers().markConsistent(anychart.ConsistencyState.ALL);
+  this.selectOutlierMarkers().markConsistent(anychart.ConsistencyState.ALL);
 
   goog.base(this, 'finalizeDrawing');
 };
@@ -458,22 +404,47 @@ anychart.core.cartesian.series.Box.prototype.createPositionProvider = function(p
   var shape = iterator.meta('shape');
   if (shape) {
     var shapeBounds = shape.getBounds();
-    shapeBounds.top = iterator.meta('high');
-    shapeBounds.height = Math.abs(/** @type {number} */ (iterator.meta('high')) - /** @type {number} */ (iterator.meta('low')));
+    shapeBounds.top = iterator.meta('highest');
+    shapeBounds.height = Math.abs(/** @type {number} */ (iterator.meta('highest')) - /** @type {number} */ (iterator.meta('lowest')));
     position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('highest')}};
   }
 };
 
 
 /**
+ * Gets marker position.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
+ * @return {string} Position settings.
+ */
+anychart.core.cartesian.series.Box.prototype.getMarkersPosition = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
+
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+      markerPosition || this.markers().position();
+};
+
+
+/**
  * Draws outliers markers for the point.
- * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  * @private
  */
-anychart.core.cartesian.series.Box.prototype.drawOutlierMarkers_ = function(hovered) {
+anychart.core.cartesian.series.Box.prototype.drawOutlierMarkers_ = function(pointState) {
   var iterator = this.getIterator();
   var outliers = iterator.meta('outliers');
 
@@ -481,13 +452,25 @@ anychart.core.cartesian.series.Box.prototype.drawOutlierMarkers_ = function(hove
     return;
 
   var len = outliers.length;
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('outlierMarker');
+  var hoverPointMarker = iterator.get('hoverOutlierMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var index = iterator.getIndex();
+  var markersFactory;
+  if (selected) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectOutlierMarkers());
+  } else if (hovered) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverOutlierMarkers());
+  } else {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.outlierMarkers());
+  }
+
 
   for (var i = 0; i < len; i++) {
-    var pointMarker = iterator.get('outlierMarker');
-    var hoverPointMarker = iterator.get('hoverOutlierMarker');
-    var index = iterator.getIndex();
-    var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverOutlierMarkers() : this.outlierMarkers());
-
     if (!this.indexToMarkerIndexes_[index])
       this.indexToMarkerIndexes_[index] = [];
 
@@ -497,24 +480,29 @@ anychart.core.cartesian.series.Box.prototype.drawOutlierMarkers_ = function(hove
 
     var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
     var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+    var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-    var isDraw = hovered ?
-        goog.isNull(markerHoverEnabledState) ?
-            goog.isNull(this.hoverOutlierMarkers().enabled()) ?
-                goog.isNull(markerEnabledState) ?
-                    this.outlierMarkers().enabled() :
-                    markerEnabledState :
-                this.hoverOutlierMarkers().enabled() :
-            markerHoverEnabledState :
+    var isDraw = hovered || selected ?
+        hovered ?
+            goog.isNull(markerHoverEnabledState) ?
+                goog.isNull(this.hoverOutlierMarkers().enabled()) ?
+                    goog.isNull(markerEnabledState) ?
+                        this.outlierMarkers().enabled() :
+                        markerEnabledState :
+                    this.hoverOutlierMarkers().enabled() :
+                markerHoverEnabledState :
+            goog.isNull(markerSelectEnabledState) ?
+                goog.isNull(this.selectOutlierMarkers().enabled()) ?
+                    goog.isNull(markerEnabledState) ?
+                        this.outlierMarkers().enabled() :
+                        markerEnabledState :
+                    this.selectOutlierMarkers().enabled() :
+                markerSelectEnabledState :
         goog.isNull(markerEnabledState) ?
             this.outlierMarkers().enabled() :
             markerEnabledState;
 
     if (isDraw) {
-      var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
-      var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-      var position = (hovered && (markerHoverPosition || this.hoverOutlierMarkers().position())) || markerPosition || this.outlierMarkers().position();
-
       var positionProvider = {'value': {'x': iterator.meta('x'), 'y': outliers[i]}};
       if (marker) {
         marker.positionProvider(positionProvider);
@@ -599,24 +587,51 @@ anychart.core.cartesian.series.Box.prototype.hoverMedianStroke = function(opt_st
 
 
 /**
+ * Getter/setter for select median stroke setting.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Hover stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.Box|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.Box.prototype.selectMedianStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectMedianStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    return this;
+  }
+  return this.selectMedianStroke_;
+};
+
+
+/**
  * Method that gets final color of the median line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @private
  */
-anychart.core.cartesian.series.Box.prototype.getFinalMedianStroke_ = function(hover) {
+anychart.core.cartesian.series.Box.prototype.getFinalMedianStroke_ = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('medianStroke') ||
-      this.medianStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          iterator.get('hoverMedianStroke') ||
-          this.hoverMedianStroke() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((iterator.get('medianStroke')) || this.medianStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('selectMedianStroke') || this.selectMedianStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('hoverMedianStroke') || this.hoverMedianStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -665,24 +680,51 @@ anychart.core.cartesian.series.Box.prototype.hoverStemStroke = function(opt_stro
 
 
 /**
+ * Getter/setter for select median stroke setting.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Hover stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.Box|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.Box.prototype.selectStemStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectStemStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    return this;
+  }
+  return this.selectStemStroke_;
+};
+
+
+/**
  * Method that gets final color of the median line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @private
  */
-anychart.core.cartesian.series.Box.prototype.getFinalStemStroke_ = function(hover) {
+anychart.core.cartesian.series.Box.prototype.getFinalStemStroke_ = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('stemStroke') ||
-      this.stemStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          iterator.get('hoverStemStroke') ||
-          this.hoverStemStroke() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((iterator.get('stemStroke')) || this.stemStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('selectStemStroke') || this.selectStemStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('hoverStemStroke') || this.hoverStemStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -731,24 +773,51 @@ anychart.core.cartesian.series.Box.prototype.hoverWhiskerStroke = function(opt_s
 
 
 /**
+ * Getter/setter for select median stroke setting.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Hover stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.Box|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.Box.prototype.selectWhiskerStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectWhiskerStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    return this;
+  }
+  return this.selectWhiskerStroke_;
+};
+
+
+/**
  * Method that gets final color of the median line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @private
  */
-anychart.core.cartesian.series.Box.prototype.getFinalWhiskerStroke_ = function(hover) {
+anychart.core.cartesian.series.Box.prototype.getFinalWhiskerStroke_ = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('whiskerStroke') ||
-      this.whiskerStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          iterator.get('hoverWhiskerStroke') ||
-          this.hoverWhiskerStroke() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((iterator.get('whiskerStroke')) || this.whiskerStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('selectWhiskerStroke') || this.selectWhiskerStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        iterator.get('hoverWhiskerStroke') || this.hoverWhiskerStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -786,16 +855,41 @@ anychart.core.cartesian.series.Box.prototype.hoverWhiskerWidth = function(opt_va
 
 
 /**
+ * Getter/setter for whisker width settings.
+ * @param {(number|string)=} opt_value Whisker width.
+ * @return {(anychart.core.cartesian.series.Box|number|string)} Whisker width setting or self for chaining.
+ */
+anychart.core.cartesian.series.Box.prototype.selectWhiskerWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.selectWhiskerWidth_ != opt_value) {
+      this.selectWhiskerWidth_ = opt_value;
+    }
+    return this;
+  }
+  return this.selectWhiskerWidth_;
+};
+
+
+/**
  * Get whisker width in px.
- * @param {boolean} hover
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {number} Whisker width pixel value.
  */
-anychart.core.cartesian.series.Box.prototype.getWhiskerWidth = function(hover) {
+anychart.core.cartesian.series.Box.prototype.getWhiskerWidth = function(pointState) {
   var iterator = this.getIterator();
-  var whiskerWidth = hover ? (iterator.get('hoverWhiskerWidth') || this.hoverWhiskerWidth()) :
-      (iterator.get('whiskerWidth') || this.whiskerWidth());
+  var normalWhiskerWidth = iterator.get('whiskerWidth') || this.whiskerWidth();
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = iterator.get('selectWhiskerWidth') || this.selectWhiskerWidth() || normalWhiskerWidth;
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = iterator.get('hoverWhiskerWidth') || this.hoverWhiskerWidth() || normalWhiskerWidth;
+  } else {
+    result = normalWhiskerWidth;
+  }
+
   var pointWidth = this.getPointWidth();
-  return anychart.utils.normalizeSize(/** @type {(number|string)} */ (whiskerWidth), pointWidth) / 2;
+  return anychart.utils.normalizeSize(/** @type {(number|string)} */ (result), pointWidth) / 2;
 };
 
 
@@ -854,6 +948,43 @@ anychart.core.cartesian.series.Box.prototype.hoverOutlierMarkers = function(opt_
 
 
 /**
+ * Getter for series outlier markers on select.
+ * @param {(Object|boolean|null|string)=} opt_value Series outliers hover markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.Box)} Markers instance or itself for chaining call.
+ */
+anychart.core.cartesian.series.Box.prototype.selectOutlierMarkers = function(opt_value) {
+  if (!this.selectOutlierMarkers_) {
+    this.selectOutlierMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.registerDisposable(this.selectOutlierMarkers_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectOutlierMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.selectOutlierMarkers_;
+};
+
+
+/**
+ * Return outlier marker color for series.
+ * @return {!acgraph.vector.Fill} Marker color for series.
+ */
+anychart.core.cartesian.series.Box.prototype.getOutlierMarkerFill = function() {
+  return this.getFinalFill(false, anychart.PointState.NORMAL);
+};
+
+
+/**
+ * Return outlier marker color for series.
+ * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Marker color for series.
+ */
+anychart.core.cartesian.series.Box.prototype.getOutlierMarkerStroke = function() {
+  return anychart.color.darken(this.outlierMarkers().fill());
+};
+
+
+/**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -876,85 +1007,23 @@ anychart.core.cartesian.series.Box.prototype.makePointEvent = function(event) {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  this.unhover();
-  if (this.getIterator().select(index)) {
-    this.colorizeShape(true);
-    this.applyHatchFill(true);
-    this.drawMarker(true);
-    this.drawOutlierMarkers_(true);
-    this.drawLabel(true);
-    this.drawWhisker_(true);
-    if (opt_event) this.showTooltip(opt_event);
-  }
-  this.hoverStatus = index;
-  return this;
+anychart.core.cartesian.series.Box.prototype.applyAppearanceToPoint = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
+  this.drawOutlierMarkers_(pointState);
+  this.drawWhisker_(pointState);
+
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-
-  //hover all points
-  var iterator = this.getResetIterator();
-  while (iterator.advance()) {
-    this.colorizeShape(true);
-    this.applyHatchFill(true);
-    this.drawWhisker_(true);
-    this.drawOutlierMarkers_(true);
-
-  }
-  this.hoverStatus = -1;
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
-      if (goog.isDef(rect)) {
-        this.colorizeShape(false);
-        this.applyHatchFill(false);
-        this.drawWhisker_(false);
-        this.drawMarker(false);
-        this.drawOutlierMarkers_(false);
-        this.drawLabel(false);
-      }
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.colorizeShape(false);
-      this.applyHatchFill(false);
-      this.drawWhisker_(false);
-      this.drawOutlierMarkers_(false);
-    }
-  }
-  this.hoverStatus = NaN;
-  return this;
+anychart.core.cartesian.series.Box.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
+  this.drawOutlierMarkers_(pointState);
+  this.drawWhisker_(pointState);
 };
 
 
@@ -983,6 +1052,16 @@ anychart.core.cartesian.series.Box.prototype.serialize = function() {
     json['hoverMedianStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverMedianStroke()));
   }
 
+  if (goog.isFunction(this.selectMedianStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Box Series  selectMedianStroke']
+    );
+  } else {
+    json['selectMedianStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectMedianStroke()));
+  }
+
   if (goog.isFunction(this.stemStroke())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -1001,6 +1080,16 @@ anychart.core.cartesian.series.Box.prototype.serialize = function() {
     );
   } else {
     json['hoverStemStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStemStroke()));
+  }
+
+  if (goog.isFunction(this.selectStemStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Box Series  selectStemStroke']
+    );
+  } else {
+    json['selectStemStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStemStroke()));
   }
 
   if (goog.isFunction(this.whiskerStroke())) {
@@ -1023,11 +1112,23 @@ anychart.core.cartesian.series.Box.prototype.serialize = function() {
     json['hoverWhiskerStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverWhiskerStroke()));
   }
 
+  if (goog.isFunction(this.selectWhiskerStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Box Series  selectWhiskerStroke']
+    );
+  } else {
+    json['selectWhiskerStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectWhiskerStroke()));
+  }
+
   json['whiskerWidth'] = this.whiskerWidth_ || null;
   json['hoverWhiskerWidth'] = this.hoverWhiskerWidth_ || null;
+  json['selectWhiskerWidth'] = this.selectWhiskerWidth_ || null;
 
   json['outlierMarkers'] = this.outlierMarkers().serialize();
   json['hoverOutlierMarkers'] = this.hoverOutlierMarkers().serialize();
+  json['selectOutlierMarkers'] = this.selectOutlierMarkers().serialize();
 
   return json;
 };
@@ -1038,57 +1139,58 @@ anychart.core.cartesian.series.Box.prototype.serialize = function() {
  */
 anychart.core.cartesian.series.Box.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+
   this.medianStroke(config['medianStroke']);
   this.hoverMedianStroke(config['hoverMedianStroke']);
+  this.selectMedianStroke(config['selectMedianStroke']);
+
   this.stemStroke(config['stemStroke']);
   this.hoverStemStroke(config['hoverStemStroke']);
+  this.selectStemStroke(config['selectStemStroke']);
+
   this.whiskerStroke(config['whiskerStroke']);
   this.hoverWhiskerStroke(config['hoverWhiskerStroke']);
+  this.selectWhiskerStroke(config['selectWhiskerStroke']);
+
   this.whiskerWidth(config['whiskerWidth']);
   this.hoverWhiskerWidth(config['hoverWhiskerWidth']);
+  this.selectWhiskerWidth(config['selectWhiskerWidth']);
+
   this.outlierMarkers(config['outlierMarkers']);
   this.hoverOutlierMarkers(config['hoverOutlierMarkers']);
-};
-
-
-/**
- * Return outlier marker color for series.
- * @return {!acgraph.vector.Fill} Marker color for series.
- */
-anychart.core.cartesian.series.Box.prototype.getOutlierMarkerFill = function() {
-  return this.getFinalFill(false, false);
-};
-
-
-/**
- * Return outlier marker color for series.
- * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)} Marker color for series.
- */
-anychart.core.cartesian.series.Box.prototype.getOutlierMarkerStroke = function() {
-  return anychart.color.darken(this.outlierMarkers().fill());
+  this.selectOutlierMarkers(config['selectOutlierMarkers']);
 };
 
 
 //exports
 anychart.core.cartesian.series.Box.prototype['fill'] = anychart.core.cartesian.series.Box.prototype.fill;//inherited
-anychart.core.cartesian.series.Box.prototype['stroke'] = anychart.core.cartesian.series.Box.prototype.stroke;//inherited
 anychart.core.cartesian.series.Box.prototype['hoverFill'] = anychart.core.cartesian.series.Box.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.Box.prototype['selectFill'] = anychart.core.cartesian.series.Box.prototype.selectFill;//inherited
+
+anychart.core.cartesian.series.Box.prototype['stroke'] = anychart.core.cartesian.series.Box.prototype.stroke;//inherited
 anychart.core.cartesian.series.Box.prototype['hoverStroke'] = anychart.core.cartesian.series.Box.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Box.prototype['selectStroke'] = anychart.core.cartesian.series.Box.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.Box.prototype['hatchFill'] = anychart.core.cartesian.series.Box.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.Box.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Box.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.Box.prototype['selectHatchFill'] = anychart.core.cartesian.series.Box.prototype.selectHatchFill;//inherited
 
 anychart.core.cartesian.series.Box.prototype['medianStroke'] = anychart.core.cartesian.series.Box.prototype.medianStroke;
 anychart.core.cartesian.series.Box.prototype['hoverMedianStroke'] = anychart.core.cartesian.series.Box.prototype.hoverMedianStroke;
+anychart.core.cartesian.series.Box.prototype['selectMedianStroke'] = anychart.core.cartesian.series.Box.prototype.selectMedianStroke;
 
 anychart.core.cartesian.series.Box.prototype['stemStroke'] = anychart.core.cartesian.series.Box.prototype.stemStroke;
 anychart.core.cartesian.series.Box.prototype['hoverStemStroke'] = anychart.core.cartesian.series.Box.prototype.hoverStemStroke;
+anychart.core.cartesian.series.Box.prototype['selectStemStroke'] = anychart.core.cartesian.series.Box.prototype.selectStemStroke;
 
 anychart.core.cartesian.series.Box.prototype['whiskerStroke'] = anychart.core.cartesian.series.Box.prototype.whiskerStroke;
 anychart.core.cartesian.series.Box.prototype['hoverWhiskerStroke'] = anychart.core.cartesian.series.Box.prototype.hoverWhiskerStroke;
+anychart.core.cartesian.series.Box.prototype['selectWhiskerStroke'] = anychart.core.cartesian.series.Box.prototype.selectWhiskerStroke;
 
 anychart.core.cartesian.series.Box.prototype['whiskerWidth'] = anychart.core.cartesian.series.Box.prototype.whiskerWidth;
 anychart.core.cartesian.series.Box.prototype['hoverWhiskerWidth'] = anychart.core.cartesian.series.Box.prototype.hoverWhiskerWidth;
+anychart.core.cartesian.series.Box.prototype['selectWhiskerWidth'] = anychart.core.cartesian.series.Box.prototype.selectWhiskerWidth;
 
 anychart.core.cartesian.series.Box.prototype['outlierMarkers'] = anychart.core.cartesian.series.Box.prototype.outlierMarkers;
 anychart.core.cartesian.series.Box.prototype['hoverOutlierMarkers'] = anychart.core.cartesian.series.Box.prototype.hoverOutlierMarkers;
-anychart.core.cartesian.series.Box.prototype['unhover'] = anychart.core.cartesian.series.Box.prototype.unhover;
+anychart.core.cartesian.series.Box.prototype['selectOutlierMarkers'] = anychart.core.cartesian.series.Box.prototype.selectOutlierMarkers;

@@ -330,63 +330,63 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   if (goog.isDef(this.iconSize()))
     json['iconSize'] = this.iconSize();
 
-  if (goog.isFunction(this.iconType())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconType']
-    );
-  } else {
-    if (goog.isDef(this.iconType()))
-      json['iconType'] = this.iconType();
-  }
+  //if (goog.isFunction(this.iconType())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconType']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconType()))
+    json['iconType'] = this.iconType();
+  //}
 
-  if (goog.isFunction(this.iconMarkerType())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconMarkerType']
-    );
-  } else {
-    if (goog.isDef(this.iconMarkerType()))
-      json['iconMarkerType'] = this.iconMarkerType();
-  }
+  //if (goog.isFunction(this.iconMarkerType())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconMarkerType']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconMarkerType()))
+    json['iconMarkerType'] = this.iconMarkerType();
+  //}
 
   if (goog.isDef(this.disabled()))
     json['disabled'] = this.disabled();
 
-  if (goog.isFunction(this.iconFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconFill']
-    );
-  } else {
-    if (goog.isDef(this.iconFill()))
-      json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
-  }
+  //if (goog.isFunction(this.iconFill())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconFill']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconFill()))
+    json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
+  //}
 
-  if (goog.isFunction(this.iconStroke())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconStroke']
-    );
-  } else {
-    if (goog.isDef(this.iconStroke()))
-      json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
-  }
+  //if (goog.isFunction(this.iconStroke())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconStroke']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconStroke()))
+    json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
+  //}
 
-  if (goog.isFunction(this.iconHatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.iconHatchFill()))
-      json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
-  }
+  //if (goog.isFunction(this.iconHatchFill())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconHatchFill']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconHatchFill()))
+    json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
+  //}
 
   if (goog.isDef(this.iconMarkerFill()))
     json['iconMarkerFill'] = this.iconMarkerFill();

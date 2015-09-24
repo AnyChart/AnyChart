@@ -39,7 +39,7 @@ anychart.core.cartesian.series.Column.prototype.setAnimation = function(value) {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -54,7 +54,7 @@ anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function()
     var rect = /** @type {!acgraph.vector.Rect} */(this.rootElement.genNextChild());
     var barWidth = this.getPointWidth();
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y).meta('shape', rect);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y).meta('shape', rect);
     if (!this.isAnimation_)
       rect
         .setX(x - barWidth / 2)
@@ -66,9 +66,9 @@ anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function()
         .setX(x - barWidth / 2)
         .setWidth(barWidth);
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(rect);
+    this.makeInteractive(rect);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -81,7 +81,7 @@ anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function()
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(false);
+    this.applyHatchFill(pointState);
   }
 
   return true;
@@ -99,7 +99,12 @@ anychart.core.cartesian.series.Column.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.Column.prototype['fill'] = anychart.core.cartesian.series.Column.prototype.fill;//inherited
 anychart.core.cartesian.series.Column.prototype['hoverFill'] = anychart.core.cartesian.series.Column.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.Column.prototype['selectFill'] = anychart.core.cartesian.series.Column.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.Column.prototype['stroke'] = anychart.core.cartesian.series.Column.prototype.stroke;//inherited
 anychart.core.cartesian.series.Column.prototype['hoverStroke'] = anychart.core.cartesian.series.Column.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Column.prototype['selectStroke'] = anychart.core.cartesian.series.Column.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.Column.prototype['hatchFill'] = anychart.core.cartesian.series.Column.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Column.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.Column.prototype['selectHatchFill'] = anychart.core.cartesian.series.Column.prototype.selectHatchFill;//inherited

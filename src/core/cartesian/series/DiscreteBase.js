@@ -99,14 +99,14 @@ anychart.core.cartesian.series.DiscreteBase.prototype.startDrawing = function() 
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.DiscreteBase.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.DiscreteBase.prototype.colorizeShape = function(pointState) {
   var shape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('shape'));
   if (goog.isDef(shape)) {
-    shape.stroke(this.getFinalStroke(true, hover));
-    shape.fill(this.getFinalFill(true, hover));
+    shape.stroke(this.getFinalStroke(true, pointState));
+    shape.fill(this.getFinalFill(true, pointState));
   }
 };
 
@@ -114,93 +114,36 @@ anychart.core.cartesian.series.DiscreteBase.prototype.colorizeShape = function(h
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState If the point is hovered.
  * @protected
  */
-anychart.core.cartesian.series.DiscreteBase.prototype.applyHatchFill = function(hover) {
+anychart.core.cartesian.series.DiscreteBase.prototype.applyHatchFill = function(pointState) {
   var hatchFillShape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('hatchFillShape'));
   if (goog.isDefAndNotNull(hatchFillShape)) {
     hatchFillShape
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, hover));
+        .fill(this.getFinalHatchFill(true, pointState));
   }
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.DiscreteBase.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-
-  //hover all points
-  var iterator = this.getResetIterator();
-  while (iterator.advance()) {
-    this.colorizeShape(true);
-    this.applyHatchFill(true);
-
-  }
-  this.hoverStatus = -1;
-  return this;
+anychart.core.cartesian.series.DiscreteBase.prototype.isDiscreteBased = function() {
+  return true;
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.DiscreteBase.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  this.unhover();
-  if (this.getIterator().select(index)) {
-    this.colorizeShape(true);
-    this.applyHatchFill(true);
-    this.drawMarker(true);
-    this.drawLabel(true);
-    if (opt_event) this.showTooltip(opt_event);
-  }
-  this.hoverStatus = index;
-  return this;
+anychart.core.cartesian.series.DiscreteBase.prototype.applyAppearanceToPoint = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.DiscreteBase.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      var rect = /** @type {acgraph.vector.Rect} */(this.getIterator().meta('shape'));
-      if (goog.isDef(rect)) {
-        this.colorizeShape(false);
-        this.applyHatchFill(false);
-        this.drawMarker(false);
-        this.drawLabel(false);
-      }
-    }
-  } else {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.colorizeShape(false);
-      this.applyHatchFill(false);
-    }
-  }
-  this.hoverStatus = NaN;
-  return this;
+anychart.core.cartesian.series.DiscreteBase.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
 };
-
-
-//exports
-anychart.core.cartesian.series.DiscreteBase.prototype['unhover'] = anychart.core.cartesian.series.DiscreteBase.prototype.unhover;

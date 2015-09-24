@@ -43,12 +43,11 @@ anychart.core.VisualBase = function() {
   goog.base(this);
 
   /**
-   * Handler to manage broswer event listeners.
+   * Handler to manage browser event listeners.
    * @type {goog.events.EventHandler}
-   * @private
    */
-  this.eventsHandler_ = new goog.events.EventHandler(this);
-  this.registerDisposable(this.eventsHandler_);
+  this.eventsHandler = new goog.events.EventHandler(this);
+  this.registerDisposable(this.eventsHandler);
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };
@@ -138,15 +137,15 @@ anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, opt_overHandler, opt_outHandler,
     opt_clickHandler, opt_moveHandler, opt_downHandler, opt_upHandler) {
   element.tag = this;
-  this.eventsHandler_.listen(element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
-  this.eventsHandler_.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.CLICK, opt_clickHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.DBLCLICK, this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOVER, opt_overHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
 };
 
 
@@ -159,19 +158,20 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
  * @param {?function(anychart.core.MouseEvent)=} opt_clickHandler
  * @param {?function(anychart.core.MouseEvent)=} opt_moveHandler
  * @param {?function(anychart.core.MouseEvent)=} opt_allHandler - if set, replaces this.handleMouseEvent default.
+ * @param {?function(anychart.core.MouseEvent)=} opt_downHandler
  * @protected
  */
 anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, opt_overHandler, opt_outHandler,
-    opt_clickHandler, opt_moveHandler, opt_allHandler) {
-  this.eventsHandler_.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler_.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
+    opt_clickHandler, opt_moveHandler, opt_allHandler, opt_downHandler) {
+  this.eventsHandler.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
 };
 
 
@@ -294,23 +294,6 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
         }
       } else {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
-      }
-
-      // wrapping <svg> to div with position:relative and size of parent container
-      // need to correctly position credits <a> dom element
-      // see DVF-791
-      var innerDom;
-      if (this.container_ instanceof acgraph.vector.Stage) {
-        if (!this.container_.wrapped_) {
-          innerDom = goog.dom.createDom(goog.dom.TagName.DIV, {
-            style: 'position: relative; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden'
-          });
-          goog.dom.appendChild(/** @type {Element} */
-              ((/** @type {acgraph.vector.Stage} */(this.container_)).container()), innerDom);
-          this.container_.wrapped_ = true;
-          this.container_.container(innerDom);
-
-        }
       }
 
       var state = anychart.ConsistencyState.CONTAINER;
@@ -756,6 +739,15 @@ anychart.core.VisualBase.prototype.setupByJSON = function(config) {
 };
 
 
+/** @inheritDoc */
+anychart.core.VisualBase.prototype.disposeInternal = function() {
+  goog.dispose(this.eventsHandler);
+  this.eventsHandler = null;
+
+  goog.base(this, 'disposeInternal');
+};
+
+
 //exports
 anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//deprecated
 anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//deprecated
@@ -765,9 +757,4 @@ anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype
 
 anychart.core.VisualBase.prototype['zIndex'] = anychart.core.VisualBase.prototype.zIndex;//in docs/final
 anychart.core.VisualBase.prototype['enabled'] = anychart.core.VisualBase.prototype.enabled;//doc|ex
-anychart.core.VisualBase.prototype['saveAsPng'] = anychart.core.VisualBase.prototype.saveAsPng;
-anychart.core.VisualBase.prototype['saveAsJpg'] = anychart.core.VisualBase.prototype.saveAsJpg;
-anychart.core.VisualBase.prototype['saveAsPdf'] = anychart.core.VisualBase.prototype.saveAsPdf;
-anychart.core.VisualBase.prototype['saveAsSvg'] = anychart.core.VisualBase.prototype.saveAsSvg;
-anychart.core.VisualBase.prototype['toSvg'] = anychart.core.VisualBase.prototype.toSvg;
 anychart.core.VisualBase.prototype['print'] = anychart.core.VisualBase.prototype.print;

@@ -6,6 +6,7 @@ goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
@@ -26,7 +27,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
   goog.base(this);
   this.suspendSignalsDispatching();
 
-
   /**
    * The width of the connector compared to the ((bounds.width - baseWidth) / 2), or the pixel width if it is a number.
    * Defaults to 20 px.
@@ -35,13 +35,11 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.connectorLength_;
 
-
   /**
    * @type {!acgraph.vector.Stroke}
    * @private
    */
   this.connectorStroke_;
-
 
   /**
    * Default fill function.
@@ -52,7 +50,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.fill_;
 
-
   /**
    * Hatch fill.
    * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
@@ -60,13 +57,11 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.hatchFill_ = null;
 
-
   /**
    * @type {anychart.palettes.HatchFills}
    * @private
    */
   this.hatchFillPalette_ = null;
-
 
   /**
    * The width of the pyramid/funnel compared to the width of the bounds, or the pixel width if it is a number.
@@ -75,7 +70,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.baseWidth_;
-
 
   /**
    * Default fill function for hover state.
@@ -86,7 +80,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.hoverFill_;
 
-
   /**
    * Hover hatch fill.
    * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
@@ -94,13 +87,11 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.hoverHatchFill_;
 
-
   /**
    * @type {anychart.core.ui.MarkersFactory}
    * @private
    */
   this.hoverMarkers_ = null;
-
 
   /**
    * Default stroke function for hover state.
@@ -111,6 +102,36 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.hoverStroke_;
 
+  /**
+   * Default fill function for hover state.
+   * this {{index:number, sourceColor: acgraph.vector.Fill}}
+   * return {acgraph.vector.Fill} Fill for a chart point in hover state.
+   * @type {acgraph.vector.Fill|Function}
+   * @private
+   */
+  this.selectFill_;
+
+  /**
+   * Select hatch fill.
+   * @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean}
+   * @private
+   */
+  this.selectHatchFill_;
+
+  /**
+   * @type {anychart.core.ui.MarkersFactory}
+   * @private
+   */
+  this.selectMarkers_ = null;
+
+  /**
+   * Default stroke function for select state.
+   * this {{index:number, sourceColor: acgraph.vector.Stroke}}
+   * return {acgraph.vector.Stroke} Stroke for a chart point in hover state.
+   * @type {acgraph.vector.Stroke|Function}
+   * @private
+   */
+  this.selectStroke_;
 
   /**
    * @type {!anychart.data.Iterator}
@@ -118,13 +139,11 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.iterator_;
 
-
   /**
    * @type {anychart.core.ui.LabelsFactory}
    * @private
    */
   this.labels_ = null;
-
 
   /**
    * List of all label domains
@@ -132,13 +151,11 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.labelDomains = [];
 
-
   /**
    * @type {anychart.palettes.Markers}
    * @private
    */
   this.markerPalette_ = null;
-
 
   /**
    * @type {anychart.core.ui.MarkersFactory}
@@ -146,14 +163,12 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.markers_ = null;
 
-
   /**
    * The minimum height of the point.
    * @type {number}
    * @private
    */
   this.minHeightOfPoint_ = 1;
-
 
   /**
    * The height of the neck. (for funnel)
@@ -169,14 +184,12 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.neckWidth_ = NaN;
 
-
   /**
    * Chart default palette.
    * @type {anychart.palettes.DistinctColors|anychart.palettes.RangeColors}
    * @private
    */
   this.palette_ = null;
-
 
   /**
    * Original view for the chart data.
@@ -185,14 +198,12 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.parentView_ = null;
 
-
   /**
    * Chart point provider.
    * @type {anychart.core.utils.PointContextProvider}
    * @private
    */
   this.pointProvider_;
-
 
   /**
    * The distance between points in pixels (or percent) of the bounds height.
@@ -202,14 +213,12 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    */
   this.pointsPadding_ = 3;
 
-
   /**
    * Specifies that the pyramid is inverted base up.
    * @type {boolean}
    * @private
    */
   this.reversed_ = false;
-
 
   /**
    * Object with information about chart.
@@ -218,7 +227,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.statistics_;
-
 
   /**
    * Default stroke function.
@@ -231,10 +239,15 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
     return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this['sourceColor'], .2));
   });
 
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
+
   this.data(opt_data || null, opt_csvSettings);
 
   this.resumeSignalsDispatching(false);
-  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, null, this.handleMouseOverAndMove_);
 };
 goog.inherits(anychart.core.PyramidFunnelBase, anychart.core.SeparateChart);
 
@@ -295,6 +308,31 @@ anychart.core.PyramidFunnelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
     anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.PyramidFunnelBase.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * Tester if the series is discrete based.
+ * @return {boolean}
+ */
+anychart.core.PyramidFunnelBase.prototype.isDiscreteBased = function() {
+  return true;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
+  return true;
+};
 
 
 /**
@@ -366,6 +404,7 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
  */
 anychart.core.PyramidFunnelBase.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    this.statistics_ = null;
     this.invalidate(
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
@@ -385,6 +424,15 @@ anychart.core.PyramidFunnelBase.prototype.dataInvalidated_ = function(event) {
  */
 anychart.core.PyramidFunnelBase.prototype.getIterator = function() {
   return this.iterator_ || (this.iterator_ = this.view_.getIterator());
+};
+
+
+/**
+ * Returns new default iterator for the current mapping.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.core.PyramidFunnelBase.prototype.getResetIterator = function() {
+  return this.iterator_ = this.view_.getIterator();
 };
 
 
@@ -421,62 +469,18 @@ anychart.core.PyramidFunnelBase.prototype.normalizeColor = function(color, var_a
 
 
 /**
- * Method that gets final fill color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the fill should be a hover fill.
- * @return {!acgraph.vector.Fill} Final hover fill for the current point.
- * @protected
- */
-anychart.core.PyramidFunnelBase.prototype.getFillColor = function(usePointSettings, hover) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      (usePointSettings && acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(iterator.get('fill')))) || this.fill());
-
-  return /** @type {!acgraph.vector.Fill} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(
-          (usePointSettings && acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(iterator.get('hoverFill')))) || this.hoverFill() || normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
-};
-
-
-/**
- * Method that gets final stroke color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the stroke should be a hover stroke.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current point.
- * @protected
- */
-anychart.core.PyramidFunnelBase.prototype.getStrokeColor = function(usePointSettings, hover) {
-  var iterator = this.getIterator();
-
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      (usePointSettings && acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')))) ||
-      this.stroke());
-
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          (usePointSettings && acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(iterator.get('hoverStroke')))) || this.hoverStroke() || normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
-};
-
-
-/**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.colorizePoint_ = function(hover) {
+anychart.core.PyramidFunnelBase.prototype.colorizePoint_ = function(pointState) {
   var point = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('point'));
   if (goog.isDef(point)) {
-    var fillColor = this.getFillColor(true, hover);
+    var fillColor = this.getFinalFill(true, pointState);
     point.fill(fillColor);
 
-    var strokeColor = this.getStrokeColor(true, hover);
+    var strokeColor = this.getFinalStroke(true, pointState);
     point.stroke(strokeColor);
   }
 };
@@ -767,23 +771,58 @@ anychart.core.PyramidFunnelBase.prototype.hoverFill = function(opt_fillOrColorOr
 
 
 /**
+ * Getter/setter for the chart points fill in the select state.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.PyramidFunnelBase|Function} .
+ */
+anychart.core.PyramidFunnelBase.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.selectFill_) {
+      this.selectFill_ = fill;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.selectFill_;
+};
+
+
+/**
  * Method that gets final stroke color for the current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalFill = function(usePointSettings, hover) {
+anychart.core.PyramidFunnelBase.prototype.getFinalFill = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      (usePointSettings && acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(iterator.get('fill')))) || this.fill());
-  var result = /** @type {!acgraph.vector.Fill} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(
-          (usePointSettings && acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(iterator.get('hoverFill')))) || this.hoverFill() || normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
-  return acgraph.vector.normalizeFill(result);
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        (usePointSettings && iterator.get('selectFill')) || this.selectFill() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
 };
 
 
@@ -875,13 +914,37 @@ anychart.core.PyramidFunnelBase.prototype.hoverHatchFill = function(opt_patternF
 
 
 /**
+ * Getter/setter for current select hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.PyramidFunnelBase|Function|boolean} Hatch fill.
+ */
+anychart.core.PyramidFunnelBase.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (this.selectHatchFill_ != hatchFill)
+      this.selectHatchFill_ = hatchFill;
+
+    return this;
+  }
+  return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.selectHatchFill_);
+};
+
+
+/**
  * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the hatch fill should be a hover hatch fill.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.PyramidFunnelBase.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
 
   var normalHatchFill;
@@ -892,7 +955,15 @@ anychart.core.PyramidFunnelBase.prototype.getFinalHatchFill = function(usePointS
   }
 
   var hatchFill;
-  if (hover) {
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    if (usePointSettings && goog.isDef(iterator.get('selectHatchFill'))) {
+      hatchFill = iterator.get('selectHatchFill');
+    } else if (goog.isDef(this.selectHatchFill())) {
+      hatchFill = this.selectHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
     if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
       hatchFill = iterator.get('hoverHatchFill');
     } else if (goog.isDef(this.hoverHatchFill())) {
@@ -939,15 +1010,15 @@ anychart.core.PyramidFunnelBase.prototype.normalizeHatchFill = function(hatchFil
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.applyHatchFill = function(hover) {
+anychart.core.PyramidFunnelBase.prototype.applyHatchFill = function(pointState) {
   var hatchPoint = /** @type {acgraph.vector.Path} */(this.getIterator().meta('hatchPoint'));
   if (goog.isDefAndNotNull(hatchPoint)) {
     hatchPoint
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, hover));
+        .fill(this.getFinalHatchFill(true, pointState));
   }
 };
 
@@ -1054,27 +1125,57 @@ anychart.core.PyramidFunnelBase.prototype.hoverStroke = function(opt_strokeOrFil
 
 
 /**
+ * Getter for the chart points stroke in the select state.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.PyramidFunnelBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.PyramidFunnelBase.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.selectStroke_) {
+      this.selectStroke_ = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.selectStroke_;
+};
+
+
+/**
  * Method that gets final line color for the current point, with all fallbacks taken into account.
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.getFinalStroke = function(usePointSettings, hover) {
+anychart.core.PyramidFunnelBase.prototype.getFinalStroke = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      (usePointSettings && acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')))) ||
-      this.stroke());
-  var result = /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          (acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke} */(iterator.get('hoverStroke'))) && usePointSettings) ||
-          this.hoverStroke() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
 
-  return acgraph.vector.normalizeStroke(result);
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (usePointSettings && iterator.get('selectStroke')) || this.selectStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -1192,6 +1293,10 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     // drawPoint_ must be called independently since centerX may be shifted at any iteration of the iterator.
     iterator.reset();
     while (iterator.advance()) {
+      var index = iterator.getIndex();
+      if (iterator.get('selected'))
+        this.state.setPointState(anychart.PointState.SELECT, index);
+
       this.drawPoint_();
     }
 
@@ -1212,7 +1317,8 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
 
     iterator.reset();
     while (iterator.advance()) {
-      this.drawMarker(false);
+
+      this.drawMarker(this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex()));
     }
 
     this.markers().draw();
@@ -1227,9 +1333,9 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     }
 
     if (this.isInsideLabels_()) {
-      this.labels().setAutoColor(anychart.getFullTheme()['pyramidFunnel']['insideLabels']['autoColor']);
+      this.labels().setAutoColor(this.getProperThemePart()['insideLabels']['autoColor']);
     } else {
-      this.labels().setAutoColor(anychart.getFullTheme()['pyramidFunnel']['outsideLabels']['autoColor']);
+      this.labels().setAutoColor(this.getProperThemePart()['outsideLabels']['autoColor']);
 
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
           this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
@@ -1263,7 +1369,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
         iterator.meta('labelWidthForced', undefined);
       }
 
-      this.drawLabel_(false);
+      this.drawLabel_(this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex()));
     }
     this.overlapCorrection_();
 
@@ -1272,6 +1378,15 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
 
     this.markConsistent(anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS);
   }
+};
+
+
+/**
+ * @return {*}
+ * @protected
+ */
+anychart.core.PyramidFunnelBase.prototype.getProperThemePart = function() {
+  return anychart.getFullTheme()['pyramid'];
 };
 
 
@@ -1496,13 +1611,20 @@ anychart.core.PyramidFunnelBase.prototype.drawPoint_ = function() {
 
   iterator.meta('point', point);
 
-  point.tag = index;
-  var hover = (this.hoverStatus == index);
-  this.colorizePoint_(hover);
+  point.tag = {
+    index: index,
+    series: this
+  };
+
+  var state = this.state.getPointStateByIndex(iterator.getIndex());
+  this.colorizePoint_(state);
   if (hatchPoint) {
     hatchPoint.deserialize(point.serialize());
-    hatchPoint.tag = index;
-    this.applyHatchFill(hover);
+    hatchPoint.tag = {
+      index: index,
+      series: this
+    };
+    this.applyHatchFill(state);
   }
 };
 
@@ -1514,52 +1636,39 @@ anychart.core.PyramidFunnelBase.prototype.drawPoint_ = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.PyramidFunnelBase.prototype.makeBrowserEvent = function(e) {
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = {
+    'type': e['type'],
+    'target': this,
+    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
+    'domTarget': e['target'],
+    'relatedDomTarget': e['relatedTarget'],
+    'offsetX': e['offsetX'],
+    'offsetY': e['offsetY'],
+    'clientX': e['clientX'],
+    'clientY': e['clientY'],
+    'screenX': e['screenX'],
+    'screenY': e['screenY'],
+    'button': e['button'],
+    'keyCode': e['keyCode'],
+    'charCode': e['charCode'],
+    'ctrlKey': e['ctrlKey'],
+    'altKey': e['altKey'],
+    'shiftKey': e['shiftKey'],
+    'metaKey': e['metaKey'],
+    'platformModifierKey': e['platformModifierKey'],
+    'state': e['state']
+  };
   var tag = anychart.utils.extractTag(res['domTarget']);
   if (!anychart.utils.isNaN(tag))
-    res['pointIndex'] = anychart.utils.toNumber(tag);
+    res['pointIndex'] = anychart.utils.toNumber(tag.index);
+
   return res;
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.PyramidFunnelBase.prototype.handleMouseOverAndMove_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt &&
-      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && !isNaN(this.hoverStatus)) ||
-      this.dispatchEvent(evt))) {
-    // we don't want to dispatch if this an out-over from the same slice
-    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
-    this.hoverPoint_(/** @type {number} */ (evt['pointIndex']), event);
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.core.PyramidFunnelBase.prototype.handleMouseOut_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt) {
-    if (anychart.utils.checkIfParent(this, event['relatedTarget']) &&
-        anychart.utils.toNumber(anychart.utils.extractTag(event['relatedDomTarget'])) == evt['pointIndex']) {
-      // this means we got an out-over on the same slice, for example - from the slice to inside label
-      // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
-      this.hoverPoint_(/** @type {number} */ (evt['pointIndex']), event);
-    } else if (this.dispatchEvent(evt)) {
-      this.unhoverPoint_();
-    }
-  }
 };
 
 
 /** @inheritDoc */
 anychart.core.PyramidFunnelBase.prototype.handleMouseEvent = function(event) {
-  var evt = this.makePointEvent_(event);
+  var evt = this.makePointEvent(event);
   if (evt)
     this.dispatchEvent(evt);
 };
@@ -1570,9 +1679,8 @@ anychart.core.PyramidFunnelBase.prototype.handleMouseEvent = function(event) {
  * browser events.
  * @param {anychart.core.MouseEvent} event
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- * @private
  */
-anychart.core.PyramidFunnelBase.prototype.makePointEvent_ = function(event) {
+anychart.core.PyramidFunnelBase.prototype.makePointEvent = function(event) {
   var pointIndex;
   if ('pointIndex' in event) {
     pointIndex = event['pointIndex'];
@@ -1581,9 +1689,8 @@ anychart.core.PyramidFunnelBase.prototype.makePointEvent_ = function(event) {
   } else if ('markerIndex' in event) {
     pointIndex = event['markerIndex'];
   }
+
   pointIndex = anychart.utils.toNumber(pointIndex);
-  if (isNaN(pointIndex))
-    return null;
 
   event['pointIndex'] = pointIndex;
 
@@ -1630,141 +1737,275 @@ anychart.core.PyramidFunnelBase.prototype.makePointEvent_ = function(event) {
 };
 
 
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.getSeriesStatus = function(event) {
+  //todo (blackart) coming soon.
+  //var bounds = anychart.math.rect(0, 0, 0, 0);
+  //var clientX = event['clientX'];
+  //var clientY = event['clientY'];
+  //
+  //var value, index, iterator;
+  //
+  //var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  //
+  //var x = clientX - containerOffset.x;
+  //var y = clientY - containerOffset.y;
+  //
+  //var minX = bounds.left;
+  //var minY = bounds.top;
+  //var rangeX = bounds.width;
+  //var rangeY = bounds.height;
+  //
+  //if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+  //  return null;
+  //
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+
+  }
+
+  return points;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Hover.
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Point hover status. NaN - not hovered, non-negative number - chart point with this index hovered.
- * @type {number}
- * @protected
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
+ * @return {!anychart.core.PyramidFunnelBase}  {@link anychart.core.PyramidFunnelBase} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverStatus = NaN;
+anychart.core.PyramidFunnelBase.prototype.hover = function(opt_indexOrIndexes) {
+  if (goog.isDef(opt_indexOrIndexes))
+    this.hoverPoint(opt_indexOrIndexes);
+  else
+    this.hoverSeries();
 
-
-/**
- * Hovers chart point by its index.
- * @private
- * @param {number} index Index of the point to hover.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate Point hovering.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- */
-anychart.core.PyramidFunnelBase.prototype.hoverPoint_ = function(index, opt_event) {
-  var iterator = this.getIterator();
-
-  if (this.hoverStatus == index) {
-    if (iterator.select(index)) {
-      if (opt_event) this.showTooltip(opt_event);
-    }
-    return this;
-  }
-  this.unhover();
-
-  iterator.reset();
-  while (iterator.advance()) {
-    this.drawLabel_(iterator.getIndex() == index);
-  }
-  this.overlapCorrection_(this.labels().getLabel(index));
-
-  if (iterator.reset().select(index)) {
-    this.colorizePoint_(true);
-    this.applyHatchFill(true);
-    this.drawMarker(true);
-    if (goog.isDef(opt_event)) {
-      // Select index again because drawLabel changes the position of the iterator if the overlap calculation was performed.
-      this.getIterator().select(index);
-      if (opt_event) this.showTooltip(opt_event);
-    }
-  }
-  this.hoverStatus = index;
   return this;
 };
 
 
-/**
- * Removes hover from the chart point.
- * @private
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- */
-anychart.core.PyramidFunnelBase.prototype.unhoverPoint_ = function() {
-  if (isNaN(this.hoverStatus)) return this;
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.unhover = function() {
+  if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
+      !this.enabled())
+    return;
 
+  this.state.removePointState(anychart.PointState.HOVER, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+
+  //---------------------------------------------------------------------
   var iterator = this.getIterator();
   iterator.reset();
   while (iterator.advance()) {
-    this.drawLabel_(false);
+    this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
   }
   this.overlapCorrection_();
+  //---------------------------------------------------------------------
 
-  if (iterator.select(this.hoverStatus)) {
-    this.colorizePoint_(false);
-    this.applyHatchFill(false);
-    this.drawMarker(false);
-    this.hideTooltip();
-  }
-  this.hoverStatus = NaN;
-  return this;
+  this.hideTooltip();
 };
 
 
 /**
- *
- * @private
- * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.core.PyramidFunnelBase}  {@link anychart.core.PyramidFunnelBase} instance for method chaining.
  */
-anychart.core.PyramidFunnelBase.prototype.hoverAllPoints_ = function() {
-  this.hoverStatus = -1;
-  var iterator = this.getIterator();
+anychart.core.PyramidFunnelBase.prototype.hoverPoint = function(index, opt_event) {
+  if (!this.enabled())
+    return this;
 
-  iterator.reset();
-  while (iterator.advance()) {
-    this.drawLabel_(true);
-    this.colorizePoint_(true);
-    this.applyHatchFill(true);
-    this.drawMarker(true);
-  }
-  this.overlapCorrection_(null, true);
-  return this;
-};
+  var iterator;
+  if (goog.isArray(index)) {
+    var hoveredPoints = this.state.getIndexByPointState(anychart.PointState.HOVER);
+    for (var i = 0; i < hoveredPoints.length; i++) {
+      if (!goog.array.contains(index, hoveredPoints[i])) {
+        this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
+      }
+    }
+    this.state.addPointState(anychart.PointState.HOVER, index);
+    this.showTooltip(opt_event);
 
-
-/**
- * If index is passed, hovers a point of the chart by its index, else hovers all points of the chart.
- * @param {number=} opt_index
- * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
- */
-anychart.core.PyramidFunnelBase.prototype.hover = function(opt_index) {
-  if (goog.isDef(opt_index)) this.hoverPoint_(opt_index);
-  else this.hoverAllPoints_();
-  return this;
-};
-
-
-/**
- * Removes hover from all chart points.
- * @return {!anychart.core.PyramidFunnelBase} instance for method chaining.
- */
-anychart.core.PyramidFunnelBase.prototype.unhover = function() {
-  if (this.hoverStatus >= 0) {
-    this.unhoverPoint_();
-  } else {
-    var iterator = this.getIterator();
-    iterator.reset();
+    iterator = this.getResetIterator();
     while (iterator.advance()) {
-      this.drawLabel_(false);
-      this.colorizePoint_(false);
-      this.applyHatchFill(false);
-      this.drawMarker(false);
-      this.hideTooltip();
+      this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
     }
     this.overlapCorrection_();
+
+
+  } else if (goog.isNumber(index)) {
+    this.unhover();
+    this.state.addPointState(anychart.PointState.HOVER, index);
+    this.showTooltip(opt_event);
+
+    iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
+    }
+    this.overlapCorrection_(this.labels().getLabel(index));
   }
+
+  // for float tooltip
+  this.getIterator().select(index[0] || index);
+  return this;
+};
+
+
+/**
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.core.PyramidFunnelBase} An instance of the {@link anychart.core.PyramidFunnelBase} class for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.hoverSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.setPointState(anychart.PointState.HOVER);
+  this.overlapCorrection_(null);
 
   return this;
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Select.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Imitates selects a point of the series by its index.
+ * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
+ * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.select = function(opt_indexOrIndexes) {
+  if (!this.enabled())
+    return this;
+
+  if (goog.isDef(opt_indexOrIndexes))
+    this.selectPoint(opt_indexOrIndexes);
+  else
+    this.selectSeries();
+
+  return this;
+};
+
+
+/**
+ * Selects all points of the series. Use <b>unselect</b> method for unselect series.
+ * @return {!anychart.core.PyramidFunnelBase} An instance of the {@link anychart.core.PyramidFunnelBase} class for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.selectSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  //hide tooltip in any case
+  this.hideTooltip();
+
+  this.state.setPointState(anychart.PointState.SELECT);
+  this.overlapCorrection_(null);
+
+  return this;
+};
+
+
+/**
+ * Selects a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to select.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
+ * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
+ */
+anychart.core.PyramidFunnelBase.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  if (!this.enabled())
+    return this;
+
+  var unselect = !(opt_event && opt_event.shiftKey);
+
+  if (goog.isArray(indexOrIndexes)) {
+    if (!opt_event)
+      this.unselect();
+
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+  } else if (goog.isNumber(indexOrIndexes)) {
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+  }
+
+  var iterator = this.getResetIterator();
+  while (iterator.advance()) {
+    this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
+  }
+  var index;
+  if (goog.isNumber(indexOrIndexes))
+    index = this.labels().getLabel(indexOrIndexes);
+  this.overlapCorrection_(index);
+
+  // for float tooltip
+  this.getIterator().select(indexOrIndexes[0] || indexOrIndexes);
+
+  return this;
+};
+
+
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.unselect = function() {
+  if (!this.enabled())
+    return;
+
+  this.state.removePointState(anychart.PointState.SELECT, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+
+  //---------------------------------------------------------------------
+  var iterator = this.getIterator();
+  iterator.reset();
+  while (iterator.advance()) {
+    this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
+  }
+  this.overlapCorrection_();
+  //---------------------------------------------------------------------
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Apply appearance.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.PyramidFunnelBase.prototype.applyAppearanceToPoint = function(pointState) {
+  this.colorizePoint_(pointState);
+  this.applyHatchFill(pointState);
+  this.drawMarker(pointState);
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.PyramidFunnelBase.prototype.applyAppearanceToSeries = function(pointState) {
+  this.drawLabel_(pointState);
+  this.colorizePoint_(pointState);
+  this.applyHatchFill(pointState);
+  this.drawMarker(pointState);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Settings.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * The width of the pyramid/funnel in pixels or in percentage of the width of the bounds.
  * Defaults to 90%.
@@ -1923,6 +2164,44 @@ anychart.core.PyramidFunnelBase.prototype.labels = function(opt_value) {
 
 
 /**
+ * Getter/setter for series hover data labels.
+ * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} Labels instance or itself for chaining call.
+ */
+anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
+  if (!this.hoverLabels_) {
+    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
+    this.registerDisposable(this.hoverLabels_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.hoverLabels_.setup(opt_value);
+    return this;
+  }
+  return this.hoverLabels_;
+};
+
+
+/**
+ * Getter/setter for series select data labels.
+ * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} Labels instance or itself for chaining call.
+ */
+anychart.core.PyramidFunnelBase.prototype.selectLabels = function(opt_value) {
+  if (!this.selectLabels_) {
+    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
+    this.registerDisposable(this.selectLabels_);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectLabels_.setup(opt_value);
+    return this;
+  }
+  return this.selectLabels_;
+};
+
+
+/**
  * Internal label invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
  * @private
@@ -1940,55 +2219,6 @@ anychart.core.PyramidFunnelBase.prototype.labelsInvalidated_ = function(event) {
   }
 
   this.invalidate(state, signal);
-};
-
-
-/**
- * Getter for series hover data labels.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pyramid(data);
- *  chart.hoverLabels()
- *      .fontSize(10)
- *      .fontStyle('italic')
- *      .fontColor('red');
- *  chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory} Current labels instance.
- *//**
- * Setter for series hover data labels.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pyramid(data);
- *  chart.hoverLabels(false);
- *  chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(Object|boolean|null)=} opt_value chart hover data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} Labels instance or itself for chaining call.
- */
-anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.registerDisposable(this.hoverLabels_);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
 };
 
 
@@ -2112,40 +2342,62 @@ anychart.core.PyramidFunnelBase.prototype.connectorStroke = function(opt_strokeO
 /**
  * Draws outside label for a point.
  * @private
- * @param {boolean} hovered If it is a hovered label drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {anychart.core.ui.LabelsFactory.Label} Label.
  */
-anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(hovered) {
+anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
   var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
   var pointLabel = iterator.get('label');
   var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
+  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+
   var index = iterator.getIndex();
-  var labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(hovered ? this.hoverLabels() : this.labels());
+  var labelsFactory;
+  if (selected) {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  } else if (hovered) {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  } else {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+  }
+
   var label = this.labels().getLabel(index);
 
   var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
   var labelHoverEnabledState = hoverPointLabel && goog.isDef(hoverPointLabel['enabled']) ? hoverPointLabel['enabled'] : null;
+  var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
 
-  var isDraw = hovered ?
-      goog.isNull(labelHoverEnabledState) ?
-          goog.isNull(this.hoverLabels().enabled()) ?
-              goog.isNull(labelEnabledState) ?
-                  this.labels().enabled() :
-                  labelEnabledState :
-              this.hoverLabels().enabled() :
-          labelHoverEnabledState :
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(labelHoverEnabledState) ?
+              goog.isNull(this.hoverLabels().enabled()) ?
+                  goog.isNull(labelEnabledState) ?
+                      this.labels().enabled() :
+                      labelEnabledState :
+                  this.hoverLabels().enabled() :
+              labelHoverEnabledState :
+          goog.isNull(labelSelectEnabledState) ?
+              goog.isNull(this.selectLabels().enabled()) ?
+                  goog.isNull(labelEnabledState) ?
+                      this.labels().enabled() :
+                      labelEnabledState :
+                  this.selectLabels().enabled() :
+              labelSelectEnabledState :
       goog.isNull(labelEnabledState) ?
           this.labels().enabled() :
           labelEnabledState;
 
-  var positionProvider = this.createLabelsPositionProvider_(null, hovered);
+  var positionProvider = this.createLabelsPositionProvider_(null, pointState);
   var formatProvider = this.createFormatProvider();
 
   var isInsideLabels = this.isInsideLabels_();
 
   var isFitToPoint = true;
-  if (!hovered && isInsideLabels && this.overlapMode() == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
+  if (!hovered && !selected && isInsideLabels && this.overlapMode() == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
     var labelBounds = labelsFactory.measureWithTransform(formatProvider, positionProvider, /** @type {Object} */(pointLabel), index);
     isFitToPoint = this.isLabelFitsIntoThePoint_(labelBounds);
   }
@@ -2161,17 +2413,18 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(hovered) {
     }
 
     label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hoverPointLabel));
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
 
     if (iterator.meta('labelWidthForced')) {
       label.width(anychart.utils.toNumber(iterator.meta('labelWidthForced')));
       // label height is automatically changed - fix label position
       var labelAnchorFromData = pointLabel && pointLabel['anchor'] ? pointLabel['anchor'] : null;
       var labelAnchorFromHoverData = hoverPointLabel && hoverPointLabel['anchor'] ? hoverPointLabel['anchor'] : null;
+      var labelAnchorFromSelectData = selectPointLabel && selectPointLabel['anchor'] ? selectPointLabel['anchor'] : null;
 
       // don't fix label position if anchor is set
-      if (!labelAnchorFromData && !labelAnchorFromHoverData) {
-        positionProvider = this.createLabelsPositionProvider_(label, hovered);
+      if (!labelAnchorFromData && !labelAnchorFromHoverData && !labelAnchorFromSelectData) {
+        positionProvider = this.createLabelsPositionProvider_(label, pointState);
         label.positionProvider(positionProvider);
       }
     }
@@ -2181,20 +2434,19 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(hovered) {
     //todo: this shit should be reworked when labelsFactory will be reworked
     //if usual label isn't disabled and not drawn then it doesn't have container and hover label doesn't know nothing
     //about its DOM element and trying to apply itself setting to it. But nothing will happen because container is empty.
-    if (hovered && !label.container() && this.labels().getDomElement()) {
+    if ((hovered || selected) && !label.container() && this.labels().getDomElement()) {
       label.container(this.labels().getDomElement());
       if (!label.container().parent()) {
         label.container().parent(/** @type {acgraph.vector.ILayer} */(this.labels().container()));
       }
       label.draw();
     }
-
   } else if (label) {
     label.clear();
   }
 
   if (isDraw && !isInsideLabels) {
-    this.updateConnector(label, hovered);
+    this.updateConnector(label, pointState);
   }
 
   return label;
@@ -2205,19 +2457,23 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(hovered) {
  * Create labels position provider.
  *
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_label Is used for alignment of the label height.
- * @param {boolean=} opt_hovered If it is a hovered label drawing.
+ * @param {(anychart.PointState|number)=} opt_pointState Point state.
  * @return {Object} Object with info for labels formatting.
  * @private
  */
-anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = function(opt_label, opt_hovered) {
+anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = function(opt_label, opt_pointState) {
   var labelPosition = this.getLabelsPosition_();
 
   var iterator = this.getIterator();
   var bounds = this.boundsValue_;
 
+  var selected = goog.isDef(opt_pointState) ? this.state.isStateContains(opt_pointState, anychart.PointState.SELECT) : null;
+  var hovered = goog.isDef(opt_pointState) ? !selected && this.state.isStateContains(opt_pointState, anychart.PointState.HOVER) : null;
+
   var normalPointLabel = /** @type {Object} */ (iterator.get('label'));
-  var hoverPointLabel = opt_hovered ? /** @type {Object} */ (iterator.get('hoverLabel')) : null;
-  var labelSettings = hoverPointLabel || normalPointLabel || {};
+  var hoverPointLabel = hovered ? /** @type {Object} */ (iterator.get('hoverLabel')) : null;
+  var selectPointLabel = selected ? /** @type {Object} */ (iterator.get('hoverLabel')) : null;
+  var labelSettings = selectPointLabel || hoverPointLabel || normalPointLabel || {};
 
   var x1 = anychart.utils.toNumber(iterator.meta('x1'));
   var x2 = anychart.utils.toNumber(iterator.meta('x2'));
@@ -2236,7 +2492,7 @@ anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = functi
   // get label width and height
   var labelBounds;
   if (opt_label) {
-    labelBounds = this.getTrueLabelBounds(opt_label, opt_hovered);
+    labelBounds = this.getTrueLabelBounds(opt_label, /** @type {anychart.PointState|number}*/(opt_pointState));
   } else {
     labelBounds = this.labels_.measureWithTransform(this.createFormatProvider(), null, /** @type {Object} */(labelSettings));
     labelBounds = anychart.math.Rect.fromCoordinateBox(labelBounds);
@@ -2317,14 +2573,18 @@ anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = functi
  * Get label bounds given hover and forced the width of the label.
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label} label
- * @param {boolean=} opt_hovered
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!anychart.math.Rect}
  */
-anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, opt_hovered) {
-  var normalPointLabel = /** @type {Object} */ (this.data().get(label.getIndex(), 'label'));
-  var hoverPointLabel = opt_hovered ? /** @type {Object} */ (this.data().get(label.getIndex(), 'hoverLabel')) : null;
+anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, pointState) {
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  var labelSettings = hoverPointLabel || normalPointLabel || {};
+  var normalPointLabel = /** @type {Object} */ (this.data().get(label.getIndex(), 'label'));
+  var hoverPointLabel = hovered ? /** @type {Object} */ (this.data().get(label.getIndex(), 'hoverLabel')) : null;
+  var selectPointLabel = selected ? /** @type {Object} */ (this.data().get(label.getIndex(), 'hoverLabel')) : null;
+
+  var labelSettings = selectPointLabel || hoverPointLabel || normalPointLabel || {};
 
   // labelWidthForced
   var savedWidth = labelSettings.width;
@@ -2348,14 +2608,13 @@ anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, o
  * To place the labels so that they do not overlap.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
- * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel, opt_hoverAll) {
+anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel) {
   if (this.overlapMode() != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels_() || !this.labels().enabled()) {
     return;
   }
 
-  var hoveredIndex = opt_hoveredLabel ? opt_hoveredLabel.getIndex() : null;
+  var pointState = this.state.getSeriesState() | (opt_hoveredLabel ? this.state.getPointStateByIndex(opt_hoveredLabel.getIndex()) : 0);
 
   this.clearLabelDomains_();
   var count = this.getIterator().getRowsCount();
@@ -2374,7 +2633,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
     if (!label || label.enabled() == false) {
       continue;
     }
-    labelBounds = this.getTrueLabelBounds(label, opt_hoverAll || hoveredIndex == label.getIndex());
+    labelBounds = this.getTrueLabelBounds(label, pointState);
     heightTotal += labelBounds.height;
   }
 
@@ -2405,7 +2664,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
       if (!label || label.enabled() == false) {
         continue;
       }
-      labelBounds = this.getTrueLabelBounds(label, opt_hoverAll || hoveredIndex == label.getIndex());
+      labelBounds = this.getTrueLabelBounds(label, pointState);
       heightTotal += labelBounds.height;
 
       comparingLabel = this.reversed_ ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
@@ -2414,7 +2673,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
       if (!comparingLabel) {
         continue;
       }
-      comparingLabelBounds = this.getTrueLabelBounds(comparingLabel, opt_hoverAll || hoveredIndex == comparingLabel.getIndex());
+      comparingLabelBounds = this.getTrueLabelBounds(comparingLabel, pointState);
 
       // if intersected
       if (comparingLabelBounds.top <= labelBounds.top + labelBounds.height) {
@@ -2425,7 +2684,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
 
   if (this.labelDomains.length) {
     goog.array.forEach(this.labelDomains, function(labelDomain) {
-      labelDomain.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
+      labelDomain.recalculateLabelsPosition(opt_hoveredLabel);
     });
   }
 };
@@ -2866,9 +3125,9 @@ anychart.core.PyramidFunnelBase.prototype.getLabelsPosition_ = function() {
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label} label Label.
  * @param {acgraph.vector.Path} path Connector path element.
- * @param {boolean} hovered If label is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  */
-anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, path, hovered) {
+anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, path, pointState) {
   var bounds = this.boundsValue_;
   var index = label.getIndex();
 
@@ -2877,7 +3136,7 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
   // anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_
   var pointPath = this.data().meta(index, 'point');
   var pointBounds = pointPath.getBounds();
-  var labelBounds = this.getTrueLabelBounds(label, hovered);
+  var labelBounds = this.getTrueLabelBounds(label, pointState);
 
   var x0 = labelBounds.left;
   var y0 = labelBounds.top + (labelBounds.height / 2);
@@ -2918,18 +3177,18 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
  * Update or create label connector.
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label} label
- * @param {boolean} hovered If label is hovered.
+ * @param {anychart.PointState|number} pointState If label is hovered.
  */
-anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, hovered) {
+anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, pointState) {
   var labelIndex = label.getIndex();
 
   if (this.drawnConnectors_[labelIndex]) {
-    this.drawConnectorLine_(label, this.drawnConnectors_[labelIndex], hovered);
+    this.drawConnectorLine_(label, this.drawnConnectors_[labelIndex], pointState);
   } else {
     var connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
     this.drawnConnectors_[labelIndex] = connectorPath;
     connectorPath.stroke(this.connectorStroke_);
-    this.drawConnectorLine_(label, connectorPath, hovered);
+    this.drawConnectorLine_(label, connectorPath, pointState);
   }
 };
 
@@ -3009,6 +3268,27 @@ anychart.core.PyramidFunnelBase.prototype.hoverMarkers = function(opt_value) {
 
 
 /**
+ * Getter/setter for series data markers on select.
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
+ */
+anychart.core.PyramidFunnelBase.prototype.selectMarkers = function(opt_value) {
+  if (!this.selectMarkers_) {
+    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
+
+    this.registerDisposable(this.selectMarkers_);
+    // don't listen to it, for it will be reapplied at the next select
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.selectMarkers_;
+};
+
+
+/**
  * Listener for markers invalidation.
  * @private
  * @param {anychart.SignalEvent} event Invalidation event.
@@ -3025,7 +3305,7 @@ anychart.core.PyramidFunnelBase.prototype.markersInvalidated_ = function(event) 
  * @return {!acgraph.vector.Fill} Marker color for point.
  */
 anychart.core.PyramidFunnelBase.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, false);
+  return this.getFinalFill(false, anychart.PointState.NORMAL);
 };
 
 
@@ -3137,27 +3417,51 @@ anychart.core.PyramidFunnelBase.prototype.getWidthAtYGivenReversed_ = function(y
 /**
  * Draws marker for the point.
  * @protected
- * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  */
-anychart.core.PyramidFunnelBase.prototype.drawMarker = function(hovered) {
-  var pointMarker = this.getIterator().get('marker');
-  var hoverPointMarker = this.getIterator().get('hoverMarker');
+anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+
   var index = this.getIterator().getIndex();
-  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarkers() : this.markers());
+  var markersFactory;
+  if (selected) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
+  } else if (hovered) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
+  } else {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+  }
 
   var marker = this.markers().getMarker(index);
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-  var isDraw = hovered ?
-      goog.isNull(markerHoverEnabledState) ?
-          goog.isNull(this.hoverMarkers().enabled()) ?
-              goog.isNull(markerEnabledState) ?
-                  this.markers().enabled() :
-                  markerEnabledState :
-              this.hoverMarkers().enabled() :
-          markerHoverEnabledState :
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(markerHoverEnabledState) ?
+              goog.isNull(this.hoverMarkers().enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers().enabled() :
+                      markerEnabledState :
+                  this.hoverMarkers().enabled() :
+              markerHoverEnabledState :
+          goog.isNull(markerSelectEnabledState) ?
+              goog.isNull(this.selectMarkers().enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers().enabled() :
+                      markerEnabledState :
+                  this.selectMarkers().enabled() :
+              markerSelectEnabledState :
       goog.isNull(markerEnabledState) ?
           this.markers().enabled() :
           markerEnabledState;
@@ -3165,7 +3469,11 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(hovered) {
   if (isDraw) {
     var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
     var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+    var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
+
+    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+        (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+        markerPosition || this.markers().position();
 
     var positionProvider = this.createMarkersPositionProvider_(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
@@ -3175,9 +3483,7 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(hovered) {
     }
 
     var markerSettings = {};
-    var settingsPropsList = ['position', 'anchor', 'offsetX', 'offsetY',
-      'type', 'size', 'fill', 'stroke', 'enabled'];
-    // Copy settings
+    var settingsPropsList = ['position', 'anchor', 'offsetX', 'offsetY', 'type', 'size', 'fill', 'stroke', 'enabled'];
     if (pointMarker) {
       goog.array.forEach(settingsPropsList, function(prop) {
         if (prop in pointMarker) {
@@ -3190,23 +3496,47 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(hovered) {
     var finalMarkerType = goog.isDef(markerType) ? markerType : (this.markers().getType() || this.markerPalette().itemAt(index));
     var markerHoverType = hoverPointMarker && hoverPointMarker['type'];
     var finalMarkerHoverType = goog.isDef(markerHoverType) ? markerHoverType : this.hoverMarkers().getType();
-    markerSettings.type = hovered && goog.isDef(finalMarkerHoverType) ? finalMarkerHoverType : finalMarkerType;
+    var markerSelectType = selectPointMarker && selectPointMarker['type'];
+    var finalMarkerSelectType = goog.isDef(markerSelectType) ? markerSelectType : this.selectMarkers().getType();
+
+    if (selected && goog.isDef(finalMarkerSelectType))
+      markerSettings.type = finalMarkerSelectType;
+    else if (hovered && goog.isDef(finalMarkerHoverType))
+      markerSettings.type = finalMarkerHoverType;
+    else
+      markerSettings.type = finalMarkerType;
 
     var markerFill = pointMarker && pointMarker['fill'];
     var finalMarkerFill = goog.isDef(markerFill) ? markerFill : (this.markers().getFill() || this.getMarkerFill());
     var markerHoverFill = hoverPointMarker && hoverPointMarker['fill'];
     var finalMarkerHoverFill = goog.isDef(markerHoverFill) ? markerHoverFill : this.hoverMarkers().getFill();
-    markerSettings.fill = hovered && goog.isDef(finalMarkerHoverFill) ? finalMarkerHoverFill : finalMarkerFill;
+    var markerSelectFill = selectPointMarker && selectPointMarker['fill'];
+    var finalMarkerSelectFill = goog.isDef(markerSelectFill) ? markerSelectFill : this.selectMarkers().getFill();
+
+    if (selected && goog.isDef(finalMarkerSelectFill))
+      markerSettings.fill = finalMarkerSelectFill;
+    else if (hovered && goog.isDef(finalMarkerHoverFill))
+      markerSettings.fill = finalMarkerHoverFill;
+    else
+      markerSettings.fill = finalMarkerFill;
 
     var markerStroke = pointMarker && pointMarker['stroke'];
     var finalMarkerStroke = goog.isDef(markerStroke) ? markerStroke : (this.markers().getStroke() || this.getMarkerStroke());
     var markerHoverStroke = hoverPointMarker && hoverPointMarker['stroke'];
     var finalMarkerHoverStroke = goog.isDef(markerHoverStroke) ? markerHoverStroke : (this.hoverMarkers().getStroke() || this.getMarkerStroke());
-    markerSettings.stroke = hovered && goog.isDef(finalMarkerHoverStroke) ? finalMarkerHoverStroke : finalMarkerStroke;
+    var markerSelectStroke = selectPointMarker && selectPointMarker['stroke'];
+    var finalMarkerSelectStroke = goog.isDef(markerSelectStroke) ? markerSelectStroke : (this.selectMarkers().getStroke() || this.getMarkerStroke());
+
+    if (selected && goog.isDef(finalMarkerSelectStroke))
+      markerSettings.stroke = finalMarkerSelectStroke;
+    else if (hovered && goog.isDef(finalMarkerHoverStroke))
+      markerSettings.stroke = finalMarkerHoverStroke;
+    else
+      markerSettings.stroke = finalMarkerStroke;
 
     marker.resetSettings();
     marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(markerSettings), /** @type {Object} */(hoverPointMarker));
+    marker.setSettings(/** @type {Object} */(markerSettings), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
 
     marker.draw();
 
@@ -3276,12 +3606,20 @@ anychart.core.PyramidFunnelBase.prototype.onTooltipSignal_ = function(event) {
  * @protected
  */
 anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
+  if (opt_event && opt_event['target'] == this.legend()) {
+    return;
+  }
+
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var formatProvider = this.createFormatProvider();
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
         formatProvider,
         new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+
+    // for float
+    this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+
   } else {
     tooltip.show(
         formatProvider,
@@ -3295,7 +3633,12 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
  * @protected
  */
 anychart.core.PyramidFunnelBase.prototype.hideTooltip = function() {
-  (/** @type {anychart.core.ui.Tooltip} */(this.tooltip())).hide();
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  if (tooltip.isFloating()) {
+    this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  }
+
+  tooltip.hide();
 };
 
 
@@ -3360,11 +3703,12 @@ anychart.core.PyramidFunnelBase.prototype.statistics = function(opt_key, opt_val
 
 /**
  * Create chart label/tooltip format provider.
- * @protected
+ * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels/tooltip formatting.
+ * @protected
  */
-anychart.core.PyramidFunnelBase.prototype.createFormatProvider = function() {
-  if (!this.pointProvider_) {
+anychart.core.PyramidFunnelBase.prototype.createFormatProvider = function(opt_force) {
+  if (!this.pointProvider_ || opt_force) {
     this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value', 'name']);
   }
   this.pointProvider_.applyReferenceValues();
@@ -3406,13 +3750,14 @@ anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(s
       'enabled': true,
       'meta': {
         'pointIndex': index,
-        'pointValue': iterator.get('value')
+        'pointValue': iterator.get('value'),
+        series: this
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': this.getStrokeColor(true, false),
-      'iconFill': this.getFillColor(true, false),
-      'iconHatchFill': this.getFinalHatchFill(true, false)
+      'iconStroke': this.getFinalStroke(true, anychart.PointState.NORMAL),
+      'iconFill': this.getFinalFill(true, anychart.PointState.NORMAL),
+      'iconHatchFill': this.getFinalHatchFill(true, anychart.PointState.NORMAL)
     };
     goog.object.extend(obj, legendItem);
     obj['sourceUid'] = goog.getUid(this);
@@ -3431,20 +3776,63 @@ anychart.core.PyramidFunnelBase.prototype.legendItemCanInteractInMode = function
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemOver = function(item) {
+anychart.core.PyramidFunnelBase.prototype.legendItemClick = function(item, event) {
   var sourceKey = item.sourceKey();
   if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
-  var iterator = this.data().getIterator();
-  if (iterator.select(/** @type {number} */ (sourceKey))) {
-    this.hoverPoint_(/** @type {number} */ (sourceKey));
-  }
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
 };
 
 
 /** @inheritDoc */
-anychart.core.PyramidFunnelBase.prototype.legendItemOut = function(item) {
-  this.unhoverPoint_();
+anychart.core.PyramidFunnelBase.prototype.legendItemOver = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
+};
+
+
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.legendItemOut = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
+};
+
+
+/**
+ * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
+ * @return {anychart.core.PyramidFunnelBase|anychart.enums.SelectionMode|null} .
+ */
+anychart.core.PyramidFunnelBase.prototype.selectionMode = function(opt_value) {
+  return null;
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.core.PyramidFunnelBase|anychart.enums.HoverMode} .
+ */
+anychart.core.PyramidFunnelBase.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
 };
 
 
@@ -3456,14 +3844,19 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
 
   json['type'] = anychart.enums.ChartTypes.PYRAMID;
   json['data'] = this.data().serialize();
+
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
+  json['selectLabels'] = this.selectLabels().serialize();
+
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['tooltip'] = this.tooltip().serialize();
+
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['selectMarkers'] = this.selectMarkers().serialize();
 
   json['baseWidth'] = this.baseWidth();
   json['overlapMode'] = this.overlapMode();
@@ -3481,6 +3874,7 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
       json['connectorStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.connectorStroke()));
     }
   }
+
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.utils.warning(
@@ -3503,6 +3897,18 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
       json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
     }
   }
+  if (goog.isFunction(this['selectFill'])) {
+    if (goog.isFunction(this.selectFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          [this.getType() + ' selectFill']
+      );
+    } else {
+      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
+    }
+  }
+
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
       anychart.utils.warning(
@@ -3525,6 +3931,18 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
       json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
     }
   }
+  if (goog.isFunction(this['selectStroke'])) {
+    if (goog.isFunction(this.selectStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          [this.getType() + ' selectStroke']
+      );
+    } else {
+      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
+    }
+  }
+
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
       anychart.utils.warning(
@@ -3548,6 +3966,18 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
           (this.hoverHatchFill()));
     }
   }
+  if (goog.isFunction(this['selectHatchFill'])) {
+    if (goog.isFunction(this.selectHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          [this.getType() + ' selectHatchFill']
+      );
+    } else {
+      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.selectHatchFill()));
+    }
+  }
 
   return json;
 };
@@ -3563,26 +3993,44 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config) {
   this.connectorLength(config['connectorLength']);
   this.connectorStroke(config['connectorStroke']);
   this.data(config['data']);
-  this.fill(config['fill']);
-  this.hatchFill(config['hatchFill']);
+
   this.hatchFillPalette(config['hatchFillPalette']);
-  this.hoverFill(config['hoverFill']);
-  this.hoverHatchFill(config['hoverHatchFill']);
-  this.hoverLabels(config['hoverLabels']);
-  this.hoverMarkers(config['hoverMarkers']);
-  this.hoverStroke(config['hoverStroke']);
-  this.labels(config['labels']);
   this.markerPalette(config['markerPalette']);
+
+  this.fill(config['fill']);
+  this.hoverFill(config['hoverFill']);
+  this.selectFill(config['selectFill']);
+
+  this.hatchFill(config['hatchFill']);
+  this.hoverHatchFill(config['hoverHatchFill']);
+  this.selectHatchFill(config['selectHatchFill']);
+
+  this.labels(config['labels']);
+  this.hoverLabels(config['hoverLabels']);
+  this.selectLabels(config['selectLabels']);
+
+  this.stroke(config['stroke']);
+  this.hoverStroke(config['hoverStroke']);
+  this.selectStroke(config['selectStroke']);
+
   this.markers(config['markers']);
+  this.hoverMarkers(config['hoverMarkers']);
+  this.selectMarkers(config['selectMarkers']);
+
   this.overlapMode(config['overlapMode']);
   this.palette(config['palette']);
   this.pointsPadding(config['pointsPadding']);
-  this.stroke(config['stroke']);
+
   this.tooltip(config['tooltip']);
 };
 
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  LabelsDomain.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Labels domain for overlap mode.
  * @constructor
@@ -3648,21 +4096,21 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.clear = function() {
  * To calculate the coordinates of the labels given the overlap mode.
  * @protected
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
- * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel, opt_hoverAll) {
+anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition = function(opt_hoveredLabel) {
   if (this.labels.length < 2) {
     this.chart.removeLabelDomain(this);
     return;
   }
 
+  var pointState;
   var domain = this;
   var bounds = this.chart.boundsValue_;
-  var hoveredIndex = opt_hoveredLabel ? opt_hoveredLabel.getIndex() : null;
 
   var firstLabel = this.labels[0];
   var lastLabel = this.labels[this.labels.length - 1];
-  var firstLabelBounds = this.getLabelBounds_(firstLabel, opt_hoverAll || hoveredIndex == firstLabel.getIndex());
+  pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(firstLabel.getIndex());
+  var firstLabelBounds = this.getLabelBounds_(firstLabel, pointState);
 
   var h1, y1;
   var h2, y2;
@@ -3677,7 +4125,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
   var label, labelBounds, labelPointPath, labelPointBounds;
   for (var i = 1, len = this.labels.length; i < len; i++) {
     label = this.labels[i];
-    labelBounds = this.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
+    pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(label.getIndex());
+    labelBounds = this.getLabelBounds_(label, pointState);
     labelPointPath = this.chart.data().meta(label.getIndex(), 'point');
     labelPointBounds = labelPointPath.getBounds();
 
@@ -3699,7 +4148,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
 
   // update
   this.height = goog.array.reduce(this.labels, function(res, label) {
-    var labelBounds = domain.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
+    pointState = domain.chart.state.getSeriesState() | domain.chart.state.getPointStateByIndex(label.getIndex());
+    var labelBounds = domain.getLabelBounds_(label, pointState);
     return res + labelBounds.height;
   }, 0);
 
@@ -3713,7 +4163,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
   }
   this.y = domainTop;
 
-  this.applyLabelsPosition_(opt_hoveredLabel, opt_hoverAll);
+
+  this.applyLabelsPosition_(opt_hoveredLabel);
 
   var comparingLabel;
   var comparingLabelBounds;
@@ -3730,8 +4181,10 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
       return;
     }
 
-    comparingLabelBounds = domain.getLabelBounds_(comparingLabel, opt_hoverAll || hoveredIndex == comparingLabel.getIndex());
-    labelBounds = domain.getLabelBounds_(label, opt_hoverAll || hoveredIndex == label.getIndex());
+    pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(comparingLabel.getIndex());
+    comparingLabelBounds = domain.getLabelBounds_(comparingLabel, pointState);
+    pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(label.getIndex());
+    labelBounds = domain.getLabelBounds_(label, pointState);
 
     var isOverlap = this.chart.reversed_ ?
         comparingLabelBounds.top < labelBounds.top + labelBounds.height :
@@ -3741,14 +4194,14 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
       domainForPreviousLabel = domain.chart.getLabelsDomainByLabel(comparingLabel);
       if (domainForPreviousLabel) {
         unitedDomain = domain.chart.mergeLabelsDomains(domainForPreviousLabel, this);
-        unitedDomain.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
+        unitedDomain.recalculateLabelsPosition(opt_hoveredLabel);
 
       } else {
         this.chart.reversed_ ?
             this.labels.push(comparingLabel) :
             this.labels.unshift(comparingLabel);
 
-        this.recalculateLabelsPosition(opt_hoveredLabel, opt_hoverAll);
+        this.recalculateLabelsPosition(opt_hoveredLabel);
       }
     }
   }
@@ -3759,9 +4212,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
  * To reposition the labels relative to the top of the domain.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
- * @param {boolean=} opt_hoverAll hover all labels.
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel, opt_hoverAll) {
+anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = function(opt_hoveredLabel) {
   var domain = this;
 
   var labelsHeightSum = 0;
@@ -3771,12 +4223,11 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
   var prevLabelBounds = null;
   var prevLabelPosition = null;
 
-  var hoveredIndex = opt_hoveredLabel ? opt_hoveredLabel.getIndex() : null;
+  var pointState = this.chart.state.getSeriesState() | (opt_hoveredLabel ? this.chart.state.getPointStateByIndex(opt_hoveredLabel.getIndex()) : 0);
 
   goog.array.forEach(this.labels, function(label) {
-    var labelIsHovered = opt_hoverAll || hoveredIndex == label.getIndex();
     var labelPositionProvider = label.positionProvider()['value'];
-    var labelBounds = domain.getLabelBounds_(label, labelIsHovered);
+    var labelBounds = domain.getLabelBounds_(label, pointState);
     var labelNewY = domain.y + labelsHeightSum + labelsOffsetYSum + labelBounds.height / 2;
 
     // Need to preserve the order of the labels.
@@ -3792,7 +4243,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
     label.positionProvider({'value': {'x': labelPositionProvider.x, 'y': labelNewY}});
     // Always draw label, because hover and unhover (with offsets and rotations and other bounds changers).
     label.draw();
-    domain.chart.updateConnector(label, labelIsHovered);
+    domain.chart.updateConnector(label, pointState);
 
     labelsHeightSum += labelBounds.height;
     labelsOffsetYSum += label.offsetY() || 0;
@@ -3808,14 +4259,18 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
  * Get label bounds given hover and forced the width of the label.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label} label
- * @param {boolean} hovered
+ * @param {anychart.PointState|number} pointState
  * @return {!anychart.math.Rect}
  */
-anychart.core.PyramidFunnelBase.LabelsDomain.prototype.getLabelBounds_ = function(label, hovered) {
+anychart.core.PyramidFunnelBase.LabelsDomain.prototype.getLabelBounds_ = function(label, pointState) {
+  var selected = this.chart.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.chart.state.isStateContains(pointState, anychart.PointState.HOVER);
+
   var normalPointLabel = /** @type {Object} */ (this.chart.data().get(label.getIndex(), 'label'));
   var hoverPointLabel = hovered ? /** @type {Object} */ (this.chart.data().get(label.getIndex(), 'hoverLabel')) : null;
+  var selectPointLabel = selected ? /** @type {Object} */ (this.chart.data().get(label.getIndex(), 'selectLabel')) : null;
 
-  var labelSettings = hoverPointLabel || normalPointLabel || {};
+  var labelSettings = selectPointLabel || hoverPointLabel || normalPointLabel || {};
 
   // labelWidthForced
   var savedWidth = labelSettings.width;

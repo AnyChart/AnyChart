@@ -144,7 +144,7 @@ anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom,
  */
 anychart.core.utils.Space.prototype.left = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
+    var val = anychart.utils.toNumberOrStringOrNull(opt_value) || 0;
     if (val != this.left_) {
       this.left_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -162,7 +162,7 @@ anychart.core.utils.Space.prototype.left = function(opt_value) {
  */
 anychart.core.utils.Space.prototype.top = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
+    var val = anychart.utils.toNumberOrStringOrNull(opt_value) || 0;
     if (val != this.top_) {
       this.top_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -180,7 +180,7 @@ anychart.core.utils.Space.prototype.top = function(opt_value) {
  */
 anychart.core.utils.Space.prototype.right = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
+    var val = anychart.utils.toNumberOrStringOrNull(opt_value) || 0;
     if (val != this.right_) {
       this.right_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -198,7 +198,7 @@ anychart.core.utils.Space.prototype.right = function(opt_value) {
  */
 anychart.core.utils.Space.prototype.bottom = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var val = (goog.isNumber(opt_value) || goog.isString(opt_value)) ? opt_value || 0 : 0;
+    var val = anychart.utils.toNumberOrStringOrNull(opt_value) || 0;
     if (val != this.bottom_) {
       this.bottom_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);

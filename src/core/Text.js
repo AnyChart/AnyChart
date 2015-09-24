@@ -153,8 +153,8 @@ anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {string|number=} opt_value .
- * @return {!anychart.core.Text|string|number} .
+ * @param {string|number=} opt_value
+ * @return {!anychart.core.Text|string|number}
  */
 anychart.core.Text.prototype.fontSize = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
@@ -173,8 +173,8 @@ anychart.core.Text.prototype.fontSize = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {string=} opt_value .
- * @return {!anychart.core.Text|string} .
+ * @param {string=} opt_value
+ * @return {!anychart.core.Text|string}
  */
 anychart.core.Text.prototype.fontFamily = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = String(opt_value);
@@ -195,8 +195,8 @@ anychart.core.Text.prototype.fontFamily = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {string=} opt_value .
- * @return {!anychart.core.Text|string} .
+ * @param {string=} opt_value
+ * @return {!anychart.core.Text|string}
  */
 anychart.core.Text.prototype.fontColor = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = String(opt_value);
@@ -216,8 +216,8 @@ anychart.core.Text.prototype.fontColor = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {number=} opt_value .
- * @return {!anychart.core.Text|number} .
+ * @param {number=} opt_value
+ * @return {!anychart.core.Text|number}
  */
 anychart.core.Text.prototype.fontOpacity = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = goog.math.clamp(+opt_value, 0, 1);
@@ -236,8 +236,8 @@ anychart.core.Text.prototype.fontOpacity = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.Decoration} .
+ * @param {(acgraph.vector.Text.Decoration|string)=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.Decoration}
  */
 anychart.core.Text.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -258,8 +258,8 @@ anychart.core.Text.prototype.fontDecoration = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.FontStyle} .
+ * @param {acgraph.vector.Text.FontStyle|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.FontStyle}
  */
 anychart.core.Text.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -280,8 +280,8 @@ anychart.core.Text.prototype.fontStyle = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.FontVariant} .
+ * @param {acgraph.vector.Text.FontVariant|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.FontVariant}
  */
 anychart.core.Text.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -304,8 +304,8 @@ anychart.core.Text.prototype.fontVariant = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|number)=} opt_value .
- * @return {!anychart.core.Text|string|number} .
+ * @param {(string|number)=} opt_value
+ * @return {!anychart.core.Text|string|number}
  */
 anychart.core.Text.prototype.fontWeight = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
@@ -325,8 +325,8 @@ anychart.core.Text.prototype.fontWeight = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|string)=} opt_value .
- * @return {!anychart.core.Text|number|string} .
+ * @param {(number|string)=} opt_value
+ * @return {!anychart.core.Text|number|string}
  */
 anychart.core.Text.prototype.letterSpacing = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
@@ -345,8 +345,8 @@ anychart.core.Text.prototype.letterSpacing = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.Direction|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.Direction} .
+ * @param {acgraph.vector.Text.Direction|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.Direction}
  */
 anychart.core.Text.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -368,8 +368,8 @@ anychart.core.Text.prototype.textDirection = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {(number|string)=} opt_value .
- * @return {!anychart.core.Text|number|string} .
+ * @param {(number|string)=} opt_value
+ * @return {!anychart.core.Text|number|string}
  */
 anychart.core.Text.prototype.lineHeight = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = anychart.utils.toNumberOrString(opt_value);
@@ -388,8 +388,8 @@ anychart.core.Text.prototype.lineHeight = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {number=} opt_value .
- * @return {!anychart.core.Text|number} .
+ * @param {number=} opt_value
+ * @return {!anychart.core.Text|number}
  */
 anychart.core.Text.prototype.textIndent = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = parseFloat(anychart.utils.toNumberOrString(opt_value));
@@ -408,8 +408,8 @@ anychart.core.Text.prototype.textIndent = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.VAlign|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.VAlign} .
+ * @param {acgraph.vector.Text.VAlign|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.VAlign}
  */
 anychart.core.Text.prototype.vAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -430,8 +430,8 @@ anychart.core.Text.prototype.vAlign = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.HAlign|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.HAlign} .
+ * @param {acgraph.vector.Text.HAlign|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.HAlign}
  */
 anychart.core.Text.prototype.hAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -452,8 +452,8 @@ anychart.core.Text.prototype.hAlign = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.TextWrap} .
+ * @param {acgraph.vector.Text.TextWrap|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.TextWrap}
  */
 anychart.core.Text.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -474,8 +474,8 @@ anychart.core.Text.prototype.textWrap = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {acgraph.vector.Text.TextOverflow|string=} opt_value .
- * @return {!anychart.core.Text|acgraph.vector.Text.TextOverflow} .
+ * @param {acgraph.vector.Text.TextOverflow|string=} opt_value
+ * @return {!anychart.core.Text|acgraph.vector.Text.TextOverflow}
  */
 anychart.core.Text.prototype.textOverflow = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = String(opt_value);
@@ -495,8 +495,8 @@ anychart.core.Text.prototype.textOverflow = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {boolean=} opt_value .
- * @return {!anychart.core.Text|boolean} .
+ * @param {boolean=} opt_value
+ * @return {!anychart.core.Text|boolean}
  */
 anychart.core.Text.prototype.selectable = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = !!opt_value;
@@ -506,8 +506,8 @@ anychart.core.Text.prototype.selectable = function(opt_value) {
 
 /**
  * Pointer events.
- * @param {boolean=} opt_value .
- * @return {!anychart.core.Text|boolean} .
+ * @param {boolean=} opt_value
+ * @return {!anychart.core.Text|boolean}
  */
 anychart.core.Text.prototype.disablePointerEvents = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = !!opt_value;
@@ -527,8 +527,8 @@ anychart.core.Text.prototype.disablePointerEvents = function(opt_value) {
  * @return {!anychart.core.Text} An instance of {@link anychart.core.Text} class for method chaining.
  *//**
  * @ignoreDoc
- * @param {boolean=} opt_value .
- * @return {!anychart.core.Text|boolean} .
+ * @param {boolean=} opt_value
+ * @return {!anychart.core.Text|boolean}
  */
 anychart.core.Text.prototype.useHtml = function(opt_value) {
   if (goog.isDef(opt_value)) opt_value = !!opt_value;

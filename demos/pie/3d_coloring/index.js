@@ -27,6 +27,8 @@ function changePalette(value) {
 
 function load() {
 
+  anychart.theme('v6');
+
   var data = [
     {name: 'Product A', value: '1222'},
     {name: 'Product B', value: '2431'},

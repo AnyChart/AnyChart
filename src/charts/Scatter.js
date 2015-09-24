@@ -347,7 +347,7 @@ anychart.charts.Scatter.prototype.crosshair = function(opt_value) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
     this.crosshair_.enabled(false);
     this.crosshair_.zIndex(anychart.charts.Scatter.ZINDEX_CROSSHAIR);
-    this.crosshair_.bindHandlersTo(this);
+    this.crosshair_.bindHandlers(this);
     this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.SCATTER_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
@@ -1493,14 +1493,15 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     var index = this.series_.length - 1;
     var inc = index * anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Scatter.ZINDEX_SERIES) + inc);
-    instance.labels().setAutoZIndex(anychart.charts.Scatter.ZINDEX_LABEL + inc + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
+    var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Scatter.ZINDEX_SERIES) + inc;
+    instance.setAutoZIndex(seriesZIndex);
+    instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
     instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
     if (instance.hasMarkers()) {
-      instance.markers().setAutoZIndex(anychart.charts.Scatter.ZINDEX_MARKER + inc);
+      instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoFill(instance.getMarkerFill());
       instance.markers().setAutoStroke(instance.getMarkerStroke());
     }
@@ -1570,27 +1571,17 @@ anychart.charts.Scatter.prototype.invalidateSeries_ = function() {
 };
 
 
-/**
- * Getter series by index.
- * @example
- * var data = [
- *     [{x: 2, y:1}, {x: 3, y: 2}, {x: 4, y: 3}],
- *     [{x: 2, y:2}, {x: 3, y: 3}, {x: 4, y: 4}],
- *     [{x: 2, y:3}, {x: 3, y: 4}, {x: 4, y: 1}],
- *     [{x: 2, y:4}, {x: 3, y: 1}, {x: 4, y: 2}]
- * ];
- * var chart = anychart.scatterChart.apply(this, data);
- * var series, i=0;
- * while (series = chart.getSeries(i)){
- *     series.type('circle');
- *     i++;
- * }
- * chart.container(stage).draw();
- * @param {number} index
- * @return {anychart.core.scatter.series.Base}
- */
+/** @inheritDoc */
 anychart.charts.Scatter.prototype.getSeries = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Scatter.prototype.getAllSeries = function() {
+  return this.series_;
 };
 
 
@@ -1622,36 +1613,107 @@ anychart.charts.Scatter.prototype.legendItemCanInteractInMode = function(mode) {
 
 
 /** @inheritDoc */
-anychart.charts.Scatter.prototype.legendItemClick = function(item, event) {
-  var sourceKey = item.sourceKey();
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.enabled(!series.enabled());
+anychart.charts.Scatter.prototype.getSeriesStatus = function(event) {
+  var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
+
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+  var value, index;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = interactivity.spotRadius();
+    var minRatio = (x - spotRadius - minX) / rangeX;
+    var maxRatio = (x + spotRadius - minX) / rangeX;
+
+    var minValue, maxValue;
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      if (series.enabled()) {
+        minValue = /** @type {number} */(series.xScale().inverseTransform(minRatio));
+        maxValue = /** @type {number} */(series.xScale().inverseTransform(maxRatio));
+
+        var indexes = series.data().findInRangeByX(minValue, maxValue);
+        var iterator = series.getIterator();
+        var ind = [];
+        var minLength = Infinity;
+        var minLengthIndex;
+        for (var j = 0; j < indexes.length; j++) {
+          index = indexes[j];
+          if (iterator.select(index)) {
+            var pixX = /** @type {number} */(iterator.meta('x'));
+            var pixY = /** @type {number} */(iterator.meta('value'));
+
+            var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+            if (length <= spotRadius) {
+              ind.push(index);
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = index;
+              }
+            }
+          }
+        }
+        if (ind.length)
+          points.push({
+            series: series,
+            points: ind,
+            lastPoint: ind[ind.length - 1],
+            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+          });
+      }
+    }
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+    var ratio = (x - minX) / rangeX;
+
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      value = /** @type {number} */(series.xScale().inverseTransform(ratio));
+      index = series.data().findInUnsortedDataByX(value);
+
+      iterator = series.getIterator();
+      minLength = Infinity;
+      if (index.length) {
+        for (j = 0; j < index.length; j++) {
+          if (iterator.select(index[j])) {
+            pixX = /** @type {number} */(iterator.meta('x'));
+            pixY = /** @type {number} */(iterator.meta('value'));
+
+            length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+            if (length < minLength) {
+              minLength = length;
+              minLengthIndex = index[j];
+            }
+          }
+        }
+
+        points.push({
+          series: series,
+          points: index,
+          lastPoint: index[index.length - 1],
+          nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+        });
+      }
+    }
   }
-};
 
-
-/** @inheritDoc */
-anychart.charts.Scatter.prototype.legendItemOver = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.hoverSeries();
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Scatter.prototype.legendItemOut = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.unhover();
-  }
+  return /** @type {Array.<Object>} */(points);
 };
 
 
@@ -2106,7 +2168,11 @@ anychart.charts.Scatter.prototype.drawSeries_ = function() {
 
     iterator = series.getResetIterator();
     while (iterator.advance()) {
-      series.drawPoint();
+      var index = iterator.getIndex();
+      if (iterator.get('selected'))
+        series.state.setPointState(anychart.PointState.SELECT, index);
+
+      series.drawPoint(series.state.getPointStateByIndex(index));
     }
 
     series.finalizeDrawing();

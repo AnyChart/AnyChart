@@ -46,15 +46,15 @@ anychart.animations.BubbleAnimation.prototype.cycle = function(now) {
   var iterator = this.series_.getResetIterator();
   while (iterator.advance()) {
     var x = /** @type {number} */ (iterator.meta('x'));
-    var y = /** @type {number} */ (iterator.meta('y'));
+    var y = /** @type {number} */ (iterator.meta('value'));
     var size = Math.abs(iterator.meta('size'));
 
     var shapeBounds = anychart.math.rect(x - size, y - size, size * 2, size * 2);
 
-    var labelsPosition = this.series_.getLabelsPosition(false);
+    var labelsPosition = this.series_.getLabelsPosition(anychart.PointState.NORMAL);
     var labelProvider = this.createPositionProvider(shapeBounds, labelsPosition)['value'];
 
-    var markersPosition = this.series_.getMarkersPosition(false);
+    var markersPosition = this.series_.getMarkersPosition(anychart.PointState.NORMAL);
     var markerProvider = this.createPositionProvider(shapeBounds, markersPosition)['value'];
 
     this.startPoint.push(0);

@@ -43,19 +43,17 @@ anychart.core.cartesian.series.ContinuousBase = function(opt_data, opt_csvSettin
 goog.inherits(anychart.core.cartesian.series.ContinuousBase, anychart.core.cartesian.series.BaseWithMarkers);
 
 
-/**
- * Draws all series points.
- */
-anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function() {
+/** @inheritDoc */
+anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     var pointDrawn;
     if (this.firstPointDrawn)
-      pointDrawn = this.drawSubsequentPoint();
+      pointDrawn = this.drawSubsequentPoint(pointState);
     else
-      pointDrawn = this.drawFirstPoint();
+      pointDrawn = this.drawFirstPoint(pointState);
     if (pointDrawn) {
-      this.drawMarker(this.hoverStatus == this.getIterator().getIndex());
-      this.drawLabel(this.hoverStatus == this.getIterator().getIndex());
+      this.drawMarker(pointState);
+      this.drawLabel(pointState);
       if (this.isErrorAvailable())
         this.drawError();
     }
@@ -73,7 +71,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
   var i;
   var len = this.paths.length;
   for (i = 0; i < len; i++) {
-    this.makeHoverable(this.paths[i], true);
+    this.makeInteractive(this.paths[i], true);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -84,7 +82,9 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(!isNaN(this.hoverStatus));
+
+    var seriesState = this.state.seriesState;
+    this.colorizeShape(seriesState);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -128,7 +128,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.finalizeDrawing = functi
 /** @inheritDoc */
 anychart.core.cartesian.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
 };
 
 
@@ -190,11 +190,11 @@ anychart.core.cartesian.series.ContinuousBase.prototype.connectMissingPoints = f
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.ContinuousBase.prototype.colorizeShape = function(hover) {
-  this.path.stroke(this.getFinalStroke(false, hover), 2);
+anychart.core.cartesian.series.ContinuousBase.prototype.colorizeShape = function(pointState) {
+  this.path.stroke(this.getFinalStroke(false, pointState), 2);
   this.path.fill(null);
 };
 
@@ -202,37 +202,34 @@ anychart.core.cartesian.series.ContinuousBase.prototype.colorizeShape = function
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
+anychart.core.cartesian.series.ContinuousBase.prototype.applyHatchFill = function(pointState) {
   if (this.hatchFillPath) {
     this.hatchFillPath.stroke(null);
-    this.hatchFillPath.fill(this.getFinalHatchFill(false, hover));
+    this.hatchFillPath.fill(this.getFinalHatchFill(false, pointState));
   }
 };
 
 
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousBase.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.cartesian.series.ContinuousBase.prototype.applyAppearanceToPoint = function(pointState) {
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
+};
 
-  //hide tooltip in any case
-  this.hideTooltip();
 
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-
-  //hover all points
-  this.applyHatchFill(true);
-  this.colorizeShape(true);
-
-  this.hoverStatus = -1;
-  return this;
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.cartesian.series.ContinuousBase.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
 };
 
 
@@ -249,61 +246,12 @@ anychart.core.cartesian.series.ContinuousBase.prototype.getIndexByEvent = functi
   range = bounds.width;
   var ratio = (x - min) / range;
   value = this.xScale().inverseTransform(ratio);
+
   index = this.data().find('x', value);
+
   if (index < 0) index = NaN;
 
   return /** @type {number} */(index);
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousBase.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-  if (this.getIterator().select(index)) {
-    if (isNaN(this.hoverStatus)) {
-      this.applyHatchFill(true);
-      this.colorizeShape(true);
-    }
-    this.drawMarker(true);
-    this.drawLabel(true);
-    if (opt_event) this.showTooltip(opt_event);
-    this.hoverStatus = index;
-  } else {
-    this.applyHatchFill(false);
-    this.colorizeShape(false);
-    this.hoverStatus = NaN;
-  }
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousBase.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-    }
-  }
-
-  this.applyHatchFill(false);
-  this.colorizeShape(false);
-  this.hoverStatus = NaN;
-  return this;
 };
 
 
@@ -330,4 +278,3 @@ anychart.core.cartesian.series.ContinuousBase.prototype.setupByJSON = function(c
 //anychart.core.cartesian.series.ContinuousBase.prototype['drawMissing'] = anychart.core.cartesian.series.ContinuousBase.prototype.drawMissing;//inherited
 //exports
 anychart.core.cartesian.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.cartesian.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex
-anychart.core.cartesian.series.ContinuousBase.prototype['unhover'] = anychart.core.cartesian.series.ContinuousBase.prototype.unhover;

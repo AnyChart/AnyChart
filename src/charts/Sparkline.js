@@ -7,6 +7,7 @@ goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.sparkline.series.Base');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.enums');
 goog.require('anychart.scales');
 
@@ -125,6 +126,14 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
   this.labelsInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_LABEL);
 
   this.data(opt_data || null, opt_csvSettings);
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 };
 goog.inherits(anychart.charts.Sparkline, anychart.core.Chart);
 
@@ -175,6 +184,242 @@ anychart.charts.Sparkline.ZINDEX_MARKER = 40;
  * @type {number}
  */
 anychart.charts.Sparkline.ZINDEX_LABEL = 40;
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  res['pointIndex'] = this.getIndexByEvent_(res);
+  return res;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.unhover = function() {
+  // do nothing
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
+  var bounds = (this.series_ && this.series_.pixelBoundsCache) || anychart.math.rect(0, 0, 0, 0);
+
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+  var value, index;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY) {
+    return null;
+  }
+
+  var points = [];
+
+  var ratio = (x - minX) / rangeX;
+  value = this.xScale().inverseTransform(ratio);
+  index = this.data().find('x', value);
+  if (index < 0) index = NaN;
+
+  var iterator = this.getIterator();
+
+  if (iterator.select(index)) {
+    var pixX = /** @type {number} */(iterator.meta('x'));
+    var pixY = /** @type {number} */(iterator.meta('value'));
+    var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+
+    if (!isNaN(pixX) && !isNaN(pixY)) {
+      points.push({
+        series: this,
+        points: [index],
+        lastPoint: index,
+        nearestPointToCursor: {index: index, distance: length}
+      });
+    }
+  }
+
+  return /** @type {Array.<Object>} */(points);
+};
+
+
+/**
+ * Selection mode dummy.
+ * @return {anychart.enums.SelectionMode|string}
+ */
+anychart.charts.Sparkline.prototype.selectionMode = function() {
+  return anychart.enums.SelectionMode.NONE;
+};
+
+
+/**
+ * Create base series format provider.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.charts.Sparkline.prototype.createFormatProvider = function() {
+  if (!this.pointProvider_)
+    this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value']);
+  this.pointProvider_.applyReferenceValues();
+  return this.pointProvider_;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.useUnionTooltipAsSingle = function() {
+  return true;
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event
+ * @return {number}
+ * @private
+ */
+anychart.charts.Sparkline.prototype.getIndexByEvent_ = function(event) {
+  var bounds = (this.series_ && this.series_.pixelBoundsCache) || anychart.math.rect(0, 0, 0, 0);
+  var x = event['clientX'];
+  var min, range;
+  var value, index;
+
+  min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+  range = bounds.width;
+  var ratio = (x - min) / range;
+  value = this.xScale().inverseTransform(ratio);
+
+  index = this.data().find('x', value);
+
+  if (index < 0) index = NaN;
+
+  return /** @type {number} */(index);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.charts.Sparkline.prototype.makePointEvent = function(event) {
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+
+  event['pointIndex'] = pointIndex;
+
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'pie': this,
+    'iterator': iter,
+    'sliceIndex': pointIndex,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Select a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Sparkline}  {@link anychart.charts.Sparkline} instance for method chaining.
+ */
+anychart.charts.Sparkline.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this;
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Sparkline}  {@link anychart.charts.Sparkline} instance for method chaining.
+ */
+anychart.charts.Sparkline.prototype.hoverPoint = function(index, opt_event) {
+  return this;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Sparkline.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.charts.Sparkline|anychart.enums.HoverMode} .
+ */
+anychart.charts.Sparkline.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
 
 
 /**

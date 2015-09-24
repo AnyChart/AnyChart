@@ -4,6 +4,7 @@ goog.require('anychart.core.Chart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.bullet.Marker');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.Markers');
@@ -46,6 +47,12 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.layout_;
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
 
   this.data(opt_data || null, opt_csvSettings);
 };
@@ -785,6 +792,117 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
 };
 
 
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.charts.Bullet.prototype.makePointEvent = function(event) {
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+
+  event['pointIndex'] = pointIndex;
+
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'pie': this,
+    'iterator': iter,
+    'sliceIndex': pointIndex,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Select a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Bullet}  {@link anychart.charts.Bullet} instance for method chaining.
+ */
+anychart.charts.Bullet.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this;
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Bullet}  {@link anychart.charts.Bullet} instance for method chaining.
+ */
+anychart.charts.Bullet.prototype.hoverPoint = function(index, opt_event) {
+  return this;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Bullet.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.charts.Bullet|anychart.enums.HoverMode} .
+ */
+anychart.charts.Bullet.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
 /** @inheritDoc */
 anychart.charts.Bullet.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
@@ -807,8 +925,8 @@ anychart.charts.Bullet.prototype.serialize = function() {
 anychart.charts.Bullet.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  if ('defaultRangeSettings' in config)
-    this.defaultRangeSettings(config['defaultRangeSettings']);
+  if ('defaultRangeMarkerSettings' in config)
+    this.defaultRangeSettings(config['defaultRangeMarkerSettings']);
 
   if ('defaultMarkerSettings' in config)
     this.defaultMarkerSettings(config['defaultMarkerSettings']);

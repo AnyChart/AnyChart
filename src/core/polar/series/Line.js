@@ -47,7 +47,7 @@ anychart.core.polar.series.Line.prototype.startDrawing = function() {
   } else {
     this.strokeLayer = new anychart.core.utils.TypedLayer(function() {
       var path = acgraph.path();
-      this.makeHoverable(path, true);
+      this.makeInteractive(path, true);
       return path;
     }, function(child) {
       (/** @type {acgraph.vector.Path} */ (child)).clear();
@@ -59,7 +59,7 @@ anychart.core.polar.series.Line.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Line.prototype.drawFirstPoint = function() {
+anychart.core.polar.series.Line.prototype.drawFirstPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
 
   if (!valuePoint) {
@@ -85,7 +85,7 @@ anychart.core.polar.series.Line.prototype.drawFirstPoint = function() {
     if (!this.currentStrokePath) this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
     this.currentStrokePath.moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -93,7 +93,7 @@ anychart.core.polar.series.Line.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Line.prototype.drawSubsequentPoint = function() {
+anychart.core.polar.series.Line.prototype.drawSubsequentPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
   if (!valuePoint)
     return false;
@@ -117,7 +117,7 @@ anychart.core.polar.series.Line.prototype.drawSubsequentPoint = function() {
 
       this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
     }
-    this.getIterator().meta('x', P4x).meta('y', P4y);
+    this.getIterator().meta('x', P4x).meta('value', P4y);
   }
 
   return true;
@@ -163,14 +163,9 @@ anychart.core.polar.series.Line.prototype.finalizeDrawing = function() {
 };
 
 
-/**
- * Colorizes shape in accordance to current point colorization settings.
- * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
- * @protected
- */
-anychart.core.polar.series.Line.prototype.colorizeShape = function(hover) {
-  var stroke = this.getFinalStroke(false, hover);
+/** @inheritDoc */
+anychart.core.polar.series.Line.prototype.colorizeShape = function(pintState) {
+  var stroke = this.getFinalStroke(false, pintState);
 
   this.strokeLayer.forEachChild(function(path) {
     path.stroke(stroke);
@@ -187,12 +182,12 @@ anychart.core.polar.series.Line.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.polar.series.Line.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return this.getFinalStroke(false, anychart.PointState.NORMAL);
 };
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.polar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -215,3 +210,4 @@ anychart.core.polar.series.Line.prototype.getLegendIconType = function() {
 //exports
 anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;//inherited
 anychart.core.polar.series.Line.prototype['hoverStroke'] = anychart.core.polar.series.Line.prototype.hoverStroke;//inherited
+anychart.core.polar.series.Line.prototype['selectStroke'] = anychart.core.polar.series.Line.prototype.selectStroke;//inherited

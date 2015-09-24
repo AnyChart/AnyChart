@@ -57,10 +57,10 @@ anychart.core.cartesian.series.AreaBase.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.AreaBase.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.AreaBase.prototype.colorizeShape = function(pointState) {
   this.path.stroke(null);
-  this.path.fill(this.getFinalFill(false, hover));
-  this.strokePath.stroke(this.getFinalStroke(false, hover));
+  this.path.fill(this.getFinalFill(false, pointState));
+  this.strokePath.stroke(this.getFinalStroke(false, pointState));
   this.strokePath.fill(null);
 };
 
@@ -70,7 +70,9 @@ anychart.core.cartesian.series.AreaBase.prototype.finalizeHatchFill = function()
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillPath) {
       this.hatchFillPath.deserialize(this.path.serialize());
-      this.applyHatchFill(false);
+
+      var seriesState = this.state.getSeriesState();
+      this.applyHatchFill(seriesState);
     }
   }
 };

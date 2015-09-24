@@ -104,6 +104,14 @@ anychart.core.ui.Title.prototype.height_ = null;
 
 
 /**
+ * Width settings for the title.
+ * @type {number|string|null}
+ * @private
+ */
+anychart.core.ui.Title.prototype.autoWidth_ = null;
+
+
+/**
  * Actual width of the title.
  * @type {number}
  * @private
@@ -230,6 +238,18 @@ anychart.core.ui.Title.prototype.text = function(opt_value) {
 
 
 /**
+ * Set/get auto text.
+ * Used for tooltip.
+ * @param {string=} opt_value
+ * @return {!anychart.core.ui.Title|string}
+ */
+anychart.core.ui.Title.prototype.autoText = function(opt_value) {
+  if (goog.isDef(opt_value)) opt_value = goog.string.makeSafe(opt_value);
+  return /** @type {!anychart.core.ui.Title|string} */(this.textSettings('autoText', opt_value));
+};
+
+
+/**
  * Getter for the title background.
  * @example <t>simple-h100</t>
  * var title = anychart.ui.title();
@@ -335,6 +355,14 @@ anychart.core.ui.Title.prototype.height = function(opt_value) {
     return this;
   }
   return this.height_;
+};
+
+
+/**
+ * @param {number|string|null} width
+ */
+anychart.core.ui.Title.prototype.setAutoWidth = function(width) {
+  this.autoWidth_ = width;
 };
 
 
@@ -705,11 +733,12 @@ anychart.core.ui.Title.prototype.getContentBounds = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.applyTextSettings = function(textElement, isInitial) {
-  if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {
-    if (!!this.settingsObj['useHtml'])
-      textElement.htmlText(this.settingsObj['text']);
-    else
-      textElement.text(this.settingsObj['text']);
+  if (isInitial || 'text' in this.changedSettings || 'autoText' in this.changedSettings || 'useHtml' in this.changedSettings) {
+    if (!!this.settingsObj['useHtml']) {
+      textElement.htmlText(this.settingsObj['text'] || this.settingsObj['autoText']);
+    } else {
+      textElement.text(this.settingsObj['text'] || this.settingsObj['autoText']);
+    }
   }
   goog.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
@@ -788,11 +817,12 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   textBounds = this.text_.getBounds();
 
-  if (goog.isNull(this.width_)) {
+  var width = goog.isNull(this.width_) ? (this.autoWidth_ || null) : this.width_;
+  if (goog.isNull(width)) {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
   } else {
-    this.backgroundWidth_ = anychart.utils.normalizeSize(/** @type {number|string} */(this.width_), parentWidth);
+    this.backgroundWidth_ = anychart.utils.normalizeSize(/** @type {number|string} */(width), parentWidth);
     this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
   }
 
@@ -800,7 +830,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
     this.backgroundWidth_ = margin.tightenWidth(parentWidth);
     this.textWidth_ = padding.tightenWidth(this.backgroundWidth_);
     this.text_.width(this.textWidth_);
-  } else if (!goog.isNull(this.width_))
+  } else if (!goog.isNull(width))
     this.text_.width(this.textWidth_);
 
   // need to set transformation to drop text bounds cache

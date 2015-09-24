@@ -7,6 +7,7 @@ goog.require('anychart.data.PieView');
 goog.require('anychart.data.ScatterView');
 goog.require('anychart.data.Set');
 goog.require('anychart.data.SortView');
+goog.require('anychart.data.Table');
 goog.require('anychart.data.Tree');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
@@ -104,7 +105,7 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
     for (i = 0; i < seriesCount; i++) {
       res.push(dataSet.mapAs({
         'x': [0],
-        'low': [1 + i * 2 + 0],
+        'low': [1 + i * 2],
         'high': [1 + i * 2 + 1]
       }));
     }
@@ -112,7 +113,7 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
     for (i = 0; i < seriesCount; i++) {
       res.push(dataSet.mapAs({
         'x': [0],
-        'open': [1 + i * 4 + 0],
+        'open': [1 + i * 4],
         'high': [1 + i * 4 + 1],
         'low': [1 + i * 4 + 2],
         'close': [1 + i * 4 + 3]

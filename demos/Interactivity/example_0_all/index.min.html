@@ -1,0 +1,56 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="../../../out/anychart-bundle.min.js"></script>
+  <meta charset="utf-8">
+  <script src="http://cdn.anychart.com/geodata/countries/usa/usa_mainland.js"></script>
+  <script src="index.js"></script>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+    #container {
+      width: 100%;
+      height: 900px;
+      margin: 0;
+    }
+    #control {
+      padding: 10px;
+    }
+    fieldset {
+      display: inline-block;
+      margin: 8px;
+      border: 1px solid silver;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    legend {
+      padding: 2px;
+    }
+  </style>
+</head>
+<body>
+<div id="control">
+  <fieldset>
+    <legend>Hover mode</legend>
+    <input type="radio" id='byspot' name='hoverMode' value="byspot" onclick="changeHoverMode(this.value);"> BY_SPOT
+    <input type="radio" id='byx' name='hoverMode' value="byx"  onclick="changeHoverMode(this.value);"> BY_X
+    <input type="radio" id='single' name='hoverMode' value="single"  onclick="changeHoverMode(this.value);"> SINGLE
+  </fieldset>
+
+  <fieldset>
+    <legend>Select mode</legend>
+    <input type="radio" id='none' name='selectMode' value="none" onclick="changeSelectionMode(this.value);"> NONE
+    <input type="radio" id='singleselect' name='selectMode' value="singleselect" onclick="changeSelectionMode(this.value);"> SINGLE_SELECT
+    <input type="radio" id='multiselect' name='selectMode' value="multiselect" onclick="changeSelectionMode(this.value);"> MULTI_SELECT
+  </fieldset>
+</div>
+<div id="container"></div>
+</body>
+</html>
+
+
+
+

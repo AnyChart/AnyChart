@@ -189,10 +189,12 @@ anychart.core.ui.LegendItem.prototype.drawIconMarker_ = function(path, size) {
     this.registerDisposable(this.marker_);
   } else
     this.marker_.clear();
-  this.applyMarkerFillAndStroke_(this.hovered_);
-  var type = (/** @type {anychart.core.ui.LegendItem} */(this)).iconMarkerType_;
-  var markerDrawer = goog.isString(type) ? anychart.enums.getMarkerDrawer(type) : type;
-  markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
+  if (this.iconMarkerType_) {
+    this.applyMarkerFillAndStroke_(this.hovered_);
+    var type = (/** @type {anychart.core.ui.LegendItem} */(this)).iconMarkerType_;
+    var markerDrawer = goog.isString(type) ? anychart.enums.getMarkerDrawer(type) : type;
+    markerDrawer.call(this, this.marker_, size / 2, size / 2, size / 6);
+  }
 };
 
 
@@ -348,9 +350,7 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
             .moveTo(0, 0)
             .close();
 
-        if (this.iconMarkerType_) {
-          this.drawIconMarker_(path, size);
-        }
+        this.drawIconMarker_(path, size);
       };
       break;
 
@@ -360,9 +360,7 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
             .lineTo(size, 0.5 * size)
             .close();
 
-        if (this.iconMarkerType_) {
-          this.drawIconMarker_(path, size);
-        }
+        this.drawIconMarker_(path, size);
       };
       break;
 
@@ -374,9 +372,7 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
             .moveTo(0, 0)
             .close();
 
-        if (this.iconMarkerType_) {
-          this.drawIconMarker_(path, size);
-        }
+        this.drawIconMarker_(path, size);
       };
       break;
 
@@ -626,13 +622,13 @@ anychart.core.ui.LegendItem.prototype.iconHatchFill = function(opt_patternFillOr
 
 /**
  * Getter/setter for marker type.
- * @param {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @param {(null|string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.core.ui.LegendItem|null|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
  */
 anychart.core.ui.LegendItem.prototype.iconMarkerType = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!goog.isFunction(opt_value))
-      opt_value = anychart.enums.normalizeMarkerType(opt_value);
+      opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeMarkerType(opt_value);
     if (this.iconMarkerType_ != opt_value) {
       this.iconMarkerType_ = opt_value;
       this.redrawIcon_ = true;
@@ -861,7 +857,7 @@ anychart.core.ui.LegendItem.prototype.getTextElement = function() {
  * @param {number} index
  */
 anychart.core.ui.LegendItem.prototype.setItemIndexToLayer = function(index) {
-  this.layer_.tag = index;
+  this.layer_.tag = {index: index};
 };
 
 

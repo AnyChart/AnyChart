@@ -724,14 +724,15 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
     var index = this.series_.length - 1;
     var inc = index * anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Radar.ZINDEX_SERIES) + inc);
-    instance.labels().setAutoZIndex(anychart.charts.Radar.ZINDEX_LABEL + inc + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
+    var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Radar.ZINDEX_SERIES) + inc;
+    instance.setAutoZIndex(seriesZIndex);
+    instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
     var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1));
     instance.setAutoMarkerType(markerType);
     if (instance.hasMarkers()) {
-      instance.markers().setAutoZIndex(anychart.charts.Radar.ZINDEX_MARKER + inc);
+      instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoType(markerType);
       instance.markers().setAutoFill(instance.getMarkerFill());
       instance.markers().setAutoStroke(instance.getMarkerStroke());
@@ -757,28 +758,17 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
 };
 
 
-/**
- * Getter series by index.
- * @example
- * var data = [
- *     [1, 2, 3, 4],
- *     [2, 3, 4, 1],
- *     [3, 4, 1, 2],
- *     [4, 1, 2, 3],
- *     [5, 5, 5, 5]
- * ];
- * var chart = anychart.radar.apply(this, data);
- * var series, i=0;
- * while (series = chart.getSeries(i)){
- *     series.markers().type('circle');
- *     i++;
- * }
- * chart.container(stage).draw();
- * @param {number} index
- * @return {anychart.core.radar.series.Base}
- */
+/** @inheritDoc */
 anychart.charts.Radar.prototype.getSeries = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Radar.prototype.getAllSeries = function() {
+  return this.series_;
 };
 
 
@@ -1464,7 +1454,12 @@ anychart.charts.Radar.prototype.drawSeries_ = function() {
       yScaleNegativeSumms[yUid] = 0;
     }
     var pointClb = function(series) {
-      series.drawPoint();
+      var iterator = series.getIterator();
+      var index = iterator.getIndex();
+      if (iterator.get('selected'))
+        series.state.setPointState(anychart.PointState.SELECT, index);
+
+      series.drawPoint(series.state.getPointStateByIndex(index));
     };
     var missingClb = function(series) {
       series.drawMissing();
@@ -1576,36 +1571,153 @@ anychart.charts.Radar.prototype.createLegendItemsProvider = function(sourceMode,
 
 
 /** @inheritDoc */
-anychart.charts.Radar.prototype.legendItemClick = function(item, event) {
-  var sourceKey = item.sourceKey();
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.enabled(!series.enabled());
+anychart.charts.Radar.prototype.getSeriesStatus = function(event) {
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+  var xValue, yValue, index;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var radius = Math.min(this.dataBounds_.width, this.dataBounds_.height) / 2;
+  var cx = Math.round(this.dataBounds_.left + this.dataBounds_.width / 2);
+  var cy = Math.round(this.dataBounds_.top + this.dataBounds_.height / 2);
+
+  var clientRadius = Math.sqrt(Math.pow(cx - x, 2) + Math.pow(cy - y, 2));
+
+  if (clientRadius > radius)
+    return null;
+
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+  var iterator;
+  var dx, dy, angle;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = interactivity.spotRadius();
+
+    var leftSideRatio, rightSideRatio;
+    if (clientRadius - spotRadius >= 0) {
+      dx = cx - x;
+      dy = cy - y;
+
+      angle = Math.atan(dx / dy);
+      if (angle <= 0)
+        angle += Math.PI;
+      if (dx < 0 || (angle == Math.PI && dy > 0))
+        angle += Math.PI;
+      angle += this.startAngle_;
+      goog.math.modulo(/** @type {number} */(angle), Math.PI * 2);
+
+
+      var dAngle = Math.asin(spotRadius / clientRadius);
+      var leftSideAngle = angle + dAngle;
+      var rightSideAngle = angle - dAngle;
+
+      leftSideRatio = 1 - (leftSideAngle / (Math.PI * 2));
+      rightSideRatio = 1 - (rightSideAngle / (Math.PI * 2));
+    } else {
+      leftSideRatio = 0;
+      rightSideRatio = 1;
+    }
+
+    var minValue, maxValue;
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      if (series.enabled()) {
+        minValue = /** @type {number} */(series.xScale().inverseTransform(leftSideRatio));
+        maxValue = /** @type {number} */(series.xScale().inverseTransform(rightSideRatio));
+
+        iterator = series.getIterator();
+        var indexes = series.data().findInRangeByX(minValue, maxValue);
+
+        if (rightSideRatio >= 1) {
+          index = series.data().findInUnsortedDataByX(0);
+          goog.array.extend(indexes, index);
+        }
+
+        var ind = [];
+        var minLength = Infinity;
+        var minLengthIndex;
+        for (var j = 0; j < indexes.length; j++) {
+          index = indexes[j];
+          if (iterator.select(index)) {
+            xValue = iterator.get('x');
+            yValue = iterator.get('value');
+
+            var xRatio = series.xScale().transform(xValue);
+            var yRatio = series.yScale().transform(yValue);
+
+            var pointAngle = goog.math.modulo(goog.math.toRadians(this.startAngle() - 90 + 360 * xRatio), Math.PI * 2);
+            var pointRadius = radius * yRatio;
+            var pointX = cx + pointRadius * Math.cos(pointAngle);
+            var pointY = cy + pointRadius * Math.sin(pointAngle);
+
+            var length = Math.sqrt(Math.pow(pointX - x, 2) + Math.pow(pointY - y, 2));
+            if (length <= spotRadius) {
+              ind.push(index);
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = index;
+              }
+            }
+          }
+        }
+        if (ind.length)
+          points.push({
+            series: series,
+            points: ind,
+            lastPoint: ind[ind.length - 1],
+            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+          });
+      }
+    }
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+    dx = cx - x;
+    dy = cy - y;
+
+    angle = Math.atan(dx / dy);
+    if (angle <= 0)
+      angle += Math.PI;
+    if (dx < 0 || (angle == Math.PI && dy > 0))
+      angle += Math.PI;
+    angle += this.startAngle_;
+    goog.math.modulo(/** @type {number} */(angle), Math.PI * 2);
+
+    var ratio = 1 - (angle / (Math.PI * 2));
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      xValue = series.xScale().inverseTransform(ratio);
+      index = series.data().find('x', xValue);
+      if (index < 0) index = NaN;
+
+      iterator = series.getIterator();
+      minLength = Infinity;
+
+      if (iterator.select(index) && !anychart.utils.isNaN(iterator.get('value'))) {
+        var pixX = /** @type {number} */(iterator.meta('x'));
+        var pixY = /** @type {number} */(iterator.meta('value'));
+
+        length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+        if (length < minLength) {
+          minLength = length;
+        }
+
+        points.push({
+          series: series,
+          points: [index],
+          lastPoint: index,
+          nearestPointToCursor: {index: index, distance: minLength}
+        });
+      }
+    }
   }
-};
 
-
-/** @inheritDoc */
-anychart.charts.Radar.prototype.legendItemOver = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.hoverSeries();
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Radar.prototype.legendItemOut = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.unhover();
-  }
+  return /** @type {Array.<Object>} */(points);
 };
 
 

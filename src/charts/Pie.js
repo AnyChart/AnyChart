@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
@@ -222,13 +223,16 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
    */
   this.sides3D_ = [];
 
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
+
   this.data(opt_data || null, opt_csvSettings);
 
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
-
-  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
-      this.handleMouseOverAndMove_);
 };
 goog.inherits(anychart.charts.Pie, anychart.core.SeparateChart);
 
@@ -368,6 +372,31 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
 
 
 /**
+ * @inheritDoc
+ */
+anychart.charts.Pie.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * Tester if the series is discrete based.
+ * @return {boolean}
+ */
+anychart.charts.Pie.prototype.isDiscreteBased = function() {
+  return true;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Pie.prototype.isSeries = function() {
+  return true;
+};
+
+
+/**
  * Gets current chart data.
  * @return {anychart.data.View} Current data view.
  *//**
@@ -480,6 +509,15 @@ anychart.charts.Pie.prototype.redefineView_ = function() {
  */
 anychart.charts.Pie.prototype.getIterator = function() {
   return this.iterator_ || (this.iterator_ = this.view_.getIterator());
+};
+
+
+/**
+ * Returns new default iterator for the current mapping.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.charts.Pie.prototype.getResetIterator = function() {
+  return this.iterator_ = this.view_.getIterator();
 };
 
 
@@ -622,6 +660,11 @@ anychart.charts.Pie.prototype.hatchFillPalette = function(opt_value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Fill.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for the pie slices fill in normal state.
  * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the normal state.
@@ -687,6 +730,62 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
 
 
 /**
+ * Getter/setter for the pie slices fill in the hover state.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.Pie|Function} .
+ */
+anychart.charts.Pie.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.hoverFill_) {
+      this.hoverFill_ = fill;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.hoverFill_;
+};
+
+
+/**
+ * Method that gets final fill color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState Point state.
+ * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
+ * @protected
+ */
+anychart.charts.Pie.prototype.getFinalFill = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Stroke.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
  * Getter for the pie slices stroke in the normal state.
  * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the normal state.
  *//**
@@ -731,55 +830,6 @@ anychart.charts.Pie.prototype.stroke = function(opt_strokeOrFill, opt_thickness,
     return this;
   }
   return this.stroke_;
-};
-
-
-/**
- * Getter for the pie slices fill in the hover state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the hover state.
- *//**
- * Setter for the pie slices fill in the hover state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.hoverFill(['red', 'blue']);
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighter fill of the default pallete.
- * function() {
- *   return anychart.color.lighten(this.sourceColor);
- * };] or Fill, or fill-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Fill - fill of the current point
- *  // }
- *  return myFill; //acgraph.vector.Fill
- * };</code>.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.charts.Pie|Function} .
- */
-anychart.charts.Pie.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.hoverFill_) {
-      this.hoverFill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.hoverFill_;
 };
 
 
@@ -831,6 +881,36 @@ anychart.charts.Pie.prototype.hoverStroke = function(opt_strokeOrFill, opt_thick
 };
 
 
+/**
+ * Method that gets final stroke color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState Point state.
+ * @return {!acgraph.vector.Stroke} Final hover stroke for the current slice.
+ * @protected
+ */
+anychart.charts.Pie.prototype.getFinalStroke = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  HatchFill.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for current hatch fill settings.
  * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
@@ -909,6 +989,41 @@ anychart.charts.Pie.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrS
     return this;
   }
   return /** @type {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|boolean} */ (this.hoverHatchFill_);
+};
+
+
+/**
+ * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState .
+ * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
+ */
+anychart.charts.Pie.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+
+  var normalHatchFill;
+  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
+    normalHatchFill = iterator.get('hatchFill');
+  } else {
+    normalHatchFill = this.hatchFill();
+  }
+
+  var hatchFill;
+  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
+      hatchFill = iterator.get('hoverHatchFill');
+    } else if (goog.isDef(this.hoverHatchFill())) {
+      hatchFill = this.hoverHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
+      this.normalizeHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
@@ -1542,15 +1657,24 @@ anychart.charts.Pie.prototype.explodeSlice = function(index, opt_explode) {
  * var chart = anychart.pie([10, 12, 14, 46]);
  * chart.explodeSlices(true);
  * chart.container(stage).draw();
- * @param {boolean} value Whether to explode.
+ * @param {boolean|Array.<number>} value Whether to explode.
  * @return {anychart.charts.Pie} .
  */
 anychart.charts.Pie.prototype.explodeSlices = function(value) {
   var iterator = this.getIterator().reset();
 
-  while (iterator.advance()) {
-    if (iterator.select(iterator.getIndex()) && !this.isMissing_(iterator.get('value'))) {
-      this.clickSlice(value);
+  if (goog.isArray(value)) {
+    for (var i = 0, len = value.length; i < len; i++) {
+      var index = value[i];
+      if (iterator.select(index) && !this.isMissing_(iterator.get('value'))) {
+        this.clickSlice(true);
+      }
+    }
+  } else {
+    while (iterator.advance()) {
+      if (iterator.select(iterator.getIndex()) && !this.isMissing_(iterator.get('value'))) {
+        this.clickSlice(/** @type {boolean} */(value));
+      }
     }
   }
 
@@ -1667,83 +1791,6 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
 
   this.hoverLabels()
       .parentBounds(this.pieBounds_);
-};
-
-
-/**
- * Method that gets final fill color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the fill should be a hover fill.
- * @return {!acgraph.vector.Fill} Final hover fill for the current slice.
- * @protected
- */
-anychart.charts.Pie.prototype.getFillColor = function(usePointSettings, hover) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      (usePointSettings && iterator.get('fill')) || this.fill());
-  return /** @type {!acgraph.vector.Fill} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(
-          (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
-};
-
-
-/**
- * Method that gets final stroke color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean} hover If the stroke should be a hover stroke.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current slice.
- * @protected
- */
-anychart.charts.Pie.prototype.getStrokeColor = function(usePointSettings, hover) {
-  var iterator = this.getIterator();
-
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      (usePointSettings && iterator.get('stroke')) ||
-      this.stroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-          (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
-};
-
-
-/**
- * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {boolean=} opt_hover If the hatch fill should be a hover hatch fill.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
- */
-anychart.charts.Pie.prototype.getFinalHatchFill = function(usePointSettings, opt_hover) {
-  var iterator = this.getIterator();
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
-    normalHatchFill = iterator.get('hatchFill');
-  } else {
-    normalHatchFill = this.hatchFill();
-  }
-
-  var hatchFill;
-  if (opt_hover) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
-      hatchFill = iterator.get('hoverHatchFill');
-    } else if (goog.isDef(this.hoverHatchFill())) {
-      hatchFill = this.hoverHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
 };
 
 
@@ -1937,8 +1984,9 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
-        var hovered = this.hoverStatus == iterator.getIndex();
-        this.drawLabel_(hovered, hovered);
+        var pointState = this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex());
+        var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
+        this.drawLabel_(pointState, hovered);
       }
     }
     this.labels().draw();
@@ -2003,16 +2051,38 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
     slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, this.radiusValue_, this.innerRadiusValue_, start, sweep);
   }
 
-  slice.tag = index;
-  var hover = (this.hoverStatus == index);
-  this.colorizeSlice(hover);
+  slice.tag = {
+    series: this,
+    index: index
+  };
+  var pointState = this.state.getPointStateByIndex(iterator.getIndex());
+  this.colorizeSlice(pointState);
   if (hatchSlice) {
     hatchSlice.deserialize(slice.serialize());
-    hatchSlice.tag = index;
-    this.applyHatchFill(hover);
+    hatchSlice.tag = {
+      series: this,
+      index: index
+    };
+    this.applyHatchFill(pointState);
   }
 
   return true;
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.charts.Pie|anychart.enums.HoverMode} .
+ */
+anychart.charts.Pie.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
 };
 
 
@@ -2223,23 +2293,23 @@ anychart.charts.Pie.prototype.draw3DSlice_ = function(side, opt_update) {
   var outerR = this.radiusValue_;
   var innerR = this.innerRadiusValue_;
 
-  var hover = (this.hoverStatus == side.index);
+  var pointState = this.state.getPointStateByIndex(iterator.getIndex());
 
   switch (side.type) {
     case anychart.charts.Pie.Side3DType.TOP:
-      this.drawTopSide_(cx, cy, outerR, innerR, side.start, side.sweep, opt_update, hover);
+      this.drawTopSide_(cx, cy, outerR, innerR, side.start, side.sweep, pointState, opt_update);
       break;
     case anychart.charts.Pie.Side3DType.FRONT:
-      this.drawFrontSide_(cx, cy, outerR, side.start, side.end, side.sweep, opt_update, hover);
+      this.drawFrontSide_(cx, cy, outerR, side.start, side.end, side.sweep, pointState, opt_update);
       break;
     case anychart.charts.Pie.Side3DType.BACK:
-      this.drawBackSide_(cx, cy, innerR, side.start, side.end, side.sweep, opt_update, hover);
+      this.drawBackSide_(cx, cy, innerR, side.start, side.end, side.sweep, pointState, opt_update);
       break;
     case anychart.charts.Pie.Side3DType.START:
-      this.drawSimpleSide_('startPath', cx, cy, outerR, innerR, side.angle, opt_update, hover);
+      this.drawSimpleSide_('startPath', cx, cy, outerR, innerR, side.angle, pointState, opt_update);
       break;
     case anychart.charts.Pie.Side3DType.END:
-      this.drawSimpleSide_('endPath', cx, cy, outerR, innerR, side.angle, opt_update, hover);
+      this.drawSimpleSide_('endPath', cx, cy, outerR, innerR, side.angle, pointState, opt_update);
       break;
   }
 };
@@ -2253,12 +2323,12 @@ anychart.charts.Pie.prototype.draw3DSlice_ = function(side, opt_update) {
  * @param {number} innerR
  * @param {number} start Start angle in degrees.
  * @param {number} sweep Sweep angle in degrees.
+ * @param {(anychart.PointState|number)} pointState Point state.
  * @param {boolean=} opt_update
- * @param {boolean=} opt_hover
  * @return {!acgraph.vector.Path}
  * @private
  */
-anychart.charts.Pie.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, start, sweep, opt_update, opt_hover) {
+anychart.charts.Pie.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, start, sweep, pointState, opt_update) {
   if (outerR < 0) outerR = 0;
   if (innerR < 0) innerR = 0;
   if (outerR < innerR) {
@@ -2279,7 +2349,7 @@ anychart.charts.Pie.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, st
       path.moveTo(cx, cy).circularArc(cx, cy, outerR, this.get3DYRadius(outerR), start, sweep, true).close();
     }
 
-    this.colorize3DPath_('topPath', opt_hover);
+    this.colorize3DPath_('topPath', pointState);
     return path;
   }
 
@@ -2292,7 +2362,7 @@ anychart.charts.Pie.prototype.drawTopSide_ = function(cx, cy, outerR, innerR, st
     path.close();
   }
 
-  this.colorize3DPath_('topPath', opt_hover);
+  this.colorize3DPath_('topPath', pointState);
   return path;
 };
 
@@ -2345,10 +2415,10 @@ anychart.charts.Pie.prototype.createPath_ = function(pathName, opt_update) {
 
 /**
  * Colorize and apply hatchFill for all path of slice.
- * @param {boolean} hover
+ * @param {anychart.PointState|number} pointState Point state.
  * @private
  */
-anychart.charts.Pie.prototype.colorize3DSlice_ = function(hover) {
+anychart.charts.Pie.prototype.colorize3DSlice_ = function(pointState) {
   var i, length = this.sides3D_.length;
   var side;
   var index = this.getIterator().getIndex();
@@ -2358,7 +2428,7 @@ anychart.charts.Pie.prototype.colorize3DSlice_ = function(hover) {
     if (side.index == index) {
       var uniqueValue = side.type == anychart.charts.Pie.Side3DType.FRONT ||
                         side.type == anychart.charts.Pie.Side3DType.BACK ? side.start : '';
-      this.colorize3DPath_(side.type + 'Path' + uniqueValue, hover);
+      this.colorize3DPath_(side.type + 'Path' + uniqueValue, pointState);
     }
   }
 };
@@ -2367,19 +2437,22 @@ anychart.charts.Pie.prototype.colorize3DSlice_ = function(hover) {
 /**
  * Get fill color for 3D mode.
  * Compute named colors (from point data) and fallback if rawColor is not hex.
- * @param {boolean=} opt_hover
+ * @param {(anychart.PointState|number)} pointState Point state.
  * @return {string}
  * @private
  */
-anychart.charts.Pie.prototype.get3DFillColor_ = function(opt_hover) {
+anychart.charts.Pie.prototype.get3DFillColor_ = function(pointState) {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
 
   var normalColor = /** @type {acgraph.vector.Fill|Function} */(iterator.get('fill') || this.fill());
-  var rawColor = /** @type {!acgraph.vector.Fill} */(opt_hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(iterator.get('hoverFill') || normalColor), normalColor) :
-      this.normalizeColor(normalColor));
+  var rawColor;
+  if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    rawColor = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(iterator.get('hoverFill') || normalColor), normalColor);
+  } else {
+    rawColor = this.normalizeColor(normalColor);
+  }
 
   var parsedColor;
   if (goog.isString(rawColor)) {
@@ -2407,25 +2480,28 @@ anychart.charts.Pie.prototype.get3DFillColor_ = function(opt_hover) {
  * @return {acgraph.vector.Stroke}
  */
 anychart.charts.Pie.prototype.get3DStrokeColor = function() {
-  return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this.get3DFillColor_(), .2));
+  return /** @type {acgraph.vector.Stroke} */ (anychart.color.darken(this.get3DFillColor_(anychart.PointState.NORMAL), .2));
 };
 
 
 /**
  * Colorize and apply hatchFill for path.
  * @param {!string} pathName
- * @param {boolean=} opt_hover
+ * @param {(anychart.PointState|number)} pointState Point state.
  * @private
  */
-anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, opt_hover) {
+anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, pointState) {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
 
-  var color = this.get3DFillColor_(opt_hover);
+  var color = this.get3DFillColor_(pointState);
   var rgbColor = goog.color.hexToRgb(color);
 
   var path = iterator.meta(pathName);
-  path.tag = index;
+  path.tag = {
+    series: this,
+    index: index
+  };
 
   var fill;
 
@@ -2438,17 +2514,20 @@ anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, opt_hover) {
   var darkPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .2));
   var darkSidesPathColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
 
+  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
   if (pathName == 'topPath') {
+
     fill = {
       'angle': -50,
       'keys': [{
         'position': 0,
         'opacity': 1,
-        'color': opt_hover ? anychart.color.lighten(color, .3) : color
+        'color': hovered ? anychart.color.lighten(color, .3) : color
       }, {
         'position': 1,
         'opacity': 1,
-        'color': opt_hover ? anychart.color.lighten(topPathSecondColor, .2) : topPathSecondColor
+        'color': hovered ? anychart.color.lighten(topPathSecondColor, .2) : topPathSecondColor
       }]
     };
 
@@ -2458,24 +2537,24 @@ anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, opt_hover) {
       'keys': [{
         'position': 0,
         'opacity': 1,
-        'color': opt_hover ? anychart.color.lighten(color, .2) : anychart.color.lighten(color, .1)
+        'color': hovered ? anychart.color.lighten(color, .2) : anychart.color.lighten(color, .1)
       }, {
         'position': .19,
         'opacity': 1,
-        'color': opt_hover ? anychart.color.lighten(frontSecondColor, .2) : frontSecondColor
+        'color': hovered ? anychart.color.lighten(frontSecondColor, .2) : frontSecondColor
       }, {
         'position': 1,
         'opacity': 1,
-        'color': opt_hover ? anychart.color.lighten(frontThirdColor, .2) : frontThirdColor
+        'color': hovered ? anychart.color.lighten(frontThirdColor, .2) : frontThirdColor
       }]
     };
 
   } else if (goog.string.startsWith(pathName, 'backPath')) {
-    fill = opt_hover ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
+    fill = hovered ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
 
   // sides (start, end)
   } else {
-    fill = opt_hover ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
+    fill = hovered ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
   }
 
   path.fill(fill);
@@ -2486,8 +2565,11 @@ anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, opt_hover) {
   var hatchPath = iterator.meta(hatchPathName);
   if (hatchPath) {
     hatchPath.deserialize(path.serialize());
-    hatchPath.tag = index;
-    this.applyHatchFill(opt_hover, hatchPathName);
+    hatchPath.tag = {
+      series: this,
+      index: index
+    };
+    this.applyHatchFill(pointState, hatchPathName);
   }
 };
 
@@ -2775,12 +2857,12 @@ anychart.charts.Pie.prototype.getBackSides_ = function(startAngle, endAngle) {
  * @param {number} startAngle
  * @param {number} endAngle
  * @param {number} sweep
+ * @param {anychart.PointState|number} pointState
  * @param {boolean=} opt_update
- * @param {boolean=} opt_hover
  * @return {!acgraph.vector.Path}
  * @private
  */
-anychart.charts.Pie.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, opt_update, opt_hover) {
+anychart.charts.Pie.prototype.drawFrontSide_ = function(cx, cy, outerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two front sides
   var uniqueValue = '' + startAngle;
   var pathName = 'frontPath' + uniqueValue;
@@ -2814,7 +2896,7 @@ anychart.charts.Pie.prototype.drawFrontSide_ = function(cx, cy, outerR, startAng
   path.lineTo(startX, startY);
   path.close();
 
-  this.colorize3DPath_(pathName, opt_hover);
+  this.colorize3DPath_(pathName, pointState);
   return path;
 };
 
@@ -2827,12 +2909,12 @@ anychart.charts.Pie.prototype.drawFrontSide_ = function(cx, cy, outerR, startAng
  * @param {number} startAngle
  * @param {number} endAngle
  * @param {number} sweep
+ * @param {anychart.PointState|number} pointState
  * @param {boolean=} opt_update
- * @param {boolean=} opt_hover
  * @return {!acgraph.vector.Path}
  * @private
  */
-anychart.charts.Pie.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, opt_update, opt_hover) {
+anychart.charts.Pie.prototype.drawBackSide_ = function(cx, cy, innerR, startAngle, endAngle, sweep, pointState, opt_update) {
   // there may be two back sides
   var uniqueValue = '' + startAngle;
   var pathName = 'backPath' + uniqueValue;
@@ -2866,7 +2948,7 @@ anychart.charts.Pie.prototype.drawBackSide_ = function(cx, cy, innerR, startAngl
   path.lineTo(innerStartX, innerStartY);
   path.close();
 
-  this.colorize3DPath_(pathName, opt_hover);
+  this.colorize3DPath_(pathName, pointState);
   return path;
 };
 
@@ -2879,12 +2961,12 @@ anychart.charts.Pie.prototype.drawBackSide_ = function(cx, cy, innerR, startAngl
  * @param {number} outerR
  * @param {number} innerR
  * @param {number} angle
+ * @param {anychart.PointState|number} pointState
  * @param {boolean=} opt_update
- * @param {boolean=} opt_hover
  * @return {!acgraph.vector.Path}
  * @private
  */
-anychart.charts.Pie.prototype.drawSimpleSide_ = function(pathName, cx, cy, outerR, innerR, angle, opt_update, opt_hover) {
+anychart.charts.Pie.prototype.drawSimpleSide_ = function(pathName, cx, cy, outerR, innerR, angle, pointState, opt_update) {
   var outerXR = outerR;
   var outerYR = this.get3DYRadius(outerR);
   var innerXR = innerR;
@@ -2906,7 +2988,7 @@ anychart.charts.Pie.prototype.drawSimpleSide_ = function(pathName, cx, cy, outer
   path.lineTo(x1, y1);
   path.close();
 
-  this.colorize3DPath_(pathName, opt_hover);
+  this.colorize3DPath_(pathName, pointState);
   return path;
 };
 
@@ -2928,13 +3010,14 @@ anychart.charts.Pie.prototype.getCenterAngle_ = function(startAngle, endAngle) {
 /**
  * Draws outside label for a slice.
  * @private
- * @param {boolean} hovered If it is a hovered label drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  * @param {boolean=} opt_updateConnector Whether to update connector or not.
  * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
  */
-anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateConnector) {
+anychart.charts.Pie.prototype.drawOutsideLabel_ = function(pointState, opt_updateConnector) {
   var iterator = this.getIterator();
 
+  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
   var sliceLabel = iterator.get('label');
   var hoverSliceLabel = hovered ? iterator.get('hoverLabel') : null;
 
@@ -3008,13 +3091,15 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(hovered, opt_updateCo
 /**
  * Draws label for a slice.
  * @private
- * @param {boolean} hovered If it is a hovered label drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  * @param {boolean=} opt_updateConnector Whether to update connector or not. Used only with outside labels.
  * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
  */
-anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector) {
+anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnector) {
   if (this.isOutsideLabels_())
-    return this.drawOutsideLabel_(hovered, opt_updateConnector);
+    return this.drawOutsideLabel_(pointState, opt_updateConnector);
+
+  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
   var iterator = this.getIterator();
   var sliceLabel = iterator.get('label');
@@ -3067,7 +3152,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
 
     var bounds = this.labels().measureWithTransform(this.measureLabel_, null, null, index);
 
-    var singlePiePoint = (iterator.getRowsCount() == 1 && this.innerRadiusValue_ == 0);
+    var singlePiePoint = ((iterator.getRowsCount() == 1 || sweep == 360) && this.innerRadiusValue_ == 0);
     var notIntersectStartLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
     var notIntersectEndLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
     var notIntersectPieOuterRadius = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
@@ -3122,29 +3207,29 @@ anychart.charts.Pie.prototype.drawLabel_ = function(hovered, opt_updateConnector
 /**
  * Colorizes shape in accordance to current slice colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the slice is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.charts.Pie.prototype.colorizeSlice = function(hover) {
+anychart.charts.Pie.prototype.colorizeSlice = function(pointState) {
   if (this.mode3d_) {
-    this.colorize3DSlice_(hover);
+    this.colorize3DSlice_(pointState);
 
   } else {
     var slice = /** @type {acgraph.vector.Path} */ (this.getIterator().meta('slice'));
     if (goog.isDef(slice)) {
-      var fill = this.getFillColor(true, hover);
+      var fill = this.getFinalFill(true, pointState);
       if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode)) {
         fill = /** @type {!acgraph.vector.Fill} */(goog.object.clone(/** @type {Object} */(fill)));
         fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
       }
       slice.fill(fill);
 
-      fill = this.getStrokeColor(true, hover);
+      fill = this.getFinalStroke(true, pointState);
       if (this.isRadialGradientMode_(fill) && goog.isNull(fill.mode))
         fill.mode = this.pieBounds_ ? this.pieBounds_ : null;
       slice.stroke(fill);
 
-      this.applyHatchFill(hover);
+      this.applyHatchFill(pointState);
     }
   }
 };
@@ -3153,16 +3238,16 @@ anychart.charts.Pie.prototype.colorizeSlice = function(hover) {
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean=} opt_hover If the point is hovered.
+ * @param {(anychart.PointState|number)} pointState Point state.
  * @param {string=} opt_pathName
  * @protected
  */
-anychart.charts.Pie.prototype.applyHatchFill = function(opt_hover, opt_pathName) {
+anychart.charts.Pie.prototype.applyHatchFill = function(pointState, opt_pathName) {
   var hatchSlice = /** @type {acgraph.vector.Path} */(this.getIterator().meta(opt_pathName || 'hatchSlice'));
   if (goog.isDefAndNotNull(hatchSlice)) {
     hatchSlice
         .stroke(null)
-        .fill(this.getFinalHatchFill(true, opt_hover));
+        .fill(this.getFinalHatchFill(true, pointState));
   }
 };
 
@@ -3174,6 +3259,7 @@ anychart.charts.Pie.prototype.applyHatchFill = function(opt_hover, opt_pathName)
  */
 anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    this.statistics_ = null;
     this.invalidate(
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.APPEARANCE |
@@ -3220,111 +3306,14 @@ anychart.charts.Pie.prototype.paletteInvalidated_ = function(event) {
 
 
 /**
- * Slice hover status. NaN - not hovered, non-negative number - pie slice with this index hovered.
- * @type {number}
- * @protected
- */
-anychart.charts.Pie.prototype.hoverStatus = NaN;
-
-
-/**
- * Hover all pie slices.
- * @return {anychart.charts.Pie}
- */
-anychart.charts.Pie.prototype.hoverSlices = function() {
-  if (this.hoverStatus == -1) return this;
-
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.colorizeSlice(false);
-      this.drawLabel_(false, true);
-    }
-  }
-
-  var iterator = this.getIterator().reset();
-  while (iterator.advance()) {
-    this.colorizeSlice(true);
-  }
-
-  this.hoverStatus = -1;
-  return this;
-};
-
-
-/**
- * Hovers pie slice by its index.
- * @param {number} index Index of the slice to hover.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate Slice hovering.
- * @protected
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- */
-anychart.charts.Pie.prototype.hoverSlice = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().reset().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  this.unhover();
-  if (this.getIterator().select(index)) {
-    this.colorizeSlice(true);
-    if (goog.isDef(opt_event)) this.showTooltip(opt_event);
-    this.drawLabel_(true, true);
-  }
-  this.hoverStatus = index;
-  return this;
-};
-
-
-/**
- * Removes hover from the pie slice.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- */
-anychart.charts.Pie.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.colorizeSlice(false);
-      this.drawLabel_(false, true);
-    }
-  } else {
-    var iterator = this.getIterator().reset();
-    while (iterator.advance()) {
-      this.colorizeSlice(false);
-      this.drawLabel_(false, true);
-    }
-  }
-  this.hoverStatus = NaN;
-  return this;
-};
-
-
-/**
- * If index is passed, hovers a slice of the chart by its index, else hovers all slices of the chart.
- * @param {number=} opt_index
- * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
- */
-anychart.charts.Pie.prototype.hover = function(opt_index) {
-  if (goog.isDef(opt_index)) this.hoverSlice(opt_index);
-  else this.hoverSlices();
-  return this;
-};
-
-
-/**
  * Explode or implode pie slice.
  * @protected
  * @param {boolean=} opt_explode Explode value to set.
  */
 anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
   var iterator = this.getIterator();
-  // if only 1 point in Pie forbid to explode it
-  if (iterator.getRowsCount() == 1)
+  // if only 1 point in Pie was drawn - forbid to explode it
+  if (iterator.getRowsCount() == 1 || iterator.meta('sweep') == 360)
     return;
   if (goog.isDef(opt_explode)) {
     iterator.meta('exploded', opt_explode);
@@ -3347,7 +3336,21 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
     this.labels().resumeSignalsDispatching(true);
     iterator.select(index);
   }
-  this.drawLabel_(this.hoverStatus == index, this.hoverStatus == index);
+  var pointState = this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex());
+  var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  this.drawLabel_(pointState, hovered);
+};
+
+
+/**
+ * Select a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Pie.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this;
 };
 
 
@@ -3361,11 +3364,67 @@ anychart.charts.Pie.prototype.isOutsideLabels_ = function() {
 
 
 /** @inheritDoc */
+anychart.charts.Pie.prototype.getSeriesStatus = function(event) {
+  //todo (blackart) coming soon.
+  //var bounds = anychart.math.rect(0, 0, 0, 0);
+  //var clientX = event['clientX'];
+  //var clientY = event['clientY'];
+  //
+  //var value, index, iterator;
+  //
+  //var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  //
+  //var x = clientX - containerOffset.x;
+  //var y = clientY - containerOffset.y;
+  //
+  //var minX = bounds.left;
+  //var minY = bounds.top;
+  //var rangeX = bounds.width;
+  //var rangeY = bounds.height;
+  //
+  //if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+  //  return null;
+  //
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+
+  }
+
+  return points;
+};
+
+
+/** @inheritDoc */
 anychart.charts.Pie.prototype.makeBrowserEvent = function(e) {
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = {
+    'type': e['type'],
+    'target': this,
+    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
+    'domTarget': e['target'],
+    'relatedDomTarget': e['relatedTarget'],
+    'offsetX': e['offsetX'],
+    'offsetY': e['offsetY'],
+    'clientX': e['clientX'],
+    'clientY': e['clientY'],
+    'screenX': e['screenX'],
+    'screenY': e['screenY'],
+    'button': e['button'],
+    'keyCode': e['keyCode'],
+    'charCode': e['charCode'],
+    'ctrlKey': e['ctrlKey'],
+    'altKey': e['altKey'],
+    'shiftKey': e['shiftKey'],
+    'metaKey': e['metaKey'],
+    'platformModifierKey': e['platformModifierKey'],
+    'state': e['state']
+  };
   var tag = anychart.utils.extractTag(res['domTarget']);
-  if (!anychart.utils.isNaN(tag))
-    res['pointIndex'] = res['sliceIndex'] = anychart.utils.toNumber(tag);
+  res['pointIndex'] = res['sliceIndex'] = anychart.utils.toNumber(tag.index);
   return res;
 };
 
@@ -3373,54 +3432,18 @@ anychart.charts.Pie.prototype.makeBrowserEvent = function(e) {
 /**
  * Mouse click internal handler.
  * @param {anychart.core.MouseEvent} event Event object.
- * @private
  */
-anychart.charts.Pie.prototype.handleMouseClick_ = function(event) {
-  var evt = this.makePointEvent_(event);
+anychart.charts.Pie.prototype.handleMouseDown = function(event) {
+  var evt = this.makePointEvent(event);
   if (evt && this.dispatchEvent(evt) && this.getIterator().select(anychart.utils.toNumber(evt['pointIndex']))) {
     this.clickSlice();
   }
 };
 
 
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.charts.Pie.prototype.handleMouseOverAndMove_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt &&
-      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && !isNaN(this.hoverStatus)) ||
-      this.dispatchEvent(evt))) {
-    // we don't want to dispatch if this an out-over from the same slice
-    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
-    this.hoverSlice(/** @type {number} */ (evt['pointIndex']), event);
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- * @private
- */
-anychart.charts.Pie.prototype.handleMouseOut_ = function(event) {
-  var evt = this.makePointEvent_(event);
-  if (evt) {
-    if (anychart.utils.checkIfParent(this, event['relatedTarget']) &&
-        anychart.utils.toNumber(anychart.utils.extractTag(event['relatedDomTarget'])) == evt['pointIndex']) {
-      // this means we got an out-over on the same slice, for example - from the slice to inside label
-      // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
-      this.hoverSlice(/** @type {number} */ (evt['pointIndex']), event);
-    } else if (this.dispatchEvent(evt)) {
-      this.unhover();
-    }
-  }
-};
-
-
 /** @inheritDoc */
 anychart.charts.Pie.prototype.handleMouseEvent = function(event) {
-  var evt = this.makePointEvent_(event);
+  var evt = this.makePointEvent(event);
   if (evt)
     this.dispatchEvent(evt);
 };
@@ -3431,9 +3454,8 @@ anychart.charts.Pie.prototype.handleMouseEvent = function(event) {
  * browser events.
  * @param {anychart.core.MouseEvent} event
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- * @private
  */
-anychart.charts.Pie.prototype.makePointEvent_ = function(event) {
+anychart.charts.Pie.prototype.makePointEvent = function(event) {
   var pointIndex;
   if ('pointIndex' in event) {
     pointIndex = event['pointIndex'];
@@ -3443,8 +3465,6 @@ anychart.charts.Pie.prototype.makePointEvent_ = function(event) {
     pointIndex = event['markerIndex'];
   }
   pointIndex = anychart.utils.toNumber(pointIndex);
-  if (isNaN(pointIndex))
-    return null;
 
   event['pointIndex'] = pointIndex;
 
@@ -3530,9 +3550,9 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
       },
       'iconType': anychart.enums.LegendItemIconType.SQUARE,
       'text': itemText,
-      'iconStroke': this.mode3d_ ? this.get3DStrokeColor() : this.getStrokeColor(true, false),
-      'iconFill': this.mode3d_ ? this.get3DFillColor_(false) : this.getFillColor(true, false),
-      'iconHatchFill': this.getFinalHatchFill(true, false)
+      'iconStroke': this.mode3d_ ? this.get3DStrokeColor() : this.getFinalStroke(true, anychart.PointState.NORMAL),
+      'iconFill': this.mode3d_ ? this.get3DFillColor_(anychart.PointState.NORMAL) : this.getFinalFill(true, anychart.PointState.NORMAL),
+      'iconHatchFill': this.getFinalHatchFill(true, anychart.PointState.NORMAL)
     };
     goog.object.extend(obj, legendItem);
     obj['sourceUid'] = goog.getUid(this);
@@ -3563,20 +3583,128 @@ anychart.charts.Pie.prototype.legendItemClick = function(item, event) {
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.legendItemOver = function(item) {
+anychart.charts.Pie.prototype.legendItemOver = function(item, event) {
   var sourceKey = item.sourceKey();
   if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
     return;
-  var iterator = this.data().getIterator();
-  if (iterator.select(/** @type {number} */ (sourceKey))) {
-    this.hoverSlice(/** @type {number} */ (sourceKey));
-  }
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
 };
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.legendItemOut = function(item) {
-  this.unhover();
+anychart.charts.Pie.prototype.legendItemOut = function(item, event) {
+  var sourceKey = item.sourceKey();
+
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  if (tag)
+    tag.series = this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Hover.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
+ * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Pie.prototype.hover = function(opt_indexOrIndexes) {
+  if (goog.isDef(opt_indexOrIndexes))
+    this.hoverPoint(opt_indexOrIndexes);
+  else
+    this.hoverSeries();
+
+  return this;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.unhover = function() {
+  if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
+      !this.enabled())
+    return;
+
+  this.state.removePointState(anychart.PointState.HOVER, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+
+  this.hideTooltip();
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Pie.prototype.hoverPoint = function(index, opt_event) {
+  if (!this.enabled())
+    return this;
+
+  if (goog.isArray(index)) {
+    var hoveredPoints = this.state.getIndexByPointState(anychart.PointState.HOVER);
+    for (var i = 0; i < hoveredPoints.length; i++) {
+      if (!goog.array.contains(index, hoveredPoints[i])) {
+        this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
+      }
+    }
+    this.state.addPointState(anychart.PointState.HOVER, index);
+    this.showTooltip(opt_event);
+
+  } else if (goog.isNumber(index)) {
+    this.unhover();
+    this.state.addPointState(anychart.PointState.HOVER, index);
+    this.showTooltip(opt_event);
+  }
+  return this;
+};
+
+
+/**
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.charts.Pie} An instance of the {@link anychart.charts.Pie} class for method chaining.
+ */
+anychart.charts.Pie.prototype.hoverSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.setPointState(anychart.PointState.HOVER);
+
+  return this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Apply appearance.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.charts.Pie.prototype.applyAppearanceToPoint = function(pointState) {
+  this.colorizeSlice(pointState);
+  this.drawLabel_(pointState, true);
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.charts.Pie.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeSlice(pointState);
 };
 
 
@@ -3641,12 +3769,20 @@ anychart.charts.Pie.prototype.onTooltipSignal_ = function(event) {
  * @protected
  */
 anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
+  if (opt_event && opt_event['target'] == this.legend()) {
+    return;
+  }
+
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var formatProvider = this.createFormatProvider();
   if (tooltip.isFloating() && opt_event) {
     tooltip.show(
         formatProvider,
         new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+
+    // for float
+    this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+
   } else {
     tooltip.show(
         formatProvider,
@@ -3660,7 +3796,12 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
  * @protected
  */
 anychart.charts.Pie.prototype.hideTooltip = function() {
-  (/** @type {anychart.core.ui.Tooltip} */(this.tooltip())).hide();
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  if (tooltip.isFloating()) {
+    this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  }
+
+  tooltip.hide();
 };
 
 
@@ -3725,11 +3866,12 @@ anychart.charts.Pie.prototype.statistics = function(opt_key, opt_value) {
 
 /**
  * Create pie label format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
-anychart.charts.Pie.prototype.createFormatProvider = function() {
-  if (!this.pointProvider_)
+anychart.charts.Pie.prototype.createFormatProvider = function(opt_force) {
+  if (!this.pointProvider_ || opt_force)
     this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value', 'name']);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
@@ -3896,7 +4038,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
     var anchor = isRightSide ? anychart.enums.Position.LEFT_CENTER : anychart.enums.Position.RIGHT_CENTER;
     iterator.meta('anchor', anchor);
-    label = this.drawLabel_(false, false);
+    label = this.drawLabel_(anychart.PointState.NORMAL, false);
     this.dropLabelBoundsCache(label);
 
     label.angle_ = angleDeg;
@@ -4243,9 +4385,9 @@ anychart.charts.Pie.prototype.updateConnector_ = function(label, show) {
 anychart.charts.Pie.prototype.createPositionProvider = function() {
   var outside = this.isOutsideLabels_();
   var iterator = this.getIterator();
-  var singlePoint = (iterator.getRowsCount() == 1);
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  var singlePoint = (iterator.getRowsCount() == 1) || sweep == 360;
   var exploded = /** @type {boolean} */ (iterator.meta('exploded')) && !singlePoint;
   var angle = start + sweep / 2;
   var dR;

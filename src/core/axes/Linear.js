@@ -130,7 +130,7 @@ anychart.core.axes.Linear.prototype.stroke_;
 
 
 /**
- * @type {anychart.enums.Orientation}
+ * @type {?anychart.enums.Orientation}
  * @private
  */
 anychart.core.axes.Linear.prototype.orientation_;
@@ -581,16 +581,16 @@ anychart.core.axes.Linear.prototype.stroke = function(opt_strokeOrFill, opt_thic
  * @example <t>lineChart</t>
  * chart.spline([1.1, 1.6, 1.4, 1.9]);
  * chart.yAxis().orientation('right');
- * @param {(string|anychart.enums.Orientation)=} opt_value ['top'] Value to set.
+ * @param {(string|anychart.enums.Orientation|null)=} opt_value ['top'] Value to set.
  * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
  *//**
  * @ignoreDoc
- * @param {(string|anychart.enums.Orientation)=} opt_value Axis orientation.
+ * @param {(string|anychart.enums.Orientation|null)=} opt_value Axis orientation.
  * @return {anychart.enums.Orientation|!anychart.core.axes.Linear} Axis orientation or itself for method chaining.
  */
 anychart.core.axes.Linear.prototype.orientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var orientation = anychart.enums.normalizeOrientation(opt_value);
+    var orientation = goog.isNull(opt_value) ? null : anychart.enums.normalizeOrientation(opt_value);
     if (this.orientation_ != orientation) {
       this.orientation_ = orientation;
       this.dropStaggeredLabelsCache_();

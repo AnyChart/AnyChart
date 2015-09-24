@@ -69,6 +69,13 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers_ = null;
 
 
 /**
+ * @type {anychart.core.ui.MarkersFactory}
+ * @private
+ */
+anychart.core.radar.series.ContinuousBase.prototype.selectMarkers_ = null;
+
+
+/**
  * @type {Object.<number>}
  * @protected
  */
@@ -158,6 +165,25 @@ anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers = function(opt_
 
 
 /**
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.radar.series.ContinuousBase)} Markers instance or itself for chaining call.
+ */
+anychart.core.radar.series.ContinuousBase.prototype.selectMarkers = function(opt_value) {
+  if (!this.selectMarkers_) {
+    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.registerDisposable(this.selectMarkers_);
+    // don't listen to it, for it will be reapplied at the next hover
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.selectMarkers_;
+};
+
+
+/**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -169,19 +195,17 @@ anychart.core.radar.series.ContinuousBase.prototype.markersInvalidated_ = functi
 };
 
 
-/**
- * Draws all series points.
- */
-anychart.core.radar.series.ContinuousBase.prototype.drawPoint = function() {
+/** @inheritDoc */
+anychart.core.radar.series.ContinuousBase.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     var pointDrawn;
     if (this.firstPointDrawn)
-      pointDrawn = this.drawSubsequentPoint();
+      pointDrawn = this.drawSubsequentPoint(pointState);
     else
-      pointDrawn = this.drawFirstPoint();
+      pointDrawn = this.drawFirstPoint(pointState);
     if (pointDrawn) {
-      this.drawMarker(false);
-      this.drawLabel(false);
+      this.drawMarker(anychart.PointState.NORMAL);
+      this.drawLabel(anychart.PointState.NORMAL);
     }
     // if connectMissing == true, firstPointDrawn will never be false when drawing.
     this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;
@@ -197,11 +221,13 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
 
   var markers = this.markers();
   var hoverMarkers = this.hoverMarkers();
+  var selectMarkers = this.selectMarkers();
 
   markers.suspendSignalsDispatching();
   hoverMarkers.suspendSignalsDispatching();
+  selectMarkers.suspendSignalsDispatching();
 
-  var fillColor = this.getMarkerFill();
+  var fillColor = this.getMarkerFill(anychart.PointState.NORMAL);
   markers.setAutoFill(fillColor);
 
   var strokeColor = /** @type {acgraph.vector.Stroke} */(this.getMarkerStroke());
@@ -218,7 +244,7 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
   var i;
   var len = this.paths.length;
   for (i = 0; i < len; i++) {
-    this.makeHoverable(this.paths[i], true);
+    this.makeInteractive(this.paths[i], true);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -229,7 +255,16 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(!isNaN(this.hoverStatus));
+
+
+    var seriesState = this.state.seriesState;
+    var state = anychart.PointState.NORMAL;
+    if (this.state.hasPointState(anychart.PointState.SELECT))
+      state = anychart.PointState.SELECT;
+    else if (this.state.hasPointState(anychart.PointState.HOVER))
+      state = anychart.PointState.HOVER;
+
+    this.colorizeShape(seriesState | state);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -291,7 +326,7 @@ anychart.core.radar.series.ContinuousBase.prototype.remove = function() {
 /** @inheritDoc */
 anychart.core.radar.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
 };
 
 
@@ -355,11 +390,11 @@ anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints = funct
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.radar.series.ContinuousBase.prototype.colorizeShape = function(hover) {
-  this.path.stroke(this.getFinalStroke(false, hover), 2);
+anychart.core.radar.series.ContinuousBase.prototype.colorizeShape = function(pointState) {
+  this.path.stroke(this.getFinalStroke(false, pointState), 2);
   this.path.fill(null);
 };
 
@@ -367,37 +402,14 @@ anychart.core.radar.series.ContinuousBase.prototype.colorizeShape = function(hov
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.radar.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
+anychart.core.radar.series.ContinuousBase.prototype.applyHatchFill = function(pointState) {
   if (this.hatchFillPath) {
     this.hatchFillPath.stroke(null);
-    this.hatchFillPath.fill(this.getFinalHatchFill(false, hover));
+    this.hatchFillPath.fill(this.getFinalHatchFill(false, pointState));
   }
-};
-
-
-/** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-
-  //hover all points
-  this.applyHatchFill(true);
-  this.colorizeShape(true);
-
-  this.hoverStatus = -1;
-  return this;
 };
 
 
@@ -429,88 +441,86 @@ anychart.core.radar.series.ContinuousBase.prototype.getIndexByEvent = function(e
 };
 
 
-/** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-  if (isNaN(this.hoverStatus)) {
-    this.applyHatchFill(true);
-    this.colorizeShape(true);
-  }
-  if (this.getIterator().select(index)) {
-    this.drawMarker(true);
-    this.drawLabel(true);
-    if (opt_event) this.showTooltip(opt_event);
-    this.hoverStatus = index;
-  } else {
-    this.hoverStatus = -1;
-  }
-  return this;
-};
+/**
+ * Gets marker position.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
+ * @return {string} Position settings.
+ */
+anychart.core.radar.series.ContinuousBase.prototype.getMarkersPosition = function(pointState) {
+  var iterator = this.getIterator();
 
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-/** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
 
-  //hide tooltip in any case
-  this.hideTooltip();
+  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-    }
-  }
-
-  this.applyHatchFill(false);
-  this.colorizeShape(false);
-  this.hoverStatus = NaN;
-  return this;
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+      markerPosition || this.markers().position();
 };
 
 
 /**
  * Draws marker for the point.
- * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
  * @protected
  */
-anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(hovered) {
+anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(pointState) {
+  var iterator = this.getIterator();
+
   var value = anychart.utils.toNumber(this.getIterator().get('value'));
-  var pointMarker = this.getIterator().get('marker');
-  var hoverPointMarker = this.getIterator().get('hoverMarker');
-  var index = this.getIterator().getIndex();
-  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarkers() : this.markers());
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var index = iterator.getIndex();
+  var markersFactory;
+  if (selected) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
+  } else if (hovered) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
+  } else {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+  }
 
   var marker = this.markers().getMarker(index);
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-  var isDraw = hovered ?
-      goog.isNull(markerHoverEnabledState) ?
-          goog.isNull(this.hoverMarkers().enabled()) ?
-              goog.isNull(markerEnabledState) ?
-                  this.markers().enabled() :
-                  markerEnabledState :
-              this.hoverMarkers().enabled() :
-          markerHoverEnabledState :
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(markerHoverEnabledState) ?
+              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.hoverMarkers_.enabled() :
+              markerHoverEnabledState :
+          goog.isNull(markerSelectEnabledState) ?
+              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.selectMarkers_.enabled() :
+              markerSelectEnabledState :
       goog.isNull(markerEnabledState) ?
-          this.markers().enabled() :
+          this.markers_.enabled() :
           markerEnabledState;
 
   if (isDraw && !isNaN(value)) {
-    var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
-    var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+    var position = this.getMarkersPosition(pointState);
 
     var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
@@ -521,7 +531,7 @@ anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(hovere
 
     marker.resetSettings();
     marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hoverPointMarker));
+    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
     marker.draw();
   } else if (marker) {
     marker.clear();
@@ -531,10 +541,11 @@ anychart.core.radar.series.ContinuousBase.prototype.drawMarker = function(hovere
 
 /**
  * Return marker color for series.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Fill} Marker color for series.
  */
-anychart.core.radar.series.ContinuousBase.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, false);
+anychart.core.radar.series.ContinuousBase.prototype.getMarkerFill = function(pointState) {
+  return this.getFinalFill(false, pointState);
 };
 
 
@@ -554,7 +565,7 @@ anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function
   var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
 
   var markers = this.markers();
-  markers.setAutoFill(this.getMarkerFill());
+  markers.setAutoFill(this.getMarkerFill(anychart.PointState.NORMAL));
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
   if (markers.enabled()) {
     data['iconMarkerType'] = data['iconMarkerType'] || markers.getType() || this.autoMarkerType;
@@ -566,6 +577,26 @@ anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function
     data['iconMarkerStroke'] = null;
   }
   return data;
+};
+
+
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.radar.series.ContinuousBase.prototype.applyAppearanceToPoint = function(pointState) {
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.radar.series.ContinuousBase.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
 };
 
 
@@ -599,5 +630,5 @@ anychart.core.radar.series.ContinuousBase.prototype.setupByJSON = function(confi
 //exports
 anychart.core.radar.series.ContinuousBase.prototype['markers'] = anychart.core.radar.series.ContinuousBase.prototype.markers;//doc|ex
 anychart.core.radar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
+anychart.core.radar.series.ContinuousBase.prototype['selectMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.selectMarkers;
 anychart.core.radar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex
-anychart.core.radar.series.ContinuousBase.prototype['unhover'] = anychart.core.radar.series.ContinuousBase.prototype.unhover;

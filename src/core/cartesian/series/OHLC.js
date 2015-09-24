@@ -30,36 +30,42 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.OHLC.prototype.risingStroke_ = (function() {
-  return this['sourceColor'];
-});
+anychart.core.cartesian.series.OHLC.prototype.risingStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.OHLC.prototype.hoverRisingStroke_ = (function() {
-  return anychart.color.lighten(this['sourceColor']);
-});
+anychart.core.cartesian.series.OHLC.prototype.hoverRisingStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.OHLC.prototype.fallingStroke_ = (function() {
-  return anychart.color.darken(anychart.color.darken(this['sourceColor']));
-});
+anychart.core.cartesian.series.OHLC.prototype.selectRisingStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.OHLC.prototype.hoverFallingStroke_ = (function() {
-  return anychart.color.darken(anychart.color.darken(anychart.color.darken(this['sourceColor'])));
-});
+anychart.core.cartesian.series.OHLC.prototype.fallingStroke_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.cartesian.series.OHLC.prototype.hoverFallingStroke_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.cartesian.series.OHLC.prototype.selectFallingStroke_;
 
 
 /** @inheritDoc */
@@ -69,7 +75,7 @@ anychart.core.cartesian.series.OHLC.prototype.rootTypedLayerInitializer = functi
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -107,9 +113,9 @@ anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
         .moveTo(x + widthHalf, close)
         .lineTo(x, close);
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(path);
+    this.makeInteractive(path);
   }
 
   return true;
@@ -117,14 +123,14 @@ anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.OHLC.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.OHLC.prototype.colorizeShape = function(pointState) {
   var shape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('shape'));
   if (goog.isDef(shape)) {
     var stroke;
     if (!!this.getIterator().meta('rising')) {
-      stroke = this.getFinalRisingStroke(hover);
+      stroke = this.getFinalRisingStroke(pointState);
     } else {
-      stroke = this.getFinalFallingStroke(hover);
+      stroke = this.getFinalFallingStroke(pointState);
     }
     var lineCap = stroke && stroke['dash'] && !anychart.utils.isNone(stroke['dash']) ?
         acgraph.vector.StrokeLineCap.BUTT :
@@ -290,24 +296,54 @@ anychart.core.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_s
 
 
 /**
+ * Getter/setter for select stroke settings.
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.OHLC.prototype.selectRisingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectRisingStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectRisingStroke_;
+};
+
+
+/**
  * Method that gets final color of the line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(hover) {
+anychart.core.cartesian.series.OHLC.prototype.getFinalRisingStroke = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('risingStroke') ||
-      this.risingStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-              iterator.get('hoverRisingStroke') ||
-              this.hoverRisingStroke() ||
-              normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(iterator.get('risingStroke') || this.risingStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('selectRisingStroke')) || this.selectRisingStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('hoverRisingStroke')) || this.hoverRisingStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -447,29 +483,58 @@ anychart.core.cartesian.series.OHLC.prototype.hoverFallingStroke = function(opt_
 
 
 /**
+ * Getter/setter for select stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.OHLC|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.OHLC.prototype.selectFallingStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectFallingStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectFallingStroke_;
+};
+
+
+/**
  * Method that gets final color of the line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.OHLC.prototype.getFinalFallingStroke = function(hover) {
+anychart.core.cartesian.series.OHLC.prototype.getFinalFallingStroke = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('fallingStroke') ||
-      this.fallingStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-              iterator.get('hoverFallingStroke') ||
-              this.hoverFallingStroke() ||
-              normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(iterator.get('fallingStroke') || this.fallingStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('selectFallingStroke')) || this.selectFallingStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('hoverFallingStroke')) || this.hoverFallingStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.OHLC.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.cartesian.series.OHLC.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -531,6 +596,16 @@ anychart.core.cartesian.series.OHLC.prototype.serialize = function() {
     json['hoverRisingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverRisingStroke()));
   }
 
+  if (goog.isFunction(this.selectRisingStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  selectRisingStroke']
+    );
+  } else {
+    json['selectRisingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectRisingStroke()));
+  }
+
 
   if (goog.isFunction(this.fallingStroke())) {
     anychart.utils.warning(
@@ -551,6 +626,17 @@ anychart.core.cartesian.series.OHLC.prototype.serialize = function() {
   } else {
     json['hoverFallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverFallingStroke()));
   }
+
+  if (goog.isFunction(this.selectFallingStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['OHLC Series  selectFallingStroke']
+    );
+  } else {
+    json['selectFallingStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectFallingStroke()));
+  }
+
   return json;
 };
 
@@ -562,13 +648,17 @@ anychart.core.cartesian.series.OHLC.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.risingStroke(config['risingStroke']);
   this.hoverRisingStroke(config['hoverRisingStroke']);
+  this.selectRisingStroke(config['selectRisingStroke']);
   this.fallingStroke(config['fallingStroke']);
   this.hoverFallingStroke(config['hoverFallingStroke']);
+  this.selectFallingStroke(config['selectFallingStroke']);
 };
 
 
 //exports
 anychart.core.cartesian.series.OHLC.prototype['risingStroke'] = anychart.core.cartesian.series.OHLC.prototype.risingStroke;//doc|ex
 anychart.core.cartesian.series.OHLC.prototype['hoverRisingStroke'] = anychart.core.cartesian.series.OHLC.prototype.hoverRisingStroke;//doc|ex
+anychart.core.cartesian.series.OHLC.prototype['selectRisingStroke'] = anychart.core.cartesian.series.OHLC.prototype.selectRisingStroke;
 anychart.core.cartesian.series.OHLC.prototype['fallingStroke'] = anychart.core.cartesian.series.OHLC.prototype.fallingStroke;//doc|ex
 anychart.core.cartesian.series.OHLC.prototype['hoverFallingStroke'] = anychart.core.cartesian.series.OHLC.prototype.hoverFallingStroke;//doc|ex
+anychart.core.cartesian.series.OHLC.prototype['selectFallingStroke'] = anychart.core.cartesian.series.OHLC.prototype.selectFallingStroke;

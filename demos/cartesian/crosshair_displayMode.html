@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../src/deps.js"></script>
+  <meta charset="utf-8">
+  <script>
+    goog.require('anychart.modules.anychart');
+    goog.require('anychart.themes.defaultTheme');
+    goog.require('anychart.themes.v6');
+    goog.require('goog.color.names');
+  </script>
+    <script>
+        anychart.onDocumentReady(function() {
+
+            // chart type
+            chart = anychart.scatter();
+
+            // chart title
+            chart.title().enabled(true).text('Sample Scatter Line and Spline Chart');
+
+            // adjust inversion of both scales
+            chart.xScale().inverted(true);
+            chart.yScale().inverted(true);
+
+            // data for top line series
+            chart.marker([
+                [-2, 4],
+                [-1, 1],
+                [0, 0],
+                [1, 1],
+                [2, 4]
+            ]);
+
+            // data for bottom line series
+            chart.marker([
+                [-2, -4],
+                [-1, -1],
+                [0, 0],
+                [1, -1],
+                [2, -4]
+            ]);
+
+            chart.interactivity('byX');
+            chart.crosshair(true);
+            chart.crosshair().displayMode('sticky');
+
+            chart.container('container').draw();
+        });
+    </script>
+</head>
+<body>
+<div id="container" style="border: 1px solid; width: 700px; height: 400px;"></div>
+</body>
+</html>

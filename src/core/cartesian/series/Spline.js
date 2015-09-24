@@ -45,7 +45,7 @@ anychart.core.cartesian.series.Spline.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Spline.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.Spline.prototype.drawFirstPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -59,7 +59,7 @@ anychart.core.cartesian.series.Spline.prototype.drawFirstPoint = function() {
     this.path.moveTo(x, y);
     this.queue_.processPoint(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -67,7 +67,7 @@ anychart.core.cartesian.series.Spline.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Spline.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Spline.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -78,7 +78,7 @@ anychart.core.cartesian.series.Spline.prototype.drawSubsequentPoint = function()
 
     this.queue_.processPoint(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -93,12 +93,12 @@ anychart.core.cartesian.series.Spline.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Spline.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return this.getFinalStroke(false, anychart.PointState.NORMAL);
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Spline.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.cartesian.series.Spline.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -126,3 +126,4 @@ anychart.core.cartesian.series.Spline.prototype.getLegendIconType = function() {
 //exports
 anychart.core.cartesian.series.Spline.prototype['stroke'] = anychart.core.cartesian.series.Spline.prototype.stroke;//inherited
 anychart.core.cartesian.series.Spline.prototype['hoverStroke'] = anychart.core.cartesian.series.Spline.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Spline.prototype['selectStroke'] = anychart.core.cartesian.series.Spline.prototype.selectStroke;//inherited

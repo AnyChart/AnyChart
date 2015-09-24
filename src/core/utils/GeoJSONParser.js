@@ -96,6 +96,21 @@ anychart.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry
 
   var geoCoords, len, len_;
 
+  if (properties && !(properties['middle-x'] || properties['middle-y'])) {
+    var geoMiddleX = goog.object.findValue(properties, function(value, key) {
+      return (/middle-x/).test(key);
+    });
+    var geoMiddleY = goog.object.findValue(properties, function(value, key) {
+      return (/middle-y/).test(key);
+    });
+
+    var middleX = /** @type {number}*/(geoMiddleX || .5);
+    var middleY = /** @type {number}*/(geoMiddleY || .5);
+
+    properties['middle-x'] = middleX;
+    properties['middle-y'] = middleY;
+  }
+
   switch (geojsonGeometry['type']) {
     case 'Point':
       return {

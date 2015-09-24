@@ -30,6 +30,9 @@ anychart.core.SeparateChart = function() {
   this.credits_ = null;
 
   goog.base(this);
+
+  if (this.supportsBaseHighlight)
+    this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 };
 goog.inherits(anychart.core.SeparateChart, anychart.core.Chart);
 
@@ -143,21 +146,49 @@ anychart.core.SeparateChart.prototype.legendItemCanInteractInMode = function(mod
  * @param {anychart.core.ui.LegendItem} item Legend item that was clicked.
  * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.SeparateChart.prototype.legendItemClick = goog.nullFunction;
+anychart.core.SeparateChart.prototype.legendItemClick = function(item, event) {
+  var sourceKey = item.sourceKey();
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.enabled(!series.enabled());
+    if (series.enabled())
+      series.hoverSeries();
+    else
+      series.unhover();
+  }
+};
 
 
 /**
  * Calls when legend item that some how belongs to the chart was hovered.
  * @param {anychart.core.ui.LegendItem} item Legend item that was hovered.
+ * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.SeparateChart.prototype.legendItemOver = goog.nullFunction;
+anychart.core.SeparateChart.prototype.legendItemOver = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.hoverSeries();
+  }
+};
 
 
 /**
  * Calls when legend item that some how belongs to the chart was unhovered.
  * @param {anychart.core.ui.LegendItem} item Legend item that was unhovered.
+ * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.SeparateChart.prototype.legendItemOut = goog.nullFunction;
+anychart.core.SeparateChart.prototype.legendItemOut = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.unhover();
+  }
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -306,11 +337,17 @@ anychart.core.SeparateChart.prototype.resizeHandler = function(evt) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Setup.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['legend'] = this.legend().serialize();
   json['credits'] = this.credits().serialize();
+  json['interactivity'] = this.interactivity().serialize();
   return json;
 };
 
@@ -320,9 +357,11 @@ anychart.core.SeparateChart.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.legend(config['legend']);
   this.credits(config['credits']);
+  this.interactivity(config['interactivity']);
 };
 
 
 //exports
 anychart.core.SeparateChart.prototype['legend'] = anychart.core.SeparateChart.prototype.legend;//doc|ex
 anychart.core.SeparateChart.prototype['credits'] = anychart.core.SeparateChart.prototype.credits;//doc|ex
+anychart.core.SeparateChart.prototype['interactivity'] = anychart.core.SeparateChart.prototype.interactivity;

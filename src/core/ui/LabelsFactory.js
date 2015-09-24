@@ -1062,8 +1062,9 @@ anychart.core.ui.LabelsFactory.prototype.callTextFormatter = function(formatter,
   if (!this.textFormatterCallsCache_)
     this.textFormatterCallsCache_ = {};
   if (goog.isDefAndNotNull(opt_cacheIndex)) {
-    if (!goog.isDef(this.textFormatterCallsCache_[opt_cacheIndex]))
+    if (!goog.isDef(this.textFormatterCallsCache_[opt_cacheIndex])) {
       this.textFormatterCallsCache_[opt_cacheIndex] = formatter.call(provider, provider);
+    }
 
     return this.textFormatterCallsCache_[opt_cacheIndex];
   }
@@ -2164,7 +2165,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
   if (goog.isDef(this.height())) json['height'] = this.height();
   if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
   if (!goog.isDef(this.enabled())) delete json['enabled'];
-  if (goog.isDef(this.settingsObj.adjustByHeight) || goog.isDef(this.settingsObj.adjustByHeight))
+  if (goog.isDef(this.settingsObj.adjustByHeight) || goog.isDef(this.settingsObj.adjustByWidth))
     json['adjustFontSize'] = this.adjustFontSize();
   if (goog.isDef(this.minFontSize())) json['minFontSize'] = this.minFontSize();
   if (goog.isDef(this.maxFontSize())) json['maxFontSize'] = this.maxFontSize();

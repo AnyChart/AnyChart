@@ -53,7 +53,6 @@ anychart.core.sparkline.series.Base.SeriesTypesMap = {};
 
 /**
  * @type {anychart.math.Rect}
- * @protected
  */
 anychart.core.sparkline.series.Base.prototype.pixelBoundsCache = null;
 
@@ -320,10 +319,11 @@ anychart.core.sparkline.series.Base.prototype.finalizeDrawing = function() {
 
 /**
  * Create base series format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels formatting.
  */
-anychart.core.sparkline.series.Base.prototype.createFormatProvider = function() {
-  if (!this.pointProvider_)
+anychart.core.sparkline.series.Base.prototype.createFormatProvider = function(opt_force) {
+  if (!this.pointProvider_ || opt_force)
     this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['x', 'value'], false);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
@@ -343,7 +343,7 @@ anychart.core.sparkline.series.Base.prototype.createPositionProvider = function(
     position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
   }
 };
 

@@ -252,6 +252,26 @@ anychart.utils.toNumberOrString = function(value) {
 
 
 /**
+ * Converts value of any type to number or string, according to these rules:
+ * 1) number -> number
+ * 2) NaN -> null
+ * 3) string -> leaved as is
+ * 4) string containing only spaces -> null
+ * 5) null -> null
+ * 6) boolean -> null
+ * 7) undefined -> null
+ * 8) Object -> null
+ * @param {*} value
+ * @return {number|string|null}
+ */
+anychart.utils.toNumberOrStringOrNull = function(value) {
+  return ((goog.isNumber(value) && !isNaN(value)) || (goog.isString(value) && goog.string.trim(value) != '')) ?
+      value :
+      null;
+};
+
+
+/**
  * Converts to number and checks if it is NaN.
  * @param {*} value
  * @return {boolean}
@@ -296,6 +316,8 @@ anychart.utils.normalizeTimestamp = function(value) {
     result = +new Date(value);
     if (isNaN(result))
       result = +value;
+  } else if (goog.isNull(value)) {
+    result = NaN;
   } else { // also accepts Date
     result = Number(value);
   }
@@ -398,6 +420,131 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
   else if (mod < 0)
     mod += interval;
   return anychart.math.round(value + interval - mod, 7);
+};
+
+
+/**
+ * Aligns passed timestamp to the left according to the passed interval.
+ * @param {number} date Date to align.
+ * @param {goog.date.Interval} interval Interval to align by.
+ * @param {number} flagDateValue Flag date to align within years scope.
+ * @return {number} Aligned timestamp.
+ */
+anychart.utils.alignDateLeft = function(date, interval, flagDateValue) {
+  var dateObj = new Date(date);
+
+  var years = dateObj.getUTCFullYear();
+  var months = dateObj.getUTCMonth();
+  var days = dateObj.getUTCDate();
+  var hours = dateObj.getUTCHours();
+  var minutes = dateObj.getUTCMinutes();
+  var seconds = dateObj.getUTCSeconds();
+  var milliseconds = dateObj.getUTCMilliseconds();
+
+  if (interval.years) {
+    var flagDate = new Date(flagDateValue);
+    var flagYear = flagDate.getUTCFullYear();
+    years = anychart.utils.alignLeft(years, interval.years, flagYear);
+    return Date.UTC(years, 0);
+  } else if (interval.months) {
+    months = anychart.utils.alignLeft(months, interval.months);
+    return Date.UTC(years, months);
+  } else if (interval.days) {
+    days = anychart.utils.alignLeft(days, interval.days);
+    return Date.UTC(years, months, days);
+  } else if (interval.hours) {
+    hours = anychart.utils.alignLeft(hours, interval.hours);
+    return Date.UTC(years, months, days, hours);
+  } else if (interval.minutes) {
+    minutes = anychart.utils.alignLeft(minutes, interval.minutes);
+    return Date.UTC(years, months, days, hours, minutes);
+  } else if (interval.seconds >= 1) {
+    seconds = anychart.utils.alignLeft(seconds, interval.seconds);
+    return Date.UTC(years, months, days, hours, minutes, seconds);
+  } else if (interval.seconds) {
+    milliseconds = anychart.utils.alignLeft(milliseconds, interval.seconds * 1000);
+    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+  } else {
+    return date;
+  }
+};
+
+
+/**
+ * Creates a goog interval from StockInterval and count.
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @return {!goog.date.Interval}
+ */
+anychart.utils.getIntervalFromInfo = function(unit, count) {
+  var u, c;
+  switch (unit) {
+    case anychart.enums.Interval.YEAR:
+      u = goog.date.Interval.YEARS;
+      c = count;
+      break;
+    case anychart.enums.Interval.SEMESTER:
+      u = goog.date.Interval.MONTHS;
+      c = count * 6;
+      break;
+    case anychart.enums.Interval.QUARTER:
+      u = goog.date.Interval.MONTHS;
+      c = count * 3;
+      break;
+    case anychart.enums.Interval.MONTH:
+      u = goog.date.Interval.MONTHS;
+      c = count;
+      break;
+    case anychart.enums.Interval.THIRD_OF_MONTH:
+      // roughly
+      u = goog.date.Interval.DAYS;
+      c = count / 3;
+      break;
+    case anychart.enums.Interval.WEEK:
+      u = goog.date.Interval.DAYS;
+      c = count * 7;
+      break;
+    case anychart.enums.Interval.DAY:
+      u = goog.date.Interval.DAYS;
+      c = count;
+      break;
+    case anychart.enums.Interval.HOUR:
+      u = goog.date.Interval.HOURS;
+      c = count;
+      break;
+    case anychart.enums.Interval.MINUTE:
+      u = goog.date.Interval.MINUTES;
+      c = count;
+      break;
+    case anychart.enums.Interval.SECOND:
+      u = goog.date.Interval.SECONDS;
+      c = count;
+      break;
+    case anychart.enums.Interval.MILLISECOND:
+      u = goog.date.Interval.SECONDS;
+      c = count / 1000;
+      break;
+    default:
+      u = goog.date.Interval.YEARS;
+      c = count;
+      break;
+  }
+  return new goog.date.Interval(u, c);
+};
+
+
+/**
+ * Returns closest aligned pixel.
+ * @param {number} value
+ * @param {number|boolean} thickness
+ * @return {number}
+ */
+anychart.utils.applyPixelShift = function(value, thickness) {
+  var shift = (+thickness % 2) ? 0.5 : 0;
+  if (value % 1 >= 0.5)
+    return Math.ceil(value) - shift;
+  else
+    return Math.floor(value) + shift;
 };
 
 
@@ -729,7 +876,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
   var root = anychart.utils.json2xml_(json, opt_rootNodeName || 'anychart', result);
   if (root) {
     if (!opt_rootNodeName)
-      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.6.0/xml-schema.xsd');
+      root.setAttribute('xmlns', 'http://anychart.com/schemas/7.7.0/xml-schema.xsd');
     result.appendChild(root);
   }
   return opt_returnAsXmlNode ? result : goog.dom.xml.serialize(result);
@@ -1131,6 +1278,12 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT:
       return 'Invalid GeoJSON object:';
 
+    case anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR:
+      return 'Double quotes in separator are not allowed.';
+
+    case anychart.enums.ErrorCode.CSV_PARSING_FAILED:
+      return 'CSV parsing failed.';
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';
@@ -1231,7 +1384,7 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
       return 'We can not serialize \'' + opt_arguments[0] + '\' function, please reset it manually.';
 
     case anychart.enums.WarningCode.DG_INCORRECT_METHOD_USAGE:
-      return 'Data grid incorrect method \'' + opt_arguments[0] + '()\'usage: You use not standalone data grid. Perform all operations ' +
+      return 'Data grid incorrect method \'' + opt_arguments[0] + '()\' usage: You use not standalone data grid. Perform all operations ' +
           'on data grid using the controller, but not directly. In current case, use \'' + opt_arguments[1] + '()\' instead. ' +
           opt_arguments[2];
 
@@ -1263,6 +1416,12 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.DEPRECATED:
       return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead.';
 
+    case anychart.enums.WarningCode.TABLE_ALREADY_IN_TRANSACTION:
+      return 'Table is already in transaction mode. Calling startTransaction() multiple times does nothing.';
+
+    case anychart.enums.WarningCode.STOCK_WRONG_MAPPING:
+      return 'Wrong mapping passed to ' + opt_arguments[0] + ' series - required "' + opt_arguments[1] + "' field is missing.";
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
@@ -1287,7 +1446,56 @@ anychart.utils.callLog_ = function(name, message, opt_exception) {
 };
 
 
+/**
+ * Returns the number of milliseconds passed since an event in past. Returns fractional milliseconds, if possible.
+ * Consequent calls return non-decreasing numeric sequences.
+ * @return {number}
+ */
+anychart.utils.relativeNow = (
+    goog.global['performance'] && goog.isFunction(goog.global['performance']['now']) ?
+        goog.bind(goog.global['performance']['now'], goog.global['performance']) :
+        goog.now);
+
+
+/**
+ * Caches of static datetime formatter.
+ * @type {Object.<string, goog.i18n.DateTimeFormat>}
+ * @private
+ */
+anychart.utils.formatDateTimeCache_ = {};
+
+
+/**
+ * Cache if zero timezone.
+ * @type {!goog.i18n.TimeZone}
+ * @private
+ */
+anychart.utils.UTCTimeZoneCache_;
+
+
+/**
+ * Formats date by pattern.
+ * @param {number|Date} date UTC timestamp or Date object.
+ * @param {string} pattern
+ * @return {string}
+ */
+anychart.utils.formatDateTime = function(date, pattern) {
+  /** @type {goog.i18n.DateTimeFormat} */
+  var formatter;
+  if (pattern in anychart.utils.formatDateTimeCache_)
+    formatter = anychart.utils.formatDateTimeCache_[pattern];
+  else
+    formatter = anychart.utils.formatDateTimeCache_[pattern] = new goog.i18n.DateTimeFormat(pattern);
+
+  if (!anychart.utils.UTCTimeZoneCache_)
+    anychart.utils.UTCTimeZoneCache_ = goog.i18n.TimeZone.createTimeZone(0);
+
+  return formatter.format(goog.isNumber(date) ? new Date(date) : date, anychart.utils.UTCTimeZoneCache_);
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);
+goog.exportSymbol('anychart.utils.formatDateTime', anychart.utils.formatDateTime);

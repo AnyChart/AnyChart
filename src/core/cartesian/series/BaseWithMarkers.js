@@ -45,6 +45,13 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers_ = null;
 anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers_ = null;
 
 
+/**
+ * @type {anychart.core.ui.MarkersFactory}
+ * @private
+ */
+anychart.core.cartesian.series.BaseWithMarkers.prototype.selectMarkers_ = null;
+
+
 /** @inheritDoc */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.hasMarkers = function() {
   return true;
@@ -119,6 +126,25 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function
 
 
 /**
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
+ */
+anychart.core.cartesian.series.BaseWithMarkers.prototype.selectMarkers = function(opt_value) {
+  if (!this.selectMarkers_) {
+    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.registerDisposable(this.selectMarkers_);
+    // don't listen to it, for it will be reapplied at the next hover
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.selectMarkers_;
+};
+
+
+/**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -166,10 +192,10 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing = function
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint = function() {
-  goog.base(this, 'drawPoint');
+anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint = function(pointState) {
+  goog.base(this, 'drawPoint', pointState);
   if (this.enabled() && this.firstPointDrawn) {
-    this.drawMarker(this.hoverStatus == this.getIterator().getIndex());
+    this.drawMarker(pointState);
   }
 };
 
@@ -202,49 +228,83 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing = funct
 
 /**
  * Gets marker position.
- * @param {boolean} hovered Whether labels hovered.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
  * @return {string} Position settings.
  */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkersPosition = function(hovered) {
-  var pointMarker = this.getIterator().get('marker');
-  var hoverPointMarker = this.getIterator().get('hoverMarker');
+anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkersPosition = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
 
   var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
   var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
+
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+      markerPosition || this.markers().position();
 };
 
 
 /**
  * Draws marker for the point.
- * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(hovered) {
-  var pointMarker = this.getIterator().get('marker');
-  var hoverPointMarker = this.getIterator().get('hoverMarker');
-  var index = this.getIterator().getIndex();
-  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarkers() : this.markers());
+anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var index = iterator.getIndex();
+  var markersFactory;
+  if (selected) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
+  } else if (hovered) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
+  } else {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+  }
 
   var marker = this.markers().getMarker(index);
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-  var isDraw = hovered ?
-      goog.isNull(markerHoverEnabledState) ?
-          goog.isNull(this.hoverMarkers().enabled()) ?
-              goog.isNull(markerEnabledState) ?
-                  this.markers().enabled() :
-                  markerEnabledState :
-              this.hoverMarkers().enabled() :
-          markerHoverEnabledState :
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(markerHoverEnabledState) ?
+              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.hoverMarkers_.enabled() :
+              markerHoverEnabledState :
+          goog.isNull(markerSelectEnabledState) ?
+              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.selectMarkers_.enabled() :
+              markerSelectEnabledState :
       goog.isNull(markerEnabledState) ?
-          this.markers().enabled() :
+          this.markers_.enabled() :
           markerEnabledState;
 
   if (isDraw) {
-    var position = this.getMarkersPosition(hovered);
+    var position = this.getMarkersPosition(pointState);
+
     var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
       marker.positionProvider(positionProvider);
@@ -254,32 +314,11 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(h
 
     marker.resetSettings();
     marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hoverPointMarker));
+    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
     marker.draw();
   } else if (marker) {
     marker.clear();
   }
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['markers'] = this.markers().serialize();
-  json['hoverMarkers'] = this.hoverMarkers().serialize();
-  return json;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
-  this.markers(config['markers']);
-  this.hoverMarkers(config['hoverMarkers']);
 };
 
 
@@ -289,9 +328,9 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkerFill = function() {
   if (anychart.DEFAULT_THEME != 'v6')
-    return anychart.color.setOpacity(this.getFinalFill(false, false), 1, false);
+    return anychart.color.setOpacity(this.getFinalFill(false, anychart.PointState.NORMAL), 1, false);
   else
-    return this.getFinalFill(false, false);
+    return this.getFinalFill(false, anychart.PointState.NORMAL);
 };
 
 
@@ -325,9 +364,33 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.getLegendItemData = fun
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.BaseWithMarkers.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['markers'] = this.markers().serialize();
+  json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['selectMarkers'] = this.selectMarkers().serialize();
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  this.markers(config['markers']);
+  this.hoverMarkers(config['hoverMarkers']);
+  this.selectMarkers(config['selectMarkers']);
+};
+
+
 //anychart.core.cartesian.series.BaseWithMarkers.prototype['startDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing;//inherited
 //anychart.core.cartesian.series.BaseWithMarkers.prototype['drawPoint'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint;//inherited
 //anychart.core.cartesian.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.finalizeDrawing;//inherited
 //exports
 anychart.core.cartesian.series.BaseWithMarkers.prototype['markers'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.markers;//doc|ex
 anychart.core.cartesian.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers;//doc|ex
+anychart.core.cartesian.series.BaseWithMarkers.prototype['selectMarkers'] = anychart.core.cartesian.series.BaseWithMarkers.prototype.selectMarkers;

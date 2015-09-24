@@ -15,7 +15,7 @@ function load() {
   separator.container('container');
   separator.margin(10, 200, 50, 10).width('100').height('5');
   separator.draw();
-  // РµС‰Рµ РјРѕР¶РЅРѕ РїРѕР»РѕРјР°С‚СЊ РІСЃРµ РјРµРЅСЏСЏ РѕСЂРёРµРЅС‚Р°С†РёСЋ Рё РїРѕР»РѕР¶РµРЅРёРµ С‚Р°Р№С‚Р»Р°, РµСЃР»Рё РµРіРѕ С€РёСЂРёРЅР° РЅРµ С„РёРєСЃРёСЂРѕРІР°РЅР°
+  // еще можно поломать все меняя ориентацию и положение тайтла, если его ширина не фиксирована
 
   stage = separator.container().getStage();
   rect = stage.rect().fill('red .5').stroke('none');

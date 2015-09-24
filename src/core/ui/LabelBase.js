@@ -945,7 +945,7 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   if (autoWidth) {
     width += this.textElement.getBounds().width;
     this.textWidth = width;
-    width = this.backgroundWidth = padding.widenWidth(width);
+    this.backgroundWidth = padding.widenWidth(width);
   } else {
     width = this.textWidth = padding.tightenWidth(width);
   }
@@ -955,7 +955,7 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   if (autoHeight) {
     height += this.textElement.getBounds().height;
     this.textHeight = height;
-    height = this.backgroundHeight = padding.widenHeight(height);
+    this.backgroundHeight = padding.widenHeight(height);
   } else {
     height = this.textHeight = padding.tightenHeight(height);
   }
@@ -972,6 +972,18 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
     this.suspendSignalsDispatching();
     this.fontSize(calculatedFontSize);
     this.textElement.fontSize(calculatedFontSize);
+    if (autoWidth) {
+      this.textElement.width(null);
+      this.textWidth = this.textElement.getBounds().width;
+      this.textElement.width(this.textWidth);
+      this.backgroundWidth = padding.widenWidth(this.textWidth);
+    }
+    if (autoHeight) {
+      this.textElement.height(null);
+      this.textHeight = this.textElement.getBounds().height;
+      this.textElement.height(this.textHeight);
+      this.backgroundHeight = padding.widenHeight(this.textHeight);
+    }
     this.resumeSignalsDispatching(false);
   }
 
@@ -1066,13 +1078,13 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
   backgroundBounds.top = position.y;
 
   this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
-  var clip = this.textElement.clip();
-  if (clip) {
-    clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
-  } else {
-    clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
-    this.textElement.clip(clip);
-  }
+  //var clip = this.textElement.clip();
+  //if (clip) {
+  //  clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
+  //} else {
+  //  clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
+  //  this.textElement.clip(clip);
+  //}
 
   return backgroundBounds;
 };

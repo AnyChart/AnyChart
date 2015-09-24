@@ -171,7 +171,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
   this.arrayMapping_ = opt_arrayMapping || {
     'x': [0],
     'value': [1, 0],
-    'size': [2], // bubble series
+    'size': [2, 1], // bubble series
     'open': [1],
     'high': [2],
     'low': [3, 1],
@@ -186,7 +186,9 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     'outliers': [6],
 
     // maps
-    'id': [0]
+    'id': [0],
+    'lat': [0],
+    'long': [1]
   };
 
   /**
@@ -198,7 +200,10 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     //'x': ['x'], // this mapping entry can be omitted cause of defaults
     'value': ['value', 'y', 'close'], // 'value' here enforces checking order
     'lowest': ['lowest', 'low'],
-    'highest': ['highest', 'high']
+    'highest': ['highest', 'high'],
+    //for maps
+    'lat': ['lat', 'x'],
+    'long': ['long', 'y', 'value']
   };
 
   /**

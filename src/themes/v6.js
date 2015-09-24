@@ -145,24 +145,20 @@ window['anychart']['themes']['v6'] = {
   // global tooltip settings
   'defaultTooltip': {
     'enabled': true,
-    'allowLeaveScreen': false,
-    'isFloating': true,
     'title': {
       'enabled': false,
-
       'fontSize': 10,
       'fontFamily': 'Verdana',
       'fontColor': '#232323',
       'fontWeight': 'bold',
       'vAlign': 'top',
       'hAlign': 'center',
-
-      'text': 'Tooltip Title',
+      'text': '',
       'background': {
         'enabled': false
       },
       'rotation': 0,
-      'width': null,
+      'width': '100%',
       'height': null,
       'margin': 0,
       'padding': {
@@ -203,8 +199,7 @@ window['anychart']['themes']['v6'] = {
       'vAlign': 'top',
       'hAlign': 'center',
       'textWrap': 'byLetter',
-
-      'text': 'Content Title',
+      'text': 'Tooltip Text',
       'background': {
         'enabled': false
       },
@@ -214,7 +209,7 @@ window['anychart']['themes']['v6'] = {
         'bottom': 5,
         'left': 10
       },
-      'width': null,
+      'width': '100%',
       'height': null,
       'anchor': 'leftTop',
       'offsetX': 0,
@@ -252,6 +247,9 @@ window['anychart']['themes']['v6'] = {
     },
     'offsetX': 5,
     'offsetY': 5,
+    'valuePrefix': '',
+    'valuePostfix': '',
+    'position': 'leftTop',
     'anchor': 'centerBottom',
     'hideDelay': 0,
     /**
@@ -265,8 +263,8 @@ window['anychart']['themes']['v6'] = {
      * @this {*}
      * @return {*}
      */
-    'contentFormatter': function() {
-      return this['value'];
+    'textFormatter': function() {
+      return this['valuePrefix'] + this['value'] + this['valuePostfix'];
     }
   },
 
@@ -608,6 +606,36 @@ window['anychart']['themes']['v6'] = {
       'minHeight': null,
       'maxWidth': null,
       'maxHeight': null
+    },
+    'interactivity': {
+      'hoverMode': 'single',
+      'selectionMode': 'multiSelect',
+      'spotRadius': 2,
+      'allowMultiSeriesSelection': true
+    },
+    'tooltip': {
+      'allowLeaveScreen': false,
+      'allowLeaveChart': true,
+      'displayMode': 'single',
+      'positionMode': 'float',
+      'title': {
+        'enabled': true
+      },
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return 'Union Tooltip';
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return this['formattedValues'].join('\n');
+      }
     }
   },
 
@@ -633,6 +661,14 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
+        'selectFill': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
         'stroke': function() {
           return window['anychart']['color']['darken'](this['sourceColor']);
         },
@@ -642,6 +678,14 @@ window['anychart']['themes']['v6'] = {
          */
         'hoverStroke': function() {
           return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken']('red');
         },
         'hatchFill': false,
         //'hoverHatchFill': null,
@@ -725,8 +769,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return this['x'] + ': ' + this['value'];
+          'textFormatter': function() {
+            return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
           }
         },
         'xScale': null,
@@ -876,12 +920,12 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'lowest: ' + parseFloat(this['lowest']).toFixed(2) + '\n' +
-                'q1: ' + parseFloat(this['q1']).toFixed(2) + '\n' +
-                'median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
-                'q3: ' + parseFloat(this['q3']).toFixed(2) + '\n' +
-                'highest: ' + parseFloat(this['highest']).toFixed(2);
+          'textFormatter': function() {
+            return 'lowest: ' + this['valuePrefix'] + parseFloat(this['lowest']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'q1: ' + this['valuePrefix'] + parseFloat(this['q1']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'median: ' + this['valuePrefix'] + parseFloat(this['median']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'q3: ' + this['valuePrefix'] + parseFloat(this['q3']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'highest: ' + this['valuePrefix'] + parseFloat(this['highest']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -941,8 +985,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -969,6 +1013,15 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
+        'selectRisingFill': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['lighten'](
+              window['anychart']['color']['lighten']('red'));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
         'fallingFill': function() {
           return window['anychart']['color']['darken'](this['sourceColor']);
         },
@@ -979,6 +1032,15 @@ window['anychart']['themes']['v6'] = {
         'hoverFallingFill': function() {
           return window['anychart']['color']['darken'](
               window['anychart']['color']['darken'](this['sourceColor']));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectFallingFill': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken']('blue'));
         },
         'risingHatchFill': null,
         'hoverRisingHatchFill': null,
@@ -1002,6 +1064,14 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
+        'selectRisingStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['lighten']('red');
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
         'fallingStroke': function() {
           return window['anychart']['color']['darken'](
               window['anychart']['color']['darken'](this['sourceColor']));
@@ -1015,6 +1085,16 @@ window['anychart']['themes']['v6'] = {
               window['anychart']['color']['darken'](
               window['anychart']['color']['darken'](this['sourceColor'])));
         },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectFallingStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken'](
+                  window['anychart']['color']['darken']('blue')));
+        },
         'tooltip': {
           'content': {
             'hAlign': 'left'
@@ -1023,11 +1103,11 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
-                'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
-                'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-                'C: ' + parseFloat(this['close']).toFixed(4);
+          'textFormatter': function() {
+            return 'O: ' + this['valuePrefix'] + parseFloat(this['open']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'H: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'L: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'C: ' + this['valuePrefix'] + parseFloat(this['close']).toFixed(4) + this['valuePostfix'];
           }
         },
         'labels': {
@@ -1075,14 +1155,15 @@ window['anychart']['themes']['v6'] = {
       'marker': {
         'size': 10,
         'hoverSize': 12,
+        'selectSize': 12,
         'hatchFill': false,
         'tooltip': {
           /**
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1105,6 +1186,14 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
+        'selectRisingStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken']('red');
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
         'fallingStroke': function() {
           return window['anychart']['color']['darken'](
               window['anychart']['color']['darken'](this['sourceColor']));
@@ -1118,6 +1207,14 @@ window['anychart']['themes']['v6'] = {
               window['anychart']['color']['darken'](
               window['anychart']['color']['darken'](this['sourceColor'])));
         },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectFallingStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken']('blue');
+        },
         'tooltip': {
           'content': {
             'hAlign': 'left'
@@ -1126,11 +1223,11 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
-                'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
-                'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-                'C: ' + parseFloat(this['close']).toFixed(4);
+          'textFormatter': function() {
+            return 'O: ' + this['valuePrefix'] + parseFloat(this['open']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'H: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'L: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(4) + this['valuePostfix'] + '\n' +
+                'C: ' + this['valuePrefix'] + parseFloat(this['close']).toFixed(4) + this['valuePostfix'];
           }
         },
         'labels': {
@@ -1184,9 +1281,9 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-                'Low: ' + parseFloat(this['low']).toFixed(2);
+          'textFormatter': function() {
+            return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1205,9 +1302,9 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-                'Low: ' + parseFloat(this['low']).toFixed(2);
+          'textFormatter': function() {
+            return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1220,9 +1317,9 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-                'Low: ' + parseFloat(this['low']).toFixed(2);
+          'textFormatter': function() {
+            return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1266,9 +1363,9 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-                'Low: ' + parseFloat(this['low']).toFixed(2);
+          'textFormatter': function() {
+            return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1312,9 +1409,9 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-                'Low: ' + parseFloat(this['low']).toFixed(2);
+          'textFormatter': function() {
+            return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
+                'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -1546,7 +1643,7 @@ window['anychart']['themes']['v6'] = {
     'barChartMode': false,
     'crosshair': {
       'enabled': false,
-
+      'displayMode': 'float',
       'xStroke': '#000',
       'yStroke': '#000',
       'xLabel': {
@@ -1675,6 +1772,9 @@ window['anychart']['themes']['v6'] = {
       'right': 20,
       'bottom': 10,
       'left': 20
+    },
+    'interactivity': {
+      'hoverMode': 'byX'
     }
   },
   'bar': {
@@ -1984,6 +2084,9 @@ window['anychart']['themes']['v6'] = {
       'right': 20,
       'bottom': 10,
       'left': 20
+    },
+    'interactivity': {
+      'hoverMode': 'byX'
     }
   },
 
@@ -2099,8 +2202,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return this['x'] + ': ' + this['value'];
+          'textFormatter': function() {
+            return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
           }
         },
         'xScale': null,
@@ -2178,8 +2281,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       },
@@ -2206,14 +2309,15 @@ window['anychart']['themes']['v6'] = {
       'marker': {
         'size': 10,
         'hoverSize': 12,
+        'selectSize': 12,
         'hatchFill': false,
         'tooltip': {
           /**
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       }
@@ -2403,7 +2507,7 @@ window['anychart']['themes']['v6'] = {
     'minBubbleSize': '5%',
     'crosshair': {
       'enabled': false,
-
+      'displayMode': 'float',
       'xStroke': '#000',
       'yStroke': '#000',
       'xLabel': {
@@ -2698,8 +2802,8 @@ window['anychart']['themes']['v6'] = {
        * @this {*}
        * @return {*}
        */
-      'contentFormatter': function() {
-        return (this['name'] || this['x']) + '\n' + this['value'];
+      'textFormatter': function() {
+        return (this['name'] || this['x']) + '\n' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
       }
     },
     'legend': {
@@ -2724,8 +2828,8 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
-        'contentFormatter': function() {
-          return (this['value']) + '\n' + this['meta']['pointValue'];
+        'textFormatter': function() {
+          return (this['value']) + '\n' + this['valuePrefix'] + this['meta']['pointValue'] + this['valuePostfix'];
         }
       }
     }
@@ -2738,7 +2842,7 @@ window['anychart']['themes']['v6'] = {
   },
 
   // merge with chart
-  'pyramidFunnel': {
+  'pieFunnelPyramidBase': {
     'baseWidth': '90%',
     'connectorLength': 20,
     'connectorStroke': '#000',
@@ -2863,8 +2967,8 @@ window['anychart']['themes']['v6'] = {
        * @this {*}
        * @return {*}
        */
-      'contentFormatter': function() {
-        return (this['name'] || this['x']) + '\n' + this['value'];
+      'textFormatter': function() {
+        return (this['name'] || this['x']) + '\n' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
       }
     },
     'legend': {
@@ -2879,8 +2983,8 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
-        'contentFormatter': function() {
-          return (this['value']) + '\n' + this['meta']['pointValue'];
+        'textFormatter': function() {
+          return (this['value']) + '\n' + this['valuePrefix'] + this['meta']['pointValue'] + this['valuePostfix'];
         }
       },
       'zIndex': 35
@@ -2950,8 +3054,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return this['x'] + ': ' + this['value'];
+          'textFormatter': function() {
+            return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
           }
         }
       },
@@ -2967,8 +3071,53 @@ window['anychart']['themes']['v6'] = {
         }
       },
       'marker': {
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'fill': function() {
+          return this['sourceColor'];
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverFill': function() {
+          return window['anychart']['color']['lighten'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectFill': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'stroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverStroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken']('red');
+        },
         'size': 10,
         'hoverSize': 12,
+        'selectSize': 12,
         'hatchFill': false,
         'labels': {
           'anchor': 'center'
@@ -2978,8 +3127,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       }
@@ -3111,8 +3260,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return this['x'] + ': ' + this['value'];
+          'textFormatter': function() {
+            return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
           }
         }
       },
@@ -3125,11 +3274,63 @@ window['anychart']['themes']['v6'] = {
          */
         'hoverStroke': function() {
           return window['anychart']['color']['lighten'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectStroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
         }
       },
       'marker': {
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'fill': function() {
+          return this['sourceColor'];
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverFill': function() {
+          return window['anychart']['color']['lighten'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectFill': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'stroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverStroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectStroke': function() {
+          //todo need define cool color.
+          return window['anychart']['color']['darken']('red');
+        },
         'size': 10,
         'hoverSize': 12,
+        'selectSize': 12,
         'labels': {
           'anchor': 'bottom'
         },
@@ -3139,8 +3340,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return parseFloat(this['value']).toFixed(2);
+          'textFormatter': function() {
+            return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
           }
         }
       }
@@ -3586,7 +3787,30 @@ window['anychart']['themes']['v6'] = {
     'markers': [],
     'needles': [],
     'knobs': [],
-    'ranges': []
+    'ranges': [],
+    'interactivity': {
+      'hoverMode': 'single'
+    },
+    'tooltip': {
+      'enabled': false,
+      'title': {
+        'enabled': false
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return this['value'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return this['valuePrefix'] + this['value'] + this['valuePostfix'];
+      }
+    }
   },
 
   // merge with chart
@@ -3685,8 +3909,8 @@ window['anychart']['themes']['v6'] = {
            * @this {*}
            * @return {*}
            */
-          'contentFormatter': function() {
-            return this['x'] + ': ' + this['value'];
+          'textFormatter': function() {
+            return this['id'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
           }
         },
         'xScale': null,
@@ -3741,7 +3965,8 @@ window['anychart']['themes']['v6'] = {
         return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
       }
     },
-    'allowPointsSelect': true
+    'maxBubbleSize': '20%',
+    'minBubbleSize': '5%'
   },
 
   'defaultDataGrid': {
@@ -3765,7 +3990,7 @@ window['anychart']['themes']['v6'] = {
       'content': {
         'hAlign': 'left'
       },
-      'contentFormatter': function(data) {
+      'textFormatter': function(data) {
         var name = data['get']('name');
         return (name !== void 0) ? name + '' : '';
       }
@@ -3965,7 +4190,7 @@ window['anychart']['themes']['v6'] = {
     'ganttResource': {
       'dataGrid': {
         'tooltip': {
-          'contentFormatter': function(data) {
+          'textFormatter': function(data) {
             var item = data['item'];
             if (!item) return '';
             var name = item['get']('name');
@@ -3980,7 +4205,7 @@ window['anychart']['themes']['v6'] = {
       'timeline': {
         'selectedElementStroke': 'none',
         'tooltip': {
-          'contentFormatter': function(data) {
+          'textFormatter': function(data) {
             var item = data['item'];
             var period = data['period'];
             var name = item['get']('name');
@@ -3997,7 +4222,7 @@ window['anychart']['themes']['v6'] = {
     'ganttProject': {
       'dataGrid': {
         'tooltip': {
-          'contentFormatter': function(data) {
+          'textFormatter': function(data) {
             var item = data['item'];
             if (!item) return '';
             var name = item['get']('name');
@@ -4020,7 +4245,7 @@ window['anychart']['themes']['v6'] = {
       'timeline': {
         'selectedElementStroke': '#000',
         'tooltip': {
-          'contentFormatter': function(data) {
+          'textFormatter': function(data) {
             var item = data['item'];
             var name = item['get']('name');
             var startDate = item['get']('actualStart') || item['meta']('autoStart');

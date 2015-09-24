@@ -302,8 +302,8 @@ anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
 anychart.scales.ScatterBase.prototype.resetDataRange = function() {
   this.oldDataRangeMin = this.dataRangeMin;
   this.oldDataRangeMax = this.dataRangeMax;
-  this.dataRangeMin = Number.MAX_VALUE;
-  this.dataRangeMax = -Number.MAX_VALUE;
+  this.dataRangeMin = Infinity;
+  this.dataRangeMax = -Infinity;
   this.consistent = false;
   return this;
 };
@@ -395,6 +395,20 @@ anychart.scales.ScatterBase.prototype.calculate = function() {
  * @protected
  */
 anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
+  if (!isFinite(this.dataRangeMax)) {
+    if (!isFinite(this.dataRangeMin)) {
+      this.dataRangeMin = 0;
+      this.dataRangeMax = 1;
+    } else {
+      this.dataRangeMax = this.dataRangeMin + 1;
+    }
+  } else if (!isFinite(this.dataRangeMin)) {
+    this.dataRangeMin = this.dataRangeMax - 1;
+  } else if (anychart.math.roughlyEqual(this.dataRangeMin, this.dataRangeMax, 1e-10)) {
+    this.dataRangeMin -= 0.5;
+    this.dataRangeMax += 0.5;
+  }
+
   var max = this.maximumModeAuto ?
       (isNaN(this.softMax) ?
           this.dataRangeMax :
@@ -406,15 +420,8 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
           Math.min(this.dataRangeMin, this.softMin)) :
       this.min;
   var range = max - min;
-  if (!isFinite(range)) {
-    this.dataRangeMin = 0;
-    this.dataRangeMax = 1;
-    range = 1;
-  } else if (!range) {
-    this.dataRangeMin -= 0.5;
-    this.dataRangeMax += 0.5;
-    range = 1;
-  }
+
+
   if (this.minimumModeAuto) {
     this.min = this.dataRangeMin - range * this.minimumRangeBasedGap;
     if (!isNaN(this.softMin)) {

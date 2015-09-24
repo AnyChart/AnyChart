@@ -1130,20 +1130,6 @@ anychart.charts.Cartesian.prototype.onMarkersSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Tooltip.
-//
-//----------------------------------------------------------------------------------------------------------------------
-///**
-// * Do nothing.
-// * @param {*=} opt_value Do nothing.
-// */
-//anychart.charts.Cartesian.prototype.tooltip = function(opt_value) {
-//  //todo:implement in 21 sprint
-//};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
 //  Crosshair.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1156,7 +1142,7 @@ anychart.charts.Cartesian.prototype.crosshair = function(opt_value) {
   if (!this.crosshair_) {
     this.crosshair_ = new anychart.core.ui.Crosshair();
     this.crosshair_.enabled(false);
-    this.crosshair_.bindHandlersTo(this);
+    this.crosshair_.bindHandlers(this);
     this.registerDisposable(this.crosshair_);
     this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
     this.invalidate(anychart.ConsistencyState.CARTESIAN_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
@@ -1618,14 +1604,15 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     var index = this.series_.length - 1;
     var inc = index * anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Cartesian.ZINDEX_SERIES) + inc);
-    instance.labels().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_LABEL + inc + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
+    var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Cartesian.ZINDEX_SERIES) + inc;
+    instance.setAutoZIndex(seriesZIndex);
+    instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
     instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
     if (instance.hasMarkers()) {
-      instance.markers().setAutoZIndex(anychart.charts.Cartesian.ZINDEX_MARKER + inc);
+      instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
       instance.markers().setAutoStroke((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
     }
@@ -1650,25 +1637,7 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
 };
 
 
-/**
- * Getter series by index.
- * @example
- * var data = [
- *     [1, 2, 3, 4],
- *     [2, 3, 4, 1],
- *     [3, 4, 1, 2],
- *     [4, 1, 2, 3]
- * ];
- * var chart = anychart.line.apply(this, data);
- * var series, i=0;
- * while (series = chart.getSeries(i)){
- *     series.markers().type('circle');
- *     i++;
- * }
- * chart.container(stage).draw();
- * @param {number} index
- * @return {anychart.core.cartesian.series.Base}
- */
+/** @inheritDoc */
 anychart.charts.Cartesian.prototype.getSeries = function(index) {
   return this.series_[index] || null;
 };
@@ -1700,6 +1669,14 @@ anychart.charts.Cartesian.prototype.seriesInvalidated_ = function(event) {
       state |= anychart.ConsistencyState.BOUNDS;
   }
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Cartesian.prototype.getAllSeries = function() {
+  return this.series_;
 };
 
 
@@ -2761,7 +2738,12 @@ anychart.charts.Cartesian.prototype.drawSeries_ = function() {
     }
     var categories = scale.getCategorisation();
     var pointClb = function(series) {
-      series.drawPoint();
+      var iterator = series.getIterator();
+      var index = iterator.getIndex();
+      if (iterator.get('selected'))
+        series.state.setPointState(anychart.PointState.SELECT, index);
+
+      series.drawPoint(series.state.getPointStateByIndex(index));
     };
     var missingClb = function(series) {
       series.drawMissing();
@@ -2904,36 +2886,136 @@ anychart.charts.Cartesian.prototype.createLegendItemsProvider = function(sourceM
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian.prototype.legendItemClick = function(item, event) {
-  var sourceKey = item.sourceKey();
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.enabled(!series.enabled());
+anychart.charts.Cartesian.prototype.getSeriesStatus = function(event) {
+  var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+
+  var value, index, iterator;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = interactivity.spotRadius();
+    var minRatio, maxRatio;
+    if (this.getType() == anychart.enums.ChartTypes.BAR) {
+      minRatio = (rangeY - (y - spotRadius - minY)) / rangeY;
+      maxRatio = (rangeY - (y + spotRadius - minY)) / rangeY;
+
+      //swap values for bar
+      var x_tmp = x;
+      x = y;
+      y = x_tmp;
+    } else {
+      minRatio = (x - spotRadius - minX) / rangeX;
+      maxRatio = (x + spotRadius - minX) / rangeX;
+    }
+
+    var isOrdinal = this.xScale() instanceof anychart.scales.Ordinal;
+
+    var minValue, maxValue;
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      if (series.enabled()) {
+        minValue =  /** @type {number} */(series.xScale().inverseTransform(minRatio));
+        maxValue = /** @type {number} */(series.xScale().inverseTransform(maxRatio));
+
+        if (isOrdinal) {
+          minValue = series.xScale().getIndexByValue(minValue);
+          maxValue = series.xScale().getIndexByValue(maxValue);
+        }
+
+        var indexes = series.data().findInRangeByX(minValue, maxValue, isOrdinal);
+
+        iterator = series.getIterator();
+        var ind = [];
+        var minLength = Infinity;
+        var minLengthIndex;
+        for (var j = 0; j < indexes.length; j++) {
+          index = indexes[j];
+          if (iterator.select(index)) {
+            var pixX = /** @type {number} */(iterator.meta('x'));
+            var pickValue = false;
+            for (var k = 0; k < series.referenceValueMeanings.length; k++) {
+              if (series.referenceValueMeanings[k] == 'y') {
+                var pixY = /** @type {number} */(iterator.meta(series.referenceValueNames[k]));
+
+                var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+                pickValue = pickValue || length <= spotRadius;
+                if (length < minLength) {
+                  minLength = length;
+                  minLengthIndex = index;
+                }
+              }
+            }
+            if (pickValue) {
+              ind.push(index);
+            }
+          }
+        }
+        if (ind.length)
+          points.push({
+            series: series,
+            points: ind,
+            lastPoint: ind[ind.length - 1],
+            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+          });
+      }
+    }
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+    var ratio = (this.getType() == anychart.enums.ChartTypes.BAR ? (rangeY - (y - minY)) / rangeY : (x - minX) / rangeX);
+
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      value = series.xScale().inverseTransform(ratio);
+      index = series.data().find('x', value);
+      if (index < 0) index = NaN;
+
+      iterator = series.getIterator();
+      minLength = Infinity;
+
+      if (iterator.select(index)) {
+        var missing = false;
+        pixX = /** @type {number} */(iterator.meta('x'));
+        for (k = 0; k < series.referenceValueMeanings.length; k++) {
+          if (series.referenceValueMeanings[k] == 'y') {
+            missing = missing || anychart.utils.isNaN(iterator.get(series.referenceValueNames[k]));
+            pixY = /** @type {number} */(iterator.meta(series.referenceValueNames[k]));
+            length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+            if (length < minLength) {
+              minLength = length;
+            }
+          }
+        }
+
+        if (!missing) {
+          points.push({
+            series: series,
+            points: [index],
+            lastPoint: index,
+            nearestPointToCursor: {index: index, distance: minLength}
+          });
+        }
+      }
+    }
   }
-};
 
-
-/** @inheritDoc */
-anychart.charts.Cartesian.prototype.legendItemOver = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.hoverSeries();
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Cartesian.prototype.legendItemOut = function(item) {
-  var sourceKey = item.sourceKey();
-  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
-    return;
-  var series = this.getSeries(/** @type {number} */ (sourceKey));
-  if (series) {
-    series.unhover();
-  }
+  return /** @type {Array.<Object>} */(points);
 };
 
 
@@ -2973,6 +3055,60 @@ anychart.charts.Cartesian.prototype.doAnimation = function() {
 };
 
 
+/**
+ * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
+ * <b>Note:</b> To get a chart with initial settings use:
+ *  <ul>
+ *      <li>{@link anychart.area}</li>
+ *      <li>{@link anychart.bar}</li>
+ *      <li>{@link anychart.column}</li>
+ *      <li>{@link anychart.financial}</li>
+ *      <li>{@link anychart.line}</li>
+ *  </ul>
+ * @example
+ * var chart = anychart.cartesian();
+ * chart.line([20, 7, 10, 14]);
+ * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
+ * @return {!anychart.charts.Cartesian} Empty chart.
+ */
+anychart.cartesian = function(opt_barChartMode) {
+  var chart = new anychart.charts.Cartesian(opt_barChartMode);
+  chart.setup(anychart.getFullTheme()['cartesian']);
+
+  return chart;
+};
+
+
+anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;
+
+
+/**
+ * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
+ * <b>Note:</b> To get a chart with initial settings use:
+ *  <ul>
+ *      <li>{@link anychart.area}</li>
+ *      <li>{@link anychart.bar}</li>
+ *      <li>{@link anychart.column}</li>
+ *      <li>{@link anychart.financial}</li>
+ *      <li>{@link anychart.line}</li>
+ *  </ul>
+ * @example
+ * var chart = anychart.cartesian();
+ * chart.line([20, 7, 10, 14]);
+ * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
+ * @return {!anychart.charts.Cartesian} Empty chart.
+ * @deprecated Use anychart.cartesian() instead.
+ */
+anychart.cartesianChart = anychart.cartesian;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Setup
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @inheritDoc
  */
@@ -3360,55 +3496,6 @@ anychart.charts.Cartesian.prototype.serialize = function() {
     json['scales'] = scales;
   return {'chart': json};
 };
-
-
-/**
- * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
- * <b>Note:</b> To get a chart with initial settings use:
- *  <ul>
- *      <li>{@link anychart.area}</li>
- *      <li>{@link anychart.bar}</li>
- *      <li>{@link anychart.column}</li>
- *      <li>{@link anychart.financial}</li>
- *      <li>{@link anychart.line}</li>
- *  </ul>
- * @example
- * var chart = anychart.cartesian();
- * chart.line([20, 7, 10, 14]);
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
- * @return {!anychart.charts.Cartesian} Empty chart.
- */
-anychart.cartesian = function(opt_barChartMode) {
-  var chart = new anychart.charts.Cartesian(opt_barChartMode);
-  chart.setup(anychart.getFullTheme()['cartesian']);
-
-  return chart;
-};
-
-
-anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;
-
-
-/**
- * Returns a chart instance with initial settings (no axes, grids, titles, legend and so on).<br/>
- * <b>Note:</b> To get a chart with initial settings use:
- *  <ul>
- *      <li>{@link anychart.area}</li>
- *      <li>{@link anychart.bar}</li>
- *      <li>{@link anychart.column}</li>
- *      <li>{@link anychart.financial}</li>
- *      <li>{@link anychart.line}</li>
- *  </ul>
- * @example
- * var chart = anychart.cartesian();
- * chart.line([20, 7, 10, 14]);
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
- * @return {!anychart.charts.Cartesian} Empty chart.
- * @deprecated Use anychart.cartesian() instead.
- */
-anychart.cartesianChart = anychart.cartesian;
 
 
 //exports

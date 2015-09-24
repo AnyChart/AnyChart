@@ -26,7 +26,7 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Line.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.Line.prototype.drawFirstPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -37,7 +37,7 @@ anychart.core.cartesian.series.Line.prototype.drawFirstPoint = function() {
 
     this.path.moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -45,7 +45,7 @@ anychart.core.cartesian.series.Line.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Line.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Line.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -56,7 +56,7 @@ anychart.core.cartesian.series.Line.prototype.drawSubsequentPoint = function() {
 
     this.path.lineTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -71,7 +71,7 @@ anychart.core.cartesian.series.Line.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Line.prototype.getMarkerFill = function() {
-  var stroke = this.getFinalStroke(false, false);
+  var stroke = this.getFinalStroke(false, anychart.PointState.NORMAL);
   if (goog.isObject(stroke)) {
     delete stroke['thickness'];
     delete stroke['dash'];
@@ -83,7 +83,7 @@ anychart.core.cartesian.series.Line.prototype.getMarkerFill = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.cartesian.series.Line.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -126,6 +126,7 @@ anychart.core.cartesian.series.line = function(data, opt_csvSettings) {
 //exports
 anychart.core.cartesian.series.Line.prototype['stroke'] = anychart.core.cartesian.series.Line.prototype.stroke;//inherited
 anychart.core.cartesian.series.Line.prototype['hoverStroke'] = anychart.core.cartesian.series.Line.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Line.prototype['selectStroke'] = anychart.core.cartesian.series.Line.prototype.selectStroke;//inherited
 //only for standalone and deprecated
 anychart.core.cartesian.series.Line.prototype['draw'] = anychart.core.cartesian.series.Line.prototype.draw;//doc|ex
 anychart.core.cartesian.series.Line.prototype['drawPoint'] = anychart.core.cartesian.series.Line.prototype.drawPoint;//doc|need-ex

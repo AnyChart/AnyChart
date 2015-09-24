@@ -112,6 +112,22 @@ anychart.data.ScatterView.prototype.search_ = function(fieldValue) {
 /**
  * @inheritDoc
  */
+anychart.data.ScatterView.prototype.findInRangeByX = function(minValue, maxValue) {
+  this.ensureConsistent();
+  var minIndex = this.search_(/** @type {number} */ (minValue));
+  var maxIndex = this.search_(/** @type {number} */ (maxValue));
+
+  var indexes = [];
+  for (var i = minIndex; i <= maxIndex; i++)
+    indexes.push(i);
+
+  return indexes;
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.data.ScatterView.prototype.find = function(fieldName, fieldValue) {
   if (fieldName != 'x')
     return goog.base(this, 'find', fieldName, fieldValue);

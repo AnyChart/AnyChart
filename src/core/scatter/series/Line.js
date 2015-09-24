@@ -45,15 +45,13 @@ anychart.core.scatter.series.Line.prototype.getLegendIconType = function() {
 // ----------------------
 // --- ContinuousBase ---
 // ----------------------
-/**
- * Draws all series points.
- */
-anychart.core.scatter.series.Line.prototype.drawPoint = function() {
+/** @inheritDoc */
+anychart.core.scatter.series.Line.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
-    var pointDrawn = this.drawSeriesPoint();
+    var pointDrawn = this.drawSeriesPoint(pointState);
     if (pointDrawn) {
-      this.drawMarker(false);
-      this.drawLabel(false);
+      this.drawMarker(pointState);
+      this.drawLabel(pointState);
       this.drawError();
     }
     this.pointDrawn = (this.connectMissing && this.pointDrawn) || pointDrawn;
@@ -67,7 +65,7 @@ anychart.core.scatter.series.Line.prototype.startDrawing = function() {
   if (this.isConsistent() || !this.enabled())
     return;
 
-  this.makeHoverable(this.path, true);
+  this.makeInteractive(this.path, true);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
@@ -91,7 +89,15 @@ anychart.core.scatter.series.Line.prototype.startDrawing = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.path.clear();
-    this.colorizeShape(!isNaN(this.hoverStatus));
+
+    var seriesState = this.state.seriesState;
+    var state = anychart.PointState.NORMAL;
+    if (this.state.hasPointState(anychart.PointState.SELECT))
+      state = anychart.PointState.SELECT;
+    else if (this.state.hasPointState(anychart.PointState.HOVER))
+      state = anychart.PointState.HOVER;
+
+    this.colorizeShape(seriesState | state);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -104,15 +110,9 @@ anychart.core.scatter.series.Line.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.finalizeDrawing = function() {
-  goog.base(this, 'finalizeDrawing');
-};
-
-
-/** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.createPositionProvider = function() {
   var iterator = this.getIterator();
-  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
 };
 
 
@@ -177,81 +177,12 @@ anychart.core.scatter.series.Line.prototype.connectMissingPoints = function(opt_
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.scatter.series.Line.prototype.colorizeShape = function(hover) {
-  this.path.stroke(this.getFinalStroke(false, hover), 2);
+anychart.core.scatter.series.Line.prototype.colorizeShape = function(pointState) {
+  this.path.stroke(this.getFinalStroke(false, pointState), 2);
   this.path.fill(null);
-};
-
-
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-
-  //hover all points
-  this.colorizeShape(true);
-
-  this.hoverStatus = -1;
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-  if (isNaN(this.hoverStatus)) {
-    this.colorizeShape(true);
-  }
-  if (this.getIterator().select(index)) {
-    this.drawMarker(true);
-    this.drawLabel(true);
-    if (opt_event) this.showTooltip(opt_event);
-    this.hoverStatus = index;
-  } else {
-    this.hoverStatus = -1;
-  }
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-    }
-  }
-
-  this.colorizeShape(false);
-  this.hoverStatus = NaN;
-  return this;
 };
 // ----------------------
 // --- end ContinuousBase ---
@@ -259,7 +190,7 @@ anychart.core.scatter.series.Line.prototype.unhover = function() {
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.drawSeriesPoint = function() {
+anychart.core.scatter.series.Line.prototype.drawSeriesPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -273,7 +204,7 @@ anychart.core.scatter.series.Line.prototype.drawSeriesPoint = function() {
     else
       this.path.moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -282,27 +213,62 @@ anychart.core.scatter.series.Line.prototype.drawSeriesPoint = function() {
 
 /** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return this.getFinalStroke(false, anychart.PointState.NORMAL);
 };
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.scatter.series.Line.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.getType = function() {
   return anychart.enums.ScatterSeriesTypes.LINE;
 };
 
 
 /**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.scatter.series.Line.prototype.applyAppearanceToPoint = function(pointState) {
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.scatter.series.Line.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+};
+
+
+/**
  * @inheritDoc
  */
+anychart.core.scatter.series.Line.prototype.getIndexByEvent = function(event) {
+  var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
+  var x = event['clientX'];
+  var min, range;
+  var value, index;
+
+  min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+  range = bounds.width;
+  var ratio = (x - min) / range;
+  value = this.xScale().inverseTransform(ratio);
+  index = this.data().find('x', value);
+  if (index < 0) index = NaN;
+
+  return /** @type {number} */(index);
+};
+
+
+/** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['connectMissingPoints'] = this.connectMissingPoints();
@@ -310,9 +276,7 @@ anychart.core.scatter.series.Line.prototype.serialize = function() {
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.connectMissingPoints(config['connectMissingPoints']);
@@ -323,4 +287,4 @@ anychart.core.scatter.series.Line.prototype.setupByJSON = function(config) {
 anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.core.scatter.series.Line.prototype.connectMissingPoints;//doc|ex
 anychart.core.scatter.series.Line.prototype['stroke'] = anychart.core.scatter.series.Line.prototype.stroke;//inherited
 anychart.core.scatter.series.Line.prototype['hoverStroke'] = anychart.core.scatter.series.Line.prototype.hoverStroke;//inherited
-anychart.core.scatter.series.Line.prototype['unhover'] = anychart.core.scatter.series.Line.prototype.unhover;
+anychart.core.scatter.series.Line.prototype['selectStroke'] = anychart.core.scatter.series.Line.prototype.selectStroke;

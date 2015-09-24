@@ -188,7 +188,7 @@ anychart.ConsistencyState = {
   TOOLTIP_POSITION: 1 << 5,
   TOOLTIP_TITLE: 1 << 6,
   TOOLTIP_SEPARATOR: 1 << 7,
-  TOOLTIP_LABELS: 1 << 8,
+  TOOLTIP_CONTENT: 1 << 8,
   TOOLTIP_BACKGROUND: 1 << 9,
   TOOLTIP_VISIBILITY: 1 << 10,
   //---------------------------------- GAUGE (CHART) ------------------------------------------
@@ -206,6 +206,30 @@ anychart.ConsistencyState = {
   TABLE_FILLS: 1 << 8,
   TABLE_CONTENT: 1 << 9,
   TABLE_STRUCTURE: 1 << 10,
+  //---------------------------------- SCROLLER (VB) ---------------------------------------------
+  SCROLLER_THUMBS_SHAPE: 1 << 5,
+  //---------------------------------- STOCK CHART (CHART) -------------------------------------------
+  STOCK_PLOTS_APPEARANCE: 1 << 11,
+  STOCK_SCROLLER: 1 << 12,
+  STOCK_DATA: 1 << 22, //13,
+  STOCK_SCALES: 1 << 14,
+  STOCK_FULL_RANGE_PARAMS: 1 << 15,
+  //---------------------------------- STOCK PLOT (VB) -------------------------------------------
+  STOCK_PLOT_BACKGROUND: 1 << 5,
+  STOCK_PLOT_SERIES: 1 << 6,
+  STOCK_PLOT_AXES: 1 << 7,
+  STOCK_PLOT_DT_AXIS: 1 << 8,
+  STOCK_PLOT_GRIDS: 1 << 9,
+  STOCK_PLOT_LEGEND: 1 << 10,
+  //---------------------------------- STOCK SERIES (VB) -------------------------------------------
+  STOCK_SERIES_POINTS: 1 << 5,
+  STOCK_SERIES_COLOR: 1 << 6,
+  STOCK_SERIES_CLIP: 1 << 7,
+  //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
+  STOCK_DTAXIS_BACKGROUND: 1 << 5,
+  //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
+  STOCK_SCROLLER_SERIES: 1 << 6,
+  STOCK_SCROLLER_AXIS: 1 << 7,
   /**
    * Combination of all states.
    */
@@ -225,7 +249,21 @@ anychart.Signal = {
   DATA_CHANGED: 1 << 4,
   META_CHANGED: 1 << 5,
   NEED_UPDATE_LEGEND: 1 << 6,
-  NEED_UPDATE_COLOR_RANGE: 1 << 7
+  NEED_UPDATE_COLOR_RANGE: 1 << 7,
+  NEED_UPDATE_FULL_RANGE_ITEMS: 1 << 8,
+  NEED_UPDATE_TICK_DEPENDENT: 1 << 9
+};
+
+
+/**
+ * The list of point states.
+ * @enum {number}
+ */
+anychart.PointState = {
+  NORMAL: 0,
+  HOVER: 1 << 1,
+  SELECT: 1 << 2,
+  ALL: 0xFFFFFFFF
 };
 
 

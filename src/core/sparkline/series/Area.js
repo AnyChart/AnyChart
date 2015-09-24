@@ -90,7 +90,7 @@ anychart.core.sparkline.series.Area.prototype.drawFirstPoint = function() {
 
     this.lastDrawnX = x;
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -112,7 +112,7 @@ anychart.core.sparkline.series.Area.prototype.drawSubsequentPoint = function() {
 
     this.lastDrawnX = x;
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;

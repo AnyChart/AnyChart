@@ -26,7 +26,7 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -57,7 +57,7 @@ anychart.core.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.RangeStepArea.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.RangeStepArea.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -136,9 +136,16 @@ anychart.core.cartesian.series.RangeStepArea.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.RangeStepArea.prototype['fill'] = anychart.core.cartesian.series.RangeStepArea.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeStepArea.prototype['hoverFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.RangeStepArea.prototype['selectFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.RangeStepArea.prototype['highStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.highStroke;//inherited
 anychart.core.cartesian.series.RangeStepArea.prototype['hoverHighStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.hoverHighStroke;//inherited
+anychart.core.cartesian.series.RangeStepArea.prototype['selectHighStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.selectHighStroke;//inherited
+
 anychart.core.cartesian.series.RangeStepArea.prototype['lowStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.lowStroke;//inherited
 anychart.core.cartesian.series.RangeStepArea.prototype['hoverLowStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.hoverLowStroke;//inherited
+anychart.core.cartesian.series.RangeStepArea.prototype['selectLowStroke'] = anychart.core.cartesian.series.RangeStepArea.prototype.selectLowStroke;//inherited
+
 anychart.core.cartesian.series.RangeStepArea.prototype['hatchFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.RangeStepArea.prototype['hoverHatchFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.RangeStepArea.prototype['selectHatchFill'] = anychart.core.cartesian.series.RangeStepArea.prototype.selectHatchFill;//inherited

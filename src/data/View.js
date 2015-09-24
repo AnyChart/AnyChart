@@ -431,6 +431,102 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 
 
 /**
+ * Search on unsorted data by field name - 'x'. Returns array of indexes of found points.
+ * @param {number} fieldValue Value to find.
+ * @return {Array.<number>} Point indexes.
+ */
+anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue) {
+  this.ensureConsistent();
+
+  if (!this.cachedScatterValues) this.cachedScatterValues = {};
+  if (this.cachedScatterValues[fieldValue])
+    return /** @type {Array.<number>}*/(this.cachedScatterValues[fieldValue]);
+
+  var indexes = [];
+
+  if (goog.isDef(fieldValue)) {
+    var iterator = this.getIterator();
+    var index = -1;
+    var length = Infinity;
+    var x, value, minValue, length_;
+
+    var lastNotNaNValueIndex = -1;
+    var lastNotNaNValueX = -Infinity;
+
+    iterator.reset();
+    while (iterator.advance()) {
+      index = iterator.getIndex();
+
+      x = /** @type {number}*/(iterator.get('x'));
+      value = iterator.get('value');
+
+      if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex) && !isNaN(value) && x > lastNotNaNValueX)
+        lastNotNaNValueIndex = index;
+
+      length_ = Math.abs(x - fieldValue);
+      if (length_ < length && !isNaN(value)) {
+        length = length_;
+        minValue = x;
+        indexes.length = 0;
+      }
+      if (x == minValue) {
+        indexes.push(index);
+      }
+    }
+    if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex))
+      this.cachedScatterValues.lastNotNaNValueIndex = lastNotNaNValueIndex;
+
+    this.cachedScatterValues[minValue] = indexes;
+  }
+
+  return /** @type {Array.<number>}*/(indexes);
+};
+
+
+/**
+ * Search in range of values by field name - 'x'. Returns array of indexes of found points.
+ * @param {number} minValue Minimum range limit.
+ * @param {number} maxValue Maximum range limit.
+ * @param {boolean=} opt_isOrdinal .
+ * @return {Array.<number>} indexes.
+ */
+anychart.data.View.prototype.findInRangeByX = function(minValue, maxValue, opt_isOrdinal) {
+  this.ensureConsistent();
+  if (!goog.isDef(minValue) || !goog.isDef(maxValue))
+    return null;
+
+  if (!this.cachedRanges) this.cachedRanges = {};
+
+  var name = minValue + '|' + maxValue;
+  if (this.cachedRanges[name]) {
+    return this.cachedRanges[name].slice();
+  }
+
+  if (minValue > maxValue) {
+    var tempValue = minValue;
+    minValue = maxValue;
+    maxValue = tempValue;
+  }
+
+  var iterator = this.getIterator();
+  var value, index;
+
+  var indexes = [];
+  iterator.reset();
+  while (iterator.advance()) {
+    index = iterator.getIndex();
+    value = /** @type {number} */(opt_isOrdinal ? index : iterator.get('x'));
+    if (value >= minValue && value <= maxValue) {
+      indexes.push(index);
+    }
+  }
+  this.cachedRanges[name] = indexes;
+
+  return indexes;
+};
+
+
+/**
  * Gets the value from the row by row index and field name.
  * @example
  * var data = anychart.data.set([
@@ -520,6 +616,8 @@ anychart.data.View.prototype.buildMask = function() {
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
   this.cachedValues = null;
+  this.cachedScatterValues = null;
+  this.cachedRanges = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.invalidate(anychart.ConsistencyState.DATA_MASK, anychart.Signal.DATA_CHANGED);
 };

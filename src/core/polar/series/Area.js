@@ -62,7 +62,7 @@ anychart.core.polar.series.Area.prototype.startDrawing = function() {
   } else {
     this.fillLayer = new anychart.core.utils.TypedLayer(function() {
       var path = acgraph.path();
-      this.makeHoverable(path, true);
+      this.makeInteractive(path, true);
       return path;
     }, function(child) {
       (/** @type {acgraph.vector.Path} */ (child)).clear();
@@ -77,7 +77,7 @@ anychart.core.polar.series.Area.prototype.startDrawing = function() {
   } else {
     this.strokeLayer = new anychart.core.utils.TypedLayer(function() {
       var path = acgraph.path();
-      this.makeHoverable(path, true);
+      this.makeInteractive(path, true);
       return path;
     }, function(child) {
       (/** @type {acgraph.vector.Path} */ (child)).clear();
@@ -105,7 +105,7 @@ anychart.core.polar.series.Area.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
+anychart.core.polar.series.Area.prototype.drawFirstPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
 
   if (!valuePoint) {
@@ -138,7 +138,7 @@ anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
     this.currentStrokePath
         .moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -146,7 +146,7 @@ anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function() {
+anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
 
   if (!valuePoint)
@@ -176,7 +176,7 @@ anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function() {
       this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
     }
 
-    this.getIterator().meta('x', P4x).meta('y', P4y);
+    this.getIterator().meta('x', P4x).meta('value', P4y);
   }
 
   return true;
@@ -234,15 +234,10 @@ anychart.core.polar.series.Area.prototype.getType = function() {
 };
 
 
-/**
- * Colorizes shape in accordance to current point colorization settings.
- * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
- * @protected
- */
-anychart.core.polar.series.Area.prototype.colorizeShape = function(hover) {
-  var fill = this.getFinalFill(false, hover);
-  var stroke = this.getFinalStroke(false, hover);
+/** @inheritDoc */
+anychart.core.polar.series.Area.prototype.colorizeShape = function(pointState) {
+  var fill = this.getFinalFill(false, pointState);
+  var stroke = this.getFinalStroke(false, pointState);
 
   this.fillLayer.forEachChild(function(path) {
     path.stroke(null);
@@ -263,23 +258,19 @@ anychart.core.polar.series.Area.prototype.finalizeHatchFill = function() {
       this.fillLayer.forEachChild(function(path) {
         /** @type {acgraph.vector.Path} */(this.hatchFillLayer.genNextChild()).deserialize(path.serialize());
       }, this);
-      this.applyHatchFill(false);
+      var seriesState = this.state.getSeriesState();
+      this.applyHatchFill(seriesState);
     }
   }
 };
 
 
-/**
- * Apply hatch fill to shape in accordance to current point colorization settings.
- * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
- * @protected
- */
-anychart.core.polar.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
+/** @inheritDoc */
+anychart.core.polar.series.Area.prototype.applyHatchFill = function(pointState) {
   if (this.hatchFillLayer) {
     this.hatchFillLayer.forEachChild(function(path) {
       path.stroke(null);
-      path.fill(this.getFinalHatchFill(false, hover));
+      path.fill(this.getFinalHatchFill(false, pointState));
     }, this);
   }
 };
@@ -296,8 +287,11 @@ anychart.core.polar.series.Area.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.polar.series.Area.prototype['fill'] = anychart.core.polar.series.Area.prototype.fill;//inherited
 anychart.core.polar.series.Area.prototype['hoverFill'] = anychart.core.polar.series.Area.prototype.hoverFill;//inherited
+anychart.core.polar.series.Area.prototype['selectFill'] = anychart.core.polar.series.Area.prototype.selectFill;//inherited
 anychart.core.polar.series.Area.prototype['stroke'] = anychart.core.polar.series.Area.prototype.stroke;//inherited
 anychart.core.polar.series.Area.prototype['hoverStroke'] = anychart.core.polar.series.Area.prototype.hoverStroke;//inherited
+anychart.core.polar.series.Area.prototype['selectStroke'] = anychart.core.polar.series.Area.prototype.selectStroke;//inherited
 anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.series.Area.prototype.hatchFill;//inherited
 anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;//inherited
+anychart.core.polar.series.Area.prototype['selectHatchFill'] = anychart.core.polar.series.Area.prototype.selectHatchFill;//inherited
 anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;//inherited
