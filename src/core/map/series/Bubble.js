@@ -485,6 +485,19 @@ anychart.core.map.series.Bubble.prototype.isSizeBased = function() {
 
 
 /** @inheritDoc */
+anychart.core.map.series.Bubble.prototype.needDrawHatchFill = function() {
+  return !!(
+      this.hatchFill() ||
+      this.hoverHatchFill() ||
+      this.selectHatchFill() ||
+      this.negativeHatchFill() ||
+      this.hoverNegativeHatchFill() ||
+      this.selectNegativeHatchFill()
+  );
+};
+
+
+/** @inheritDoc */
 anychart.core.map.series.Bubble.prototype.calculateSizeScale = function(opt_minMax) {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.selfMinimumBubbleValue_ = Number.POSITIVE_INFINITY;
@@ -679,7 +692,7 @@ anychart.core.map.series.Bubble.prototype.drawPoint = function(pointState) {
         .centerX(x)
         .centerY(y);
 
-    this.colorizeShape(pointState);
+    this.colorizeShape(pointState | this.state.getSeriesState());
     this.makeInteractive(circle);
   }
 
@@ -693,7 +706,7 @@ anychart.core.map.series.Bubble.prototype.drawPoint = function(pointState) {
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(pointState);
+    this.applyHatchFill(pointState | this.state.getSeriesState());
   }
 
   goog.base(this, 'drawPoint', pointState);

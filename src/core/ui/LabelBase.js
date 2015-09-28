@@ -902,6 +902,12 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   var autoWidth;
   var autoHeight;
 
+  //TODO(AntonKagakin): need to rework autoWidth/autoHeight logic
+  //and crop size if width/height is more than parentBounds
+  //1) if no width/height but paretnBounds, width/height = parentBounds
+  //2) if no bounds but adjustByWidth||Height => calculate to minFontSize
+  //3) ...
+
   // canAdjustBy = !auto
   if (parentBounds) {
     parentWidth = parentBounds.width;
@@ -967,9 +973,9 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
 
   var needAdjust = ((canAdjustByWidth && this.adjustByWidth_) || (canAdjustByHeight && this.adjustByHeight_));
 
+  this.suspendSignalsDispatching();
   if (needAdjust) {
     var calculatedFontSize = this.calculateFontSize_(width, height);
-    this.suspendSignalsDispatching();
     this.fontSize(calculatedFontSize);
     this.textElement.fontSize(calculatedFontSize);
     if (autoWidth) {
@@ -984,8 +990,23 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
       this.textElement.height(this.textHeight);
       this.backgroundHeight = padding.widenHeight(this.textHeight);
     }
-    this.resumeSignalsDispatching(false);
+  } else if (this.adjustByWidth_ || this.adjustByHeight_) {
+    this.fontSize(this.minFontSize_);
+    this.textElement.fontSize(this.minFontSize_);
+    if (autoWidth) {
+      this.textElement.width(null);
+      this.textWidth = this.textElement.getBounds().width;
+      this.textElement.width(this.textWidth);
+      this.backgroundWidth = padding.widenWidth(this.textWidth);
+    }
+    if (autoHeight) {
+      this.textElement.height(null);
+      this.textHeight = this.textElement.getBounds().height;
+      this.textElement.height(this.textHeight);
+      this.backgroundHeight = padding.widenHeight(this.textHeight);
+    }
   }
+  this.resumeSignalsDispatching(false);
 
   this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth);
   this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight);

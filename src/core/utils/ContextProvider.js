@@ -204,7 +204,7 @@ anychart.core.utils.StockSeriesContextProvider.prototype.applyReferenceValues = 
     if (!goog.isDef(this[value])) this[value] = NaN;
   }
   this['x'] = currentPoint ? currentPoint.getKey() : NaN;
-  this['seriesName'] = 'Series ' + this['series'].getIndex();
+  this['seriesName'] = this['series'].name();
 };
 
 

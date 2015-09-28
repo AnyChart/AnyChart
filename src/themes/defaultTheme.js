@@ -5234,6 +5234,9 @@ window['anychart']['themes']['defaultTheme'] = {
       },
       'zIndex': 40,
       'xAxis': {
+        'background': {
+          'enabled': false
+        },
         'minorTicks': {
           'enabled': true,
           'stroke': '#cecece'
@@ -5315,7 +5318,8 @@ window['anychart']['themes']['defaultTheme'] = {
             }
             return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
           }
-        }
+        },
+        'zIndex': 75
       }
     },
     'tooltip': {

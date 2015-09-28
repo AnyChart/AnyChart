@@ -53,14 +53,16 @@ anychart.data.TableIterator = function(mapping, selection, usesAggregatedMapping
   /**
    * Advances the iterator to the next position.
    * @return {boolean}
+   * @private
    */
-  this.advance = this.coIterator_ ? this.coAdvance_ : this.advanceSimple_;
+  this.advance_ = this.coIterator_ ? this.coAdvance_ : this.advanceSimple_;
 
   /**
    * Returns item index.
    * @return {number}
+   * @private
    */
-  this.getIndex = this.coIterator_ ? this.getCoIndex_ : this.getIndexSimple_;
+  this.getIndex_ = this.coIterator_ ? this.getCoIndex_ : this.getIndexSimple_;
 
   this.reset();
 };
@@ -115,6 +117,82 @@ anychart.data.TableIterator.prototype.reset = function() {
 /**
  * Advances the iterator to the next position.
  * @return {boolean}
+ */
+anychart.data.TableIterator.prototype.advance = function() {
+  return this.advance_();
+};
+
+
+/**
+ * Returns current item.
+ * @return {anychart.data.TableRow}
+ */
+anychart.data.TableIterator.prototype.current = function() {
+  return this.current_;
+};
+
+
+/**
+ * Returns current field values.
+ * @param {string} field
+ * @return {*}
+ */
+anychart.data.TableIterator.prototype.get = function(field) {
+  return this.getColumn(this.aggregated_ ? this.mapping_.getAggregateColumn(field) : this.mapping_.getSourceColumn(field));
+};
+
+
+/**
+ * Returns current column value.
+ * @param {number} column
+ * @return {*}
+ */
+anychart.data.TableIterator.prototype.getColumn = function(column) {
+  return (0 <= column && column < this.currentValuesLength_) ? this.current_.values[column] : undefined;
+};
+
+
+/**
+ * Returns item key.
+ * @return {number}
+ */
+anychart.data.TableIterator.prototype.getKey = function() {
+  return this.currentKey_;
+};
+
+
+/**
+ * Returns item index.
+ * @return {number}
+ */
+anychart.data.TableIterator.prototype.getIndex = function() {
+  return this.getIndex_();
+};
+
+
+/**
+ * Returns item index.
+ * @return {number}
+ * @private
+ */
+anychart.data.TableIterator.prototype.getIndexSimple_ = function() {
+  return this.currentIndex_;
+};
+
+
+/**
+ * Returns item index.
+ * @return {number}
+ * @private
+ */
+anychart.data.TableIterator.prototype.getCoIndex_ = function() {
+  return this.coIterator_.currentIndex();
+};
+
+
+/**
+ * Advances the iterator to the next position.
+ * @return {boolean}
  * @private
  */
 anychart.data.TableIterator.prototype.advanceSimple_ = function() {
@@ -162,64 +240,6 @@ anychart.data.TableIterator.prototype.coAdvance_ = function() {
     this.currentValuesLength_ = 0;
     return false;
   }
-};
-
-
-/**
- * Returns current item.
- * @return {anychart.data.TableRow}
- */
-anychart.data.TableIterator.prototype.current = function() {
-  return this.current_;
-};
-
-
-/**
- * Returns current field values.
- * @param {string} field
- * @return {*}
- */
-anychart.data.TableIterator.prototype.get = function(field) {
-  return this.getColumn(this.aggregated_ ? this.mapping_.getAggregateColumn(field) : this.mapping_.getSourceColumn(field));
-};
-
-
-/**
- * Returns current column value.
- * @param {number} column
- * @return {*}
- */
-anychart.data.TableIterator.prototype.getColumn = function(column) {
-  return (0 <= column && column < this.currentValuesLength_) ? this.current_.values[column] : undefined;
-};
-
-
-/**
- * Returns item key.
- * @return {number}
- */
-anychart.data.TableIterator.prototype.getKey = function() {
-  return this.currentKey_;
-};
-
-
-/**
- * Returns item index.
- * @return {number}
- * @private
- */
-anychart.data.TableIterator.prototype.getIndexSimple_ = function() {
-  return this.currentIndex_;
-};
-
-
-/**
- * Returns item index.
- * @return {number}
- * @private
- */
-anychart.data.TableIterator.prototype.getCoIndex_ = function() {
-  return this.coIterator_.currentIndex();
 };
 
 

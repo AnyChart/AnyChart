@@ -1,4 +1,4 @@
-var chart, stage, series, series1, series2, interactivity, charts = [];
+var chart, stage, series, series1, series2, series3, interactivity, charts = [];
 
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
@@ -54,9 +54,12 @@ anychart.onDocumentReady(function () {
     dataForCartesian[i][0] = 'a' + i;
   }
 
-  series = chart.line([4, 6, 7, 3, 1, -8, -9]);
+  series = chart.area([4, 6, 7, 3, 1, -8, -9]);
+  series.select();
   series1 = chart.line([-4, -6, -7, -3, -1, 8, 9]);
   series2 = chart.column([7, 3, 5, -5, -6, 2, 4]).markers(true).selectMarkers({type: 'star5', size: 10});
+  series3 = chart.column([7, 3, 5, -5, -6, 2, 4]).markers(true).selectMarkers({type: 'star5', size: 10});
+  series3.select();
 
   chart.container('container').draw();
 
@@ -74,5 +77,7 @@ anychart.onDocumentReady(function () {
   //
   //chart.listen('pointdblclick', function(e) {console.log('%c' + e.type, "color:red; background: #eee;");});
   //
-  //chart.listen('pointsselect', function(e) {console.log(e.seriesStatus);});
+  //chart.listen('pointsselect', function(e) {console.log(e.currentPoint, e.seriesStatus);});
+  //
+  //chart.listen('pointshover', function(e) {console.log(e.currentPoint, e.seriesStatus);});
 });

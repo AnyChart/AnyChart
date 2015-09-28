@@ -246,6 +246,15 @@ anychart.core.map.series.Base.prototype.isChoropleth = function() {
 };
 
 
+/**
+ * Whether draw hatch fill.
+ * @return {boolean}
+ */
+anychart.core.map.series.Base.prototype.needDrawHatchFill = function() {
+  return false;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Statistics

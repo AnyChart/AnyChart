@@ -84,7 +84,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
       this.paths[i].clear();
 
     var seriesState = this.state.seriesState;
-    this.colorizeShape(seriesState);
+    this.colorizeShape(seriesState | this.state.getSeriesState());
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {

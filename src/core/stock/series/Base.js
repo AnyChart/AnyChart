@@ -357,7 +357,9 @@ anychart.core.stock.series.Base.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.pixelBoundsCache = this.getPixelBounds();
-    this.invalidate(anychart.ConsistencyState.STOCK_SERIES_CLIP | anychart.ConsistencyState.STOCK_SERIES_POINTS);
+    this.invalidate(anychart.ConsistencyState.STOCK_SERIES_CLIP |
+        anychart.ConsistencyState.STOCK_SERIES_POINTS |
+        anychart.ConsistencyState.STOCK_SERIES_COLOR);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -760,7 +762,7 @@ anychart.core.stock.series.Base.prototype.getLegendItemData = function(itemsText
     itemText = itemsTextFormatter.call(format, format);
   }
   if (!goog.isString(itemText)) {
-    itemText = 'Series ' + this.getIndex() + ': ' + this.getLegendValue(format);
+    itemText = /** @type {string} */(this.name()) + ': ' + this.getLegendValue(format);
   }
 
   var ret = {
@@ -774,6 +776,23 @@ anychart.core.stock.series.Base.prototype.getLegendItemData = function(itemsText
   };
   goog.object.extend(ret, json);
   return ret;
+};
+
+
+/**
+ * Sets and gets series name.
+ * @param {string=} opt_value
+ * @return {anychart.core.stock.series.Base|string}
+ */
+anychart.core.stock.series.Base.prototype.name = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.name_ != opt_value) {
+      this.name_ = String(opt_value);
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
+    }
+    return this;
+  }
+  return this.name_ || ('Series ' + this.getIndex());
 };
 
 
@@ -843,3 +862,4 @@ anychart.core.stock.series.Base.prototype['yScale'] = anychart.core.stock.series
 anychart.core.stock.series.Base.prototype['getIndex'] = anychart.core.stock.series.Base.prototype.getIndex;
 anychart.core.stock.series.Base.prototype['tooltip'] = anychart.core.stock.series.Base.prototype.tooltip;
 anychart.core.stock.series.Base.prototype['legendItem'] = anychart.core.stock.series.Base.prototype.legendItem;
+anychart.core.stock.series.Base.prototype['name'] = anychart.core.stock.series.Base.prototype.name;

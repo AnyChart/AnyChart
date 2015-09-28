@@ -1055,7 +1055,7 @@ anychart.core.ui.SeriesTooltip.prototype.calculateContentBounds_ = function() {
     if (content.enabled()) {
       content.parentBounds(null);
       if (title.width())
-        content.width(/** @type {?(number|string)} */(title.width()));
+        content.width(/** @type {(number|string)} */(title.width()));
       // fix for content.width('100%');
       if (anychart.utils.isPercent(content.width())) {
         tmpWidth = /** @type {number|string|null} */(content.width());

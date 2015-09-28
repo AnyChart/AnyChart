@@ -341,7 +341,9 @@ anychart.core.stock.scrollerSeries.Base.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.pixelBoundsCache = this.getPixelBounds();
     this.rootLayer.clip(this.pixelBoundsCache);
-    this.invalidate(anychart.ConsistencyState.STOCK_SERIES_CLIP | anychart.ConsistencyState.STOCK_SERIES_POINTS);
+    this.invalidate(anychart.ConsistencyState.STOCK_SERIES_CLIP |
+        anychart.ConsistencyState.STOCK_SERIES_POINTS |
+        anychart.ConsistencyState.STOCK_SERIES_COLOR);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 

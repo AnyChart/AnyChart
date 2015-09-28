@@ -333,6 +333,13 @@ anychart.core.stock.Scroller.prototype.invalidateScaleDependend = function() {
 
 
 /** @inheritDoc */
+anychart.core.stock.Scroller.prototype.remove = function() {
+  if (this.rootLayer)
+    this.rootLayer.remove();
+};
+
+
+/** @inheritDoc */
 anychart.core.stock.Scroller.prototype.draw = function() {
   goog.base(this, 'draw');
 

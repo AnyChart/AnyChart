@@ -73,7 +73,7 @@ anychart.core.map.series.DiscreteBase.prototype.startDrawing = function() {
     this.rootElement.clear();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    var needHatchFill = this.hatchFill() || this.hoverHatchFill() || this.selectHatchFill();
+    var needHatchFill = this.needDrawHatchFill();
     if (!this.hatchFillRootElement && needHatchFill) {
       this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
           this.rootTypedLayerInitializer,
@@ -130,6 +130,12 @@ anychart.core.map.series.DiscreteBase.prototype.applyHatchFill = function(pointS
 /** @inheritDoc */
 anychart.core.map.series.DiscreteBase.prototype.isDiscreteBased = function() {
   return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.DiscreteBase.prototype.needDrawHatchFill = function() {
+  return !!(this.hatchFill() || this.hoverHatchFill() || this.selectHatchFill());
 };
 
 

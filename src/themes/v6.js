@@ -4268,6 +4268,565 @@ window['anychart']['themes']['v6'] = {
     }
   },
 
+  'stock': {
+    'defaultPlotSettings': {
+      'defaultSeriesSettings': {
+        'base': {
+          'pointWidth': '75%',
+          'tooltip': {
+            /**
+             * @this {*}
+             * @return {*}
+             */
+            'textFormatter': function() {
+              var val = this['value'];
+              if (val === undefined) val = this['close'];
+              val = parseFloat(val).toFixed(4);
+              return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
+            }
+          },
+          'legendItem': {'iconStroke': 'none'}
+        },
+        'line': {
+          'stroke': '1.5 #64b5f6'
+        },
+        'column': {
+          'fill': '#64b5f6',
+          'stroke': 'none'
+        },
+        'ohlc': {
+          'risingStroke': '#1976d2',
+          'fallingStroke': '#ef6c00'
+        }
+      },
+      'defaultGridSettings': {
+        'enabled': true,
+        'isMinor': false,
+        'layout': 'horizontal',
+        'drawFirstLine': true,
+        'drawLastLine': true,
+        'oddFill': null,
+        'evenFill': null,
+        'stroke': '#cecece',
+        'scale': 0,
+        'zIndex': 11
+      },
+      'defaultMinorGridSettings': {
+        'enabled': true,
+        'isMinor': true,
+        'layout': 'horizontal',
+        'drawFirstLine': true,
+        'drawLastLine': true,
+        'oddFill': null,
+        'evenFill': null,
+        'stroke': '#eaeaea',
+        'scale': 0,
+        'zIndex': 10
+      },
+      'defaultYAxisSettings': {
+        'enabled': true,
+        'orientation': 'left',
+        'title': {
+          'enabled': false,
+          'text': 'Y-Axis'
+        },
+        'staggerMode': false,
+        'staggerLines': null,
+        'ticks': {
+          'enabled': true
+        },
+        'width': 50,
+        'labels': {
+          'fontSize': '11px',
+          'padding': {
+            'top': 0,
+            'right': 5,
+            'bottom': 0,
+            'left': 5
+          }
+        },
+        'minorLabels': {
+          'fontSize': '11px',
+          'padding': {
+            'top': 0,
+            'right': 5,
+            'bottom': 0,
+            'left': 5
+          }
+        },
+        'scale': 0
+      },
+      'xAxis': {
+        'enabled': true,
+        'orientation': 'bottom',
+        'background': {
+          //'stroke': '#cecece'
+          //fill: '#F7F7F7'
+        },
+        'height': 25,
+        'scale': 0,
+        'labels': {
+          'enabled': true,
+          'fontSize': '11px',
+          'padding': {
+            'top': 5,
+            'right': 5,
+            'bottom': 5,
+            'left': 5
+          },
+          'anchor': 'centerTop',
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var date = this['tickValue'];
+            switch (this['majorIntervalUnit']) {
+              case 'year':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+              case 'semester':
+              case 'quarter':
+              case 'month':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM');
+              case 'thirdOfMonth':
+              case 'week':
+              case 'day':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM dd');
+              case 'hour':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM-dd HH');
+              case 'minute':
+                return window['anychart']['utils']['formatDateTime'](date, 'dd HH:mm');
+              case 'second':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+              case 'millisecond':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+            }
+            return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM dd');
+          }
+        },
+        'minorLabels': {
+          'enabled': true,
+          'anchor': 'centerTop',
+          'fontSize': '11px',
+          'padding': {
+            'top': 5,
+            'right': 0,
+            'bottom': 5,
+            'left': 0
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var date = this['tickValue'];
+            switch (this['majorIntervalUnit']) {
+              case 'year':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+              case 'semester':
+              case 'quarter':
+              case 'month':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM');
+              case 'thirdOfMonth':
+              case 'week':
+              case 'day':
+                return window['anychart']['utils']['formatDateTime'](date, 'dd');
+              case 'hour':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH');
+              case 'minute':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm');
+              case 'second':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+              case 'millisecond':
+                return window['anychart']['utils']['formatDateTime'](date, 'SSS');
+            }
+            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+          }
+        }
+      },
+      'dateTimeHighlighter': '#B9B9B9',
+      'legend': {
+        'enabled': true,
+        'vAlign': 'bottom',
+        'fontSize': 12,
+        'itemsLayout': 'horizontal',
+        'itemsSpacing': 15,
+        'items': null,
+        'iconSize': 13,
+        'itemsFormatter': null, // effectively equals current settings
+        'itemsTextFormatter': null,
+        'itemsSourceMode': 'default',
+        'inverted': false,
+        'hoverCursor': 'pointer',
+        'iconTextSpacing': 5,
+        'width': null,
+        'height': null,
+        'position': 'top',
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'titleFormatter': function() {
+          var date = /** @type {number} */(this['value']);
+          switch (this['groupingIntervalUnit']) {
+            case 'year':
+              return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+            case 'semester':
+            case 'quarter':
+            case 'month':
+              return window['anychart']['utils']['formatDateTime'](date, 'MMM yyyy');
+            case 'thirdofmonth':
+            case 'week':
+            case 'day':
+              return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+            case 'hour':
+            case 'minute':
+              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm, dd MMM');
+            case 'second':
+              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+            case 'millisecond':
+              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+          }
+          return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+        },
+        'align': 'center',
+        'margin': {
+          'top': 0,
+          'right': 0,
+          'bottom': 0,
+          'left': 0
+        },
+        'padding': {
+          'top': 10,
+          'right': 10,
+          'bottom': 10,
+          'left': 10
+        },
+        'background': {
+          'enabled': false,
+          'fill': '#fff',
+          'stroke': 'none',
+          'corners': 5
+        },
+        'title': {
+          'enabled': true,
+          'fontSize': 12,
+          'text': '',
+          'background': {
+            'enabled': false,
+            'fill': {
+              'keys': [
+                '#fff',
+                '#f3f3f3',
+                '#fff'
+              ],
+              'angle': '90'
+            },
+            'stroke': {
+              'keys': [
+                '#ddd',
+                '#d0d0d0'
+              ],
+              'angle': '90'
+            }
+          },
+          'margin': {
+            'top': 0,
+            'right': 15,
+            'bottom': 0,
+            'left': 0
+          },
+          'padding': {
+            'top': 0,
+            'right': 0,
+            'bottom': 0,
+            'left': 0
+          },
+          'orientation': 'left',
+          'align': 'left',
+          'hAlign': 'left',
+          'rotation': 0
+        },
+        'titleSeparator': {
+          'enabled': false,
+          'width': '100%',
+          'height': 1,
+          'margin': {
+            'top': 3,
+            'right': 0,
+            'bottom': 3,
+            'left': 0
+          },
+          'orientation': 'top',
+          'fill': ['#000 0', '#000', '#000 0'],
+          'stroke': 'none'
+        },
+        'paginator': {
+          'enabled': true,
+
+          'fontSize': 12,
+          'fontColor': '#545f69',
+
+          'background': {
+            'enabled': false,
+            'fill': {
+              'keys': [
+                '#fff',
+                '#f3f3f3',
+                '#fff'
+              ],
+              'angle': '90'
+            },
+            'stroke': {
+              'keys': [
+                '#ddd',
+                '#d0d0d0'
+              ],
+              'angle': '90'
+            }
+          },
+          'padding': {
+            'top': 0,
+            'right': 0,
+            'bottom': 0,
+            'left': 0
+          },
+          'margin': {
+            'top': 0,
+            'right': 0,
+            'bottom': 0,
+            'left': 0
+          },
+          'orientation': 'right',
+          'layout': 'horizontal',
+          'zIndex': 30
+        },
+        'tooltip': {
+          'enabled': false,
+          'title': {
+            'enabled': false,
+            'margin': {
+              'top': 3,
+              'right': 3,
+              'bottom': 0,
+              'left': 3
+            },
+            'padding': {
+              'top': 0,
+              'right': 0,
+              'bottom': 0,
+              'left': 0
+            }
+          }
+        },
+        'zIndex': 20
+      },
+      'scales': [
+        {
+          'type': 'linear',
+          'inverted': false,
+          'maximum': null,
+          'minimum': null,
+          'minimumGap': 0.1,
+          'maximumGap': 0.1,
+          'softMinimum': null,
+          'softMaximum': null,
+          'ticks': {
+            'mode': 'linear',
+            'base': 0,
+            'minCount': 4,
+            'maxCount': 6
+          },
+          'minorTicks': {
+            'mode': 'linear',
+            'base': 0,
+            'count': 5
+          },
+          'stackMode': 'none',
+          'stickToZero': true
+        }
+      ],
+      'yScale': 0,
+      'zIndex': 10,
+      'xAxes': [{}],
+      'yAxes': [{}]
+    },
+    'padding': [20, 30, 20, 60],
+    'plots': [{}],
+    'scroller': {
+      'defaultSeriesSettings': {
+        'base': {
+          'pointWidth': '75%'
+        },
+        'line': {
+          'stroke': '#999 0.9',
+          'selectedStroke': '1.5 #64b5f6'
+        },
+        'column': {
+          'fill': '#64b5f6 0.6',
+          'stroke': 'none',
+          'selectedFill': '#64b5f6 0.9',
+          'selectedStroke': 'none'
+        },
+        'ohlc': {
+          'risingStroke': '#1976d2 0.6',
+          'fallingStroke': '#ef6c00 0.6',
+          'selectedRisingStroke': '#1976d2 0.9',
+          'selectedFallingStroke': '#ef6c00 0.9'
+        }
+      },
+      'enabled': true,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': '#cecece',
+      'height': 40,
+      'minHeight': null,
+      'maxHeight': null,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 40,
+      'xAxis': {
+        'background': {
+          'enabled': false
+        },
+        'minorTicks': {
+          'enabled': true,
+          'stroke': '#cecece'
+        },
+        'labels': {
+          'enabled': true,
+          'fontSize': '11px',
+          'padding': {
+            'top': 5,
+            'right': 5,
+            'bottom': 5,
+            'left': 5
+          },
+          'anchor': 'leftTop',
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var date = this['tickValue'];
+            switch (this['majorIntervalUnit']) {
+              case 'year':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+              case 'semester':
+              case 'quarter':
+              case 'month':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM');
+              case 'thirdOfMonth':
+              case 'week':
+              case 'day':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM dd');
+              case 'hour':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM-dd HH');
+              case 'minute':
+                return window['anychart']['utils']['formatDateTime'](date, 'dd HH:mm');
+              case 'second':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+              case 'millisecond':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+            }
+            return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM dd');
+          }
+        },
+        'minorLabels': {
+          'enabled': true,
+          'anchor': 'leftTop',
+          'fontSize': '11px',
+          'padding': {
+            'top': 5,
+            'right': 5,
+            'bottom': 5,
+            'left': 5
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var date = this['tickValue'];
+            switch (this['majorIntervalUnit']) {
+              case 'year':
+                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+              case 'semester':
+              case 'quarter':
+              case 'month':
+                return window['anychart']['utils']['formatDateTime'](date, 'MMM');
+              case 'thirdOfMonth':
+              case 'week':
+              case 'day':
+                return window['anychart']['utils']['formatDateTime'](date, 'dd');
+              case 'hour':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH');
+              case 'minute':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm');
+              case 'second':
+                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+              case 'millisecond':
+                return window['anychart']['utils']['formatDateTime'](date, 'SSS');
+            }
+            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+          }
+        },
+        'zIndex': 75
+      }
+    },
+    'tooltip': {
+      'allowLeaveScreen': false,
+      'allowLeaveChart': true,
+      'displayMode': 'union',
+      'positionMode': 'float',
+      'title': {
+        'enabled': true,
+        'fontSize': 13
+      },
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        var date = /** @type {number} */(this['hoveredDate']);
+        switch (this['groupingIntervalUnit']) {
+          case 'year':
+            return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+          case 'semester':
+          case 'quarter':
+          case 'month':
+            return window['anychart']['utils']['formatDateTime'](date, 'MMM yyyy');
+          case 'thirdofmonth':
+          case 'week':
+          case 'day':
+            return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+          case 'hour':
+          case 'minute':
+            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm, dd MMM');
+          case 'second':
+            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+          case 'millisecond':
+            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+        }
+        return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return this['formattedValues'].join('\n');
+      }
+    }
+  },
+
   // standalone components
   'standalones': {
     'background': {
@@ -4553,6 +5112,23 @@ window['anychart']['themes']['v6'] = {
       'isStandalone': true,
       'backgroundFill': '#fff',
       'zIndex': 0
+    },
+    'scroller': {
+      'enabled': true,
+      'fill': '#fff',
+      'selectedFill': '#e2e2e2',
+      'outlineStroke': '#fff',
+      'height': 40,
+      'minHeight': null,
+      'maxHeight': null,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#545f69',
+        'hoverFill': '#ccc',
+        'hoverStroke': '#000'
+      }
     }
   }
 };

@@ -8,14 +8,14 @@ var min = 0, max = 350;
 
 anychart.onDocumentReady(function() {
   var dataSet = anychart.data.set([
-    ["AU.CT", 15, "Australian Capital Territory"],
-    ["AU.VI", 23, "Victoria"],
-    ["AU.WA", 86, "Western Australia"],
-    ["AU.QL", 90, "Queensland"],
-    ["AU.NS", 32, "New South Wales"],
-    ["AU.NT", 64, "Northern Territory"],
-    ["AU.TS", 30, "Tasmania"],
-    ["AU.SA", 45, "South Australian"]
+    ["AU.CT", -15, "Australian Capital Territory"],
+    ["AU.VI", -23, "Victoria"],
+    ["AU.WA", -86, "Western Australia"],
+    ["AU.QL", -90, "Queensland"],
+    ["AU.NS", -32, "New South Wales"],
+    ["AU.NT", -64, "Northern Territory"],
+    ["AU.TS", -30, "Tasmania"],
+    ["AU.SA", -45, "South Australian"]
   ]);
 
   //anychart.maps.australia['ac-geoFieldId'] = 'code_hasc';
@@ -29,15 +29,15 @@ anychart.onDocumentReady(function() {
   map.geoData(anychart.maps.australia);
   map.geoIdField('code_hasc');
 
-  map.choropleth(choroplethData);
-
-  var colorScale = anychart.scales.ordinalColor();
-  colorScale.ranges([
-    {from: -100, to: 30},
-    {from: 30, to: 65},
-    {from: 65, to: 90}
-  ]);
-  map.getSeries(0).colorScale(colorScale);
+  //map.choropleth(choroplethData);
+  //
+  //var colorScale = anychart.scales.ordinalColor();
+  //colorScale.ranges([
+  //  {from: -100, to: 30},
+  //  {from: 30, to: 65},
+  //  {from: 65, to: 90}
+  //]);
+  //map.getSeries(0).colorScale(colorScale);
 
   map.maxBubbleSize('10%');
   map.minBubbleSize('1%');
@@ -47,9 +47,20 @@ anychart.onDocumentReady(function() {
   series.labels(true);
 
   series
-      .hatchFill('diagonal')
-      .hoverHatchFill('confetti')
-      .selectHatchFill('percent60');
+      .displayNegative(true)
+
+      .selectNegativeFill('purple')
+      .hoverNegativeFill('yellow')
+      .negativeFill('red .5')
+
+      .selectNegativeStroke('red .9')
+      .hoverNegativeStroke({color: 'green', thickness: 6, dash: '5 4 5'})
+      .negativeStroke('green .9')
+
+      .selectNegativeHatchFill('DIAGONAL_CROSS')
+      .hoverNegativeHatchFill('horizontal')
+      .negativeHatchFill('vertical');
+
 
   map.container('container').draw();
 });

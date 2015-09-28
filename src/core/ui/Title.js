@@ -734,10 +734,12 @@ anychart.core.ui.Title.prototype.getContentBounds = function() {
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.applyTextSettings = function(textElement, isInitial) {
   if (isInitial || 'text' in this.changedSettings || 'autoText' in this.changedSettings || 'useHtml' in this.changedSettings) {
+    var text = !this.settingsObj['text'] && goog.isDef(this.settingsObj['autoText']) ? this.settingsObj['autoText'] : this.settingsObj['text'];
+
     if (!!this.settingsObj['useHtml']) {
-      textElement.htmlText(this.settingsObj['text'] || this.settingsObj['autoText']);
+      textElement.htmlText(text);
     } else {
-      textElement.text(this.settingsObj['text'] || this.settingsObj['autoText']);
+      textElement.text(text);
     }
   }
   goog.base(this, 'applyTextSettings', textElement, isInitial);

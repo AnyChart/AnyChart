@@ -146,7 +146,14 @@ anychart.charts.Map.ZINDEX_LABEL = 40;
  * Marker z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_MARKER = 50;
+anychart.charts.Map.ZINDEX_MARKER = 40;
+
+
+/**
+ * Color range z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_COLOR_RANGE = 50;
 
 
 /**
@@ -782,6 +789,7 @@ anychart.charts.Map.prototype.calculate = function() {
       sum += /** @type {number} */(series.statistics('seriesSum'));
       pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
       //----------------------------------end calc statistics for series
+      series.calculate();
     }
 
     //----------------------------------calc statistics for series
@@ -1085,6 +1093,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     if (this.colorRange_) {
       this.colorRange_.suspendSignalsDispatching();
       this.colorRange_.container(this.rootElement);
+      this.colorRange_.zIndex(anychart.charts.Map.ZINDEX_COLOR_RANGE);
       this.colorRange_.draw();
       this.colorRange_.resumeSignalsDispatching(false);
     }

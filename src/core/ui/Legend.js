@@ -1263,7 +1263,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
       } else {
         if (fullAreaHeight > maxHeight) {
           var accHeight = 0;
-          if (separatorIsVertical) {
+          if (separatorBounds && separatorIsVertical) {
             accHeight += separatorBounds.height;
           }
           if (paginator.orientation() == anychart.enums.Orientation.TOP || paginator.orientation() == anychart.enums.Orientation.BOTTOM) {

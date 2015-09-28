@@ -298,7 +298,7 @@ anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function()
     for (i = 0; i < len; i++)
       this.paths[i].clear();
 
-    var seriesState = this.state.seriesState;
+    var seriesState = this.state.getSeriesState();
     var state = anychart.PointState.NORMAL;
     if (this.state.hasPointState(anychart.PointState.SELECT))
       state = anychart.PointState.SELECT;

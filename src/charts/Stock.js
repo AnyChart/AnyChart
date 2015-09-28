@@ -174,7 +174,6 @@ anychart.charts.Stock.prototype.scroller = function(opt_value) {
   if (!this.scroller_) {
     this.scroller_ = new anychart.core.stock.Scroller(this);
     this.scroller_.setParentEventTarget(this);
-    this.scroller_.enabled(false);
     this.scroller_.listenSignals(this.scrollerInvalidated_, this);
     this.eventsHandler.listen(this.scroller_, anychart.enums.EventType.SCROLLER_CHANGE_START, this.scrollerChangeStartHandler_);
     this.eventsHandler.listen(this.scroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);

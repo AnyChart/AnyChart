@@ -1316,6 +1316,39 @@ anychart.core.Chart.prototype.createEventSeriesStatus = function(seriesStatus, o
 
 
 /**
+ * Makes current point for events.
+ * @param {Object} seriesStatus .
+ * @param {string} event .
+ * @param {boolean=} opt_empty .
+ * @return {Object}
+ * @private
+ */
+anychart.core.Chart.prototype.makeCurrentPoint_ = function(seriesStatus, event, opt_empty) {
+  var series, pointIndex, pointStatus, minDistance = Infinity;
+  for (var i = 0, len = seriesStatus.length; i < len; i++) {
+    var status = seriesStatus[i];
+    if (status.nearestPointToCursor) {
+      var nearestPoint = status.nearestPointToCursor;
+      if (minDistance > nearestPoint.distance) {
+        series = status.series;
+        pointIndex = nearestPoint.index;
+        pointStatus = goog.array.contains(status.points, nearestPoint.index);
+        minDistance = nearestPoint.distance;
+      }
+    }
+  }
+  var currentPoint = {
+    'index': pointIndex,
+    'series': series
+  };
+
+  currentPoint[event] = opt_empty ? !pointStatus : pointStatus;
+
+  return currentPoint;
+};
+
+
+/**
  * This method also has a side effect - it patches the original source event to maintain seriesStatus support for
  * browser events.
  * @param {Object} event Event object.
@@ -1327,6 +1360,7 @@ anychart.core.Chart.prototype.makeHoverPointEvent = function(event, seriesStatus
   return {
     'type': anychart.enums.EventType.POINTS_HOVER,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
+    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'hovered', opt_empty),
     'actualTarget': event['target'],
     'target': this,
     'originalEvent': event
@@ -1346,6 +1380,7 @@ anychart.core.Chart.prototype.makeSelectPointEvent = function(event, seriesStatu
   return {
     'type': anychart.enums.EventType.POINTS_SELECT,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
+    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'selected', opt_empty),
     'actualTarget': event['target'],
     'target': this,
     'originalEvent': event
@@ -1418,9 +1453,9 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
             eventSeriesStatus.push({
               series: series,
               points: alreadyHoveredPoints,
-              lastPoint: index,
               nearestPointToCursor: {index: index, distance: 0}
             });
+
           this.dispatchEvent(this.makeHoverPointEvent(event, eventSeriesStatus));
         }
       }
@@ -1508,7 +1543,11 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
       if (hoverMode == anychart.enums.HoverMode.SINGLE && !isNaN(index)) {
         series.unhover();
-        this.dispatchEvent(this.makeHoverPointEvent(event, [{series: series, points: [], lastPoint: index}]));
+        this.dispatchEvent(this.makeHoverPointEvent(event, [{
+          series: series,
+          points: [],
+          nearestPointToCursor: {index: index, distance: 0}
+        }]));
       }
     }
   }
@@ -1535,7 +1574,7 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
   var controlKeyPressed = event.ctrlKey || event.metaKey;
-  var clickWithControlOnSelectedSeries;
+  var clickWithControlOnSelectedSeries, equalsSelectedPoints;
 
   var tag = anychart.utils.extractTag(event['domTarget']);
 
@@ -1562,9 +1601,15 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
         if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE || series.selectionMode() == anychart.enums.SelectionMode.NONE)
           return;
 
+        alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+        equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == index;
+
+        if (!(controlKeyPressed || event.shiftKey) && equalsSelectedPoints)
+          return;
+
         clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
         var unselect = clickWithControlOnSelectedSeries ||
-            !((controlKeyPressed || event.shiftKey)) ||
+            !(controlKeyPressed || event.shiftKey) ||
             ((controlKeyPressed || event.shiftKey) && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT);
 
         if (unselect) {
@@ -1596,8 +1641,21 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
             });
           }
         }
+
+        if (!eventSeriesStatus.length) {
+          eventSeriesStatus.push({
+            series: series,
+            points: [],
+            nearestPointToCursor: {index: index, distance: 0}
+          });
+        }
+
         this.dispatchEvent(this.makeSelectPointEvent(evt, eventSeriesStatus));
-        this.prevSelectSeriesStatus = eventSeriesStatus;
+
+        if (equalsSelectedPoints)
+          this.prevSelectSeriesStatus = null;
+        else
+          this.prevSelectSeriesStatus = eventSeriesStatus;
       }
     }
   } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
@@ -1617,7 +1675,7 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
     if (seriesStatus && seriesStatus.length) {
       var dispatchEvent = false;
       eventSeriesStatus = [];
-      var contains, equalsSelectedPoints, seriesStatus_;
+      var contains, seriesStatus_;
 
       if (interactivity.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
         var nearest;
@@ -1639,18 +1697,20 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
         equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == nearest.nearestPointToCursor.index;
 
-        dispatchEvent = !equalsSelectedPoints;
+        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && (controlKeyPressed || event.shiftKey));
 
-        if (!equalsSelectedPoints) {
+        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        if ((clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey)) && !equalsSelectedPoints) {
           series.unselect();
-          series.selectPoint(/** @type {number} */ (nearest.nearestPointToCursor.index), event);
         }
+        series.selectPoint(/** @type {number} */ (nearest.nearestPointToCursor.index), event);
+
         alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+
         if (alreadySelectedPoints.length) {
           eventSeriesStatus.push({
             series: series,
             points: [nearest.nearestPointToCursor.index],
-            lastPoint: nearest.nearestPointToCursor.index,
             nearestPointToCursor: nearest.nearestPointToCursor
           });
 
@@ -1666,6 +1726,12 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
               series.unselect();
             }
           }
+        } else {
+          eventSeriesStatus.push({
+            series: series,
+            points: alreadySelectedPoints,
+            nearestPointToCursor: seriesStatus_.nearestPointToCursor
+          });
         }
       } else {
         var emptySeries = [];
@@ -1699,7 +1765,6 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
           var points;
           if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
             points = [seriesStatus_.nearestPointToCursor.index];
-            seriesStatus_.lastPoint = seriesStatus_.nearestPointToCursor.index;
           } else {
             points = seriesStatus_.points;
           }
@@ -1728,11 +1793,14 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
             eventSeriesStatus.push({
               series: series,
               points: alreadySelectedPoints,
-              lastPoint: seriesStatus_.lastPoint,
               nearestPointToCursor: seriesStatus_.nearestPointToCursor
             });
           } else {
-            emptySeries.push({series: series, points: alreadySelectedPoints});
+            emptySeries.push({
+              series: series,
+              points: alreadySelectedPoints,
+              nearestPointToCursor: seriesStatus_.nearestPointToCursor
+            });
           }
         }
 

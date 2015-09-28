@@ -470,9 +470,9 @@ anychart.core.polar.series.Base.prototype.isDiscreteBased = function() {
 anychart.core.polar.series.Base.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     if (this.firstPointDrawn)
-      this.firstPointDrawn = this.drawSubsequentPoint(pointState);
+      this.firstPointDrawn = this.drawSubsequentPoint(pointState | this.state.getSeriesState());
     else
-      this.firstPointDrawn = this.drawFirstPoint(pointState);
+      this.firstPointDrawn = this.drawFirstPoint(pointState | this.state.getSeriesState());
     if (this.firstPointDrawn) {
       this.drawLabel(pointState);
     }

@@ -257,7 +257,7 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
       this.paths[i].clear();
 
 
-    var seriesState = this.state.seriesState;
+    var seriesState = this.state.getSeriesState();
     var state = anychart.PointState.NORMAL;
     if (this.state.hasPointState(anychart.PointState.SELECT))
       state = anychart.PointState.SELECT;

@@ -47,15 +47,6 @@ anychart.core.map.series.Choropleth.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_COLOR_SCALE;
 
 
-/**
- * Tester if the series is choropleth.
- * @return {boolean}
- */
-anychart.core.map.series.Choropleth.prototype.isChoropleth = function() {
-  return true;
-};
-
-
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.getType = function() {
   return anychart.enums.MapSeriesType.CHOROPLETH;
@@ -253,7 +244,7 @@ anychart.core.map.series.Choropleth.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    var needHatchFill = this.hatchFill() || this.hoverHatchFill() || this.selectHatchFill();
+    var needHatchFill = this.needDrawHatchFill();
     if (!this.hatchFillRootElement && needHatchFill) {
       this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
           this.rootTypedLayerInitializer,
@@ -290,7 +281,7 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
       var y = shapeBounds.top + shapeBounds.height * middleY;
 
 
-      this.colorizeShape(pointState);
+      this.colorizeShape(pointState | this.state.getSeriesState());
       iterator.meta('shape', iterator.meta('regionShape')).meta('x', x).meta('value', y);
       this.makeInteractive(/** @type {acgraph.vector.Element} */(iterator.meta('regionShape')));
     }
@@ -305,7 +296,7 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(pointState);
+    this.applyHatchFill(pointState | this.state.getSeriesState());
   }
 
   goog.base(this, 'drawPoint', pointState);
@@ -315,6 +306,18 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.isDiscreteBased = function() {
   return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.isChoropleth = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.needDrawHatchFill = function() {
+  return !!(this.hatchFill() || this.hoverHatchFill() || this.selectHatchFill());
 };
 
 
