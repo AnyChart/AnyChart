@@ -1,5 +1,4 @@
 goog.provide('anychart.themes.defaultTheme');
-goog.require('anychart.enums');
 
 
 window['anychart'] = window['anychart'] || {};
