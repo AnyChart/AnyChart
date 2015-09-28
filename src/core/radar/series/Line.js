@@ -30,7 +30,7 @@ anychart.core.radar.series.Line.prototype.prevPointIsMissing = false;
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Line.prototype.drawFirstPoint = function() {
+anychart.core.radar.series.Line.prototype.drawFirstPoint = function(pointState) {
   var referenceValues = this.getValuePointCoords();
 
   if (!goog.isDef(this.firstPointIsMissing))
@@ -49,7 +49,7 @@ anychart.core.radar.series.Line.prototype.drawFirstPoint = function() {
     if (!this.firstDrawnPoint) this.firstDrawnPoint = {x: x, y: y};
     this.path.moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -57,7 +57,7 @@ anychart.core.radar.series.Line.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Line.prototype.drawSubsequentPoint = function() {
+anychart.core.radar.series.Line.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getValuePointCoords();
   if (!referenceValues) {
     this.prevPointIsMissing = true;
@@ -71,7 +71,7 @@ anychart.core.radar.series.Line.prototype.drawSubsequentPoint = function() {
 
     this.path.lineTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -108,12 +108,12 @@ anychart.core.radar.series.Line.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.radar.series.Line.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return this.getFinalStroke(false, anychart.PointState.NORMAL);
 };
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.radar.series.Line.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -137,5 +137,6 @@ anychart.core.radar.series.Line.prototype.getLegendIconType = function() {
 //exports
 anychart.core.radar.series.Line.prototype['stroke'] = anychart.core.radar.series.Line.prototype.stroke;//inherited
 anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.series.Line.prototype.hoverStroke;//inherited
+anychart.core.radar.series.Line.prototype['selectStroke'] = anychart.core.radar.series.Line.prototype.selectStroke;//inherited
 anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;//inherited
 anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;//inherited

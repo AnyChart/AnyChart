@@ -215,8 +215,9 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.data().getIterator();
+    var iterator = gauge.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
+
     var value = parseFloat(iterator.get('value'));
 
     if (scale.isMissing(value)) {
@@ -319,6 +320,8 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
 
 
     this.domElement.close();
+
+    this.makeInteractive(/** @type {acgraph.vector.Path} */(this.domElement));
 
     if (this.hatchFillElement) {
       this.hatchFillElement.clear();

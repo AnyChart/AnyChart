@@ -1,0 +1,22 @@
+<html>
+<head>
+  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+  <script src="../../../out/anychart-bundle.min.js"></script>
+  <meta charset="utf-8">
+  <script src="index.js"></script>
+  <style>
+    html body #container {
+      width: 100%;
+      height: 800px;
+      margin: 0;
+      border: 1px black solid;
+    }
+  </style>
+</head>
+<body>
+<div id="container"></div>
+<input type="range" min="0" max="999999" id="startKey" oninput="draw();" style="width: 500px;" value="0"/>
+<input type="range" min="0" max="999999" id="endKey" oninput="draw();" style="width: 500px;" value="999999"/><br/>
+<input type="button" id="stream" value="Start Stream" onclick="toggleStream()"/>
+</body>
+</html>

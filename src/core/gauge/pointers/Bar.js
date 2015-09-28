@@ -59,8 +59,8 @@ anychart.core.gauge.pointers.Bar.prototype.width = function(opt_value) {
 
 /**
  * Bar position relative axis - inside, center, outside.
- * @param {(anychart.enums.SidePosition|string)=} opt_value [center].
- * @return {(anychart.enums.SidePosition|string|!anychart.core.gauge.pointers.Bar)} .
+ * @param {(anychart.enums.GaugeSidePosition|string)=} opt_value [center].
+ * @return {(anychart.enums.GaugeSidePosition|string|!anychart.core.gauge.pointers.Bar)} .
  */
 anychart.core.gauge.pointers.Bar.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -135,7 +135,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.data().getIterator();
+    var iterator = gauge.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
     var value = parseFloat(iterator.get('value'));
 
@@ -205,6 +205,8 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
         -sweepAngle, true);
 
     this.domElement.close();
+
+    this.makeInteractive(/** @type {acgraph.vector.Path} */(this.domElement));
 
     if (this.hatchFillElement) {
       this.hatchFillElement.clear();

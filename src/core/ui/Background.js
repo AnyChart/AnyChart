@@ -46,14 +46,14 @@ anychart.core.ui.Background = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_;
+  this.fill_ = 'none';
 
   /**
    * Stroke settings.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_;
+  this.stroke_ = 'none';
 
   /**
    * Pointer events.
@@ -453,8 +453,14 @@ anychart.core.ui.Background.prototype.stroke = function(opt_strokeOrFill, opt_th
   if (goog.isDef(opt_strokeOrFill)) {
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(val, this.stroke_)) {
+      var state = anychart.ConsistencyState.APPEARANCE;
+      var signal = anychart.Signal.NEEDS_REDRAW;
+      if (acgraph.vector.getThickness(val) != acgraph.vector.getThickness(this.stroke_)) {
+        state |= anychart.ConsistencyState.BOUNDS;
+        state |= anychart.Signal.BOUNDS_CHANGED;
+      }
       this.stroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(state, signal);
     }
     return this;
   } else {
@@ -590,8 +596,15 @@ anychart.core.ui.Background.prototype.remove = function() {
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+
+  if (this.fill_) {
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  }
+
+  if (this.stroke_) {
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  }
+
   json['cornerType'] = this.cornerType();
   var corners = /** @type {Array} */(this.corners());
   if (corners.length >= 4) {

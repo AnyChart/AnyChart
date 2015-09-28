@@ -5,6 +5,7 @@ goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('goog.i18n.DateTimeFormat');
 
 
@@ -155,6 +156,11 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
     this.getTimeline().initMouseFeatures();
   }, false, this);
 
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
@@ -212,6 +218,65 @@ anychart.charts.Gantt.Z_INDEX_DG_TL = 5;
  * @type {number}
  */
 anychart.charts.Gantt.Z_INDEX_SCROLL = 20;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Gantt.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.charts.Gantt.prototype.makePointEvent = function(event) {
+  return null;
+};
+
+
+/**
+ * Select a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Gantt}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Gantt.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this;
+};
+
+
+/**
+ * Рщмук a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Gantt}  {@link anychart.charts.Pie} instance for method chaining.
+ */
+anychart.charts.Gantt.prototype.hoverPoint = function(indexOrIndexes, opt_event) {
+  return this;
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.charts.Gantt|anychart.enums.HoverMode} .
+ */
+anychart.charts.Gantt.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
 
 
 /**

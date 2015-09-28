@@ -6,6 +6,8 @@
 
     <script>
         goog.require('anychart.modules.anychart');
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.themes.v6');
     </script>
     <style>
         html, body, #container {
@@ -18,22 +20,23 @@
 <body>
 <div id="container" style="width: 400px; height: 370px; border: 1px solid #000000"></div>
 <script>
-    var chart;
-    anychart.onDocumentLoad(function(){
-        chart = anychart.funnel([
-            ['Product A', 70],
-            ['Product B', 40],
-            ['Product C', 120],
-            ['Product D', 40],
-            ['Product E', 50],
-            ['Product F', 70]
-        ]);
-        chart.legend(true);
+  anychart.theme('v6');
+  var chart;
+  anychart.onDocumentLoad(function(){
+      chart = anychart.funnel([
+          ['Product A', 70],
+          ['Product B', 40],
+          ['Product C', 120],
+          ['Product D', 40],
+          ['Product E', 50],
+          ['Product F', 70]
+      ]);
+      chart.legend(true);
 
-        chart.pointsPadding(10);
+      chart.pointsPadding(10);
 
-        chart.container('container').draw();
-    });
+      chart.container('container').draw();
+  });
 </script>
 </body>
 </html>

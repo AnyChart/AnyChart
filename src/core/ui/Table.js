@@ -2850,3 +2850,9 @@ anychart.core.ui.Table.prototype['rowOddFill'] = anychart.core.ui.Table.prototyp
 anychart.core.ui.Table.prototype['cellBorder'] = anychart.core.ui.Table.prototype.cellBorder;
 
 anychart.core.ui.Table.prototype['cellPadding'] = anychart.core.ui.Table.prototype.cellPadding;
+
+anychart.core.ui.Table.prototype['saveAsPng'] = anychart.core.ui.Table.prototype.saveAsPng;//inherited
+anychart.core.ui.Table.prototype['saveAsJpg'] = anychart.core.ui.Table.prototype.saveAsJpg;//inherited
+anychart.core.ui.Table.prototype['saveAsPdf'] = anychart.core.ui.Table.prototype.saveAsPdf;//inherited
+anychart.core.ui.Table.prototype['saveAsSvg'] = anychart.core.ui.Table.prototype.saveAsSvg;//inherited
+anychart.core.ui.Table.prototype['toSvg'] = anychart.core.ui.Table.prototype.toSvg;//inherited

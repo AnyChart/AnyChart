@@ -20,23 +20,10 @@ anychart.core.polar.series.ContinuousBase = function(opt_data, opt_csvSettings) 
   this.markers().position(anychart.enums.Position.CENTER);
 
   /**
-   * @type {!acgraph.vector.Path}
-   * @protected
-   */
-  this.path = acgraph.path();
-  this.path.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES);
-
-  /**
-   * @type {acgraph.vector.Path}
-   * @protected
-   */
-  this.hatchFillPath = null;
-
-  /**
    * @type {Array.<!acgraph.vector.Path>}
    * @protected
    */
-  this.paths = [this.path];
+  this.paths = [];
 
   /**
    * @type {boolean}
@@ -86,6 +73,13 @@ anychart.core.polar.series.ContinuousBase.prototype.markers_ = null;
  * @private
  */
 anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers_ = null;
+
+
+/**
+ * @type {anychart.core.ui.MarkersFactory}
+ * @private
+ */
+anychart.core.polar.series.ContinuousBase.prototype.selectMarkers_ = null;
 
 
 /** @inheritDoc */
@@ -174,6 +168,25 @@ anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers = function(opt_
 
 
 /**
+ * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.core.polar.series.ContinuousBase)} Markers instance or itself for chaining call.
+ */
+anychart.core.polar.series.ContinuousBase.prototype.selectMarkers = function(opt_value) {
+  if (!this.selectMarkers_) {
+    this.selectMarkers_ = new anychart.core.ui.MarkersFactory();
+    this.registerDisposable(this.selectMarkers_);
+    // don't listen to it, for it will be reapplied at the next hover
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectMarkers_.setup(opt_value);
+    return this;
+  }
+  return this.selectMarkers_;
+};
+
+
+/**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
@@ -218,17 +231,18 @@ anychart.core.polar.series.ContinuousBase.prototype.closed = function(opt_value)
 
 /**
  * Draws all series points.
+ * @param {anychart.PointState|number} pointState Point state.
  */
-anychart.core.polar.series.ContinuousBase.prototype.drawPoint = function() {
+anychart.core.polar.series.ContinuousBase.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     var pointDrawn;
     if (this.firstPointDrawn)
-      pointDrawn = this.drawSubsequentPoint();
+      pointDrawn = this.drawSubsequentPoint(pointState);
     else
-      pointDrawn = this.drawFirstPoint();
+      pointDrawn = this.drawFirstPoint(pointState);
     if (pointDrawn) {
-      this.drawMarker(false);
-      this.drawLabel(false);
+      this.drawMarker(pointState);
+      this.drawLabel(pointState);
     }
     // if connectMissing == true, firstPointDrawn will never be false when drawing.
     this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;
@@ -245,9 +259,11 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
 
   var markers = this.markers();
   var hoverMarkers = this.hoverMarkers();
+  var selectMarkers = this.selectMarkers();
 
   markers.suspendSignalsDispatching();
   hoverMarkers.suspendSignalsDispatching();
+  selectMarkers.suspendSignalsDispatching();
 
   var fillColor = this.getMarkerFill();
   markers.setAutoFill(fillColor);
@@ -260,13 +276,17 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   markers.parentBounds(this.pixelBoundsCache);
+};
 
+
+/** @inheritDoc */
+anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function() {
   if (this.isConsistent() || !this.enabled()) return;
 
   var i;
   var len = this.paths.length;
   for (i = 0; i < len; i++) {
-    this.makeHoverable(this.paths[i], true);
+    this.makeInteractive(this.paths[i], true);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -277,32 +297,23 @@ anychart.core.polar.series.ContinuousBase.prototype.startDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     for (i = 0; i < len; i++)
       this.paths[i].clear();
-    this.colorizeShape(!isNaN(this.hoverStatus));
+
+    var seriesState = this.state.getSeriesState();
+    var state = anychart.PointState.NORMAL;
+    if (this.state.hasPointState(anychart.PointState.SELECT))
+      state = anychart.PointState.SELECT;
+    else if (this.state.hasPointState(anychart.PointState.HOVER))
+      state = anychart.PointState.HOVER;
+
+    this.colorizeShape(seriesState | state);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     var container = /** @type {acgraph.vector.ILayer} */(this.container());
     this.rootLayer.parent(container);
-    for (i = 0; i < len; i++)
-      this.paths[i].parent(this.rootLayer);
-    if (this.hatchFillPath)
-      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    if (!this.hatchFillPath) {
-      this.hatchFillPath = acgraph.path();
-      this.hatchFillPath.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillPath.zIndex(anychart.core.polar.series.Base.ZINDEX_HATCH_FILL);
-      this.hatchFillPath.disablePointerEvents(true);
-    }
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function() {
   this.finalizeSegment();
   this.finalizeHatchFill();
 
@@ -313,7 +324,6 @@ anychart.core.polar.series.ContinuousBase.prototype.finalizeDrawing = function()
 
   this.markers().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverMarkers().markConsistent(anychart.ConsistencyState.ALL);
-
 
   goog.base(this, 'finalizeDrawing');
 };
@@ -330,7 +340,7 @@ anychart.core.polar.series.ContinuousBase.prototype.remove = function() {
 /** @inheritDoc */
 anychart.core.polar.series.ContinuousBase.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('y')}};
+  return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
 };
 
 
@@ -382,133 +392,106 @@ anychart.core.polar.series.ContinuousBase.prototype.connectMissingPoints = funct
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.polar.series.ContinuousBase.prototype.colorizeShape = function(hover) {
-  this.path.stroke(this.getFinalStroke(false, hover), 2);
-  this.path.fill(null);
-};
+anychart.core.polar.series.ContinuousBase.prototype.colorizeShape = goog.abstractMethod;
 
 
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.polar.series.ContinuousBase.prototype.applyHatchFill = function(hover) {
+anychart.core.polar.series.ContinuousBase.prototype.applyHatchFill = function(pointState) {
   if (this.hatchFillPath) {
     this.hatchFillPath.stroke(null);
-    this.hatchFillPath.fill(this.getFinalHatchFill(false, hover));
+    this.hatchFillPath.fill(this.getFinalHatchFill(false, pointState));
   }
 };
 
 
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.hoverSeries = function() {
-  if (this.hoverStatus == -1) return this;
+/**
+ * Gets marker position.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
+ * @return {string} Position settings.
+ */
+anychart.core.polar.series.ContinuousBase.prototype.getMarkersPosition = function(pointState) {
+  var iterator = this.getIterator();
 
-  //hide tooltip in any case
-  this.hideTooltip();
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
-  //unhover current point if any
-  if (this.hoverStatus >= 0 && this.getResetIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
 
-  //hover all points
-  this.applyHatchFill(true);
-  this.colorizeShape(true);
+  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
 
-  this.hoverStatus = -1;
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.hoverPoint = function(index, opt_event) {
-  if (this.hoverStatus == index) {
-    if (this.getIterator().select(index))
-      if (opt_event) this.showTooltip(opt_event);
-      return this;
-  }
-  if (this.hoverStatus >= 0 && this.getIterator().select(this.hoverStatus)) {
-    this.drawMarker(false);
-    this.drawLabel(false);
-    this.hideTooltip();
-  }
-  if (isNaN(this.hoverStatus)) {
-    this.applyHatchFill(true);
-    this.colorizeShape(true);
-  }
-  if (this.getIterator().select(index)) {
-    this.drawMarker(true);
-    this.drawLabel(true);
-    if (opt_event) this.showTooltip(opt_event);
-    this.hoverStatus = index;
-  } else {
-    this.hoverStatus = -1;
-  }
-  return this;
-};
-
-
-/** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.unhover = function() {
-  if (isNaN(this.hoverStatus)) return this;
-
-  //hide tooltip in any case
-  this.hideTooltip();
-
-  if (this.hoverStatus >= 0) {
-    if (this.getIterator().select(this.hoverStatus)) {
-      this.drawMarker(false);
-      this.drawLabel(false);
-    }
-  }
-
-  this.applyHatchFill(false);
-  this.colorizeShape(false);
-  this.hoverStatus = NaN;
-  return this;
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+      markerPosition || this.markers().position();
 };
 
 
 /**
  * Draws marker for the point.
- * @param {boolean} hovered If it is a hovered marker drawing.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
  * @protected
  */
-anychart.core.polar.series.ContinuousBase.prototype.drawMarker = function(hovered) {
-  var pointMarker = this.getIterator().get('marker');
-  var hoverPointMarker = this.getIterator().get('hoverMarker');
-  var index = this.getIterator().getIndex();
-  var markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(hovered ? this.hoverMarkers() : this.markers());
+anychart.core.polar.series.ContinuousBase.prototype.drawMarker = function(pointState) {
+  var iterator = this.getIterator();
+
+  var value = anychart.utils.toNumber(this.getIterator().get('value'));
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var index = iterator.getIndex();
+  var markersFactory;
+  if (selected) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
+  } else if (hovered) {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
+  } else {
+    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+  }
 
   var marker = this.markers().getMarker(index);
 
   var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-  var isDraw = hovered ?
-      goog.isNull(markerHoverEnabledState) ?
-          goog.isNull(this.hoverMarkers().enabled()) ?
-              goog.isNull(markerEnabledState) ?
-                  this.markers().enabled() :
-                  markerEnabledState :
-              this.hoverMarkers().enabled() :
-          markerHoverEnabledState :
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(markerHoverEnabledState) ?
+              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.hoverMarkers_.enabled() :
+              markerHoverEnabledState :
+          goog.isNull(markerSelectEnabledState) ?
+              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.selectMarkers_.enabled() :
+              markerSelectEnabledState :
       goog.isNull(markerEnabledState) ?
-          this.markers().enabled() :
+          this.markers_.enabled() :
           markerEnabledState;
 
-  if (isDraw) {
-    var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
-    var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-    var position = (hovered && (markerHoverPosition || this.hoverMarkers().position())) || markerPosition || this.markers().position();
+  if (isDraw && !isNaN(value)) {
+    var position = this.getMarkersPosition(pointState);
 
     var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
@@ -519,7 +502,7 @@ anychart.core.polar.series.ContinuousBase.prototype.drawMarker = function(hovere
 
     marker.resetSettings();
     marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hoverPointMarker));
+    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
     marker.draw();
   } else if (marker) {
     marker.clear();
@@ -532,7 +515,7 @@ anychart.core.polar.series.ContinuousBase.prototype.drawMarker = function(hovere
  * @return {!acgraph.vector.Fill} Marker color for series.
  */
 anychart.core.polar.series.ContinuousBase.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, false);
+  return this.getFinalFill(false, anychart.PointState.NORMAL);
 };
 
 
@@ -554,11 +537,35 @@ anychart.core.polar.series.ContinuousBase.prototype.getLegendItemData = function
   markers.setAutoFill(this.getMarkerFill());
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
   if (markers.enabled()) {
-    data['iconMarkerType'] = data['iconMarkerType'] || markers.type() || this.autoMarkerType;
+    data['iconMarkerType'] = data['iconMarkerType'] || markers.getType() || this.autoMarkerType;
     data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  } else {
+    data['iconMarkerType'] = null;
+    data['iconMarkerFill'] = null;
+    data['iconMarkerStroke'] = null;
   }
   return data;
+};
+
+
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.polar.series.ContinuousBase.prototype.applyAppearanceToPoint = function(pointState) {
+  this.drawMarker(pointState);
+  this.drawLabel(pointState);
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.polar.series.ContinuousBase.prototype.applyAppearanceToSeries = function(pointState) {
+  this.colorizeShape(pointState);
+  this.applyHatchFill(pointState);
 };
 
 
@@ -570,6 +577,7 @@ anychart.core.polar.series.ContinuousBase.prototype.serialize = function() {
   json['closed'] = this.closed();
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['selectMarkers'] = this.selectMarkers().serialize();
   json['connectMissingPoints'] = this.connectMissingPoints();
   return json;
 };
@@ -583,6 +591,7 @@ anychart.core.polar.series.ContinuousBase.prototype.setupByJSON = function(confi
   this.closed(config['closed']);
   this.markers(config['markers']);
   this.hoverMarkers(config['hoverMarkers']);
+  this.selectMarkers(config['selectMarkers']);
   this.connectMissingPoints(config['connectMissingPoints']);
 };
 
@@ -594,6 +603,6 @@ anychart.core.polar.series.ContinuousBase.prototype.setupByJSON = function(confi
 //exports
 anychart.core.polar.series.ContinuousBase.prototype['markers'] = anychart.core.polar.series.ContinuousBase.prototype.markers;//doc|ex
 anychart.core.polar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.polar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
+anychart.core.polar.series.ContinuousBase.prototype['selectMarkers'] = anychart.core.polar.series.ContinuousBase.prototype.selectMarkers;
 anychart.core.polar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.polar.series.ContinuousBase.prototype.connectMissingPoints;
 anychart.core.polar.series.ContinuousBase.prototype['closed'] = anychart.core.polar.series.ContinuousBase.prototype.closed;//doc|ex
-anychart.core.polar.series.ContinuousBase.prototype['unhover'] = anychart.core.polar.series.ContinuousBase.prototype.unhover;

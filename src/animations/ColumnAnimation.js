@@ -49,15 +49,15 @@ anychart.animations.ColumnAnimation.prototype.cycle = function(now) {
   var columnHeight = this.series_.getPointWidth();
   while (iterator.advance()) {
     var x = /** @type {number} */ (iterator.meta('x'));
-    var y = /** @type {number} */ (iterator.meta('y'));
+    var y = /** @type {number} */ (iterator.meta('value'));
     var zero = /** @type {number} */ (iterator.meta('zero'));
 
     var shapeBounds = anychart.math.rect(x - columnHeight / 2, Math.min(zero, y), columnHeight, Math.abs(zero - y));
 
-    var labelsPosition = this.series_.getLabelsPosition(false);
+    var labelsPosition = this.series_.getLabelsPosition(anychart.PointState.NORMAL);
     var labelProvider = this.createPositionProvider(shapeBounds, labelsPosition)['value'];
 
-    var markersPosition = this.series_.getMarkersPosition(false);
+    var markersPosition = this.series_.getMarkersPosition(anychart.PointState.NORMAL);
     var markerProvider = this.createPositionProvider(shapeBounds, markersPosition)['value'];
 
     this.startPoint.push(0);    // rect

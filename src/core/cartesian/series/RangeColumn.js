@@ -26,7 +26,7 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -45,9 +45,9 @@ anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = funct
 
     rect.setX(x - barWidth / 2).setY(Math.min(low, high)).setWidth(barWidth).setHeight(Math.abs(low - high));
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(rect);
+    this.makeInteractive(rect);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -60,7 +60,7 @@ anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = funct
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(false);
+    this.applyHatchFill(pointState);
   }
 
   return true;
@@ -115,7 +115,12 @@ anychart.core.cartesian.series.RangeColumn.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.RangeColumn.prototype['fill'] = anychart.core.cartesian.series.RangeColumn.prototype.fill;//inherited
 anychart.core.cartesian.series.RangeColumn.prototype['hoverFill'] = anychart.core.cartesian.series.RangeColumn.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.RangeColumn.prototype['selectFill'] = anychart.core.cartesian.series.RangeColumn.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.RangeColumn.prototype['stroke'] = anychart.core.cartesian.series.RangeColumn.prototype.stroke;//inherited
 anychart.core.cartesian.series.RangeColumn.prototype['hoverStroke'] = anychart.core.cartesian.series.RangeColumn.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.RangeColumn.prototype['selectStroke'] = anychart.core.cartesian.series.RangeColumn.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.RangeColumn.prototype['hatchFill'] = anychart.core.cartesian.series.RangeColumn.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.RangeColumn.prototype['hoverHatchFill'] = anychart.core.cartesian.series.RangeColumn.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.RangeColumn.prototype['selectHatchFill'] = anychart.core.cartesian.series.RangeColumn.prototype.selectHatchFill;//inherited

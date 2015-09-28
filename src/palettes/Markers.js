@@ -40,8 +40,20 @@ anychart.palettes.Markers.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
  * @param {number} index Index of marker to get/set.
  * @param {string=} opt_marker Type of the marker to set.
  * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.palettes.Markers} Marker by index or self for chaining.
+ * @deprecated use itemAt.
  */
 anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
+  return this.itemAt(index, opt_marker);
+};
+
+
+/**
+ * Setter for the marker at index if the opt_marker set, getter otherwise.
+ * @param {number} index Index of marker to get/set.
+ * @param {string=} opt_item Type of the marker to set.
+ * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.palettes.Markers} Marker by index or self for chaining.
+ */
+anychart.palettes.Markers.prototype.itemAt = function(index, opt_item) {
   if (!this.markers_) this.markers_ = [];
 
   var count = this.markers_.length;
@@ -51,8 +63,8 @@ anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
   var marker;
 
   // work as setter
-  if (goog.isDef(opt_marker)) {
-    marker = anychart.enums.normalizeAnyMarkerType(opt_marker);
+  if (goog.isDef(opt_item)) {
+    marker = anychart.enums.normalizeAnyMarkerType(opt_item);
     if (marker != this.markers_[index]) {
       this.markers_[index] = marker;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -73,19 +85,35 @@ anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
  * palette.markers(); // ['star4', 'star5', 'star6', ...]
  * palette.markers(['cross', 'diagonalcross']).markers(); // ['cross', 'diagonalcross']
  * palette.markers('diamond', 'circle', 'square').markers(); // ['diamond', 'circle', 'square']
- * @param {(Array.<string>)=} opt_markers
+ * @param {(Array.<string>|string)=} opt_markers
+ * @param {...string} var_args .
+ * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
+ * @deprecated use items.
+ */
+anychart.palettes.Markers.prototype.markers = function(opt_markers, var_args) {
+  return this.items.apply(this, arguments);
+};
+
+
+/**
+ * Getter/setter for markers list of palette.
+ * @example <t>listingOnly</t>
+ * var palette = anychart.utils.markerPalette();
+ * palette.items(); // ['star4', 'star5', 'star6', ...]
+ * palette.items(['cross', 'diagonalcross']).items(); // ['cross', 'diagonalcross']
+ * palette.items('diamond', 'circle', 'square').items(); // ['diamond', 'circle', 'square']
+ * @param {(Array.<string>|string)=} opt_items .
+ * @param {...string} var_args .
  * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
  */
-anychart.palettes.Markers.prototype.markers = function(opt_markers) {
-  if (goog.isDef(opt_markers)) {
-    if (arguments.length > 1) {
-      opt_markers = goog.array.slice(arguments, 0);
+anychart.palettes.Markers.prototype.items = function(opt_items, var_args) {
+  if (goog.isDef(opt_items)) {
+    if (!goog.isArray(opt_items)) {
+      opt_items = goog.array.slice(arguments, 0);
     }
-    if (goog.isArray(opt_markers)) {
-      this.markers_ = goog.array.map(opt_markers, function(marker) {
-        return anychart.enums.normalizeAnyMarkerType(marker);
-      });
-    }
+    this.markers_ = goog.array.map(opt_items, function(marker) {
+      return anychart.enums.normalizeAnyMarkerType(marker);
+    });
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
@@ -99,7 +127,7 @@ anychart.palettes.Markers.prototype.markers = function(opt_markers) {
  */
 anychart.palettes.Markers.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['items'] = this.markers();
+  json['items'] = this.items();
   return json;
 };
 
@@ -108,11 +136,11 @@ anychart.palettes.Markers.prototype.serialize = function() {
 anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
   var args = arguments;
   if (goog.isArray(args[0])) {
-    this.markers(args[0]);
+    this.items(args[0]);
     return true;
   }
   if (args[0] instanceof anychart.palettes.Markers) {
-    this.markers(args[0].markers());
+    this.items(args[0].items());
     return true;
   }
   return anychart.core.Base.prototype.setupSpecial.apply(this, args);
@@ -124,20 +152,28 @@ anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
  */
 anychart.palettes.Markers.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.markers(config['items']);
+  this.items(config['items']);
 };
 
 
 /**
  * Constructor function.
+ * @param {(Array.<string>|string)=} opt_value Array of markers.
+ * @param {...string} var_args Markers enumeration.
  * @return {!anychart.palettes.Markers}
  */
-anychart.palettes.markers = function() {
-  return new anychart.palettes.Markers();
+anychart.palettes.markers = function(opt_value, var_args) {
+  var palette = new anychart.palettes.Markers();
+  if (goog.isDef(opt_value)) {
+    palette.items.apply(palette, arguments);
+  }
+  return palette;
 };
 
 
 //exports
 goog.exportSymbol('anychart.palettes.markers', anychart.palettes.markers);
 anychart.palettes.Markers.prototype['markerAt'] = anychart.palettes.Markers.prototype.markerAt;
+anychart.palettes.Markers.prototype['itemAt'] = anychart.palettes.Markers.prototype.itemAt;
 anychart.palettes.Markers.prototype['markers'] = anychart.palettes.Markers.prototype.markers;
+anychart.palettes.Markers.prototype['items'] = anychart.palettes.Markers.prototype.items;

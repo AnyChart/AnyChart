@@ -71,9 +71,22 @@ anychart.charts.Map = function() {
    */
   this.geoData_ = null;
 
+  /**
+   * Max size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.maxBubbleSize_;
+
+  /**
+   * Min size for all bubbles on the chart.
+   * @type {string|number}
+   * @private
+   */
+  this.minBubbleSize_;
+
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
-  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, this.handleMouseClick, this.handleMouseOverAndMove);
 };
 goog.inherits(anychart.charts.Map, anychart.core.SeparateChart);
 
@@ -105,28 +118,63 @@ anychart.charts.Map.ZINDEX_MAP = 10;
  * Series labels z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_CHORPLETH_LABELS = 20;
+anychart.charts.Map.ZINDEX_CHORPLETH_LABELS = 11;
 
 
 /**
  * Series markers z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 20;
+anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 12;
+
+
+/**
+ * Series z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_SERIES = 30;
+
+
+/**
+ * Label z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_LABEL = 40;
+
+
+/**
+ * Marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_MARKER = 40;
+
+
+/**
+ * Color range z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_COLOR_RANGE = 50;
 
 
 /**
  * Series hatch fill z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL = 30;
+anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL = 60;
 
 
 /**
  * Axis z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_AXIS = 35;
+anychart.charts.Map.ZINDEX_AXIS = 100;
+
+
+/**
+ * Z-index increment multiplier.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
 /**
@@ -170,6 +218,23 @@ anychart.charts.Map.prototype.defaultSeriesType = function(opt_value) {
 /** @inheritDoc */
 anychart.charts.Map.prototype.getType = function() {
   return anychart.enums.MapTypes.MAP;
+};
+
+
+/**
+ * Sets/gets geo id field.
+ * @param {string=} opt_value Geo id.
+ * @return {string|anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.geoIdField = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (opt_value != this.geoIdField_) {
+      this.geoIdField_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.geoIdField_;
 };
 
 
@@ -242,22 +307,16 @@ anychart.charts.Map.prototype.unboundRegions = function(opt_value) {
  * Allows to select points of the Map.
  * @param {boolean=} opt_value Allow or not.
  * @return {boolean|anychart.charts.Map} Returns allow points select state or current map instance for chaining.
+ * @deprecated use chart.interactivity().selectionMode().
  */
 anychart.charts.Map.prototype.allowPointsSelect = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.allowPointsSelect_ != opt_value) {
-      this.allowPointsSelect_ = opt_value;
-      for (var i = this.series_.length; i--;) {
-        var series = this.series_[i];
-        series.setAutoAllowPointsSelect(this.allowPointsSelect_);
-        if (!series.getFinalAllowPointsSelect())
-          series.unselect();
-      }
-    }
+    this.interactivity().selectionMode(opt_value ?
+        anychart.enums.SelectionMode.MULTI_SELECT :
+        anychart.enums.SelectionMode.NONE);
     return this;
   }
-  return this.allowPointsSelect_;
+  return this.interactivity().selectionMode() != anychart.enums.SelectionMode.NONE;
 };
 
 
@@ -390,7 +449,7 @@ anychart.charts.Map.prototype.hatchFillPaletteInvalidated_ = function(event) {
 /**
  * Getter/setter for color range.
  * @param {(anychart.core.ui.ColorRange|Object)=} opt_value Chart marker palette settings to set.
- * @return {!(anychart.palettes.Markers|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
+ * @return {!(anychart.core.ui.ColorRange|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
  */
 anychart.charts.Map.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
@@ -450,6 +509,18 @@ anychart.charts.Map.prototype.choropleth = function(data, opt_csvSettings) {
 
 
 /**
+ * Creates bubble series.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data SVG|SVGString|GeoJSON|MapNameString.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {Node|string|Object} Passed geo data.
+ */
+anychart.charts.Map.prototype.bubble = function(data, opt_csvSettings) {
+  return this.createSeriesByType_(anychart.enums.MapSeriesType.BUBBLE, data, opt_csvSettings);
+};
+
+
+/**
  * @param {string} type Series type.
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -473,12 +544,24 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     this.series_.push(instance);
 
     var index = this.series_.length - 1;
+    var inc = index * anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index);
+
+    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Map.ZINDEX_SERIES) + inc);
+    instance.labels().setAutoZIndex(anychart.charts.Map.ZINDEX_LABEL + inc + anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER / 2);
+
+    instance.setAutoGeoIdField(this.geoIdField());
     instance.setGeoData(this, this.internalGeoData_);
-    instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(this.series_.length - 1)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(this.series_.length - 1)));
-    instance.setAutoAllowPointsSelect(this.allowPointsSelect_);
+    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
+
+    if (instance.hasMarkers()) {
+      instance.markers().setAutoZIndex(anychart.charts.Map.ZINDEX_MARKER + inc);
+      instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
+      instance.markers().setAutoStroke((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
+    }
+
     instance.setup(this.defaultSeriesSettings()[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(
@@ -509,10 +592,42 @@ anychart.charts.Map.prototype.defaultSeriesSettings = function(opt_value) {
 
 
 /**
- * Getter series by index.
- * @param {number} index
- * @return {anychart.core.map.series.Base}
+ * Sets max size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Map}
  */
+anychart.charts.Map.prototype.maxBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.maxBubbleSize_ != opt_value) {
+      this.maxBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.maxBubbleSize_;
+};
+
+
+/**
+ * Sets min size for all bubbles on the charts.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.minBubbleSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.minBubbleSize_ != opt_value) {
+      this.minBubbleSize_ = opt_value;
+      this.invalidateSizeBasedSeries_();
+      this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.minBubbleSize_;
+};
+
+
+/** @inheritDoc */
 anychart.charts.Map.prototype.getSeries = function(index) {
   return this.series_[index] || null;
 };
@@ -540,9 +655,18 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_COLOR_RANGE)) {
     state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
+    var colorRange = this.colorRange();
+    colorRange.dropBoundsCache();
+    colorRange.invalidate(colorRange.ALL_VISUAL_STATES);
   }
 
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.getAllSeries = function() {
+  return this.series_;
 };
 
 
@@ -599,6 +723,9 @@ anychart.charts.Map.prototype.processGeoData = function() {
       }
       var geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
       this.internalGeoData_ = anychart.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
+      var geoIdFromGeoData = geoData['ac-geoFieldId'];
+      if (geoIdFromGeoData)
+        this.geoIdField(geoIdFromGeoData);
 
       if (!this.mapLayer_) {
         this.mapLayer_ = this.rootElement.layer();
@@ -645,11 +772,38 @@ anychart.charts.Map.prototype.calculate = function() {
     }
     scale.finishAutoCalc();
 
+    var max = -Infinity;
+    var min = Infinity;
+    var sum = 0;
+    var pointsCount = 0;
+
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
       series.setGeoData(this, this.internalGeoData_);
+      series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+
+      //----------------------------------calc statistics for series
+      series.calculateStatistics();
+      max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
+      min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
+      sum += /** @type {number} */(series.statistics('seriesSum'));
+      pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
+      //----------------------------------end calc statistics for series
       series.calculate();
     }
+
+    //----------------------------------calc statistics for series
+    //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
+    var average = sum / pointsCount;
+    for (i = 0; i < this.series_.length; i++) {
+      series = this.series_[i];
+      series.statistics('max', max);
+      series.statistics('min', min);
+      series.statistics('sum', sum);
+      series.statistics('average', average);
+      series.statistics('pointsCount', pointsCount);
+    }
+    //----------------------------------end calc statistics for series
 
     this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
   }
@@ -664,12 +818,42 @@ anychart.charts.Map.prototype.calculate = function() {
 
 
 /**
+ * Calculates bubble sizes for series.
+ * @private
+ */
+anychart.charts.Map.prototype.calcBubbleSizes_ = function() {
+  var i;
+  var minMax = [Number.MAX_VALUE, -Number.MAX_VALUE];
+  for (i = this.series_.length; i--;) {
+    if (this.series_[i].isSizeBased())
+      this.series_[i].calculateSizeScale(minMax);
+  }
+  for (i = this.series_.length; i--;) {
+    if (this.series_[i].isSizeBased())
+      this.series_[i].setAutoSizeScale(minMax[0], minMax[1], this.minBubbleSize_, this.maxBubbleSize_);
+  }
+};
+
+
+/**
  * Invalidates APPEARANCE for all width-based series.
  * @private
  */
 anychart.charts.Map.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
     this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+};
+
+
+/**
+ * Invalidates APPEARANCE for all size-based series.
+ * @private
+ */
+anychart.charts.Map.prototype.invalidateSizeBasedSeries_ = function() {
+  for (var i = this.series_.length; i--;) {
+    if (this.series_[i].isSizeBased())
+      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+  }
 };
 
 
@@ -767,7 +951,11 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   var i, series;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
     if (this.colorRange_) {
-      var targetSeries = this.series_[0];
+      var targetSeries;
+      for (i = 0; i < this.series_.length; i++) {
+        if (this.series_[i].isChoropleth())
+          targetSeries = this.series_[i];
+      }
       if (targetSeries) {
         this.colorRange_.suspendSignalsDispatching();
         this.colorRange_.scale(targetSeries.colorScale());
@@ -790,33 +978,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       contentAreaBounds = bounds.clone();
     }
     scale.setBounds(contentAreaBounds);
-
-    //todo Don't remove (blackart).
-    //------------------------------------------For tests. Bounds map.----------------------------------------------------
-
-    //var minx_ = scale.minimumX();
-    //var miny_ = scale.minimumY();
-    //var maxx_ = scale.maximumX();
-    //var maxy_ = scale.maximumY();
-
-    //console.log(minx_, miny_, maxx_, maxy_);
-
-    //var minx = scale.transformX(minx_);
-    //var miny = scale.transformY(miny_);
-    //var maxx = scale.transformX(maxx_);
-    //var maxy = scale.transformY(maxy_);
-
-    //console.log(minx, miny, maxx, maxy);
-
-    //if (!this.boundingDataRect) this.boundingDataRect = this.mapLayer_.rect();
-    //this.boundingDataRect.setBounds(anychart.math.rect(minx, maxy, maxx - minx, miny - maxy));
-
-    //console.log(bounds);
-
-    //if (!this.boundingRect) this.boundingRect = this.mapLayer_.rect().stroke('red');
-    //this.boundingRect.setBounds(bounds);
-
-    //------------------------------------------For tests. Bounds map.----------------------------------------------------
+    this.dataBounds_ = contentAreaBounds;
 
     this.clear();
     var j, len;
@@ -874,13 +1036,14 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
       anychart.ConsistencyState.MAP_SERIES))
   {
+    this.calcBubbleSizes_();
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-      series.setAutoColor(this.palette().colorAt(i));
-      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
-      series.setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
+      series.setAutoColor(this.palette().itemAt(i));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
+      series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
       series.draw();
     }
     this.markConsistent(anychart.ConsistencyState.MAP_PALETTE | anychart.ConsistencyState.MAP_MARKER_PALETTE |
@@ -890,7 +1053,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_PALETTE)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.setAutoColor(this.palette().colorAt(i));
+      series.setAutoColor(this.palette().itemAt(i));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
@@ -900,7 +1063,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MARKER_PALETTE)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().markerAt(i)));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
@@ -910,8 +1073,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().hatchFillAt(i)));
+      series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
     }
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
@@ -921,6 +1083,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
+      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       series.draw();
     }
     this.markConsistent(anychart.ConsistencyState.MAP_SERIES);
@@ -930,120 +1093,11 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     if (this.colorRange_) {
       this.colorRange_.suspendSignalsDispatching();
       this.colorRange_.container(this.rootElement);
+      this.colorRange_.zIndex(anychart.charts.Map.ZINDEX_COLOR_RANGE);
       this.colorRange_.draw();
       this.colorRange_.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.MAP_COLOR_RANGE);
-  }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Events.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.charts.Map.prototype.makeBrowserEvent = function(e) {
-  //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
-  var tag = anychart.utils.extractTag(res['domTarget']);
-  var series = tag && tag.series;
-  if (series && !series.isDisposed() && series.enabled()) {
-    return series.makeBrowserEvent(e);
-  }
-  return res;
-};
-
-
-/**
- * Handler for mouseMove and mouseOver events.
- * @param {anychart.core.MouseEvent} event Event object.
- */
-anychart.charts.Map.prototype.handleMouseOverAndMove = function(event) {
-  var tag = anychart.utils.extractTag(event['domTarget']);
-
-  var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    series = event['target'].getParentEventTarget();
-    index = tag;
-  } else {
-    series = tag && tag.series;
-    index = tag['index'];
-  }
-
-  if (series && !series.isDisposed() && series.enabled()) {
-    series.handleMouseOverAndMove(event);
-    if (this.colorRange_ && this.colorRange_.target()) {
-      var target = this.colorRange_.target();
-      if (target == series) {
-        var iterator = target.getIterator();
-        iterator.select(index);
-        var value = iterator.get(target.referenceValueNames[1]);
-        this.colorRange_.showMarker(value);
-      }
-    }
-  }
-};
-
-
-/**
- * Handler for mouseOut event.
- * @param {anychart.core.MouseEvent} event Event object.
- */
-anychart.charts.Map.prototype.handleMouseOut = function(event) {
-  var tag = anychart.utils.extractTag(event['domTarget']);
-
-  var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    series = event['target'].getParentEventTarget();
-    index = tag;
-  } else {
-    series = tag && tag.series;
-    index = tag['index'];
-  }
-
-  if (series && !series.isDisposed() && series.enabled()) {
-    series.handleMouseOut(event);
-    if (this.colorRange_ && this.colorRange_.enabled()) {
-      this.colorRange_.hideMarker();
-    }
-  }
-};
-
-
-/**
- * Deselects all regions. It doesn't matter what series it belongs to.
- * @param {anychart.core.MouseEvent} event Event object.
- */
-anychart.charts.Map.prototype.unselect = function(event) {
-  var i, len;
-  for (i = 0, len = this.series_.length; i < len; i++) {
-    this.series_[i].unselect(event);
-  }
-};
-
-
-/**
- * Handler for mouseClick event.
- * @param {anychart.core.MouseEvent} event Event object.
- */
-anychart.charts.Map.prototype.handleMouseClick = function(event) {
-  var tag = anychart.utils.extractTag(event['domTarget']);
-
-  var series, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    series = event['target'].getParentEventTarget();
-    index = tag;
-  } else {
-    series = tag && tag.series;
-    index = tag['index'];
-  }
-
-  if (series && !series.isDisposed()) {
-    series.handleMouseClick(event);
-  } else {
-    this.unselect(event);
   }
 };
 
@@ -1129,35 +1183,47 @@ anychart.charts.Map.prototype.legendItemClick = function(item, event) {
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
     var sourceKey = item.sourceKey();
     series = this.getSeries(/** @type {number} */ (sourceKey));
-    if (series)
+    if (series) {
       series.enabled(!series.enabled());
+      if (series.enabled())
+        series.hoverSeries();
+      else
+        series.unhover();
+    }
   } else if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     series = meta.series;
     var scale = meta.scale;
 
-    if (!(event.metaKey || event.shiftKey)) {
-      this.unselect(event);
-    }
-
     if (scale && series) {
+      var points = [];
       var range = meta.range;
       var iterator = series.getResetIterator();
 
       while (iterator.advance()) {
         var pointValue = iterator.get(series.referenceValueNames[1]);
         if (range == scale.getRangeByValue(pointValue)) {
-          series.selectPoint(iterator.getIndex());
+          points.push(iterator.getIndex());
         }
       }
+
+      if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        event.series = series;
+        event.index = points;
+      } else {
+        event.points = [{
+          series: series,
+          points: points,
+          lastPoint: points[points.length - 1],
+          nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+        }];
+      }
     }
-    series.hideTooltip();
-    event.stopPropagation();
   }
 };
 
 
 /** @inheritDoc */
-anychart.charts.Map.prototype.legendItemOver = function(item) {
+anychart.charts.Map.prototype.legendItemOver = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
 
@@ -1176,13 +1242,29 @@ anychart.charts.Map.prototype.legendItemOver = function(item) {
       var range = meta.range;
       var iterator = series.getResetIterator();
 
+      var points = [];
       while (iterator.advance()) {
         var pointValue = iterator.get(series.referenceValueNames[1]);
         if (range == scale.getRangeByValue(pointValue)) {
-          series.hoverPoint(iterator.getIndex());
+          points.push(iterator.getIndex());
         }
       }
-      series.hideTooltip();
+
+      var tag = anychart.utils.extractTag(event['domTarget']);
+      if (tag) {
+        if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          tag.series = series;
+          tag.index = points;
+        } else {
+          tag.points = [{
+            series: series,
+            points: points,
+            lastPoint: points[points.length - 1],
+            nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+          }];
+        }
+      }
+
       if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target()) {
         this.colorRange_.showMarker((range.start + range.end) / 2);
       }
@@ -1192,7 +1274,7 @@ anychart.charts.Map.prototype.legendItemOver = function(item) {
 
 
 /** @inheritDoc */
-anychart.charts.Map.prototype.legendItemOut = function(item) {
+anychart.charts.Map.prototype.legendItemOut = function(item, event) {
   var meta = /** @type {Object} */(item.meta());
   var series;
 
@@ -1205,12 +1287,184 @@ anychart.charts.Map.prototype.legendItemOut = function(item) {
     if (series)
       series.unhover();
   } else if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    series = meta.series;
-    series.unhover();
+    if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      var tag = anychart.utils.extractTag(event['domTarget']);
+      if (tag)
+        tag.series = meta.series;
+    }
+    if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target()) {
+      this.colorRange_.hideMarker();
+    }
   }
 };
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.getSeriesStatus = function(event) {
+  if (event['target'] instanceof anychart.core.ui.Legend) {
+    var tag = anychart.utils.extractTag(event['domTarget']);
+    return tag.points;
+  }
+
+  var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+
+  var value, index;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = interactivity.spotRadius();
+
+    for (i = 0, len = this.series_.length; i < len; i++) {
+      series = this.series_[i];
+      if (series.enabled()) {
+        var iterator = series.getIterator();
+
+        var indexes = [];
+        iterator.reset();
+        var minLength = Infinity;
+        var minLengthIndex;
+        while (iterator.advance()) {
+          var shape = iterator.meta('shape');
+          if (shape) {
+            var pixX = /** @type {number} */(iterator.meta('x'));
+            var pixY = /** @type {number} */(iterator.meta('value'));
+
+            index = iterator.getIndex();
+            var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+            if (length <= spotRadius) {
+              indexes.push(index);
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = index;
+              }
+            }
+          }
+        }
+        if (indexes.length)
+          points.push({
+            series: series,
+            points: indexes,
+            lastPoint: indexes[indexes.length - 1],
+            nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+          });
+      }
+    }
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+    //not working yet. coming soon.
+  }
+
+  return /** @type {Array.<Object>} */(points);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.createEventSeriesStatus = function(seriesStatus, opt_empty) {
+  var eventSeriesStatus = [];
+  for (var i = 0, len = seriesStatus.length; i < len; i++) {
+    var status = seriesStatus[i];
+    var series = status.series;
+    var eventStatus = {'series': series};
+    var iterator = series.getIterator();
+    var points = [];
+    if (!opt_empty) {
+      for (var j = 0; j < status.points.length; j++) {
+        var index = status.points[j];
+        if (iterator.select(index)) {
+          var prop = iterator.meta('regionProperties');
+          if (prop) {
+            var point = {
+              'id': prop[series.getFinalGeoIdField()],
+              'index': iterator.getIndex(),
+              'properties': prop
+            };
+            points.push(point);
+          } else {
+            points.push(index);
+          }
+        }
+      }
+    }
+    eventStatus['points'] = points;
+
+    var nearestPointToCursor = status.nearestPointToCursor;
+    var nearestPointToCursor_;
+    if (nearestPointToCursor) {
+      index = status.nearestPointToCursor.index;
+      if (iterator.select(index)) {
+        point = {};
+        prop = iterator.meta('regionProperties');
+        if (prop) {
+          point['id'] = prop[series.getFinalGeoIdField()];
+          point['index'] = iterator.getIndex();
+          point['properties'] = prop;
+        }
+      } else {
+        point = index;
+      }
+      nearestPointToCursor_ = {
+        'point': point,
+        'distance': status.nearestPointToCursor.distance
+      };
+    } else {
+      nearestPointToCursor_ = {
+        'index': NaN,
+        'distance': NaN
+      };
+    }
+    eventStatus['nearestPointToCursor'] = nearestPointToCursor_;
+    eventSeriesStatus.push(eventStatus);
+  }
+
+  return eventSeriesStatus;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.doAdditionActionsOnMouseOverAndMove = function(index, series) {
+  index = goog.isArray(index) && index.length ? index[0] : index;
+  if (this.colorRange_ && this.colorRange_.target()) {
+    var target = this.colorRange_.target();
+    if (target == series) {
+      var iterator = target.getIterator();
+      iterator.select(index);
+      var value = iterator.get(target.referenceValueNames[1]);
+      this.colorRange_.showMarker(value);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.doAdditionActionsOnMouseOut = function() {
+  if (this.colorRange_ && this.colorRange_.enabled()) {
+    this.colorRange_.hideMarker();
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Setup.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Map.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
@@ -1223,7 +1477,13 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
   this.hatchFillPalette(config['hatchFillPalette']);
   this.colorRange(config['colorRange']);
   this.unboundRegions(config['unboundRegions']);
-  this.allowPointsSelect(config['allowPointsSelect']);
+  this.minBubbleSize(config['minBubbleSize']);
+  this.maxBubbleSize(config['maxBubbleSize']);
+  this.geoIdField(config['geoIdField']);
+  if (goog.isDef(config['allowPointsSelect'])) {
+    this.interactivity().selectionMode(
+        config['allowPointsSelect'] ? anychart.enums.SelectionMode.MULTI_SELECT : anychart.enums.SelectionMode.NONE);
+  }
 
   var i, json, scale;
   if (config['geoScale']) {
@@ -1286,9 +1546,9 @@ anychart.charts.Map.prototype.serialize = function() {
   json['unboundRegions'] = this.unboundRegions().serialize();
   json['colorRange'] = this.colorRange().serialize();
   json['geoScale'] = this.scale().serialize();
-
-  if (goog.isDef(this.allowPointsSelect()))
-    json['allowPointsSelect'] = this.allowPointsSelect();
+  json['minBubbleSize'] = this.minBubbleSize();
+  json['maxBubbleSize'] = this.maxBubbleSize();
+  json['geoIdField'] = this.geoIdField();
 
   var series = [];
   var scalesIds = {};
@@ -1324,6 +1584,7 @@ anychart.charts.Map.prototype.serialize = function() {
 anychart.charts.Map.prototype['getType'] = anychart.charts.Map.prototype.getType;
 anychart.charts.Map.prototype['geoData'] = anychart.charts.Map.prototype.geoData;
 anychart.charts.Map.prototype['choropleth'] = anychart.charts.Map.prototype.choropleth;
+anychart.charts.Map.prototype['bubble'] = anychart.charts.Map.prototype.bubble;
 anychart.charts.Map.prototype['unboundRegions'] = anychart.charts.Map.prototype.unboundRegions;
 anychart.charts.Map.prototype['colorRange'] = anychart.charts.Map.prototype.colorRange;
 anychart.charts.Map.prototype['palette'] = anychart.charts.Map.prototype.palette;
@@ -1331,3 +1592,6 @@ anychart.charts.Map.prototype['markerPalette'] = anychart.charts.Map.prototype.m
 anychart.charts.Map.prototype['hatchFillPalette'] = anychart.charts.Map.prototype.hatchFillPalette;
 anychart.charts.Map.prototype['getSeries'] = anychart.charts.Map.prototype.getSeries;
 anychart.charts.Map.prototype['allowPointsSelect'] = anychart.charts.Map.prototype.allowPointsSelect;
+anychart.charts.Map.prototype['minBubbleSize'] = anychart.charts.Map.prototype.minBubbleSize;
+anychart.charts.Map.prototype['maxBubbleSize'] = anychart.charts.Map.prototype.maxBubbleSize;
+anychart.charts.Map.prototype['geoIdField'] = anychart.charts.Map.prototype.geoIdField;

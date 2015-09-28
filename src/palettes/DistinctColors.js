@@ -42,37 +42,31 @@ anychart.palettes.DistinctColors.prototype.SUPPORTED_SIGNALS = anychart.Signal.N
 
 
 /**
- * Getter for color palette colors from list by index.
- * @param {number} index Index to set or get color.
- * @return {acgraph.vector.Fill|anychart.palettes.DistinctColors} Color palette colors by index.
- *//**
- * Setter for color palette colors from list by index.
- * @example <t>simple-h100</t>
- * var palette = anychart.palettes.distinctColors()
- *     .colors(['red', 'yellow', 'brown', 'green']);
- * palette.colorAt(2, 'white');
- * for (var i = 1; i < 10; i++) {
- *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
- *       .fill(palette.colorAt(i))
- *       .stroke('1px #000');
- * }
- * @param {number} index Index to set or get color.
- * @param {acgraph.vector.Fill=} opt_color Color to set by passed index.
- * @return {!anychart.palettes.DistinctColors} An instance of the {@link anychart.palettes.DistinctColors} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for color palette colors from list by index.
  * @param {number} index .
  * @param {acgraph.vector.Fill=} opt_color .
  * @return {acgraph.vector.Fill|!anychart.palettes.DistinctColors} .
+ * @deprecated use itemAt.
  */
 anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) {
+  return this.itemAt(index, opt_color);
+};
+
+
+/**
+ * Getter/setter for color palette colors from list by index.
+ * @param {number} index .
+ * @param {acgraph.vector.Fill=} opt_item .
+ * @return {acgraph.vector.Fill|!anychart.palettes.DistinctColors} .
+ */
+anychart.palettes.DistinctColors.prototype.itemAt = function(index, opt_item) {
   if (!this.colors_) this.colors_ = [];
   var count = this.colors_.length;
 
   if (index >= count && count > 0) index = index % count;
 
-  if (goog.isDef(opt_color)) {
-    this.colors_[index] = opt_color;
+  if (goog.isDef(opt_item)) {
+    this.colors_[index] = opt_item;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
@@ -83,28 +77,28 @@ anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) 
 
 
 /**
- * Getter for color palette colors list.
- * @return {Array.<acgraph.vector.Fill>} Color palette colors list.
- *//**
- * Setter for color palette colors list.
- * @example <t>simple-h100</t>
- * var palette = anychart.palettes.distinctColors()
- *      .colors(['#00F', 'red', ['orange', 'red'], '#00C', '#00B', '#00A', '#009', '#008']);
- * var len = palette.colors().length-1;
- * for (var i = 1; i <= len; i++) {
- *   stage.rect((i - 1) * stage.width() / len, 0, stage.width() / len - .5, stage.height())
- *       .fill(palette.colorAt(i-1))
- *       .stroke('1px #000');
- * }
- * @param {Array.<acgraph.vector.Fill>=} opt_value Color palette colors list to set.
- * @return {!anychart.palettes.DistinctColors} An instance of the {@link anychart.palettes.DistinctColors} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {Array.<acgraph.vector.Fill>=} opt_value .
+ * Getter/setter for color palette colors list.
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value .
+ * @param {...acgraph.vector.Fill} var_args .
+ * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
+ * @deprecated use items.
+ */
+anychart.palettes.DistinctColors.prototype.colors = function(opt_value, var_args) {
+  return this.items.apply(this, arguments);
+};
+
+
+/**
+ * Getter/setter for color palette colors list.
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value .
+ * @param {...acgraph.vector.Fill} var_args .
  * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
  */
-anychart.palettes.DistinctColors.prototype.colors = function(opt_value) {
+anychart.palettes.DistinctColors.prototype.items = function(opt_value, var_args) {
   if (goog.isDef(opt_value)) {
+    if (!goog.isArray(opt_value)) {
+      opt_value = goog.array.slice(arguments, 0);
+    }
     this.colors_ = goog.array.map(opt_value, function(element) {
       return acgraph.vector.normalizeFill(element);
     });
@@ -143,11 +137,11 @@ anychart.palettes.DistinctColors.prototype.serialize = function() {
 anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
   var args = arguments;
   if (goog.isArray(args[0])) {
-    this.colors(args[0]);
+    this.items(args[0]);
     return true;
   }
   if (args[0] instanceof anychart.palettes.DistinctColors) {
-    this.colors(args[0].colors());
+    this.items(args[0].items());
     return true;
   }
   return anychart.core.Base.prototype.setupSpecial.apply(this, args);
@@ -157,20 +151,28 @@ anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
 /** @inheritDoc */
 anychart.palettes.DistinctColors.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.colors(config['items']);
+  this.items(config['items']);
 };
 
 
 /**
  * Constructor function.
+ * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value Array of colors.
+ * @param {...acgraph.vector.Fill} var_args Colors enumeration.
  * @return {!anychart.palettes.DistinctColors}
  */
-anychart.palettes.distinctColors = function() {
-  return new anychart.palettes.DistinctColors();
+anychart.palettes.distinctColors = function(opt_value, var_args) {
+  var palette = new anychart.palettes.DistinctColors();
+  if (goog.isDef(opt_value)) {
+    palette.items.apply(palette, arguments);
+  }
+  return palette;
 };
 
 
 //exports
 goog.exportSymbol('anychart.palettes.distinctColors', anychart.palettes.distinctColors);
-anychart.palettes.DistinctColors.prototype['colorAt'] = anychart.palettes.DistinctColors.prototype.colorAt;//in docs/
-anychart.palettes.DistinctColors.prototype['colors'] = anychart.palettes.DistinctColors.prototype.colors;//in docs/
+anychart.palettes.DistinctColors.prototype['colorAt'] = anychart.palettes.DistinctColors.prototype.colorAt;
+anychart.palettes.DistinctColors.prototype['itemAt'] = anychart.palettes.DistinctColors.prototype.itemAt;
+anychart.palettes.DistinctColors.prototype['colors'] = anychart.palettes.DistinctColors.prototype.colors;
+anychart.palettes.DistinctColors.prototype['items'] = anychart.palettes.DistinctColors.prototype.items;

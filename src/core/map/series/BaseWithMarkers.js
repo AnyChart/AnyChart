@@ -164,7 +164,6 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
     var markers = this.markers_;
 
     markers.setAutoType(this.autoMarkerType_);
-    markers.setAutoZIndex(anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS);
 
     var fillColor = this.getMarkerFill();
     markers.setAutoFill(fillColor);
@@ -215,16 +214,41 @@ anychart.core.map.series.BaseWithMarkers.prototype.finalizeDrawing = function() 
 
 
 /**
+ * Gets marker position.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
+ * @return {string} Position settings.
+ */
+anychart.core.map.series.BaseWithMarkers.prototype.getMarkersPosition = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
+  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
+  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
+
+  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
+      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
+      markerPosition || this.markers().position();
+};
+
+
+/**
  * Draws marker for the point.
- * @param {anychart.enums.AnyMapPointState} pointState If it is a hovered oe selected marker drawing.
+ * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
  * @protected
  */
 anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointState) {
   if (!this.markers_) return;
   var iterator = this.getIterator();
 
-  var selected = pointState == anychart.enums.AnyMapPointState.SELECT;
-  var hovered = pointState == anychart.enums.AnyMapPointState.HOVER;
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
 
   var pointMarker = iterator.get('marker');
   var hoverPointMarker = iterator.get('hoverMarker');
@@ -267,7 +291,8 @@ anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointSt
           markerEnabledState;
 
   if (isDraw) {
-    var positionProvider = this.createPositionProvider();
+    var position = this.getMarkersPosition(pointState);
+    var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     if (marker) {
       marker.positionProvider(positionProvider);
     } else {
@@ -318,7 +343,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config
  * @return {!acgraph.vector.Fill} Marker color for series.
  */
 anychart.core.map.series.BaseWithMarkers.prototype.getMarkerFill = function() {
-  return this.getFinalFill(false, anychart.enums.AnyMapPointState.NORMAL);
+  return this.getFinalFill(false, anychart.PointState.NORMAL);
 };
 
 
@@ -343,6 +368,10 @@ anychart.core.map.series.BaseWithMarkers.prototype.getLegendItemData = function(
     data['iconMarkerType'] = data['iconMarkerType'] || markers.type();
     data['iconMarkerFill'] = data['iconMarkerFill'] || markers.fill();
     data['iconMarkerStroke'] = data['iconMarkerStroke'] || markers.stroke();
+  } else {
+    data['iconMarkerType'] = null;
+    data['iconMarkerFill'] = null;
+    data['iconMarkerStroke'] = null;
   }
   return data;
 };

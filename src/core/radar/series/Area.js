@@ -70,7 +70,7 @@ anychart.core.radar.series.Area.prototype.firstMissings;
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Area.prototype.drawFirstPoint = function() {
+anychart.core.radar.series.Area.prototype.drawFirstPoint = function(pointState) {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
 
     var zeroMissing = this.yScale().isStackValMissing();
@@ -112,7 +112,7 @@ anychart.core.radar.series.Area.prototype.drawFirstPoint = function() {
     else
       this.zeroesStack = [xZero, yZero, zeroMissing];
 
-    this.getIterator().meta('x', x).meta('y', y).meta('xZero', xZero).meta('yZero', yZero);
+    this.getIterator().meta('x', x).meta('value', y).meta('xZero', xZero).meta('yZero', yZero);
   }
 
   return true;
@@ -120,7 +120,7 @@ anychart.core.radar.series.Area.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Area.prototype.drawSubsequentPoint = function() {
+anychart.core.radar.series.Area.prototype.drawSubsequentPoint = function(pointState) {
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
 
     var zeroMissing = this.yScale().isStackValMissing();
@@ -149,7 +149,7 @@ anychart.core.radar.series.Area.prototype.drawSubsequentPoint = function() {
     if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
       this.lastDrawnX = x;
 
-    this.getIterator().meta('x', x).meta('y', y).meta('xZero', xZero).meta('yZero', yZero);
+    this.getIterator().meta('x', x).meta('value', y).meta('xZero', xZero).meta('yZero', yZero);
   }
 
   return true;
@@ -234,10 +234,10 @@ anychart.core.radar.series.Area.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.radar.series.Area.prototype.colorizeShape = function(hover) {
+anychart.core.radar.series.Area.prototype.colorizeShape = function(pointState) {
   this.path.stroke(null);
-  this.path.fill(this.getFinalFill(false, hover));
-  this.strokePath.stroke(this.getFinalStroke(false, hover));
+  this.path.fill(this.getFinalFill(false, pointState));
+  this.strokePath.stroke(this.getFinalStroke(false, pointState));
   this.strokePath.fill(null);
 };
 
@@ -247,7 +247,9 @@ anychart.core.radar.series.Area.prototype.finalizeHatchFill = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillPath) {
       this.hatchFillPath.deserialize(this.path.serialize());
-      this.applyHatchFill(false);
+
+      var seriesState = this.state.getSeriesState();
+      this.applyHatchFill(seriesState);
     }
   }
 };
@@ -258,7 +260,12 @@ anychart.core.radar.series.Area.prototype.finalizeHatchFill = function() {
 //exports
 anychart.core.radar.series.Area.prototype['fill'] = anychart.core.radar.series.Area.prototype.fill;//inherited
 anychart.core.radar.series.Area.prototype['hoverFill'] = anychart.core.radar.series.Area.prototype.hoverFill;//inherited
+anychart.core.radar.series.Area.prototype['selectFill'] = anychart.core.radar.series.Area.prototype.selectFill;//inherited
+
 anychart.core.radar.series.Area.prototype['stroke'] = anychart.core.radar.series.Area.prototype.stroke;//inherited
 anychart.core.radar.series.Area.prototype['hoverStroke'] = anychart.core.radar.series.Area.prototype.hoverStroke;//inherited
+anychart.core.radar.series.Area.prototype['selectStroke'] = anychart.core.radar.series.Area.prototype.selectStroke;//inherited
+
 anychart.core.radar.series.Area.prototype['hatchFill'] = anychart.core.radar.series.Area.prototype.hatchFill;//inherited
 anychart.core.radar.series.Area.prototype['hoverHatchFill'] = anychart.core.radar.series.Area.prototype.hoverHatchFill;//inherited
+anychart.core.radar.series.Area.prototype['selectHatchFill'] = anychart.core.radar.series.Area.prototype.selectHatchFill;//inherited

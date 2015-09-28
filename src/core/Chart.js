@@ -2,11 +2,13 @@ goog.provide('anychart.core.Chart');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.ChartTooltip');
 goog.require('anychart.core.ui.Credits');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.Animation');
+goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.themes.merging');
@@ -79,6 +81,13 @@ anychart.core.Chart = function() {
    */
   this.animation_ = null;
 
+  /**
+   * Dirty state for autoRedraw_ field. Used to avoid similar checking through multiple this.listenSignal calls.
+   * @type {boolean}
+   * @private
+   */
+  this.autoRedrawIsSet_ = false;
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -102,6 +111,14 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CHART_BACKGROUND |
     anychart.ConsistencyState.CHART_TITLE |
     anychart.ConsistencyState.CHART_ANIMATION;
+
+
+/**
+ * A temporary crutch to suppress base interactivity support in Stock.
+ * @protected
+ * @type {boolean}
+ */
+anychart.core.Chart.prototype.supportsBaseHighlight = true;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,7 +220,8 @@ anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
  * @param {(string|number)=} opt_left .
  * @return {!(anychart.core.Chart|anychart.core.utils.Margin)} .
  */
-anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+anychart.core.Chart.prototype.margin = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
+    opt_left) {
   if (!this.margin_) {
     this.margin_ = new anychart.core.utils.Margin();
     this.margin_.listenSignals(this.marginInvalidated_, this);
@@ -332,7 +350,8 @@ anychart.core.Chart.prototype.marginInvalidated_ = function(event) {
  * @param {(string|number)=} opt_left .
  * @return {!(anychart.core.Chart|anychart.core.utils.Padding)} .
  */
-anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+anychart.core.Chart.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
+    opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
@@ -574,6 +593,168 @@ anychart.core.Chart.prototype.createChartLabel = function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Creates chart tooltip.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.ui.ChartTooltip|anychart.core.ui.Tooltip|anychart.core.Chart)}
+ */
+anychart.core.Chart.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = this.createTooltip();
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Creates tooltip.
+ * @protected
+ * @return {!anychart.core.ui.ChartTooltip}
+ */
+anychart.core.Chart.prototype.createTooltip = function() {
+  var tooltip = new anychart.core.ui.ChartTooltip();
+  this.registerDisposable(tooltip);
+  tooltip.chart(this);
+
+  this.listen(anychart.enums.EventType.POINTS_HOVER, this.showTooltip_);
+  return tooltip;
+};
+
+
+/**
+ * @param {anychart.core.MouseEvent} event
+ * @private
+ */
+anychart.core.Chart.prototype.showTooltip_ = function(event) {
+  // summary
+  // Tooltip Mode   | Interactivity mode
+  // Single + Single - draw one tooltip.
+  // Union + Single - draw one tooltip at the hovered point, content from all points by index of hovered point.
+  // Separated + Single  - draw all tooltips for hovered points.
+
+  // Single + byX - draw one tooltip at nearest point to cursor.
+  // Union + byX - draw one tooltip at nearest point to cursor (in point position), content from all hovered points.
+  // Separated + byX - draw all tooltips for hovered points.
+
+  // For bySpot as for byX
+
+  var toShowSeriesStatus = [];
+  goog.array.forEach(event['seriesStatus'], function(status) {
+    if (goog.array.isEmpty(status['points'])) {
+      if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
+        this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip_);
+      }
+      this.tooltip_.hide(event);
+
+    } else if (status['series'].enabled()) {
+      toShowSeriesStatus.push(status);
+    }
+  }, this);
+
+  if (!goog.array.isEmpty(toShowSeriesStatus)) {
+    if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
+      this.listen(goog.events.EventType.MOUSEMOVE, this.updateTooltip_);
+    }
+
+    var interactivity = this.interactivity();
+    if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      var points = [];
+      if (this.tooltip_.displayMode() == anychart.enums.TooltipDisplayMode.SINGLE) {
+        points = event['seriesStatus'];
+      } else {
+        var pointIndex = event['seriesStatus'][0]['points'][0];
+        // improve maps support (separated & point modes)
+        if (goog.isDef(pointIndex['index'])) pointIndex = pointIndex['index'];
+
+        // condition for compile_each
+        if (this.series_) {
+          // get points from all series by point index
+          points = goog.array.map(this.series_, function(series) {
+            series.getIterator().select(pointIndex);
+            return {
+              'series': series,
+              'points': [pointIndex]
+            };
+          });
+        }
+
+        // filter missing
+        points = goog.array.filter(points, function(point) {
+          var series = point['series'];
+          var iterator = series.getIterator();
+          return !anychart.utils.isNaN(iterator.get('value'));
+        });
+      }
+
+      this.tooltip_.show(points,
+          event['originalEvent']['clientX'],
+          event['originalEvent']['clientY'],
+          event['seriesStatus'][0]['series'],
+          this.useUnionTooltipAsSingle());
+
+    // byX, bySpot
+    } else {
+      var nearestSeriesStatus = toShowSeriesStatus[0];
+      toShowSeriesStatus[0]['series'].getIterator().select(toShowSeriesStatus[0]['nearestPointToCursor']['index']);
+
+      goog.array.forEach(toShowSeriesStatus, function(status) {
+        if (nearestSeriesStatus['nearestPointToCursor']['distance'] > status['nearestPointToCursor']['distance']) {
+          status['series'].getIterator().select(status['nearestPointToCursor']['index']);
+          nearestSeriesStatus = status;
+        }
+      });
+
+      if (this.tooltip_.displayMode() == anychart.enums.TooltipDisplayMode.SINGLE) {
+        // show nearest hovered point to cursor
+        this.tooltip_.show([nearestSeriesStatus],
+            event['originalEvent']['clientX'],
+            event['originalEvent']['clientY'],
+            nearestSeriesStatus['series'],
+            this.useUnionTooltipAsSingle());
+
+      } else {
+        // show all hovered points, in union mode position will be to nearest hovered point to cursor
+        this.tooltip_.show(toShowSeriesStatus,
+            event['originalEvent']['clientX'],
+            event['originalEvent']['clientY'],
+            nearestSeriesStatus['series'],
+            this.useUnionTooltipAsSingle());
+      }
+    }
+  }
+};
+
+
+/**
+ * Used in sparklines.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
+  return false;
+};
+
+
+/**
+ * Update tooltip position. (for float)
+ * @param {anychart.core.MouseEvent} event
+ * @private
+ */
+anychart.core.Chart.prototype.updateTooltip_ = function(event) {
+  this.tooltip_.updatePosition(event['clientX'], event['clientY']);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -677,17 +858,21 @@ anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  */
 anychart.core.Chart.prototype.draw = function() {
-  //todo(Anton Saukh): refactor this mess!
-  if (this.autoRedraw_)
-    this.listenSignals(this.invalidateHandler_, this);
-  else
-    this.unlistenSignals(this.invalidateHandler_, this);
-  //end mess
+  if (!this.autoRedrawIsSet_) {
+    if (this.autoRedraw_)
+      this.listenSignals(this.invalidateHandler_, this);
+    else
+      this.unlistenSignals(this.invalidateHandler_, this);
+    this.autoRedrawIsSet_ = true;
+  }
 
   if (!this.checkDrawingNeeded())
     return this;
 
-  var startTime = new Date().getTime();
+  var startTime;
+  if (anychart.DEVELOP) {
+    startTime = anychart.utils.relativeNow();
+  }
 
   this.suspendSignalsDispatching();
 
@@ -718,6 +903,9 @@ anychart.core.Chart.prototype.draw = function() {
   }
   //end clear container consistency states
 
+  // DVF-1648
+  this.beforeDraw();
+
   //total chart area bounds, do not override, it can be useful later
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
   var contentBounds = this.calculateContentAreaSpace(totalBounds);
@@ -726,9 +914,11 @@ anychart.core.Chart.prototype.draw = function() {
   // used for crosshair
   var background = this.background();
   var fill = background.fill();
-  if ((!background.enabled() || !fill || fill == 'none') && !this.shadowRect_) {
-    this.shadowRect_ = this.rootElement.rect();
-    this.shadowRect_.fill('#fff 0.00001').stroke(null);
+  if ((!background.enabled() || !fill || fill == 'none')) {
+    if (!this.shadowRect_) {
+      this.shadowRect_ = this.rootElement.rect();
+      this.shadowRect_.fill(anychart.color.TRANSPARENT_HANDLER).stroke(null);
+    }
     this.shadowRect_.setBounds(contentBounds);
   }
 
@@ -769,19 +959,32 @@ anychart.core.Chart.prototype.draw = function() {
     if (this.animation().enabled()) this.doAnimation();
   }
 
-  if (manualSuspend) stage.resume();
-
   this.resumeSignalsDispatching(false);
+
+  if (manualSuspend) stage.resume();
 
   this.dispatchDetachedEvent({
     'type': anychart.enums.EventType.CHART_DRAW,
     'chart': this
   });
 
-  var msg = 'Chart rendering time: ' + (new Date().getTime() - startTime);
-  anychart.utils.info(msg);
+  if (anychart.DEVELOP) {
+    var msg = 'Chart rendering time: ' + anychart.math.round((anychart.utils.relativeNow() - startTime), 4);
+    anychart.utils.info(msg);
+  }
+
+
+  if (this.supportsBaseHighlight)
+    this.onInteractivitySignal_();
+
   return this;
 };
+
+
+/**
+ * Extension point do before draw chart content.
+ */
+anychart.core.Chart.prototype.beforeDraw = goog.nullFunction;
 
 
 /**
@@ -805,6 +1008,7 @@ anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.autoRedraw_ != opt_value) {
       this.autoRedraw_ = opt_value;
+      this.autoRedrawIsSet_ = false;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -917,6 +1121,7 @@ anychart.core.Chart.prototype.serialize = function() {
   // from VisualBaseWithBounds
   json['bounds'] = this.bounds().serialize();
   json['animation'] = this.animation().serialize();
+  json['tooltip'] = this.tooltip().serialize();
   return json;
 };
 
@@ -952,6 +1157,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   this.right(config['right']);
   this.bottom(config['bottom']);
   this.animation(config['animation']);
+  this.tooltip(config['tooltip']);
 };
 
 
@@ -988,6 +1194,694 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Events.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Internal public method. Returns all chart series.
+ * @return {!Array.<anychart.core.SeriesBase>}
+ */
+anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
+
+
+/**
+ * Getter series by index.
+ * @param {number} index .
+ * @return {anychart.core.SeriesBase}
+ */
+anychart.core.Chart.prototype.getSeries = function(index) {
+  return null;
+};
+
+
+/**
+ * Tester if it is series.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isSeries = function() {
+  return false;
+};
+
+
+/**
+ * Tester if it is chart.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isChart = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.handleMouseEvent = function(event) {
+  var series;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  var index;
+
+  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+    if (tag) {
+      series = tag.series;
+      index = tag.index;
+    }
+  } else {
+    series = tag && tag.series;
+    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+  }
+
+  if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
+    if (!goog.isDef(event['pointIndex']))
+      event['pointIndex'] = goog.isArray(index) ? index[index.length - 1] : index;
+
+    var evt = series.makePointEvent(event);
+    if (evt)
+      series.dispatchEvent(evt);
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  var tag = anychart.utils.extractTag(res['relatedDomTarget']);
+
+  var series = tag && tag.series;
+  if (series && !series.isDisposed() && series.enabled()) {
+    return series.makeBrowserEvent(e);
+  }
+  return res;
+};
+
+
+/**
+ * Creates series status objects for event.
+ * @param {Array.<Object>} seriesStatus .
+ * @param {boolean=} opt_empty .
+ * @return {Array.<Object>}
+ * @protected
+ */
+anychart.core.Chart.prototype.createEventSeriesStatus = function(seriesStatus, opt_empty) {
+  var eventSeriesStatus = [];
+  for (var i = 0, len = seriesStatus.length; i < len; i++) {
+    var status = seriesStatus[i];
+    var nearestPointToCursor = status.nearestPointToCursor;
+    var nearestPointToCursor_;
+    if (nearestPointToCursor) {
+      nearestPointToCursor_ = {
+        'index': status.nearestPointToCursor.index,
+        'distance': status.nearestPointToCursor.distance
+      };
+    } else {
+      nearestPointToCursor_ = {
+        'index': NaN,
+        'distance': NaN
+      };
+    }
+    eventSeriesStatus.push({
+      'series': status.series,
+      'points': opt_empty ? [] : status.points ? goog.array.clone(status.points) : [],
+      'nearestPointToCursor': nearestPointToCursor_
+    });
+  }
+  return eventSeriesStatus;
+};
+
+
+/**
+ * Makes current point for events.
+ * @param {Object} seriesStatus .
+ * @param {string} event .
+ * @param {boolean=} opt_empty .
+ * @return {Object}
+ * @private
+ */
+anychart.core.Chart.prototype.makeCurrentPoint_ = function(seriesStatus, event, opt_empty) {
+  var series, pointIndex, pointStatus, minDistance = Infinity;
+  for (var i = 0, len = seriesStatus.length; i < len; i++) {
+    var status = seriesStatus[i];
+    if (status.nearestPointToCursor) {
+      var nearestPoint = status.nearestPointToCursor;
+      if (minDistance > nearestPoint.distance) {
+        series = status.series;
+        pointIndex = nearestPoint.index;
+        pointStatus = goog.array.contains(status.points, nearestPoint.index);
+        minDistance = nearestPoint.distance;
+      }
+    }
+  }
+  var currentPoint = {
+    'index': pointIndex,
+    'series': series
+  };
+
+  currentPoint[event] = opt_empty ? !pointStatus : pointStatus;
+
+  return currentPoint;
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain seriesStatus support for
+ * browser events.
+ * @param {Object} event Event object.
+ * @param {Array.<Object>} seriesStatus Array of series statuses.
+ * @param {boolean=} opt_empty .
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.core.Chart.prototype.makeHoverPointEvent = function(event, seriesStatus, opt_empty) {
+  return {
+    'type': anychart.enums.EventType.POINTS_HOVER,
+    'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
+    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'hovered', opt_empty),
+    'actualTarget': event['target'],
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain seriesStatus support for
+ * browser events.
+ * @param {Object} event Event object.
+ * @param {Array.<Object>} seriesStatus Array of series statuses.
+ * @param {boolean=} opt_empty .
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.core.Chart.prototype.makeSelectPointEvent = function(event, seriesStatus, opt_empty) {
+  return {
+    'type': anychart.enums.EventType.POINTS_SELECT,
+    'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
+    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'selected', opt_empty),
+    'actualTarget': event['target'],
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Returns points by event.
+ * @param {anychart.core.MouseEvent} event
+ * @return {?Array.<{series: anychart.core.SeriesBase, points: Array.<number>, lastPoint: number, nearestPointToCursor: Object.<number>}>}
+ */
+anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
+
+
+/**
+ * Some action on mouse over and move.
+ * @param {Array.<number>|number} index Point index or indexes.
+ * @param {anychart.core.SeriesBase} series Series.
+ */
+anychart.core.Chart.prototype.doAdditionActionsOnMouseOverAndMove = goog.nullFunction;
+
+
+/**
+ * Some action on mouse out.
+ */
+anychart.core.Chart.prototype.doAdditionActionsOnMouseOut = goog.nullFunction;
+
+
+/**
+ * Handler for mouseMove and mouseOver events.
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
+  var series, i, j, len;
+  var interactivity = this.interactivity();
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  var index;
+
+  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+    if (tag) {
+      series = tag.series;
+      index = tag.index;
+    }
+  } else {
+    series = tag && tag.series;
+    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+  }
+
+  if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
+    var evt = series.makePointEvent(event);
+    if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
+      if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+
+        if (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index)) {
+          if (goog.isFunction(series.hoverPoint))
+            series.hoverPoint(/** @type {number} */ (index), event);
+
+          this.doAdditionActionsOnMouseOverAndMove(/** @type {number|Array.<number>} */(index), /** @type {!anychart.core.SeriesBase} */(series));
+
+          var alreadyHoveredPoints = series.state.getIndexByPointState(anychart.PointState.HOVER);
+          var eventSeriesStatus = [];
+          if (alreadyHoveredPoints.length)
+            eventSeriesStatus.push({
+              series: series,
+              points: alreadyHoveredPoints,
+              nearestPointToCursor: {index: index, distance: 0}
+            });
+
+          this.dispatchEvent(this.makeHoverPointEvent(event, eventSeriesStatus));
+        }
+      }
+    }
+  }
+
+  if (interactivity.hoverMode() != anychart.enums.HoverMode.SINGLE) {
+    var seriesStatus = this.getSeriesStatus(event);
+    var dispatchEvent = false;
+
+    if (seriesStatus && seriesStatus.length) {
+      series = this.getAllSeries();
+      for (i = 0; i < series.length; i++) {
+        var contains = false;
+        for (j = 0; j < seriesStatus.length; j++) {
+          contains = contains || series[i] == seriesStatus[j].series;
+        }
+        if (!contains && series[i].state.getIndexByPointState(anychart.PointState.HOVER).length) {
+          seriesStatus.push({series: series[i], points: []});
+          series[i].unhover();
+          dispatchEvent = true;
+        }
+      }
+
+      for (i = 0, len = seriesStatus.length; i < len; i++) {
+        var seriesStatus_ = seriesStatus[i];
+        series = seriesStatus_.series;
+        var points = seriesStatus_.points;
+
+        var hoveredPoints = series.state.getIndexByPointState(anychart.PointState.HOVER);
+        dispatchEvent = dispatchEvent || !goog.array.equals(points, hoveredPoints);
+        if (!series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.HOVER)) {
+          series.hoverPoint(seriesStatus_.points);
+        }
+      }
+      if (dispatchEvent) {
+        this.dispatchEvent(this.makeHoverPointEvent(event, seriesStatus));
+        this.prevHoverSeriesStatus = seriesStatus.length ? seriesStatus : null;
+      }
+    } else {
+      if (!(event['target'] instanceof anychart.core.ui.Legend)) {
+        this.unhover();
+        if (this.prevHoverSeriesStatus)
+          this.dispatchEvent(this.makeHoverPointEvent(event, this.prevHoverSeriesStatus, true));
+        this.prevHoverSeriesStatus = null;
+      }
+    }
+  }
+};
+
+
+/**
+ * Handler for mouseOut event.
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.core.Chart.prototype.handleMouseOut = function(event) {
+  var hoverMode = this.interactivity().hoverMode();
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+
+  var series, index;
+  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+    if (tag) {
+      series = tag.series;
+      index = tag.index;
+    }
+  } else {
+    series = tag && tag.series;
+    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+  }
+
+  if (series && !series.isDisposed() && series.enabled() &&
+      goog.isFunction(series.makePointEvent)) {
+    var evt = series.makePointEvent(event);
+    var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
+    var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
+
+    var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
+
+    if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
+      if (hoverMode == anychart.enums.HoverMode.SINGLE && !isNaN(index)) {
+        series.unhover();
+        this.dispatchEvent(this.makeHoverPointEvent(event, [{
+          series: series,
+          points: [],
+          nearestPointToCursor: {index: index, distance: 0}
+        }]));
+      }
+    }
+  }
+
+  if (hoverMode != anychart.enums.HoverMode.SINGLE) {
+    if (!anychart.utils.checkIfParent(this, event['relatedTarget'])) {
+      this.unhover();
+      this.doAdditionActionsOnMouseOut();
+      if (this.prevHoverSeriesStatus)
+        this.dispatchEvent(this.makeHoverPointEvent(event, this.prevHoverSeriesStatus, true));
+      this.prevHoverSeriesStatus = null;
+    }
+  }
+
+};
+
+
+/**
+ * Handler for mouseClick event.
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.core.Chart.prototype.handleMouseDown = function(event) {
+  var interactivity = this.interactivity();
+
+  var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
+  var controlKeyPressed = event.ctrlKey || event.metaKey;
+  var clickWithControlOnSelectedSeries, equalsSelectedPoints;
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+
+  var series, s, index;
+  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+    if (tag) {
+      series = tag.series;
+      index = tag.index;
+    }
+  } else {
+    series = tag && tag.series;
+    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+  }
+
+  if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
+    var evt = series.makePointEvent(event);
+    if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
+      if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE || series.selectionMode() == anychart.enums.SelectionMode.NONE)
+          return;
+
+        alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+        equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == index;
+
+        if (!(controlKeyPressed || event.shiftKey) && equalsSelectedPoints)
+          return;
+
+        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        var unselect = clickWithControlOnSelectedSeries ||
+            !(controlKeyPressed || event.shiftKey) ||
+            ((controlKeyPressed || event.shiftKey) && interactivity.selectionMode() != anychart.enums.SelectionMode.MULTI_SELECT);
+
+        if (unselect) {
+          this.unselect();
+          if (this.prevSelectSeriesStatus)
+            this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+        } else if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+          if (this.prevSelectSeriesStatus)
+            this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+          series.unselect();
+          if (goog.isArray(index))
+            index = index[index.length - 1];
+        }
+
+        if (goog.isFunction(series.selectPoint))
+          series.selectPoint(/** @type {number} */ (index), event);
+
+        allSeries = this.getAllSeries();
+        eventSeriesStatus = [];
+        for (i = 0; i < allSeries.length; i++) {
+          s = allSeries[i];
+          if (!s) continue;
+          alreadySelectedPoints = s.state.getIndexByPointState(anychart.PointState.SELECT);
+          if (alreadySelectedPoints.length) {
+            eventSeriesStatus.push({
+              series: s,
+              points: alreadySelectedPoints,
+              nearestPointToCursor: {index: index, distance: 0}
+            });
+          }
+        }
+
+        if (!eventSeriesStatus.length) {
+          eventSeriesStatus.push({
+            series: series,
+            points: [],
+            nearestPointToCursor: {index: index, distance: 0}
+          });
+        }
+
+        this.dispatchEvent(this.makeSelectPointEvent(evt, eventSeriesStatus));
+
+        if (equalsSelectedPoints)
+          this.prevSelectSeriesStatus = null;
+        else
+          this.prevSelectSeriesStatus = eventSeriesStatus;
+      }
+    }
+  } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+    this.unselect();
+    if (this.prevSelectSeriesStatus)
+      this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+    this.prevSelectSeriesStatus = null;
+  }
+
+  if (interactivity.hoverMode() != anychart.enums.HoverMode.SINGLE) {
+    if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE)
+      return;
+
+    var j, len;
+    seriesStatus = this.getSeriesStatus(event);
+
+    if (seriesStatus && seriesStatus.length) {
+      var dispatchEvent = false;
+      eventSeriesStatus = [];
+      var contains, seriesStatus_;
+
+      if (interactivity.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+        var nearest;
+        for (i = 0, len = seriesStatus.length; i < len; i++) {
+          seriesStatus_ = seriesStatus[i];
+          series = seriesStatus_.series;
+
+          if (series.selectionMode() == anychart.enums.SelectionMode.NONE)
+            continue;
+
+          if (!nearest) nearest = seriesStatus_;
+          if (nearest.nearestPointToCursor.distance > seriesStatus_.nearestPointToCursor.distance) {
+            nearest = seriesStatus_;
+          }
+        }
+
+        series = nearest.series;
+
+        alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+        equalsSelectedPoints = alreadySelectedPoints.length == 1 && alreadySelectedPoints[0] == nearest.nearestPointToCursor.index;
+
+        dispatchEvent = !equalsSelectedPoints || (equalsSelectedPoints && (controlKeyPressed || event.shiftKey));
+
+        clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+        if ((clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey)) && !equalsSelectedPoints) {
+          series.unselect();
+        }
+        series.selectPoint(/** @type {number} */ (nearest.nearestPointToCursor.index), event);
+
+        alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+
+        if (alreadySelectedPoints.length) {
+          eventSeriesStatus.push({
+            series: series,
+            points: [nearest.nearestPointToCursor.index],
+            nearestPointToCursor: nearest.nearestPointToCursor
+          });
+
+
+          allSeries = this.getAllSeries();
+          for (i = 0; i < allSeries.length; i++) {
+            series = allSeries[i];
+            if (series.selectionMode() == anychart.enums.SelectionMode.NONE)
+              continue;
+
+            contains = series == eventSeriesStatus[0].series;
+            if (!contains) {
+              series.unselect();
+            }
+          }
+        } else {
+          eventSeriesStatus.push({
+            series: series,
+            points: alreadySelectedPoints,
+            nearestPointToCursor: seriesStatus_.nearestPointToCursor
+          });
+        }
+      } else {
+        var emptySeries = [];
+        if (!(controlKeyPressed || event.shiftKey)) {
+          allSeries = this.getAllSeries();
+
+          for (i = 0; i < allSeries.length; i++) {
+            s = allSeries[i];
+            if (s.selectionMode() == anychart.enums.SelectionMode.NONE)
+              continue;
+
+            contains = false;
+            for (j = 0; j < seriesStatus.length; j++) {
+              contains = contains || s == seriesStatus[j].series;
+            }
+            if (!contains && s.state.getIndexByPointState(anychart.PointState.SELECT).length) {
+              emptySeries.push({series: s, points: []});
+              s.unselect();
+              dispatchEvent = true;
+            }
+          }
+        }
+
+        for (i = 0, len = seriesStatus.length; i < len; i++) {
+          seriesStatus_ = seriesStatus[i];
+          series = seriesStatus_.series;
+
+          if (series.selectionMode() == anychart.enums.SelectionMode.NONE)
+            continue;
+
+          var points;
+          if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+            points = [seriesStatus_.nearestPointToCursor.index];
+          } else {
+            points = seriesStatus_.points;
+          }
+
+          alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+          if (event.shiftKey) {
+            contains = true;
+            for (j = 0; j < points.length; j++) {
+              contains = contains && goog.array.contains(alreadySelectedPoints, points[j]);
+            }
+            equalsSelectedPoints = contains;
+          } else if (!controlKeyPressed) {
+            equalsSelectedPoints = goog.array.equals(points, alreadySelectedPoints);
+          }
+          dispatchEvent = dispatchEvent || !equalsSelectedPoints;
+
+          if (!equalsSelectedPoints) {
+            clickWithControlOnSelectedSeries = (controlKeyPressed || event.shiftKey) && series.state.isStateContains(series.state.getSeriesState(), anychart.PointState.SELECT);
+            if (clickWithControlOnSelectedSeries || !(controlKeyPressed || event.shiftKey) || series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
+              series.unselect();
+            }
+            series.selectPoint(points, event);
+          }
+          alreadySelectedPoints = series.state.getIndexByPointState(anychart.PointState.SELECT);
+          if (alreadySelectedPoints.length) {
+            eventSeriesStatus.push({
+              series: series,
+              points: alreadySelectedPoints,
+              nearestPointToCursor: seriesStatus_.nearestPointToCursor
+            });
+          } else {
+            emptySeries.push({
+              series: series,
+              points: alreadySelectedPoints,
+              nearestPointToCursor: seriesStatus_.nearestPointToCursor
+            });
+          }
+        }
+
+        for (i = 0; i < emptySeries.length; i++) {
+          eventSeriesStatus.push(emptySeries[i]);
+        }
+      }
+
+      if (dispatchEvent) {
+        this.dispatchEvent(this.makeSelectPointEvent(event, eventSeriesStatus));
+        this.prevSelectSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
+      }
+    } else {
+      this.unselect();
+      if (this.prevSelectSeriesStatus)
+        this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+      this.prevSelectSeriesStatus = null;
+    }
+  }
+};
+
+
+/**
+ * Deselects all series. It doesn't matter what series it belongs to.
+ */
+anychart.core.Chart.prototype.unselect = function() {
+  var i, len;
+  var series = this.getAllSeries();
+  for (i = 0, len = series.length; i < len; i++) {
+    if (series[i]) series[i].unselect();
+  }
+};
+
+
+/**
+ * Make unhover to all series. It doesn't matter what series it belongs to.
+ */
+anychart.core.Chart.prototype.unhover = function() {
+  var i, len;
+  var series = this.getAllSeries();
+  for (i = 0, len = series.length; i < len; i++) {
+    if (series[i]) series[i].unhover();
+  }
+};
+
+
+/**
+ * Sets/gets settings for regions doesn't linked to anything regions.
+ * @param {(Object|anychart.enums.HoverMode)=} opt_value Settings object or boolean value like enabled state.
+ * @return {anychart.core.utils.Interactivity|anychart.core.Chart}
+ */
+anychart.core.Chart.prototype.interactivity = function(opt_value) {
+  if (!this.interactivity_) {
+    this.interactivity_ = new anychart.core.utils.Interactivity(this);
+    this.interactivity_.listenSignals(this.onInteractivitySignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value))
+      this.interactivity_.setup(opt_value);
+    else
+      this.interactivity_.hoverMode(opt_value);
+    return this;
+  }
+  return this.interactivity_;
+};
+
+
+/**
+ * Animation enabled change handler.
+ * @private
+ */
+anychart.core.Chart.prototype.onInteractivitySignal_ = function() {
+  var series = this.getAllSeries();
+  for (var i = series.length; i--;) {
+    if (series[i])
+      series[i].hoverMode(/** @type {string} */(this.interactivity().hoverMode()));
+  }
+};
+
+
 /**
  * Returns chart or gauge type. Published in charts.
  * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
@@ -1014,3 +1908,9 @@ anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;/
 anychart.core.Chart.prototype['toXml'] = anychart.core.Chart.prototype.toXml;//|need-ex
 anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//dummy DO NOT USE
 anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//dummy DO NOT USE
+anychart.core.Chart.prototype['tooltip'] = anychart.core.Chart.prototype.tooltip;
+anychart.core.Chart.prototype['saveAsPng'] = anychart.core.Chart.prototype.saveAsPng;//inherited
+anychart.core.Chart.prototype['saveAsJpg'] = anychart.core.Chart.prototype.saveAsJpg;//inherited
+anychart.core.Chart.prototype['saveAsPdf'] = anychart.core.Chart.prototype.saveAsPdf;//inherited
+anychart.core.Chart.prototype['saveAsSvg'] = anychart.core.Chart.prototype.saveAsSvg;//inherited
+anychart.core.Chart.prototype['toSvg'] = anychart.core.Chart.prototype.toSvg;//inherited

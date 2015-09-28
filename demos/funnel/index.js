@@ -109,7 +109,10 @@ function load() {
   ];
 
   chart = anychart.funnel(data2);
-  chart.legend(true);
+  chart.legend()
+      .enabled(true)
+      .position('bottom')
+      .itemsLayout('h');
 
   chart.hatchFill(true); // hatchFill('diagonalbrick');
   chart.baseWidth('80%');

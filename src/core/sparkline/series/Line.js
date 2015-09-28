@@ -30,7 +30,7 @@ anychart.core.sparkline.series.Line.prototype.drawFirstPoint = function() {
 
     this.path.moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -49,7 +49,7 @@ anychart.core.sparkline.series.Line.prototype.drawSubsequentPoint = function() {
 
     this.path.lineTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;

@@ -1,0 +1,1947 @@
+goog.provide('anychart.core.SeriesBase');
+goog.require('acgraph');
+goog.require('anychart.color');
+goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.core.ui.SeriesTooltip');
+goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.core.utils.LegendContextProvider');
+goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.utils.SeriesPointContextProvider');
+goog.require('anychart.data');
+goog.require('anychart.enums');
+goog.require('anychart.utils');
+
+
+
+/**
+ * Base class for all base series.<br/>
+ * Base class defines common methods, such as those for:
+ * <ul>
+ *   <li>Binding series to a scale: <i>xScale, yScale</i></li>
+ *   <li>Base color settings: <i>color</i></li>
+ * </ul>
+ * You can also obtain <i>getIterator, getResetIterator</i> iterators here.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Series data.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @constructor
+ * @extends {anychart.core.VisualBaseWithBounds}
+ */
+anychart.core.SeriesBase = function(opt_data, opt_csvSettings) {
+  goog.base(this);
+  this.data(opt_data || null, opt_csvSettings);
+
+  this.statistics_ = {};
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
+};
+goog.inherits(anychart.core.SeriesBase, anychart.core.VisualBaseWithBounds);
+
+
+/**
+ * Default hatch fill type.
+ * @type {acgraph.vector.HatchFill.HatchFillType|string}
+ */
+anychart.core.SeriesBase.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
+
+
+/**
+ * Series name.
+ * @type {string}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.name_;
+
+
+/**
+ * Series index.
+ * @type {number}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.index_;
+
+
+/**
+ * Series meta map.
+ * @type {Object}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.meta_;
+
+
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.rawData;
+
+
+/**
+ * @type {!anychart.data.View}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.dataInternal;
+
+
+/**
+ * @type {anychart.data.View}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.parentView;
+
+
+/**
+ * @type {goog.Disposable}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.parentViewToDispose;
+
+
+/**
+ *
+ * @type {!anychart.data.Iterator}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.iterator_;
+
+
+/**
+ * @type {Object}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.statistics_;
+
+
+/**
+ * @type {anychart.core.ui.SeriesTooltip}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.tooltip_ = null;
+
+
+/**
+ * @type {anychart.core.ui.LabelsFactory}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.labels_ = null;
+
+
+/**
+ * @type {anychart.core.ui.LabelsFactory}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hoverLabels_ = null;
+
+
+/**
+ * @type {anychart.core.ui.LabelsFactory}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.selectLabels_ = null;
+
+
+/**
+ * @type {Array.<number>}
+ */
+anychart.core.SeriesBase.prototype.stateIndex;
+
+
+/**
+ * @type {Array.<anychart.PointState>}
+ */
+anychart.core.SeriesBase.prototype.stateValue;
+
+
+/**
+ * @type {anychart.PointState|number}
+ */
+anychart.core.SeriesBase.prototype.seriesState;
+
+
+/**
+ * @type {(acgraph.vector.Fill|Function|null)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.fill_;
+
+
+/**
+ * @type {(acgraph.vector.Fill|Function|null)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hoverFill_;
+
+
+/**
+ * @type {(acgraph.vector.Fill|Function|null)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.selectFill_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.strokeInternal;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hoverStroke_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.selectStroke_;
+
+
+/**
+ * Hatch fill.
+ * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hatchFill_;
+
+
+/**
+ * Hover hatch fill.
+ * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hoverHatchFill_;
+
+
+/**
+ * Hover hatch fill.
+ * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.selectHatchFill_;
+
+
+/**
+ * Series color. See this.color().
+ * @type {?acgraph.vector.Fill}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.color_ = null;
+
+
+/**
+ * Series color from chart. See. this.color().
+ * @type {?acgraph.vector.Fill}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.autoColor_ = null;
+
+
+/**
+ * Hatch fill type from chart.
+ * @type {acgraph.vector.HatchFill}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.autoHatchFill;
+
+
+/**
+ * Tester if the series is discrete based.
+ * @return {boolean}
+ */
+anychart.core.SeriesBase.prototype.isDiscreteBased = function() {
+  return true;
+};
+
+
+/**
+ * Tester if it is series.
+ * @return {boolean}
+ */
+anychart.core.SeriesBase.prototype.isSeries = function() {
+  return true;
+};
+
+
+/**
+ * Tester if it is chart.
+ * @return {boolean}
+ */
+anychart.core.SeriesBase.prototype.isChart = function() {
+  return false;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Data
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for series mapping.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @return {(!anychart.core.SeriesBase|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
+ */
+anychart.core.SeriesBase.prototype.data = function(opt_value, opt_csvSettings) {
+  if (goog.isDef(opt_value)) {
+    if (this.rawData !== opt_value) {
+      this.rawData = opt_value;
+      goog.dispose(this.parentViewToDispose); // disposing a view created by the series if any;
+      if (opt_value instanceof anychart.data.View)
+        this.parentView = this.parentViewToDispose = opt_value.derive(); // deriving a view to avoid interference with other view users
+      else if (opt_value instanceof anychart.data.Set)
+        this.parentView = this.parentViewToDispose = opt_value.mapAs();
+      else
+        this.parentView = (this.parentViewToDispose = new anychart.data.Set(
+            (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
+      this.registerDisposable(this.parentViewToDispose);
+      this.dataInternal = this.parentView;
+      this.dataInternal.listenSignals(this.dataInvalidated_, this);
+      // DATA is supported only in Bubble, so we invalidate only for it.
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
+    }
+    return this;
+  }
+  return this.dataInternal;
+};
+
+
+/**
+ * Listens to data invalidation.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.SeriesBase.prototype.dataInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
+  }
+};
+
+
+/**
+ * Returns current mapping iterator.
+ * @return {!anychart.data.Iterator} Current series iterator.
+ */
+anychart.core.SeriesBase.prototype.getIterator = function() {
+  return this.iterator_ || this.getResetIterator();
+};
+
+
+/**
+ * Returns new default iterator for the current mapping.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.core.SeriesBase.prototype.getResetIterator = function() {
+  return this.iterator_ = this.data().getIterator();
+};
+
+
+/**
+ * Sets/gets series meta data.
+ * @param {*=} opt_object_or_key Object to replace metadata or metadata key.
+ * @param {*=} opt_value Meta data value.
+ * @return {*} Metadata object, key value or itself for method chaining.
+ */
+anychart.core.SeriesBase.prototype.meta = function(opt_object_or_key, opt_value) {
+  if (!this.meta_) this.meta_ = {};
+
+  if (goog.isDef(opt_object_or_key)) {
+    if (goog.isDef(opt_value)) {
+      var value = this.meta_[opt_object_or_key];
+      if (!goog.isDef(value) || value != opt_value) {
+        this.meta_[opt_object_or_key] = opt_value;
+        //TODO: send signal to redraw components that depend on meta (legend)
+      }
+      return this;
+    } else {
+      if (goog.isObject(opt_object_or_key)) {
+        if (this.meta_ != opt_object_or_key) {
+          this.meta_ = opt_object_or_key;
+          //TODO: send signal to redraw components that depend on meta (legend)
+        }
+        return this;
+      } else {
+        return this.meta_[opt_object_or_key];
+      }
+    }
+  } else {
+    return this.meta_;
+  }
+};
+
+
+/**
+ * Sets/gets series name.
+ * @param {string=} opt_value Series name value.
+ * @return {!(string|anychart.core.SeriesBase|undefined)} Series name value or itself for method chaining.
+ */
+anychart.core.SeriesBase.prototype.name = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.name_ != opt_value) {
+      this.name_ = opt_value;
+      //TODO: send signal to redraw name dependent components, series, legend etc
+    }
+    return this;
+  } else {
+    return this.name_;
+  }
+};
+
+
+/**
+ * Sets/gets series number.
+ * @param {number=} opt_value
+ * @return {anychart.core.SeriesBase|number}
+ */
+anychart.core.SeriesBase.prototype.index = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.index_ != opt_value) {
+      this.index_ = opt_value;
+    }
+    return this;
+  } else {
+    return this.index_;
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Series statistics.
+ * @param {string=} opt_name Statistics parameter name.
+ * @param {number=} opt_value Statistics parameter value.
+ * @return {anychart.core.SeriesBase|Object.<number>|number}
+ */
+anychart.core.SeriesBase.prototype.statistics = function(opt_name, opt_value) {
+  if (!this.statistics_)
+    this.calculateStatistics();
+  if (goog.isDef(opt_name)) {
+    if (goog.isDef(opt_value)) {
+      this.statistics_[opt_name] = opt_value;
+      return this;
+    } else {
+      return this.statistics_[opt_name];
+    }
+  } else {
+    return this.statistics_;
+  }
+};
+
+
+/**
+ * Calculate series statistics.
+ */
+anychart.core.SeriesBase.prototype.calculateStatistics = goog.nullFunction;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets/sets current series data tooltip.
+ * @param {(Object|boolean|null)=} opt_value Tooltip settings.
+ * @return {!(anychart.core.SeriesBase|anychart.core.ui.SeriesTooltip)} Tooltip instance or itself for chaining call.
+ */
+anychart.core.SeriesBase.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.core.ui.SeriesTooltip();
+    this.registerDisposable(this.tooltip_);
+  }
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Legend
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Creates context provider for legend items text formatter function.
+ * @return {anychart.core.utils.LegendContextProvider} Legend context provider.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.createLegendContextProvider = function() {
+  if (!this.legendProvider_)
+    this.legendProvider_ = new anychart.core.utils.LegendContextProvider(this);
+  return this.legendProvider_;
+};
+
+
+/**
+ * Return color for legend item.
+ * @param {Function} itemsTextFormatter Items text formatter.
+ * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
+ */
+anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatter) {
+  var legendItem = this.legendItem();
+  legendItem.markAllConsistent();
+  var json = legendItem.serialize();
+  var iconFill, iconStroke, iconHatchFill;
+  if (goog.isFunction(legendItem.iconFill())) {
+    iconFill = legendItem.iconFill().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconStroke())) {
+    iconStroke = legendItem.iconStroke().call(this.color());
+  }
+  if (goog.isFunction(legendItem.iconHatchFill())) {
+    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill);
+  }
+  var itemText;
+  if (goog.isFunction(itemsTextFormatter)) {
+    var format = this.createLegendContextProvider();
+    itemText = itemsTextFormatter.call(format, format);
+  }
+  if (!goog.isString(itemText))
+    itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
+
+  var ret = {
+    'meta': /** @type {Object} */ (this.meta()),
+    'text': /** @type {string} */ (itemText),
+    'iconEnabled': true,
+    'iconType': this.getLegendIconType(),
+    'iconStroke': iconStroke || this.getFinalStroke(false, anychart.PointState.NORMAL),
+    'iconFill': iconFill || this.getFinalFill(false, anychart.PointState.NORMAL),
+    'iconHatchFill': iconHatchFill || this.getFinalHatchFill(false, anychart.PointState.NORMAL),
+    'disabled': !this.enabled()
+  };
+  goog.object.extend(ret, json);
+  return ret;
+};
+
+
+/**
+ * Gets legend icon type for the series.
+ * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
+ */
+anychart.core.SeriesBase.prototype.getLegendIconType = function() {
+  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SQUARE);
+};
+
+
+/**
+ * Sets/Gets legend item setting for series.
+ * @param {(Object)=} opt_value Legend item settings object.
+ * @return {(anychart.core.utils.LegendItemSettings|anychart.core.SeriesBase)} Legend item settings or self for chaining.
+ */
+anychart.core.SeriesBase.prototype.legendItem = function(opt_value) {
+  if (!this.legendItem_) {
+    this.legendItem_ = new anychart.core.utils.LegendItemSettings();
+    this.registerDisposable(this.legendItem_);
+    this.legendItem_.listenSignals(this.onLegendItemSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.legendItem_.setup(opt_value);
+    return this;
+  }
+
+  return this.legendItem_;
+};
+
+
+/**
+ * Listener for legend item settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.SeriesBase.prototype.onLegendItemSignal_ = function(event) {
+  var signal = anychart.Signal.NEED_UPDATE_LEGEND;
+  var force = false;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+    force = true;
+  }
+  this.dispatchSignal(signal, force);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Coloring
+//
+//----------------------------------------------------------------------------------------------------------------------
+// Fill and stroke settings are located here, but you should export them ONLY in series themselves.
+/**
+ * Getter/setter for current series color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {!(acgraph.vector.Fill|anychart.core.SeriesBase)} .
+ */
+anychart.core.SeriesBase.prototype.color = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
+    if (this.color_ != color) {
+      this.color_ = color;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
+    }
+    return this;
+  }
+  return this.color_ || this.autoColor_ || 'blue';
+};
+
+
+/**
+ * Sets series color that parent chart have set for it.
+ * @param {acgraph.vector.Fill} value Auto color fill distributed by the chart.
+ */
+anychart.core.SeriesBase.prototype.setAutoColor = function(value) {
+  this.autoColor_ = value;
+};
+
+
+/**
+ * Sets series marker type that parent chart have set for it.
+ * @param {anychart.enums.MarkerType} value Auto marker type distributed by the chart.
+ */
+anychart.core.SeriesBase.prototype.setAutoMarkerType = goog.abstractMethod;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  HatchFill.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for current hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
+ *//**
+ * Setter for hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * var chart = anychart.column();
+ * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
+ * chart.container(stage).draw();
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.SeriesBase|Function|boolean} Hatch fill.
+ */
+anychart.core.SeriesBase.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill != this.hatchFill_) {
+      this.hatchFill_ = hatchFill;
+      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
+    }
+    return this;
+  }
+  return this.hatchFill_;
+};
+
+
+/**
+ * Getter for current hover hatch fill settings.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
+ *//**
+ * Setter for hover hatch fill settings.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
+ * @example
+ * var chart = anychart.column();
+ * chart.column([0.3, 3, 2.2, 1.7]).hoverHatchFill('diamiond', 'grey', 5, 5);
+ * chart.container(stage).draw();
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.SeriesBase|Function|boolean} Hatch fill.
+ */
+anychart.core.SeriesBase.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill !== this.hoverHatchFill_)
+      this.hoverHatchFill_ = hatchFill;
+    return this;
+  }
+  return this.hoverHatchFill_;
+};
+
+
+/**
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.SeriesBase|Function|boolean} Hatch fill.
+ */
+anychart.core.SeriesBase.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill !== this.selectHatchFill_)
+      this.selectHatchFill_ = hatchFill;
+    return this;
+  }
+  return this.selectHatchFill_;
+};
+
+
+/**
+ * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState Point state.
+ * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
+ */
+anychart.core.SeriesBase.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+
+  var normalHatchFill;
+  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
+    normalHatchFill = iterator.get('hatchFill');
+  } else {
+    normalHatchFill = this.hatchFill();
+  }
+
+  var hatchFill;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    if (usePointSettings && goog.isDef(iterator.get('selectHatchFill'))) {
+      hatchFill = iterator.get('selectHatchFill');
+    } else if (goog.isDef(this.selectHatchFill())) {
+      hatchFill = this.selectHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
+      hatchFill = iterator.get('hoverHatchFill');
+    } else if (goog.isDef(this.hoverHatchFill())) {
+      hatchFill = this.hoverHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else {
+    hatchFill = normalHatchFill;
+  }
+
+  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
+      this.normalizeHatchFill(
+          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
+};
+
+
+/**
+ * Gets final normalized pattern/hatch fill.
+ * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|string|boolean} hatchFill Normal state hatch fill.
+ * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.normalizeHatchFill = function(hatchFill) {
+  var fill;
+  var index = this.getIterator().getIndex();
+  if (goog.isFunction(hatchFill)) {
+    var sourceHatchFill = this.autoHatchFill ||
+        acgraph.vector.normalizeHatchFill(anychart.core.SeriesBase.DEFAULT_HATCH_FILL_TYPE);
+    var scope = {
+      'index': index,
+      'sourceHatchFill': sourceHatchFill,
+      'iterator': this.getIterator()
+    };
+    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
+  } else if (goog.isBoolean(hatchFill)) {
+    fill = hatchFill ? this.autoHatchFill : null;
+  } else
+    fill = acgraph.vector.normalizeHatchFill(hatchFill);
+  return fill;
+};
+
+
+/**
+ * Sets series hatch fill type that parent chart have set for it.
+ * @param {?(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} value Auto hatch fill type distributed by the chart.
+ */
+anychart.core.SeriesBase.prototype.setAutoHatchFill = function(value) {
+  this.autoHatchFill = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Fill.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).fill('green');
+ * @example <c>Linear gradient fill</c><t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).fill(['green', 'yellow']);
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).fill('green', 0.4);
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], 45, true, 0.5);
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).fill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.SeriesBase|Function} .
+ */
+anychart.core.SeriesBase.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.fill_) {
+      this.fill_ = fill;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
+    }
+    return this;
+  }
+  return this.fill_;
+};
+
+
+/**
+ * Getter for current series fill color.
+ * @return {!acgraph.vector.Fill} Current fill color.
+ *//**
+ * Sets fill settings using an object or a string.
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <c>Solid fill</c><t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).hoverFill('green');
+ * @example <c>Linear gradient fill</c><t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).hoverFill(['green', 'yellow']);
+ * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Fill color with opacity.<br/>
+ * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
+ * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
+ * @shortDescription Fill as a string or an object.
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).hoverFill('green', 0.4);
+ * @param {string} color Color as a string.
+ * @param {number=} opt_opacity Color opacity.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Linear gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], 45, true, 0.5);
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
+ * @param {number=} opt_angle Gradient angle.
+ * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
+ * @param {number=} opt_opacity Gradient opacity.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Radial gradient fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.column([1, 4, 7, 1]).hoverFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
+ * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
+ * @param {number} cx X ratio of center radial gradient.
+ * @param {number} cy Y ratio of center radial gradient.
+ * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {number=} opt_opacity Opacity of the gradient.
+ * @param {number=} opt_fx X ratio of focal point.
+ * @param {number=} opt_fy Y ratio of focal point.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Image fill.<br/>
+ * Learn more about coloring at:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
+ * @example <t>lineChart</t>
+ * chart.area([1, 4, 7, 1]).hoverFill({
+ *  src: 'http://static.anychart.com/underwater.jpg',
+ *  mode: acgraph.vector.ImageFillMode.STRETCH
+ * });
+ * @param {!acgraph.vector.Fill} imageSettings Object with settings.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.SeriesBase|Function} .
+ */
+anychart.core.SeriesBase.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    // TODO: we don't set anything cause everything is fine?
+    return this;
+  }
+  return this.hoverFill_;
+};
+
+
+/**
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.SeriesBase|Function} .
+ */
+anychart.core.SeriesBase.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.selectFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    // TODO: we don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectFill_;
+};
+
+
+/**
+ * Method that gets final stroke color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState Point state.
+ * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.getFinalFill = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        (usePointSettings && iterator.get('selectFill')) || this.selectFill() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Stroke.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for current stroke settings.
+ * @return {!acgraph.vector.Stroke} Current stroke settings.
+ *//**
+ * Setter for series stroke by function.
+ * @example <t>lineChart</t>
+ * chart.line([1, 4, 7, 1]).stroke(
+ *      function(){
+ *        return '3 '+ this.sourceColor;
+ *      }
+ * );
+ * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
+ *  return anychart.color.darken(this.sourceColor);
+ * }] Function that looks like <code>function(){
+ *    // this.sourceColor -  color returned by fill() getter.
+ *    return fillValue; // type acgraph.vector.Fill
+ * }</code>.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * Setter for stroke settings.<br/>
+ * Learn more about stroke settings:
+ * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
+ * @example <t>lineChart</t>
+ * chart.line([1, 4, 7, 1]).stroke('orange', 3, '5 2', 'round');
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ *//**
+ * @ignoreDoc
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.SeriesBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.SeriesBase.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.strokeInternal) {
+      this.strokeInternal = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
+    }
+    return this;
+  }
+  return this.strokeInternal;
+};
+
+
+/**
+ * Getter/setter for current hover stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.SeriesBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.SeriesBase.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.hoverStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: we don't set anything cause there is nothing to do?
+    return this;
+  }
+  return this.hoverStroke_;
+};
+
+
+/**
+ * Getter/setter for current select stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.SeriesBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.SeriesBase.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: we don't set anything cause there is nothing to do?
+    return this;
+  }
+  return this.selectStroke_;
+};
+
+
+/**
+ * Method that gets final line color for the current point, with all fallbacks taken into account.
+ * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
+ * @param {anychart.PointState|number} pointState Point state.
+ * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.getFinalStroke = function(usePointSettings, pointState) {
+  var iterator = this.getIterator();
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (usePointSettings && iterator.get('selectStroke')) || this.selectStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
+};
+
+
+/**
+ * Gets final normalized fill or stroke color.
+ * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
+ * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
+ * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.normalizeColor = function(color, var_args) {
+  var fill;
+  if (goog.isFunction(color)) {
+    var sourceColor = arguments.length > 1 ?
+        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
+        this.color();
+    var scope = {
+      'index': this.getIterator().getIndex(),
+      'sourceColor': sourceColor,
+      'iterator': this.getIterator()
+    };
+    fill = color.call(scope);
+  } else
+    fill = color;
+  return fill;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Labels.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for current series data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.SeriesBase)} Labels instance or itself for chaining call.
+ */
+anychart.core.SeriesBase.prototype.labels = function(opt_value) {
+  if (!this.labels_) {
+    this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.setParentEventTarget(this);
+    this.registerDisposable(this.labels_);
+    this.labels_.listenSignals(this.labelsInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.labels_.setup(opt_value);
+    return this;
+  }
+  return this.labels_;
+};
+
+
+/**
+ * Gets or sets series hover data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.SeriesBase)} Labels instance or itself for chaining call.
+ */
+anychart.core.SeriesBase.prototype.hoverLabels = function(opt_value) {
+  if (!this.hoverLabels_) {
+    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
+    this.hoverLabels_.enabled(null);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.hoverLabels_.setup(opt_value);
+    return this;
+  }
+  return this.hoverLabels_;
+};
+
+
+/**
+ * Gets or sets series select data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.SeriesBase)} Labels instance or itself for chaining call.
+ */
+anychart.core.SeriesBase.prototype.selectLabels = function(opt_value) {
+  if (!this.selectLabels_) {
+    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
+    this.selectLabels_.enabled(null);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.selectLabels_.setup(opt_value);
+    return this;
+  }
+  return this.selectLabels_;
+};
+
+
+/**
+ * Listener for labels invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.SeriesBase.prototype.labelsInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Gets label position.
+ * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
+ * @return {string} Position settings.
+ */
+anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var iterator = this.getIterator();
+
+  var pointLabel = iterator.get('label');
+  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
+  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+
+  var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
+  var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
+  var labelSelectPosition = selectPointLabel && selectPointLabel['position'] ? selectPointLabel['position'] : null;
+
+  return hovered || selected ?
+      hovered ?
+          labelHoverPosition ?
+              labelHoverPosition :
+              this.hoverLabels().position() ?
+                  this.hoverLabels().position() :
+                  labelPosition ?
+                      labelPosition :
+                      this.labels().position() :
+          labelSelectPosition ?
+              labelSelectPosition :
+              this.selectLabels().position() ?
+                  this.selectLabels().position() :
+                  labelPosition ?
+                      labelPosition :
+                      this.labels().position() :
+      labelPosition ?
+          labelPosition :
+          this.labels().position();
+};
+
+
+/**
+ * Draws marker for a point.
+ * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
+  var iterator = this.getIterator();
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointLabel = iterator.get('label');
+  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
+  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
+
+  var index = iterator.getIndex();
+  var labelsFactory;
+  if (selected) {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  } else if (hovered) {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  } else {
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+  }
+
+  var label = this.labels().getLabel(index);
+
+  var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
+  var labelHoverEnabledState = hoverPointLabel && goog.isDef(hoverPointLabel['enabled']) ? hoverPointLabel['enabled'] : null;
+
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(labelHoverEnabledState) ?
+              goog.isNull(this.hoverLabels().enabled()) ?
+                  goog.isNull(labelEnabledState) ?
+                      this.labels().enabled() :
+                      labelEnabledState :
+                  this.hoverLabels().enabled() :
+              labelHoverEnabledState :
+          goog.isNull(labelSelectEnabledState) ?
+              goog.isNull(this.selectLabels().enabled()) ?
+                  goog.isNull(labelEnabledState) ?
+                      this.labels().enabled() :
+                      labelEnabledState :
+                  this.selectLabels().enabled() :
+              labelSelectEnabledState :
+      goog.isNull(labelEnabledState) ?
+          this.labels().enabled() :
+          labelEnabledState;
+
+  if (isDraw) {
+    var position = this.getLabelsPosition(pointState);
+
+    var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
+    var formatProvider = this.createFormatProvider();
+    if (label) {
+      label.formatProvider(formatProvider);
+      label.positionProvider(positionProvider);
+    } else {
+      label = this.labels().add(formatProvider, positionProvider, index);
+    }
+
+    label.resetSettings();
+    label.currentLabelsFactory(labelsFactory);
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
+    label.draw();
+  } else if (label) {
+    label.clear();
+  }
+};
+
+
+/**
+ * Create series position provider.
+ * @param {string} position Understands anychart.enums.Position and some additional values.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.createPositionProvider = goog.abstractMethod;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity section.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.SeriesBase.prototype.applyAppearanceToPoint = goog.nullFunction;
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.SeriesBase.prototype.applyAppearanceToSeries = goog.nullFunction;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Events manipulation.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.SeriesBase.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  res['pointIndex'] = this.getIndexByEvent(res);
+  return res;
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.core.SeriesBase.prototype.makePointEvent = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  event['pointIndex'] = pointIndex;
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'series': this,
+    'iterator': iter,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Get point index by event. Used for events from data layer only
+ * @param {anychart.core.MouseEvent} event .
+ * @protected
+ * @return {number} Point index.
+ */
+anychart.core.SeriesBase.prototype.getIndexByEvent = function(event) {
+  return anychart.utils.toNumber(anychart.utils.extractTag(event['domTarget']).index);
+};
+
+
+/** @inheritDoc */
+anychart.core.SeriesBase.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * Temporarily works only for acgraph.vector.Element.
+ * @param {acgraph.vector.Element} element .
+ * @param {boolean=} opt_seriesGlobal .
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.makeInteractive = function(element, opt_seriesGlobal) {
+  if (!element) return;
+  element.tag = {series: this};
+  if (opt_seriesGlobal) {
+    element.tag.index = true;
+  } else {
+    element.tag.index = this.getIterator().getIndex();
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Hover.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
+ * @return {!anychart.core.SeriesBase}  {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.hover = function(opt_indexOrIndexes) {
+  if (goog.isDef(opt_indexOrIndexes))
+    this.hoverPoint(opt_indexOrIndexes);
+  else
+    this.hoverSeries();
+
+  return this;
+};
+
+
+/**
+ * Removes hover from the series.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.unhover = function() {
+  if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
+      !this.enabled())
+    return this;
+
+  this.state.removePointState(anychart.PointState.HOVER, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+
+  return this;
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @return {!anychart.core.SeriesBase}  {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.hoverPoint = function(index) {
+  if (!this.enabled())
+    return this;
+
+  if (goog.isArray(index)) {
+    var hoveredPoints = this.state.getIndexByPointState(anychart.PointState.HOVER);
+    for (var i = 0; i < hoveredPoints.length; i++) {
+      if (!goog.array.contains(index, hoveredPoints[i])) {
+        this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
+      }
+    }
+    this.state.addPointState(anychart.PointState.HOVER, index);
+  } else if (goog.isNumber(index)) {
+    this.unhover();
+    this.state.addPointState(anychart.PointState.HOVER, index);
+  }
+  return this;
+};
+
+
+/**
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.core.SeriesBase} An instance of the {@link anychart.core.SeriesBase} class for method chaining.
+ */
+anychart.core.SeriesBase.prototype.hoverSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.setPointState(anychart.PointState.HOVER);
+
+  return this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Select.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Imitates selects a point of the series by its index.
+ * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.select = function(opt_indexOrIndexes) {
+  if (!this.enabled())
+    return this;
+
+  if (goog.isDef(opt_indexOrIndexes))
+    this.selectPoint(opt_indexOrIndexes);
+  else
+    this.selectSeries();
+
+  return this;
+};
+
+
+/**
+ * Selects all points of the series. Use <b>unselect</b> method for unselect series.
+ * @return {!anychart.core.SeriesBase} An instance of the {@link anychart.core.SeriesBase} class for method chaining.
+ */
+anychart.core.SeriesBase.prototype.selectSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.setPointState(anychart.PointState.SELECT);
+
+  return this;
+};
+
+
+/**
+ * Selects a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to select.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  if (!this.enabled())
+    return this;
+
+  var unselect = !(opt_event && opt_event.shiftKey);
+
+  if (goog.isArray(indexOrIndexes)) {
+    if (!opt_event)
+      this.unselect();
+
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+  } else if (goog.isNumber(indexOrIndexes)) {
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+  }
+
+  return this;
+};
+
+
+/**
+ * Deselects all points.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.unselect = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.removePointState(anychart.PointState.SELECT, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+  return this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity modes.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Selection mode.
+ * @type {?anychart.enums.SelectionMode}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.selectionMode_;
+
+
+/**
+ * Selection mode.
+ * @type {anychart.enums.HoverMode}
+ * @private
+ */
+anychart.core.SeriesBase.prototype.hoverMode_;
+
+
+/**
+ * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
+ * @return {anychart.core.SeriesBase|anychart.enums.SelectionMode|null} .
+ */
+anychart.core.SeriesBase.prototype.selectionMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeSelectMode(opt_value);
+    if (opt_value != this.selectionMode_) {
+      this.selectionMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.core.SeriesBase|anychart.enums.HoverMode} .
+ */
+anychart.core.SeriesBase.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  AllowPointsSelect. (Deprecated)
+//
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/**
+ * Allows to select points of the series.
+ * @param {?boolean=} opt_value Allow or not.
+ * @return {null|boolean|anychart.core.SeriesBase} Returns allow points select state or current series instance for chaining.
+ * @deprecated Use this.selectionMode().
+ */
+anychart.core.SeriesBase.prototype.allowPointsSelect = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.selectionMode(goog.isBoolean(opt_value) ?
+        (opt_value ?
+            anychart.enums.SelectionMode.MULTI_SELECT :
+            anychart.enums.SelectionMode.NONE) :
+        opt_value);
+    return this;
+  }
+  return goog.isNull(this.selectionMode()) ? null : this.selectionMode() != anychart.enums.SelectionMode.NONE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Serialize
+//
+//------------------------------------------- ---------------------------------------------------------------------------
+// Fill and stroke settings are located here, but you should export them ONLY in series themselves.
+/**
+ * @inheritDoc
+ */
+anychart.core.SeriesBase.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+  if (goog.isDef(this.name()))
+    json['name'] = this.name();
+  json['data'] = this.data().serialize();
+  json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['selectLabels'] = this.selectLabels().serialize();
+  json['tooltip'] = this.tooltip().serialize();
+  json['legendItem'] = this.legendItem().serialize();
+  if (goog.isFunction(this['fill'])) {
+    if (goog.isFunction(this.fill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series fill']
+      );
+    } else {
+      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+    }
+  }
+  if (goog.isFunction(this['hoverFill'])) {
+    if (goog.isFunction(this.hoverFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverFill']
+      );
+    } else {
+      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+    }
+  }
+  if (goog.isFunction(this['selectFill'])) {
+    if (goog.isFunction(this.selectFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectFill']
+      );
+    } else {
+      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
+    }
+  }
+  if (goog.isFunction(this['stroke'])) {
+    if (goog.isFunction(this.stroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series stroke']
+      );
+    } else {
+      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+    }
+  }
+  if (goog.isFunction(this['hoverStroke'])) {
+    if (goog.isFunction(this.hoverStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverStroke']
+      );
+    } else {
+      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+    }
+  }
+  if (goog.isFunction(this['selectStroke'])) {
+    if (goog.isFunction(this.selectStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectStroke']
+      );
+    } else {
+      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
+    }
+  }
+  if (goog.isFunction(this['hatchFill'])) {
+    if (goog.isFunction(this.hatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hatchFill']
+      );
+    } else {
+      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+    }
+  }
+  if (goog.isFunction(this['hoverHatchFill'])) {
+    if (goog.isFunction(this.hoverHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverHatchFill']
+      );
+    } else {
+      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.hoverHatchFill()));
+    }
+  }
+  if (goog.isFunction(this['selectHatchFill'])) {
+    if (goog.isFunction(this.selectHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectHatchFill']
+      );
+    } else {
+      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.selectHatchFill()));
+    }
+  }
+  if (goog.isDef(this.selectionMode()))
+    json['selectionMode'] = this.selectionMode();
+  return json;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+  if (goog.isFunction(this['fill']))
+    this.fill(config['fill']);
+  if (goog.isFunction(this['hoverFill']))
+    this.hoverFill(config['hoverFill']);
+  if (goog.isFunction(this['selectFill']))
+    this.selectFill(config['selectFill']);
+  if (goog.isFunction(this['stroke']))
+    this.stroke(config['stroke']);
+  if (goog.isFunction(this['hoverStroke']))
+    this.hoverStroke(config['hoverStroke']);
+  if (goog.isFunction(this['selectStroke']))
+    this.selectStroke(config['selectStroke']);
+  if (goog.isFunction(this['hatchFill']))
+    this.hatchFill(config['hatchFill']);
+  if (goog.isFunction(this['hoverHatchFill']))
+    this.hoverHatchFill(config['hoverHatchFill']);
+  if (goog.isFunction(this['selectHatchFill']))
+    this.selectHatchFill(config['selectHatchFill']);
+  this.color(config['color']);
+  this.name(config['name']);
+  this.meta(config['meta']);
+  if ('data' in config)
+    this.data(config['data'] || null);
+  this.labels(config['labels']);
+  this.hoverLabels(config['hoverLabels']);
+  this.selectLabels(config['selectLabels']);
+  this.tooltip(config['tooltip']);
+  this.legendItem(config['legendItem']);
+  if (goog.isDef(config['allowPointsSelect'])) {
+    this.selectionMode(goog.isBoolean(config['allowPointsSelect']) ?
+        (config['allowPointsSelect'] ?
+            anychart.enums.SelectionMode.MULTI_SELECT :
+            anychart.enums.SelectionMode.NONE) :
+        config['allowPointsSelect']);
+  }
+  this.selectionMode(config['selectionMode']);
+};
+
+
+//exports
+anychart.core.SeriesBase.prototype['color'] = anychart.core.SeriesBase.prototype.color;//doc|ex
+anychart.core.SeriesBase.prototype['name'] = anychart.core.SeriesBase.prototype.name;//doc|ex
+anychart.core.SeriesBase.prototype['meta'] = anychart.core.SeriesBase.prototype.meta;//doc|ex
+anychart.core.SeriesBase.prototype['data'] = anychart.core.SeriesBase.prototype.data;//doc|ex
+anychart.core.SeriesBase.prototype['tooltip'] = anychart.core.SeriesBase.prototype.tooltip;
+
+anychart.core.SeriesBase.prototype['labels'] = anychart.core.SeriesBase.prototype.labels;//doc|ex
+anychart.core.SeriesBase.prototype['hoverLabels'] = anychart.core.SeriesBase.prototype.hoverLabels;
+anychart.core.SeriesBase.prototype['selectLabels'] = anychart.core.SeriesBase.prototype.selectLabels;
+
+anychart.core.SeriesBase.prototype['unhover'] = anychart.core.SeriesBase.prototype.unhover;
+anychart.core.SeriesBase.prototype['unselect'] = anychart.core.SeriesBase.prototype.unselect;
+
+anychart.core.SeriesBase.prototype['hover'] = anychart.core.SeriesBase.prototype.hover;
+anychart.core.SeriesBase.prototype['select'] = anychart.core.SeriesBase.prototype.select;
+anychart.core.SeriesBase.prototype['selectionMode'] = anychart.core.SeriesBase.prototype.selectionMode;
+anychart.core.SeriesBase.prototype['allowPointsSelect'] = anychart.core.SeriesBase.prototype.allowPointsSelect;
+
+anychart.core.SeriesBase.prototype['legendItem'] = anychart.core.SeriesBase.prototype.legendItem;

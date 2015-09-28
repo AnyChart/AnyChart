@@ -44,7 +44,7 @@ anychart.core.cartesian.series.StepLine.prototype.prevY_;
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.StepLine.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.StepLine.prototype.drawFirstPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -58,7 +58,7 @@ anychart.core.cartesian.series.StepLine.prototype.drawFirstPoint = function() {
     this.prevX_ = x;
     this.prevY_ = y;
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -66,7 +66,7 @@ anychart.core.cartesian.series.StepLine.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.StepLine.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.StepLine.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -84,7 +84,7 @@ anychart.core.cartesian.series.StepLine.prototype.drawSubsequentPoint = function
     this.prevX_ = x;
     this.prevY_ = y;
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -99,12 +99,12 @@ anychart.core.cartesian.series.StepLine.prototype.strokeInternal = (function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.StepLine.prototype.getMarkerFill = function() {
-  return this.getFinalStroke(false, false);
+  return this.getFinalStroke(false, anychart.PointState.NORMAL);
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.StepLine.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.cartesian.series.StepLine.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -126,3 +126,4 @@ anychart.core.cartesian.series.StepLine.prototype.getLegendIconType = function()
 //exports
 anychart.core.cartesian.series.StepLine.prototype['stroke'] = anychart.core.cartesian.series.StepLine.prototype.stroke;//inherited
 anychart.core.cartesian.series.StepLine.prototype['hoverStroke'] = anychart.core.cartesian.series.StepLine.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.StepLine.prototype['selectStroke'] = anychart.core.cartesian.series.StepLine.prototype.selectStroke;//inherited

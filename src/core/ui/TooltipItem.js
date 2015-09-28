@@ -180,7 +180,7 @@ anychart.core.ui.TooltipItem.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.TOOLTIP_POSITION |
         anychart.ConsistencyState.TOOLTIP_TITLE |
         anychart.ConsistencyState.TOOLTIP_SEPARATOR |
-        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_CONTENT |
         anychart.ConsistencyState.TOOLTIP_BACKGROUND |
         anychart.ConsistencyState.TOOLTIP_VISIBILITY;
 
@@ -224,7 +224,7 @@ anychart.core.ui.TooltipItem.prototype.onTitleSignal_ = function(event) {
         anychart.ConsistencyState.TOOLTIP_POSITION |
         anychart.ConsistencyState.TOOLTIP_TITLE |
         anychart.ConsistencyState.TOOLTIP_SEPARATOR |
-        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_CONTENT |
         anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
@@ -271,7 +271,7 @@ anychart.core.ui.TooltipItem.prototype.onSeparatorSignal_ = function(event) {
         anychart.ConsistencyState.TOOLTIP_POSITION |
         anychart.ConsistencyState.TOOLTIP_TITLE |
         anychart.ConsistencyState.TOOLTIP_SEPARATOR |
-        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_CONTENT |
         anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
@@ -319,11 +319,11 @@ anychart.core.ui.TooltipItem.prototype.onContentSignal_ = function(event) {
         anychart.ConsistencyState.TOOLTIP_POSITION |
         anychart.ConsistencyState.TOOLTIP_TITLE |
         anychart.ConsistencyState.TOOLTIP_SEPARATOR |
-        anychart.ConsistencyState.TOOLTIP_LABELS |
+        anychart.ConsistencyState.TOOLTIP_CONTENT |
         anychart.ConsistencyState.TOOLTIP_BACKGROUND),
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.TOOLTIP_LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.TOOLTIP_CONTENT, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -681,7 +681,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.TOOLTIP_SEPARATOR);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_LABELS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.TOOLTIP_CONTENT)) {
     var label = /** @type {anychart.core.ui.Label} */(this.content());
     var remainingBounds = this.separatorRemainingBounds_ || this.titleRemainingBounds_ || this.boundsWithoutPadding_;
     label.suspendSignalsDispatching();
@@ -690,7 +690,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
     label.resumeSignalsDispatching(false);
     label.draw();
 
-    this.markConsistent(anychart.ConsistencyState.TOOLTIP_LABELS);
+    this.markConsistent(anychart.ConsistencyState.TOOLTIP_CONTENT);
   }
 
   if (manualSuspend) stage.resume();
@@ -713,21 +713,50 @@ anychart.core.ui.TooltipItem.prototype.calculateContentBounds_ = function() {
   if (!this.contentBounds_) {
     var result = new anychart.math.Rect(0, 0, 0, 0);
     var separatorBounds;
+    var tmpWidth = null;
 
     var title = /** @type {anychart.core.ui.Title} */(this.title());
     if (title.enabled()) {
       title.parentBounds(null);
+      // fix for title.width('100%');
+      if (anychart.utils.isPercent(title.width())) {
+        tmpWidth = /** @type {number|string|null} */(title.width());
+        title.width(null);
+      }
       var titleBounds = title.getContentBounds();
       result.width = Math.max(result.width, titleBounds.width);
       result.height += titleBounds.height;
+
+      if (tmpWidth) {
+        title.width(tmpWidth);
+        tmpWidth = null;
+      }
     }
 
     var label = /** @type {anychart.core.ui.Label} */(this.content());
     if (label.enabled()) {
       label.parentBounds(null);
-      var contentContentBounds = label.getContentBounds();
-      result.width = Math.max(result.width, contentContentBounds.width);
-      result.height += contentContentBounds.height;
+      // fix for content.width('100%');
+      if (anychart.utils.isPercent(label.width())) {
+        tmpWidth = /** @type {number|string|null} */(label.width());
+        label.width(null);
+      }
+      var contentBounds = label.getContentBounds();
+      result.width = Math.max(result.width, contentBounds.width);
+      result.height += contentBounds.height;
+
+      if (tmpWidth) {
+        label.width(tmpWidth);
+        tmpWidth = null;
+      }
+    }
+
+    // fix for title and content .width('100%');
+    if (title.enabled()) {
+      title.parentBounds(new anychart.math.Rect(0, 0, result.width, titleBounds.height));
+    }
+    if (label.enabled()) {
+      label.parentBounds(new anychart.math.Rect(0, 0, result.width, contentBounds.height));
     }
 
     var separator = /** @type {anychart.core.ui.Separator} */(this.separator());

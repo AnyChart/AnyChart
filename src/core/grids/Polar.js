@@ -254,7 +254,7 @@ anychart.core.grids.Polar.prototype.oddFill = function(opt_fillOrColorOrKeys, op
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.oddFill_), val)) {
       this.oddFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -278,7 +278,7 @@ anychart.core.grids.Polar.prototype.evenFill = function(opt_fillOrColorOrKeys, o
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.evenFill_), val)) {
       this.evenFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -319,7 +319,7 @@ anychart.core.grids.Polar.prototype.stroke = function(opt_strokeOrFill, opt_thic
     var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.stroke_ != stroke) {
       this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {

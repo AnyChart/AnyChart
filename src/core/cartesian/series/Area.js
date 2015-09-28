@@ -26,7 +26,7 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Area.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.Area.prototype.drawFirstPoint = function(pointState) {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
@@ -50,7 +50,7 @@ anychart.core.cartesian.series.Area.prototype.drawFirstPoint = function() {
     else
       this.zeroesStack = [x, zero, zeroMissing];
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
 
   return true;
@@ -58,7 +58,7 @@ anychart.core.cartesian.series.Area.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Area.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Area.prototype.drawSubsequentPoint = function(pointState) {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
@@ -77,7 +77,7 @@ anychart.core.cartesian.series.Area.prototype.drawSubsequentPoint = function() {
     else
       this.zeroesStack.push(x, zero, zeroMissing);
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
 
   return true;
@@ -99,7 +99,7 @@ anychart.core.cartesian.series.Area.prototype.finalizeSegment = function() {
       /** @type {number} */
       var y = /** @type {number} */(this.zeroesStack[i - 1]);
       /** @type {boolean} */
-      var isMissing = /** @type {boolean} */(this.zeroesStack[i - 0]);
+      var isMissing = /** @type {boolean} */(this.zeroesStack[i]);
       if (isMissing && !isNaN(prevX))
         this.path.lineTo(prevX, y);
       else if (prevWasMissing && !isNaN(prevY))
@@ -130,7 +130,12 @@ anychart.core.cartesian.series.Area.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.Area.prototype['fill'] = anychart.core.cartesian.series.Area.prototype.fill;//inherited
 anychart.core.cartesian.series.Area.prototype['hoverFill'] = anychart.core.cartesian.series.Area.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.Area.prototype['selectFill'] = anychart.core.cartesian.series.Area.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.Area.prototype['stroke'] = anychart.core.cartesian.series.Area.prototype.stroke;//inherited
 anychart.core.cartesian.series.Area.prototype['hoverStroke'] = anychart.core.cartesian.series.Area.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Area.prototype['selectStroke'] = anychart.core.cartesian.series.Area.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.Area.prototype['hatchFill'] = anychart.core.cartesian.series.Area.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.Area.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Area.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.Area.prototype['selectHatchFill'] = anychart.core.cartesian.series.Area.prototype.selectHatchFill;//inherited

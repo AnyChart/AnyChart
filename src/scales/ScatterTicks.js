@@ -410,9 +410,9 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
             anychart.utils.alignRight(currentInterval, val3),
             anychart.utils.alignRight(currentInterval, val5),
             anychart.utils.alignRight(currentInterval, val6));
-        var tmpDiff1 = anychart.math.round(anychart.utils.alignLeft(min, currentInterval, this.base_), 7) - min;
+        var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, this.base_)) - min;
         tmpDiff1 *= tmpDiff1;
-        var tmpDiff2 = anychart.math.round(anychart.utils.alignRight(max, currentInterval, this.base_), 7) - max;
+        var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, this.base_)) - max;
         tmpDiff2 *= tmpDiff2;
         var tmpDiff = tmpDiff1 + tmpDiff2;
         //console.log(currentInterval, tmpDiff);
@@ -423,22 +423,22 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
       }
     }
     interval = Math.max(interval, 1e-7);
-    var desiredMin = anychart.math.round(anychart.utils.alignLeft(min, interval, this.base_), 7);
+    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_));
     if (opt_canModifyMin)
       result[0] = min = desiredMin;
     else if (min - desiredMin > 1e-7) {
       ticks.push(min);
       result[2] = desiredMin;
     }
-    var desiredMax = anychart.math.round(anychart.utils.alignRight(max, interval, this.base_), 7);
+    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_));
     if (opt_canModifyMax)
       result[1] = max = desiredMax;
     else if (desiredMax - max > 1e-7) {
       result[3] = desiredMax;
     }
-    for (var j = anychart.math.round(anychart.utils.alignRight(min, interval, this.base_), 7);
+    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_));
          j <= max;
-         j = anychart.math.round(j + interval, 7)) {
+         j = anychart.math.specialRound(j + interval)) {
       ticks.push(j);
     }
     if (3 in result)
@@ -500,9 +500,9 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, lo
             anychart.utils.alignRight(currentInterval, val6),
             anychart.utils.alignRight(currentInterval, val7));
         currentInterval = Math.max(currentInterval, 1e-7);
-        var tmpDiff1 = anychart.math.round(anychart.utils.alignLeft(min, currentInterval, this.base_), 7) - min;
+        var tmpDiff1 = anychart.math.specialRound(anychart.utils.alignLeft(min, currentInterval, this.base_)) - min;
         tmpDiff1 *= tmpDiff1;
-        var tmpDiff2 = anychart.math.round(anychart.utils.alignRight(max, currentInterval, this.base_), 7) - max;
+        var tmpDiff2 = anychart.math.specialRound(anychart.utils.alignRight(max, currentInterval, this.base_)) - max;
         tmpDiff2 *= tmpDiff2;
         var tmpDiff = tmpDiff1 + tmpDiff2;
         if (isNaN(currentDiff) || tmpDiff < currentDiff) {
@@ -513,7 +513,7 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, lo
     }
     interval = Math.max(interval, 1e-7);
 
-    var desiredMin = anychart.math.round(anychart.utils.alignLeft(min, interval, this.base_), 7);
+    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_));
     if (opt_canModifyMin) {
       min = desiredMin;
       result[0] = anychart.math.pow(logBase, desiredMin);
@@ -521,16 +521,16 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, lo
       ticks.push(anychart.math.pow(logBase, min));
       result[2] = anychart.math.pow(logBase, desiredMin);
     }
-    var desiredMax = anychart.math.round(anychart.utils.alignRight(max, interval, this.base_), 7);
+    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_));
     if (opt_canModifyMax) {
       max = desiredMax;
       result[1] = anychart.math.pow(logBase, desiredMax);
     } else if (desiredMax - max > 1e-7) {
       result[3] = anychart.math.pow(logBase, desiredMax);
     }
-    for (var j = anychart.math.round(anychart.utils.alignRight(min, interval, this.base_), 7);
+    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_));
          j <= max;
-         j = anychart.math.round(j + interval, 7)) {
+         j = anychart.math.specialRound(j + interval)) {
       ticks.push(anychart.math.pow(logBase, j));
     }
     if (3 in result)

@@ -466,7 +466,7 @@ anychart.core.axes.Circular.prototype.fill = function(opt_fillOrColorOrKeys, opt
 
 
 /**
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
+ * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|string|anychart.core.axes.Circular} Drawing flag or itself for method chaining.
  */
 anychart.core.axes.Circular.prototype.overlapMode = function(opt_value) {

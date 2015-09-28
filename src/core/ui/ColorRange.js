@@ -811,18 +811,13 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
 
     value = /** @type {number} */(scale.inverseTransform(ratio));
     if (!(event.metaKey || event.shiftKey)) {
-      series.map.unselect(event);
+      series.map.unselect();
     }
     var iterator, pointValue;
     if (scale instanceof anychart.core.map.scale.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
-      if (series) {
-        var regions = this.rangeRegions_[range.sourceIndex];
-        for (var i = 0, len = regions.length; i < len; i++)
-          series.selectPoint(regions[i], undefined, false);
-        event['pointIndex'] = regions[regions.length - 1];
-        series.dispatchEvent(series.makeSelectPointEvent(event));
-      }
+      if (series)
+        series.selectPoint(this.rangeRegions_[range.sourceIndex], event);
     } else if (scale instanceof anychart.core.map.scale.LinearColor) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
@@ -845,7 +840,6 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
           series.selectPoint(iterator.getIndex());
       }
     }
-    series.hideTooltip();
     event.stopPropagation();
   }
 };
@@ -875,13 +869,8 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     value = /** @type {number} */(scale.inverseTransform(ratio));
     if (scale instanceof anychart.core.map.scale.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
-      var regions = range && this.rangeRegions_[range.sourceIndex];
-      if (series && regions) {
-        for (var i = 0, len = regions.length; i < len; i++)
-          series.hoverPoint(regions[i], undefined, false);
-        event['pointIndex'] = regions[regions.length - 1];
-        series.dispatchEvent(series.makePointEvent(event));
-      }
+      if (series)
+        series.hoverPoint(this.rangeRegions_[range.sourceIndex]);
     } else if (scale instanceof anychart.core.map.scale.LinearColor && series) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
@@ -907,7 +896,6 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
           series.hoverPoint(iterator.getIndex());
       }
     }
-    series.hideTooltip();
     this.showMarker(/** @type {number} */(value));
   }
 };
@@ -953,6 +941,7 @@ anychart.core.ui.ColorRange.prototype.setupByJSON = function(config) {
 };
 
 
+//exports
 anychart.core.ui.ColorRange.prototype['marker'] = anychart.core.ui.ColorRange.prototype.marker;
 anychart.core.ui.ColorRange.prototype['colorLineSize'] = anychart.core.ui.ColorRange.prototype.colorLineSize;
 anychart.core.ui.ColorRange.prototype['length'] = anychart.core.ui.ColorRange.prototype.length;

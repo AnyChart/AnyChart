@@ -5,10 +5,22 @@
   <meta charset="utf-8">
   <script>
     goog.require('anychart.modules.sparkline');
+    goog.require('anychart.themes.defaultTheme');
   </script>
   <script src="index.js"></script>
+  <style>
+    #container {
+      position: absolute;
+      left: 100px;
+      top: 100px;
+      border: 1px solid;
+      width: 900px;
+      height: 500px;
+      float: left;
+    }
+  </style>
 </head>
 <body>
-<div id="container" style="position: absolute; left: 100px; top: 100px; border: 1px solid; width: 400px; height: 100px; float: left;"></div>
+<div id="container"></div>
 </body>
 </html>

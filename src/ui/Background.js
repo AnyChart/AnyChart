@@ -24,6 +24,8 @@ anychart.ui.background = function() {
 };
 
 
+//anychart.ui.Background.prototype['getRemainingBounds'] = anychart.ui.Background.prototype.getRemainingBounds;
+
 //exports
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
 anychart.ui.Background.prototype['draw'] = anychart.ui.Background.prototype.draw;

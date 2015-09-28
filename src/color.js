@@ -14,6 +14,13 @@ goog.require('goog.string');
 
 
 /**
+ * Transparent fill color, that still can handle events.
+ * @type {acgraph.vector.Fill}
+ */
+anychart.color.TRANSPARENT_HANDLER = {'color': '#fff', 'opacity': 0.00001};
+
+
+/**
  * Blend two colors together, using the specified factor to indicate the weight given to the first color.
  * @example <t>stageOnly</t>
  * var color1 = [255, 0, 0];
@@ -293,7 +300,7 @@ anychart.color.equals = function(color1, color2) {
 /**
  * Serializes fill or stroke.
  * @param {acgraph.vector.Fill|acgraph.vector.Stroke} color
- * @return {Object|string}
+ * @return {Object|string|boolean}
  */
 anychart.color.serialize = function(color) {
   var result;
@@ -309,6 +316,8 @@ anychart.color.serialize = function(color) {
     result = color.serialize();
   } else if (goog.isObject(color)) {
     result = /** @type {Object} */(anychart.utils.recursiveClone(color));
+  } else if (goog.isBoolean(color)) {
+    result = color;
   } else {
     result = String(color || 'none');
   }

@@ -115,7 +115,7 @@ function load() {
 
   startAngleSet = 90;
 
-//  var values = ['РћРґРёРЅ', 'Р”РІР°', 'РўСЂРё', 'Р§РµС‚С‹СЂРµ', 'РџСЏС‚СЊ', 'РЁРµСЃС‚СЊ', 'РЎРµРјСЊ', 'Р’РѕСЃРµРјСЊ', 'Р”РµРІСЏС‚СЊ'];
+//  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'];
 //  var values = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16', 'P17', 'P18', 'P19', 'P20', 'P21', 'P22', 'P23', 'P24'];
 //  var values = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'];
 //  var values = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
@@ -139,7 +139,7 @@ function load() {
   axis1.container(stage);
   axis1.parentBounds(parentBounds);
   axis1.ticks().length(5);
-  axis1.labels().rotation(0).textFormatter(function () {return this.value + 'В°'});
+  axis1.labels().rotation(0).textFormatter(function () {return this.value + '°'});
   axis1.stroke(stroke);
   axis1.enabled(true);
   axis1.zIndex(2);

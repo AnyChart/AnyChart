@@ -775,7 +775,7 @@
             };
             var chart = anychart.fromJson(json);
             chart.xAxis().labels().textFormatter(function() {
-                return this["value"] + "Â°"
+                return this["value"] + "°"
             });
             chart.draw();
         });

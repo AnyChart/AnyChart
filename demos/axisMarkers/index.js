@@ -23,7 +23,7 @@ function load() {
   chart.textMarker(2)
       .scale(chart.xScale())
       .value(2)
-      .text('VERTICAL!!! –†–ê–ë–û–¢–ê–ï–¢!!!')
+      .text('VERTICAL!!! –¿¡Œ“¿≈“!!!')
       .layout('vertical')
       .align('center');
 

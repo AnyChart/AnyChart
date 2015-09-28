@@ -902,6 +902,12 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   var autoWidth;
   var autoHeight;
 
+  //TODO(AntonKagakin): need to rework autoWidth/autoHeight logic
+  //and crop size if width/height is more than parentBounds
+  //1) if no width/height but paretnBounds, width/height = parentBounds
+  //2) if no bounds but adjustByWidth||Height => calculate to minFontSize
+  //3) ...
+
   // canAdjustBy = !auto
   if (parentBounds) {
     parentWidth = parentBounds.width;
@@ -945,7 +951,7 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   if (autoWidth) {
     width += this.textElement.getBounds().width;
     this.textWidth = width;
-    width = this.backgroundWidth = padding.widenWidth(width);
+    this.backgroundWidth = padding.widenWidth(width);
   } else {
     width = this.textWidth = padding.tightenWidth(width);
   }
@@ -955,7 +961,7 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   if (autoHeight) {
     height += this.textElement.getBounds().height;
     this.textHeight = height;
-    height = this.backgroundHeight = padding.widenHeight(height);
+    this.backgroundHeight = padding.widenHeight(height);
   } else {
     height = this.textHeight = padding.tightenHeight(height);
   }
@@ -967,13 +973,40 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
 
   var needAdjust = ((canAdjustByWidth && this.adjustByWidth_) || (canAdjustByHeight && this.adjustByHeight_));
 
+  this.suspendSignalsDispatching();
   if (needAdjust) {
     var calculatedFontSize = this.calculateFontSize_(width, height);
-    this.suspendSignalsDispatching();
     this.fontSize(calculatedFontSize);
     this.textElement.fontSize(calculatedFontSize);
-    this.resumeSignalsDispatching(false);
+    if (autoWidth) {
+      this.textElement.width(null);
+      this.textWidth = this.textElement.getBounds().width;
+      this.textElement.width(this.textWidth);
+      this.backgroundWidth = padding.widenWidth(this.textWidth);
+    }
+    if (autoHeight) {
+      this.textElement.height(null);
+      this.textHeight = this.textElement.getBounds().height;
+      this.textElement.height(this.textHeight);
+      this.backgroundHeight = padding.widenHeight(this.textHeight);
+    }
+  } else if (this.adjustByWidth_ || this.adjustByHeight_) {
+    this.fontSize(this.minFontSize_);
+    this.textElement.fontSize(this.minFontSize_);
+    if (autoWidth) {
+      this.textElement.width(null);
+      this.textWidth = this.textElement.getBounds().width;
+      this.textElement.width(this.textWidth);
+      this.backgroundWidth = padding.widenWidth(this.textWidth);
+    }
+    if (autoHeight) {
+      this.textElement.height(null);
+      this.textHeight = this.textElement.getBounds().height;
+      this.textElement.height(this.textHeight);
+      this.backgroundHeight = padding.widenHeight(this.textHeight);
+    }
   }
+  this.resumeSignalsDispatching(false);
 
   this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth);
   this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight);
@@ -1066,13 +1099,13 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
   backgroundBounds.top = position.y;
 
   this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
-  var clip = this.textElement.clip();
-  if (clip) {
-    clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
-  } else {
-    clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
-    this.textElement.clip(clip);
-  }
+  //var clip = this.textElement.clip();
+  //if (clip) {
+  //  clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
+  //} else {
+  //  clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
+  //  this.textElement.clip(clip);
+  //}
 
   return backgroundBounds;
 };

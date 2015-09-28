@@ -46,36 +46,42 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowsStack;
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectHighStroke_;
 
 
 /**
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke_;
+
+
+/**
+ * @type {(acgraph.vector.Stroke|Function|null)}
+ * @private
+ */
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectLowStroke_;
 
 
 /**
@@ -90,12 +96,12 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.startDrawing = func
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.colorizeShape = function(pointState) {
   this.path.stroke(null);
-  this.path.fill(this.getFinalFill(false, hover));
-  this.lowPath.stroke(this.getFinalLowStroke(hover), 1);
+  this.path.fill(this.getFinalFill(false, pointState));
+  this.lowPath.stroke(this.getFinalLowStroke(pointState), 1);
   this.lowPath.fill(null);
-  this.highPath.stroke(this.getFinalHighStroke(hover), 1);
+  this.highPath.stroke(this.getFinalHighStroke(pointState), 1);
   this.highPath.fill(null);
 };
 
@@ -244,24 +250,54 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = f
 
 
 /**
+ * Getter/setter for select stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectHighStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
+                                                                                        opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectHighStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectHighStroke_;
+};
+
+
+/**
  * Method that gets final color of the line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke = function(hover) {
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('highStroke') ||
-      this.highStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-              iterator.get('hoverHighStroke') ||
-              this.hoverHighStroke() ||
-              normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(iterator.get('highStroke') || this.highStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('selectHighStroke')) || this.selectHighStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('hoverHighStroke')) || this.hoverHighStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -397,24 +433,54 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = fu
 
 
 /**
+ * Getter/setter for select stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
+ */
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectLowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
+                                                                                       opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.selectLowStroke_ = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectLowStroke_;
+};
+
+
+/**
  * Method that gets final color of the line, all fallbacks are taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalLowStroke = function(hover) {
+anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalLowStroke = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(
-      iterator.get('lowStroke') ||
-      this.lowStroke());
-  return /** @type {!acgraph.vector.Stroke} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Stroke|Function} */(
-              iterator.get('hoverLowStroke') ||
-              this.hoverLowStroke() ||
-              normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Stroke|Function} */(iterator.get('lowStroke') || this.lowStroke());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('selectLowStroke')) || this.selectLowStroke() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Stroke|Function} */(
+        (iterator.get('hoverLowStroke')) || this.hoverLowStroke() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
 };
 
 
@@ -423,7 +489,9 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.finalizeHatchFill =
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (this.hatchFillPath) {
       this.hatchFillPath.deserialize(this.path.serialize());
-      this.applyHatchFill(false);
+
+      var seriesState = this.state.getSeriesState();
+      this.applyHatchFill(seriesState);
     }
   }
 };
@@ -478,6 +546,16 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = functio
     json['hoverHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverHighStroke()));
   }
 
+  if (goog.isFunction(this.selectHighStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series selectHighStroke']
+    );
+  } else {
+    json['selectHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectHighStroke()));
+  }
+
   if (goog.isFunction(this.lowStroke())) {
     anychart.utils.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -497,6 +575,16 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = functio
   } else {
     json['hoverLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverLowStroke()));
   }
+
+  if (goog.isFunction(this.selectLowStroke())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Series selectLowStroke']
+    );
+  } else {
+    json['selectLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectLowStroke()));
+  }
   return json;
 };
 
@@ -508,17 +596,27 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.setupByJSON = funct
   goog.base(this, 'setupByJSON', config);
   this.highStroke(config['highStroke']);
   this.hoverHighStroke(config['hoverHighStroke']);
+  this.selectHighStroke(config['selectHighStroke']);
+
   this.lowStroke(config['lowStroke']);
   this.hoverLowStroke(config['hoverLowStroke']);
+  this.selectLowStroke(config['selectLowStroke']);
 };
 
 
 //exports
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['fill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.fill;//inherited
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hoverFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.ContinuousRangeBase.prototype['selectFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['highStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke;//doc|ex
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hoverHighStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke;//doc|ex
+anychart.core.cartesian.series.ContinuousRangeBase.prototype['selectHighStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectHighStroke;//doc|ex
+
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['lowStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke;//doc|ex
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hoverLowStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke;//doc|ex
+anychart.core.cartesian.series.ContinuousRangeBase.prototype['selectLowStroke'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectLowStroke;//doc|ex
+
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hatchFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.ContinuousRangeBase.prototype['hoverHatchFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.ContinuousRangeBase.prototype['selectHatchFill'] = anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectHatchFill;//inherited

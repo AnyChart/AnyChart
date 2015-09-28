@@ -1,6 +1,5 @@
 goog.provide('anychart.core.utils.TooltipsContainer');
 goog.require('acgraph');
-goog.require('anychart.core.ui.TooltipItem');
 goog.require('goog.Disposable');
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -16,6 +15,13 @@ goog.require('goog.userAgent');
  */
 anychart.core.utils.TooltipsContainer = function() {
   goog.base(this);
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.selectable_ = false;
+
   var document = goog.dom.getDocument();
   if (goog.userAgent.IE && (!goog.userAgent.isVersionOrHigher('7') || document.documentMode && document.documentMode <= 6)) {
     this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; left:0; top:0; z-index: 9999;'});
@@ -26,12 +32,14 @@ anychart.core.utils.TooltipsContainer = function() {
   var ah = goog.dom.getWindow().screen.availHeight;
 
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher('9')) {
+    // hack like `pointer-events: none`
     this.stage_ = acgraph.create(this.root_, 1, 1);
   } else {
     this.stage_ = acgraph.create(this.root_, aw, ah);
   }
-  this.children_ = [];
+
   this.stage_.domElement()['style']['cssText'] = 'position:fixed; left:0; top:0; opacity:1; pointer-events: none';
+
   // do not wrap TooltipsContainer stage into relative div
   // DVF-791
   this.stage_.wrapped_ = true;
@@ -56,56 +64,46 @@ anychart.core.utils.TooltipsContainer.prototype.stage_ = null;
 
 
 /**
- * @type {Array.<anychart.core.ui.TooltipItem>}
- * @private
+ * Set container to tooltip.
+ * @param {anychart.core.ui.SeriesTooltip|anychart.core.ui.TooltipItem} tooltip
  */
-anychart.core.utils.TooltipsContainer.prototype.children_ = null;
-
-
-/**
- * Create and return new tooltip item.
- * @return {anychart.core.ui.TooltipItem} New tooltip item.
- */
-anychart.core.utils.TooltipsContainer.prototype.alloc = function() {
-  var item = new anychart.core.ui.TooltipItem();
-  item.container(this.stage_);
-  this.children_.push(item);
-  return item;
+anychart.core.utils.TooltipsContainer.prototype.allocTooltip = function(tooltip) {
+  tooltip.container(this.stage_);
 };
 
 
 /**
- * Release passed tooltip item
- * @param {anychart.core.ui.TooltipItem} item Tooltip item to release.
+ * Release passed tooltip.
+ * @param {anychart.core.ui.SeriesTooltip|anychart.core.ui.TooltipItem} tooltip
  */
-anychart.core.utils.TooltipsContainer.prototype.release = function(item) {
-  if (item) {
-    var index = goog.array.indexOf(this.children_, item);
-    if (index >= 0) {
-      item.dispose();
-      goog.array.splice(this.children_, index, 1);
+anychart.core.utils.TooltipsContainer.prototype.release = function(tooltip) {
+  tooltip.container(null);
+};
+
+
+/**
+ * Getter/Setter for the text selectable option.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.core.utils.TooltipsContainer}
+ */
+anychart.core.utils.TooltipsContainer.prototype.selectable = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.selectable_ != opt_value) {
+      this.selectable_ = opt_value;
     }
+    return this;
+  } else {
+    return this.selectable_;
   }
-};
-
-
-/**
- * Clear all elements from TooltipsContainer (dispose them).
- */
-anychart.core.utils.TooltipsContainer.prototype.clear = function() {
-  for (var i = 0, count = this.children_.length; i < count; i++) {
-    this.children_[i].dispose();
-  }
-  this.children_ = [];
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.TooltipsContainer.prototype.disposeInternal = function() {
+  //todo this method is never called
+
   this.stage_.dispose();
   this.stage_ = null;
-  //we don't need to iterate  children and dispose them, it is done by this.stage_.dispose() call
-  this.children_ = null;
   goog.dom.removeNode(this.root_);
   this.root_ = null;
 };

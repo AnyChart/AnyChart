@@ -112,7 +112,7 @@
                         '</anychart>';
             var chart = anychart.fromXml(xml);
             chart.xAxis().labels().textFormatter(function() {
-                return this['value'] + 'Â°';
+                return this['value'] + '°';
             });
             chart.draw();
         });

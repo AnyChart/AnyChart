@@ -1,5 +1,5 @@
 goog.provide('anychart.scales.DateTimeTicks');
-
+goog.forwardDeclare('anychart.scales.StockOrdinalDateTime');
 goog.require('anychart.core.Base');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
@@ -9,7 +9,7 @@ goog.require('goog.date.UtcDateTime');
 
 /**
  * Scale ticks.
- * @param {!anychart.scales.DateTime} scale Scale to ask for a setup.
+ * @param {!(anychart.scales.DateTime|anychart.scales.StockScatterDateTime)} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.core.Base}
  */
@@ -18,10 +18,31 @@ anychart.scales.DateTimeTicks = function(scale) {
 
   /**
    * Scale reference to get setup from in emergency situations.
-   * @type {!anychart.scales.DateTime}
-   * @private
+   * @type {!(anychart.scales.DateTime|anychart.scales.StockScatterDateTime)}
+   * @protected
    */
-  this.scale_ = scale;
+  this.scale = scale;
+
+  /**
+   * Array of minor intervals, synced with RANGES_. Used by interval auto calculation.
+   * @type {!Array.<!goog.date.Interval>}
+   * @protected
+   */
+  this.MINOR_INTERVALS = anychart.scales.DateTimeTicks.MINOR_INTERVALS_;
+
+  /**
+   * Array of minor intervals, synced with RANGES_. Used by interval auto calculation.
+   * @type {!Array.<!goog.date.Interval>}
+   * @protected
+   */
+  this.MAJOR_INTERVALS = anychart.scales.DateTimeTicks.MAJOR_INTERVALS_;
+
+  /**
+   * Array of different ranges. Used by interval auto calculation.
+   * @type {!Array.<number>}
+   * @protected
+   */
+  this.RANGES = anychart.scales.DateTimeTicks.RANGES_;
 };
 goog.inherits(anychart.scales.DateTimeTicks, anychart.core.Base);
 
@@ -63,6 +84,14 @@ anychart.scales.DateTimeTicks.prototype.explicit_ = null;
  * @private
  */
 anychart.scales.DateTimeTicks.prototype.autoTicks_ = null;
+
+
+/**
+ * Range multiplier for minor/major relation when ranges are bigger than the last in RANGES.
+ * @type {number}
+ * @protected
+ */
+anychart.scales.DateTimeTicks.prototype.bigRangeMultiplier = 4;
 
 
 /**
@@ -142,8 +171,50 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
     else if (goog.isString(opt_years) && arguments.length == 1)
       val = goog.date.Interval.fromIsoString(opt_years);
     else {
-      if (goog.isString(opt_years))
+      if (goog.isString(opt_years)) {
         opt_years = anychart.enums.normalizeInterval(opt_years);
+        opt_months = anychart.utils.toNumber(opt_months) || 1;
+        switch (opt_years) {
+          case anychart.enums.Interval.YEAR:
+            opt_years = 'y';
+            break;
+          case anychart.enums.Interval.SEMESTER:
+            opt_years = 'm';
+            opt_months *= 6;
+            break;
+          case anychart.enums.Interval.QUARTER:
+            opt_years = 'm';
+            opt_months *= 4;
+            break;
+          case anychart.enums.Interval.MONTH:
+            opt_years = 'm';
+            break;
+          case anychart.enums.Interval.THIRD_OF_MONTH:
+            // very rough
+            opt_years = 'd';
+            opt_months *= 10;
+            break;
+          case anychart.enums.Interval.WEEK:
+            opt_years = 'd';
+            opt_months *= 7;
+            break;
+          case anychart.enums.Interval.DAY:
+            opt_years = 'd';
+            break;
+          case anychart.enums.Interval.HOUR:
+            opt_years = 'h';
+            break;
+          case anychart.enums.Interval.MINUTE:
+            opt_years = 'n';
+            break;
+          case anychart.enums.Interval.SECOND:
+            opt_years = 's';
+            break;
+          case anychart.enums.Interval.MILLISECOND:
+            opt_years = 't';
+            break;
+        }
+      }
       val = new goog.date.Interval(opt_years, opt_months, opt_days, opt_hours, opt_minutes, opt_seconds);
     }
     if (!((val && this.interval_ && this.interval_.equals(val)) || (!val && !this.interval_))) {
@@ -221,8 +292,18 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
   if (this.explicit_ != ticks) {
     this.count_ = NaN;
     this.interval_ = null;
-    this.explicit_ = goog.array.clone(ticks);
-    goog.array.removeDuplicates(this.explicit_);
+    this.explicit_ = goog.array.map(ticks, anychart.utils.normalizeTimestamp);
+    goog.array.sort(this.explicit_);
+    var prev = this.explicit_[0];
+    var currIndex = 1;
+    for (var i = 1; i < this.explicit_.length; i++) {
+      var curr = this.explicit_[i];
+      if (curr != prev) {
+        this.explicit_[currIndex++] = curr;
+      }
+      prev = curr;
+    }
+    this.explicit_.length = ticks.length ? currIndex : 0;
     this.autoTicks_ = null;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
@@ -249,12 +330,22 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
  */
 anychart.scales.DateTimeTicks.prototype.get = function() {
   if (this.explicit_) {
-    return goog.array.filter(this.explicit_, function(el) {
-      return !(el < this.scale_.minimum() || el > this.scale_.maximum());
-    }, this);
+    return goog.array.filter(this.explicit_, this.filterFunction, this);
   }
-  this.scale_.calculate();
+  this.scale.calculate();
   return /** @type {!Array} */(this.autoTicks_);
+};
+
+
+/**
+ * Filter function to filter out invisible explicit ticks.
+ * @param {number} el
+ * @return {boolean}
+ * @protected
+ */
+anychart.scales.DateTimeTicks.prototype.filterFunction = function(el) {
+  var scale = /** @type {anychart.scales.DateTime} */(this.scale);
+  return !(el < scale.minimum() || el > scale.maximum());
 };
 
 
@@ -273,7 +364,7 @@ anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, adjust
     var interval = this.interval_ || this.calculateIntervals_(min, max, true);
     var date = new goog.date.UtcDateTime(new Date(adjustedMin));
     var endDate = new goog.date.UtcDateTime(new Date(adjustedMax));
-    for (; goog.date.Date.compare(date, endDate) <= 0; date.add(interval))
+    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < 150; date.add(interval), i++)
       ticks.push(date.getTime());
     this.autoTicks_ = ticks;
   }
@@ -296,10 +387,10 @@ anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_ca
     var ticks = [];
     var interval = this.interval_ || this.calculateIntervals_(min, max, false);
     if (opt_canModifyMin)
-      result[0] = min = this.alignDateLeft_(min, interval, 0);
+      result[0] = min = anychart.utils.alignDateLeft(min, interval, 0);
     var date = new goog.date.UtcDateTime(new Date(min));
     var endDate = new goog.date.UtcDateTime(new Date(max));
-    for (; goog.date.Date.compare(date, endDate) <= 0; date.add(interval))
+    for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < 150; date.add(interval), i++)
       ticks.push(date.getTime());
     if (opt_canModifyMax && goog.date.Date.compare(date, endDate) > 0)
       ticks.push(result[1] = date.getTime());
@@ -471,69 +562,21 @@ anychart.scales.DateTimeTicks.MAJOR_INTERVALS_ = [
  */
 anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max, asMinor) {
   var range = Math.abs(max - min) / (this.count_);
-  var len = anychart.scales.DateTimeTicks.RANGES_.length;
+  var len = this.RANGES.length;
   for (var i = 0; i < len; i++) {
-    if (range <= anychart.scales.DateTimeTicks.RANGES_[i]) {
+    if (range <= this.RANGES[i]) {
       if (asMinor)
-        return anychart.scales.DateTimeTicks.MINOR_INTERVALS_[i].clone();
+        return this.MINOR_INTERVALS[i].clone();
       else
-        return anychart.scales.DateTimeTicks.MAJOR_INTERVALS_[i].clone();
+        return this.MAJOR_INTERVALS[i].clone();
     }
   }
   // Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) is always >= 0.5, because the last
-  // anychart.scales.DateTimeTicks.RANGES_ is half a year, so there shouldn't be a situation when interval is 0.
+  // this.RANGES is 2 years, so there shouldn't be a situation when interval is 0.
   if (asMinor)
-    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) / 4);
+    return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)) / this.bigRangeMultiplier);
   else
     return new goog.date.Interval(goog.date.Interval.YEARS, Math.ceil(range / (365 * 24 * 60 * 60 * 1000)));
-};
-
-
-/**
- * Aligns passed timestamp to the left according to the passed interval.
- * @param {number} date Date to align.
- * @param {goog.date.Interval} interval Interval to align by.
- * @param {number} flagDateValue Flag date to align within years scope.
- * @return {number} Aligned timestamp.
- * @private
- */
-anychart.scales.DateTimeTicks.prototype.alignDateLeft_ = function(date, interval, flagDateValue) {
-  var dateObj = new Date(date);
-
-  var years = dateObj.getUTCFullYear();
-  var months = dateObj.getUTCMonth();
-  var days = dateObj.getUTCDate();
-  var hours = dateObj.getUTCHours();
-  var minutes = dateObj.getUTCMinutes();
-  var seconds = dateObj.getUTCSeconds();
-  var milliseconds = dateObj.getUTCMilliseconds();
-
-  if (interval.years) {
-    var flagDate = new Date(flagDateValue);
-    var flagYear = flagDate.getUTCFullYear();
-    years = anychart.utils.alignLeft(years, interval.years, flagYear);
-    return Date.UTC(years, 0);
-  } else if (interval.months) {
-    months = anychart.utils.alignLeft(months, interval.months);
-    return Date.UTC(years, months);
-  } else if (interval.days) {
-    days = anychart.utils.alignLeft(days, interval.days);
-    return Date.UTC(years, months, days);
-  } else if (interval.hours) {
-    hours = anychart.utils.alignLeft(hours, interval.hours);
-    return Date.UTC(years, months, days, hours);
-  } else if (interval.minutes) {
-    minutes = anychart.utils.alignLeft(minutes, interval.minutes);
-    return Date.UTC(years, months, days, hours, minutes);
-  } else if (interval.seconds >= 1) {
-    seconds = anychart.utils.alignLeft(seconds, interval.seconds);
-    return Date.UTC(years, months, days, hours, minutes, seconds);
-  } else if (interval.seconds) {
-    milliseconds = anychart.utils.alignLeft(milliseconds, interval.seconds * 1000);
-    return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
-  } else {
-    return date;
-  }
 };
 
 

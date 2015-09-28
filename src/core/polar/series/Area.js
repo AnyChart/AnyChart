@@ -17,20 +17,95 @@ anychart.core.polar.series.Area = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   /**
-   * @type {!acgraph.vector.Path}
+   * @type {acgraph.vector.Path}
    * @protected
    */
-  this.strokePath = acgraph.path();
-  this.strokePath.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES + 0.1);
+  this.currentStrokePath;
 
-  this.paths.push(this.strokePath);
+  /**
+   * @type {acgraph.vector.Path}
+   * @protected
+   */
+  this.currentFillPath;
+
+  /**
+   * @type {anychart.core.utils.TypedLayer}
+   * @protected
+   */
+  this.fillLayer;
+
+  /**
+   * @type {anychart.core.utils.TypedLayer}
+   * @protected
+   */
+  this.strokeLayer;
+
+  /**
+   * @type {anychart.core.utils.TypedLayer}
+   * @protected
+   */
+  this.hatchFillLayer;
 };
 goog.inherits(anychart.core.polar.series.Area, anychart.core.polar.series.ContinuousBase);
 anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.AREA] = anychart.core.polar.series.Area;
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
+anychart.core.polar.series.Area.prototype.startDrawing = function() {
+  goog.base(this, 'startDrawing');
+
+  this.currentStrokePath = null;
+  this.currentFillPath = null;
+
+  if (this.fillLayer) {
+    this.fillLayer.clear();
+  } else {
+    this.fillLayer = new anychart.core.utils.TypedLayer(function() {
+      var path = acgraph.path();
+      this.makeInteractive(path, true);
+      return path;
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    }, undefined, this);
+    this.fillLayer.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES);
+    this.fillLayer.parent(this.rootLayer);
+  }
+
+
+  if (this.strokeLayer) {
+    this.strokeLayer.clear();
+  } else {
+    this.strokeLayer = new anychart.core.utils.TypedLayer(function() {
+      var path = acgraph.path();
+      this.makeInteractive(path, true);
+      return path;
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    }, undefined, this);
+    this.strokeLayer.zIndex(anychart.core.polar.series.Base.ZINDEX_SERIES + .1);
+    this.strokeLayer.parent(this.rootLayer);
+  }
+
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
+    if (this.hatchFillLayer) {
+      this.hatchFillLayer.clear();
+    } else {
+      this.hatchFillLayer = new anychart.core.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.hatchFillLayer.parent(this.rootLayer);
+      this.hatchFillLayer.zIndex(anychart.core.polar.series.Base.ZINDEX_HATCH_FILL);
+      this.hatchFillLayer.disablePointerEvents(true);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.polar.series.Area.prototype.drawFirstPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
 
   if (!valuePoint) {
@@ -44,16 +119,26 @@ anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
       this.firstPointIsMissing = false;
     }
 
-    var x = valuePoint[4];
-    var y = valuePoint[5];
+    for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+      if (valuePoint[i]) {
+        this.currentFillPath = /** @type {acgraph.vector.Path} */(this.fillLayer.genNextChild());
+        this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+      }
+    }
 
-    this.path
+    if (!this.currentFillPath) this.currentFillPath = /** @type {acgraph.vector.Path} */(this.fillLayer.genNextChild());
+    if (!this.currentStrokePath) this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+
+    var x = valuePoint[valuePoint.length - 2];
+    var y = valuePoint[valuePoint.length - 1];
+
+    this.currentFillPath
         .moveTo(this.cx, this.cy)
         .lineTo(x, y);
-    this.strokePath
+    this.currentStrokePath
         .moveTo(x, y);
 
-    this.getIterator().meta('x', x).meta('y', y);
+    this.getIterator().meta('x', x).meta('value', y);
   }
 
   return true;
@@ -61,25 +146,37 @@ anychart.core.polar.series.Area.prototype.drawFirstPoint = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function() {
+anychart.core.polar.series.Area.prototype.drawSubsequentPoint = function(pointState) {
   var valuePoint = this.getValuePointCoords();
+
   if (!valuePoint)
     return false;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    for (var i = 0, len = valuePoint.length; i < len; i += 6) {
-      var P2x = valuePoint[i];
-      var P2y = valuePoint[i + 1];
-      var P3x = valuePoint[i + 2];
-      var P3y = valuePoint[i + 3];
-      var P4x = valuePoint[i + 4];
-      var P4y = valuePoint[i + 5];
+    var P2x, P2y, P3x, P3y, P4x, P4y;
+    for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+      if (valuePoint[i]) {
+        var startX = valuePoint[i + 1];
+        var startY = valuePoint[i + 2];
 
-      this.path.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
-      this.strokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+        this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+        this.currentStrokePath.moveTo(startX, startY);
+
+        this.currentFillPath = /** @type {acgraph.vector.Path} */(this.fillLayer.genNextChild());
+        this.currentFillPath.moveTo(this.cx, this.cy).lineTo(startX, startY);
+      }
+      P2x = valuePoint[i + 3];
+      P2y = valuePoint[i + 4];
+      P3x = valuePoint[i + 5];
+      P3y = valuePoint[i + 6];
+      P4x = valuePoint[i + 7];
+      P4y = valuePoint[i + 8];
+
+      this.currentFillPath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+      this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
     }
 
-    this.getIterator().meta('x', P4x).meta('y', P4y);
+    this.getIterator().meta('x', P4x).meta('value', P4y);
   }
 
   return true;
@@ -94,21 +191,32 @@ anychart.core.polar.series.Area.prototype.finalizeDrawing = function() {
         goog.isDefAndNotNull(this.prevValuePointCoords) &&
         goog.isDefAndNotNull(this.firstValuePointCoords)) {
 
-      var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords);
+      var valuePoint = this.approximateCurve(this.prevValuePointCoords, this.firstValuePointCoords, false);
       if (!valuePoint) {
-        this.path.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
-        this.strokePath.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
+        this.currentFillPath.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
+        this.currentStrokePath.lineTo(this.firstValuePointCoords[0], this.firstValuePointCoords[1]);
       } else {
-        for (var i = 0, len = valuePoint.length; i < len; i += 6) {
-          var P2x = valuePoint[i];
-          var P2y = valuePoint[i + 1];
-          var P3x = valuePoint[i + 2];
-          var P3y = valuePoint[i + 3];
-          var P4x = valuePoint[i + 4];
-          var P4y = valuePoint[i + 5];
+        var P2x, P2y, P3x, P3y, P4x, P4y;
+        for (var i = 0, len = valuePoint.length; i < len; i += 9) {
+          if (valuePoint[i]) {
+            var startX = valuePoint[i + 1];
+            var startY = valuePoint[i + 2];
 
-          this.path.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
-          this.strokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+            this.currentStrokePath = /** @type {acgraph.vector.Path} */(this.strokeLayer.genNextChild());
+            this.currentStrokePath.moveTo(startX, startY);
+
+            this.currentFillPath = /** @type {acgraph.vector.Path} */(this.fillLayer.genNextChild());
+            this.currentFillPath.moveTo(this.cx, this.cy).lineTo(startX, startY);
+          }
+          P2x = valuePoint[i + 3];
+          P2y = valuePoint[i + 4];
+          P3x = valuePoint[i + 5];
+          P3y = valuePoint[i + 6];
+          P4x = valuePoint[i + 7];
+          P4y = valuePoint[i + 8];
+
+          this.currentFillPath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
+          this.currentStrokePath.curveTo(P2x, P2y, P3x, P3y, P4x, P4y);
         }
       }
     }
@@ -127,21 +235,43 @@ anychart.core.polar.series.Area.prototype.getType = function() {
 
 
 /** @inheritDoc */
-anychart.core.polar.series.Area.prototype.colorizeShape = function(hover) {
-  this.path.stroke(null);
-  this.path.fill(this.getFinalFill(false, hover));
-  this.strokePath.stroke(this.getFinalStroke(false, hover));
-  this.strokePath.fill(null);
+anychart.core.polar.series.Area.prototype.colorizeShape = function(pointState) {
+  var fill = this.getFinalFill(false, pointState);
+  var stroke = this.getFinalStroke(false, pointState);
+
+  this.fillLayer.forEachChild(function(path) {
+    path.stroke(null);
+    path.fill(fill);
+  }, this);
+
+  this.strokeLayer.forEachChild(function(path) {
+    path.stroke(stroke);
+    path.fill(null);
+  }, this);
 };
 
 
 /** @inheritDoc */
 anychart.core.polar.series.Area.prototype.finalizeHatchFill = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    if (this.hatchFillPath) {
-      this.hatchFillPath.deserialize(this.path.serialize());
-      this.applyHatchFill(false);
+    if (this.hatchFillLayer) {
+      this.fillLayer.forEachChild(function(path) {
+        /** @type {acgraph.vector.Path} */(this.hatchFillLayer.genNextChild()).deserialize(path.serialize());
+      }, this);
+      var seriesState = this.state.getSeriesState();
+      this.applyHatchFill(seriesState);
     }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.polar.series.Area.prototype.applyHatchFill = function(pointState) {
+  if (this.hatchFillLayer) {
+    this.hatchFillLayer.forEachChild(function(path) {
+      path.stroke(null);
+      path.fill(this.getFinalHatchFill(false, pointState));
+    }, this);
   }
 };
 
@@ -157,8 +287,11 @@ anychart.core.polar.series.Area.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.polar.series.Area.prototype['fill'] = anychart.core.polar.series.Area.prototype.fill;//inherited
 anychart.core.polar.series.Area.prototype['hoverFill'] = anychart.core.polar.series.Area.prototype.hoverFill;//inherited
+anychart.core.polar.series.Area.prototype['selectFill'] = anychart.core.polar.series.Area.prototype.selectFill;//inherited
 anychart.core.polar.series.Area.prototype['stroke'] = anychart.core.polar.series.Area.prototype.stroke;//inherited
 anychart.core.polar.series.Area.prototype['hoverStroke'] = anychart.core.polar.series.Area.prototype.hoverStroke;//inherited
+anychart.core.polar.series.Area.prototype['selectStroke'] = anychart.core.polar.series.Area.prototype.selectStroke;//inherited
 anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.series.Area.prototype.hatchFill;//inherited
 anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;//inherited
+anychart.core.polar.series.Area.prototype['selectHatchFill'] = anychart.core.polar.series.Area.prototype.selectHatchFill;//inherited
 anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;//inherited

@@ -844,12 +844,20 @@ anychart.onDocumentReady(function() {
     //set map Geo data
     map.geoData(anychart.maps.usa_mainland);
 
-    map.listen('pointSelect', function(e) {
+    map.listen(anychart.enums.EventType.POINT_SELECT, function(e) {
       var selected = [];
       for (var i=0; i<e.selectedPoints.length; i++){
         selected.push(e.selectedPoints[i].id);
       }
       changeContent(selected);
+    });
+
+    map.listen(anychart.enums.EventType.POINT_HOVER, function(e) {
+      var hovered = [];
+      for (var i=0; i<e.hoveredPoints.length; i++){
+        hovered.push(e.hoveredPoints[i].id);
+      }
+      changeContent(hovered);
     });
 
     mapSeries = map.choropleth(dataSet);

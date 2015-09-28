@@ -323,8 +323,10 @@ anychart.data.csv.Parser.prototype.getPrefixFunction_ = function(pattern) {
 
   for (var i = 1; i < length; i++) {
     var ch = pattern.charAt(i);
-    if (ch == '\"')
-      throw new Error('Double quotes in separator are banned');
+    if (ch == '\"') {
+      anychart.utils.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+      throw new Error('Double quotes in separator are not allowed');
+    }
     while ((k > 0) && (pattern.charAt(k + 1) != ch))
       k = result[k];
     if (pattern.charAt(k + 1) == ch)

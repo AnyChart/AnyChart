@@ -148,6 +148,15 @@ anychart.core.map.scale.Geo.prototype.SUPPORTED_SIGNALS =
 
 
 /**
+ * Returns pixel bounds.
+ * @return {anychart.math.Rect} .
+ */
+anychart.core.map.scale.Geo.prototype.getBounds = function() {
+  return this.bounds_ ? this.bounds_.clone() : anychart.math.rect(0, 0, 0, 0);
+};
+
+
+/**
  * @param {anychart.math.Rect} value Bounds.
  * @return {anychart.core.map.scale.Geo} .
  */
@@ -438,6 +447,35 @@ anychart.core.map.scale.Geo.prototype.transform = function(x, y) {
 
 
 /**
+ * @param {*} x X value to transform in input scope.
+ * @param {*} y Y value to transform in input scope.
+ * @return {Array.<number>} Transformed value adjust bounds.
+ */
+anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
+  this.calculate();
+
+  if (!this.bounds_)
+    return [NaN, NaN];
+
+  x = anychart.utils.toNumber(x);
+  y = anychart.utils.toNumber(y);
+
+  var transformX = this.isInvertedX ?
+      this.bounds_.getRight() - this.centerOffsetX - x :
+      x - this.bounds_.left - this.centerOffsetX;
+
+  var transformY = this.isInverted ?
+      x - this.bounds_.top - this.centerOffsetY :
+      this.bounds_.getBottom() - this.centerOffsetY - y;
+
+  var resultX = +(/** @type {number} */(transformX)) / this.ratio + this.minX;
+  var resultY = +(/** @type {number} */(transformY)) / this.ratio + this.minY;
+
+  return [resultX, resultY];
+};
+
+
+/**
  * Getter and setter for scale inversion.
  * @param {boolean=} opt_invertedX Inverted X state to set.
  * @param {boolean=} opt_invertedY Inverted Y state to set.
@@ -542,10 +580,10 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
 };
 
 
-//exports
 //todo (blackart) Don't export yet.
 //anychart.core.map.scale.Geo.prototype['setBounds'] = anychart.core.map.scale.Geo.prototype.setBounds;
-//anychart.core.map.scale.Geo.prototype['transform'] = anychart.core.map.scale.Geo.prototype.transform;
+anychart.core.map.scale.Geo.prototype['transform'] = anychart.core.map.scale.Geo.prototype.transform;
+anychart.core.map.scale.Geo.prototype['inverseTransform'] = anychart.core.map.scale.Geo.prototype.inverseTransform;
 //anychart.core.map.scale.Geo.prototype['minimumX'] = anychart.core.map.scale.Geo.prototype.minimumX;
 //anychart.core.map.scale.Geo.prototype['minimumY'] = anychart.core.map.scale.Geo.prototype.minimumY;
 //anychart.core.map.scale.Geo.prototype['maximumX'] = anychart.core.map.scale.Geo.prototype.maximumX;
@@ -555,3 +593,4 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
 //anychart.core.map.scale.Geo.prototype['inverted'] = anychart.core.map.scale.Geo.prototype.inverted;
 //anychart.core.map.scale.Geo.prototype['startAutoCalc'] = anychart.core.map.scale.Geo.prototype.startAutoCalc;
 //anychart.core.map.scale.Geo.prototype['finishAutoCalc'] = anychart.core.map.scale.Geo.prototype.finishAutoCalc;
+//exports

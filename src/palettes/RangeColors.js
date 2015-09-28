@@ -25,7 +25,7 @@ anychart.palettes.RangeColors = function() {
 
   /**
    * Color palette colors list.
-   * @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+   * @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
    * Array.<acgraph.vector.GradientKey>|Array.<string>}
    * @private
    */
@@ -67,33 +67,43 @@ anychart.palettes.RangeColors.prototype.colorPalette_;
 
 
 /**
- * Getter for the color palette colors list.
- * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>} Color palette colors list.
- *//**
- * Setter for color palette colors list.
- * @example <t>listingOnly</t>
- * var palette = anychart.palettes.rangeColors()
- *      .colors(['red', 'yellow'])
- *      .count(10);
- * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value Color palette colors list to set.
- * @return {!anychart.palettes.RangeColors} An instance of the {@link anychart.palettes.RangeColors} class for method chaining.
- *//**
- * @ignoreDoc
- * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
- * Array.<acgraph.vector.GradientKey>|Array.<string>)=} opt_value .
- * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradient|acgraph.vector.RadialGradient|
+ * Getter/setter for the color palette colors list.
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value Color palette colors list to set.
+ * @param {...(acgraph.vector.SolidFill|string)} var_args .
+ * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
+ * @deprecated use items.
+ */
+anychart.palettes.RangeColors.prototype.colors = function(opt_value, var_args) {
+  return this.items.apply(this, arguments);
+};
+
+
+/**
+ * Getter/setter for the color palette colors list.
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value .
+ * @param {...(acgraph.vector.SolidFill|string)} var_args .
+ * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
  * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
  */
-anychart.palettes.RangeColors.prototype.colors = function(opt_value) {
+anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
   if (goog.isDef(opt_value)) {
-    this.colors_ = opt_value;
+    if (goog.isObject(opt_value) && opt_value.keys)
+      this.colors_ = /** @type {acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (opt_value);
+    else if (!goog.isArray(opt_value)) {
+      opt_value = goog.array.slice(arguments, 0);
+    }
+    if (goog.isArray(opt_value))
+      this.colors_ = goog.array.map(opt_value, function(element) {
+        return acgraph.vector.normalizeFill(element);
+      });
     this.processColorRange_();
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
-    return this.colors_;
+    return /** @type {Array|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (this.colors_);
   }
 };
 
@@ -126,36 +136,29 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
 
 
 /**
- * Getter for color palette colors from list by index.
- * @param {number} index Index to set or get color.
- * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} Color palette colors by index.
- *//**
- * Setter for color palette colors from list by index.
- * @example <t>simple-h100</t>
- * var palette = anychart.palettes.rangeColors()
- *     .colors(['red', 'yellow'])
- *     .count(9);
- * palette.colorAt(4, 'blue');
- * for (var i = 1; i < 10; i++) {
- *   stage.rect((i - 1) * stage.width() / 9, 0, stage.width() / 9 - .5, stage.height())
- *     .fill(palette.colorAt(i))
- *     .stroke('1px #000');
- * }
- * @param {number} index Index to set or get color.
- * @param {acgraph.vector.SolidFill=} opt_color Color to set by passed index.
- * @return {!anychart.palettes.RangeColors} An instance of the {@link anychart.palettes.RangeColors} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for color palette colors from list by index.
  * @param {number} index .
  * @param {acgraph.vector.SolidFill=} opt_color .
  * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} .
+ * @deprecated use itemAt.
  */
 anychart.palettes.RangeColors.prototype.colorAt = function(index, opt_color) {
+  return this.itemAt(index, opt_color);
+};
+
+
+/**
+ * Getter/setter for color palette colors from list by index.
+ * @param {number} index .
+ * @param {acgraph.vector.SolidFill=} opt_item .
+ * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} .
+ */
+anychart.palettes.RangeColors.prototype.itemAt = function(index, opt_item) {
   if (!this.colors_ || this.colors_.length < 1) return null;
   if (this.count_ == 0) return null;
 
-  if (goog.isDef(opt_color)) {
-    this.colorPalette_[index] = opt_color;
+  if (goog.isDef(opt_item)) {
+    this.colorPalette_[index] = opt_item;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;
   } else {
@@ -313,12 +316,12 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
 anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
   var args = arguments;
   if (goog.isArray(args[0])) {
-    this.colors(args[0]);
+    this.items(args[0]);
     this.count(args[0].length);
     return true;
   }
   if (args[0] instanceof anychart.palettes.RangeColors) {
-    this.colors(args[0].colors());
+    this.items(args[0].items());
     this.count(args[0].count());
     return true;
   }
@@ -329,22 +332,31 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
 /** @inheritDoc */
 anychart.palettes.RangeColors.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.colors(config['items']);
+  this.items(config['items']);
   this.count(config['count']);
 };
 
 
 /**
  * Constructor function.
+ * @param {(Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
+ * Array.<acgraph.vector.GradientKey>|Array.<string>|acgraph.vector.SolidFill|string)=} opt_value Array of colors or gradient.
+ * @param {...(acgraph.vector.SolidFill|string)} var_args Colors enumeration.
  * @return {!anychart.palettes.RangeColors}
  */
-anychart.palettes.rangeColors = function() {
-  return new anychart.palettes.RangeColors();
+anychart.palettes.rangeColors = function(opt_value, var_args) {
+  var palette = new anychart.palettes.RangeColors();
+  if (goog.isDef(opt_value)) {
+    palette.setup.apply(palette, arguments);
+  }
+  return palette;
 };
 
 
 //exports
 goog.exportSymbol('anychart.palettes.rangeColors', anychart.palettes.rangeColors);
-anychart.palettes.RangeColors.prototype['colorAt'] = anychart.palettes.RangeColors.prototype.colorAt;//in docs/
-anychart.palettes.RangeColors.prototype['colors'] = anychart.palettes.RangeColors.prototype.colors;//in docs/
-anychart.palettes.RangeColors.prototype['count'] = anychart.palettes.RangeColors.prototype.count;//in docs/
+anychart.palettes.RangeColors.prototype['colorAt'] = anychart.palettes.RangeColors.prototype.colorAt;
+anychart.palettes.RangeColors.prototype['itemAt'] = anychart.palettes.RangeColors.prototype.itemAt;
+anychart.palettes.RangeColors.prototype['colors'] = anychart.palettes.RangeColors.prototype.colors;
+anychart.palettes.RangeColors.prototype['items'] = anychart.palettes.RangeColors.prototype.items;
+anychart.palettes.RangeColors.prototype['count'] = anychart.palettes.RangeColors.prototype.count;

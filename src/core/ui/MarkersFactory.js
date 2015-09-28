@@ -1662,6 +1662,8 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  this.markConsistent(anychart.ConsistencyState.BOUNDS);
+
   return this;
 };
 

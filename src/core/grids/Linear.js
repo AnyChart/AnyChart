@@ -2,7 +2,6 @@ goog.provide('anychart.core.grids.Linear');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
-goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 
@@ -17,13 +16,13 @@ anychart.core.grids.Linear = function() {
   goog.base(this);
 
   /**
-   * @type {anychart.core.utils.TypedLayer}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.oddFillElement_;
 
   /**
-   * @type {anychart.core.utils.TypedLayer}
+   * @type {acgraph.vector.Path}
    * @private
    */
   this.evenFillElement_;
@@ -227,7 +226,7 @@ anychart.core.grids.Linear.prototype.oddFill = function(opt_fillOrColorOrKeys, o
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.oddFill_), val)) {
       this.oddFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -251,7 +250,7 @@ anychart.core.grids.Linear.prototype.evenFill = function(opt_fillOrColorOrKeys, 
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.evenFill_), val)) {
       this.evenFill_ = val;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -274,7 +273,7 @@ anychart.core.grids.Linear.prototype.stroke = function(opt_strokeOrFill, opt_thi
     var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.stroke_ != stroke) {
       this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -396,11 +395,11 @@ anychart.core.grids.Linear.prototype.isHorizontal = function() {
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
  * @param {string} fillSettings Interlace fill settings.
- * @param {anychart.core.utils.TypedLayer} layer Layer to draw interlace.
+ * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.core.grids.Linear.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, layer, shift) {
+anychart.core.grids.Linear.prototype.drawInterlaceHorizontal = function(ratio, prevRatio, fillSettings, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var y1, y2, checkIndex;
@@ -410,13 +409,11 @@ anychart.core.grids.Linear.prototype.drawInterlaceHorizontal = function(ratio, p
     ratio == checkIndex ? y2 -= shift : y2 += shift;
     prevRatio == checkIndex ? y1 -= shift : y1 += shift;
 
-    var element = layer.genNextChild();
-
-    element.moveTo(parentBounds.getLeft(), y1);
-    element.lineTo(parentBounds.getRight(), y1);
-    element.lineTo(parentBounds.getRight(), y2);
-    element.lineTo(parentBounds.getLeft(), y2);
-    element.close();
+    path.moveTo(parentBounds.getLeft(), y1);
+    path.lineTo(parentBounds.getRight(), y1);
+    path.lineTo(parentBounds.getRight(), y2);
+    path.lineTo(parentBounds.getLeft(), y2);
+    path.close();
   }
 };
 
@@ -426,11 +423,11 @@ anychart.core.grids.Linear.prototype.drawInterlaceHorizontal = function(ratio, p
  * @param {number} ratio Scale ratio to draw grid interlace.
  * @param {number} prevRatio Previous scale ratio to draw grid interlace.
  * @param {string} fillSettings Interlace fill settings.
- * @param {anychart.core.utils.TypedLayer} layer Layer to draw interlace.
+ * @param {acgraph.vector.Path} path Layer to draw interlace.
  * @param {number} shift Grid line pixel shift.
  * @protected
  */
-anychart.core.grids.Linear.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, layer, shift) {
+anychart.core.grids.Linear.prototype.drawInterlaceVertical = function(ratio, prevRatio, fillSettings, path, shift) {
   if (!isNaN(prevRatio)) {
     var parentBounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
     var x1, x2, checkIndex;
@@ -440,13 +437,11 @@ anychart.core.grids.Linear.prototype.drawInterlaceVertical = function(ratio, pre
     ratio == checkIndex ? x2 += shift : x2 -= shift;
     prevRatio == checkIndex ? x1 += shift : x1 -= shift;
 
-    var element = layer.genNextChild();
-
-    element.moveTo(x1, parentBounds.getTop());
-    element.lineTo(x2, parentBounds.getTop());
-    element.lineTo(x2, parentBounds.getBottom());
-    element.lineTo(x1, parentBounds.getBottom());
-    element.close();
+    path.moveTo(x1, parentBounds.getTop());
+    path.lineTo(x2, parentBounds.getTop());
+    path.lineTo(x2, parentBounds.getBottom());
+    path.lineTo(x1, parentBounds.getBottom());
+    path.close();
   }
 };
 
@@ -489,8 +484,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var layout;
     var fill;
-    /** @type {anychart.core.utils.TypedLayer} */
-    var layer;
+    var path;
     var ratio;
     var prevRatio = NaN;
     var isOrdinal = this.scale_ instanceof anychart.scales.Ordinal;
@@ -527,14 +521,14 @@ anychart.core.grids.Linear.prototype.draw = function() {
 
       if (i % 2 == 0) {
         fill = this.evenFill_;
-        layer = this.evenFillElement_;
+        path = this.evenFillElement_;
       } else {
         fill = this.oddFill_;
-        layer = this.oddFillElement_;
+        path = this.oddFillElement_;
       }
 
-      if (fill) {
-        drawInterlace.call(this, ratio, prevRatio, fill, layer, pixelShift);
+      if (fill != 'none') {
+        drawInterlace.call(this, ratio, prevRatio, fill, path, pixelShift);
       }
 
       if (i == 0) {
@@ -553,15 +547,15 @@ anychart.core.grids.Linear.prototype.draw = function() {
     //draw last line on ordinal
     if (i % 2 == 0) {
       fill = this.evenFill_;
-      layer = this.evenFillElement_;
+      path = this.evenFillElement_;
     } else {
       fill = this.oddFill_;
-      layer = this.oddFillElement_;
+      path = this.oddFillElement_;
     }
 
     if (isOrdinal && goog.isDef(tickVal)) {
       if (this.drawLastLine_) drawLine.call(this, 1, pixelShift);
-      drawInterlace.call(this, 1, ratio, fill, layer, pixelShift);
+      drawInterlace.call(this, 1, ratio, fill, path, pixelShift);
     }
 
     this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION);
@@ -570,13 +564,8 @@ anychart.core.grids.Linear.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.lineElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-    this.oddFillElement().forEachChild(function(child) {
-      child.fill(this.oddFill());
-    }, this);
-
-    this.evenFillElement().forEachChild(function(child) {
-      child.fill(this.evenFill());
-    }, this);
+    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.oddFill()));
+    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.evenFill()));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -611,42 +600,30 @@ anychart.core.grids.Linear.prototype.lineElement = function() {
 
 
 /**
- * @return {!anychart.core.utils.TypedLayer} Grid odd fill element.
+ * @return {!acgraph.vector.Path} Grid odd fill element.
  * @protected
  */
 anychart.core.grids.Linear.prototype.oddFillElement = function() {
-  this.oddFillElement_ = this.oddFillElement_ ?
-      this.oddFillElement_ :
-      new anychart.core.utils.TypedLayer(function() {
-        var path = acgraph.path();
-        path.stroke('none');
-        path.zIndex(this.zIndex_);
-        return path;
-      }, function(child) {
-        child.clear();
-      }, undefined, this);
-  this.registerDisposable(this.oddFillElement_);
+  if (!this.oddFillElement_) {
+    this.oddFillElement_ = acgraph.path();
+    this.oddFillElement_.stroke('none');
+    this.registerDisposable(this.oddFillElement_);
+  }
 
   return this.oddFillElement_;
 };
 
 
 /**
- * @return {!anychart.core.utils.TypedLayer} Grid event fill element.
+ * @return {!acgraph.vector.Path} Grid event fill element.
  * @protected
  */
 anychart.core.grids.Linear.prototype.evenFillElement = function() {
-  this.evenFillElement_ = this.evenFillElement_ ?
-      this.evenFillElement_ :
-      new anychart.core.utils.TypedLayer(function() {
-        var path = acgraph.path();
-        path.stroke('none');
-        path.zIndex(this.zIndex_);
-        return path;
-      }, function(child) {
-        child.clear();
-      }, undefined, this);
-  this.registerDisposable(this.evenFillElement_);
+  if (!this.evenFillElement_) {
+    this.evenFillElement_ = acgraph.path();
+    this.evenFillElement_.stroke('none');
+    this.registerDisposable(this.evenFillElement_);
+  }
 
   return this.evenFillElement_;
 };

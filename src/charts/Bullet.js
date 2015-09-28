@@ -4,6 +4,7 @@ goog.require('anychart.core.Chart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.bullet.Marker');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.Markers');
@@ -47,9 +48,25 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    */
   this.layout_;
 
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
+
   this.data(opt_data || null, opt_csvSettings);
 };
 goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
+
+
+/**
+ * Link to incoming raw data.
+ * Used to avoid data reapplication on same data sets.
+ * NOTE: If is disposable entity, should be disposed from the source, not from this class.
+ * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
+ * @private
+ */
+anychart.charts.Bullet.prototype.rawData_;
 
 
 /**
@@ -129,23 +146,26 @@ anychart.charts.Bullet.prototype.getType = function() {
  */
 anychart.charts.Bullet.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.data.View) {
-      this.data_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-    } else if (opt_value instanceof anychart.data.Set) {
-      this.data_ = opt_value.mapAs();
-    } else {
-      opt_value = goog.isArray(opt_value) || goog.isString(opt_value) ? opt_value : null;
-      this.data_ = new anychart.data.Set(opt_value, opt_csvSettings).mapAs();
+    if (this.rawData_ !== opt_value) {
+      this.rawData_ = opt_value;
+      if (opt_value instanceof anychart.data.View) {
+        this.data_ = opt_value.derive(); // deriving a view to avoid interference with other view users
+      } else if (opt_value instanceof anychart.data.Set) {
+        this.data_ = opt_value.mapAs();
+      } else {
+        opt_value = goog.isArray(opt_value) || goog.isString(opt_value) ? opt_value : null;
+        this.data_ = new anychart.data.Set(opt_value, opt_csvSettings).mapAs();
+      }
+      this.data_.listenSignals(this.dataInvalidated_, this);
+      this.invalidate(
+          anychart.ConsistencyState.BULLET_DATA |
+          anychart.ConsistencyState.BULLET_SCALES |
+          anychart.ConsistencyState.BULLET_AXES |
+          anychart.ConsistencyState.BULLET_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES_MARKERS,
+          anychart.Signal.NEEDS_REDRAW
+      );
     }
-    this.data_.listenSignals(this.dataInvalidated_, this);
-    this.invalidate(
-        anychart.ConsistencyState.BULLET_DATA |
-            anychart.ConsistencyState.BULLET_SCALES |
-            anychart.ConsistencyState.BULLET_AXES |
-            anychart.ConsistencyState.BULLET_MARKERS |
-            anychart.ConsistencyState.BULLET_AXES_MARKERS,
-        anychart.Signal.NEEDS_REDRAW
-    );
     return this;
   }
   return this.data_;
@@ -498,7 +518,7 @@ anychart.charts.Bullet.prototype.onRangeSignal_ = function(event) {
 anychart.charts.Bullet.prototype.rangePalette = function(opt_value) {
   if (!this.rangePalette_) {
     this.rangePalette_ = new anychart.palettes.DistinctColors();
-    this.rangePalette_.colors(['#828282', '#a8a8a8', '#c2c2c2', '#d4d4d4', '#e1e1e1']);
+    this.rangePalette_.items(['#828282', '#a8a8a8', '#c2c2c2', '#d4d4d4', '#e1e1e1']);
     this.rangePalette_.listenSignals(this.onRangePaletteSignal_, this);
     this.registerDisposable(this.rangePalette_);
   }
@@ -547,7 +567,7 @@ anychart.charts.Bullet.prototype.onRangePaletteSignal_ = function(event) {
 anychart.charts.Bullet.prototype.markerPalette = function(opt_value) {
   if (!this.markerPalette_) {
     this.markerPalette_ = new anychart.palettes.Markers();
-    this.markerPalette_.markers(['bar', 'line', 'x', 'ellipse']);
+    this.markerPalette_.items(['bar', 'line', 'x', 'ellipse']);
     this.markerPalette_.listenSignals(this.onPaletteSignal_, this);
     this.registerDisposable(this.markerPalette_);
   }
@@ -685,7 +705,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
                 anychart.enums.Layout.VERTICAL :
                 anychart.enums.Layout.HORIZONTAL
         );
-        range.setDefaultFill(/** @type {acgraph.vector.Fill} */(this.rangePalette().colorAt(i)));
+        range.setDefaultFill(/** @type {acgraph.vector.Fill} */(this.rangePalette().itemAt(i)));
         range.parentBounds(boundsWithoutAxis);
         range.container(this.rootElement);
         range.axesLinesSpace(0);
@@ -704,7 +724,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
       var marker = this.markers_[i];
       marker.suspendSignalsDispatching();
       marker.parentBounds(boundsWithoutAxis);
-      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().markerAt(i)));
+      marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(i)));
       marker.setDefaultLayout(/** @type {anychart.enums.Layout} */(this.layout()));
       marker.draw();
       marker.resumeSignalsDispatching(false);
@@ -758,7 +778,7 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.zIndex(settings['zIndex']);
   marker.setDefaultFill(settings['fill']);
   marker.setDefaultStroke(settings['stroke']);
-  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().markerAt(index)));
+  marker.setDefaultType(/** @type {anychart.enums.BulletMarkerType} */(this.markerPalette().itemAt(index)));
 
   //settings from data
   marker.value(/** @type {string|number} */(iterator.get('value')));
@@ -769,6 +789,117 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.resumeSignalsDispatching(false);
 
   return marker;
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.charts.Bullet.prototype.makePointEvent = function(event) {
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+
+  event['pointIndex'] = pointIndex;
+
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var iter = this.data().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'pie': this,
+    'iterator': iter,
+    'sliceIndex': pointIndex,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Select a point of the series by its index.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Bullet}  {@link anychart.charts.Bullet} instance for method chaining.
+ */
+anychart.charts.Bullet.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this;
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
+ *    <b>Note:</b> Used only to display float tooltip.
+ * @return {!anychart.charts.Bullet}  {@link anychart.charts.Bullet} instance for method chaining.
+ */
+anychart.charts.Bullet.prototype.hoverPoint = function(index, opt_event) {
+  return this;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Bullet.prototype.getAllSeries = function() {
+  return [this];
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.charts.Bullet|anychart.enums.HoverMode} .
+ */
+anychart.charts.Bullet.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
 };
 
 
@@ -794,8 +925,8 @@ anychart.charts.Bullet.prototype.serialize = function() {
 anychart.charts.Bullet.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  if ('defaultRangeSettings' in config)
-    this.defaultRangeSettings(config['defaultRangeSettings']);
+  if ('defaultRangeMarkerSettings' in config)
+    this.defaultRangeSettings(config['defaultRangeMarkerSettings']);
 
   if ('defaultMarkerSettings' in config)
     this.defaultMarkerSettings(config['defaultMarkerSettings']);

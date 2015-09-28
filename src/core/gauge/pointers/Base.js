@@ -1,6 +1,7 @@
 goog.provide('anychart.core.gauge.pointers.Base');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.utils.SeriesPointContextProvider');
 
 
 
@@ -64,6 +65,12 @@ anychart.core.gauge.pointers.Base = function() {
    * @protected
    */
   this.contextProvider = {};
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
 };
 goog.inherits(anychart.core.gauge.pointers.Base, anychart.core.VisualBase);
 
@@ -85,6 +92,33 @@ anychart.core.gauge.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.gauge.pointers.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_RECALCULATION;
+
+
+/**
+ * Tester if the series is discrete based.
+ * @return {boolean}
+ */
+anychart.core.gauge.pointers.Base.prototype.isDiscreteBased = function() {
+  return true;
+};
+
+
+/**
+ * Tester if it is series.
+ * @return {boolean}
+ */
+anychart.core.gauge.pointers.Base.prototype.isSeries = function() {
+  return true;
+};
+
+
+/**
+ * Tester if it is chart.
+ * @return {boolean}
+ */
+anychart.core.gauge.pointers.Base.prototype.isChart = function() {
+  return false;
+};
 
 
 /**
@@ -265,6 +299,24 @@ anychart.core.gauge.pointers.Base.prototype.remove = function() {
 
 
 /**
+ * Returns current mapping iterator.
+ * @return {!anychart.data.Iterator} Current series iterator.
+ */
+anychart.core.gauge.pointers.Base.prototype.getIterator = function() {
+  return this.gauge().getIterator();
+};
+
+
+/**
+ * Returns new default iterator for the current mapping.
+ * @return {!anychart.data.Iterator} New iterator.
+ */
+anychart.core.gauge.pointers.Base.prototype.getResetIterator = function() {
+  return this.gauge().getResetIterator();
+};
+
+
+/**
  * Drawing.
  * @return {anychart.core.gauge.pointers.Base} .
  */
@@ -305,7 +357,295 @@ anychart.core.gauge.pointers.Base.prototype.draw = function() {
 
 
 //----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity section.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Create base series format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
+ * @return {Object} Object with info for labels formatting.
+ */
+anychart.core.gauge.pointers.Base.prototype.createFormatProvider = function(opt_force) {
+  if (!this.pointProvider_ || opt_force)
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['value'], false);
+  this.pointProvider_.applyReferenceValues();
+
+  return this.pointProvider_;
+};
+
+
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.core.gauge.pointers.Base.prototype.applyAppearanceToPoint = goog.nullFunction;
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.core.gauge.pointers.Base.prototype.applyAppearanceToSeries = goog.nullFunction;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Events manipulation.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.gauge.pointers.Base.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = goog.base(this, 'makeBrowserEvent', e);
+  res['pointIndex'] = this.getIndexByEvent(res);
+  return res;
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.core.gauge.pointers.Base.prototype.makePointEvent = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var pointIndex;
+  if ('pointIndex' in event) {
+    pointIndex = event['pointIndex'];
+  } else if ('labelIndex' in event) {
+    pointIndex = event['labelIndex'];
+  } else if ('markerIndex' in event) {
+    pointIndex = event['markerIndex'];
+  }
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  event['pointIndex'] = pointIndex;
+
+  var iter = this.gauge().getIterator();
+  if (!iter.select(pointIndex))
+    iter.reset();
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'series': this,
+    'iterator': iter,
+    'pointIndex': pointIndex,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Get point index by event. Used for events from data layer only
+ * @param {anychart.core.MouseEvent} event .
+ * @protected
+ * @return {number} Point index.
+ */
+anychart.core.gauge.pointers.Base.prototype.getIndexByEvent = function(event) {
+  return anychart.utils.toNumber(anychart.utils.extractTag(event['domTarget']).index);
+};
+
+
+/** @inheritDoc */
+anychart.core.gauge.pointers.Base.prototype.handleMouseEvent = function(event) {
+  var evt = this.makePointEvent(event);
+  if (evt)
+    this.dispatchEvent(evt);
+};
+
+
+/**
+ * Temporarily works only for acgraph.vector.Element.
+ * @param {acgraph.vector.Element} element .
+ * @param {boolean=} opt_seriesGlobal .
+ * @protected
+ */
+anychart.core.gauge.pointers.Base.prototype.makeInteractive = function(element, opt_seriesGlobal) {
+  if (!element) return;
+  element.tag = {series: this};
+  if (opt_seriesGlobal) {
+    element.tag.index = true;
+  } else {
+    element.tag.index = this.gauge().getIterator().getIndex();
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Hover.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
+ * @return {!anychart.core.gauge.pointers.Base}  {@link anychart.core.gauge.pointers.Base} instance for method chaining.
+ */
+anychart.core.gauge.pointers.Base.prototype.hover = function(opt_indexOrIndexes) {
+  if (goog.isDef(opt_indexOrIndexes))
+    this.hoverPoint(opt_indexOrIndexes);
+  else
+    this.hoverSeries();
+
+  return this;
+};
+
+
+/**
+ * Removes hover from the series.
+ * @return {!anychart.core.gauge.pointers.Base} {@link anychart.core.gauge.pointers.Base} instance for method chaining.
+ */
+anychart.core.gauge.pointers.Base.prototype.unhover = function() {
+  if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
+      !this.enabled())
+    return this;
+
+  this.state.removePointState(anychart.PointState.HOVER, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+
+  return this;
+};
+
+
+/**
+ * Hovers a point of the series by its index.
+ * @param {number|Array<number>} index Index of the point to hover.
+ * @return {!anychart.core.gauge.pointers.Base}  {@link anychart.core.gauge.pointers.Base} instance for method chaining.
+ */
+anychart.core.gauge.pointers.Base.prototype.hoverPoint = function(index) {
+  if (!this.enabled())
+    return this;
+
+  if (goog.isArray(index)) {
+    var hoveredPoints = this.state.getIndexByPointState(anychart.PointState.HOVER);
+    for (var i = 0; i < hoveredPoints.length; i++) {
+      if (!goog.array.contains(index, hoveredPoints[i])) {
+        this.state.removePointState(anychart.PointState.HOVER, hoveredPoints[i]);
+      }
+    }
+    this.state.addPointState(anychart.PointState.HOVER, index);
+  } else if (goog.isNumber(index)) {
+    this.unhover();
+    this.state.addPointState(anychart.PointState.HOVER, index);
+  }
+  return this;
+};
+
+
+/**
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.core.gauge.pointers.Base} An instance of the {@link anychart.core.gauge.pointers.Base} class for method chaining.
+ */
+anychart.core.gauge.pointers.Base.prototype.hoverSeries = function() {
+  if (!this.enabled())
+    return this;
+
+  this.state.setPointState(anychart.PointState.HOVER);
+
+  return this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Select.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Deselects all points.
+ * @return {!anychart.core.gauge.pointers.Base} {@link anychart.core.gauge.pointers.Base} instance for method chaining.
+ */
+anychart.core.gauge.pointers.Base.prototype.unselect = function() {
+  return this;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity modes.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Selection mode.
+ * @type {?anychart.enums.SelectionMode}
+ * @private
+ */
+anychart.core.gauge.pointers.Base.prototype.selectionMode_;
+
+
+/**
+ * Selection mode.
+ * @type {anychart.enums.HoverMode}
+ * @private
+ */
+anychart.core.gauge.pointers.Base.prototype.hoverMode_;
+
+
+/**
+ * @param {(anychart.enums.SelectionMode|string|null)=} opt_value Selection mode.
+ * @return {anychart.core.gauge.pointers.Base|anychart.enums.SelectionMode|null} .
+ */
+anychart.core.gauge.pointers.Base.prototype.selectionMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeSelectMode(opt_value);
+    if (opt_value != this.selectionMode_) {
+      this.selectionMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.SelectionMode}*/(this.selectionMode_);
+};
+
+
+/**
+ * @param {(anychart.enums.HoverMode|string)=} opt_value Hover mode.
+ * @return {anychart.core.gauge.pointers.Base|anychart.enums.HoverMode} .
+ */
+anychart.core.gauge.pointers.Base.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Serialize & Deserialize
+//
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.gauge.pointers.Base.prototype.serialize = function() {

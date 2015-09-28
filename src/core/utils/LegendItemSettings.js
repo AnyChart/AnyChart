@@ -64,8 +64,8 @@ anychart.core.utils.LegendItemSettings.prototype.iconEnabled = function(opt_valu
 
 /**
  * Getter/setter for icon type.
- * @param {(string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
- * @return {(string|function(acgraph.vector.Path, number)|anychart.core.utils.LegendItemSettings)} icon type or drawer function or self for method chaining.
+ * @param {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
+ * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number)|anychart.core.utils.LegendItemSettings)} icon type or drawer function or self for method chaining.
  */
 anychart.core.utils.LegendItemSettings.prototype.iconType = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -240,6 +240,24 @@ anychart.core.utils.LegendItemSettings.prototype.iconMarkerStroke = function(opt
 
 
 /**
+ * Getter/setter for icon size of legend item.
+ * @param {(number|string)=} opt_value Icon size setting.
+ * @return {(number|anychart.core.utils.LegendItemSettings)} Icon size or self for method chaining.
+ */
+anychart.core.utils.LegendItemSettings.prototype.iconSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.iconSize_ != opt_value) {
+      this.iconSize_ = /** @type {number} */ (opt_value);
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconSize_;
+};
+
+
+/**
  * Getter/setter for legend item text.
  * @param {string=} opt_value Legend item text.
  * @return {(string|anychart.core.utils.LegendItemSettings)} Legend item text or self for method chaining.
@@ -309,64 +327,66 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
     json['text'] = this.text();
   if (goog.isDef(this.iconEnabled()))
     json['iconEnabled'] = this.iconEnabled();
+  if (goog.isDef(this.iconSize()))
+    json['iconSize'] = this.iconSize();
 
-  if (goog.isFunction(this.iconType())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconType']
-    );
-  } else {
-    if (goog.isDef(this.iconType()))
-      json['iconType'] = this.iconType();
-  }
+  //if (goog.isFunction(this.iconType())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconType']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconType()))
+    json['iconType'] = this.iconType();
+  //}
 
-  if (goog.isFunction(this.iconMarkerType())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconMarkerType']
-    );
-  } else {
-    if (goog.isDef(this.iconMarkerType()))
-      json['iconMarkerType'] = this.iconMarkerType();
-  }
+  //if (goog.isFunction(this.iconMarkerType())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconMarkerType']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconMarkerType()))
+    json['iconMarkerType'] = this.iconMarkerType();
+  //}
 
   if (goog.isDef(this.disabled()))
     json['disabled'] = this.disabled();
 
-  if (goog.isFunction(this.iconFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconFill']
-    );
-  } else {
-    if (goog.isDef(this.iconFill()))
-      json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
-  }
+  //if (goog.isFunction(this.iconFill())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconFill']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconFill()))
+    json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
+  //}
 
-  if (goog.isFunction(this.iconStroke())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconStroke']
-    );
-  } else {
-    if (goog.isDef(this.iconStroke()))
-      json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
-  }
+  //if (goog.isFunction(this.iconStroke())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconStroke']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconStroke()))
+    json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
+  //}
 
-  if (goog.isFunction(this.iconHatchFill())) {
-    anychart.utils.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['LegendItemSetting iconHatchFill']
-    );
-  } else {
-    if (goog.isDef(this.iconHatchFill()))
-      json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
-  }
+  //if (goog.isFunction(this.iconHatchFill())) {
+  //  anychart.utils.warning(
+  //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+  //      null,
+  //      ['LegendItemSetting iconHatchFill']
+  //  );
+  //} else {
+  if (goog.isDef(this.iconHatchFill()))
+    json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
+  //}
 
   if (goog.isDef(this.iconMarkerFill()))
     json['iconMarkerFill'] = this.iconMarkerFill();
@@ -390,6 +410,7 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config) 
   this.iconMarkerType(config['iconMarkerType']);
   this.iconMarkerFill(config['iconMarkerFill']);
   this.iconMarkerStroke(config['iconMarkerStroke']);
+  this.iconSize(config['iconSize']);
   this.text(config['text']);
   this.disabled(config['disabled']);
   this.resumeSignalsDispatching(true);
@@ -405,5 +426,6 @@ anychart.core.utils.LegendItemSettings.prototype['iconHatchFill'] = anychart.cor
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerType'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerType;
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerFill'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerFill;
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerStroke'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerStroke;
+anychart.core.utils.LegendItemSettings.prototype['iconSize'] = anychart.core.utils.LegendItemSettings.prototype.iconSize;
 anychart.core.utils.LegendItemSettings.prototype['text'] = anychart.core.utils.LegendItemSettings.prototype.text;
 anychart.core.utils.LegendItemSettings.prototype['disabled'] = anychart.core.utils.LegendItemSettings.prototype.disabled;

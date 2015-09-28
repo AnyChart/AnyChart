@@ -1749,20 +1749,13 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
     return this;
   } else {
     if (newColumn) {
-      //var columnWidth = index ?
-      //    (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
-      //    anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
-
       var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
       column.suspendSignalsDispatching();
       column
           .container(this.getColumnsLayer_())
-          //.width(columnWidth)
           .height('100%');
 
       column.title().text(columnTitle);
-      //column.title().height(this.titleHeight_);
-      //column.title().width(columnWidth);
 
       column.resumeSignalsDispatching(true);
       this.columns_[index] = column;
@@ -2564,6 +2557,20 @@ anychart.core.ui.DataGrid.Column.prototype.SUPPORTED_SIGNALS = anychart.core.Vis
 
 
 /**
+ * Labels factory z-index.
+ * @type {number}
+ */
+anychart.core.ui.DataGrid.Column.LF_Z_INDEX = 0;
+
+
+/**
+ * Buttons z-index.
+ * @type {number}
+ */
+anychart.core.ui.DataGrid.Column.BUTTONS_Z_INDEX = 10;
+
+
+/**
  * Sets column format.
  * @param {string} fieldName - Name of field of data item to work with.
  * @param {anychart.enums.ColumnFormats|Object} presetOrSettings - Preset or custom column format.
@@ -2662,6 +2669,7 @@ anychart.core.ui.DataGrid.Column.prototype.cellTextSettings = function(opt_value
 
     this.labelsFactory_.container(this.getCellsLayer_());
     this.labelsFactory_.setParentEventTarget(this);
+    this.labelsFactory_.zIndex(anychart.core.ui.DataGrid.Column.LF_Z_INDEX);
     this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
 
     this.registerDisposable(this.labelsFactory_);
@@ -3029,6 +3037,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
           if (!button) {
             button = new anychart.core.ui.DataGrid.Button(this.dataGrid_);
             this.buttons_.push(button);
+            button.zIndex(anychart.core.ui.DataGrid.Column.BUTTONS_Z_INDEX);
             button.container(this.getCellsLayer_());
           }
 

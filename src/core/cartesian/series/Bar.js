@@ -41,7 +41,7 @@ anychart.core.cartesian.series.Bar.prototype.setAnimation = function(value) {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -55,7 +55,7 @@ anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
     var rect = /** @type {!acgraph.vector.Rect} */(this.rootElement.genNextChild());
     var barWidth = this.getPointWidth();
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y).meta('shape', rect);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y).meta('shape', rect);
     if (!this.isAnimation_)
       rect
         .setX(Math.min(zero, y))
@@ -67,9 +67,9 @@ anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
         .setY(x - barWidth / 2)
         .setHeight(barWidth);
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(rect);
+    this.makeInteractive(rect);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -82,7 +82,7 @@ anychart.core.cartesian.series.Bar.prototype.drawSubsequentPoint = function() {
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(false);
+    this.applyHatchFill(pointState);
   }
 
   return true;
@@ -100,7 +100,12 @@ anychart.core.cartesian.series.Bar.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.Bar.prototype['fill'] = anychart.core.cartesian.series.Bar.prototype.fill;//inherited
 anychart.core.cartesian.series.Bar.prototype['hoverFill'] = anychart.core.cartesian.series.Bar.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.Bar.prototype['selectFill'] = anychart.core.cartesian.series.Bar.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.Bar.prototype['stroke'] = anychart.core.cartesian.series.Bar.prototype.stroke;//inherited
 anychart.core.cartesian.series.Bar.prototype['hoverStroke'] = anychart.core.cartesian.series.Bar.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.Bar.prototype['selectStroke'] = anychart.core.cartesian.series.Bar.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.Bar.prototype['hatchFill'] = anychart.core.cartesian.series.Bar.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Bar.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.Bar.prototype['selectHatchFill'] = anychart.core.cartesian.series.Bar.prototype.selectHatchFill;//inherited

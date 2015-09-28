@@ -24,36 +24,28 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.Candlestick.prototype.risingFill_ = (function() {
-  return anychart.color.lighten(this['sourceColor']);
-});
+anychart.core.cartesian.series.Candlestick.prototype.risingFill_;
 
 
 /**
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.Candlestick.prototype.hoverRisingFill_ = (function() {
-  return anychart.color.lighten(anychart.color.lighten(this['sourceColor']));
-});
+anychart.core.cartesian.series.Candlestick.prototype.hoverRisingFill_;
 
 
 /**
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.Candlestick.prototype.fallingFill_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
+anychart.core.cartesian.series.Candlestick.prototype.fallingFill_;
 
 
 /**
  * @type {(acgraph.vector.Fill|Function|null)}
  * @private
  */
-anychart.core.cartesian.series.Candlestick.prototype.hoverFallingFill_ = (function() {
-  return anychart.color.darken(anychart.color.darken(this['sourceColor']));
-});
+anychart.core.cartesian.series.Candlestick.prototype.hoverFallingFill_;
 
 
 /**
@@ -85,7 +77,7 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverFallingHatchFill_;
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function(pointState) {
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues)
     return false;
@@ -129,9 +121,9 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
         .lineTo(x, rising ? open : close);
 
 
-    this.colorizeShape(this.hoverStatus == this.getIterator().getIndex() || this.hoverStatus < 0);
+    this.colorizeShape(pointState);
 
-    this.makeHoverable(path);
+    this.makeInteractive(path);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
@@ -144,7 +136,7 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(false);
+    this.applyHatchFill(anychart.PointState.NORMAL);
   }
 
   return true;
@@ -154,19 +146,19 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
 /**
  * Colorizes shape in accordance to current point colorization settings.
  * Shape is get from current meta 'shape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.Candlestick.prototype.colorizeShape = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.colorizeShape = function(pointState) {
   var shape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('shape'));
   if (goog.isDef(shape)) {
     var stroke, fill;
     if (!!this.getIterator().meta('rising')) {
-      fill = this.getFinalRisingFill(hover);
-      stroke = this.getFinalRisingStroke(hover);
+      fill = this.getFinalRisingFill(pointState);
+      stroke = this.getFinalRisingStroke(pointState);
     } else {
-      fill = this.getFinalFallingFill(hover);
-      stroke = this.getFinalFallingStroke(hover);
+      fill = this.getFinalFallingFill(pointState);
+      stroke = this.getFinalFallingStroke(pointState);
     }
 
     var lineCap = stroke && stroke['dash'] && !anychart.utils.isNone(stroke['dash']) ?
@@ -182,17 +174,17 @@ anychart.core.cartesian.series.Candlestick.prototype.colorizeShape = function(ho
 /**
  * Apply hatch fill to shape in accordance to current point colorization settings.
  * Shape is get from current meta 'hatchFillShape'.
- * @param {boolean} hover If the point is hovered.
+ * @param {anychart.PointState|number} pointState Point state.
  * @protected
  */
-anychart.core.cartesian.series.Candlestick.prototype.applyHatchFill = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.applyHatchFill = function(pointState) {
   var hatchFillShape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('hatchFillShape'));
   if (goog.isDefAndNotNull(hatchFillShape)) {
     var fill;
     if (!!this.getIterator().meta('rising')) {
-      fill = this.getFinalRisingHatchFill(hover);
+      fill = this.getFinalRisingHatchFill(pointState);
     } else {
-      fill = this.getFinalFallingHatchFill(hover);
+      fill = this.getFinalFallingHatchFill(pointState);
     }
 
     hatchFillShape
@@ -301,11 +293,35 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverRisingHatchFill = func
 
 
 /**
+ * Getter/setter for current hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.cartesian.series.Base|Function|boolean} Hatch fill.
+ */
+anychart.core.cartesian.series.Candlestick.prototype.selectRisingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (this.selectRisingHatchFill_ != hatchFill)
+      this.selectRisingHatchFill_ = hatchFill;
+
+    return this;
+  }
+  return this.selectRisingHatchFill_;
+};
+
+
+/**
  * Method to get final rising hatch fill, with all fallbacks taken into account.
- * @param {boolean} hover If the hatch fill should be a hover hatch fill.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final rising hatch fill for the current row.
  */
-anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = function(pointState) {
   var iterator = this.getIterator();
 
   var normalHatchFill;
@@ -316,7 +332,15 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = f
   }
 
   var hatchFill;
-  if (hover) {
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    if (goog.isDef(iterator.get('selectRisingHatchFill'))) {
+      hatchFill = iterator.get('selectRisingHatchFill');
+    } else if (goog.isDef(this.selectRisingHatchFill())) {
+      hatchFill = this.selectRisingHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
     if (goog.isDef(iterator.get('hoverRisingHatchFill'))) {
       hatchFill = iterator.get('hoverRisingHatchFill');
     } else if (goog.isDef(this.hoverRisingHatchFill())) {
@@ -327,6 +351,7 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingHatchFill = f
   } else {
     hatchFill = normalHatchFill;
   }
+
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
           /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
@@ -427,11 +452,35 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverFallingHatchFill = fun
 
 
 /**
+ * Getter/setter for current hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.cartesian.series.Base|Function|boolean} Hatch fill.
+ */
+anychart.core.cartesian.series.Candlestick.prototype.selectFallingHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
+        opt_patternFillOrTypeOrState :
+        acgraph.vector.normalizeHatchFill.apply(null, arguments);
+
+    if (hatchFill !== this.selectFallingHatchFill_)
+      this.selectFallingHatchFill_ = hatchFill;
+
+    return this;
+  }
+  return this.selectFallingHatchFill_;
+};
+
+
+/**
  * Method to get final falling hatch fill, with all fallbacks taken into account.
- * @param {boolean} hover If the hatch fill should be a hover hatch fill.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final falling hatch fill for the current row.
  */
-anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = function(pointState) {
   var iterator = this.getIterator();
 
   var normalHatchFill;
@@ -442,7 +491,15 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = 
   }
 
   var hatchFill;
-  if (hover) {
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    if (goog.isDef(iterator.get('selectFallingHatchFill'))) {
+      hatchFill = iterator.get('selectFallingHatchFill');
+    } else if (goog.isDef(this.selectFallingHatchFill())) {
+      hatchFill = this.selectFallingHatchFill();
+    } else {
+      hatchFill = normalHatchFill;
+    }
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
     if (goog.isDef(iterator.get('hoverFallingHatchFill'))) {
       hatchFill = iterator.get('hoverFallingHatchFill');
     } else if (goog.isDef(this.hoverFallingHatchFill())) {
@@ -453,6 +510,7 @@ anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingHatchFill = 
   } else {
     hatchFill = normalHatchFill;
   }
+
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
       this.normalizeHatchFill(
           /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
@@ -694,24 +752,54 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverRisingFill = function(
 
 
 /**
+ * Getter/setter for select series fill color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.cartesian.series.Base|Function} .
+ */
+anychart.core.cartesian.series.Candlestick.prototype.selectRisingFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.selectRisingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectRisingFill_;
+};
+
+
+/**
  * Method to get final stroke, with all fallbacks taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingFill = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.getFinalRisingFill = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      iterator.get('risingFill') ||
-      this.risingFill());
-  return /** @type {!acgraph.vector.Fill} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(
-          iterator.get('hoverRisingFill') ||
-          this.hoverRisingFill() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */(iterator.get('risingFill') || this.risingFill());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        iterator.get('selectRisingFill') || this.selectRisingFill() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        iterator.get('hoverRisingFill') || this.hoverRisingFill() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
 };
 
 
@@ -951,29 +1039,59 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverFallingFill = function
 
 
 /**
+ * Getter/setter for select series falling fill color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.cartesian.series.Base|Function} .
+ */
+anychart.core.cartesian.series.Candlestick.prototype.selectFallingFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.selectFallingFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    // TODO: We don't set anything cause everything is fine?
+    return this;
+  }
+  return this.selectFallingFill_;
+};
+
+
+/**
  * Method to get final rising point stroke, with all fallbacks taken into account.
- * @param {boolean} hover If the stroke should be a hover stroke.
+ * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
  * @protected
  */
-anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(hover) {
+anychart.core.cartesian.series.Candlestick.prototype.getFinalFallingFill = function(pointState) {
   var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */(
-      iterator.get('fallingFill') ||
-      this.fallingFill());
-  return /** @type {!acgraph.vector.Fill} */(hover ?
-      this.normalizeColor(
-          /** @type {acgraph.vector.Fill|Function} */(
-          iterator.get('hoverFallingFill') ||
-          this.hoverFallingFill() ||
-          normalColor),
-          normalColor) :
-      this.normalizeColor(normalColor));
+  var normalColor = /** @type {acgraph.vector.Fill|Function} */(iterator.get('fallingFill') || this.fallingFill());
+
+  var result;
+  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        iterator.get('selectFallingFill') || this.selectFallingFill() || normalColor),
+        normalColor);
+  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+    result = this.normalizeColor(
+        /** @type {acgraph.vector.Fill|Function} */(
+        iterator.get('hoverFallingFill') || this.hoverFallingFill() || normalColor),
+        normalColor);
+  } else {
+    result = this.normalizeColor(normalColor);
+  }
+
+  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Candlestick.prototype.getFinalHatchFill = function(usePointSettings, hover) {
+anychart.core.cartesian.series.Candlestick.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
   return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */ (/** @type {Object} */ (null));
 };
 
@@ -1012,6 +1130,16 @@ anychart.core.cartesian.series.Candlestick.prototype.serialize = function() {
     json['hoverRisingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverRisingFill()));
   }
 
+  if (goog.isFunction(this.selectRisingFill())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series selectRisingFill']
+    );
+  } else {
+    json['selectRisingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectRisingFill()));
+  }
+
 
   if (goog.isFunction(this.fallingFill())) {
     anychart.utils.warning(
@@ -1031,6 +1159,16 @@ anychart.core.cartesian.series.Candlestick.prototype.serialize = function() {
     );
   } else {
     json['hoverFallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFallingFill()));
+  }
+
+  if (goog.isFunction(this.selectFallingFill())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series selectFallingFill']
+    );
+  } else {
+    json['selectFallingFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFallingFill()));
   }
 
 
@@ -1054,6 +1192,16 @@ anychart.core.cartesian.series.Candlestick.prototype.serialize = function() {
     json['hoverFallingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFallingHatchFill()));
   }
 
+  if (goog.isFunction(this.selectFallingHatchFill())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series selectFallingHatchFill']
+    );
+  } else {
+    json['selectFallingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFallingHatchFill()));
+  }
+
 
   if (goog.isFunction(this.risingHatchFill())) {
     anychart.utils.warning(
@@ -1075,6 +1223,16 @@ anychart.core.cartesian.series.Candlestick.prototype.serialize = function() {
     json['hoverRisingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverRisingHatchFill()));
   }
 
+  if (goog.isFunction(this.selectRisingHatchFill())) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Candlestick Series selectRisingHatchFill']
+    );
+  } else {
+    json['selectRisingHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectRisingHatchFill()));
+  }
+
   return json;
 };
 
@@ -1086,21 +1244,35 @@ anychart.core.cartesian.series.Candlestick.prototype.setupByJSON = function(conf
   goog.base(this, 'setupByJSON', config);
   this.risingFill(config['risingFill']);
   this.hoverRisingFill(config['hoverRisingFill']);
+  this.selectRisingFill(config['hoverRisingFill']);
+
   this.fallingFill(config['fallingFill']);
   this.hoverFallingFill(config['hoverFallingFill']);
+  this.selectFallingFill(config['hoverFallingFill']);
+
   this.risingHatchFill(config['risingHatchFill']);
   this.hoverRisingHatchFill(config['hoverRisingHatchFill']);
+  this.selectRisingHatchFill(config['hoverRisingHatchFill']);
+
   this.fallingHatchFill(config['fallingHatchFill']);
   this.hoverFallingHatchFill(config['hoverFallingHatchFill']);
+  this.selectFallingHatchFill(config['hoverFallingHatchFill']);
 };
 
 
 //exports
 anychart.core.cartesian.series.Candlestick.prototype['risingFill'] = anychart.core.cartesian.series.Candlestick.prototype.risingFill;//doc|ex
 anychart.core.cartesian.series.Candlestick.prototype['hoverRisingFill'] = anychart.core.cartesian.series.Candlestick.prototype.hoverRisingFill;//doc|ex
+anychart.core.cartesian.series.Candlestick.prototype['selectRisingFill'] = anychart.core.cartesian.series.Candlestick.prototype.selectRisingFill;
+
 anychart.core.cartesian.series.Candlestick.prototype['fallingFill'] = anychart.core.cartesian.series.Candlestick.prototype.fallingFill;//doc|ex
 anychart.core.cartesian.series.Candlestick.prototype['hoverFallingFill'] = anychart.core.cartesian.series.Candlestick.prototype.hoverFallingFill;//doc|ex
+anychart.core.cartesian.series.Candlestick.prototype['selectFallingFill'] = anychart.core.cartesian.series.Candlestick.prototype.selectFallingFill;
+
 anychart.core.cartesian.series.Candlestick.prototype['risingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.risingHatchFill;//doc|ex
 anychart.core.cartesian.series.Candlestick.prototype['hoverRisingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.hoverRisingHatchFill;//doc|ex
+anychart.core.cartesian.series.Candlestick.prototype['selectRisingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.selectRisingHatchFill;
+
 anychart.core.cartesian.series.Candlestick.prototype['fallingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.fallingHatchFill;//doc|ex
 anychart.core.cartesian.series.Candlestick.prototype['hoverFallingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.hoverFallingHatchFill;//doc|ex
+anychart.core.cartesian.series.Candlestick.prototype['selectFallingHatchFill'] = anychart.core.cartesian.series.Candlestick.prototype.selectFallingHatchFill;

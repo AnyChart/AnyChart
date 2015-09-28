@@ -1,5 +1,5 @@
 goog.provide('anychart.core.map.series.Base');
-goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.utils.LegendContextProvider');
 goog.require('anychart.core.utils.LegendItemSettings');
@@ -12,21 +12,19 @@ goog.require('anychart.enums');
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @constructor
- * @extends {anychart.core.VisualBaseWithBounds}
+ * @extends {anychart.core.SeriesBase}
  */
 anychart.core.map.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
-  goog.base(this);
 
-  this.data(opt_data || null, opt_csvSettings);
+  goog.base(this, opt_data, opt_csvSettings);
+
   this.geoData = [];
-  this.selectStatus = [];
-  this.hoverStatus = [];
   this.needSelfLayer = true;
 
   this.resumeSignalsDispatching(false);
 };
-goog.inherits(anychart.core.map.series.Base, anychart.core.VisualBaseWithBounds);
+goog.inherits(anychart.core.map.series.Base, anychart.core.SeriesBase);
 
 
 /**
@@ -44,8 +42,7 @@ anychart.core.map.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
-    anychart.Signal.NEED_UPDATE_LEGEND |
-    anychart.Signal.NEED_UPDATE_COLOR_RANGE;
+    anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -57,7 +54,6 @@ anychart.core.map.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
-    anychart.ConsistencyState.MAP_COLOR_SCALE |
     anychart.ConsistencyState.SERIES_DATA;
 
 
@@ -83,38 +79,16 @@ anychart.core.map.series.Base.ZINDEX_HATCH_FILL = 2;
 
 
 /**
- * @type {!anychart.data.Iterator}
- * @private
+ * @type {boolean}
+ * @protected
  */
-anychart.core.map.series.Base.prototype.iterator_;
-
-
-/**
- * @type {string}
- * @private
- */
-anychart.core.map.series.Base.prototype.geoIdField_;
+anychart.core.map.series.Base.prototype.needSelfLayer;
 
 
 /**
  * @type {anychart.charts.Map}
  */
 anychart.core.map.series.Base.prototype.map;
-
-
-/**
- * Geo data internal view.
- * @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>}
- * @protected
- */
-anychart.core.map.series.Base.prototype.geoData;
-
-
-/**
- * @type {anychart.core.ui.Tooltip}
- * @private
- */
-anychart.core.map.series.Base.prototype.tooltip_ = null;
 
 
 /**
@@ -138,224 +112,62 @@ anychart.core.map.series.Base.prototype.referenceValueNames;
 anychart.core.map.series.Base.prototype.referenceValueMeanings;
 
 
+/**
+ * Calculates size scale for the series. If opt_minMax is passed, also compares with opt_minMax members.
+ * @param {Array.<number>=} opt_minMax Array of two values: [min, max].
+ */
+anychart.core.map.series.Base.prototype.calculateSizeScale = goog.nullFunction;
+
+
+/**
+ * @param {number} min .
+ * @param {number} max .
+ * @param {number|string} minSize
+ * @param {number|string} maxSize
+ */
+anychart.core.map.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Coloring.
+//  Color scale.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Series color. See this.color().
- * @type {?acgraph.vector.Fill}
- * @private
- */
-anychart.core.map.series.Base.prototype.color_ = null;
-
-
-/**
- * Series color from chart. See. this.color().
- * @type {?acgraph.vector.Fill}
- * @private
- */
-anychart.core.map.series.Base.prototype.autoColor_ = null;
-
-
-/**
- * Hatch fill type from chart.
- * @type {acgraph.vector.HatchFill}
- * @protected
- */
-anychart.core.map.series.Base.prototype.autoHatchFill_;
-
-
-/**
- * Allow points select state from chart.
- * @type {boolean}
- * @protected
- */
-anychart.core.map.series.Base.autoAllowPointsSelect_;
-
-
-/**
- * Hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
- * @private
- */
-anychart.core.map.series.Base.prototype.hatchFill_ = (function() {
-  return this['sourceHatchFill'];
-});
-
-
-/**
- * Hover hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
- * @private
- */
-anychart.core.map.series.Base.prototype.hoverHatchFill_;
-
-
-/**
- * Select hatch fill.
- * @type {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|null|boolean)}
- * @private
- */
-anychart.core.map.series.Base.prototype.selectHatchFill_;
-
-
-/**
- * @type {(acgraph.vector.Fill|Function|null)}
- * @private
- */
-anychart.core.map.series.Base.prototype.fill_ = (function() {
-  var color;
-  if (this['colorScale']) {
-    var refVale = this['referenceValueNames'][1];
-    var value = this['iterator'].get(refVale);
-    color = this['colorScale'].valueToColor(value);
-  } else {
-    color = this['sourceColor'];
-  }
-  return color;
-});
-
-
-/**
- * @type {(acgraph.vector.Fill|Function|null)}
- * @private
- */
-anychart.core.map.series.Base.prototype.hoverFill_ = (function() {
-  return anychart.color.lighten(this['sourceColor']);
-});
-
-
-/**
- * @type {(acgraph.vector.Fill|Function|null)}
- * @private
- */
-anychart.core.map.series.Base.prototype.selectFill_ = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
-
-
-/**
- * @type {(acgraph.vector.Stroke|Function|null)}
- * @protected
- */
-anychart.core.map.series.Base.prototype.strokeInternal = (function() {
-  return anychart.color.darken(this['sourceColor']);
-});
-
-
-/**
- * @type {(acgraph.vector.Stroke|Function|null)}
- * @private
- */
-anychart.core.map.series.Base.prototype.selectStroke_ = null;
-
-
-/**
- * @type {(acgraph.vector.Stroke|Function|null)}
- * @private
- */
-anychart.core.map.series.Base.prototype.hoverStroke_ = null;
-
-
 /**
  * Color scale.
  * @param {(anychart.core.map.scale.LinearColor|anychart.core.map.scale.OrdinalColor)=} opt_value Scale to set.
- * @return {!(anychart.core.map.scale.OrdinalColor|anychart.core.map.scale.LinearColor|anychart.core.map.series.Base)} Default chart color scale value or itself for
+ * @return {anychart.core.map.scale.OrdinalColor|anychart.core.map.scale.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.core.map.series.Base.prototype.colorScale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.colorScale_ != opt_value) {
-      if (this.colorScale_)
-        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
-      this.colorScale_ = opt_value;
-      if (this.colorScale_)
-        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
-
-      this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
-    }
-    return this;
-  }
-  return this.colorScale_;
+  return null;
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Geo data.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
- * Chart scale invalidation handler.
- * @param {anychart.SignalEvent} event Event.
+ * @type {?string}
  * @private
  */
-anychart.core.map.series.Base.prototype.colorScaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MAP_COLOR_SCALE,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_COLOR_RANGE);
-  }
-};
+anychart.core.map.series.Base.prototype.geoIdField_;
 
 
 /**
- * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Data to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
- * @return {(!anychart.core.map.series.Base|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
+ * Geo data internal view.
+ * @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>}
+ * @protected
  */
-anychart.core.map.series.Base.prototype.data = function(opt_value, opt_csvSettings) {
-  if (goog.isDef(opt_value)) {
-    goog.dispose(this.parentViewToDispose_); // disposing a view created by the series if any;
-    if (opt_value instanceof anychart.data.View)
-      this.parentView_ = this.parentViewToDispose_ = opt_value.derive(); // deriving a view to avoid interference with other view users
-    else if (opt_value instanceof anychart.data.Set)
-      this.parentView_ = this.parentViewToDispose_ = opt_value.mapAs();
-    else
-      this.parentView_ = (this.parentViewToDispose_ = new anychart.data.Set(
-          (goog.isArray(opt_value) || goog.isString(opt_value)) ? opt_value : null, opt_csvSettings)).mapAs();
-    this.registerDisposable(this.parentViewToDispose_);
-    this.data_ = this.parentView_;
-    this.data_.listenSignals(this.dataInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
-        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
-    return this;
-  }
-  return this.data_;
-};
-
-
-/**
- * Listens to data invalidation.
- * @param {anychart.SignalEvent} e
- * @private
- */
-anychart.core.map.series.Base.prototype.dataInvalidated_ = function(e) {
-  if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
-  }
-};
-
-
-/**
- * Returns current mapping iterator.
- * @return {!anychart.data.Iterator} Current series iterator.
- */
-anychart.core.map.series.Base.prototype.getIterator = function() {
-  return this.iterator_ || this.getResetIterator();
-};
-
-
-/**
- * Returns new default iterator for the current mapping.
- * @return {!anychart.data.Iterator} New iterator.
- */
-anychart.core.map.series.Base.prototype.getResetIterator = function() {
-  return this.iterator_ = this.data().getIterator();
-};
+anychart.core.map.series.Base.prototype.geoData;
 
 
 /**
  * Sets/gets geo id field.
- * @param {string=} opt_value Geo id.
- * @return {string|anychart.core.map.series.Base}
+ * @param {?string=} opt_value Geo id.
+ * @return {null|string|anychart.core.map.series.Base}
  */
 anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -371,6 +183,26 @@ anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
 
 
 /**
+ * Sets auto geo id for series.
+ * @param {string} value
+ */
+anychart.core.map.series.Base.prototype.setAutoGeoIdField = function(value) {
+  this.geoAutoGeoIdField_ = value;
+  if (!this.geoIdField_)
+    this.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Returns final geo id for series.
+ * @return {string}
+ */
+anychart.core.map.series.Base.prototype.getFinalGeoIdField = function() {
+  return this.geoIdField_ || this.geoAutoGeoIdField_;
+};
+
+
+/**
  * Internal method. Sets link to geo data.
  * @param {anychart.charts.Map} map .
  * @param {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} geoData Geo data to set.
@@ -382,6 +214,11 @@ anychart.core.map.series.Base.prototype.setGeoData = function(map, geoData) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Sufficient properties
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Tester if the series has markers() method.
  * @return {boolean}
@@ -392,932 +229,66 @@ anychart.core.map.series.Base.prototype.hasMarkers = function() {
 
 
 /**
- * Sets series marker type that parent chart have set for it.
- * @param {anychart.enums.MarkerType} value Auto marker type distributed by the chart.
- */
-anychart.core.map.series.Base.prototype.setAutoMarkerType = goog.abstractMethod;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Tooltip.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!(anychart.core.map.series.Base|anychart.core.ui.Tooltip)} Tooltip instance or itself for chaining call.
- */
-anychart.core.map.series.Base.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
-    this.registerDisposable(this.tooltip_);
-    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
-};
-
-
-/**
- * Scales invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.map.series.Base.prototype.onTooltipSignal_ = function(event) {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Coloring.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @ignoreDoc
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.map.series.Base} .
- */
-anychart.core.map.series.Base.prototype.color = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = goog.isNull(opt_fillOrColorOrKeys) ? null : acgraph.vector.normalizeFill.apply(null, arguments);
-    if (this.color_ != color) {
-      this.color_ = color;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.color_ || this.autoColor_;
-};
-
-
-/**
- * Sets series color that parent chart have set for it.
- * @param {acgraph.vector.Fill} value Auto color fill distributed by the chart.
- */
-anychart.core.map.series.Base.prototype.setAutoColor = function(value) {
-  this.autoColor_ = value;
-};
-
-
-/**
- * Sets series hatch fill type that parent chart have set for it.
- * @param {?(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} value Auto hatch fill type distributed by the chart.
- */
-anychart.core.map.series.Base.prototype.setAutoHatchFill = function(value) {
-  this.autoHatchFill_ = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
-};
-
-
-/**
- * Sets series "allow points select" state that parent chart have set for it.
- * @param {boolean} value Auto hatch fill type distributed by the chart.
- */
-anychart.core.map.series.Base.prototype.setAutoAllowPointsSelect = function(value) {
-  this.autoAllowPointsSelect_ = value;
-};
-
-
-/**
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.map.series.Base|Function|boolean} Hatch fill.
- */
-anychart.core.map.series.Base.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill != this.hatchFill_) {
-      this.hatchFill_ = hatchFill;
-      this.invalidate(anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.hatchFill_;
-};
-
-
-/**
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.map.series.Base|Function|boolean} Hatch fill.
- */
-anychart.core.map.series.Base.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.hoverHatchFill_)
-      this.hoverHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.hoverHatchFill_;
-};
-
-
-/**
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.core.map.series.Base|Function|boolean} Hatch fill.
- */
-anychart.core.map.series.Base.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = goog.isFunction(opt_patternFillOrTypeOrState) || goog.isBoolean(opt_patternFillOrTypeOrState) ?
-        opt_patternFillOrTypeOrState :
-        acgraph.vector.normalizeHatchFill.apply(null, arguments);
-
-    if (hatchFill !== this.selectHatchFill_)
-      this.selectHatchFill_ = hatchFill;
-    return this;
-  }
-  return this.selectHatchFill_;
-};
-
-
-/**
- * Method that gets the final hatch fill for a current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.enums.AnyMapPointState} pointState If the hatch fill should be a hover hatch fill.
- * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Final hatch fill for the current row.
- */
-anychart.core.map.series.Base.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-
-  var normalHatchFill;
-  if (usePointSettings && goog.isDef(iterator.get('hatchFill'))) {
-    normalHatchFill = iterator.get('hatchFill');
-  } else {
-    normalHatchFill = this.hatchFill();
-  }
-
-  var hatchFill;
-  if (pointState == anychart.enums.AnyMapPointState.HOVER) {
-    if (usePointSettings && goog.isDef(iterator.get('hoverHatchFill'))) {
-      hatchFill = iterator.get('hoverHatchFill');
-    } else if (goog.isDef(this.hoverHatchFill())) {
-      hatchFill = this.hoverHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else if (pointState == anychart.enums.AnyMapPointState.SELECT) {
-    if (usePointSettings && goog.isDef(iterator.get('selectHatchFill'))) {
-      hatchFill = iterator.get('selectHatchFill');
-    } else if (goog.isDef(this.selectHatchFill())) {
-      hatchFill = this.selectHatchFill();
-    } else {
-      hatchFill = normalHatchFill;
-    }
-  } else {
-    hatchFill = normalHatchFill;
-  }
-
-  return /** @type {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} */(
-      this.normalizeHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|boolean|string} */(hatchFill)));
-};
-
-
-/**
- * Gets final normalized pattern/hatch fill.
- * @param {acgraph.vector.HatchFill|acgraph.vector.PatternFill|Function|string|boolean} hatchFill Normal state hatch fill.
- * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill} Normalized hatch fill.
- * @protected
- */
-anychart.core.map.series.Base.prototype.normalizeHatchFill = function(hatchFill) {
-  var fill;
-  var index = this.getIterator().getIndex();
-  if (goog.isFunction(hatchFill)) {
-    var sourceHatchFill = this.autoHatchFill_ ||
-        acgraph.vector.normalizeHatchFill(anychart.core.map.series.Base.DEFAULT_HATCH_FILL_TYPE);
-    var scope = {
-      'index': index,
-      'sourceHatchFill': sourceHatchFill,
-      'iterator': this.getIterator()
-    };
-    fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
-  } else if (goog.isBoolean(hatchFill)) {
-    fill = hatchFill ? this.autoHatchFill_ : null;
-  } else
-    fill = acgraph.vector.normalizeHatchFill(hatchFill);
-  return fill;
-};
-
-
-/**
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.map.series.Base|Function} .
- */
-anychart.core.map.series.Base.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.fill_) {
-      this.fill_ = fill;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.fill_;
-};
-
-
-/**
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.map.series.Base|Function} .
- */
-anychart.core.map.series.Base.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.hoverFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    // TODO: we don't set anything cause everything is fine?
-    return this;
-  }
-  return this.hoverFill_;
-};
-
-
-/**
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.map.series.Base|Function} .
- */
-anychart.core.map.series.Base.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    this.selectFill_ = goog.isFunction(opt_fillOrColorOrKeys) ?
-        opt_fillOrColorOrKeys :
-        acgraph.vector.normalizeFill.apply(null, arguments);
-    // TODO: we don't set anything cause everything is fine?
-    return this;
-  }
-  return this.selectFill_;
-};
-
-
-/**
- * Method that gets final stroke color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.enums.AnyMapPointState} pointState Point state - normal, hover or select.
- * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
- * @protected
- */
-anychart.core.map.series.Base.prototype.getFinalFill = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && iterator.get('fill')) || this.fill());
-
-  var result;
-  if (pointState == anychart.enums.AnyMapPointState.HOVER) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('hoverFill')) || this.hoverFill() || normalColor),
-        normalColor);
-  } else if (pointState == anychart.enums.AnyMapPointState.SELECT) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Fill|Function} */(
-        (usePointSettings && iterator.get('selectFill')) || this.selectFill() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeFill(/** @type {!acgraph.vector.Fill} */(result));
-};
-
-
-/**
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.map.series.Base|acgraph.vector.Stroke|Function} .
- */
-anychart.core.map.series.Base.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.strokeInternal) {
-      this.strokeInternal = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
-    }
-    return this;
-  }
-  return this.strokeInternal;
-};
-
-
-/**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.map.series.Base|acgraph.vector.Stroke|Function} .
- */
-anychart.core.map.series.Base.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.hoverStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    // TODO: we don't set anything cause there is nothing to do?
-    return this;
-  }
-  return this.hoverStroke_;
-};
-
-
-/**
- * @ignoreDoc
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.map.series.Base|acgraph.vector.Stroke|Function} .
- */
-anychart.core.map.series.Base.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    this.selectStroke_ = goog.isFunction(opt_strokeOrFill) ?
-        opt_strokeOrFill :
-        acgraph.vector.normalizeStroke.apply(null, arguments);
-    // TODO: we don't set anything cause there is nothing to do?
-    return this;
-  }
-  return this.selectStroke_;
-};
-
-
-/**
- * Method that gets final line color for the current point, with all fallbacks taken into account.
- * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
- * @param {anychart.enums.AnyMapPointState} pointState If the stroke should be a hover stroke.
- * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
- * @protected
- */
-anychart.core.map.series.Base.prototype.getFinalStroke = function(usePointSettings, pointState) {
-  var iterator = this.getIterator();
-  var normalColor = /** @type {acgraph.vector.Stroke|Function} */((usePointSettings && iterator.get('stroke')) || this.stroke());
-
-  var result;
-  if (pointState == anychart.enums.AnyMapPointState.HOVER) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('hoverStroke')) || this.hoverStroke() || normalColor),
-        normalColor);
-  } else if (pointState == anychart.enums.AnyMapPointState.SELECT) {
-    result = this.normalizeColor(
-        /** @type {acgraph.vector.Stroke|Function} */(
-        (usePointSettings && iterator.get('selectStroke')) || this.selectStroke() || normalColor),
-        normalColor);
-  } else {
-    result = this.normalizeColor(normalColor);
-  }
-
-  return acgraph.vector.normalizeStroke(/** @type {!acgraph.vector.Stroke} */(result));
-};
-
-
-/**
- * Gets final normalized fill or stroke color.
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
- * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
- * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
- * @protected
- */
-anychart.core.map.series.Base.prototype.normalizeColor = function(color, var_args) {
-  var fill;
-  if (goog.isFunction(color)) {
-    var sourceColor = arguments.length > 1 ?
-        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.color();
-    var scope = {
-      'index': this.getIterator().getIndex(),
-      'sourceColor': sourceColor,
-      'iterator': this.getIterator(),
-      'colorScale': this.colorScale_,
-      'referenceValueNames': this.referenceValueNames
-    };
-    fill = color.call(scope);
-  } else
-    fill = color;
-  return fill;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Labels.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Checks whether a labelsFactory instance already exist.
+ * Tester if the series is size based (bubble).
  * @return {boolean}
  */
-anychart.core.map.series.Base.prototype.isLabelsInit = function() {
-  return !!this.labels_;
+anychart.core.map.series.Base.prototype.isSizeBased = function() {
+  return false;
 };
 
 
 /**
- * Gets or sets series data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.map.series.Base)} Labels instance or itself for chaining call.
- */
-anychart.core.map.series.Base.prototype.labels = function(opt_value) {
-  //If you invoke this method, you create labelsFactory instance. If you don't want to create the instance,
-  // use isLabelsInit method to check whether a labelsFactory instance already exist.
-  if (!this.labels_) {
-    this.labels_ = new anychart.core.ui.LabelsFactory();
-    this.labels_.adjustFontSize(true);
-    this.labels_.fontWeight('bold');
-    this.labels_.enabled(true);
-    this.labels_.setParentEventTarget(this);
-    this.labels_.textFormatter(function() {
-      return this['name'];
-    });
-    this.labels_.listenSignals(this.labelsInvalidated_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.labels_.setup(opt_value);
-    return this;
-  }
-  return this.labels_;
-};
-
-
-/**
- * Gets or sets series hover data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.map.series.Base)} Labels instance or itself for chaining call.
- */
-anychart.core.map.series.Base.prototype.hoverLabels = function(opt_value) {
-  if (!this.hoverLabels_) {
-    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
-    this.hoverLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.hoverLabels_.setup(opt_value);
-    return this;
-  }
-  return this.hoverLabels_;
-};
-
-
-/**
- * Gets or sets series select data labels.
- * @param {(Object|boolean|null)=} opt_value Series data labels settings.
- * @return {!(anychart.core.ui.LabelsFactory|anychart.core.map.series.Base)} Labels instance or itself for chaining call.
- */
-anychart.core.map.series.Base.prototype.selectLabels = function(opt_value) {
-  if (!this.selectLabels_) {
-    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
-    this.selectLabels_.enabled(null);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.selectLabels_.setup(opt_value);
-    return this;
-  }
-  return this.selectLabels_;
-};
-
-
-/**
- * Listener for labels invalidation.
- * @param {anychart.SignalEvent} event Invalidation event.
- * @private
- */
-anychart.core.map.series.Base.prototype.labelsInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
-  }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Interactivity
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.makeBrowserEvent = function(e) {
-  //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
-  res['pointIndex'] = this.getIndexByEvent(res);
-  return res;
-};
-
-
-/**
- * Get point index by event. Used for events from data layer only
- * @param {anychart.core.MouseEvent} event .
- * @protected
- * @return {number} Point index.
- */
-anychart.core.map.series.Base.prototype.getIndexByEvent = function(event) {
-  return anychart.utils.toNumber(anychart.utils.extractTag(event['domTarget']).index);
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- */
-anychart.core.map.series.Base.prototype.handleMouseOverAndMove = function(event) {
-  var evt = this.makePointEvent(event);
-  if (evt &&
-      ((anychart.utils.checkIfParent(this, event['relatedTarget']) && this.hoverStatus.length > 0) ||
-      this.dispatchEvent(evt))) {
-    // we don't want to dispatch if this an out-over from the same point
-    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
-    this.hoverPoint(/** @type {number} */ (evt['pointIndex']), event);
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- */
-anychart.core.map.series.Base.prototype.handleMouseOut = function(event) {
-  var evt = this.makePointEvent(event);
-  var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
-  var prevIndex = anychart.utils.toNumber(prevTag && prevTag.index);
-  var index = evt['pointIndex'];
-  if (anychart.utils.checkIfParent(this, event['relatedTarget']) && (isNaN(prevIndex) || prevIndex == index)) {
-    // this means we got an out-over on the same point, for example - from the point to inside label
-    // in this case we skip dispatching the event and unhovering to avoid possible label disappearance
-    this.hoverPoint(/** @type {number} */ (index), event);
-  } else if (this.dispatchEvent(evt)) {
-    this.unhover();
-  }
-};
-
-
-/**
- * @param {anychart.core.MouseEvent} event .
- */
-anychart.core.map.series.Base.prototype.handleMouseClick = function(event) {
-  var evt = this.makePointEvent(event);
-
-  if (evt && ((anychart.utils.checkIfParent(this, event['relatedTarget'])) || this.dispatchEvent(evt))) {
-    if (!(event.metaKey || event.shiftKey)) {
-      this.map.unselect(event);
-    }
-    // we don't want to dispatch if this an out-over from the same point
-    // in case of move we will always dispatch, because checkIfParent(this, undefined) will return false
-    //todo (blackart) don't remove, maybe will be useful.
-    //if (goog.array.indexOf(this.selectStatus, evt['pointIndex']) == -1)
-    this.selectPoint(/** @type {number} */ (evt['pointIndex']), event);
-    this.dispatchEvent(this.makeSelectPointEvent(event));
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.handleMouseEvent = function(event) {
-  var evt = this.makePointEvent(event);
-  if (evt)
-    this.dispatchEvent(evt);
-};
-
-
-/**
- * This method also has a side effect - it patches the original source event to maintain pointIndex support for
- * browser events.
- * @param {anychart.core.MouseEvent} event
- * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- */
-anychart.core.map.series.Base.prototype.makePointEvent = function(event) {
-  var type = event['type'];
-  switch (type) {
-    case acgraph.events.EventType.MOUSEOUT:
-      type = anychart.enums.EventType.POINT_MOUSE_OUT;
-      break;
-    case acgraph.events.EventType.MOUSEOVER:
-      type = anychart.enums.EventType.POINT_MOUSE_OVER;
-      break;
-    case acgraph.events.EventType.MOUSEMOVE:
-      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
-      break;
-    case acgraph.events.EventType.MOUSEDOWN:
-      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
-      break;
-    case acgraph.events.EventType.MOUSEUP:
-      type = anychart.enums.EventType.POINT_MOUSE_UP;
-      break;
-    case acgraph.events.EventType.CLICK:
-      type = anychart.enums.EventType.POINT_CLICK;
-      break;
-    case acgraph.events.EventType.DBLCLICK:
-      type = anychart.enums.EventType.POINT_DBLCLICK;
-      break;
-    default:
-      return null;
-  }
-
-  var pointIndex;
-  if ('pointIndex' in event) {
-    pointIndex = event['pointIndex'];
-  } else if ('labelIndex' in event) {
-    pointIndex = event['labelIndex'];
-  } else if ('markerIndex' in event) {
-    pointIndex = event['markerIndex'];
-  }
-
-  pointIndex = anychart.utils.toNumber(pointIndex);
-  event['pointIndex'] = pointIndex;
-
-  var iter = this.data().getIterator();
-  if (!iter.select(pointIndex))
-    iter.reset();
-
-  return {
-    'type': type,
-    'actualTarget': event['target'],
-    'series': this,
-    'iterator': iter,
-    'pointIndex': pointIndex,
-    'target': this,
-    'originalEvent': event
-  };
-};
-
-
-/**
- * This method also has a side effect - it patches the original source event to maintain pointIndex support for
- * browser events.
- * @param {Object} event
- * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
- */
-anychart.core.map.series.Base.prototype.makeSelectPointEvent = function(event) {
-  var selectedPoints = [];
-  var iterator = this.getIterator();
-  for (var i = 0, len = this.selectStatus.length; i < len; i++) {
-    if (iterator.select(this.selectStatus[i])) {
-      var prop = iterator.meta('properties');
-      if (prop)
-        selectedPoints.push({'id': prop[this.geoIdField()], 'index': iterator.getIndex(), 'properties': prop});
-    }
-  }
-
-  var pointIndex;
-  if ('pointIndex' in event) {
-    pointIndex = event['pointIndex'];
-  } else if ('labelIndex' in event) {
-    pointIndex = event['labelIndex'];
-  } else if ('markerIndex' in event) {
-    pointIndex = event['markerIndex'];
-  }
-
-  pointIndex = anychart.utils.toNumber(pointIndex);
-  event['pointIndex'] = pointIndex;
-
-  return {
-    'type': anychart.enums.EventType.POINT_SELECT,
-    'selectedPoint': selectedPoints[selectedPoints.length - 1],
-    'selectedPoints': selectedPoints,
-    'actualTarget': event['target'],
-    'series': this,
-    'iterator': iterator,
-    'pointIndex': pointIndex,
-    'target': this,
-    'originalEvent': event
-  };
-};
-
-
-/**
- * Series hover status.
- * NaN - not hovered
- * -1 - series hovered
- * non-negative number - point with this index hovered.
- * @type {Array.<number>}
- * @protected
- */
-anychart.core.map.series.Base.prototype.hoverStatus;
-
-
-/**
- * @type {Array.<number>}
- * @protected
- */
-anychart.core.map.series.Base.prototype.selectStatus;
-
-
-/**
- * @type {boolean}
- * @protected
- */
-anychart.core.map.series.Base.prototype.needSelfLayer;
-
-
-/**
- * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
- * @return {!anychart.core.map.series.Base} An instance of the {@link anychart.core.map.series.Base} class for method chaining.
- */
-anychart.core.map.series.Base.prototype.hoverSeries = goog.abstractMethod;
-
-
-/**
- * Hovers a point of the series by its index.
- * @param {number} index Index of the point to hover.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
- *    <b>Note:</b> Used only to display float tooltip.
- * @param {boolean=} opt_showTooltip Whether shows tooltip.
- * @return {!anychart.core.map.series.Base}  {@link anychart.core.map.series.Base} instance for method chaining.
- */
-anychart.core.map.series.Base.prototype.hoverPoint = goog.abstractMethod;
-
-
-/**
- * @param {number=} opt_index Point index.
- * @return {!anychart.core.map.series.Base}
- */
-anychart.core.map.series.Base.prototype.hover = function(opt_index) {
-  if (goog.isDef(opt_index)) this.hoverPoint(opt_index);
-  else this.hoverSeries();
-  return this;
-};
-
-
-/**
- * Removes hover from the series.
- * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
- */
-anychart.core.map.series.Base.prototype.unhover = goog.abstractMethod;
-
-
-/**
- * Selects a point of the series by its index.
- * @param {number} index Index of the point to select.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
- * @param {boolean=} opt_showTooltip Whether shows tooltip.
- * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
- */
-anychart.core.map.series.Base.prototype.selectPoint = goog.abstractMethod;
-
-
-/**
- * Deselects all points.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate point selecting.
- * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
- */
-anychart.core.map.series.Base.prototype.unselect = goog.abstractMethod;
-
-
-/**
- * Imitates selects a point of the series by its index.
- * @param {number} index Index of the point to select.
- * @return {!anychart.core.map.series.Base} {@link anychart.core.map.series.Base} instance for method chaining.
- */
-anychart.core.map.series.Base.prototype.select = function(index) {
-  if (this.getFinalAllowPointsSelect()) {
-    this.selectPoint(index);
-    this.hideTooltip();
-  }
-  return this;
-};
-
-
-/**
- * Allow point selection if is true.
- * @type {?boolean}
- * @private
- */
-anychart.core.map.series.Base.prototype.allowPointsSelect_;
-
-
-/**
- * Temporarily works only for acgraph.vector.Element.
- * @param {acgraph.vector.Element} element .
- * @param {Object} prop .
- * @param {boolean=} opt_seriesGlobal .
- * @protected
- */
-anychart.core.map.series.Base.prototype.makeInteractive = function(element, prop, opt_seriesGlobal) {
-  if (!element) return;
-  element.tag = {series: this};
-  if (opt_seriesGlobal) {
-    element.tag.index = true;
-  } else {
-    element.tag.index = this.getIterator().getIndex();
-  }
-};
-
-
-/**
- * Allows to select points of the series.
- * @param {?boolean=} opt_value Allow or not.
- * @return {null|boolean|anychart.core.map.series.Base} Returns allow points select state or current series instance for chaining.
- */
-anychart.core.map.series.Base.prototype.allowPointsSelect = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.allowPointsSelect_ != opt_value) {
-      this.allowPointsSelect_ = opt_value;
-      if (!this.allowPointsSelect_)
-        this.unselect();
-    }
-    return this;
-  }
-  return this.allowPointsSelect_;
-};
-
-
-/**
- * Gets final allow points select state for series.
+ * Tester if the series is size based (bubble).
  * @return {boolean}
  */
-anychart.core.map.series.Base.prototype.getFinalAllowPointsSelect = function() {
-  return goog.isDefAndNotNull(this.allowPointsSelect_) ? this.allowPointsSelect_ : !!this.autoAllowPointsSelect_;
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.remove = function() {
-  this.labels().container(null);
-
-  goog.base(this, 'remove');
+anychart.core.map.series.Base.prototype.isChoropleth = function() {
+  return false;
 };
 
 
 /**
- * Calculation color scale.
+ * Whether draw hatch fill.
+ * @return {boolean}
  */
-anychart.core.map.series.Base.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA | anychart.ConsistencyState.MAP_COLOR_SCALE)) {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
-        var name = iterator.get(this.referenceValueNames[0]);
-        for (var i = 0, len = this.geoData.length; i < len; i++) {
-          var geom = this.geoData[i];
-          if (!geom) continue;
-          var prop = geom['properties'];
-          if (prop[this.geoIdField()] == name) {
-            this.points_.push(geom);
-            iterator.meta('shape', geom.domElement).meta('properties', prop);
-            break;
-          }
-        }
-      }
+anychart.core.map.series.Base.prototype.needDrawHatchFill = function() {
+  return false;
+};
 
-      if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
-        if (this.colorScale_ && this.colorScale_ instanceof anychart.core.map.scale.LinearColor) {
-          var value = iterator.get(this.referenceValueNames[1]);
-          this.colorScale_.extendDataRange(value);
-        }
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.calculateStatistics = function() {
+  var seriesMax = -Infinity;
+  var seriesMin = Infinity;
+  var seriesSum = 0;
+  var seriesPointsCount = 0;
+
+  var iterator = this.getResetIterator();
+
+  while (iterator.advance()) {
+    var values = this.getReferenceScaleValues();
+
+    if (values) {
+      var y = anychart.utils.toNumber(values[0]);
+      if (!isNaN(y)) {
+        seriesMax = Math.max(seriesMax, y);
+        seriesMin = Math.min(seriesMin, y);
+        seriesSum += y;
       }
     }
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
-    this.markConsistent(anychart.ConsistencyState.MAP_COLOR_SCALE);
+    seriesPointsCount++;
   }
+  var seriesAverage = seriesSum / seriesPointsCount;
+
+  this.statistics('seriesMax', seriesMax);
+  this.statistics('seriesMin', seriesMin);
+  this.statistics('seriesSum', seriesSum);
+  this.statistics('seriesAverage', seriesAverage);
+  this.statistics('seriesPointsCount', seriesPointsCount);
 };
 
 
@@ -1326,6 +297,33 @@ anychart.core.map.series.Base.prototype.calculate = function() {
 //  Drawing.
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Calculation before draw.
+ */
+anychart.core.map.series.Base.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
+    var iterator = this.getResetIterator();
+    while (iterator.advance()) {
+      var name = iterator.get('id');
+      if (!name || !goog.isString(name))
+        continue;
+
+      iterator.meta('regionShape', undefined).meta('regionProperties', undefined);
+      for (var i = 0, len = this.geoData.length; i < len; i++) {
+        var geom = this.geoData[i];
+        if (!geom) continue;
+        var prop = geom['properties'];
+        if (prop[this.getFinalGeoIdField()] == name) {
+          iterator.meta('regionShape', geom.domElement).meta('regionProperties', prop);
+          break;
+        }
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
+  }
+};
+
+
 /**
  * Draws series into the current container.
  * @return {anychart.core.map.series.Base} An instance of {@link anychart.core.map.series.Base} class for method chaining.
@@ -1342,13 +340,10 @@ anychart.core.map.series.Base.prototype.draw = function() {
   this.startDrawing();
   while (iterator.advance() && this.enabled()) {
     var index = iterator.getIndex();
-    var pointState = anychart.enums.AnyMapPointState.NORMAL;
-    if (goog.array.indexOf(this.selectStatus, index) != -1)
-      pointState = anychart.enums.AnyMapPointState.SELECT;
-    else if (goog.array.indexOf(this.hoverStatus, index) != -1)
-      pointState = anychart.enums.AnyMapPointState.HOVER;
+    if (iterator.get('selected'))
+      this.state.setPointState(anychart.PointState.SELECT, index);
 
-    this.drawPoint(pointState);
+    this.drawPoint(this.state.getPointStateByIndex(index));
   }
   this.finalizeDrawing();
 
@@ -1375,33 +370,13 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
 
   this.checkDrawingNeeded();
 
-  var labels = this.labels_;
-  var hoverLabels = this.hoverLabels_;
-  var selectLabels = this.selectLabels_;
+  this.labels().suspendSignalsDispatching();
+  this.hoverLabels().suspendSignalsDispatching();
+  this.selectLabels().suspendSignalsDispatching();
 
-  if (labels || hoverLabels || selectLabels) {
-    this.labels().suspendSignalsDispatching();
-    this.hoverLabels().suspendSignalsDispatching();
-    this.selectLabels().suspendSignalsDispatching();
-    labels.clear();
-    labels.setAutoZIndex(anychart.charts.Map.ZINDEX_CHORPLETH_LABELS);
-    labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    labels.parentBounds(/** @type {anychart.math.Rect} */(this.container().getBounds()));
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    var needHatchFill = this.hatchFill_ || this.hoverHatchFill_ || this.selectHatchFill_;
-    if (!this.hatchFillRootElement && needHatchFill) {
-      this.hatchFillRootElement = new anychart.core.utils.TypedLayer(
-          this.rootTypedLayerInitializer,
-          goog.nullFunction);
-
-      this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-      this.hatchFillRootElement.zIndex(anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL);
-      this.hatchFillRootElement.disablePointerEvents(true);
-    }
-    if (this.hatchFillRootElement) this.hatchFillRootElement.clear();
-  }
+  this.labels().clear();
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.container().getBounds()));
 };
 
 
@@ -1415,7 +390,7 @@ anychart.core.map.series.Base.prototype.rootTypedLayerInitializer = goog.abstrac
 
 /**
  * Draws a point iterator points to.
- * @param {anychart.enums.AnyMapPointState} pointState Point state.
+ * @param {anychart.PointState|number} pointState Point state.
  */
 anychart.core.map.series.Base.prototype.drawPoint = function(pointState) {
   this.drawLabel(pointState);
@@ -1431,19 +406,15 @@ anychart.core.map.series.Base.prototype.drawPoint = function(pointState) {
  * series.finalizeDrawing();
  */
 anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
-  if (this.labels_) {
-    this.labels_.draw();
-    this.labels_.resumeSignalsDispatching(false);
-    this.labels_.markConsistent(anychart.ConsistencyState.ALL);
-  }
-  if (this.hoverLabels_) {
-    this.hoverLabels_.resumeSignalsDispatching(false);
-    this.hoverLabels_.markConsistent(anychart.ConsistencyState.ALL);
-  }
-  if (this.selectLabels_) {
-    this.selectLabels_.resumeSignalsDispatching(false);
-    this.selectLabels_.markConsistent(anychart.ConsistencyState.ALL);
-  }
+  this.labels().draw();
+
+  this.labels().resumeSignalsDispatching(false);
+  this.hoverLabels().resumeSignalsDispatching(false);
+  this.selectLabels().resumeSignalsDispatching(false);
+
+  this.labels().markConsistent(anychart.ConsistencyState.ALL);
+  this.hoverLabels().markConsistent(anychart.ConsistencyState.ALL);
+  this.selectLabels().markConsistent(anychart.ConsistencyState.ALL);
 
   //if (this.clip()) {
   //  var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
@@ -1458,65 +429,56 @@ anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
 
 
 /**
+ * Gets an array of reference 'y' fields from the row iterator points to.
+ * Reference fields are defined using referenceValueNames and referenceValueMeanings.
+ * If there is only one field - a value is returned.
+ * If there are several - array.
+ * If any of the two is undefined - returns null.
+ *
+ * @return {Array.<*>|null} Fetches significant scale values from current data row.
+ */
+anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
+  if (!this.enabled()) return null;
+  var res = [];
+  var iterator = this.getIterator();
+  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
+    if (this.referenceValueMeanings[i] != 'y') continue;
+    var val = iterator.get(this.referenceValueNames[i]);
+    if (anychart.utils.isNaN(val)) return null;
+    res.push(val);
+  }
+  return res;
+};
+
+
+/**
  * Create base series format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
-anychart.core.map.series.Base.prototype.createFormatProvider = function() {
+anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_)
-    this.pointProvider_ = {};
-
-  var iterator = this.getIterator();
-  var id = iterator.get(this.referenceValueNames[0]);
-  var value = iterator.get(this.referenceValueNames[1]);
-  var pointGeoProp = iterator.meta('properties');
-
-  this.pointProvider_['id'] = id;
-  this.pointProvider_['value'] = value;
-  if (pointGeoProp)
-    this.pointProvider_['name'] = pointGeoProp['name'];
-
-
-  if (this.colorScale_) {
-    this.pointProvider_['color'] = this.colorScale_.valueToColor(value);
-    if (this.colorScale_ instanceof anychart.core.map.scale.OrdinalColor) {
-      var range = this.colorScale_.getRangeByValue(/** @type {number} */(value));
-      if (range) {
-        this.pointProvider_['colorRange'] = {
-          'color': range.color,
-          'end': range.end,
-          'name': range.name,
-          'start': range.start,
-          'index': range.sourceIndex
-        };
-      }
-    }
-  }
-
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
+  this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };
 
 
 /**
- * Create series position provider.
+ * Returns position relative bounded region.
  * @return {Object} Object with info for labels formatting.
- * @protected
  */
-anychart.core.map.series.Base.prototype.createPositionProvider = function() {
+anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
   var iterator = this.getIterator();
-  var pointGeoProp = /** @type {Object}*/(iterator.meta('properties'));
+  var pointGeoProp = /** @type {Object}*/(iterator.meta('regionProperties'));
 
-  var geoMiddleX = goog.object.findValue(pointGeoProp, function(value, key) {
-    return (/middle-x/).test(key);
-  });
-  var geoMiddleY = goog.object.findValue(pointGeoProp, function(value, key) {
-    return (/middle-y/).test(key);
-  });
+  var midX = iterator.get('middle-x');
+  var midY = iterator.get('middle-y');
+  var middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : .5);
+  var middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : .5);
 
-  var middleX = /** @type {number}*/(iterator.get('middle-x') || geoMiddleX || .5);
-  var middleY = /** @type {number}*/(iterator.get('middle-y') || geoMiddleY || .5);
-
-  var shape = iterator.meta('shape');
+  var shape = iterator.meta('regionShape');
   var positionProvider;
   if (shape) {
     var bounds = shape.getBounds();
@@ -1529,110 +491,55 @@ anychart.core.map.series.Base.prototype.createPositionProvider = function() {
 
 
 /**
- * Draws marker for a point.
- * @param {anychart.enums.AnyMapPointState} pointState If it is a hovered marker drawing.
+ * Create series position provider.
+ * @param {string} position Understands anychart.enums.Position and some additional values.
+ * @return {Object} Object with info for labels formatting.
  * @protected
  */
-anychart.core.map.series.Base.prototype.drawLabel = function(pointState) {
+anychart.core.map.series.Base.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
-  if (!shape || !this.labels_) return;
-
-  var selected = pointState == anychart.enums.AnyMapPointState.SELECT;
-  var hovered = pointState == anychart.enums.AnyMapPointState.HOVER;
-
-  var pointLabel = iterator.get('labels');
-  var hoverPointLabel = hovered ? iterator.get('hoverLabels') : null;
-  var selectPointLabel = selected ? iterator.get('selectLabels') : null;
-
-  var index = iterator.getIndex();
-  var labelsFactory;
-  if (selected) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
-  } else if (hovered) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  var shape = iterator.meta('shape');
+  if (shape) {
+    var shapeBounds = shape.getBounds();
+    position = anychart.enums.normalizeAnchor(position);
+    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
-  }
-
-  var label = this.labels_.getLabel(index);
-
-  var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
-  var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
-  var labelHoverEnabledState = hoverPointLabel && goog.isDef(hoverPointLabel['enabled']) ? hoverPointLabel['enabled'] : null;
-
-  var isDraw = hovered || selected ?
-      hovered ?
-          goog.isNull(labelHoverEnabledState) ?
-              goog.isNull(this.hoverLabels_.enabled()) ?
-                  goog.isNull(labelEnabledState) ?
-                      this.labels_.enabled() :
-                      labelEnabledState :
-                  this.hoverLabels_.enabled() :
-              labelHoverEnabledState :
-          goog.isNull(labelSelectEnabledState) ?
-              goog.isNull(this.selectLabels_.enabled()) ?
-                  goog.isNull(labelEnabledState) ?
-                      this.labels_.enabled() :
-                      labelEnabledState :
-                  this.selectLabels_.enabled() :
-              labelSelectEnabledState :
-      goog.isNull(labelEnabledState) ?
-          this.labels_.enabled() :
-          labelEnabledState;
-
-  if (isDraw) {
-    var positionProvider = this.createPositionProvider();
-    var formatProvider = this.createFormatProvider();
-    if (label) {
-      label.formatProvider(formatProvider);
-      label.positionProvider(positionProvider);
-    } else {
-      label = this.labels_.add(formatProvider, positionProvider, index);
-    }
-
-    label.resetSettings();
-    label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
-    label.draw();
-  } else if (label) {
-    label.clear();
+    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
   }
 };
 
 
-/**
- * Show data point tooltip.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate tooltip to show.
- */
-anychart.core.map.series.Base.prototype.showTooltip = function(opt_event) {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.remove = function() {
+  this.labels().container(null);
 
-  if (tooltip.isFloating() && opt_event) {
-    tooltip.show(
-        this.createFormatProvider(),
-        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
-  } else {
-    tooltip.show(
-        this.createFormatProvider(),
-        new acgraph.math.Coordinate(0, 0));
-  }
+  goog.base(this, 'remove');
 };
 
 
-/**
- * Hide data point tooltip.
- */
-anychart.core.map.series.Base.prototype.hideTooltip = function() {
-  /** @type {anychart.core.ui.Tooltip} */(this.tooltip()).hide();
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Coloring
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.normalizeColor = function(color, var_args) {
+  var fill;
+  if (goog.isFunction(color)) {
+    var sourceColor = arguments.length > 1 ?
+        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
+        this.color();
+    var scope = {
+      'index': this.getIterator().getIndex(),
+      'sourceColor': sourceColor,
+      'iterator': this.getIterator(),
+      'referenceValueNames': this.referenceValueNames
+    };
+    fill = color.call(scope);
+  } else
+    fill = color;
+  return fill;
 };
-
-
-/**
- * Returns type of current series.
- * @return {anychart.enums.MapSeriesType} Series type.
- */
-anychart.core.map.series.Base.prototype.getType = goog.abstractMethod;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1640,58 +547,7 @@ anychart.core.map.series.Base.prototype.getType = goog.abstractMethod;
 //  Legend
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for series name.
- * @param {string=} opt_value Series name value.
- * @return {!(string|anychart.core.map.series.Base|undefined)} Series name value or itself for method chaining.
- */
-anychart.core.map.series.Base.prototype.name = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.name_ != opt_value) {
-      this.name_ = opt_value;
-      //TODO: send signal to redraw name dependent components, series, legend etc
-    }
-    return this;
-  } else {
-    return this.name_;
-  }
-};
-
-
-/**
- * Sets/gets series number.
- * @param {number=} opt_value
- * @return {number|anychart.core.map.series.Base}
- */
-anychart.core.map.series.Base.prototype.index = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.index_ != opt_value) {
-      this.index_ = opt_value;
-    }
-    return this;
-  } else {
-    return this.index_;
-  }
-};
-
-
-/**
- * Creates context provider for legend items text formatter function.
- * @return {anychart.core.utils.LegendContextProvider} Legend context provider.
- * @private
- */
-anychart.core.map.series.Base.prototype.createLegendContextProvider_ = function() {
-  if (!this.legendProvider_)
-    this.legendProvider_ = new anychart.core.utils.LegendContextProvider(this);
-  return this.legendProvider_;
-};
-
-
-/**
- * Creates legend item config.
- * @param {Function} itemsTextFormatter Items text formatter.
- * @return {!anychart.core.ui.Legend.LegendItemProvider} Legend item config.
- */
+/** @inheritDoc */
 anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
   var legendItem = this.legendItem();
   legendItem.markAllConsistent();
@@ -1704,11 +560,11 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
     iconStroke = legendItem.iconStroke().call(this.color());
   }
   if (goog.isFunction(legendItem.iconHatchFill())) {
-    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill_);
+    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill);
   }
   var itemText;
   if (goog.isFunction(itemsTextFormatter)) {
-    var format = this.createLegendContextProvider_();
+    var format = this.createLegendContextProvider();
     itemText = itemsTextFormatter.call(format, format);
   }
   if (!goog.isString(itemText))
@@ -1728,51 +584,11 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
 };
 
 
-/**
- * Sets/Gets legend item setting for series.
- * @param {(Object)=} opt_value Legend item settings object.
- * @return {(anychart.core.utils.LegendItemSettings|anychart.core.map.series.Base)} Legend item settings or self for chaining.
- */
-anychart.core.map.series.Base.prototype.legendItem = function(opt_value) {
-  if (!this.legendItem_) {
-    this.legendItem_ = new anychart.core.utils.LegendItemSettings();
-    this.registerDisposable(this.legendItem_);
-    this.legendItem_.listenSignals(this.onLegendItemSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.legendItem_.setup(opt_value);
-    return this;
-  }
-
-  return this.legendItem_;
-};
-
-
-/**
- * Listener for legend item settings invalidation.
- * @param {anychart.SignalEvent} event Invalidation event.
- * @private
- */
-anychart.core.map.series.Base.prototype.onLegendItemSignal_ = function(event) {
-  var signal = anychart.Signal.NEED_UPDATE_LEGEND;
-  var force = false;
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-    force = true;
-  }
-  this.dispatchSignal(signal, force);
-};
-
-
-/**
- * Gets legend icon type for the series.
- * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
- */
-anychart.core.map.series.Base.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SQUARE);
-};
-
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Series default settings.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
   return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED |
@@ -1780,130 +596,27 @@ anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
 };
 
 
+/**
+ * Returns type of current series.
+ * @return {anychart.enums.MapSeriesType} Series type.
+ */
+anychart.core.map.series.Base.prototype.getType = goog.abstractMethod;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Setup.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   json['seriesType'] = this.getType();
-  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
-
-  if (goog.isDef(this.name()))
-    json['name'] = this.name();
-
-  if (goog.isDef(this.allowPointsSelect()))
-    json['allowPointsSelect'] = this.allowPointsSelect();
-
-  json['data'] = this.data().serialize();
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
-  json['tooltip'] = this.tooltip().serialize();
-  json['legendItem'] = this.legendItem().serialize();
 
   if (goog.isDef(this.geoIdField()))
     json['geoIdField'] = this.geoIdField();
 
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series fill']
-      );
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['hoverFill'])) {
-    if (goog.isFunction(this.hoverFill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverFill']
-      );
-    } else {
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-    }
-  }
-  if (goog.isFunction(this['selectFill'])) {
-    if (goog.isFunction(this.selectFill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series selectFill']
-      );
-    } else {
-      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
-    }
-  }
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  if (goog.isFunction(this['hoverStroke'])) {
-    if (goog.isFunction(this.hoverStroke())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverStroke']
-      );
-    } else {
-      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-    }
-  }
-  if (goog.isFunction(this['selectStroke'])) {
-    if (goog.isFunction(this.selectStroke())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series selectStroke']
-      );
-    } else {
-      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
-    }
-  }
-  if (goog.isFunction(this['hatchFill'])) {
-    if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hatchFill']
-      );
-    } else {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-    }
-  }
-  if (goog.isFunction(this['hoverHatchFill'])) {
-    if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverHatchFill']
-      );
-    } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
-    }
-  }
-  if (goog.isFunction(this['selectHatchFill'])) {
-    if (goog.isFunction(this.selectHatchFill())) {
-      anychart.utils.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series selectHatchFill']
-      );
-    } else {
-      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.selectHatchFill()));
-    }
-  }
   return json;
 };
 
@@ -1912,45 +625,15 @@ anychart.core.map.series.Base.prototype.serialize = function() {
 anychart.core.map.series.Base.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  this.color(config['color']);
-  this.allowPointsSelect(config['allowPointsSelect']);
-
-  if (goog.isFunction(this['fill']))
-    this.fill(config['fill']);
-  if (goog.isFunction(this['hoverFill']))
-    this.hoverFill(config['hoverFill']);
-  if (goog.isFunction(this['selectFill']))
-    this.selectFill(config['selectFill']);
-
-  if (goog.isFunction(this['stroke']))
-    this.stroke(config['stroke']);
-  if (goog.isFunction(this['hoverStroke']))
-    this.hoverStroke(config['hoverStroke']);
-  if (goog.isFunction(this['selectStroke']))
-    this.selectStroke(config['selectStroke']);
-
-  if (goog.isFunction(this['hatchFill']))
-    this.hatchFill(config['hatchFill']);
-  if (goog.isFunction(this['hoverHatchFill']))
-    this.hoverHatchFill(config['hoverHatchFill']);
-  if (goog.isFunction(this['selectHatchFill']))
-    this.selectHatchFill(config['selectHatchFill']);
-
-  this.labels(config['labels']);
-  this.hoverLabels(config['hoverLabels']);
-  this.selectLabels(config['selectLabels']);
-
-  this.name(config['name']);
   this.geoIdField(config['geoIdField']);
-
-  if ('data' in config)
-    this.data(config['data'] || null);
-
-  this.tooltip(config['tooltip']);
-  this.legendItem(config['legendItem']);
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Exports.
+//
+//----------------------------------------------------------------------------------------------------------------------
 //exports
 anychart.core.map.series.Base.prototype['color'] = anychart.core.map.series.Base.prototype.color;
 
@@ -1966,16 +649,4 @@ anychart.core.map.series.Base.prototype['selectHatchFill'] = anychart.core.map.s
 anychart.core.map.series.Base.prototype['hoverHatchFill'] = anychart.core.map.series.Base.prototype.hoverHatchFill;
 anychart.core.map.series.Base.prototype['hatchFill'] = anychart.core.map.series.Base.prototype.hatchFill;
 
-anychart.core.map.series.Base.prototype['labels'] = anychart.core.map.series.Base.prototype.labels;
-anychart.core.map.series.Base.prototype['hoverLabels'] = anychart.core.map.series.Base.prototype.hoverLabels;
-anychart.core.map.series.Base.prototype['selectLabels'] = anychart.core.map.series.Base.prototype.selectLabels;
-
 anychart.core.map.series.Base.prototype['geoIdField'] = anychart.core.map.series.Base.prototype.geoIdField;
-anychart.core.map.series.Base.prototype['tooltip'] = anychart.core.map.series.Base.prototype.tooltip;
-anychart.core.map.series.Base.prototype['colorScale'] = anychart.core.map.series.Base.prototype.colorScale;
-anychart.core.map.series.Base.prototype['legendItem'] = anychart.core.map.series.Base.prototype.legendItem;
-anychart.core.map.series.Base.prototype['data'] = anychart.core.map.series.Base.prototype.data;
-
-anychart.core.map.series.Base.prototype['hover'] = anychart.core.map.series.Base.prototype.hover;
-anychart.core.map.series.Base.prototype['select'] = anychart.core.map.series.Base.prototype.select;
-anychart.core.map.series.Base.prototype['allowPointsSelect'] = anychart.core.map.series.Base.prototype.allowPointsSelect;

@@ -44,6 +44,7 @@ anychart.core.gauge.pointers.Marker = function() {
 
   this.domElement = new anychart.core.ui.MarkersFactory();
   // defaults that was deleted form MarkersFactory
+  this.domElement.setParentEventTarget(this);
   this.domElement.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
   this.domElement.size(10);
   this.domElement.anchor(anychart.enums.Anchor.CENTER);
@@ -75,8 +76,8 @@ anychart.core.gauge.pointers.Marker.prototype.size = function(opt_value) {
 
 /**
  * Marker position relative axis - inside, center, outside.
- * @param {(anychart.enums.SidePosition|string)=} opt_value .
- * @return {(anychart.enums.SidePosition|string|!anychart.core.gauge.pointers.Marker)} .
+ * @param {(anychart.enums.GaugeSidePosition|string)=} opt_value .
+ * @return {(anychart.enums.GaugeSidePosition|string|!anychart.core.gauge.pointers.Marker)} .
  */
 anychart.core.gauge.pointers.Marker.prototype.position = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -114,7 +115,7 @@ anychart.core.gauge.pointers.Marker.prototype.radius = function(opt_value) {
 /**
  * Marker type.
  * @param {(anychart.enums.MarkerType|function(acgraph.vector.Path, number,
- * number, number): acgraph.vector.Path)=} opt_value .
+ * number, number): acgraph.vector.Path|string)=} opt_value .
  * @return {(!anychart.core.gauge.pointers.Marker|anychart.enums.MarkerType|function(acgraph.vector.Path, number,
  * number, number): acgraph.vector.Path)} .
  */
@@ -180,7 +181,7 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
 
     var scale = axis.scale();
 
-    var iterator = gauge.data().getIterator();
+    var iterator = gauge.getResetIterator();
     iterator.select(/** @type {number} */(this.dataIndex()));
     var value = parseFloat(iterator.get('value'));
 
@@ -250,6 +251,10 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
 
   this.domElement.draw();
   if (this.hatchFillElement) this.hatchFillElement.draw();
+
+
+  if (marker && marker.getDomElement())
+    marker.getDomElement().tag = iterator.getIndex();
 
   return this;
 };

@@ -200,7 +200,7 @@ anychart.core.sparkline.series.Column.prototype.drawSubsequentPoint = function()
     var barWidth = this.getPointWidth();
     var pixelShift = barWidth % 2 == 0 ? 0 : .5;
 
-    this.getIterator().meta('x', xPos).meta('y', yPos).meta('shape', rect);
+    this.getIterator().meta('x', xPos).meta('value', yPos).meta('shape', rect);
 
     var x = Math.ceil(xPos + pixelShift - barWidth / 2);
     var y = Math.min(this.zeroY, yPos);

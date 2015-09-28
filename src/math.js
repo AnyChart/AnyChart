@@ -65,6 +65,16 @@ anychart.math.round = function(num, opt_digitsCount) {
 
 
 /**
+ * Rounds a given number to a certain number of decimal places.
+ * @param {number} num The number to be rounded.
+ * @return {number} The rounded number.
+ */
+anychart.math.specialRound = function(num) {
+  return anychart.math.round(num, 13 - Math.max(Math.floor(Math.log(Math.abs(num)) * Math.LOG10E), 8));
+};
+
+
+/**
  * Comparison of two numbers numbers for roughly equal with some accuracy.
  * @param {number} value First value to compare.
  * @param {number} value2 Second value to compare.

@@ -41,7 +41,7 @@ anychart.core.cartesian.series.SplineArea.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function() {
+anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function(pointState) {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues) {
@@ -68,7 +68,7 @@ anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function() 
     else
       this.zeroesStack = [x, zero, zeroMissing];
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
 
   return true;
@@ -76,7 +76,7 @@ anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function() 
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.SplineArea.prototype.drawSubsequentPoint = function() {
+anychart.core.cartesian.series.SplineArea.prototype.drawSubsequentPoint = function(pointState) {
   var zeroMissing = this.yScale().isStackValMissing();
   var referenceValues = this.getReferenceCoords();
   if (!referenceValues) {
@@ -95,7 +95,7 @@ anychart.core.cartesian.series.SplineArea.prototype.drawSubsequentPoint = functi
     else
       this.zeroesStack.push(x, zero, zeroMissing);
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('y', y);
+    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
 
   return true;
@@ -168,7 +168,12 @@ anychart.core.cartesian.series.SplineArea.prototype.getType = function() {
 //exports
 anychart.core.cartesian.series.SplineArea.prototype['fill'] = anychart.core.cartesian.series.SplineArea.prototype.fill;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['hoverFill'] = anychart.core.cartesian.series.SplineArea.prototype.hoverFill;//inherited
+anychart.core.cartesian.series.SplineArea.prototype['selectFill'] = anychart.core.cartesian.series.SplineArea.prototype.selectFill;//inherited
+
 anychart.core.cartesian.series.SplineArea.prototype['stroke'] = anychart.core.cartesian.series.SplineArea.prototype.stroke;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['hoverStroke'] = anychart.core.cartesian.series.SplineArea.prototype.hoverStroke;//inherited
+anychart.core.cartesian.series.SplineArea.prototype['selectStroke'] = anychart.core.cartesian.series.SplineArea.prototype.selectStroke;//inherited
+
 anychart.core.cartesian.series.SplineArea.prototype['hatchFill'] = anychart.core.cartesian.series.SplineArea.prototype.hatchFill;//inherited
 anychart.core.cartesian.series.SplineArea.prototype['hoverHatchFill'] = anychart.core.cartesian.series.SplineArea.prototype.hoverHatchFill;//inherited
+anychart.core.cartesian.series.SplineArea.prototype['selectHatchFill'] = anychart.core.cartesian.series.SplineArea.prototype.selectHatchFill;//inherited

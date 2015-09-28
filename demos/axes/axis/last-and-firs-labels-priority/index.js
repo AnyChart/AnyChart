@@ -98,7 +98,7 @@ function minorTickSet(value) {
 var scale;
 function load() {
   scale = new anychart.scales.Ordinal();
-//  var values = ['РћРґРёРЅ', 'Р”РІР°', 'РўСЂРё', 'Р§РµС‚С‹СЂРµ', 'РџСЏС‚СЊ', 'РЁРµСЃС‚СЊ', 'СЃРµРјСЊ', 'РІРѕСЃРµРјСЊ', 'РґРµРІСЏС‚СЊ'];
+//  var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'семь', 'восемь', 'девять'];
   var values =
       [
         'January',

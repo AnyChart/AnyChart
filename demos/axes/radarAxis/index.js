@@ -61,7 +61,7 @@ function load() {
   scale.ticks().interval(15);
 
   //scale = anychart.scales.ordinal();
-  //var values = ['РћРґРёРЅ', 'Р”РІР°', 'РўСЂРё', 'Р§РµС‚С‹СЂРµ', 'РџСЏС‚СЊ', 'РЁРµСЃС‚СЊ', 'РЎРµРјСЊ', 'Р’РѕСЃРµРјСЊ', 'Р”РµРІСЏС‚СЊ'];
+  //var values = ['Один', 'Два', 'Три', 'Четыре', 'Пять', 'Шесть', 'Семь', 'Восемь', 'Девять'];
 //  var values = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9'];
 //  var values = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December December December' ];
 //  scale.values(values);

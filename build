@@ -562,6 +562,11 @@ def __build_release():
     __call_console_commands(['./build compile -m anymap -gz'])
     __call_console_commands(['./build compile -m anymap -gz -d'])
 
+    #stock
+    print "Compile AnyStock"
+    __call_console_commands(['./build compile -m anystock -gz'])
+    __call_console_commands(['./build compile -m anystock -gz -d'])
+
     #gantt
     print "Compile AnyGantt"
     __call_console_commands(['./build compile -m anygantt -gz'])
