@@ -829,6 +829,8 @@ goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.sparkline', anychart.sparkline);
 goog.exportSymbol('anychart.scatter', anychart.scatter);
 goog.exportSymbol('anychart.map', anychart.map);
+goog.exportSymbol('anychart.choropleth', anychart.choropleth);
+goog.exportSymbol('anychart.bubbleMap', anychart.bubbleMap);
 goog.exportSymbol('anychart.areaChart', anychart.area);
 goog.exportSymbol('anychart.barChart', anychart.bar);
 goog.exportSymbol('anychart.bubbleChart', anychart.bubble);

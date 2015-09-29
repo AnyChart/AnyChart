@@ -29,7 +29,7 @@ anychart.onDocumentReady(function() {
     ["AU.VI", 50]
   ];
 
-  map = anychart.map();
+  map = anychart.choropleth(dataForSeries1);
   map.geoData(anychart.maps.australia);
 
   var currentColorScale = anychart.scales.ordinalColor();
@@ -44,14 +44,19 @@ anychart.onDocumentReady(function() {
   //    .geoIdField("code_hasc")
   //    .colorScale(currentColorScale);
 
+  map
+      .geoIdField("code_hasc");
+
+  map.getSeries(0)
+      .colorScale(currentColorScale);
+
   series = map.bubble(dataForSeries);
   series
       .labels(true)
       .markers(true)
-      //.zIndex(1000)
       .geoIdField("code_hasc");
 
-  series.tooltip().textFormatter(function() {console.log(this.getDataValue('id'))});
+  //series.tooltip().textFormatter(function() {console.log(this.getDataValue('id'))});
 
   map.container('container').draw();
 
