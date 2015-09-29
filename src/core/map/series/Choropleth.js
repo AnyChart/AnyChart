@@ -91,19 +91,11 @@ anychart.core.map.series.Choropleth.prototype.colorScaleInvalidated_ = function(
 
 
 /** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.createFormatProvider = function() {
-  if (!this.pointProvider)
-    this.pointProvider = {};
+anychart.core.map.series.Choropleth.prototype.createFormatProvider = function(opt_force) {
+  this.pointProvider = goog.base(this, 'createFormatProvider', opt_force);
 
   var iterator = this.getIterator();
-  var id = iterator.get(this.referenceValueNames[0]);
   var value = iterator.get(this.referenceValueNames[1]);
-  var pointGeoProp = iterator.meta('regionProperties');
-
-  this.pointProvider['id'] = id;
-  this.pointProvider['value'] = value;
-  if (pointGeoProp)
-    this.pointProvider['name'] = pointGeoProp['name'];
 
   if (this.colorScale_) {
     this.pointProvider['color'] = this.colorScale_.valueToColor(value);

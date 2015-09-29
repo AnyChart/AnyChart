@@ -458,10 +458,10 @@ anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
  * @protected
  */
 anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
-  if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
-  this.pointProvider_.applyReferenceValues();
-  return this.pointProvider_;
+  if (!this.pointProvider)
+    this.pointProvider = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
+  this.pointProvider.applyReferenceValues();
+  return this.pointProvider;
 };
 
 
