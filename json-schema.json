@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "ACDVF data schema",
+  "description": "AnyChart 7 JSON schema",
   "type": "object",
   "properties": {
     "chart": {
