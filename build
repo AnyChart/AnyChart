@@ -353,6 +353,49 @@ def __build_project_sources(modules):
         __gzip(output_file)
 
 
+def __get_copyrigth(modules):
+    if len(modules) != 1 or modules[0] not in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock']:
+        return ''
+
+    module = modules[0]
+
+    robust = 'Robust ' if module in ['anychart', 'anychart_bundle'] else ''
+
+    title = ''
+    name = ''
+    if module == 'anychart_bundle':
+        name = 'AnyChart'
+        title = 'Charting Framework\n * AnyChart, AnyMap, AnyGantt, AnyStock'
+    elif module == 'anychart':
+        name = 'AnyChart'
+        title = 'Charts'
+    elif module == 'anymap':
+        name = 'AnyMap'
+        title = 'Maps'
+    elif module == 'anygantt':
+        name = 'AnyGantt'
+        title = 'Gantt Charts'
+    elif module == 'anystock':
+        name = 'AnyStock'
+        title = 'Financial Charts'
+
+    build = 'Development' if __is_develop() else 'Production'
+
+    version = __get_version(False)
+
+    url = ''
+    if not module == 'anychart_bundle':
+        url = '/products/%s/' % module
+
+    copyright =\
+        "/* %s - %sJavaScript HTML5 Web %s\n"\
+        " * %s Build\n"\
+        " * Version: %s\n"\
+        " * http://anychart.com%s\n"\
+        " */\n" % (name, robust, title, build, version, url)
+    return copyright
+
+
 def __build_project(modules):
     dev_postfix = '.dev' if __is_develop() else ''
     file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
@@ -362,6 +405,7 @@ def __build_project(modules):
     print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s" % (
         ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']),
         str(arguments['gzip']), str(arguments['theme']))
+    copyright = __get_copyrigth(modules)
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
@@ -369,7 +413,7 @@ def __build_project(modules):
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
-               ['--output_wrapper "(function(){%output%})()"']
+               ['--output_wrapper "' + copyright + '(function(){%output%})()"']
 
     #debug info
     if __should_gen_debug_files():
