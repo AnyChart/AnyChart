@@ -562,16 +562,6 @@ anychart.core.map.series.Bubble.prototype.rootTypedLayerInitializer = function()
 
 
 /** @inheritDoc */
-anychart.core.map.series.Bubble.prototype.createFormatProvider = function() {
-  if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
-  this.pointProvider_.applyReferenceValues();
-
-  return this.pointProvider_;
-};
-
-
-/** @inheritDoc */
 anychart.core.map.series.Bubble.prototype.getReferenceScaleValues = function() {
   if (!this.enabled()) return null;
   var res = [];

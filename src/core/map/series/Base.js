@@ -459,8 +459,9 @@ anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
  */
 anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider)
-    this.pointProvider = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
+    this.pointProvider = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
   this.pointProvider.applyReferenceValues();
+
   return this.pointProvider;
 };
 
