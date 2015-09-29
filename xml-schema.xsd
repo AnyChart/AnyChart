@@ -5,8 +5,6 @@
         xmlns="http://anychart.com/schemas/7.7.0/xml-schema.xsd"
         elementFormDefault="qualified">
 
-    <!-- Online validator http://www.utilities-online.info/xsdvalidation/#.VImqs6SsUn- -->
-
     <xsd:element name="anychart" type="Anychart"/>
 
     <xsd:complexType name="Anychart">
