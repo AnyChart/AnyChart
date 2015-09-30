@@ -327,4 +327,5 @@ anychart.core.utils.SeriesPointContextProvider.prototype['getSeriesMeta'] = anyc
 anychart.core.utils.LegendContextProvider.prototype['getStat'] = anychart.core.utils.LegendContextProvider.prototype.getStat;
 anychart.core.utils.LegendContextProvider.prototype['getMeta'] = anychart.core.utils.LegendContextProvider.prototype.getMeta;
 anychart.core.utils.MapPointContextProvider.prototype['getDataValue'] = anychart.core.utils.MapPointContextProvider.prototype.getDataValue;
+anychart.core.utils.MapPointContextProvider.prototype['getStat'] = anychart.core.utils.MapPointContextProvider.prototype.getStat;
 anychart.core.utils.MapPointContextProvider.prototype['getSeriesMeta'] = anychart.core.utils.MapPointContextProvider.prototype.getSeriesMeta;
