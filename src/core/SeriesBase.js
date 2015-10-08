@@ -392,6 +392,7 @@ anychart.core.SeriesBase.prototype.name = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.name_ != opt_value) {
       this.name_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
       //TODO: send signal to redraw name dependent components, series, legend etc
     }
     return this;

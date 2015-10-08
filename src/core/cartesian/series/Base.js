@@ -828,17 +828,18 @@ anychart.core.cartesian.series.Base.prototype.applyRatioToBounds = function(rati
  */
 anychart.core.cartesian.series.Base.prototype.doClip = function() {
   var clip, bounds, axesLinesSpace;
-  if (this.clip() && !(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
-    if (goog.isBoolean(this.clip())) {
-      bounds = this.pixelBoundsCache;
-      axesLinesSpace = this.axesLinesSpace();
-      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-    } else {
-      clip = /** @type {!anychart.math.Rect} */(this.clip());
+  if (!(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
+    clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+    if (goog.isBoolean(clip)) {
+      if (clip) {
+        bounds = this.pixelBoundsCache;
+        axesLinesSpace = this.axesLinesSpace();
+        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      }
     }
-    this.rootLayer.clip(clip);
+    this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
     var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(clip || null));
   }
 };
 
