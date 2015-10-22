@@ -150,8 +150,8 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
 
 /**
  * Initializes mapping info objects for the mapping.
- * @param {!Object.<Array.<number>>=} opt_arrayMapping Mapping settings for array rows.
- * @param {!Object.<Array.<string>>=} opt_objectMapping Mapping setting for object rows.
+ * @param {!Object.<(Array.<number>|number)>=} opt_arrayMapping Mapping settings for array rows.
+ * @param {!Object.<(Array.<string>|string)>=} opt_objectMapping Mapping setting for object rows.
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
  *    Doesn't work if a row is an object.
  * @param {!Array.<string>=} opt_indexProps Array of the names in case other options fail.
@@ -161,12 +161,31 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
  */
 anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
     opt_writeToFirstFieldByMapping) {
+  var i;
+  if (goog.isObject(opt_arrayMapping)) {
+    for (i in opt_arrayMapping) {
+      if (!goog.isArray(opt_arrayMapping[i]))
+        opt_arrayMapping[i] = [opt_arrayMapping[i]];
+    }
+  } else {
+    opt_arrayMapping = undefined;
+  }
+
+  if (goog.isObject(opt_objectMapping)) {
+    for (i in opt_objectMapping) {
+      if (!goog.isArray(opt_objectMapping[i]))
+        opt_objectMapping[i] = [opt_objectMapping[i]];
+    }
+  } else {
+    opt_objectMapping = undefined;
+  }
+
   /**
    * Mapping settings for array rows.
    * @type {!Object.<Array.<number>>}
    * @private
    */
-  this.arrayMapping_ = opt_arrayMapping || {
+  this.arrayMapping_ = /** @type {!Object.<Array.<number>>} */(opt_arrayMapping) || {
     'x': [0],
     'value': [1, 0],
     'size': [2, 1], // bubble series
@@ -198,7 +217,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    * @type {!Object.<Array.<string>>}
    * @private
    */
-  this.objectMapping_ = opt_objectMapping || {
+  this.objectMapping_ = /** @type {!Object.<Array.<string>>} */(opt_objectMapping) || {
     //'x': ['x'], // this mapping entry can be omitted cause of defaults
     'x': ['column', 'x'],
     'value': ['value', 'y', 'close', 'heat'], // 'value' here enforces checking order

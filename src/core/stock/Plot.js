@@ -612,8 +612,7 @@ anychart.core.stock.Plot.prototype.draw = function() {
       legendTitleDate = NaN;
     }
     this.updateLegend_(seriesBounds, legendTitleDate);
-    if (this.legend_ && this.legend_.enabled())
-      seriesBounds = this.legend_.getRemainingBounds();
+    seriesBounds = this.legend().getRemainingBounds();
 
     if (this.xAxis_) {
       this.xAxis_.suspendSignalsDispatching();
@@ -758,9 +757,7 @@ anychart.core.stock.Plot.prototype.draw = function() {
  * @private
  */
 anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue) {
-  var legend = this.legend_;
-  if (!legend || !legend.enabled()) return;
-  legend = /** @type {anychart.core.ui.Legend} */(this.legend());
+  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   legend.suspendSignalsDispatching();
   legend.container(this.rootLayer_);
   if (opt_seriesBounds) {
@@ -791,14 +788,16 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
  */
 anychart.core.stock.Plot.prototype.onLegendSignal_ = function(event) {
   var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state |= anychart.ConsistencyState.STOCK_PLOT_LEGEND;
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
   }
   // If there are no signals � state == 0 and nothing will happen.
-  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+  this.invalidate(state, signal);
 };
 
 
@@ -1027,7 +1026,11 @@ anychart.core.stock.Plot.prototype.backgroundInvalidated_ = function(e) {
  * @private
  */
 anychart.core.stock.Plot.prototype.seriesInvalidated_ = function(e) {
-  this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES, anychart.Signal.NEEDS_REDRAW);
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  var state = anychart.ConsistencyState.STOCK_PLOT_SERIES;
+  if (e.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND))
+    state |= anychart.ConsistencyState.STOCK_PLOT_LEGEND;
+  this.invalidate(state, signal);
 };
 
 

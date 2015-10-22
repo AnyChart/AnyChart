@@ -6,7 +6,7 @@ goog.require('anychart.utils');
 /**
  * Table item constructor.
  * @param {number} key
- * @param {!Array} values
+ * @param {!(Array|Object)} values
  * @constructor
  */
 anychart.data.TableRow = function(key, values) {
@@ -18,7 +18,7 @@ anychart.data.TableRow = function(key, values) {
 
   /**
    * Values array.
-   * @type {!Array}
+   * @type {!(Array|Object)}
    */
   this.values = values;
 

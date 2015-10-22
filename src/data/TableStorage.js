@@ -55,14 +55,14 @@ anychart.data.TableStorage = function(table) {
 
   /**
    * Cache of mins for full range selection.
-   * @type {Array.<number>}
+   * @type {Object.<number>}
    * @private
    */
   this.fullRangeMinsCache_ = null;
 
   /**
    * Cache of maxs for full range selection.
-   * @type {Array.<number>}
+   * @type {Object.<number>}
    * @private
    */
   this.fullRangeMaxsCache_ = null;
@@ -86,8 +86,8 @@ anychart.data.TableStorage = function(table) {
  *   lastRow: anychart.data.TableRow,
  *   preFirstRow: anychart.data.TableRow,
  *   postLastRow: anychart.data.TableRow,
- *   mins: !Array.<number>,
- *   maxs: !Array.<number>,
+ *   mins: !Object.<number>,
+ *   maxs: !Object.<number>,
  *   minDistance: number
  * }}
  */
@@ -201,61 +201,98 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
     firstIndex = NaN;
   }
 
-  var mins = [];
-  var maxs = [];
+  var fields = this.getKnownFields();
+  var asArray = goog.isNumber(fields);
+  var mins = {};
+  var maxs = {};
   var minDistance = NaN;
-  var fieldsCount = this.getKnownFieldsCount();
-  mins.length = maxs.length = fieldsCount;
+  var field, val;
   if (first) { // first and last can be null only in the same time, so no point to check last in addition
     var isFullRangeSelect = !preFirst && !postLast;
     // we have additional cache for full range selections
     if (isFullRangeSelect && this.fullRangeMinsCache_ && this.fullRangeMaxsCache_) {
       minDistance = this.fullRangeMinDistanceCache_;
-      for (i = 0; i < fieldsCount; i++) {
-        mins[i] = this.fullRangeMinsCache_[i];
-        maxs[i] = this.fullRangeMaxsCache_[i];
+      for (field in this.fullRangeMinsCache_) {
+        mins[field] = this.fullRangeMinsCache_[field];
+        maxs[field] = this.fullRangeMaxsCache_[field];
       }
     } else {
       minDistance = Number.POSITIVE_INFINITY;
-      for (i = 0; i < fieldsCount; i++) {
-        mins[i] = Number.POSITIVE_INFINITY;
-        maxs[i] = Number.NEGATIVE_INFINITY;
+      if (asArray) {
+        for (i = 0; i < fields; i++) {
+          mins[i] = Number.POSITIVE_INFINITY;
+          maxs[i] = Number.NEGATIVE_INFINITY;
+        }
+      } else {
+        for (i in fields) {
+          mins[i] = Number.POSITIVE_INFINITY;
+          maxs[i] = Number.NEGATIVE_INFINITY;
+        }
       }
       var prev = null;
       var curr = first;
       while (curr && curr != postLast) {
         if (prev)
           minDistance = Math.min(minDistance, curr.key - prev.key);
-        var len = Math.min(curr.values.length, fieldsCount);
-        for (i = 0; i < len; i++) {
-          var val = anychart.utils.toNumber(curr.values[i]);
-          if (val < mins[i]) // includes NaN checking
-            mins[i] = val;
-          if (val > maxs[i]) // includes NaN checking
-            maxs[i] = val;
+        if (asArray) {
+          var len = Math.min((/** @type {Array} */(curr.values)).length, fields);
+          for (i = 0; i < len; i++) {
+            val = anychart.utils.toNumber(curr.values[i]);
+            if (val < mins[i]) // includes NaN checking
+              mins[i] = val;
+            if (val > maxs[i]) // includes NaN checking
+              maxs[i] = val;
+          }
+        } else {
+          for (i in fields) {
+            val = anychart.utils.toNumber(curr.values[i]);
+            if (val < mins[i]) // includes NaN checking
+              mins[i] = val;
+            if (val > maxs[i]) // includes NaN checking
+              maxs[i] = val;
+          }
         }
         prev = curr;
         curr = curr.next;
       }
       if (minDistance == Number.POSITIVE_INFINITY)
         minDistance = NaN;
-      for (i = 0; i < fieldsCount; i++) {
-        if (mins[i] == Number.POSITIVE_INFINITY)
-          mins[i] = NaN;
-        if (maxs[i] == Number.NEGATIVE_INFINITY)
-          maxs[i] = NaN;
+      if (asArray) {
+        for (i = 0; i < fields; i++) {
+          if (mins[i] == Number.POSITIVE_INFINITY)
+            mins[i] = NaN;
+          if (maxs[i] == Number.NEGATIVE_INFINITY)
+            maxs[i] = NaN;
+        }
+      } else {
+        for (i in fields) {
+          if (mins[i] == Number.POSITIVE_INFINITY)
+            mins[i] = NaN;
+          if (maxs[i] == Number.NEGATIVE_INFINITY)
+            maxs[i] = NaN;
+        }
       }
       // cache the results if it is a full range select
       if (isFullRangeSelect) {
-        this.fullRangeMinsCache_ = goog.array.slice(mins, 0);
-        this.fullRangeMaxsCache_ = goog.array.slice(maxs, 0);
+        this.fullRangeMinsCache_ = {};
+        this.fullRangeMaxsCache_ = {};
+        for (field in mins) {
+          this.fullRangeMinsCache_[field] = mins[field];
+          this.fullRangeMaxsCache_[field] = maxs[field];
+        }
         this.fullRangeMinDistanceCache_ = minDistance;
       }
     }
   } else {
     minDistance = NaN;
-    for (i = 0; i < fieldsCount; i++) {
-      mins[i] = maxs[i] = NaN;
+    if (asArray) {
+      for (i = 0; i < fields; i++) {
+        mins[i] = maxs[i] = NaN;
+      }
+    } else {
+      for (i in fields) {
+        mins[i] = maxs[i] = NaN;
+      }
     }
   }
 
@@ -353,10 +390,10 @@ anychart.data.TableStorage.prototype.searchIndex = function(key, opt_mode) {
 
 
 /**
- * Returns known fields count. Used to determine min-max array length.
- * @return {number}
+ * Returns known fields as an array of names or as the number of largest row. Used to determine min-max result config.
+ * @return {number|!Object.<boolean>}
  */
-anychart.data.TableStorage.prototype.getKnownFieldsCount = goog.abstractMethod;
+anychart.data.TableStorage.prototype.getKnownFields = goog.abstractMethod;
 
 
 /**
@@ -438,7 +475,7 @@ anychart.data.TableAggregatedStorage.DirtyState = {
 
 
 /** @inheritDoc */
-anychart.data.TableAggregatedStorage.prototype.getKnownFieldsCount = function() {
+anychart.data.TableAggregatedStorage.prototype.getKnownFields = function() {
   return this.numColumns_;
 };
 
@@ -668,7 +705,7 @@ anychart.data.TableAggregatedStorage.prototype.createAggregate_ = function(table
 /**
  * Main table storage class.
  * @param {!anychart.data.Table} table Table reference.
- * @param {number=} opt_keyColumn Key column index.
+ * @param {(number|string)=} opt_keyColumn Key column index.
  * @constructor
  * @extends {anychart.data.TableStorage}
  */
@@ -714,17 +751,34 @@ anychart.data.TableMainStorage = function(table, opt_keyColumn) {
 
   /**
    * The number of the column that contains indexing field.
-   * @type {number}
+   * @type {(number|string)}
    * @private
    */
-  this.keyColumn_ = anychart.utils.normalizeToNaturalNumber(opt_keyColumn, 0, true);
+  this.keyColumn_ = goog.isString(opt_keyColumn) ?
+      opt_keyColumn :
+      anychart.utils.normalizeToNaturalNumber(opt_keyColumn, 0, true);
 
   /**
-   * Known source columns number. Used to determine how much columns in we know about.
+   * Known source columns number. Used to determine how much columns we know about.
+   * If it is 0, than we probably have seen no arrays in data.
    * @type {number}
    * @private
    */
   this.largestSeenRowLength_ = 0;
+
+  /**
+   * Known source fields seen. Used to determine how much columns we know about.
+   * @type {!Object.<boolean>}
+   * @private
+   */
+  this.objectFieldsSeen_ = {};
+
+  /**
+   * If we have seen any objects in data.
+   * @type {boolean}
+   * @private
+   */
+  this.objectsSeen_ = false;
 };
 goog.inherits(anychart.data.TableMainStorage, anychart.data.TableStorage);
 
@@ -746,8 +800,7 @@ anychart.data.TableMainStorage.prototype.startTransaction = function() {
  * @return {!anychart.data.TableMainStorage}
  */
 anychart.data.TableMainStorage.prototype.commit = function() {
-  if (this.inTransaction_)
-    this.inTransaction_ = false;
+  this.inTransaction_ = false;
   if (this.appendsStorage_.length || this.removesStatus_) {
     var appendsAsc = this.normalizeAppendsDirection_();
     var appendsLength = this.appendsStorage_.length;
@@ -840,11 +893,8 @@ anychart.data.TableMainStorage.prototype.addData = function(rawData, opt_removeF
   } else if (goog.isArray(rawData)) {
     var count = 0;
     for (var i = 0; i < rawData.length; i++) {
-      var row = rawData[i];
-      if (goog.isArray(row)) {
-        this.addInternal(row);
+      if (this.addInternal(rawData[i]))
         count++;
-      }
     }
     if (opt_removeFromStart === true) opt_removeFromStart = count;
   }
@@ -862,13 +912,13 @@ anychart.data.TableMainStorage.prototype.addData = function(rawData, opt_removeF
 
 /**
  * Removes all items between start and end keys.
- * @param {number} startKey
- * @param {number} endKey
+ * @param {number=} opt_startKey
+ * @param {number=} opt_endKey
  * @return {!anychart.data.TableMainStorage} Returns itself for chaining.
  */
-anychart.data.TableMainStorage.prototype.remove = function(startKey, endKey) {
+anychart.data.TableMainStorage.prototype.remove = function(opt_startKey, opt_endKey) {
   var iterator = new anychart.data.TableMainStorage.MergingIterator(this.storage, this.appendsStorage_,
-      this.normalizeAppendsDirection_(), startKey, endKey);
+      this.normalizeAppendsDirection_(), opt_startKey, opt_endKey);
   var item;
   while (item = iterator.next()) {
     item.isRemoved = true;
@@ -912,11 +962,10 @@ anychart.data.TableMainStorage.prototype.removeFirst = function(opt_count) {
 };
 
 
-/**
- * Returns known fields count. Used to determine min-max array length.
- * @return {number}
- */
-anychart.data.TableMainStorage.prototype.getKnownFieldsCount = function() {
+/** @inheritDoc */
+anychart.data.TableMainStorage.prototype.getKnownFields = function() {
+  if (this.objectsSeen_)
+    return this.objectFieldsSeen_;
   return this.largestSeenRowLength_;
 };
 
@@ -924,16 +973,26 @@ anychart.data.TableMainStorage.prototype.getKnownFieldsCount = function() {
 /**
  * Internal method to add one row of data. If key field cannot be read and parsed - does nothing.
  * Copies passed array.
- * @param {!Array} rawRow
+ * @param {*} row Array or Object expected.
+ * @return {boolean}
  */
-anychart.data.TableMainStorage.prototype.addInternal = function(rawRow) {
-  // todo (Anton Saukh): should use proper parsing here
-  var val = rawRow[this.keyColumn_];
-  var key = anychart.utils.toNumber(val);
-  if (isNaN(key))
-    key = Date.parse(val);
-  if (!isNaN(key))
-    this.pusher_(new anychart.data.TableRow(key, goog.array.slice(rawRow, 0)));
+anychart.data.TableMainStorage.prototype.addInternal = function(row) {
+  var tmp, key;
+  if (goog.isArray(row)) {
+    row = goog.array.slice(row, 0);
+  } else if (goog.isObject(row)) {
+    tmp = row;
+    row = {};
+    for (var i in tmp) {
+      row[i] = tmp[i];
+    }
+  } else {
+    row = null;
+  }
+  var res = !!(row && !isNaN(key = anychart.utils.normalizeTimestamp(row[this.keyColumn_])));
+  if (res)
+    this.pusher_(new anychart.data.TableRow(/** @type {number} */(key), /** @type {!(Object|Array)} */(row)));
+  return res;
 };
 
 
@@ -982,8 +1041,30 @@ anychart.data.TableMainStorage.prototype.fillStorage_ = function(iterator) {
       }
       if (item.prev) item.prev.next = item;
       lastItem = item;
-      if (this.largestSeenRowLength_ < item.values.length)
-        this.largestSeenRowLength_ = item.values.length;
+      var i;
+      if (goog.isArray(item.values)) {
+        var valuesLength = item.values.length;
+        if (this.largestSeenRowLength_ < valuesLength) {
+          if (this.objectsSeen_) {
+            // if we have seen objects, than we have converted the largestSeenRowLength_ representation to the fields
+            // map already and now we should add fields to that representation
+            for (i = this.largestSeenRowLength_; i < valuesLength; i++) {
+              this.objectFieldsSeen_[i] = true;
+            }
+          }
+          this.largestSeenRowLength_ = valuesLength;
+        }
+      } else { // we are sure that this is object in this case so we can avoid double checking
+        if (!this.objectsSeen_) {
+          for (i = 0; i < this.largestSeenRowLength_; i++) {
+            this.objectFieldsSeen_[i] = true;
+          }
+          this.objectsSeen_ = true;
+        }
+        for (i in item.values) {
+          this.objectFieldsSeen_[i] = true;
+        }
+      }
     }
   }
   if (lastItem) lastItem.next = null;

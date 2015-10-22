@@ -159,7 +159,7 @@ anychart.core.stock.scrollerSeries.Base.SeriesTypesMap = {};
 /**
  * Gets and sets data for the series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_value
- * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ * @param {Object.<({column: (number|string), type: anychart.enums.AggregationType, weights: (number|string)}|number|string)>=} opt_mappingSettings
  *   An object where keys are field names and values are objects with fields:
  *      - 'column': number - Column index, that the field should get values from;
  *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.

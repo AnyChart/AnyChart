@@ -7,8 +7,8 @@ goog.require('anychart.utils');
 
 /**
  * Counts the average between all passed non-NaN values as the value of the aggregate.
- * @param {number} valuesColumn
- * @param {number=} opt_weightsColumn
+ * @param {number|string} valuesColumn
+ * @param {number|string=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */

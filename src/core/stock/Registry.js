@@ -16,14 +16,11 @@ anychart.core.stock.Registry = function() {
   this.sources_ = [];
 
   /**
-   * Dirty flag set:
-   * 1 - sources items changed;
-   * 2 - sources set changed;
-   * 3 - both.
-   * @type {number}
+   * Dirty flag.
+   * @type {boolean}
    * @private
    */
-  this.dirty_ = 3;
+  this.dirty_ = true;
 
   /**
    * Keys array. May contain some first source storage if that storage is the only storage this registry contain.
@@ -206,10 +203,9 @@ anychart.core.stock.Registry.prototype.getLastIndex = function() {
 
 /**
  * Tells current registry to recount on next update.
- * @param {boolean} sourcesSetChanged
  */
-anychart.core.stock.Registry.prototype.setDirty = function(sourcesSetChanged) {
-  this.dirty_ |= sourcesSetChanged ? 2 : 1;
+anychart.core.stock.Registry.prototype.setDirty = function() {
+  this.dirty_ = true;
 };
 
 
@@ -218,16 +214,7 @@ anychart.core.stock.Registry.prototype.setDirty = function(sourcesSetChanged) {
  * @return {boolean}
  */
 anychart.core.stock.Registry.prototype.isDirty = function() {
-  return !!this.dirty_;
-};
-
-
-/**
- * If the current registry is dirty.
- * @return {boolean}
- */
-anychart.core.stock.Registry.prototype.hasWrongSources = function() {
-  return !!(this.dirty_ & 2);
+  return this.dirty_;
 };
 
 
@@ -401,7 +388,7 @@ anychart.core.stock.Registry.prototype.update = function() {
 
     this.keys_ = res;
   }
-  this.dirty_ = 0;
+  this.dirty_ = false;
   this.syncMode_ = true;
   for (i = 0; i < this.sources_.length; i++) {
     if (this.sources_[i].getRowsCount() != this.keys_.length) {

@@ -17,7 +17,7 @@ goog.require('goog.array');
 
 /**
  * Stock data table constructor.
- * @param {number=} opt_keyColumn The number of the data column that contains the indexing field.
+ * @param {(number|string)=} opt_keyColumn The number of the data column that contains the indexing field.
  * @constructor
  * @extends {anychart.core.Base}
  */
@@ -135,13 +135,14 @@ anychart.data.Table.prototype.removeFirst = function(opt_count) {
 /**
  * Returns a new mapping for the table. You can add fields to table mappings after the mapping is created
  * using it's addField() method.
- * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_fields
- *   An object where keys are field names and values are objects with fields:
- *      - 'column': number - Column index, that the field should get values from;
+ * @param {Object.<({column:(number|string), type:anychart.enums.AggregationType, weights:(number|string)}|number|string)>=} opt_fields An
+ *   object where keys are field names and values are
+ *   objects with fields:
+ *      - 'column': (number|string) - Column index or object field name, that the field should get values from;
  *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
- *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *      - 'weights': (number|string) - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
- *   or numbers - just the column index to get values from. In this case the grouping type will be determined from
+ *   or (numbers|strings) - just the field name to get values from. In this case the grouping type will be determined from
  *      field name.
  * @return {!anychart.data.TableMapping}
  */
@@ -153,9 +154,9 @@ anychart.data.Table.prototype.mapAs = function(opt_fields) {
 /**
  * Registers a combination of aggregation type and source column and returns a number of column, where it will be placed.
  * If this combination was already registered - returns reused column index.
- * @param {number} sourceColumn
+ * @param {number|string} sourceColumn
  * @param {string=} opt_aggregatorType
- * @param {number=} opt_weightsColumn
+ * @param {(number|string)=} opt_weightsColumn
  * @return {number}
  */
 anychart.data.Table.prototype.registerField = function(sourceColumn, opt_aggregatorType, opt_weightsColumn) {

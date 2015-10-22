@@ -15,8 +15,8 @@ goog.require('anychart.enums');
 /**
  * Creates and returns proper data aggregator according to passed type.
  * @param {anychart.enums.AggregationType} type
- * @param {number} sourceColumn
- * @param {number=} opt_weightsColumn
+ * @param {number|string} sourceColumn
+ * @param {(number|string)=} opt_weightsColumn
  * @return {!anychart.data.aggregators.Base}
  */
 anychart.data.aggregators.create = function(type, sourceColumn, opt_weightsColumn) {
@@ -30,7 +30,7 @@ anychart.data.aggregators.create = function(type, sourceColumn, opt_weightsColum
     case anychart.enums.AggregationType.LAST_VALUE:
       return new anychart.data.aggregators.LastValue(sourceColumn);
     case anychart.enums.AggregationType.LIST:
-      return new anychart.data.aggregators.List(sourceColumn, opt_weightsColumn);
+      return new anychart.data.aggregators.List(sourceColumn);
     case anychart.enums.AggregationType.MAX:
       return new anychart.data.aggregators.Max(sourceColumn);
     case anychart.enums.AggregationType.MIN:
@@ -38,7 +38,7 @@ anychart.data.aggregators.create = function(type, sourceColumn, opt_weightsColum
     case anychart.enums.AggregationType.SUM:
       return new anychart.data.aggregators.Sum(sourceColumn);
     case anychart.enums.AggregationType.WEIGHTED_AVERAGE:
-      return new anychart.data.aggregators.WeightedAverage(sourceColumn);
+      return new anychart.data.aggregators.WeightedAverage(sourceColumn, opt_weightsColumn);
     default:
     case anychart.enums.AggregationType.LAST:
       return new anychart.data.aggregators.Last(sourceColumn);
@@ -49,32 +49,36 @@ anychart.data.aggregators.create = function(type, sourceColumn, opt_weightsColum
 /**
  * Returns hash string for passed params.
  * @param {anychart.enums.AggregationType} type
- * @param {number} sourceColumn
- * @param {number=} opt_weightsColumn
+ * @param {number|string} sourceColumn
+ * @param {(number|string)=} opt_weightsColumn
  * @return {string}
  */
 anychart.data.aggregators.getHash = function(type, sourceColumn, opt_weightsColumn) {
+  if (goog.isNumber(sourceColumn))
+    sourceColumn = sourceColumn.toFixed(0);
   switch (type) {
     case anychart.enums.AggregationType.AVERAGE:
-      return 'a' + sourceColumn.toFixed(0);
+      return 'a' + sourceColumn;
     case anychart.enums.AggregationType.FIRST:
-      return 'f' + sourceColumn.toFixed(0);
+      return 'f' + sourceColumn;
     case anychart.enums.AggregationType.FIRST_VALUE:
-      return 'o' + sourceColumn.toFixed(0);
+      return 'o' + sourceColumn;
     case anychart.enums.AggregationType.LAST_VALUE:
-      return 'c' + sourceColumn.toFixed(0);
+      return 'c' + sourceColumn;
     case anychart.enums.AggregationType.LIST:
-      return 'g' + sourceColumn.toFixed(0);
+      return 'g' + sourceColumn;
     case anychart.enums.AggregationType.MAX:
-      return 'x' + sourceColumn.toFixed(0);
+      return 'x' + sourceColumn;
     case anychart.enums.AggregationType.MIN:
-      return 'n' + sourceColumn.toFixed(0);
+      return 'n' + sourceColumn;
     case anychart.enums.AggregationType.SUM:
-      return 's' + sourceColumn.toFixed(0);
+      return 's' + sourceColumn;
     case anychart.enums.AggregationType.WEIGHTED_AVERAGE:
-      return 'w' + sourceColumn.toFixed(0) + ':' + opt_weightsColumn.toFixed(0);
+      if (goog.isNumber(opt_weightsColumn))
+        opt_weightsColumn = opt_weightsColumn.toFixed(0);
+      return 'w' + sourceColumn + ':' + opt_weightsColumn;
     default:
     case anychart.enums.AggregationType.LAST:
-      return 'l' + sourceColumn.toFixed(0);
+      return 'l' + sourceColumn;
   }
 };

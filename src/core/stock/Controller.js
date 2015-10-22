@@ -205,8 +205,9 @@ anychart.core.stock.Controller.prototype.registerSource = function(selectable, a
       this.tables_[guid] = table;
       table.listenSignals(this.tableInvalidated_, this);
     }
+    this.mainRegistry_.setDirty();
     for (var hash in this.registryMap_) {
-      this.registryMap_[hash].setDirty(tablesChanged);
+      this.registryMap_[hash].setDirty();
     }
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
@@ -241,8 +242,9 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
         break;
       }
     }
+    this.mainRegistry_.setDirty();
     for (var hash in this.registryMap_) {
-      this.registryMap_[hash].setDirty(tablesChanged);
+      this.registryMap_[hash].setDirty();
     }
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
   }
@@ -305,12 +307,10 @@ anychart.core.stock.Controller.prototype.select = function(startKey, endKey, opt
     // updating registry
     var hash;
     if (opt_forceUpdate || this.currentRegistry_.isDirty()) {
-      //if (this.currentRegistry_.hasWrongSources()) {
       this.currentRegistry_.resetSources();
       for (hash in this.tables_) {
         this.currentRegistry_.addSource(this.tables_[hash].getStorage(interval));
       }
-      //}
       this.currentRegistry_.update();
     }
 
@@ -378,12 +378,10 @@ anychart.core.stock.Controller.prototype.refreshFullRangeSources = function(poin
   // updating registry
   var hash;
   if (this.fullRangeRegistry_.isDirty()) {
-    //if (this.fullRangeRegistry_.hasWrongSources()) {
     this.fullRangeRegistry_.resetSources();
     for (hash in this.tables_) {
       this.fullRangeRegistry_.addSource(this.tables_[hash].getStorage(interval));
     }
-    //}
     this.fullRangeRegistry_.update();
   }
 
@@ -427,11 +425,11 @@ anychart.core.stock.Controller.prototype.getCoIterator = function(fullRange) {
  */
 anychart.core.stock.Controller.prototype.tableInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.mainRegistry_.setDirty(true);
-    this.fullRangeRegistry_.setDirty(true);
+    this.mainRegistry_.setDirty();
+    this.fullRangeRegistry_.setDirty();
     var i;
     for (i in this.registryMap_) {
-      this.registryMap_[i].setDirty(true);
+      this.registryMap_[i].setDirty();
     }
     for (i in this.selectableSources_) {
       this.selectableSources_[i].invalidateSelection();
@@ -448,12 +446,10 @@ anychart.core.stock.Controller.prototype.tableInvalidated_ = function(e) {
  */
 anychart.core.stock.Controller.prototype.ensureInit_ = function() {
   if (this.mainRegistry_.isDirty()) {
-    //if (this.mainRegistry_.hasWrongSources()) {
     this.mainRegistry_.resetSources();
     for (var hash in this.tables_) {
       this.mainRegistry_.addSource(this.tables_[hash].getStorage());
     }
-    //}
     this.mainRegistry_.update();
     return true;
   }
@@ -647,7 +643,15 @@ anychart.core.stock.Controller.prototype.getLastVisibleIndex = function() {
  * @return {boolean}
  */
 anychart.core.stock.Controller.prototype.currentSelectionSticksLeft = function() {
-  return isNaN(this.currentSelection_.preFirstIndex);
+  return isNaN(this.currentSelection_.preFirstIndex) &&
+      // we need this check to avoid expanding current range to full range when the selectRange call was done
+      // before any data was given to the chart
+      (
+          !isNaN(this.currentSelection_.firstIndex) ||
+          !isNaN(this.currentSelection_.lastIndex) ||
+          !isNaN(this.currentSelection_.preFirstIndex) ||
+          !isNaN(this.currentSelection_.postLastIndex)
+      );
 };
 
 
@@ -656,7 +660,15 @@ anychart.core.stock.Controller.prototype.currentSelectionSticksLeft = function()
  * @return {boolean}
  */
 anychart.core.stock.Controller.prototype.currentSelectionSticksRight = function() {
-  return isNaN(this.currentSelection_.postLastIndex);
+  return isNaN(this.currentSelection_.postLastIndex) &&
+      // we need this check to avoid expanding current range to full range when the selectRange call was done
+      // before any data was given to the chart
+      (
+          !isNaN(this.currentSelection_.firstIndex) ||
+          !isNaN(this.currentSelection_.lastIndex) ||
+          !isNaN(this.currentSelection_.preFirstIndex) ||
+          !isNaN(this.currentSelection_.postLastIndex)
+      );
 };
 
 

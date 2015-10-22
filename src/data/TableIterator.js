@@ -92,11 +92,11 @@ anychart.data.TableIterator.prototype.reset = function() {
   // coIterator_.advance() should return the (firstRealIndex - 1) value
 
   /**
-   * Cache of this.current.values.length.
-   * @type {number}
+   * If this.current_ represents is really the current element.
+   * @type {boolean}
    * @private
    */
-  this.currentValuesLength_ = 0;
+  this.currentExists_ = false;
 
   /**
    * Cache of this.current_.key.
@@ -144,11 +144,11 @@ anychart.data.TableIterator.prototype.get = function(field) {
 
 /**
  * Returns current column value.
- * @param {number} column
+ * @param {(number|string)} column
  * @return {*}
  */
 anychart.data.TableIterator.prototype.getColumn = function(column) {
-  return (0 <= column && column < this.currentValuesLength_) ? this.current_.values[column] : undefined;
+  return this.currentExists_ ? this.current_.values[column] : undefined;
 };
 
 
@@ -200,12 +200,12 @@ anychart.data.TableIterator.prototype.advanceSimple_ = function() {
     this.currentIndex_++;
     this.current_ = this.current_.next;
     if (this.current_ && this.current_ != this.stop_) {
-      this.currentValuesLength_ = this.current_.values.length;
+      this.currentExists_ = true;
       this.currentKey_ = this.current_.key;
       return true;
     }
     this.current_ = null;
-    this.currentValuesLength_ = 0;
+    this.currentExists_ = false;
     this.currentKey_ = NaN;
     this.currentIndex_ = NaN;
   }
@@ -227,17 +227,17 @@ anychart.data.TableIterator.prototype.coAdvance_ = function() {
         this.current_.key == this.coIterator_.currentKey() &&
         this.current_ != this.stop_);
     if (this.shouldMove_) {
-      this.currentValuesLength_ = this.current_.values.length;
+      this.currentExists_ = true;
       this.currentKey_ = this.current_.key;
     } else {
-      this.currentValuesLength_ = 0;
+      this.currentExists_ = false;
       this.currentKey_ = this.coIterator_.currentKey();
     }
     return true;
   } else {
     this.current_ = null;
     this.currentKey_ = NaN;
-    this.currentValuesLength_ = 0;
+    this.currentExists_ = false;
     return false;
   }
 };

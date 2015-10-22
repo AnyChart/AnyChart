@@ -215,7 +215,7 @@ anychart.data.TableSelectable.prototype.getMinDistance = function() {
 /**
  * Returns an index of the column mapped by the passed field name.
  * @param {string} field
- * @return {number}
+ * @return {number|string}
  */
 anychart.data.TableSelectable.prototype.getFieldColumn = function(field) {
   return this.currentStorageIsMain_ ?
@@ -235,29 +235,23 @@ anychart.data.TableSelectable.prototype.getMapping = function() {
 
 /**
  * Returns minimum value of the column  (includes only the visible range).
- * @param {number} column
+ * @param {number|string} column
  * @return {number}
  */
 anychart.data.TableSelectable.prototype.getColumnMin = function(column) {
-  column = Math.round(column);
-  if (0 <= column && column < this.currentSelection_.mins.length) {
-    return this.currentSelection_.mins[column];
-  }
-  return NaN;
+  var res = this.currentSelection_.mins[column];
+  return goog.isDef(res) ? res : NaN;
 };
 
 
 /**
  * Returns maximum value of the column (includes only the visible range).
- * @param {number} column
+ * @param {number|string} column
  * @return {number}
  */
 anychart.data.TableSelectable.prototype.getColumnMax = function(column) {
-  column = Math.round(column);
-  if (0 <= column && column < this.currentSelection_.maxs.length) {
-    return this.currentSelection_.maxs[column];
-  }
-  return NaN;
+  var res = this.currentSelection_.maxs[column];
+  return goog.isDef(res) ? res : NaN;
 };
 
 
@@ -371,11 +365,11 @@ anychart.data.TableSelectable.RowProxy.prototype.get = function(field) {
 
 /**
  * Returns current column value.
- * @param {number} column
+ * @param {number|string} column
  * @return {*}
  */
 anychart.data.TableSelectable.RowProxy.prototype.getColumn = function(column) {
-  return (0 <= column && column < this.row_.values.length) ? this.row_.values[column] : undefined;
+  return this.row_.values[column];
 };
 
 

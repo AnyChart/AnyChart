@@ -6,8 +6,8 @@ goog.require('anychart.utils');
 
 /**
  * Stores the lowest passed non-NaN value as the value of the aggregate.
- * @param {number} valuesColumn
- * @param {number=} opt_weightsColumn
+ * @param {number|string} valuesColumn
+ * @param {(number|string)=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */

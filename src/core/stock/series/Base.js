@@ -173,6 +173,15 @@ anychart.core.stock.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.stock.series.Base.prototype.SUPPORTED_SIGNALS =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEED_UPDATE_LEGEND;
+
+
+/**
  * Map of series constructors by type.
  * @type {Object.<string, Function>}
  */
@@ -182,7 +191,7 @@ anychart.core.stock.series.Base.SeriesTypesMap = {};
 /**
  * Gets and sets data for the series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_value
- * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ * @param {Object.<({column: (number|string), type: anychart.enums.AggregationType, weights: (number|string)}|number|string)>=} opt_mappingSettings
  *   An object where keys are field names and values are objects with fields:
  *      - 'column': number - Column index, that the field should get values from;
  *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
@@ -535,7 +544,7 @@ anychart.core.stock.series.Base.prototype.getScaleReferenceValues = function() {
 /**
  * Retrieves an array of column indexes matching asked column names from the current mapping.
  * @param {Array.<string>} fields
- * @return {?Array.<number>}
+ * @return {?Array.<(number|string)>}
  * @private
  */
 anychart.core.stock.series.Base.prototype.retrieveColumns_ = function(fields) {
@@ -546,7 +555,7 @@ anychart.core.stock.series.Base.prototype.retrieveColumns_ = function(fields) {
   var res = [];
   for (var i = 0; i < fields.length; i++) {
     var column = this.data_.getFieldColumn(fields[i]);
-    if (isNaN(column)) {
+    if (!goog.isString(column) && isNaN(column)) {
       anychart.utils.warning(anychart.enums.WarningCode.STOCK_WRONG_MAPPING, undefined, [this.getType(), fields[i]]);
       return null;
     }

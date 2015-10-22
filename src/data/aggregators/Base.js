@@ -4,20 +4,20 @@ goog.provide('anychart.data.aggregators.Base');
 
 /**
  * Aggregator base class.
- * @param {number} valuesColumn
- * @param {number=} opt_weightsColumn
+ * @param {number|string} valuesColumn
+ * @param {(number|string)=} opt_weightsColumn
  * @constructor
  */
 anychart.data.aggregators.Base = function(valuesColumn, opt_weightsColumn) {
   /**
    * Number of the column with values.
-   * @type {number}
+   * @type {number|string}
    */
   this.valuesColumn = valuesColumn;
 
   /**
    * Number of the column with weights.
-   * @type {number}
+   * @type {number|string}
    */
   this.weightsColumn = goog.isDef(opt_weightsColumn) ? opt_weightsColumn : NaN;
 
