@@ -49,7 +49,7 @@ anychart.core.Point.prototype.getChart = function() {
  * @return {*}
  */
 anychart.core.Point.prototype.get = function(field) {
-  return this.chart.data().get(this.index, field);
+  return (/** @type {{data:Function}} */(this.chart)).data().get(this.index, field);
 };
 
 
@@ -60,7 +60,7 @@ anychart.core.Point.prototype.get = function(field) {
  * @return {anychart.core.Point}
  */
 anychart.core.Point.prototype.set = function(field, value) {
-  this.chart.data().set(this.index, field, value);
+  (/** @type {{data:Function}} */(this.chart)).data().set(this.index, field, value);
   return this;
 };
 
@@ -112,7 +112,7 @@ anychart.core.Point.prototype.selected = function(opt_value) {
  * @return {boolean} Whether point exists in dataset or not.
  */
 anychart.core.Point.prototype.exists = function() {
-  return (this.index < this.chart.data().getRowsCount());
+  return (this.index < (/** @type {{data:Function}} */(this.chart)).data().getRowsCount());
 };
 
 

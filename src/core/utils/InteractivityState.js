@@ -141,6 +141,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
         this.setPointState_(state, +opt_index[i], opt_stateToChange);
     } else
       this.setPointState_(state, +opt_index, opt_stateToChange);
+    this.target.finalizePointAppearance();
   } else if (!this.isStateContains(this.seriesState, state)) {
     var iterator, index, update;
     var removeState = anychart.PointState.NORMAL;
@@ -160,6 +161,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
         goog.array.splice(this.stateIndex, i, 1);
       }
     }
+    this.target.finalizePointAppearance();
 
     if (this.updateRules(state)) {
       if (this.target.isDiscreteBased()) {
@@ -222,8 +224,10 @@ anychart.core.utils.InteractivityState.prototype.addPointState = function(state,
       goog.array.sort(opt_index);
       for (i = opt_index.length; i--;)
         this.addPointStateInternal(state, +opt_index[i]);
-    } else
+    } else {
       this.addPointStateInternal(state, +opt_index);
+    }
+    this.target.finalizePointAppearance();
   } else {
     if (!this.isStateContains(this.seriesState, state)) {
       for (i = this.stateValue.length; i--;) {
@@ -318,6 +322,8 @@ anychart.core.utils.InteractivityState.prototype.removePointState = function(sta
     } else
       this.removePointState_(state, +opt_index);
 
+    this.target.finalizePointAppearance();
+
     if (!this.target.isDiscreteBased() && this.target.hoverMode() == anychart.enums.HoverMode.SINGLE) {
       this.target.applyAppearanceToSeries(this.getSeriesStateForUpdate());
     }
@@ -332,6 +338,7 @@ anychart.core.utils.InteractivityState.prototype.removePointState = function(sta
         goog.array.splice(this.stateValue, i, 1);
       }
     }
+    this.target.finalizePointAppearance();
 
     this.seriesState &= ~state;
 

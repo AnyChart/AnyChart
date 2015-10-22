@@ -811,8 +811,8 @@ anychart.core.ui.LabelsFactory.prototype.clear = function(opt_index) {
         }
       }
       this.labels_.length = 0;
+      this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
     }
-    this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_HANDLERS, anychart.Signal.NEEDS_REDRAW);
   } else
     this.labels_ = [];
 

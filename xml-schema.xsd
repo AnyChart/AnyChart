@@ -97,11 +97,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_labels" type="core.LabelsFactory"/>
             <!-- charts.Sparkline and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
+            <!-- charts.HeatMap elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="OrdinalColorScale"/>
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
-            <!-- charts.HeatMap elements -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="OrdinalColorScale"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>

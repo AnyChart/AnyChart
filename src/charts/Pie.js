@@ -3834,6 +3834,12 @@ anychart.charts.Pie.prototype.applyAppearanceToPoint = function(pointState) {
 
 
 /**
+ * Finalization point appearance. For drawing labels and markers.
+ */
+anychart.charts.Pie.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */

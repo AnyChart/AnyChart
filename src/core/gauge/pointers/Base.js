@@ -383,6 +383,12 @@ anychart.core.gauge.pointers.Base.prototype.applyAppearanceToPoint = goog.nullFu
 
 
 /**
+ * Finalization point appearance. For drawing labels and markers.
+ */
+anychart.core.gauge.pointers.Base.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */

@@ -3,7 +3,10 @@ goog.provide('anychart.charts.HeatMap');
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.heatMap.series.Base');
+goog.require('anychart.core.ui.ChartScroller');
+goog.require('anychart.core.utils.IZoomableChart');
 goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.core.utils.OrdinalZoom');
 goog.require('anychart.enums');
 goog.require('anychart.scales.OrdinalColor');
 
@@ -13,6 +16,7 @@ goog.require('anychart.scales.OrdinalColor');
  * AnyChart Hea tMap class.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @implements {anychart.core.utils.IZoomableChart}
  * @extends {anychart.core.SeparateChart}
  * @constructor
  */
@@ -77,6 +81,21 @@ anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
    */
   this.dataBounds_ = null;
 
+  /**
+   * Zoom settings.
+   * @type {anychart.core.utils.OrdinalZoom}
+   * @private
+   */
+  this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
+
+
+  /**
+   * Zoom settings.
+   * @type {anychart.core.utils.OrdinalZoom}
+   * @private
+   */
+  this.yZoom_ = new anychart.core.utils.OrdinalZoom(this, false);
+
   this.createSeries_(opt_data || null, opt_csvSettings);
 };
 goog.inherits(anychart.charts.HeatMap, anychart.core.SeparateChart);
@@ -113,7 +132,10 @@ anychart.charts.HeatMap.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.HEATMAP_SERIES |
     anychart.ConsistencyState.HEATMAP_AXES |
     anychart.ConsistencyState.HEATMAP_GRIDS |
-    anychart.ConsistencyState.HEATMAP_COLOR_SCALE;
+    anychart.ConsistencyState.HEATMAP_COLOR_SCALE |
+    anychart.ConsistencyState.HEATMAP_X_SCROLLER |
+    anychart.ConsistencyState.HEATMAP_Y_SCROLLER |
+    anychart.ConsistencyState.HEATMAP_ZOOM;
 
 
 /**
@@ -142,6 +164,226 @@ anychart.charts.HeatMap.ZINDEX_LABEL = 40;
  * @type {number}
  */
 anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Zoom
+//
+//----------------------------------------------------------------------------------------------------------------------
+//region anychart.core.utils.IZoomableChart members
+/**
+ * Invalidates zoom.
+ * @param {boolean} forX
+ */
+anychart.charts.HeatMap.prototype.invalidateZoom = function(forX) {
+  // we do not distinguish between x and y zoom because we have only the x one
+  this.invalidate(anychart.ConsistencyState.HEATMAP_ZOOM, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Returns default scale for given dimension.
+ * @param {boolean} forX
+ * @return {anychart.scales.Base}
+ */
+anychart.charts.HeatMap.prototype.getDefaultScale = function(forX) {
+  return /** @type {anychart.scales.Base} */(forX ? this.xScale() : this.yScale());
+};
+
+
+/**
+ * Ensures that scales are ready for zooming.
+ */
+anychart.charts.HeatMap.prototype.ensureScalesReadyForZoom = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_SCALES)) {
+    if (!!this.xZoom().getSetup() || !!this.yZoom().getSetup())
+      this.calculate();
+  }
+};
+//endregion
+
+
+/**
+ * X Zoom settings getter/setter.
+ * @param {(number|boolean|null|Object)=} opt_value
+ * @return {anychart.charts.HeatMap|anychart.core.utils.OrdinalZoom}
+ */
+anychart.charts.HeatMap.prototype.xZoom = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.suspendSignalsDispatching();
+    this.xZoom_.setup(opt_value);
+    this.resumeSignalsDispatching(true);
+    return this;
+  }
+  return this.xZoom_;
+};
+
+
+/**
+ * Y Zoom settings getter/setter.
+ * @param {(number|boolean|null|Object)=} opt_value
+ * @return {anychart.charts.HeatMap|anychart.core.utils.OrdinalZoom}
+ */
+anychart.charts.HeatMap.prototype.yZoom = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.suspendSignalsDispatching();
+    this.yZoom_.setup(opt_value);
+    this.resumeSignalsDispatching(true);
+    return this;
+  }
+  return this.yZoom_;
+};
+
+
+/**
+ * X Scroller getter-setter.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.ui.ChartScroller|anychart.charts.HeatMap}
+ */
+anychart.charts.HeatMap.prototype.xScroller = function(opt_value) {
+  if (!this.xScroller_) {
+    this.xScroller_ = new anychart.core.ui.ChartScroller();
+    this.xScroller_.setParentEventTarget(this);
+    this.xScroller_.listenSignals(this.xScrollerInvalidated_, this);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_START, this.scrollerChangeStartHandler_);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeFinishHandler_);
+    this.invalidate(
+        anychart.ConsistencyState.HEATMAP_X_SCROLLER |
+        anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.xScroller_.setup(opt_value);
+    return this;
+  } else {
+    return this.xScroller_;
+  }
+};
+
+
+/**
+ * Y Scroller getter-setter.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.ui.ChartScroller|anychart.charts.HeatMap}
+ */
+anychart.charts.HeatMap.prototype.yScroller = function(opt_value) {
+  if (!this.yScroller_) {
+    this.yScroller_ = new anychart.core.ui.ChartScroller();
+    this.yScroller_.setParentEventTarget(this);
+    this.yScroller_.listenSignals(this.yScrollerInvalidated_, this);
+    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE_START, this.scrollerChangeStartHandler_);
+    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);
+    this.eventsHandler.listen(this.yScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeFinishHandler_);
+    this.invalidate(
+        anychart.ConsistencyState.HEATMAP_Y_SCROLLER |
+        anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.yScroller_.setup(opt_value);
+    return this;
+  } else {
+    return this.yScroller_;
+  }
+};
+
+
+/**
+ * Scroller signals handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.charts.HeatMap.prototype.xScrollerInvalidated_ = function(e) {
+  var state = anychart.ConsistencyState.HEATMAP_X_SCROLLER;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Scroller signals handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.charts.HeatMap.prototype.yScrollerInvalidated_ = function(e) {
+  var state = anychart.ConsistencyState.HEATMAP_Y_SCROLLER;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.HeatMap.prototype.scrollerChangeStartHandler_ = function(e) {
+  //if (this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+  //    this.transformScrollerSource_(e['source'])))
+  //  this.preventHighlight_();
+  //else
+  //  e.preventDefault();
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.HeatMap.prototype.scrollerChangeHandler_ = function(e) {
+  var zoom = e.target == this.xScroller() ? this.xZoom_ : this.yZoom_;
+  if (zoom.continuous()) {
+    e.preventDefault();
+    this.suspendSignalsDispatching();
+    zoom.setTo(e['startRatio'], e['endRatio']);
+    this.resumeSignalsDispatching(true);
+  }
+  //e.preventDefault();
+  //var first = e['startKey'];
+  //var last = e['endKey'];
+  //var source = this.transformScrollerSource_(e['source']);
+  //if (this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+  //    source,
+  //    Math.min(first, last), Math.max(first, last))) {
+  //  this.selectRangeInternal(first, last);
+  //  this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE, source);
+  //}
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.HeatMap.prototype.scrollerChangeFinishHandler_ = function(e) {
+  var zoom = e.target == this.xScroller() ? this.xZoom_ : this.yZoom_;
+  if (!zoom.continuous()) {
+    e.preventDefault();
+    this.suspendSignalsDispatching();
+    zoom.setTo(e['startRatio'], e['endRatio']);
+    this.resumeSignalsDispatching(true);
+  }
+  //this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+  //    this.transformScrollerSource_(e['source']));
+  //this.allowHighlight_();
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,7 +446,7 @@ anychart.charts.HeatMap.prototype.defaultGridSettings = function(opt_value) {
 anychart.charts.HeatMap.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.Ordinal)) {
-      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], true);
+      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
       return this;
     }
 
@@ -244,7 +486,7 @@ anychart.charts.HeatMap.prototype.scaleInvalidated_ = function(event) {
 anychart.charts.HeatMap.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.Ordinal)) {
-      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], true);
+      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
       return this;
     }
 
@@ -455,7 +697,8 @@ anychart.charts.HeatMap.prototype.colorScale = function(opt_value) {
       if (this.colorScale_)
         this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
 
-      this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -470,7 +713,8 @@ anychart.charts.HeatMap.prototype.colorScale = function(opt_value) {
  */
 anychart.charts.HeatMap.prototype.colorScaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE | anychart.ConsistencyState.CHART_LEGEND,
+        anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -491,7 +735,7 @@ anychart.charts.HeatMap.prototype.createLegendItemsProvider = function(sourceMod
   this.calculate();
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     var scale = this.colorScale();
-    if (scale) {
+    if (scale && scale instanceof anychart.scales.OrdinalColor) {
       var series = this.series_;
       var ranges = scale.getProcessedRanges();
       for (i = 0, count = ranges.length; i < count; i++) {
@@ -735,7 +979,7 @@ anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
 
     series = this.series_;
     value = /** @type {number} */(series.xScale().inverseTransform(ratio));
-    index = series.data().findInUnsortedDataByX(value, 'x');
+    index = series.data().findInUnsortedDataByX(value, 'x', 'heat');
 
     iterator = series.getIterator();
     minLength = Infinity;
@@ -832,7 +1076,7 @@ anychart.charts.HeatMap.prototype.seriesInvalidated_ = function(event) {
     }
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.HEATMAP_SCALES;
+    state |= anychart.ConsistencyState.HEATMAP_SCALES | anychart.ConsistencyState.HEATMAP_COLOR_SCALE;
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     state |= anychart.ConsistencyState.CHART_LEGEND;
@@ -958,8 +1202,32 @@ anychart.charts.HeatMap.prototype.calculate = function() {
 
     this.series_.calculateStatistics();
 
+    var scalesChanged = false;
+
+    if (this.xScale().needsAutoCalc())
+      scalesChanged |= this.xScale().finishAutoCalc();
+
+    if (this.yScale().needsAutoCalc())
+      scalesChanged |= this.yScale().finishAutoCalc();
+
+    if (scalesChanged) {
+      this.invalidateSeries_();
+    }
     this.markConsistent(anychart.ConsistencyState.HEATMAP_SCALES);
-    this.scalesFinalization_ = true;
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_COLOR_SCALE)) {
+    if (this.colorScale_ && this.colorScale_.needsAutoCalc()) {
+      this.colorScale_.startAutoCalc();
+      iterator = this.series_.getResetIterator();
+      while (iterator.advance()) {
+        this.colorScale_.extendDataRange(iterator.get(this.series_.referenceValueNames[2]));
+      }
+      this.colorScale_.finishAutoCalc();
+    }
+    this.invalidate(anychart.ConsistencyState.HEATMAP_SERIES);
+    this.invalidateSeries_();
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_COLOR_SCALE);
   }
 };
 
@@ -977,34 +1245,34 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
   var i, count;
 
   this.calculate();
-  if (this.scalesFinalization_) {
-    var scalesChanged = false;
-
-    if (this.xScale().needsAutoCalc())
-      scalesChanged |= this.xScale().finishAutoCalc();
-
-    if (this.yScale().needsAutoCalc())
-      scalesChanged |= this.yScale().finishAutoCalc();
-
-    this.scalesFinalization_ = false;
-
-    if (scalesChanged) {
-      this.invalidateSeries_();
-    }
-  }
 
   if (this.isConsistent())
     return;
 
+  this.xScroller().suspendSignalsDispatching();
+  this.yScroller().suspendSignalsDispatching();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_ZOOM)) {
+    var start, factor;
+
+    start = this.xZoom().getStartRatio();
+    factor = 1 / (this.xZoom().getEndRatio() - start);
+    this.xScale_.setZoom(factor, start);
+
+    start = this.yZoom().getStartRatio();
+    factor = 1 / (this.yZoom().getEndRatio() - start);
+    this.yScale_.setZoom(factor, start);
+
+    this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
+    this.yScroller().setRangeInternal(this.yZoom().getStartRatio(), this.yZoom().getEndRatio());
+
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_ZOOM);
+    this.invalidate(anychart.ConsistencyState.HEATMAP_X_SCROLLER | anychart.ConsistencyState.HEATMAP_Y_SCROLLER);
+  }
+
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_COLOR_SCALE)) {
-    this.invalidate(anychart.ConsistencyState.HEATMAP_SERIES);
-    this.invalidateSeries_();
-    this.markConsistent(anychart.ConsistencyState.HEATMAP_COLOR_SCALE);
-  }
 
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.HEATMAP_AXES)) {
@@ -1032,6 +1300,49 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
     var contentAreaBounds = bounds.clone().round();
     var attempt = 0;
 
+    var xScroller = this.xScroller();
+    var xScrollerBeforeAxes = xScroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+    xScroller.padding(0);
+    xScroller.parentBounds(contentAreaBounds);
+    var xScrollerHorizontal = xScroller.isHorizontal();
+    var xScrollerSize;
+    if (xScrollerBeforeAxes) {
+      if (xScrollerHorizontal) {
+        xScrollerSize = contentAreaBounds.height - xScroller.getRemainingBounds().height;
+      } else {
+        xScrollerSize = contentAreaBounds.width - xScroller.getRemainingBounds().width;
+      }
+    } else {
+      contentAreaBounds = xScroller.getRemainingBounds();
+    }
+
+    var yScroller = this.yScroller();
+    var yScrollerBeforeAxes = yScroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+    yScroller.padding(0);
+    yScroller.parentBounds(contentAreaBounds);
+    var yScrollerHorizontal = yScroller.isHorizontal();
+    var yScrollerSize;
+    if (yScrollerBeforeAxes) {
+      if (yScrollerHorizontal) {
+        yScrollerSize = contentAreaBounds.height - yScroller.getRemainingBounds().height;
+      } else {
+        yScrollerSize = contentAreaBounds.width - yScroller.getRemainingBounds().width;
+      }
+    } else {
+      contentAreaBounds = yScroller.getRemainingBounds();
+    }
+
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      this.xAxes_[i].suspendSignalsDispatching();
+      this.xAxes_[i].padding(0);
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      this.yAxes_[i].suspendSignalsDispatching();
+      this.yAxes_[i].padding(0);
+    }
+
+    var boundsWithoutAxes;
     do {
       //axes local vars
       var remainingBounds;
@@ -1042,7 +1353,7 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
       var leftOffset = 0;
       var rightOffset = 0;
       var complete = true;
-      var boundsWithoutAxes = bounds.clone();
+      boundsWithoutAxes = contentAreaBounds.clone();
       this.topAxisPadding_ = NaN;
       this.bottomAxisPadding_ = NaN;
       this.leftAxisPadding_ = NaN;
@@ -1052,7 +1363,6 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
       for (i = axes.length; i--;) {
         axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
         if (axis && axis.enabled()) {
-          axis.suspendSignalsDispatching();
           axis.parentBounds(contentAreaBounds);
           orientation = axis.orientation();
           axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
@@ -1086,8 +1396,73 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
             if (isNaN(this.rightAxisPadding_))
               this.rightAxisPadding_ = axisStrokeThickness;
           }
-          axis.resumeSignalsDispatching(false);
         }
+      }
+
+      if (xScrollerBeforeAxes) {
+        switch (xScroller.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            xScroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+            xScroller.padding().bottom(0);
+            topOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            xScroller.padding().top(0);
+            xScroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+            bottomOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            xScroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+            xScroller.padding().right(0);
+            leftOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            xScroller.padding().left(0);
+            xScroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+            rightOffset += xScrollerSize;
+            break;
+        }
+      }
+
+      if (yScrollerBeforeAxes) {
+        switch (yScroller.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            yScroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+            yScroller.padding().bottom(0);
+            topOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            yScroller.padding().top(0);
+            yScroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+            bottomOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            yScroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+            yScroller.padding().right(0);
+            leftOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            yScroller.padding().left(0);
+            yScroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+            rightOffset += yScrollerSize;
+            break;
+        }
+      }
+
+      if (xScrollerHorizontal) {
+        xScroller.padding().left(leftOffset);
+        xScroller.padding().right(rightOffset);
+      } else {
+        xScroller.padding().top(topOffset);
+        xScroller.padding().bottom(bottomOffset);
+      }
+
+      if (yScrollerHorizontal) {
+        yScroller.padding().left(leftOffset);
+        yScroller.padding().right(rightOffset);
+      } else {
+        yScroller.padding().top(topOffset);
+        yScroller.padding().bottom(bottomOffset);
       }
 
       boundsWithoutAxes.left += leftOffset;
@@ -1098,7 +1473,6 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
       for (i = axes.length; i--;) {
         axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
         if (axis && axis.enabled()) {
-          axis.suspendSignalsDispatching();
           var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
 
           if (axis.isHorizontal()) {
@@ -1116,11 +1490,18 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
               complete = false;
             }
           }
-          axis.resumeSignalsDispatching(false);
         }
       }
       attempt++;
     } while (!complete && attempt < anychart.charts.HeatMap.MAX_ATTEMPTS_AXES_CALCULATION_);
+
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      this.xAxes_[i].resumeSignalsDispatching(false);
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      this.yAxes_[i].resumeSignalsDispatching(false);
+    }
 
     //bounds of data area
     this.dataBounds_ = boundsWithoutAxes.clone().round();
@@ -1128,7 +1509,21 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.HEATMAP_AXES |
         anychart.ConsistencyState.HEATMAP_GRIDS |
-        anychart.ConsistencyState.HEATMAP_SERIES);
+        anychart.ConsistencyState.HEATMAP_SERIES |
+        anychart.ConsistencyState.HEATMAP_X_SCROLLER |
+        anychart.ConsistencyState.HEATMAP_Y_SCROLLER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_X_SCROLLER)) {
+    this.xScroller().container(this.rootElement);
+    this.xScroller().draw();
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_X_SCROLLER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_Y_SCROLLER)) {
+    this.yScroller().container(this.rootElement);
+    this.yScroller().draw();
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_Y_SCROLLER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_GRIDS)) {
@@ -1176,6 +1571,8 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.HEATMAP_SERIES);
   }
 
+  this.xScroller().resumeSignalsDispatching(false);
+  this.yScroller().resumeSignalsDispatching(false);
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
 };
 
@@ -1219,98 +1616,100 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
 
     pointState = series.state.getPointStateByIndex(index);
 
-    series.drawPoint(pointState);
+    var pointDrew = series.drawPoint(pointState);
 
-    if (needAdjustFontSize || hoverNeedAdjustFontSize || selectNeedAdjustFontSize) {
-      var shape = iterator.meta('shape');
-      var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
-      var cellBounds = anychart.math.rect(
-          /** @type {number} */(iterator.meta('x')) + thickness,
-          /** @type {number} */(iterator.meta('y')) + thickness,
-          /** @type {number} */(iterator.meta('width')) - thickness * 2,
-          /** @type {number} */(iterator.meta('height')) - thickness * 2
-          );
+    if (pointDrew) {
+      if (needAdjustFontSize || hoverNeedAdjustFontSize || selectNeedAdjustFontSize) {
+        var shape = iterator.meta('shape');
+        var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
+        var cellBounds = anychart.math.rect(
+            /** @type {number} */(iterator.meta('x')) + thickness,
+            /** @type {number} */(iterator.meta('y')) + thickness,
+            /** @type {number} */(iterator.meta('width')) - thickness * 2,
+            /** @type {number} */(iterator.meta('height')) - thickness * 2
+            );
 
-      if (needAdjustFontSize) {
-        var label = series.configureLabel(anychart.PointState.NORMAL, true);
-        if (label) {
-          var mergedSettings = label.getMergedSettings();
-          var padding = mergedSettings['padding'];
+        if (needAdjustFontSize) {
+          var label = series.configureLabel(anychart.PointState.NORMAL, true);
+          if (label) {
+            var mergedSettings = label.getMergedSettings();
+            var padding = mergedSettings['padding'];
 
-          var width = cellBounds.width - padding.left() - padding.right();
-          var height = cellBounds.height - padding.top() - padding.bottom();
+            var width = cellBounds.width - padding.left() - padding.right();
+            var height = cellBounds.height - padding.top() - padding.bottom();
 
-          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
-          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
-            var fontSize = label.calculateFontSize(
-                width,
-                height,
-                mergedSettings['minFontSize'],
-                mergedSettings['maxFontSize'],
-                mergedSettings['adjustByWidth'],
-                mergedSettings['adjustByHeight']);
+            var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+            if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+              var fontSize = label.calculateFontSize(
+                  width,
+                  height,
+                  mergedSettings['minFontSize'],
+                  mergedSettings['maxFontSize'],
+                  mergedSettings['adjustByWidth'],
+                  mergedSettings['adjustByHeight']);
 
-            if (!goog.isDef(minFontSize)) {
-              minFontSize = fontSize;
-            } else if (fontSize < minFontSize) {
-              minFontSize = fontSize;
+              if (!goog.isDef(minFontSize)) {
+                minFontSize = fontSize;
+              } else if (fontSize < minFontSize) {
+                minFontSize = fontSize;
+              }
             }
           }
         }
-      }
 
-      if (hoverNeedAdjustFontSize) {
-        var label = series.configureLabel(anychart.PointState.HOVER, true);
-        if (label) {
-          var mergedSettings = label.getMergedSettings();
-          var padding = mergedSettings['padding'];
+        if (hoverNeedAdjustFontSize) {
+          var label = series.configureLabel(anychart.PointState.HOVER, true);
+          if (label) {
+            var mergedSettings = label.getMergedSettings();
+            var padding = mergedSettings['padding'];
 
-          var width = cellBounds.width - padding.left() - padding.right();
-          var height = cellBounds.height - padding.top() - padding.bottom();
+            var width = cellBounds.width - padding.left() - padding.right();
+            var height = cellBounds.height - padding.top() - padding.bottom();
 
-          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
-          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
-            var fontSize = label.calculateFontSize(
-                width,
-                height,
-                mergedSettings['minFontSize'],
-                mergedSettings['maxFontSize'],
-                mergedSettings['adjustByWidth'],
-                mergedSettings['adjustByHeight']);
+            var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+            if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+              var fontSize = label.calculateFontSize(
+                  width,
+                  height,
+                  mergedSettings['minFontSize'],
+                  mergedSettings['maxFontSize'],
+                  mergedSettings['adjustByWidth'],
+                  mergedSettings['adjustByHeight']);
 
-            if (!goog.isDef(hoverMinFontSize)) {
-              hoverMinFontSize = fontSize;
-            } else if (fontSize < hoverMinFontSize) {
-              hoverMinFontSize = fontSize;
+              if (!goog.isDef(hoverMinFontSize)) {
+                hoverMinFontSize = fontSize;
+              } else if (fontSize < hoverMinFontSize) {
+                hoverMinFontSize = fontSize;
+              }
             }
           }
         }
-      }
 
-      if (selectNeedAdjustFontSize) {
-        var label = series.configureLabel(anychart.PointState.SELECT, true);
-        if (label) {
-          var mergedSettings = label.getMergedSettings();
-          var padding = mergedSettings['padding'];
+        if (selectNeedAdjustFontSize) {
+          var label = series.configureLabel(anychart.PointState.SELECT, true);
+          if (label) {
+            var mergedSettings = label.getMergedSettings();
+            var padding = mergedSettings['padding'];
 
-          var width = cellBounds.width - padding.left() - padding.right();
-          var height = cellBounds.height - padding.top() - padding.bottom();
+            var width = cellBounds.width - padding.left() - padding.right();
+            var height = cellBounds.height - padding.top() - padding.bottom();
 
-          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
-          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
-            var fontSize = label.calculateFontSize(
-                width,
-                height,
-                mergedSettings['minFontSize'],
-                mergedSettings['maxFontSize'],
-                mergedSettings['adjustByWidth'],
-                mergedSettings['adjustByHeight']);
+            var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+            if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+              var fontSize = label.calculateFontSize(
+                  width,
+                  height,
+                  mergedSettings['minFontSize'],
+                  mergedSettings['maxFontSize'],
+                  mergedSettings['adjustByWidth'],
+                  mergedSettings['adjustByHeight']);
 
 
-            if (!goog.isDef(selectMinFontSize)) {
-              selectMinFontSize = fontSize;
-            } else if (fontSize < selectMinFontSize) {
-              selectMinFontSize = fontSize;
+              if (!goog.isDef(selectMinFontSize)) {
+                selectMinFontSize = fontSize;
+              } else if (fontSize < selectMinFontSize) {
+                selectMinFontSize = fontSize;
+              }
             }
           }
         }
@@ -1498,6 +1897,30 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
   this.selectMarkers().setup(config['selectMarkers']);
 
   this.labelsDisplayMode(config['labelsDisplayMode']);
+
+  this.xScroller(config['xScroller']);
+  this.yScroller(config['yScroller']);
+
+  var xZoom = json['xZoom'];
+  var tmp;
+  if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {
+    tmp = xZoom['scale'];
+    xZoom['scale'] = scalesInstances[xZoom['scale']];
+    this.xZoom(xZoom);
+    xZoom['scale'] = tmp;
+  } else {
+    this.xZoom(xZoom);
+  }
+
+  var yZoom = json['yZoom'];
+  if (goog.isObject(yZoom) && (goog.isNumber(yZoom['scale']) || goog.isString(yZoom['scale']))) {
+    tmp = yZoom['scale'];
+    yZoom['scale'] = scalesInstances[yZoom['scale']];
+    this.xZoom(yZoom);
+    yZoom['scale'] = tmp;
+  } else {
+    this.xZoom(yZoom);
+  }
 };
 
 
@@ -1709,6 +2132,11 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   json['selectMarkers'] = this.selectMarkers().serialize();
 
   json['selectLabels'] = this.labelsDisplayMode();
+
+  json['xScroller'] = this.xScroller().serialize();
+  json['yScroller'] = this.yScroller().serialize();
+  json['xZoom'] = this.xZoom().serialize();
+  json['yZoom'] = this.yZoom().serialize();
 
   return {'chart': json};
 };
@@ -2008,6 +2436,15 @@ anychart.charts.HeatMap.prototype.data = function(opt_value, opt_csvSettings) {
 
 
 /**
+ * Returns current mapping iterator.
+ * @return {!anychart.data.Iterator} Current series iterator.
+ */
+anychart.charts.HeatMap.prototype.getIterator = function() {
+  return this.series_.getIterator();
+};
+
+
+/**
  * If index is passed, hovers a point by its index, else hovers all points.
  * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
  * @return {!anychart.charts.HeatMap} instance for method chaining.
@@ -2069,3 +2506,8 @@ anychart.charts.HeatMap.prototype['unselect'] = anychart.charts.HeatMap.prototyp
 anychart.charts.HeatMap.prototype['data'] = anychart.charts.HeatMap.prototype.data;
 
 anychart.charts.HeatMap.prototype['colorScale'] = anychart.charts.HeatMap.prototype.colorScale;
+
+anychart.charts.HeatMap.prototype['xZoom'] = anychart.charts.HeatMap.prototype.xZoom;
+anychart.charts.HeatMap.prototype['yZoom'] = anychart.charts.HeatMap.prototype.yZoom;
+anychart.charts.HeatMap.prototype['xScroller'] = anychart.charts.HeatMap.prototype.xScroller;
+anychart.charts.HeatMap.prototype['yScroller'] = anychart.charts.HeatMap.prototype.yScroller;

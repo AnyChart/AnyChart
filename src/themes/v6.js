@@ -39,6 +39,12 @@ window['anychart']['themes']['v6'] = {
     'items': ['circle', 'square', 'triangleUp', 'diamond', 'triangleDown', 'cross', 'diagonalCross', 'star4', 'star5', 'star6', 'star7', 'star10', 'pentagon', 'trapezium', 'line']
   },
 
+  'ordinalColor': {
+    'autoColors': function(rangesCount) {
+      return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
+    }
+  },
+
   // global background settings
   'defaultBackground': {
     'enabled': true,
@@ -2121,6 +2127,267 @@ window['anychart']['themes']['v6'] = {
   },
 
   // merge with chart
+  'heatMap': {
+    'scales': [
+      {
+        'type': 'ordinal',
+        'inverted': false,
+        'names': [],
+        'ticks': {
+          'interval': 1
+        }
+      },
+      {
+        'type': 'ordinal',
+        'inverted': true,
+        'names': [],
+        'ticks': {
+          'interval': 1
+        }
+      },
+      {
+        'type': 'ordinalColor'
+      }
+    ],
+    'colorScale': 2,
+    'background': {
+      'enabled': true
+    },
+    'xAxes': [{}],
+    'yAxes': [{}],
+    'grids': [],
+    'padding': {
+      'top': 30,
+      'right': 20,
+      'bottom': 20,
+      'left': 20
+    },
+    'tooltip': {
+      'enabled': true,
+      'title': {
+        'enabled': true,
+        'fontSize': 13,
+        'fontWeight': 'normal'
+      },
+      'content': {'fontSize': 11},
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return this['name'] || this['x'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        if (goog.isDef(this['heat'])) {
+          var value = 'Value: ' + this['valuePrefix'] + this['heat'] + this['valuePostfix'];
+          if (!isNaN(+this['heat']))
+            value += '\n' + 'Percent Value: ' + (this['heat'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
+          return value;
+        } else {
+          return 'x: ' + this['x'] + ' y: ' + this['y'];
+        }
+      }
+    },
+    'legendItem': {
+      'iconStroke': null
+    },
+    'legend': {
+      'itemsSourceMode': 'categories'
+    },
+
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'fill': function() {
+      var color;
+      if (this['colorScale']) {
+        var value = this['iterator']['get']('heat');
+        color = this['colorScale']['valueToColor'](value);
+      } else {
+        color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+      }
+      return color;
+    },
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'hoverFill': function() {
+      return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
+    },
+    'selectFill': '#333333',
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'stroke': function() {
+      var color;
+      if (this['colorScale']) {
+        var value = this['iterator']['get']('heat');
+        color = this['colorScale']['valueToColor'](value);
+      } else {
+        color = this['sourceColor'];
+      }
+      return window['anychart']['color']['setThickness'](color, 1 , .85);
+    },
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'hoverStroke': function() {
+      return window['anychart']['color']['setThickness'](this['sourceColor'], 1, .85);
+    },
+    'selectStroke': null,
+
+    'labels': {
+      'enabled': false,
+      'fontSize': 11,
+      'adjustFontSize': true,
+      'minFontSize': 7,
+      'maxFontSize': 15,
+      'hAlign': 'center',
+      'vAlign': 'center',
+      'textWrap': 'noWrap',
+      'fontWeight': 'normal',
+      'fontColor': '#333',
+      'selectable': false,
+
+      'background': {
+        'enabled': false
+      },
+      'padding': {
+        'top': 2,
+        'right': 4,
+        'bottom': 2,
+        'left': 4
+      },
+      'position': 'center',
+      'anchor': 'center',
+      'offsetX': 0,
+      'offsetY': 0,
+      'rotation': 0,
+      'width': null,
+      'height': null,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return this['heat'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'positionFormatter': function() {
+        return this['value'];
+      }
+    },
+    'hoverLabels': {
+      'enabled': null
+    },
+    'selectLabels': {
+      'fontColor': '#f5f500',
+      'enabled': null
+    },
+
+    'markers': {
+      'enabled': false,
+      'disablePointerEvents': false,
+      'position': 'center',
+      'rotation': 0,
+      'anchor': 'center',
+      'offsetX': 0,
+      'offsetY': 0,
+      //'type': null,
+      'size': 4,
+      //'fill': '', // autoFill
+      //'stroke': '', // autoStroke
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'positionFormatter': function() {
+        return this['value'];
+      }
+    },
+    'hoverMarkers': {
+      'enabled': null,
+      'size': 6
+    },
+    'selectMarkers': {
+      'enabled': null,
+      'fill': '#f5f500'
+    },
+    'labelsDisplayMode': 'drop',
+
+    'hatchFill': false,
+    //'hoverHatchFill': null,
+
+    'clip': true,
+    'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'xScroller': {
+      'enabled': false,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': 'none',
+      'height': 10,
+      'minHeight': null,
+      'maxHeight': null,
+      'autoHide': false,
+      'orientation': 'bottom',
+      'position': 'afterAxes',
+      'allowRangeChange': true,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 35
+    },
+    'yZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'yScroller': {
+      'enabled': false,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': 'none',
+      'height': 10,
+      'minHeight': null,
+      'maxHeight': null,
+      'autoHide': false,
+      'orientation': 'left',
+      'position': 'afterAxes',
+      'allowRangeChange': true,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 35
+    }
+  },
+
+  // merge with chart
   'scatter': {
     'defaultSeriesSettings': {
       'base': {
@@ -3944,9 +4211,102 @@ window['anychart']['themes']['v6'] = {
           }
         },
         'xScale': null,
-        'yScale': null
+        'yScale': null,
+        'geoIdField': null
       },
-      'choropleth': {}
+      'choropleth': {},
+      'bubble': {
+        'displayNegative': false,
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'fill': function() {
+          return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverFill': function() {
+          return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'stroke': function() {
+          return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverStroke': function() {
+          return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+        },
+        'legendItem': {
+          'iconStroke': null
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'negativeFill': function() {
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken'](
+                  window['anychart']['color']['darken'](this['sourceColor'])));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverNegativeFill': function() {
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken'](
+                  window['anychart']['color']['darken'](
+                      window['anychart']['color']['darken'](this['sourceColor']))));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'negativeStroke': function() {
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken'](
+                  window['anychart']['color']['darken'](
+                      window['anychart']['color']['darken'](this['sourceColor']))));
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'hoverNegativeStroke': function() {
+          return window['anychart']['color']['darken'](
+              window['anychart']['color']['darken'](
+                  window['anychart']['color']['darken'](
+                      window['anychart']['color']['darken'](
+                          window['anychart']['color']['darken'](this['sourceColor'])))));
+        },
+        'negativeHatchFill': null,
+        'hoverNegativeHatchFill': null,
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'titleFormatter': function() {
+            return this['name'] || this['getDataValue']('name');
+          },
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'Value: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
+          }
+        }
+      }
     },
     'colorRange': {
       'enabled': false,
@@ -3990,13 +4350,9 @@ window['anychart']['themes']['v6'] = {
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#B9B9B9'},
     'linearColor': {'colors': ['#fff', '#ffd54f', '#ef6c00']},
-    'ordinalColor': {
-      'autoColors': function(rangesCount) {
-        return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
-      }
-    },
     'maxBubbleSize': '20%',
-    'minBubbleSize': '5%'
+    'minBubbleSize': '5%',
+    'geoIdField': 'id'
   },
 
   'defaultDataGrid': {

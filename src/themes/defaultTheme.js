@@ -2497,13 +2497,17 @@ window['anychart']['themes']['defaultTheme'] = {
       },
       {
         'type': 'ordinal',
-        'inverted': false,
+        'inverted': true,
         'names': [],
         'ticks': {
           'interval': 1
         }
+      },
+      {
+        'type': 'ordinalColor'
       }
     ],
+    'colorScale': 2,
     'background': {
       'enabled': true
     },
@@ -2549,6 +2553,9 @@ window['anychart']['themes']['defaultTheme'] = {
     },
     'legendItem': {
       'iconStroke': null
+    },
+    'legend': {
+      'itemsSourceMode': 'categories'
     },
 
     /**
@@ -2681,7 +2688,61 @@ window['anychart']['themes']['defaultTheme'] = {
     'hatchFill': false,
     //'hoverHatchFill': null,
 
-    'clip': true
+    'clip': true,
+    'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'xScroller': {
+      'enabled': false,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': 'none',
+      'height': 10,
+      'minHeight': null,
+      'maxHeight': null,
+      'autoHide': false,
+      'orientation': 'bottom',
+      'position': 'afterAxes',
+      'allowRangeChange': true,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 35
+    },
+    'yZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'yScroller': {
+      'enabled': false,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': 'none',
+      'height': 10,
+      'minHeight': null,
+      'maxHeight': null,
+      'autoHide': false,
+      'orientation': 'left',
+      'position': 'afterAxes',
+      'allowRangeChange': true,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 35
+    }
   },
 
   // merge with chart

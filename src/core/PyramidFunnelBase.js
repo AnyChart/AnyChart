@@ -2014,6 +2014,12 @@ anychart.core.PyramidFunnelBase.prototype.applyAppearanceToPoint = function(poin
 
 
 /**
+ * Finalization point appearance. For drawing labels and markers.
+ */
+anychart.core.PyramidFunnelBase.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */

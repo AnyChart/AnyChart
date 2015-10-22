@@ -625,7 +625,8 @@ anychart.core.radar.series.ContinuousBase.prototype.setupByJSON = function(confi
   goog.base(this, 'setupByJSON', config);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);
-  this.connectMissingPoints().setup(config['connectMissingPoints']);
+  this.selectMarkers().setup(config['selectMarkers']);
+  this.connectMissingPoints(config['connectMissingPoints']);
 };
 
 

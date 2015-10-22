@@ -129,6 +129,9 @@ anychart.ConsistencyState = {
   HEATMAP_AXES: 1 << 13,
   HEATMAP_GRIDS: 1 << 14,
   HEATMAP_COLOR_SCALE: 1 << 15,
+  HEATMAP_X_SCROLLER: 1 << 16,
+  HEATMAP_Y_SCROLLER: 1 << 17,
+  HEATMAP_ZOOM: 1 << 18,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 5,

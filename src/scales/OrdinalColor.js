@@ -47,6 +47,12 @@ anychart.scales.OrdinalColor = function() {
    * @private
    */
   this.autoColors_ = null;
+
+  /**
+   * @type {Array}
+   * @private
+   */
+  this.data_ = [];
 };
 goog.inherits(anychart.scales.OrdinalColor, anychart.scales.Base);
 
@@ -373,6 +379,21 @@ anychart.scales.OrdinalColor.prototype.inverseTransform = function(ratio) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.OrdinalColor.prototype.needsAutoCalc = function() {
+  return !!this.ranges.length;
+};
+
+
+/** @inheritDoc */
+anychart.scales.OrdinalColor.prototype.checkScaleChanged = function(silently) {
+  this.consistent = false;
+  if (!silently)
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  return true;
+};
+
+
 /**
  * @return {!anychart.scales.OrdinalColor} Resets auto values.
  */
@@ -380,7 +401,24 @@ anychart.scales.OrdinalColor.prototype.resetDataRange = function() {
   this.internalRanges_ = null;
   this.resultColors_ = null;
   this.autoNames_ = null;
+  this.autoRanges_ = null;
   this.resultNames_ = null;
+  this.data_.length = 0;
+  return this;
+};
+
+
+/**
+ * Extends the current input domain with the passed values (if such don't exist in the domain).<br/>
+ * <b>Note:</b> Attention! {@link anychart.scales.Base#finishAutoCalc} drops all passed values.
+ * @param {...*} var_args Values that are supposed to extend the input domain.
+ * @return {!anychart.scales.OrdinalColor} {@link anychart.scales.ScatterBase} instance for method chaining.
+ */
+anychart.scales.OrdinalColor.prototype.extendDataRange = function(var_args) {
+  for (var i = 0; i < arguments.length; i++) {
+    var value = +arguments[i];
+    if (!isNaN(value)) this.data_.push(value);
+  }
   return this;
 };
 
@@ -392,8 +430,39 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
   if (!this.internalRanges_) {
     var i, len, range, name, color;
     var tempArr = [];
-    for (i = 0, len = this.ranges_.length; i < len; i++) {
-      range = this.ranges_[i];
+
+    if (!this.ranges_.length) {
+      this.autoRanges_ = [];
+      goog.array.sort(this.data_);
+      goog.array.removeDuplicates(this.data_);
+
+      //calculating intervals count by Sturges formula
+      var k = Math.round(1 + 3.32 * Math.log(this.data_.length) / Math.log(10));
+      //min value
+      var maxValue = this.data_[this.data_.length - 1];
+      //max value
+      var minValue = this.data_[0];
+      //intervals width
+      var h = (maxValue - minValue) / k;
+      //left limit of first interval
+      var leftLimit = Math.floor(minValue);
+      //right limit of first interval
+      var rightLimit = Math.ceil(leftLimit + h);
+
+      //calculating intervals
+      for (i = 0; i < k; i++) {
+        this.autoRanges_.push({'from': leftLimit, 'to': rightLimit});
+        leftLimit = rightLimit;
+        rightLimit = Math.ceil(leftLimit + h);
+      }
+
+      this.autoColors_ = anychart.getFullTheme()['ordinalColor']['autoColors'](k);
+    }
+
+    var ranges = this.ranges_.length ? this.ranges_ : this.autoRanges_;
+
+    for (i = 0, len = ranges.length; i < len; i++) {
+      range = ranges[i];
       name = this.names_ ? this.names_[i] : null;
       var colors = this.colors();
       var colorIndex = this.inverted() ? Math.max(0, colors.length - 1 - i) : i;

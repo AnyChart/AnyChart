@@ -257,7 +257,7 @@ anychart.core.heatMap.series.Base.prototype.data = function(opt_value, opt_csvSe
       this.dataInternal.listenSignals(this.onDataSignal_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
-          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+          anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
@@ -347,18 +347,38 @@ anychart.core.heatMap.series.Base.prototype.getReferenceCoords = function() {
       return null;
     }
 
-    var pix, width;
+    var pix, width, ratio0, ratio1;
     switch (this.referenceValueMeanings[i]) {
       case 'x':
-        pix = xScale.isMissing(val) ? NaN : this.applyRatioToBounds(xScale.transform(val, xScale.inverted() ? 1 : 0), true);
-        width = Math.abs(pix - this.applyRatioToBounds(xScale.transform(val, xScale.inverted() ? 0 : 1), true));
+        if (xScale.isMissing(val))
+          pix = NaN;
+        else {
+          ratio0 = xScale.transform(val, 0);
+          ratio1 = xScale.transform(val, 1);
+          if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) {
+            pix = NaN;
+          } else {
+            pix = this.applyRatioToBounds(xScale.transform(val, xScale.inverted() ? 1 : 0), true);
+            width = Math.abs(pix - this.applyRatioToBounds(xScale.transform(val, xScale.inverted() ? 0 : 1), true));
+          }
+        }
+
         if (isNaN(pix)) fail = true;
         break;
       case 'y':
         if (yScale.isMissing(val))
-          val = NaN;
-        pix = this.applyRatioToBounds(yScale.transform(val, yScale.inverted() ? 0 : 1), false);
-        width = Math.abs(pix - this.applyRatioToBounds(yScale.transform(val, yScale.inverted() ? 1 : 0), false));
+          pix = NaN;
+        else {
+          ratio0 = yScale.transform(val, 0);
+          ratio1 = yScale.transform(val, 1);
+          if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) {
+            pix = NaN;
+          } else {
+            pix = this.applyRatioToBounds(yScale.transform(val, yScale.inverted() ? 0 : 1), false);
+            width = Math.abs(pix - this.applyRatioToBounds(yScale.transform(val, yScale.inverted() ? 1 : 0), false));
+          }
+        }
+
         if (isNaN(pix)) fail = true;
         break;
       case 'n':
@@ -505,6 +525,7 @@ anychart.core.heatMap.series.Base.prototype.startDrawing = function() {
  * Closes polygon in a correct way if missing occured;
  * @param {anychart.PointState|number} pointState Point state.
  * @param {boolean=} opt_update This is update or draw.
+ * @return {boolean} .
  */
 anychart.core.heatMap.series.Base.prototype.drawPoint = function(pointState, opt_update) {
   var referenceValues = this.getReferenceCoords();
@@ -575,7 +596,12 @@ anychart.core.heatMap.series.Base.prototype.drawPoint = function(pointState, opt
     }
 
     this.configureMarker(pointState, true);
+
+    return true;
   }
+  this.getIterator().meta('shape', null);
+  this.getIterator().meta('hatchFillShape', null);
+  return false;
 };
 
 
@@ -654,7 +680,7 @@ anychart.core.heatMap.series.Base.prototype.configureLabel = function(pointState
 
     return label;
   } else if (label) {
-    label.clear();
+    this.labels().clear(label.getIndex());
   }
   return null;
 };
@@ -668,21 +694,80 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
   var iterator = this.getIterator().reset();
 
   while (iterator.advance()) {
-    var index = iterator.getIndex();
-    var pointState = this.state.getPointStateByIndex(index);
+    var shape = iterator.meta('shape');
 
+    if (shape) {
+      var index = iterator.getIndex();
+      var pointState = this.state.getPointStateByIndex(index);
+
+      var label = this.configureLabel(pointState, true);
+      if (label) {
+        var mergedSettings = label.getMergedSettings();
+        var padding = mergedSettings['padding'];
+
+        var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
+        var cellBounds = anychart.math.rect(
+            /** @type {number} */(iterator.meta('x')) + thickness,
+            /** @type {number} */(iterator.meta('y')) + thickness,
+            /** @type {number} */(iterator.meta('width')) - thickness * 2,
+            /** @type {number} */(iterator.meta('height')) - thickness * 2);
+
+        mergedSettings['width'] = null;
+        mergedSettings['height'] = null;
+        if (mergedSettings['adjustByWidth'] || mergedSettings['adjustByHeight'])
+          mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
+
+        var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
+        bounds = mergedSettings['padding'].widenBounds(bounds);
+
+        var notOutOfCellBounds = cellBounds.left <= bounds.left &&
+            cellBounds.getRight() >= bounds.getRight() &&
+            cellBounds.top <= bounds.top &&
+            cellBounds.getBottom() >= bounds.getBottom();
+
+        if (!notOutOfCellBounds) {
+          if (this.chart_.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
+            this.labels().clear(index);
+          } else {
+            if (label.width() != bounds.width || label.height() != bounds.height) {
+              label.dropMergedSettings();
+              label.width(bounds.width).height(bounds.height);
+            }
+          }
+        } else {
+          label.width(cellBounds.width).height(cellBounds.height);
+        }
+
+        if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+          label.clip(cellBounds);
+        } else {
+          label.clip(null);
+        }
+      }
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
+  var iterator = this.getIterator();
+  var shape = iterator.meta('shape');
+  if (shape) {
     var label = this.configureLabel(pointState, true);
+
     if (label) {
       var mergedSettings = label.getMergedSettings();
-      var padding = mergedSettings['padding'];
 
-      var shape = iterator.meta('shape');
       var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
       var cellBounds = anychart.math.rect(
           /** @type {number} */(iterator.meta('x')) + thickness,
           /** @type {number} */(iterator.meta('y')) + thickness,
           /** @type {number} */(iterator.meta('width')) - thickness * 2,
           /** @type {number} */(iterator.meta('height')) - thickness * 2);
+      label.width(cellBounds.width).height(cellBounds.height);
+
+      var padding = mergedSettings['padding'];
 
       mergedSettings['width'] = null;
       mergedSettings['height'] = null;
@@ -697,82 +782,24 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
           cellBounds.top <= bounds.top &&
           cellBounds.getBottom() >= bounds.getBottom();
 
+      if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+        label.clip(cellBounds);
+      } else {
+        label.clip(null);
+      }
+
       if (!notOutOfCellBounds) {
         if (this.chart_.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
-          this.labels().clear(index);
+          this.labels().clear(label.getIndex());
         } else {
           if (label.width() != bounds.width || label.height() != bounds.height) {
             label.dropMergedSettings();
             label.width(bounds.width).height(bounds.height);
           }
         }
-      } else {
-        label.width(cellBounds.width).height(cellBounds.height);
-      }
-
-      if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
-        label.clip(cellBounds);
-      } else {
-        label.clip(null);
       }
     }
   }
-};
-
-
-/** @inheritDoc */
-anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
-  var label = this.configureLabel(pointState, true);
-
-  if (label) {
-    var mergedSettings = label.getMergedSettings();
-
-    var iterator = this.getIterator();
-    var shape = iterator.meta('shape');
-    var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
-    var cellBounds = anychart.math.rect(
-        /** @type {number} */(iterator.meta('x')) + thickness,
-        /** @type {number} */(iterator.meta('y')) + thickness,
-        /** @type {number} */(iterator.meta('width')) - thickness * 2,
-        /** @type {number} */(iterator.meta('height')) - thickness * 2);
-    label.width(cellBounds.width).height(cellBounds.height);
-
-    var padding = mergedSettings['padding'];
-
-    mergedSettings['width'] = null;
-    mergedSettings['height'] = null;
-    if (mergedSettings['adjustByWidth'] || mergedSettings['adjustByHeight'])
-      mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
-
-    var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
-    bounds = mergedSettings['padding'].widenBounds(bounds);
-
-    var notOutOfCellBounds = cellBounds.left <= bounds.left &&
-        cellBounds.getRight() >= bounds.getRight() &&
-        cellBounds.top <= bounds.top &&
-        cellBounds.getBottom() >= bounds.getBottom();
-
-    if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
-      label.clip(cellBounds);
-    } else {
-      label.clip(null);
-    }
-
-    if (!notOutOfCellBounds) {
-      if (this.chart_.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
-        label.clear();
-      } else {
-        if (label.width() != bounds.width || label.height() != bounds.height) {
-          label.dropMergedSettings();
-          label.width(bounds.width).height(bounds.height);
-        }
-        label.draw();
-      }
-    } else {
-      label.draw();
-    }
-  }
-
 };
 
 
@@ -795,10 +822,7 @@ anychart.core.heatMap.series.Base.prototype.finalizeDrawing = function() {
   this.hoverMarkers().markConsistent(anychart.ConsistencyState.ALL);
   this.selectMarkers().markConsistent(anychart.ConsistencyState.ALL);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.doClip();
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
+
 
   this.labels().draw();
 
@@ -809,6 +833,11 @@ anychart.core.heatMap.series.Base.prototype.finalizeDrawing = function() {
   this.labels().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverLabels().markConsistent(anychart.ConsistencyState.ALL);
   this.selectLabels().markConsistent(anychart.ConsistencyState.ALL);
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.doClip();
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+  }
 
   // This check need to prevent finalizeDrawing to mark CONTAINER consistency state in case when series was disabled by
   // series.enabled(false).
@@ -984,20 +1013,27 @@ anychart.core.heatMap.series.Base.prototype.applyHatchFill = function(pointState
 /** @inheritDoc */
 anychart.core.heatMap.series.Base.prototype.applyAppearanceToPoint = function(pointState) {
   var shape = this.getIterator().meta('shape');
-  var strokeThicknessForState = acgraph.vector.getThickness(this.getFinalStroke(true, pointState));
-  var currentThickness = acgraph.vector.getThickness(shape.stroke());
-  if (strokeThicknessForState != currentThickness) {
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-    this.drawPoint(pointState, true);
-    this.drawMarker(pointState);
+  if (shape) {
+    var strokeThicknessForState = acgraph.vector.getThickness(this.getFinalStroke(true, pointState));
+    var currentThickness = acgraph.vector.getThickness(shape.stroke());
+    if (strokeThicknessForState != currentThickness) {
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+      this.drawPoint(pointState, true);
+      this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+    } else {
+      this.colorizeShape(pointState);
+      this.applyHatchFill(pointState);
+    }
     this.drawLabel(pointState);
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-  } else {
-    this.colorizeShape(pointState);
-    this.applyHatchFill(pointState);
     this.drawMarker(pointState);
-    this.drawLabel(pointState);
   }
+};
+
+
+/** @inheritDoc */
+anychart.core.heatMap.series.Base.prototype.finalizePointAppearance = function() {
+  this.labels().draw();
+  this.markers().draw();
 };
 
 
@@ -1315,9 +1351,7 @@ anychart.core.heatMap.series.Base.prototype.getMarkersPosition = function(pointS
  * @protected
  */
 anychart.core.heatMap.series.Base.prototype.drawMarker = function(pointState) {
-  var marker = this.configureMarker(pointState, true);
-  if (marker)
-    marker.draw();
+  this.configureMarker(pointState, true);
 };
 
 

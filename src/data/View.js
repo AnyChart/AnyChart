@@ -434,9 +434,10 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
  * Search on unsorted data by passed x field name [default 'x']. Returns array of indexes of found points.
  * @param {number} fieldValue Value to find.
  * @param {string=} opt_fieldName Field name.
+ * @param {string=} opt_valueFieldName Value field name.
  * @return {Array.<number>} Point indexes.
  */
-anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue, opt_fieldName) {
+anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue, opt_fieldName, opt_valueFieldName) {
   this.ensureConsistent();
 
   if (!this.cachedScatterValues) this.cachedScatterValues = {};
@@ -455,13 +456,14 @@ anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue, opt_fi
     var lastNotNaNValueX = -Infinity;
 
     var fieldName = opt_fieldName || 'x';
+    var valueFieldName = opt_valueFieldName || 'value';
 
     iterator.reset();
     while (iterator.advance()) {
       index = iterator.getIndex();
 
       x = /** @type {number}*/(iterator.get(fieldName));
-      value = iterator.get('value');
+      value = iterator.get(valueFieldName);
 
       if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex) && !isNaN(value) && x > lastNotNaNValueX)
         lastNotNaNValueIndex = index;

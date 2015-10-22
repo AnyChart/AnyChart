@@ -1444,6 +1444,12 @@ anychart.core.SeriesBase.prototype.applyAppearanceToPoint = goog.nullFunction;
 
 
 /**
+ * Finalization point appearance. For drawing labels and markers.
+ */
+anychart.core.SeriesBase.prototype.finalizePointAppearance = goog.nullFunction;
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */
