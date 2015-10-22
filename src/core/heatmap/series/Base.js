@@ -14,14 +14,13 @@ goog.require('anychart.utils');
 
 /**
  * Base class for all heat map series.<br/>
- * @param {!anychart.charts.HeatMap} chart Parent chart.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Series data.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @constructor
  * @extends {anychart.core.SeriesBase}
  */
-anychart.core.heatMap.series.Base = function(chart, opt_data, opt_csvSettings) {
+anychart.core.heatMap.series.Base = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   this.referenceValueNames = ['x', 'y', 'heat'];
@@ -39,12 +38,6 @@ anychart.core.heatMap.series.Base = function(chart, opt_data, opt_csvSettings) {
    * @private
    */
   this.pathsPool_ = null;
-
-  /**
-   * @type {!anychart.charts.HeatMap}
-   * @private
-   */
-  this.chart_ = chart;
 
   this.labels().adjustFontSizeMode('same');
 };
@@ -725,8 +718,9 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
             cellBounds.top <= bounds.top &&
             cellBounds.getBottom() >= bounds.getBottom();
 
+        var chart = this.getChart();
         if (!notOutOfCellBounds) {
-          if (this.chart_.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
+          if (chart.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
             this.labels().clear(index);
           } else {
             if (label.width() != bounds.width || label.height() != bounds.height) {
@@ -738,7 +732,7 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
           label.width(cellBounds.width).height(cellBounds.height);
         }
 
-        if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+        if (chart.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
           label.clip(cellBounds);
         } else {
           label.clip(null);
@@ -782,14 +776,15 @@ anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
           cellBounds.top <= bounds.top &&
           cellBounds.getBottom() >= bounds.getBottom();
 
-      if (this.chart_.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
+      var chart = this.getChart();
+      if (chart.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
         label.clip(cellBounds);
       } else {
         label.clip(null);
       }
 
       if (!notOutOfCellBounds) {
-        if (this.chart_.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
+        if (chart.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
           this.labels().clear(label.getIndex());
         } else {
           if (label.width() != bounds.width || label.height() != bounds.height) {
@@ -865,7 +860,7 @@ anychart.core.heatMap.series.Base.prototype.remove = function() {
  * Calculates grid padding for heat map cells.
  */
 anychart.core.heatMap.series.Base.prototype.calculateGridPadding = function() {
-  var grids = this.chart_.getGrids();
+  var grids = this.getChart().getGrids();
   var maxVerticalThickness = 0;
   var maxHorizontalThickness = 0;
   for (var i = 0, len = grids.length; i < len; i++) {
@@ -915,7 +910,7 @@ anychart.core.heatMap.series.Base.prototype.createFormatProvider = function(opt_
     this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
   this.pointProvider_.applyReferenceValues();
 
-  var colorScale = this.chart_.colorScale();
+  var colorScale = this.getChart().colorScale();
 
   if (colorScale) {
     var iterator = this.getIterator();
@@ -1175,7 +1170,7 @@ anychart.core.heatMap.series.Base.prototype.normalizeColor = function(color, var
       'index': this.getIterator().getIndex(),
       'sourceColor': sourceColor,
       'iterator': this.getIterator(),
-      'colorScale': this.chart_.colorScale()
+      'colorScale': this.getChart().colorScale()
     };
     fill = color.call(scope);
   } else

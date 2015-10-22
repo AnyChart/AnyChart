@@ -910,6 +910,12 @@ anychart.charts.HeatMap.prototype.makeCurrentPoint = function(seriesStatus, even
 
 
 /** @inheritDoc */
+anychart.charts.HeatMap.prototype.getPoint = function(index) {
+  return this.series_.getPoint(index);
+};
+
+
+/** @inheritDoc */
 anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
   var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
 
@@ -1023,12 +1029,12 @@ anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
  * @private
  */
 anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings) {
-  var instance = new anychart.core.heatMap.series.Base(this, data || null, opt_csvSettings);
+  var instance = new anychart.core.heatMap.series.Base(data || null, opt_csvSettings);
   instance.setParentEventTarget(this);
   this.registerDisposable(instance);
   this.series_ = instance;
-  var index = this.series_.length - 1;
-  instance.index(index);
+  instance.setChart(this);
+  instance.index(0);
   var seriesZIndex = anychart.charts.HeatMap.ZINDEX_SERIES;
   instance.setAutoZIndex(seriesZIndex);
   instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
